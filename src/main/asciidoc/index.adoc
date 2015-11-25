@@ -1,6 +1,14 @@
 = Neo4j Driver Documentation {project-version}
+:source-indent: 0
+:icons: font
+ifndef::project-version[:project-version: -version-]
+ifndef::java-root[:java-root: ../../../target/java-driver]
+ifndef::javascript-root[:javascript-root: ../../../target/javascript-driver]
+ifndef::python-root[:python-root: ../../../target/python-driver]
 
 == First Example
+
+TIP: Trying out the tip icon!
 
 [.tabbed-example]
 .Foo bar example
