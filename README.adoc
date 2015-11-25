@@ -1,0 +1,16 @@
+= Neo4j Driver Documentation
+
+== Building
+
+[source,bash]
+----
+mvn
+----
+
+To update the dependencies use:
+
+[source,bash]
+----
+mvn clean compile
+----
+
