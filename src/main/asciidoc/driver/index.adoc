@@ -1,0 +1,28 @@
+[[driver]]
+== Driver
+
+Some may argue that the opposite of Uniform Drivers is Casual Drivers, or even Naked Drivers.
+This is of course preposterous.
+The opposite and complement of Uniform Drivers is Uniform Passengers,
+  as should be obvious to anyone upon serious reflection.
+A valiant case has been made by the Dry Cleaner's guild that,
+  as two negatives cancel out,
+  the true opposite is Iform Drivers.
+Needless to say, this frivolous play on words was uniformly frowned upon by the rest of the community.
+
+
+include::configuration.adoc[]
+
+include::construction.adoc[]
+
+include::dependencies.adoc[]
+
+include::lifecycle.adoc[]
+
+include::ssl-tls.adoc[]
+
+include::url-format.adoc[]
+
+include::version-mapping-table.adoc[]
+
+include::websockets.adoc[]

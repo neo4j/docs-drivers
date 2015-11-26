@@ -1,0 +1,7 @@
+[[session-state]]
+=== Session State
+
+One transaction, one result.
+We don't do pay-it-forward.
+
+You can do parallell sessions, tho.

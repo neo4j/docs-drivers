@@ -1,0 +1,4 @@
+[[syncing]]
+=== Syncing
+
+Pipelining is related to syncing.

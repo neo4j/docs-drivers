@@ -1,0 +1,10 @@
+[[getting-started]]
+== Getting Started
+
+Ready, set, get, start!
+
+include::download.adoc[]
+
+include::setup.adoc[]
+
+include::versioning.adoc[]

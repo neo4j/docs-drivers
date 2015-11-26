@@ -1,0 +1,21 @@
+[[run-statement]]
+=== Run Statement
+
+[.tabbed-example]
+.Foo bar example
+====
+[source,python]
+----
+include::{python-root}/test/test_session.py[lines=52..62]
+----
+
+[source,java]
+----
+include::{java-root}/driver/src/test/java/org/neo4j/driver/v1/StatementTest.java[lines=66..72]
+----
+
+[source,javascript]
+----
+include::{javascript-root}/examples/node.js[lines=64..84]
+----
+====

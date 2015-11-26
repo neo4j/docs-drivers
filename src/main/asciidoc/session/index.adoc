@@ -1,0 +1,12 @@
+[[session]]
+== Session
+
+Therapy, we all need it.
+
+include::monitoring.adoc[]
+
+include::run-statement.adoc[]
+
+include::session-state.adoc[]
+
+include::syncing.adoc[]

@@ -1,23 +1,19 @@
+[[index]]
 = Neo4j Driver Documentation {project-version}
+:stylesheet: {css-dir}/riak.css
 
-== First Example
+include::code-example.adoc[]
 
-[.tabbed-example]
-.Foo bar example
-====
-[source,python]
-----
-include::{python-root}/test/test_session.py[lines=74..81]
-----
+include::driver/index.adoc[]
 
-[source,java]
-----
-include::{java-root}/driver/src/test/java/org/neo4j/driver/v1/StatementTest.java[lines=37..40]
-----
+include::errors/index.adoc[]
 
-[source,javascript]
-----
-include::{javascript-root}/examples/node.js[lines=20..-1]
-----
-====
+include::getting-started/index.adoc[]
 
+include::results/index.adoc[]
+
+include::session/index.adoc[]
+
+include::transaction/index.adoc[]
+
+include::type-mapping/index.adoc[]

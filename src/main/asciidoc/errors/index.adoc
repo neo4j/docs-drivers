@@ -1,0 +1,18 @@
+[[errors]]
+== Errors
+
+Some things can go wrong.
+If that happens, null can be returned.
+Also, boolean can be returned false.
+There can also be FAILURE AKA ACK_FAILURE.
+
+.Example
+[source, cypher]
+----
+MATCH (null)-[:merge]->(true)
+with null.delete as foreach, `true`.false as null
+return 2 + foreach, coalesce(null, 3.1415)
+limit 10;
+----
+
+With this query, you can get error, even when you have 100 heap.

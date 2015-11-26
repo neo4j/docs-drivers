@@ -1,0 +1,5 @@
+[[monitoring]]
+=== Monitoring
+
+You can monitor the network traffic.
+Connect your screen to your modem with a RGB cable.

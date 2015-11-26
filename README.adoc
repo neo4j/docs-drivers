@@ -7,10 +7,27 @@
 mvn
 ----
 
+The HTML output will be generated in _target/html/_, the PDF in _target/pdf/_.
+
 To update the dependencies use:
 
 [source,bash]
 ----
 mvn clean compile
 ----
+
+If you want to skip creating the PDF output, do:
+
+[source,bash]
+----
+mvn -DskipPdf
+----
+
+If you want to skip creating the HTML output, do:
+
+[source,bash]
+----
+mvn -DskipHtml
+----
+
 
