@@ -1,5 +1,6 @@
 *~
 \#*
+build/
 .cache
 .cache-main
 .cache-main
@@ -11,6 +12,7 @@
 .DS_Store
 .externalToolBuilders/
 .factorypath
+.gradle
 .idea
 *.iml
 *.ipr
