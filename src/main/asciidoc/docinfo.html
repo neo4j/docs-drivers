@@ -22,95 +22,65 @@
 <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
 
 <!-- CodeMirror -->
-<link href="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.8.0/codemirror.min.css" rel="stylesheet">
-<link href="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.8.0/theme/neo.min.css" rel="stylesheet">
-<script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.8.0/codemirror.min.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.8.0/addon/runmode/runmode.min.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.8.0/addon/mode/loadmode.min.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.8.0/mode/meta.min.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.8.0/mode/cypher/cypher.js"></script>
+<link href="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.9.0/codemirror.min.css" rel="stylesheet">
+<link href="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.9.0/theme/neo.min.css" rel="stylesheet">
+<script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.9.0/codemirror.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.9.0/addon/runmode/runmode.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.9.0/addon/mode/loadmode.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.9.0/mode/javascript/javascript.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.9.0/mode/shell/shell.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.9.0/mode/python/python.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.9.0/mode/xml/xml.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.9.0/mode/clike/clike.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.9.0/mode/cypher/cypher.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.9.0/mode/properties/properties.min.js"></script>
 
 <script>
-CodeMirror.modeURL = '//cdnjs.cloudflare.com/ajax/libs/codemirror/5.8.0/mode/%N/%N.js';
-
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
-// Modified by the DocGist team.
+// Modified by the Neo4j team.
 
 "use strict";
 
-CodeMirror.colorize = function (collection, defaultMode) {
-    var isBlock = /^(p|li|div|h\\d|pre|blockquote|td)$/;
+CodeMirror.colorize = (function() {
 
-    function textContent(node, out) {
-        if (node.nodeType == 3) return out.push(node.nodeValue);
-        for (var ch = node.firstChild; ch; ch = ch.nextSibling) {
-            textContent(ch, out);
-            if (isBlock.test(node.nodeType)) out.push("\n");
-        }
+  var isBlock = /^(p|li|div|h\\d|pre|blockquote|td)$/;
+
+  function textContent(node, out) {
+    if (node.nodeType == 3) return out.push(node.nodeValue);
+    for (var ch = node.firstChild; ch; ch = ch.nextSibling) {
+      textContent(ch, out);
+      if (isBlock.test(node.nodeType)) out.push("\n");
     }
+  }
 
-    function run(node, mode) {
-        if (mode === "cypher") {
-            // no need to require those modes; we always load them
-            applyMode(node, mode);
-            return;
-        }
-        var found = false;
-        for (var i = 0; i < CodeMirror.modeInfo.length; i++) {
-            if (CodeMirror.modeInfo[i].mode === mode) {
-                found = true;
-                break;
-            }
-        }
-        if (!found) {
-            // avoid loading modes that don't exist
-            return;
-        }
-        CodeMirror.requireMode(mode, function () {
-            applyMode(node, mode);
-        });
-    }
-
-    function applyMode(node, mode) {
-        var text = [];
-        textContent(node, text);
-        node.innerHTML = "";
-        CodeMirror.runMode(text.join(""), mode, node);
-
-        node.className += mode == "cypher" ? " cm-s-neo" : " cm-s-default";
-    }
-
-    if (!collection) collection = document.body.getElementsByTagName("code");
+  return function() {
+    var collection = document.body.getElementsByTagName("code");
 
     for (var i = 0; i < collection.length; ++i) {
-        var node = collection[i];
-        var mode = node.getAttribute("data-lang");
-        if (!mode) {
-            var cls = node.className;
-            if (cls && cls.indexOf("language-") === 0) {
-                mode = cls.substr(9);
-            } else if (cls && cls.indexOf("src-") === 0) {
-                mode = cls.substr(4);
-            } else {
-                mode = defaultMode;
-            }
-        }
-        if (!mode) continue;
+      var theme = " cm-s-default";
+      var node = collection[i];
+      var mode = node.getAttribute("data-lang");
+      if (!mode) continue;
+      if (mode === "cypher") {
+        theme = " cm-s-neo";
+      } else if (mode === "java") {
+        mode = "text/x-java";
+      } else if (mode  === "properties") {
+        mode = "text/x-properties";
+      } else if (mode === "json") {
+        mode = "application/json";
+      }
 
-        var info = CodeMirror.findModeByName(mode);
-        if (info) {
-            mode = info.mode;
-        } else {
-            info = CodeMirror.findModeByMIME(mode);
-            if (info) {
-                mode = info.mode;
-            }
-        }
+      var text = [];
+      textContent(node, text);
+      node.innerHTML = "";
+      CodeMirror.runMode(text.join(""), mode, node);
 
-        run(node, mode);
+      node.className += theme;
     }
-};
+  };
+})();
 
 function tabTheSource($content) {
     var $UL = $('<ul class="nav nav-tabs" role="tablist"/>');
