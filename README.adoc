@@ -2,6 +2,25 @@
 
 == Building
 
+=== Build with Gradle
+
+[source,bash]
+----
+./gradlew
+----
+
+The HTML output will be generated in _build/asciidoc/html5/_, the PDF in _build/asciidoc/pdf/_.
+
+To update the dependencies use:
+
+[source,bash]
+----
+./gradlew clean
+./gradlew
+----
+
+=== Build with Maven
+
 [source,bash]
 ----
 mvn
@@ -29,5 +48,3 @@ If you want to skip creating the HTML output, do:
 ----
 mvn -DskipHtml
 ----
-
-
