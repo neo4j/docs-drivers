@@ -60,7 +60,8 @@ def commonAsciidoctorAttributes = [
 
 def htmlAsciidoctorAttributes = [
         'toc'        : 'left',
-        'stylesheet' : '../css/github.css',
+        'stylesdir'  : '../css/',
+        'stylesheet' : 'github.css',
         'sectanchors': true,
         'docinfo1'   : true
 ]
