@@ -131,7 +131,7 @@
               -->
               <attributes>
                 <toc>left</toc>
-                <stylesheet>./css/github.css</stylesheet>
+                <stylesheet>../css/github.css</stylesheet>
                 <sectanchors>true</sectanchors>
                 <docinfo1>true</docinfo1>
               </attributes>

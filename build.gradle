@@ -3,13 +3,14 @@ import org.ajoberstar.grgit.*
 defaultTasks 'asciidoctor'
 
 def projectVersion = '1.0'
-def asciidctorjVersion = '1.5.3.2'
+def asciidoctorjVersion = '1.5.3.2'
 def driverLanguahes = ['java', 'javascript', 'python']
 
 buildscript {
     dependencies {
         ext {
             gradleVersion = '2.9'
+            jrubyVersion = '1.7.23'
             asciidoctorPluginVersion = '1.5.3'
             asciidoctorjPdfVersion = '1.5.0-alpha.10.1'
             gradleGitVersion = '1.3.2'
@@ -18,6 +19,7 @@ buildscript {
         classpath "org.asciidoctor:asciidoctor-gradle-plugin:$asciidoctorPluginVersion"
         classpath "org.asciidoctor:asciidoctorj-pdf:$asciidoctorjPdfVersion"
         classpath "org.ajoberstar:gradle-git:$gradleGitVersion"
+        classpath "org.jruby:jruby-complete:$jrubyVersion"
     }
 
     repositories {
@@ -58,7 +60,7 @@ def commonAsciidoctorAttributes = [
 
 def htmlAsciidoctorAttributes = [
         'toc'        : 'left',
-        'stylesheet' : './css/github.css',
+        'stylesheet' : '../css/github.css',
         'sectanchors': true,
         'docinfo1'   : true
 ]
@@ -70,7 +72,7 @@ def pdfAsciidoctorAttributes = [
 apply plugin: 'org.asciidoctor.convert'
 
 asciidoctorj {
-    version = asciidctorjVersion
+    version = asciidoctorjVersion
 }
 
 asciidoctor {
@@ -89,3 +91,8 @@ asciidoctor {
     attributes commonAsciidoctorAttributes
     attributes pdfAsciidoctorAttributes
 }
+
+task buildScriptDependencies(type: org.gradle.api.tasks.diagnostics.DependencyReportTask) {
+    configurations = project.buildscript.configurations
+}
+
