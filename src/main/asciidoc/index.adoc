@@ -1,6 +1,5 @@
 [[index]]
 = Neo4j Driver Documentation {project-version}
-:stylesheet: {css-dir}/riak.css
 :source-indent: 0
 :icons: font
 ifndef::project-version[:project-version: -version-]

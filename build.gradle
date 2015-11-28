@@ -58,7 +58,7 @@ def commonAsciidoctorAttributes = [
 
 def htmlAsciidoctorAttributes = [
         'toc'        : 'left',
-        'css-dir'    : './css',
+        'stylesheet' : './css/github.css',
         'sectanchors': true,
         'docinfo1'   : true
 ]
@@ -78,12 +78,6 @@ asciidoctor {
     sourceDir "${projectDir}/src/main/asciidoc"
     sources {
         include 'index.adoc'
-    }
-    resources {
-        from(sourceDir) {
-            include 'images/**'
-            include 'css/**'
-        }
     }
     attributes commonAsciidoctorAttributes
     attributes htmlAsciidoctorAttributes

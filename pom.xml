@@ -28,7 +28,6 @@
     <docs.java-root>${project.build.directory}/java-driver</docs.java-root>
     <docs.javascript-root>${project.build.directory}/javascript-driver</docs.javascript-root>
     <docs.python-root>${project.build.directory}/python-driver</docs.python-root>
-    <docs.css-dir>./css</docs.css-dir>
   </properties>
 
   <build>
@@ -132,7 +131,7 @@
               -->
               <attributes>
                 <toc>left</toc>
-                <css-dir>${docs.css-dir}</css-dir>
+                <stylesheet>./css/github.css</stylesheet>
                 <sectanchors>true</sectanchors>
                 <docinfo1>true</docinfo1>
               </attributes>
