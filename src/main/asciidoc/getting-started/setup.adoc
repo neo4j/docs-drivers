@@ -1,4 +1,0 @@
-[[setup]]
-=== Setup
-
-Yes, that's a good idea.

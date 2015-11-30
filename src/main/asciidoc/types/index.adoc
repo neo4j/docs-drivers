@@ -1,0 +1,35 @@
+[[types]]
+== Types
+
+The Neo4j Public Type System:
+
+* _string_
+* _number_
+* _boolean_
+* _Node_
+* _Relationship_
+* _Path_
+
+.Language mapping example
+====
+[source,cs]
+----
+COMING SOON
+----
+
+[source,java]
+----
+COMING SOON
+----
+
+[source,javascript]
+----
+COMING SOON
+----
+
+[source,python]
+----
+COMING SOON
+----
+====
+

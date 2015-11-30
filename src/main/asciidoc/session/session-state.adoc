@@ -1,7 +1,20 @@
 [[session-state]]
 === Session State
 
-One transaction, one result.
-We don't do pay-it-forward.
+A session can be in three states:
+_READY_, _RESULT_, and _FAILED_.
 
-You can do parallell sessions, tho.
+A session begins in _READY_ mode.
+When a query is executed, the session changes states.
+
+If execution is successful, the session enters _RESULT_ state.
+The results are available for consumption.
+When the entire result stream is consumed, the session returns to _READY_ state.
+
+If execution is not successful, the session enters _FAILED_ state.
+
+// TODO:
+// 1) How does the user handle the failed state?
+// 2) Document the _IGNORED_ that happens when client has not acknoledged _FAILED_ state.
+
+image::bolt-session-state-machine.svg[]

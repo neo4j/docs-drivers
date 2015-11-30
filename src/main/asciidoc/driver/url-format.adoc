@@ -1,6 +1,8 @@
 [[url-format]]
 === URL Format
 
-....
-$url = trim($url, '!"#$%&\'()*+,-./@:;<=>[\\]^_`{|}~');
-....
+The URL for a Bolt Driver follows normal URL patterns, with `scheme://hostname`.
+The scheme is `bolt`, so a valid URL could be `bolt://host.domain`.
+
+// TODO: Should we use `bolt://localhost`?
+// I assume for a majority of users that will be the actual URL.

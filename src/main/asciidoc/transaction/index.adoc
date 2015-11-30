@@ -1,27 +1,27 @@
 [[transactions]]
 == Transactions
 
+Read about how transactions in general work in the http://neo4j.com/docs/stable/transactions.html[Neo4j Manual].
+
 [[transactions-state]]
 === State
 
-.The state of the machine
-image::bolt-state-machine.svg[]
+
 
 
 [[transactions-implicit-transcation]]
 === Implicit Transcation
 
-If you transact you will be implicated.
+On `Session.run()` an implicit transaction is created.
 
 
 [[transactions-begin-commit-rollback]]
 === BEGIN, COMMIT, ROLLBACK
 
-It's what they shout at Daft Punk concerts.
+
 
 
 [[transactions-nested-transactions]]
 === Nested Transactions
 
-They are nice, but we don't do them yet.
-We probably should tell you how to deal with that.
+COMING SOON

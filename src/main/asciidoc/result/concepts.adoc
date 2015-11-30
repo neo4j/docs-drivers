@@ -1,0 +1,25 @@
+[[concepts]]
+=== Concepts
+
+Every result is a stream of <<term-record, records>>.
+A record is an ordered map of keys and values.
+These ordered fields (key-value pairs) can be accessed
+  by position (integer) by key (string).
+
+
+[[record-view]]
+==== Record View
+
+View the records.
+
+[[record-cursor]]
+==== Record Cursor
+
+Curse the records.
+
+
+TODO: Value types?
+
+strings, numbers, nodes, relationships, paths
+
+https://github.com/neo-technology/driver-compliance-kit/blob/08-results/08-results-synchronous.adoc

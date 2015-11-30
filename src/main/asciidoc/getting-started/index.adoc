@@ -1,10 +1,8 @@
 [[getting-started]]
 == Getting Started
 
-Ready, set, get, start!
+To help you get up and running quickly.
 
-include::download.adoc[]
+include::get-the-driver.adoc[]
 
-include::setup.adoc[]
-
-include::versioning.adoc[]
+include::use-the-driver.adoc[]

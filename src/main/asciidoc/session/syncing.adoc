@@ -1,4 +1,5 @@
 [[syncing]]
 === Syncing
 
+N/A
 Pipelining is related to syncing.

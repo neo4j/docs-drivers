@@ -1,4 +1,0 @@
-[[introspection]]
-=== Introspection
-
-Too deep for me, I'm afraid.

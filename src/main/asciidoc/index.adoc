@@ -7,18 +7,21 @@ ifndef::java-root[:java-root: ../../../target/java-driver]
 ifndef::javascript-root[:javascript-root: ../../../target/javascript-driver]
 ifndef::python-root[:python-root: ../../../target/python-driver]
 
-include::code-example.adoc[]
-
-include::driver/index.adoc[]
-
-include::errors/index.adoc[]
+The Uniform Language Drivers are Drivers for the http://neo4j.com/[Neo4j Database]
+  that use the <<term-bolt, `Bolt`>> protocol.
 
 include::getting-started/index.adoc[]
 
-include::results/index.adoc[]
+include::driver/index.adoc[]
 
 include::session/index.adoc[]
 
 include::transaction/index.adoc[]
 
-include::type-mapping/index.adoc[]
+include::result/index.adoc[]
+
+include::types/index.adoc[]
+
+include::errors/index.adoc[]
+
+include::terminology.adoc[]

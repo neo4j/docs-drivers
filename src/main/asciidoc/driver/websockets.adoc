@@ -1,4 +1,26 @@
 [[websockets]]
 === Websockets
 
-Put a websocket in it, will ya
+REMOVE
+
+Accessed on the same port, since we're multiplexing.
+Functionally speaking we have four different ways of connecting
+
+Standard TCP
+    plain
+    encrypted
+Websockets
+    plain
+    encrypted
+
+Same functionality.
+Tradeoff: plain sockets are faster (SSL ~20% slower) so useful if you are in a _safe environment_.
+
+
+Standard TCP sockets vs Websockts
+default: Standard
+
+Websockets exist for enfironment where there is no standard socket library, (i.e. the browser).
+
+All drivers support TLS or Plain
+All drivers support one or the other of Standard/Websockets, not necessarily both.

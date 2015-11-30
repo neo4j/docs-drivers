@@ -1,7 +1,7 @@
 [[session]]
 == Session
 
-Therapy, we all need it.
+All interacting with the server happens in a session.
 
 include::monitoring.adoc[]
 

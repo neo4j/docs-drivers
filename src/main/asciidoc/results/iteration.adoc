@@ -1,4 +1,0 @@
-[[iteration]]
-=== Iteration
-
-Rinse, repeat.

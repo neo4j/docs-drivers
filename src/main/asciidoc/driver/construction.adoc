@@ -1,53 +1,35 @@
 [[construction]]
 === Construction
 
-[verse, No Doubt, Construction Deconstruction @ Everything In Time]
-____
-His accent serenades me and presses at the door
-Broken promise to be around for my mind war
-And my accomplishment's interrogating me
-Today's become tomorrow before I wanted it to be
-And desperate discussions
-The start of the destruction
-Our sign, in my mind
-I'll be fine
-I'll be fine
+// TODO:
+A Driver object is created from a graph database singleton.
 
-'Cause I'm under construction everyone
-So you'll have to mind the mess
-I'm under some construction
+[CAUTION]
+--
+Do we have anything more to say about dependencies that we haven't said in the getting started section?
+--
 
-I always had to try harder, I never really could keep up
-Sitting in the corner with my illness and bad luck
-But in this humble place I'm feeling like red wine
-And I hope to get better with some time
-I'll be fine
-With some time
-I'll be fine
+// TODO:
+[.tabbed-example]
+.Creating a Driver object
+====
+[source,cs]
+----
+COMING SOON
+----
 
-'Cause I'm under construction everyone
-So you'll have to mind the mess
-I'm under some construction
+[source,java]
+----
+include::{java-root}/driver/src/test/java/org/neo4j/driver/v1/StatementTest.java[lines=37..40]
+----
 
-Construction
-Modification
-Motivation
-Of construction
+[source,javascript]
+----
+include::{javascript-root}/examples/node.js[lines=20..-1]
+----
 
-And the rituals that soothe and disgust me will be gone
-With some time
-I'll be fine
-With some time
-I'll be fine
-I'll be fine
-
-I'm under construction everyone
-So you'll have to mind the mess
-I'm under some construction
-I'm under construction everyone
-So you'll have to mind the mess
-I'm under some construction
-Under construction
-Construction
-Feel better with some construction
-____
+[source,python]
+----
+include::{python-root}/test/test_session.py[lines=74..81]
+----
+====

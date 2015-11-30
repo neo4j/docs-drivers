@@ -1,0 +1,7 @@
+[[plan-and-profile]]
+=== Plan + Profile
+
+Rename to "Metadata"?
+
+The result contains metadata.
+Describe it here.

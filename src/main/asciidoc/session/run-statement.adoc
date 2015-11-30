@@ -1,12 +1,15 @@
 [[run-statement]]
 === Run Statement
 
+TODO: This code example should be the first thing on the Session page.
+  Also, the heading is probably a waste.
+
 [.tabbed-example]
-.Foo bar example
+.Run statement
 ====
-[source,python]
+[source,cs]
 ----
-include::{python-root}/test/test_session.py[lines=52..62]
+COMING SOON
 ----
 
 [source,java]
@@ -17,5 +20,10 @@ include::{java-root}/driver/src/test/java/org/neo4j/driver/v1/StatementTest.java
 [source,javascript]
 ----
 include::{javascript-root}/examples/node.js[lines=64..84]
+----
+
+[source,python]
+----
+include::{python-root}/test/test_session.py[lines=52..62]
 ----
 ====

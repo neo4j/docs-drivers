@@ -1,5 +1,0 @@
-[[versioning]]
-=== Versioning
-:version-the-tables: version-mapping-table.adoc
-
-Please see <<version-mapping-table,the other section about this>>.

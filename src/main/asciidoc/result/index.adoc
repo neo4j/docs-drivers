@@ -1,0 +1,10 @@
+[[result]]
+== Result
+
+Executing a statement returns a result.
+
+include::concepts.adoc[]
+
+include::processing.adoc[]
+
+include::plan-and-profile.adoc[]

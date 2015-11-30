@@ -1,0 +1,46 @@
+[[use-the-driver]]
+=== Use the driver
+
+Each driver has a database object for creating a driver.
+To use a driver, follow the simple pattern:
+
+1. Ask the database object for a new driver.
+2. Ask the driver object for a new session.
+3. Use the session object to run statements.
+   It returns an object representing the results.
+4. Process the results.
+
+[NOTE]
+Remember to exhaust the returned results so that the session is ready to run the next statement!
+
+[.tabbed-example]
+.Usage example
+====
+[source,cs]
+----
+COMING SOON
+----
+
+[source,java]
+----
+include::{java-root}/driver/src/test/java/org/neo4j/driver/v1/StatementTest.java[lines=37..40]
+----
+
+[source,javascript]
+----
+include::{javascript-root}/examples/node.js[lines=20..-1]
+----
+
+[source,python]
+----
+include::{python-root}/test/test_session.py[lines=74..81]
+----
+====
+
+As seen above, it is possible to run statements directly from the session object.
+The session will take care of opening and closing the transaction.
+The session also provides the opportunity for a user to manage the transaction.
+When explicitly told to begin a new transaction,
+  the session will return the transaction object,
+  allowing fine-grained transaction control.
+See the <<transactions, transaction section>> for details.

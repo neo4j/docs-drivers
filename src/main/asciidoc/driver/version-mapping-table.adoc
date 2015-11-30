@@ -1,4 +1,0 @@
-[[version-mapping-table]]
-=== Version Mapping Table
-
-Let's map all the version tables.

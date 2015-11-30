@@ -1,4 +1,0 @@
-[[plan-and-profile]]
-=== Plan + Profile
-
-You can profile your queries and get the execution plan returned.

@@ -1,4 +1,10 @@
 [[ssl-tls]]
 === SSL / TLS
 
-Is it secret, is it safe?
+Traffic using the Uniform Language Drivers is encrypted by default,
+  using SSL/TLS.
+If you want unencrpyted communication you can configure the Neo4j server to listen to a different port.
+Please see \{some-handy-attribute-for-the-correct-page-in-the-manual\} for information on how to do that.
+
+// It looks like there will be no way to turn on/off in Driver.
+// Possibly not mention this much beyond: "Please see server docs for configuration."

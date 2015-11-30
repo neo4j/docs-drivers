@@ -1,11 +1,5 @@
 [[configuration]]
 === Configuration
 
-1. an arrangement of parts or elements in a particular form, figure, or combination:
-   _the unrepeatable configuration of the stars at the moment of your birth_ | _the broad configuration of the economy remains capitalist._
-** `Computing` the arrangement or set-up of the hardware and software that make up a computer system.
-    _the PC comes with a removable hard disk drive as part of the standard configuration._
-** `Chemistry` the fixed three-dimensional relationship of the atoms in a molecule, defined by the bonds between them.
-    Compare with CONFORMATION.
-2. `Psychology` another term for GESTALT.
-
+// TODO:
+(N/A, how to configure your Driver based on your server configuration.)
