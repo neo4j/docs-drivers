@@ -87,10 +87,12 @@ asciidoctor {
 }
 asciidoctor.dependsOn 'git-clone'
 
-asciidoctor {
-    backends 'pdf'
-    attributes commonAsciidoctorAttributes
-    attributes pdfAsciidoctorAttributes
+if (project.hasProperty('pdf')) {
+    asciidoctor {
+        backends 'pdf'
+        attributes commonAsciidoctorAttributes
+        attributes pdfAsciidoctorAttributes
+    }
 }
 
 task buildScriptDependencies(type: org.gradle.api.tasks.diagnostics.DependencyReportTask) {
