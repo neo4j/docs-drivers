@@ -2,12 +2,10 @@
 === Lifecycle
 
 // TODO:
-A `Driver` object can be created from your database object.
+A driver is created from the database object.
 It typically lives for the duration of your application.
-Use a `Driver` to create `Session`s.
+Use a driver to create sessions.
 
 The only reason to create more than one driver would be
-  if you have multiple destinations/URLs to create sessions for.
-(For HA purposes, or pulling data out of one database and pushing into another.)
-
-
+  if there are multiple destinations/URLs for which to create sessions.
+(For HA purposes, or to pull data out of one database and push it into another.)

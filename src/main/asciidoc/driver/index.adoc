@@ -1,15 +1,8 @@
 [[driver]]
 == Driver
 
-[CAUTION]
---
-- remove 'your'
-- don't talk about code here, this is conceptual
---
-
-The `Driver` is your primary object of interest.
-It usually lives for the duration of your application,
-  and from it you create `Session` to use for executing statements on the database.
+A driver usually lives for the duration of an application.
+It controls communication with the Neo4j server and spawns sessions.
 
 include::dependencies.adoc[]
 
@@ -17,10 +10,4 @@ include::construction.adoc[]
 
 include::lifecycle.adoc[]
 
-include::url-format.adoc[]
-
 include::configuration.adoc[]
-
-include::ssl-tls.adoc[]
-
-include::websockets.adoc[]

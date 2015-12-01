@@ -1,5 +1,32 @@
 [[configuration]]
 === Configuration
 
-// TODO:
-(N/A, how to configure your Driver based on your server configuration.)
+The only configuration necessery to use a driver is a Bolt URL.
+
+
+[[url-format]]
+==== URL Format
+
+The Bolt URL follows the standard URL pattern of `scheme://hostname:port`.
+The point of configuration is contained in the scheme.
+The simplest Bolt URL uses `bolt` for schema on the default Neo4j port:
+`bolt://localhost:7474`.
+
+To connect to Neo4j on a different port,
+  to disable default security,
+  or to manually control the use of a Websocket,
+  the server must be configured.
+The driver is then configured to connect to the server in the desired way by altering the URL.
+`bolt+ssl://server:1234`
+
+
+[[ssl-tls]]
+==== SSL / TLS
+
+Traffic using the Uniform Language Drivers is encrypted by default,
+  using SSL/TLS.
+If you want unencrpyted communication you can configure the Neo4j server to listen to a different port.
+Please see \{some-handy-attribute-for-the-correct-page-in-the-manual\} for information on how to do that.
+
+// It looks like there will be no way to turn on/off in Driver.
+// Possibly not mention this much beyond: "Please see server docs for configuration."
