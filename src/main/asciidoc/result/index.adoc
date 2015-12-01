@@ -7,4 +7,4 @@ include::concepts.adoc[]
 
 include::processing.adoc[]
 
-include::plan-and-profile.adoc[]
+include::metadata.adoc[]

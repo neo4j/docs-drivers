@@ -1,0 +1,5 @@
+[[metadata]]
+=== Metadata
+
+It is possible to retrieve metadata along with the result stream.
+An example is the query plan obtained by prepending a `PROFILE` or `EXPLAIN` keyword to the Cypher query.

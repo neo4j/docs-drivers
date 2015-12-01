@@ -3,23 +3,86 @@
 
 Every result is a stream of <<term-record, records>>.
 A record is an ordered map of keys and values.
-These ordered fields (key-value pairs) can be accessed
-  by position (integer) by key (string).
+These key-value pairs are called "fields".
+Because the fields are both keyed and ordered,
+  the value of a field can be accessed either by position (_0-based integer_) or by key (_string_).
 
+[NOTE]
+--
+To access values by position, use a 0-based integer.
+To access values by key, use a string.
+--
+
+Views and cursors are the primary way of accessing results.
 
 [[record-view]]
 ==== Record View
 
-View the records.
+The record view provides access to the individual result record.
+
+[.tabbed-example]
+.Record view example
+====
+[source,cs]
+----
+COMING SOON
+----
+
+[source,java]
+----
+RecordView r = ...;
+for (String key : r.keys())
+{
+    System.out.println(key + ": " + r.value(key));
+}
+----
+
+[source,javascript]
+----
+COMING SOON
+----
+
+[source,python]
+----
+COMING SOON
+----
+====
+
 
 [[record-cursor]]
 ==== Record Cursor
 
-Curse the records.
+A record cursor provides access to the record stream.
+It is a record view with a dynamically changing underlying record.
+
+[.tabbed-example]
+.Record cursor example
+====
+[source,cs]
+----
+COMING SOON
+----
+
+[source,java]
+----
+RecordView r = ...;
+for (String key : r.keys())
+{
+    System.out.println(key + ": " + r.value(key));
+}
+----
+
+[source,javascript]
+----
+COMING SOON
+----
+
+[source,python]
+----
+COMING SOON
+----
+====
 
 
-TODO: Value types?
-
-strings, numbers, nodes, relationships, paths
 
 https://github.com/neo-technology/driver-compliance-kit/blob/08-results/08-results-synchronous.adoc
