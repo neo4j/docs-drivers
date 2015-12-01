@@ -39,6 +39,13 @@ To update the dependencies use:
 ./gradlew
 ----
 
+Execute a new build automatically as soon as there are file changes:
+
+[source,bash]
+----
+./gradlew -t asciidoctor
+----
+
 === Build with Maven
 
 This requires {maven-download}[Apache Maven] 3.x to be installed on the system.
