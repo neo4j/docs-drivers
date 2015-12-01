@@ -17,8 +17,6 @@ include::driver/index.adoc[]
 
 include::session/index.adoc[]
 
-include::transaction/index.adoc[]
-
 include::result/index.adoc[]
 
 include::types/index.adoc[]

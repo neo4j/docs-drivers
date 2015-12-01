@@ -1,8 +1,7 @@
 [[run-statement]]
 === Run Statement
 
-TODO: This code example should be the first thing on the Session page.
-  Also, the heading is probably a waste.
+When the session runs a statement directly, it creates an implicit transaction.
 
 [.tabbed-example]
 .Run statement

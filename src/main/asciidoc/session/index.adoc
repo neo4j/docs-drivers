@@ -3,10 +3,10 @@
 
 All interacting with the server happens in a session.
 
-include::monitoring.adoc[]
-
 include::run-statement.adoc[]
 
 include::session-state.adoc[]
 
 include::syncing.adoc[]
+
+include::transactions.adoc[]
