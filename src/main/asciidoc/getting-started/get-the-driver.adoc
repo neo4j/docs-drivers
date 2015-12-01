@@ -18,13 +18,11 @@ To dowload the driver do
 [.tabbed-example]
 .Download
 ====
-[source, cs]
-----
-COMING SOON
-----
+[.include-with-java]
+--
+When using Maven, do like this:
 
-// [source,java+maven]
-[source,java]
+[source,xml]
 ----
 <dependencies>
     <dependency>
@@ -49,40 +47,30 @@ COMING SOON
 </repositories>
 ----
 
-// [source,java]
-// ----
-// NB this is not a valid build script
-// defaultTasks 'driver'
+For Gradle or Grails, this is how to add the dependency:
 
-// def projectVersion = '1.0'
-
-// buildscript {
-//     dependencies {
-//         ext {
-//             gradleVersion = '2.9'
-//             neo4jVersion = '2.3.1'
-//             neo4jDriverVersion = '1.0.0-SNAPSHOT'
-//         }
-
-//         classpath "org.neo4j:neo4j:$neo4jVersion"
-//         classpath "org.neo4j.driver:neo4j-java-driver:$neo4jDriverVersion"
-//     }
-
-//     repositories {
-//         jcenter()
-//     }
-// }
-
-// ----
+[source,groovy]
+----
+compile 'org.neo4j.driver:neo4j-java-driver:1.0-SNAPSHOT'
+----
+--
 
 [source,javascript]
 ----
 var neo4j = require('lib/neo4j');
 ----
 
-[source,python]
+[.include-with-csharp]
+--
+NOTE: Coming soon!
+--
+
+[.include-with-python]
+--
+[source,shell]
 ----
 pip install neo4j-driver
 ----
+--
 ====
 
