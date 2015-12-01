@@ -60,10 +60,11 @@ def commonAsciidoctorAttributes = [
 
 def htmlAsciidoctorAttributes = [
         'toc'        : 'left',
-        'stylesdir'  : '../css/',
+        'stylesdir'  : 'css/',
         'stylesheet' : 'github.css',
         'sectanchors': true,
-        'docinfo1'   : true
+        'docinfo1'   : true,
+        'linkcss'    : true
 ]
 
 def pdfAsciidoctorAttributes = [
