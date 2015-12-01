@@ -1,0 +1,14 @@
+.listingblock pre, .literalblock pre, .listingblock pre[class="highlight"], .listingblock pre[class^="highlight "], .listingblock pre.CodeRay, .listingblock pre.prettyprint {
+    background: #f9f9f9;
+    border: 1px solid #dddddd;;
+}
+#header, #content, #footnotes {
+    max-width: 800px;
+}
+html, body {
+    font-size: 16px;
+}
+#content ul.nav-tabs li {
+    background: none;
+    padding-left: 0;
+}

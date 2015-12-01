@@ -82,6 +82,15 @@ asciidoctor {
     sources {
         include 'index.adoc'
     }
+    resources {
+        from(sourceDir) {
+            include 'images/**'
+        }
+        from(sourceDir.getParentFile()) {
+            include 'css/**'
+            include 'javascript/**'
+        }
+    }
     attributes commonAsciidoctorAttributes
     attributes htmlAsciidoctorAttributes
 }

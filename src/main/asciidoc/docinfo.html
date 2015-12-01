@@ -18,144 +18,14 @@
 <script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.9.0/mode/cypher/cypher.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.9.0/mode/properties/properties.min.js"></script>
 
+<script src="javascript/colorize.js"></script>
+<script src="javascript/tabs.js"></script>
+
 <script>
-// CodeMirror, copyright (c) by Marijn Haverbeke and others
-// Distributed under an MIT license: http://codemirror.net/LICENSE
-// Modified by the Neo4j team.
-
-"use strict";
-
-CodeMirror.colorize = (function() {
-
-  var isBlock = /^(p|li|div|h\\d|pre|blockquote|td)$/;
-
-  function textContent(node, out) {
-    if (node.nodeType == 3) return out.push(node.nodeValue);
-    for (var ch = node.firstChild; ch; ch = ch.nextSibling) {
-      textContent(ch, out);
-      if (isBlock.test(node.nodeType)) out.push("\n");
-    }
-  }
-
-  return function() {
-    var collection = document.body.getElementsByTagName("code");
-
-    for (var i = 0; i < collection.length; ++i) {
-      var theme = " cm-s-default";
-      var node = collection[i];
-      var mode = node.getAttribute("data-lang");
-      if (!mode) continue;
-      if (mode === "cypher") {
-        theme = " cm-s-neo";
-      } else if (mode === "java") {
-        mode = "text/x-java";
-      } else if (mode  === "properties") {
-        mode = "text/x-properties";
-      } else if (mode === "json") {
-        mode = "application/json";
-      }
-
-      var text = [];
-      textContent(node, text);
-      node.innerHTML = "";
-      CodeMirror.runMode(text.join(""), mode, node);
-
-      node.className += theme;
-    }
-  };
-})();
-
-function tabTheSource($content) {
-    var $UL = $('<ul class="nav nav-tabs" role="tablist"/>');
-    var $LI = $('<li role="presentation"/>');
-    var $A = $('<a role="tab" data-toggle="tab" style="text-decoration:none;"/>');
-    var $WRAPPER = $('<div class="tab-content content"/>');
-    var snippets = [];
-    var languageEventElements = {};
-    $('div.tabbed-example', $content).each(function () {
-        var $exampleBlock = $(this);
-        var title = $exampleBlock.children('div.title', this).first().text();
-        var languages = [];
-        var $languageBlocks = {};
-        $('div.listingblock', this).each(function () {
-            var language = $('code', this).data('lang');
-            languages.push(language);
-            $languageBlocks[language] = $(this);
-        });
-        if (languages.length > 1) {
-            snippets.push({
-                '$exampleBlock': $exampleBlock,
-                'languages': languages,
-                '$languageBlocks': $languageBlocks
-            });
-        }
-    });
-    var idNum = 0;
-    for (var ix = 0; ix < snippets.length; ix++) {
-        var snippet = snippets[ix];
-        var languages = snippet.languages;
-        var $languageBlocks = snippet.$languageBlocks;
-        var $exampleBlock = snippet.$exampleBlock;
-        var idBase = 'tabbed-example-' + idNum++;
-        var $wrapper = $WRAPPER.clone();
-        var $ul = $UL.clone();
-        for (var i = 0; i < languages.length; i++) {
-            var language = languages[i];
-            var $content = $($languageBlocks[language]);
-            var id;
-            if ($content.attr('id')) {
-                id = $content.attr('id');
-            } else {
-                id = idBase + '-' + language;
-                $content.attr('id', id);
-            }
-            $content.addClass('tab-pane').css('position', 'relative');
-            var $li = $LI.clone();
-            var $a = $A.clone();
-            $a.attr('href', '#' + id).text(language).data('lang', language).on('shown.bs.tab', function (e) {
-                var language = $(e.target).data('lang');
-                var $elements = languageEventElements[language];
-                for (var j = 0; j < $elements.length; j++) {
-                    $elements[j].tab('show');
-                }
-            });
-            if (language in languageEventElements) {
-                languageEventElements[language].push($a);
-            } else {
-                languageEventElements[language] = [$a];
-            }
-            $wrapper.append($content);
-            if (i === 0) {
-                $li.addClass('active');
-                $content.addClass('active');
-            }
-            $li.append($a);
-            $ul.append($li);
-        }
-        $exampleBlock.children('div.content').first().replaceWith($ul);
-        $exampleBlock.append($wrapper);
-    }
-}
-
 $(document).ready(function() {
   CodeMirror.colorize();
   tabTheSource($('#content'));
 });
 </script>
 
-<style>
-    .listingblock pre, .literalblock pre, .listingblock pre[class="highlight"], .listingblock pre[class^="highlight "], .listingblock pre.CodeRay, .listingblock pre.prettyprint {
-        background: #f9f9f9;
-        border: 1px solid #dddddd;;
-    }
-    #header, #content, #footnotes {
-        max-width: 800px;
-    }
-    html, body {
-        font-size: 16px;
-    }
-    #content ul.nav-tabs li {
-        background: none;
-        padding-left: 0;
-    }
-</style>
+<link href="css/extra.css" rel="stylesheet">
