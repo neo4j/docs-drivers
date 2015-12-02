@@ -1,10 +1,10 @@
 [[result]]
-== Result
+= Result
 
 Executing a statement returns a result.
 
-include::concepts.adoc[]
+include::concepts.adoc[leveloffset=+1]
 
-include::processing.adoc[]
+include::processing.adoc[leveloffset=+1]
 
-include::metadata.adoc[]
+include::metadata.adoc[leveloffset=+1]

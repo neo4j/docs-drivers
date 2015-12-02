@@ -1,19 +1,14 @@
 [[get-the-driver]]
-=== Get the driver
+= Get the driver
+
+:maven-artifact-info: http://search.maven.org/#artifactdetails%7Corg.neo4j.driver%7Cneo4j-java-driver%7C{java-driver-version}%7Cjar
 
 You can download the driver source or acquire it with one of the dependency managers of your language.
 
-[[versions]]
-==== Versions
+[[download]]
+== Download
 
-Each version of a Driver supports up to four different versions of the Bolt protocol.
-This means, that for immediate future each driver version will work with all available version of the protocol.
-Once we start seeing Drivers that no longer support older versions of Bolt,
-  we will make this information available here as an accessible overview.
-
-==== Download
-
-To dowload the driver do
+To download the driver do
 
 [.tabbed-example]
 .Download
@@ -22,48 +17,32 @@ To dowload the driver do
 --
 When using Maven, do like this:
 
-[source,xml]
+[source,xml,subs="attributes,specialcharacters"]
 ----
 <dependencies>
     <dependency>
         <groupId>org.neo4j.driver</groupId>
         <artifactId>neo4j-java-driver</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>{java-driver-version}</version>
     </dependency>
 </dependencies>
-
-<repositories>
-    <repository>
-        <id>neo4j-snapshot-repository</id>
-        <name>Neo4j Maven 2 snapshot repository</name>
-        <url>http://m2.neo4j.org/content/repositories/snapshots</url>
-        <snapshots>
-            <enabled>true</enabled>
-        </snapshots>
-        <releases>
-            <enabled>false</enabled>
-        </releases>
-    </repository>
-</repositories>
 ----
 
 For Gradle or Grails, this is how to add the dependency:
 
-[source,groovy]
+[source,groovy,subs="attributes,specialcharacters"]
 ----
-compile 'org.neo4j.driver:neo4j-java-driver:1.0-SNAPSHOT'
+compile 'org.neo4j.driver:neo4j-java-driver:{java-driver-version}'
 ----
+
+For other build systems, see {maven-artifact-info}[information available at Maven Central].
+
 --
 
 [source,javascript]
 ----
 var neo4j = require('lib/neo4j');
 ----
-
-[.include-with-csharp]
---
-NOTE: Coming soon!
---
 
 [.include-with-python]
 --
@@ -73,4 +52,13 @@ pip install neo4j-driver
 ----
 --
 ====
+
+[[versions]]
+== Versions
+
+// TODO Add a table/list of supported versions here.
+
+Each version of a Driver supports up to four different versions of the Bolt protocol.
+This means, that for immediate future each driver version will work with all available version of the protocol.
+Once we start seeing Drivers that no longer support older versions of Bolt, we will make this information available here as an accessible overview.
 

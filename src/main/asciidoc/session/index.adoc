@@ -1,12 +1,12 @@
 [[session]]
-== Session
+= Session
 
-All interacting with the server happens in a session.
+All interaction with the server happens in a session.
 
-include::run-statement.adoc[]
+include::run-statement.adoc[leveloffset=+1]
 
-include::session-state.adoc[]
+include::session-state.adoc[leveloffset=+1]
 
-include::syncing.adoc[]
+include::syncing.adoc[leveloffset=+1]
 
-include::transactions.adoc[]
+include::transactions.adoc[leveloffset=+1]

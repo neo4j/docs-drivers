@@ -1,33 +1,27 @@
 [[concepts]]
-=== Concepts
+= Concepts
 
 Every result is a stream of <<term-record, records>>.
 A record is an ordered map of keys and values.
-These key-value pairs are called "fields".
-Because the fields are both keyed and ordered,
-  the value of a field can be accessed either by position (_0-based integer_) or by key (_string_).
+These key-value pairs are called _fields_.
+As the fields are both keyed and ordered, the value of a field can be accessed either by position (_0-based integer_) or by key (_string_).
 
 [NOTE]
 --
-To access values by position, use a 0-based integer.
-To access values by key, use a string.
+* To access values by position, use a 0-based integer.
+* To access values by key, use a string.
 --
 
 Views and cursors are the primary way of accessing results.
 
 [[record-view]]
-==== Record View
+== Record View
 
 The record view provides access to the individual result record.
 
 [.tabbed-example]
 .Record view example
 ====
-[source,cs]
-----
-COMING SOON
-----
-
 [source,java]
 ----
 RecordView r = ...;
@@ -50,7 +44,7 @@ COMING SOON
 
 
 [[record-cursor]]
-==== Record Cursor
+== Record Cursor
 
 A record cursor provides access to the record stream.
 It is a record view with a dynamically changing underlying record.
@@ -84,5 +78,4 @@ COMING SOON
 ====
 
 
-
-https://github.com/neo-technology/driver-compliance-kit/blob/08-results/08-results-synchronous.adoc
+// TODO https://github.com/neo-technology/driver-compliance-kit/blob/08-results/08-results-synchronous.adoc

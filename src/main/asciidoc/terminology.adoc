@@ -1,11 +1,11 @@
 [glossary]
 [[terminology]]
-== Terminology
+= Terminology
 
 The terminology used in the Neo4j Driver manual.
 This section provides cross-linked summaries of common terms.
 
-In some cases, multiple terms (e.g., ) may be used for the same or similar concept.
+In some cases, multiple terms (for example, ) may be used for the same or similar concept.
 An asterisk (*) to the right of a term indicates that the term is commonly used for Neo4j and Cypher.
 
 [glossary]
@@ -18,4 +18,4 @@ The Neo4j drivers implement the <<term-bolt, Bolt>> protocol.
 
 [[term-record]]record::
 _a result:_ An ordered map of keys and values.
-A <<term-driver, Neo4j driver>> returns results as a strem of records.
+A <<term-driver, Neo4j driver>> returns results as a stream of records.

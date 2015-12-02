@@ -1,8 +1,7 @@
 [[construction]]
-=== Construction
+= Construction
 
-// TODO:
-A Driver object is created from a graph database singleton.
+// TODO A Driver object is created from a graph database singleton.
 
 [CAUTION]
 --
@@ -13,11 +12,6 @@ Do we have anything more to say about dependencies that we haven't said in the g
 [.tabbed-example]
 .Creating a Driver object
 ====
-[source,cs]
-----
-COMING SOON
-----
-
 [source,java]
 ----
 include::{java-root}/driver/src/test/java/org/neo4j/driver/v1/StatementTest.java[lines=37..40]

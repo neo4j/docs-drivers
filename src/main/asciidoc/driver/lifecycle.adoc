@@ -1,11 +1,9 @@
 [[lifecycle]]
-=== Lifecycle
+= Lifecycle
 
-// TODO:
 A driver is created from the database object.
 It typically lives for the duration of your application.
 Use a driver to create sessions.
 
-The only reason to create more than one driver would be
-  if there are multiple destinations/URLs for which to create sessions.
+The only reason to create more than one driver would be if there are multiple destinations/URLs for which to create sessions.
 (For HA purposes, or to pull data out of one database and push it into another.)

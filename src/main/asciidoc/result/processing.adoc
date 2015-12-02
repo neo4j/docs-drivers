@@ -1,5 +1,5 @@
 [[processing]]
-=== Processing
+= Processing
 
 How to process results.
 
@@ -12,11 +12,6 @@ Now that we have examples for record views and cursors, what is left for "proces
 [.tabbed-example]
 .Processing results
 ====
-[source,cs]
-----
-COMING SOON
-----
-
 [source,java]
 ----
 include::{java-root}/driver/src/test/java/org/neo4j/driver/v1/StatementTest.java[lines=37..40]

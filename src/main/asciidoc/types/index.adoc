@@ -1,5 +1,5 @@
 [[types]]
-== Types
+= Types
 
 The Neo4j Public Type System:
 
@@ -12,11 +12,6 @@ The Neo4j Public Type System:
 
 .Language mapping example
 ====
-[source,cs]
-----
-COMING SOON
-----
-
 [source,java]
 ----
 COMING SOON

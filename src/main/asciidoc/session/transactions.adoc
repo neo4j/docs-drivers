@@ -1,7 +1,9 @@
 [[transactions]]
-=== Transactions
+= Transactions
 
-Read about how transactions in general work in the http://neo4j.com/docs/stable/transactions.html[Neo4j Manual].
+:manual-transactions: http://neo4j.com/docs/stable/transactions.html
+
+Read about how transactions in general work in the {manual-transactions}[Neo4j Manual].
 
 When the session runs a statement directly, it creates an implicit transaction.
 
