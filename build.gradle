@@ -4,7 +4,17 @@ defaultTasks 'asciidoctor'
 
 def projectVersion = '1.0'
 def asciidoctorjVersion = '1.5.3.2'
-def driverLanguahes = ['java', 'javascript', 'python']
+def driverLanguages = [
+        'java'      : [
+                'version': '1.0.0-M01'
+        ],
+        'javascript': [
+                'version': '1.0.0-M01'
+        ],
+        'python'    : [
+                'version': '1.0.0-M01'
+        ]
+]
 
 buildscript {
     ext {
@@ -30,7 +40,7 @@ task('git-clone') {
     description 'Clones the driver sources from GitHub.'
     outputs.dir file("$buildDir/driver-sources")
     doLast {
-        driverLanguahes.each { lang ->
+        driverLanguages.each { lang, info ->
             println "Cloning $lang-driver"
             def targetDir = targetGitdir(lang)
             Grgit.clone(dir: targetDir,
@@ -48,10 +58,13 @@ def commonAsciidoctorAttributes = [
         'project-version': projectVersion,
         'icons'          : 'font',
         'imagesdir'      : './images',
-        'java-root'      : targetGitdir('java'),
-        'javascript-root': targetGitdir('javascript'),
-        'python-root'    : targetGitdir('python')
+        'attribute-missing': 'warn'
 ]
+
+driverLanguages.each { lang, info ->
+    commonAsciidoctorAttributes["$lang-driver-version"] = info['version']
+    commonAsciidoctorAttributes["$lang-root"] = targetGitdir(lang)
+}
 
 def htmlAsciidoctorAttributes = [
         'toc'        : 'left',
