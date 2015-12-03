@@ -2,13 +2,25 @@
     background: #f9f9f9;
     border: 1px solid #dddddd;;
 }
+
 #header, #content, #footnotes {
     max-width: 800px;
 }
+
 html, body {
     font-size: 16px;
 }
+
 #content ul.nav-tabs li {
     background: none;
     padding-left: 0;
+}
+
+.admonitionblock > table td.content {
+    color: inherit;
+    font-size: 1em;
+}
+
+div.abstract > div.content {
+    border-color: #666666;
 }
