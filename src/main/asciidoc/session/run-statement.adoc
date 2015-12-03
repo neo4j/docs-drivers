@@ -1,10 +1,9 @@
 [[run-statement]]
-= Run a Statement
+= Run a statement
 
 When the session runs a statement directly, it creates an implicit transaction.
 
 [.tabbed-example]
-.Run statement
 ====
 [source,java]
 ----

@@ -3,14 +3,15 @@
 
 The Neo4j Public Type System:
 
-* _string_
-* _number_
-* _boolean_
-* _Node_
-* _Relationship_
-* _Path_
+// this might be a good place to use a labeled list when we have descriptions to fill in
+* string
+* number
+* boolean
+* Node
+* Relationship
+* Path
 
-.Language mapping example
+.Language type mapping example
 ====
 [source,java]
 ----

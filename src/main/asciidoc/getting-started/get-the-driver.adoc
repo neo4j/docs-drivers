@@ -8,14 +8,13 @@ You can download the driver source or acquire it with one of the dependency mana
 [[download]]
 == Download
 
-To download the driver do
+To prepare the driver for usage follow the instructions:
 
 [.tabbed-example]
-.Download
 ====
 [.include-with-java]
 --
-When using Maven, do like this:
+When using Maven, add this to your _pom.xml_ file:
 
 [source,xml,subs="attributes,specialcharacters"]
 ----
@@ -36,19 +35,21 @@ compile 'org.neo4j.driver:neo4j-java-driver:{java-driver-version}'
 ----
 
 For other build systems, see {maven-artifact-info}[information available at Maven Central].
-
 --
 
-[source,javascript]
+[.include-with-javascript]
+--
+[source,shell,subs="attributes,specialcharacters"]
 ----
-var neo4j = require('lib/neo4j');
+npm install neo4j-driver@{javascript-driver-version}
 ----
+--
 
 [.include-with-python]
 --
-[source,shell]
+[source,shell,subs="attributes,specialcharacters"]
 ----
-pip install neo4j-driver
+pip install neo4j-driver=={python-driver-version}
 ----
 --
 ====

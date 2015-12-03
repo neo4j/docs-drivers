@@ -7,7 +7,7 @@ Do we have anything more to say about dependencies that we haven't said in the g
 --
 
 [.tabbed-example]
-.Importing dependencies
+.Import dependencies
 ====
 [source,java]
 ----

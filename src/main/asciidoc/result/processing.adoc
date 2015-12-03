@@ -1,7 +1,10 @@
 [[processing]]
-= Processing
+= Process results
 
-How to process results.
+[.abstract]
+====
+How to use the results from the database.
+====
 
 [WARNING]
 --
@@ -10,7 +13,7 @@ Now that we have examples for record views and cursors, what is left for "proces
 
 // TODO:
 [.tabbed-example]
-.Processing results
+.Process results
 ====
 [source,java]
 ----

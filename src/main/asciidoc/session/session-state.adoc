@@ -3,21 +3,21 @@
 
 A session can be in three states:
 
-* _READY_
-* _RESULT_
-* _FAILED_
+* `READY`
+* `RESULT`
+* `FAILED`
 
-A session begins in _READY_ mode.
+A session begins in `READY` mode.
 When a query is executed, the session changes state.
 
-If the execution is successful, the session enters the _RESULT_ state.
+If the execution is successful, the session enters the `RESULT` state.
 The results are now available for consumption.
-When the entire result stream is consumed, the session returns to the _READY_ state.
+When the entire result stream is consumed, the session returns to the `READY` state.
 
-If execution is not successful, the session enters the _FAILED_ state.
+If execution is not successful, the session enters the `FAILED` state.
 
 // TODO:
 // 1) How does the user handle the failed state?
-// 2) Document the _IGNORED_ that happens when client has not acknoledged _FAILED_ state.
+// 2) Document the `IGNORED` that happens when client has not acknowledged `FAILED` state.
 
 image::bolt-session-state-machine.svg[]

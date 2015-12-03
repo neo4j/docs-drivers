@@ -10,7 +10,7 @@ Do we have anything more to say about dependencies that we haven't said in the g
 
 // TODO:
 [.tabbed-example]
-.Creating a Driver object
+.Create a Driver object
 ====
 [source,java]
 ----
