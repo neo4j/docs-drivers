@@ -7,17 +7,17 @@ def asciidoctorjVersion = '1.5.3.2'
 def driverLanguages = [
         'java'      : [
                 'version': '1.0.0-M01',
-                'gitref' : 'master',
+                'gitref' : '1.0',
                 'url'    : 'http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.neo4j.driver%22%20AND%20a%3A%22neo4j-java-driver%22'
         ],
         'javascript': [
                 'version': '1.0.0-alpha.3',
-                'gitref' : 'master',
+                'gitref' : '1.0',
                 'url'    : 'https://www.npmjs.com/package/neo4j-driver'
         ],
         'python'    : [
                 'version': '1.0.0b1',
-                'gitref' : 'master',
+                'gitref' : '1.0',
                 'url'    : 'https://pypi.python.org/pypi/neo4j-driver'
         ]
 ]
