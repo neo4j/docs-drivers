@@ -2,6 +2,10 @@
 = Session
 
 All interaction with the server happens in a session.
+Sessions are pooled to avoid overhead of establishing new connections to the server.
+It is important to close a session after using it.
+This returns the session to the pool.
+If sessions are not closed the pool can eventually run out of sessions.
 
 include::run-statement.adoc[leveloffset=+1]
 

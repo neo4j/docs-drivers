@@ -1,22 +1,25 @@
 [[run-statement]]
 = Run a statement
 
+A session can run a statement directly.
 When the session runs a statement directly, it creates an implicit transaction.
+A session can also create a transaction object.
+The transaction object allows for fine-grained transaction control.
 
 [.tabbed-example]
 ====
 [source,java]
 ----
-include::{java-root}/driver/src/test/java/org/neo4j/driver/v1/StatementTest.java[lines=66..72]
+COMING SOON
 ----
 
 [source,javascript]
 ----
-include::{javascript-root}/examples/node.js[lines=64..84]
+COMING SOON
 ----
 
 [source,python]
 ----
-include::{python-root}/test/test_session.py[lines=52..62]
+COMING SOON
 ----
 ====

@@ -8,4 +8,3 @@ Read about how transactions in general work in the {manual-transactions}[Neo4j M
 When the session runs a statement directly, it creates an implicit transaction.
 
 The transaction object can be controlled with `BEGIN`, `COMMIT`, and `ROLLBACK`.
-
