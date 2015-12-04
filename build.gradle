@@ -100,7 +100,7 @@ driverLanguages.each { lang, info ->
                 if (parent.getDocument().getAttributes().containsKey('include-with-' + lang)) {
                     createBlock(parent, 'open', reader.readLines(), attributes + ['role': 'include-with-' + lang], [:])
                 } else {
-                    createBlock(parent, 'skip', [], [:], [:])
+                    null
                 }
         }
     }
