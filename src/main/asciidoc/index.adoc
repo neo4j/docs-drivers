@@ -10,7 +10,8 @@ ifndef::python-root[:python-root: ../../../build/driver-sources/python-driver]
 
 :neo4j-url: http://neo4j.com/
 
-The Uniform Language Drivers are Drivers for the {neo4j-url}[Neo4j Database] that use the <<term-bolt, Bolt>> protocol.
+Neo4j Drivers are drivers for the {neo4j-url}[Neo4j database].
+The drivers use the <<term-bolt, Bolt>> protocol and have uniform design and use.
 
 include::getting-started/index.adoc[leveloffset=+1]
 
