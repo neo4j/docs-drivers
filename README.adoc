@@ -9,7 +9,7 @@
 Java JDK version 8 (preferred) or 7 is required.
 See {oracle-download}[Oracle Java SE Development Kit 8 Downloads] or {openjdk-download}[OpenJDK].
 
-=== Build with Gradle
+Gradle is used for the build.
 
 [TIP]
 The _gradlew_ / _gradlew.bat_ script will download Gradle on first run.
@@ -20,7 +20,7 @@ No previous install is needed (if one exists, it will be ignored).
 ./gradlew
 ----
 
-The HTML output will be generated in _build/asciidoc/html5/_.
+The HTML output will be generated in _build/html5/_.
 
 To additionally build PDF output, do like this:
 
@@ -29,9 +29,10 @@ To additionally build PDF output, do like this:
 ./gradlew -Ppdf
 ----
 
-The HTML output will be generated in _build/asciidoc/html5/_, the PDF in _build/asciidoc/pdf/_.
+The HTML output will be generated in _build/html5/_, the PDF in _build/pdf/_.
+One PDF per programming language is built.
 
-To update the dependencies use:
+To update the dependencies from GitHub use:
 
 [source,bash]
 ----
@@ -43,37 +44,6 @@ Execute a new build automatically as soon as there are file changes:
 
 [source,bash]
 ----
-./gradlew -t asciidoctor
+./gradlew -t
 ----
 
-=== Build with Maven
-
-This requires {maven-download}[Apache Maven] 3.x to be installed on the system.
-
-[source,bash]
-----
-mvn
-----
-
-The HTML output will be generated in _target/html/_, the PDF in _target/pdf/_.
-
-To update the dependencies use:
-
-[source,bash]
-----
-mvn clean compile
-----
-
-If you want to skip creating the PDF output, do:
-
-[source,bash]
-----
-mvn -DskipPdf
-----
-
-If you want to skip creating the HTML output, do:
-
-[source,bash]
-----
-mvn -DskipHtml
-----

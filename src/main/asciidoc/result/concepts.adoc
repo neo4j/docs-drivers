@@ -19,9 +19,16 @@ Views and cursors are the primary ways of accessing results.
 
 The record view provides access to the individual result record.
 
+[[record-view]]
+== Record View
+
+The record view provides access to the individual result record.
+
 [.tabbed-example]
 .Record view example
 ====
+[include-with-java]
+--
 [source,java]
 ----
 RecordView r = ...;
@@ -30,16 +37,23 @@ for (String key : r.keys())
     System.out.println(key + ": " + r.value(key));
 }
 ----
+--
 
+[include-with-javascript]
+--
 [source,javascript]
 ----
 COMING SOON
 ----
+--
 
+[include-with-python]
+--
 [source,python]
 ----
 COMING SOON
 ----
+--
 ====
 
 
@@ -52,6 +66,8 @@ It is a record view with a dynamically changing underlying record.
 [.tabbed-example]
 .Record cursor example
 ====
+[include-with-java]
+--
 [source, java]
 ----
 RecordView r = ...;
@@ -60,17 +76,23 @@ for (String key : r.keys())
     System.out.println(key + ": " + r.value(key));
 }
 ----
+--
 
+[include-with-javascript]
+--
 [source, javascript]
 ----
 COMING SOON
 ----
+--
 
+[include-with-python]
+--
 [source, python]
 ----
 COMING SOON
 ----
+--
 ====
-
 
 // TODO https://github.com/neo-technology/driver-compliance-kit/blob/08-results/08-results-synchronous.adoc

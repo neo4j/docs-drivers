@@ -4,18 +4,27 @@
 [.tabbed-example]
 .Import dependencies
 ====
+[include-with-java]
+--
 [source,java]
 ----
 COMING SOON
 ----
+--
 
+[include-with-javascript]
+--
 [source,javascript]
 ----
 COMING SOON
 ----
+--
 
+[include-with-python]
+--
 [source,python]
 ----
 COMING SOON
 ----
+--
 ====

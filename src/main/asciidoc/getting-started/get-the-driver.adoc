@@ -12,7 +12,7 @@ To prepare the driver for usage follow the instructions:
 
 [.tabbed-example]
 ====
-[.include-with-java]
+[include-with-java]
 --
 When using Maven, add this to your _pom.xml_ file:
 
@@ -37,7 +37,7 @@ compile 'org.neo4j.driver:neo4j-java-driver:{java-driver-version}'
 For other build systems, see {maven-artifact-info}[information available at Maven Central].
 --
 
-[.include-with-javascript]
+[include-with-javascript]
 --
 [source,shell,subs="attributes,specialcharacters"]
 ----
@@ -45,7 +45,7 @@ npm install neo4j-driver@{javascript-driver-version}
 ----
 --
 
-[.include-with-python]
+[include-with-python]
 --
 [source,shell,subs="attributes,specialcharacters"]
 ----

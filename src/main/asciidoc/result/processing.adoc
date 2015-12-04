@@ -10,18 +10,27 @@ How to use the results from the database.
 [.tabbed-example]
 .Process results
 ====
+[include-with-java]
+--
 [source,java]
 ----
 include::{java-root}/driver/src/test/java/org/neo4j/driver/v1/StatementTest.java[lines=37..40]
 ----
+--
 
+[include-with-javascript]
+--
 [source,javascript]
 ----
 include::{javascript-root}/examples/node.js[lines=20..-1]
 ----
+--
 
+[include-with-python]
+--
 [source,python]
 ----
 include::{python-root}/test/test_session.py[lines=74..81]
 ----
+--
 ====
