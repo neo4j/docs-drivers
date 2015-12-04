@@ -12,7 +12,7 @@ As the fields are both keyed and ordered, the value of a field can be accessed e
 * To access values by key, use a string.
 --
 
-Views and cursors are the primary way of accessing results.
+Views and cursors are the primary ways of accessing results.
 
 [[record-view]]
 == Record View
@@ -52,12 +52,7 @@ It is a record view with a dynamically changing underlying record.
 [.tabbed-example]
 .Record cursor example
 ====
-[source,cs]
-----
-COMING SOON
-----
-
-[source,java]
+[source, java]
 ----
 RecordView r = ...;
 for (String key : r.keys())
@@ -66,12 +61,12 @@ for (String key : r.keys())
 }
 ----
 
-[source,javascript]
+[source, javascript]
 ----
 COMING SOON
 ----
 
-[source,python]
+[source, python]
 ----
 COMING SOON
 ----

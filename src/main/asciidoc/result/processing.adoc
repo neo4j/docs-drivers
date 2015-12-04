@@ -6,11 +6,6 @@
 How to use the results from the database.
 ====
 
-[WARNING]
---
-Now that we have examples for record views and cursors, what is left for "processing results" that can go in this section?
---
-
 // TODO:
 [.tabbed-example]
 .Process results
