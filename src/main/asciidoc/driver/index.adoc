@@ -1,8 +1,8 @@
 [[driver]]
 = Driver
 
-A driver usually lives for the duration of an application.
-It controls communication with the Neo4j server and spawns sessions.
+A driver controls communication with one or more Neo4j servers.
+It provides sessions for the application to use 
 
 include::dependencies.adoc[leveloffset=+1]
 

@@ -1,26 +1,21 @@
 [[dependencies]]
 = Dependencies
 
-[CAUTION]
---
-Do we have anything more to say about dependencies that we haven't said in the getting started section?
---
-
 [.tabbed-example]
 .Import dependencies
 ====
 [source,java]
 ----
-include::{java-root}/driver/src/test/java/org/neo4j/driver/v1/StatementTest.java[lines=37..40]
+COMING SOON
 ----
 
 [source,javascript]
 ----
-include::{javascript-root}/examples/node.js[lines=20..-1]
+COMING SOON
 ----
 
 [source,python]
 ----
-include::{python-root}/test/test_session.py[lines=74..81]
+COMING SOON
 ----
 ====
