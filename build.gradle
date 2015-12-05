@@ -35,31 +35,50 @@ apply plugin: 'base'
 
 defaultTasks 'asciidoctorHtml', 'asciidoctorPdf'
 
-def projectVersion = '1.0'
-def driverLanguages = [
-        'java'      : [
-                'version': '1.0.0-M01',
-                'gitref' : '1.0',
-                'url'    : 'http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.neo4j.driver%22%20AND%20a%3A%22neo4j-java-driver%22'
-        ],
-        'javascript': [
-                'version': '1.0.0-M01',
-                'gitref' : '1.0',
-                'url'    : 'https://www.npmjs.com/package/neo4j-driver'
-        ],
-        'python'    : [
-                'version': '1.0.0b1',
-                'gitref' : '1.0',
-                'url'    : 'https://pypi.python.org/pypi/neo4j-driver'
-        ]
-]
-
+ext {
+    projectVersion = '1.0'
+    driverLanguages = [
+            'java'      : [
+                    'version': '1.0.0-M01',
+                    'gitref' : '1.0',
+                    'url'    : 'http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.neo4j.driver%22%20AND%20a%3A%22neo4j-java-driver%22'
+            ],
+            'javascript': [
+                    'version': '1.0.0-M01',
+                    'gitref' : '1.0',
+                    'url'    : 'https://www.npmjs.com/package/neo4j-driver'
+            ],
+            'python'    : [
+                    'version': '1.0.0b1',
+                    'gitref' : '1.0',
+                    'url'    : 'https://pypi.python.org/pypi/neo4j-driver'
+            ]
+    ]
+    commonAsciidoctorAttributes = [
+            'project-version'  : projectVersion,
+            'icons'            : 'font',
+            'imagesdir'        : './images',
+            'attribute-missing': 'warn'
+    ]
+    htmlAsciidoctorAttributes = [
+            'toc'        : 'left',
+            'stylesdir'  : 'css/',
+            'stylesheet' : 'github.css',
+            'sectanchors': true,
+            'docinfo1'   : true,
+            'linkcss'    : true
+    ]
+    pdfAsciidoctorAttributes = [
+            'source-highlighter': 'rouge'
+    ]
+    adoc = null
+}
 
 task('gitClone') {
     description 'Clones the driver sources from GitHub.'
     outputs.dir file("$buildDir/driver-sources")
     doLast {
-        driverLanguages.each { lang, info ->
+        project.ext.driverLanguages.each { lang, info ->
             println "Cloning $lang-driver"
             def targetDir = targetGitdir(lang)
             Grgit.clone(dir: targetDir,
@@ -105,43 +124,29 @@ task('cleanOutputs', dependsOn: ['cleanAsciidoctorHtml', 'cleanAsciidoctorPdf'])
     description 'Clean the HTML and PDF outputs.'
 }
 
-def commonAsciidoctorAttributes = [
-        'project-version'  : projectVersion,
-        'icons'            : 'font',
-        'imagesdir'        : './images',
-        'attribute-missing': 'warn'
-]
+project.ext.driverLanguages.each { lang, info ->
+    project.ext.commonAsciidoctorAttributes["$lang-driver-version"] = info['version']
+    project.ext.commonAsciidoctorAttributes["$lang-root"] = targetGitdir(lang)
+    project.ext.htmlAsciidoctorAttributes["include-with-$lang"] = true
+}
 
-def htmlAsciidoctorAttributes = [
-        'toc'        : 'left',
-        'stylesdir'  : 'css/',
-        'stylesheet' : 'github.css',
-        'sectanchors': true,
-        'docinfo1'   : true,
-        'linkcss'    : true
-]
-
-def pdfAsciidoctorAttributes = [
-        'source-highlighter': 'rouge'
-]
-
-def adoc = Asciidoctor.Factory.create()
-
-driverLanguages.each { lang, info ->
-    commonAsciidoctorAttributes["$lang-driver-version"] = info['version']
-    commonAsciidoctorAttributes["$lang-root"] = targetGitdir(lang)
-    htmlAsciidoctorAttributes["include-with-$lang"] = true
-
-    AsciidoctorExtensions.extensions {
-        block(name: 'include-with-' + lang, contexts: [':open']) {
-            parent, reader, attributes ->
-                if (parent.getDocument().getAttributes().containsKey('include-with-' + lang)) {
-                    createBlock(parent, 'open', reader.readLines(), attributes + ['role': 'include-with-' + lang], [:])
-                } else {
-                    null
+def getAsciidoctor() {
+    if (project.ext.adoc == null) {
+        project.ext.driverLanguages.each { lang, info ->
+            AsciidoctorExtensions.extensions {
+                block(name: 'include-with-' + lang, contexts: [':open']) {
+                    parent, reader, attributes ->
+                        if (parent.getDocument().getAttributes().containsKey('include-with-' + lang)) {
+                            createBlock(parent, 'open', reader.readLines(), attributes + ['role': 'include-with-' + lang], [:])
+                        } else {
+                            null
+                        }
                 }
+            }
         }
+        project.ext.adoc = Asciidoctor.Factory.create()
     }
+    project.ext.adoc
 }
 
 def asciidocSourceDir = "${projectDir}/src/main/asciidoc"
@@ -166,14 +171,14 @@ task('asciidoctorHtml', dependsOn: 'gitClone') {
     inputs.dir asciidocSourceDir
     outputs.dir htmlOutputDir
     doLast {
-        def attrs = commonAsciidoctorAttributes + htmlAsciidoctorAttributes
+        def attrs = project.ext.commonAsciidoctorAttributes + project.ext.htmlAsciidoctorAttributes
         def opts = OptionsBuilder.options()
                 .backend('html5')
                 .safe(SafeMode.UNSAFE)
                 .toDir(new File(htmlOutputDir))
                 .mkDirs(true)
                 .attributes(attrs)
-        adoc.convertFile(asciidocSourceFile, opts.get())
+        getAsciidoctor().convertFile(asciidocSourceFile, opts.get())
     }
 }
 asciidoctorHtml.finalizedBy 'copyHtmlResources'
@@ -183,15 +188,15 @@ task('asciidoctorPdf', dependsOn: 'gitClone') {
     inputs.dir asciidocSourceDir
     outputs.dir pdfOutputDir
     doLast {
-        driverLanguages.each { lang, info ->
-            def attrs = commonAsciidoctorAttributes + pdfAsciidoctorAttributes + [('include-with-' + lang): true]
+        project.ext.driverLanguages.each { lang, info ->
+            def attrs = project.ext.commonAsciidoctorAttributes + project.ext.pdfAsciidoctorAttributes + [('include-with-' + lang): true]
             def opts = OptionsBuilder.options()
                     .backend('pdf')
                     .safe(SafeMode.UNSAFE)
                     .toFile(new File("$pdfOutputDir/neo4j-driver-manual-${lang}.pdf"))
                     .mkDirs(true)
                     .attributes(attrs)
-            adoc.convertFile(asciidocSourceFile, opts.get())
+            getAsciidoctor().convertFile(asciidocSourceFile, opts.get())
         }
     }
 }
