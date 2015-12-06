@@ -36,19 +36,22 @@ apply plugin: 'base'
 defaultTasks 'asciidoctorHtml', 'asciidoctorPdf'
 
 ext {
-    projectVersion = '1.0'
+    projectVersion = '1.0 ALPHA'
     driverLanguages = [
             'java'      : [
+                    'name'   : 'Java',
                     'version': '1.0.0-M01',
                     'gitref' : '1.0',
                     'url'    : 'http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.neo4j.driver%22%20AND%20a%3A%22neo4j-java-driver%22'
             ],
             'javascript': [
+                    'name'   : 'JavaScript',
                     'version': '1.0.0-M01',
                     'gitref' : '1.0',
                     'url'    : 'https://www.npmjs.com/package/neo4j-driver'
             ],
             'python'    : [
+                    'name'   : 'Python',
                     'version': '1.0.0b1',
                     'gitref' : '1.0',
                     'url'    : 'https://pypi.python.org/pypi/neo4j-driver'
@@ -74,7 +77,8 @@ ext {
             'pdf-style'         : 'neo',
             'pdf-fontsdir'      : "$buildDir/fonts".toString(),
             'doctype'           : 'book',
-            'toc'               : ''
+            'toc'               : '',
+            'showlinks'         : ''
     ]
     adoc = null
 }
@@ -194,7 +198,11 @@ task('asciidoctorPdf', dependsOn: ['gitClone', 'unzipDownloadedFonts']) {
     outputs.dir pdfOutputDir
     doLast {
         project.ext.driverLanguages.each { lang, info ->
-            def attrs = project.ext.commonAsciidoctorAttributes + project.ext.pdfAsciidoctorAttributes + [('include-with-' + lang): true]
+            def attrs = project.ext.commonAsciidoctorAttributes + project.ext.pdfAsciidoctorAttributes +
+                    [
+                            ('include-with-' + lang): true,
+                            'manual-title': "Neo4j ${info.name} Driver Manual: ${project.ext.projectVersion}"
+                    ]
             def opts = OptionsBuilder.options()
                     .backend('pdf')
                     .safe(SafeMode.UNSAFE)

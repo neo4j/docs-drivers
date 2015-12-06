@@ -1,8 +1,11 @@
 [[index]]
-= Neo4j Driver Manual {project-version}
+= {manual-title}
+:project-version:
+:manual-title: Neo4j Driver Manual {project-version}
 :source-indent: 0
 :icons: font
 :example-caption!:
+:table-caption!:
 ifndef::project-version[:project-version: -version-]
 ifndef::java-root[:java-root: ../../../build/driver-sources/java-driver]
 ifndef::javascript-root[:javascript-root: ../../../build/driver-sources/javascript-driver]
