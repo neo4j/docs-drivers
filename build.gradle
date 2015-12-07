@@ -139,10 +139,6 @@ project.ext.driverLanguages.each { lang, info ->
     project.ext.htmlAsciidoctorAttributes["include-with-$lang"] = ''
 }
 
-if (project.hasProperty('comments')) {
-    project.ext.htmlAsciidoctorAttributes['showcomments'] = ''
-}
-
 def getAsciidoctor() {
     if (project.ext.adoc == null) {
         project.ext.driverLanguages.each { lang, info ->
@@ -158,10 +154,6 @@ def getAsciidoctor() {
             }
         }
         project.ext.adoc = Asciidoctor.Factory.create()
-        def rubyExtensionRegistry = project.ext.adoc.rubyExtensionRegistry();
-        def rubyExtensionsDir = "$projectDir/src/main/ruby-extensions"
-        def is = new FileInputStream(new File("$rubyExtensionsDir/show-comments.rb"))
-        rubyExtensionRegistry.loadClass(is).preprocessor('ShowComments');
     }
     project.ext.adoc
 }
