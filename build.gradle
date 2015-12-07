@@ -87,6 +87,7 @@ task('prepareDriverSources') {
     description 'Clones the driver sources from GitHub or uses local checkouts.'
     outputs.dir file("$buildDir/driver-sources")
     doLast {
+        file("$buildDir/driver-sources").mkdirs()
         if (!project.hasProperty('localDriverSources')) {
             project.ext.driverLanguages.each { lang, info ->
                 println "Cloning $lang-driver"
@@ -109,7 +110,8 @@ def targetGitdir(lang) {
 
 def fonts = [
         'Open Sans'  : 'https://www.google.com/fonts/download?kit=3hvsV99qyKCBS55e5pvb3ltkqrIMaAZWyLYEoB48lSQ',
-        'Inconsolata': 'https://www.google.com/fonts/download?kit=CNj0Ze1H6w4FVgc32wmZS4fD-WQWLbF4rYwcBGowFYY'
+        'Inconsolata': 'https://www.google.com/fonts/download?kit=CNj0Ze1H6w4FVgc32wmZS4fD-WQWLbF4rYwcBGowFYY',
+        'Lora'       : 'https://www.google.com/fonts/download?kit=iwrHM7FQEcKgsUvDuXxrPg'
 ]
 
 task('downloadFonts') {
@@ -166,6 +168,7 @@ def getAsciidoctor() {
 
 def asciidocSourceDir = "${projectDir}/src/main/asciidoc"
 def asciidocSourceFile = new File("$asciidocSourceDir/index.adoc")
+def pdfThemeDir = "${projectDir}/src/main/pdf-theme"
 def htmlOutputDir = "$buildDir/html5"
 def pdfOutputDir = "$buildDir/pdf"
 
@@ -201,6 +204,7 @@ asciidoctorHtml.finalizedBy 'copyHtmlResources'
 task('asciidoctorPdf', dependsOn: ['prepareDriverSources', 'unzipDownloadedFonts']) {
     description 'Build Asciidoctor PDF outputs.'
     inputs.dir asciidocSourceDir
+    inputs.dir pdfThemeDir
     outputs.dir pdfOutputDir
     doLast {
         project.ext.driverLanguages.each { lang, info ->
