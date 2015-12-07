@@ -83,22 +83,28 @@ ext {
     adoc = null
 }
 
-task('gitClone') {
-    description 'Clones the driver sources from GitHub.'
+task('prepareDriverSources') {
+    description 'Clones the driver sources from GitHub or uses local checkouts.'
     outputs.dir file("$buildDir/driver-sources")
     doLast {
-        project.ext.driverLanguages.each { lang, info ->
-            println "Cloning $lang-driver"
-            def targetDir = targetGitdir(lang)
-            Grgit.clone(dir: targetDir,
-                    uri: "https://github.com/neo4j/neo4j-$lang-driver.git",
-                    refToCheckout: info['gitref'])
+        if (!project.hasProperty('localDriverSources')) {
+            project.ext.driverLanguages.each { lang, info ->
+                println "Cloning $lang-driver"
+                def targetDir = targetGitdir(lang)
+                Grgit.clone(dir: targetDir,
+                        uri: "https://github.com/neo4j/neo4j-$lang-driver.git",
+                        refToCheckout: info['gitref'])
+            }
         }
     }
 }
 
 def targetGitdir(lang) {
-    file("$buildDir/driver-sources/$lang-driver")
+    if (project.hasProperty('localDriverSources')) {
+        file("$projectDir/../neo4j-$lang-driver")
+    } else {
+        file("$buildDir/driver-sources/$lang-driver")
+    }
 }
 
 def fonts = [
@@ -175,7 +181,7 @@ task('copyHtmlResources', type: Copy) {
     into htmlOutputDir
 }
 
-task('asciidoctorHtml', dependsOn: 'gitClone') {
+task('asciidoctorHtml', dependsOn: 'prepareDriverSources') {
     description 'Build Asciidoctor HTML output.'
     inputs.dir asciidocSourceDir
     outputs.dir htmlOutputDir
@@ -192,7 +198,7 @@ task('asciidoctorHtml', dependsOn: 'gitClone') {
 }
 asciidoctorHtml.finalizedBy 'copyHtmlResources'
 
-task('asciidoctorPdf', dependsOn: ['gitClone', 'unzipDownloadedFonts']) {
+task('asciidoctorPdf', dependsOn: ['prepareDriverSources', 'unzipDownloadedFonts']) {
     description 'Build Asciidoctor PDF outputs.'
     inputs.dir asciidocSourceDir
     outputs.dir pdfOutputDir
@@ -201,7 +207,7 @@ task('asciidoctorPdf', dependsOn: ['gitClone', 'unzipDownloadedFonts']) {
             def attrs = project.ext.commonAsciidoctorAttributes + project.ext.pdfAsciidoctorAttributes +
                     [
                             ('include-with-' + lang): true,
-                            'manual-title': "Neo4j ${info.name} Driver Manual: ${project.ext.projectVersion}"
+                            'manual-title'          : "Neo4j ${info.name} Driver Manual: ${project.ext.projectVersion}"
                     ]
             def opts = OptionsBuilder.options()
                     .backend('pdf')

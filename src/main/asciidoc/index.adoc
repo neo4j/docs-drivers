@@ -6,7 +6,6 @@
 :icons: font
 :example-caption!:
 :table-caption!:
-ifndef::project-version[:project-version: -version-]
 ifndef::java-root[:java-root: ../../../build/driver-sources/java-driver]
 ifndef::javascript-root[:javascript-root: ../../../build/driver-sources/javascript-driver]
 ifndef::python-root[:python-root: ../../../build/driver-sources/python-driver]
