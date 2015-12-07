@@ -19,11 +19,11 @@ page:
   background_color: ffffff
   layout: portrait
   margin: [0.5in, 0.67in, 0.67in, 0.67in]
-  size: LETTER
+  size: A4
 base:
   align: left
   # color as hex string (leading # is optional)
-  font_color: 222222
+  font_color: 000000
   # color as RGB array
   #font_color: [51, 51, 51]
   # color as CMYK array (approximated)
@@ -138,7 +138,7 @@ blockquote:
   cite_font_color: 999999
 # code is used for source blocks (perhaps change to source or listing?)
 code:
-  font_color: 222222
+  font_color: 000000
   font_family: $literal_font_family
   font_size: ceil($base_font_size)
   padding: $code_font_size

@@ -24,3 +24,7 @@ html, body {
 div.abstract > div.content {
     border-color: #666666;
 }
+
+.comment {
+    background: #fff3b8;
+}
