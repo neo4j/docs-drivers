@@ -86,8 +86,10 @@ ext {
 task('prepareDriverSources') {
     description 'Clones the driver sources from GitHub or uses local checkouts.'
     outputs.dir file("$buildDir/driver-sources")
+    outputs.upToDateWhen {
+        project.hasProperty('localDriverSources') || file("$buildDir/driver-sources").exists()
+    }
     doLast {
-        file("$buildDir/driver-sources").mkdirs()
         if (!project.hasProperty('localDriverSources')) {
             project.ext.driverLanguages.each { lang, info ->
                 println "Cloning $lang-driver"
@@ -117,6 +119,9 @@ def fonts = [
 task('downloadFonts') {
     description 'Download from Google Fonts.'
     outputs.dir "$buildDir/font-downlods"
+    outputs.upToDateWhen {
+        file("$buildDir/font-downlods").exists()
+    }
     doLast {
         fonts.each { name, url ->
             download {
