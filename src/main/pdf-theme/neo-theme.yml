@@ -123,10 +123,12 @@ lead:
   font_size: $base_font_size_large
   line_height: 1.4
 abstract:
-  font_color: 5c6266
-  font_size: $lead_font_size
-  line_height: $lead_line_height
-  font_style: italic
+  padding: [0, 12pt, 12pt, 16pt]
+  font_family: Open Sans
+  font_color: 58b535
+  font_size: 10.5
+  line_height: 1.4
+  font_style: bold
 admonition:
   border_color: $base_border_color
   border_width: $base_border_width

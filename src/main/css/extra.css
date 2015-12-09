@@ -21,8 +21,11 @@ html, body {
     font-size: 1em;
 }
 
-div.abstract > div.content {
-    border-color: #666666;
+.quoteblock.abstract blockquote {
+    padding: 8px;
+    background: none;
+    border: 1px solid #666666;
+    border-radius: 4px;
 }
 
 .comment {
