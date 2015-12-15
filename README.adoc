@@ -20,24 +20,21 @@ No previous install is needed (if one exists, it will be ignored).
 ./gradlew
 ----
 
-The HTML output will be generated in _build/html5/_.
-
-To additionally build PDF output, do like this:
-
-[source,bash]
-----
-./gradlew -Ppdf
-----
-
 The HTML output will be generated in _build/html5/_, the PDF in _build/pdf/_.
 One PDF per programming language is built.
 
-To update the dependencies from GitHub use:
+To exclude building the PDF output, do like this:
 
 [source,bash]
 ----
-./gradlew clean
-./gradlew
+./gradlew -PnoPdf
+----
+
+To do a clean build of all outputs do:
+
+[source,bash]
+----
+./gradlew clean dist
 ----
 
 Execute a new build automatically as soon as there are file changes:

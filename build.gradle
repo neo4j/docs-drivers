@@ -36,7 +36,8 @@ apply plugin: 'base'
 defaultTasks 'asciidoctorHtml', 'asciidoctorPdf'
 
 ext {
-    projectVersion = '1.0 ALPHA'
+    projectVersionTitle = '1.0 ALPHA'
+    projectVersion = '1.0'
     driverLanguages = [
             'java'      : [
                     'name'   : 'Java',
@@ -58,7 +59,7 @@ ext {
             ]
     ]
     commonAsciidoctorAttributes = [
-            'project-version'  : projectVersion,
+            'project-version'  : projectVersionTitle,
             'icons'            : 'font',
             'imagesdir'        : './images',
             'attribute-missing': 'warn'
@@ -216,19 +217,23 @@ task('asciidoctorPdf', dependsOn: ['prepareDriverSources', 'unzipDownloadedFonts
             def attrs = project.ext.commonAsciidoctorAttributes + project.ext.pdfAsciidoctorAttributes +
                     [
                             ('include-with-' + lang): true,
-                            'manual-title'          : "Neo4j ${info.name} Driver Manual: ${project.ext.projectVersion}"
+                            'manual-title'          : "Neo4j ${info.name} Driver Manual: ${project.ext.projectVersionTitle}"
                     ]
             def opts = OptionsBuilder.options()
                     .backend('pdf')
                     .safe(SafeMode.UNSAFE)
-                    .toFile(new File("$pdfOutputDir/neo4j-driver-manual-${lang}.pdf"))
+                    .toFile(new File("$pdfOutputDir/neo4j-driver-manual-${lang}-${project.ext.projectVersion}.pdf"))
                     .mkDirs(true)
                     .attributes(attrs)
             getAsciidoctor().convertFile(asciidocSourceFile, opts.get())
         }
     }
 }
-asciidoctorPdf.onlyIf { project.hasProperty('pdf') }
+asciidoctorPdf.onlyIf { !project.hasProperty('noPdf') }
+
+task('dist', dependsOn: ['asciidoctorHtml', 'asciidoctorPdf']) {
+    description 'Build HTML and PDF outputs.'
+}
 
 task buildScriptDependencies(type: org.gradle.api.tasks.diagnostics.DependencyReportTask) {
     description 'Print the build script dependencies.'
