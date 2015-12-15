@@ -1,7 +1,17 @@
 [[result]]
 = Result
 
-Executing a statement returns a result.
+[.abstract]
+====
+Running a statement returns a result.
+====
+
+To successfully process the results from running a statement it is important to know about the following
+
+* Record cursors and record views
+* Result lifetime
+* Result summary
+* Result mapping
 
 include::concepts.adoc[leveloffset=+1]
 

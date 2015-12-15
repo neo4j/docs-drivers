@@ -1,10 +1,10 @@
 [[processing]]
 = Process results
 
-[abstract]
---
+[.abstract]
+====
 How to use the results from the database.
---
+====
 
 // TODO:
 [.tabbed-example]
