@@ -1,0 +1,37 @@
+[[introduction]]
+= Introduction
+
+[.abstract]
+====
+The preferred way to access a Neo4j server from an application is to use a Neo4j driver.
+====
+
+The Neo4j Driver API is the preferred surface for programmatic interaction with a Neo4j database server.
+It implements the Bolt protocol and is available in three languages: Java, JavaScript, and Python.
+
+The API is defined independently of any programming language.
+This allows for a high degree of uniformity across languages.
+Uniformity means that the same features are included in all the drivers.
+The uniformity also influences the design of the API in each language.
+This provides consistency across drivers, while retaining affinity with the idioms of each programming language.
+
+
+[[introduction-overview]]
+== Overview
+
+The key concepts when working with a Neo4j driver
+
+* Database
+* Driver
+* Session
+* Result
+
+To use a driver, follow this pattern:
+
+. Ask the _database_ for a new driver.
+. Ask the _driver_  for a new session.
+. Use the _session_  to run statements.
+  The session returns results.
+. Process the _results_.
+
+

@@ -15,6 +15,8 @@ ifndef::python-root[:python-root: ../../../build/driver-sources/python-driver]
 Neo4j Drivers are drivers for the {neo4j-url}[Neo4j database].
 The drivers use the <<term-bolt, Bolt>> protocol and have uniform design and use.
 
+include::introduction/index.adoc[leveloffset=+1]
+
 include::getting-started/index.adoc[leveloffset=+1]
 
 include::driver/index.adoc[leveloffset=+1]
