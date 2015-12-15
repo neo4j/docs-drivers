@@ -1,11 +1,16 @@
 [[session]]
 = Session
 
-All interaction with the server happens in a session.
-Sessions are pooled to avoid overhead of establishing new connections to the server.
-It is important to close a session after using it.
-This returns the session to the pool.
-If sessions are not closed the pool can eventually run out of sessions.
+[.abstract]
+====
+All interaction with a Neo4j server takes place within a session.
+====
+
+A session is used to run statements against Neo4j.
+A session is obtained from a driver object.
+It allows for running statements against the database.
+
+// TODO: connection pooling and importance of closing sessions.
 
 include::run-statement.adoc[leveloffset=+1]
 

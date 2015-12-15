@@ -1,18 +1,96 @@
 [[run-statement]]
 = Run a statement
 
-A session can run a statement directly.
-When the session runs a statement directly, it creates an implicit transaction.
-A session can also create a transaction object.
-The transaction object allows for fine-grained transaction control.
+The session can run statements directly.
+If a statement is run directly from a session, the session will take care of wrapping it in a transactions.
 
+
+.Running a statement
 [.tabbed-example]
 ====
 [include-with-java]
 --
 [source,java]
 ----
+Result cursor = session.run( "MATCH (n) WHERE n.name = {myNameParam} RETURN (n)",
+                              Values.parameters( "myNameParam", "Bob" ) );
+----
+--
+
+[include-with-javascript]
+--
+[source,javascript]
+----
 COMING SOON
+----
+--
+
+[include-with-python]
+--
+[source,python]
+----
+COMING SOON
+----
+--
+====
+
+It is always recommended to use parameters, but it is possible to run a query with literal values as well.
+
+[CAUTION]
+====
+Using parameters have significant performance and security benefits, including:
+
+* It allows the query planner to reuse its plans, which makes queries much more efficient.
+* It protects the database from Cypher injection attacks, where malicious query clauses are added from poorly typed or filtered input.
+====
+
+.Running a statement without parameters
+[.tabbed-example]
+====
+[include-with-java]
+--
+[source,java]
+----
+Result cursor = session.run( "MATCH (n) WHERE n.name = 'Bob' RETURN (n)" );
+----
+--
+
+[include-with-javascript]
+--
+[source,javascript]
+----
+COMING SOON
+----
+--
+
+[include-with-python]
+--
+[source,python]
+----
+COMING SOON
+----
+--
+====
+
+
+== Manual Transaction Management
+
+The session can also create explicit transactions to be managed manually.
+This allows for more fine-grained control.
+
+.Running a statement in a manually managed transaction
+[.tabbed-example]
+====
+[include-with-java]
+--
+[source,java]
+----
+try( Transaction tx = session.beginTransaction() )
+{
+    tx.run( "CREATE (n {name:'Alice'})" );
+    tx.run( "CREATE (n {name:'Tina'})" );
+    tx.success();
+}
 ----
 --
 
