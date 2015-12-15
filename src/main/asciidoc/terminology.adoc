@@ -16,6 +16,21 @@ The protocol used by Neo4j drivers to communicate with the server.
 An interface for operating the Neo4j database.
 The Neo4j drivers implement the <<term-bolt, Bolt>> protocol.
 
-[[term-record]]record::
-_a result:_ An ordered map of keys and values.
-A <<term-driver, Neo4j driver>> returns results as a stream of records.
+[[term-result]]result::
+The result of running a <<term-statement, statement>>.
+A result can contains a stream of <<term-record, records>> and a <<term-summary, summary>>.
+
+[[term-record]]result record::
+An ordered map of keys and values.
+A <<term-driver, Neo4j driver>> returns <<term-result, results>> as a stream of records.
+
+[[term-summary]]result summary::
+Information about the result of a <<term-statement, statement>>.
+Can contain statistics about changes to the database or the execution plan for a statement that includes a `profile` or `explain` directive.
+
+[[term-session]]session::
+A session wraps a conversation between a client application and the Neo4j server.
+It runs <<term-statement, statements>> and returns <<term-result, results>>.
+
+[[term-statement]]statement::
+COMING SOON
