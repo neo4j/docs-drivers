@@ -30,3 +30,5 @@ include::types/index.adoc[leveloffset=+1]
 include::errors/index.adoc[leveloffset=+1]
 
 include::terminology.adoc[leveloffset=+1]
+
+include::colophon.adoc[leveloffset=+1]
