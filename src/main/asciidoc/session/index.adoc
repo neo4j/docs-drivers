@@ -1,10 +1,10 @@
 [[session]]
 = Session
 
-[.abstract]
-====
+[abstract]
+--
 All interaction with a Neo4j server takes place within a session.
-====
+--
 
 A session is used to run statements against Neo4j.
 A session is obtained from a driver object.

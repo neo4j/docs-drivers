@@ -1,11 +1,11 @@
 [[driver]]
 = Driver
 
-[.abstract]
-====
+[abstract]
+--
 A driver is used to connect to a Neo4j server.
 It provides <<term-session, sessions>> that are used to execute statements and retrieve <<term-result, results>>.
-====
+--
 
 
 include::dependencies.adoc[leveloffset=+1]

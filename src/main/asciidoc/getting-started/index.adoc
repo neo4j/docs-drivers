@@ -1,10 +1,10 @@
 [[getting-started]]
 = Getting Started
 
-[.abstract]
-====
+[abstract]
+--
 Get up and running quickly with a minimal working example.
-====
+--
 
 include::get-the-driver.adoc[leveloffset=+1]
 

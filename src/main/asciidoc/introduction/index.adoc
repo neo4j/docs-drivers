@@ -1,12 +1,12 @@
 [[introduction]]
 = Introduction
 
-[.abstract]
-====
+[abstract]
+--
 The preferred way to access a Neo4j server from an application is to use a Neo4j driver.
-====
+--
 
-The Neo4j Driver API is the preferred surface for programmatic interaction with a Neo4j database server.
+The Neo4j Driver API is the preferred means of programmatic interaction with a Neo4j database server.
 It implements the Bolt protocol and is available in three languages: Java, JavaScript, and Python.
 
 The API is defined independently of any programming language.

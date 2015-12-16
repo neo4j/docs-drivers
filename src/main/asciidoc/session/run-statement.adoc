@@ -2,7 +2,7 @@
 = Run a statement
 
 The session can run statements directly.
-If a statement is run directly from a session, the session will take care of wrapping it in a transactions.
+If a statement is run directly from a session, the session will take care of wrapping it in a transaction.
 
 
 .Running a statement
@@ -36,7 +36,8 @@ COMING SOON
 
 It is always recommended to use parameters, but it is possible to run a query with literal values as well.
 
-[CAUTION]
+[IMPORTANT]
+.Why it's important to use parameters
 ====
 Using parameters have significant performance and security benefits, including:
 

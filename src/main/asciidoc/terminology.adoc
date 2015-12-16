@@ -2,11 +2,12 @@
 [[terminology]]
 = Terminology
 
-The terminology used in the Neo4j Driver manual.
+This chapter explains the terminology used in the Neo4j Driver manual.
 This section provides cross-linked summaries of common terms.
 
-In some cases, multiple terms (for example, ) may be used for the same or similar concept.
-An asterisk (*) to the right of a term indicates that the term is commonly used for Neo4j and Cypher.
+In some cases, multiple terms may be used for the same or a similar concept.
+//An asterisk (*) to the right of a term indicates that the term is commonly used for Neo4j and Cypher.
+// TODO not sure we need that
 
 [glossary]
 [[term-bolt]]bolt::
@@ -26,7 +27,10 @@ A <<term-driver, Neo4j driver>> returns <<term-result, results>> as a stream of 
 
 [[term-summary]]result summary::
 Information about the result of a <<term-statement, statement>>.
-Can contain statistics about changes to the database or the execution plan for a statement that includes a `profile` or `explain` directive.
+Can contain statistics about changes to the database or the execution plan for a statement that includes a `PROFILE` or `EXPLAIN` directive.
+
+[[term-retain]]retain result::
+COMING SOON
 
 [[term-session]]session::
 A session wraps a conversation between a client application and the Neo4j server.

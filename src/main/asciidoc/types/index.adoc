@@ -1,7 +1,7 @@
 [[types]]
 = Types
 
-The Neo4j Public Type System:
+The Neo4j types:
 
 // this might be a good place to use a labeled list when we have descriptions to fill in
 * string

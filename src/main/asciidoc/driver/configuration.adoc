@@ -12,7 +12,7 @@ The Bolt URL follows the standard URL pattern of `scheme://hostname:port`.
 
 The simplest Bolt URL has `bolt` as scheme and uses the default Neo4j port `7474`, for example `bolt://localhost:7474`.
 
-To do the following, the server must be configured:
+In order to do the following, the server must be configured accordingly:
 
 * To connect to Neo4j on a different port.
 * To disable default security.
@@ -46,10 +46,11 @@ In addition to the Bolt URL, the driver can be configured for:
 * connection pool behavior
 * authentication strategies
 
-[options='header']
+[options='header', cols='2,5,1m']
 |===
-| Name                 | Description                                                                                                        | Default
-| Connection pool size | Max number of connections per URL.                                                                                 | 10
-| Idle time            | Connections that have been unused for longer than this threshold will be tested to verify that they are still live | 10
-| Logging              | Provide a logging facility for the driver.                                                                         | ?
+| Name                 | Description                                                                                                          | Default
+
+| Connection pool size | Max number of connections per URL.                                                                                   | 10
+| Idle time            | Connections that have been unused for longer than this threshold will be tested to verify that they are still alive. | 10
+| Logging              | Provide a logging facility for the driver.                                                                           | ?
 |===

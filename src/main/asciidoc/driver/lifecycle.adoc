@@ -1,11 +1,11 @@
 [[lifecycle]]
 = Lifecycle
 
-A driver lives for the duration of an application.
+A driver object lives for the duration of an application.
 
 [NOTE]
 --
-A driver maintains a connection pool for each Neo4j instance.
+The driver maintains a connection pool for each Neo4j instance.
 It is recommended to use the same driver instance across an application.
 --
 
