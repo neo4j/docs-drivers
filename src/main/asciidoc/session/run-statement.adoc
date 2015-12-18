@@ -12,8 +12,7 @@ If a statement is run directly from a session, the session will take care of wra
 --
 [source,java]
 ----
-Result cursor = session.run( "MATCH (n) WHERE n.name = {myNameParam} RETURN (n)",
-                              Values.parameters( "myNameParam", "Bob" ) );
+include::{java-examples}[tags=statement]
 ----
 --
 
@@ -21,7 +20,7 @@ Result cursor = session.run( "MATCH (n) WHERE n.name = {myNameParam} RETURN (n)"
 --
 [source,javascript]
 ----
-COMING SOON
+include::{javascript-examples}[tags=statement]
 ----
 --
 
@@ -29,7 +28,7 @@ COMING SOON
 --
 [source,python]
 ----
-COMING SOON
+include::{python-examples}[tags=statement]
 ----
 --
 ====
@@ -52,7 +51,7 @@ Using parameters have significant performance and security benefits, including:
 --
 [source,java]
 ----
-Result cursor = session.run( "MATCH (n) WHERE n.name = 'Bob' RETURN (n)" );
+include::{java-examples}[tags=statement-without-parameters]
 ----
 --
 
@@ -60,7 +59,7 @@ Result cursor = session.run( "MATCH (n) WHERE n.name = 'Bob' RETURN (n)" );
 --
 [source,javascript]
 ----
-COMING SOON
+include::{javascript-examples}[tags=statement-without-parameters]
 ----
 --
 
@@ -68,7 +67,7 @@ COMING SOON
 --
 [source,python]
 ----
-COMING SOON
+include::{python-examples}[tags=statement-without-parameters]
 ----
 --
 ====
@@ -86,12 +85,7 @@ This allows for more fine-grained control.
 --
 [source,java]
 ----
-try( Transaction tx = session.beginTransaction() )
-{
-    tx.run( "CREATE (n {name:'Alice'})" );
-    tx.run( "CREATE (n {name:'Tina'})" );
-    tx.success();
-}
+include::{java-examples}[tags=transaction-commit]
 ----
 --
 
@@ -99,7 +93,7 @@ try( Transaction tx = session.beginTransaction() )
 --
 [source,javascript]
 ----
-COMING SOON
+include::{javascript-examples}[tags=transaction-commit]
 ----
 --
 
@@ -107,7 +101,35 @@ COMING SOON
 --
 [source,python]
 ----
-COMING SOON
+include::{python-examples}[tags=transaction-commit]
 ----
 --
 ====
+
+The manually managed transaction can also be rolled back.
+
+[.tabbed-example]
+.Rolling back a manually managed transaction
+====
+[include-with-java]
+--
+[source, java]
+----
+include::{java-examples}[tags=transaction-rollback]
+----
+--
+[include-with-javascript]
+--
+[source, javascript]
+----
+include::{javascript-examples}[tags=transaction-rollback]
+----
+--
+[include-with-python]
+--
+[source, python]
+----
+include::{python-examples}[tags=transaction-rollback]
+----
+--
+==== 

@@ -1,0 +1,31 @@
+[[result-summary]]
+= Result summary
+
+Metadata can be retrieved along with the result stream.
+An example is the query plan obtained by prepending a Cypher query with `PROFILE` or `EXPLAIN`.
+
+[.tabbed-example]
+.Result summary with query plan
+====
+[include-with-java]
+--
+[source, java]
+----
+COMING SOON
+----
+--
+[include-with-javascript]
+--
+[source, javascript]
+----
+COMING SOON
+----
+--
+[include-with-python]
+--
+[source, python]
+----
+COMING SOON
+----
+--
+====

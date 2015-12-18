@@ -30,11 +30,7 @@ Initially, before the stream has begun to be consumed, all field values are `nul
 --
 [source, java]
 ----
-RecordView r = ...;
-for (String key : r.keys())
-{
-    System.out.println(key + ": " + r.value(key));
-}
+COMING SOON
 ----
 --
 
@@ -81,11 +77,7 @@ As the fields are both keyed and ordered, the value of a field can be accessed e
 --
 [source,java]
 ----
-RecordView r = ...;
-for (String key : r.keys())
-{
-    System.out.println(key + ": " + r.value(key));
-}
+COMING SOON
 ----
 --
 

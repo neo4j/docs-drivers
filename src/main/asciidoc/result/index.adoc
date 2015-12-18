@@ -17,4 +17,4 @@ include::concepts.adoc[leveloffset=+1]
 
 include::processing.adoc[leveloffset=+1]
 
-include::metadata.adoc[leveloffset=+1]
+include::summary.adoc[leveloffset=+1]

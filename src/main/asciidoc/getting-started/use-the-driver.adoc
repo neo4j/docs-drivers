@@ -20,7 +20,7 @@ Remember to exhaust the returned results so that the session is ready to run the
 --
 [source,java]
 ----
-COMING SOON
+include::{java-examples}[tags=minimum-snippet]
 ----
 --
 
@@ -28,7 +28,7 @@ COMING SOON
 --
 [source,javascript]
 ----
-COMING SOON
+include::{javascript-examples}[tags=minimum-snippet]
 ----
 --
 
@@ -36,7 +36,7 @@ COMING SOON
 --
 [source,python]
 ----
-COMING SOON
+include::{python-examples}[tags=minimum-snippet]
 ----
 --
 ====
