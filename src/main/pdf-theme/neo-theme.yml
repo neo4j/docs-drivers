@@ -125,8 +125,8 @@ lead:
 abstract:
   padding: [0, 12pt, 12pt, 16pt]
   font_family: Open Sans
-  font_color: 58b535
-  font_size: 10.5
+  font_color: 888888
+  font_size: $base_font_size * 1.1
   line_height: 1.4
   font_style: bold
 admonition:
@@ -145,9 +145,9 @@ blockquote:
 code:
   font_color: 000000
   font_family: $literal_font_family
-  font_size: ceil($base_font_size)
+  font_size: ceil($base_font_size_small)
   padding: $code_font_size
-  line_height: 1.25
+  line_height: 1
   background_color: fafafa
   border_color: cccccc
   border_radius: $base_border_radius

@@ -31,3 +31,18 @@ html, body {
 .comment {
     background: #fff3b8;
 }
+
+pre code {
+    font-size: 85%;
+    line-height: 1;
+}
+
+pre {
+    line-height: 1;
+}
+
+.tabbed-example .content > div:last-child,
+.tabbed-example .content > div:last-child p,
+.tabbed-example .content > div:last-child .highlight:last-child {
+    margin-bottom: 0px;
+}
