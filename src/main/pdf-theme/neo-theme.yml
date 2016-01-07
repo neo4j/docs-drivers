@@ -125,10 +125,11 @@ lead:
 abstract:
   padding: [0, 12pt, 12pt, 16pt]
   font_family: Open Sans
-  font_color: 888888
+  font_color: 555555
   font_size: $base_font_size * 1.1
   line_height: 1.4
-  font_style: bold
+  font_style: italic
+  first_line_font_style: italic
 admonition:
   border_color: $base_border_color
   border_width: $base_border_width
