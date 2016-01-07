@@ -28,7 +28,7 @@ buildscript {
 }
 
 plugins {
-    id "de.undercouch.download" version "2.0.0"
+    id "de.undercouch.download" version "2.1.0"
 }
 
 apply plugin: 'base'
@@ -233,10 +233,5 @@ asciidoctorPdf.onlyIf { !project.hasProperty('noPdf') }
 
 task('dist', dependsOn: ['asciidoctorHtml', 'asciidoctorPdf']) {
     description 'Build HTML and PDF outputs.'
-}
-
-task buildScriptDependencies(type: org.gradle.api.tasks.diagnostics.DependencyReportTask) {
-    description 'Print the build script dependencies.'
-    configurations = project.buildscript.configurations
 }
 
