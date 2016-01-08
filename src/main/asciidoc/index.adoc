@@ -9,9 +9,9 @@
 ifndef::java-root[:java-root: ../../../build/driver-sources/java-driver]
 ifndef::javascript-root[:javascript-root: ../../../build/driver-sources/javascript-driver]
 ifndef::python-root[:python-root: ../../../build/driver-sources/python-driver]
-:java-examples: {java-root}/driver/src/test/java/org/neo4j/driver/v1/integration/ExamplesIT.java
-:javascript-examples: {javascript-root}/test/v1/examples.test.js
-:python-examples: {python-root}/test/test_examples.py
+:java-examples: {java-root}/driver/src/test/java/org/neo4j/driver/v1/integration
+:javascript-examples: {javascript-root}/test/v1
+:python-examples: {python-root}/test
 
 :neo4j-url: http://neo4j.com/
 

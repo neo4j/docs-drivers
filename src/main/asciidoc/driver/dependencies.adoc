@@ -8,7 +8,7 @@
 --
 [source,java]
 ----
-COMING SOON
+include::{java-examples}/ImportExample.java[tags=include-driver]
 ----
 --
 

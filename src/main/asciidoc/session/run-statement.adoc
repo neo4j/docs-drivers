@@ -12,7 +12,7 @@ If a statement is run directly from a session, the session will take care of wra
 --
 [source,java]
 ----
-include::{java-examples}[tags=statement]
+include::{java-examples}/ExamplesIT.java[tags=statement]
 ----
 --
 
@@ -20,7 +20,7 @@ include::{java-examples}[tags=statement]
 --
 [source,javascript]
 ----
-include::{javascript-examples}[tags=statement]
+include::{javascript-examples}/examples.test.js[tags=statement]
 ----
 --
 
@@ -28,7 +28,7 @@ include::{javascript-examples}[tags=statement]
 --
 [source,python]
 ----
-include::{python-examples}[tags=statement]
+include::{python-examples}/test_examples.py[tags=statement]
 ----
 --
 ====
@@ -51,7 +51,7 @@ Using parameters have significant performance and security benefits, including:
 --
 [source,java]
 ----
-include::{java-examples}[tags=statement-without-parameters]
+include::{java-examples}/ExamplesIT.java[tags=statement-without-parameters]
 ----
 --
 
@@ -59,7 +59,7 @@ include::{java-examples}[tags=statement-without-parameters]
 --
 [source,javascript]
 ----
-include::{javascript-examples}[tags=statement-without-parameters]
+include::{javascript-examples}/examples.test.js[tags=statement-without-parameters]
 ----
 --
 
@@ -67,7 +67,7 @@ include::{javascript-examples}[tags=statement-without-parameters]
 --
 [source,python]
 ----
-include::{python-examples}[tags=statement-without-parameters]
+include::{python-examples}/test_examples.py[tags=statement-without-parameters]
 ----
 --
 ====
@@ -85,7 +85,7 @@ This allows for more fine-grained control.
 --
 [source,java]
 ----
-include::{java-examples}[tags=transaction-commit]
+include::{java-examples}/ExamplesIT.java[tags=transaction-commit]
 ----
 --
 
@@ -93,7 +93,7 @@ include::{java-examples}[tags=transaction-commit]
 --
 [source,javascript]
 ----
-include::{javascript-examples}[tags=transaction-commit]
+include::{javascript-examples}/examples.test.js[tags=transaction-commit]
 ----
 --
 
@@ -101,7 +101,7 @@ include::{javascript-examples}[tags=transaction-commit]
 --
 [source,python]
 ----
-include::{python-examples}[tags=transaction-commit]
+include::{python-examples}/test_examples.py[tags=transaction-commit]
 ----
 --
 ====
@@ -115,21 +115,21 @@ The manually managed transaction can also be rolled back.
 --
 [source, java]
 ----
-include::{java-examples}[tags=transaction-rollback]
+include::{java-examples}/ExamplesIT.java[tags=transaction-rollback]
 ----
 --
 [include-with-javascript]
 --
 [source, javascript]
 ----
-include::{javascript-examples}[tags=transaction-rollback]
+include::{javascript-examples}/examples.test.js[tags=transaction-rollback]
 ----
 --
 [include-with-python]
 --
 [source, python]
 ----
-include::{python-examples}[tags=transaction-rollback]
+include::{python-examples}/test_examples.py[tags=transaction-rollback]
 ----
 --
 ==== 

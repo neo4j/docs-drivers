@@ -20,7 +20,7 @@ Remember to exhaust the returned results so that the session is ready to run the
 --
 [source,java]
 ----
-include::{java-examples}[tags=minimum-snippet]
+include::{java-examples}/ImportExample.java[tags=minimum-snippet]
 ----
 --
 
@@ -28,7 +28,7 @@ include::{java-examples}[tags=minimum-snippet]
 --
 [source,javascript]
 ----
-include::{javascript-examples}[tags=minimum-snippet]
+include::{javascript-examples}/examples.test.js[tags=minimum-snippet]
 ----
 --
 
@@ -36,7 +36,7 @@ include::{javascript-examples}[tags=minimum-snippet]
 --
 [source,python]
 ----
-include::{python-examples}[tags=minimum-snippet]
+include::{python-examples}/test_examples.py[tags=minimum-snippet]
 ----
 --
 ====
