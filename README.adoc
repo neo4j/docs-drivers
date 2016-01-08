@@ -44,3 +44,11 @@ Execute a new build automatically as soon as there are file changes:
 ./gradlew -t
 ----
 
+Use local clones of the driver projects:
+
+[source,bash]
+----
+./gradlew -PlocalDriverSources
+----
+
+The clones are expected to be located in parallel to this project.
