@@ -11,7 +11,7 @@ This object is used to create a driver.
 --
 [source,java]
 ----
-COMING SOON
+include::{java-examples}/Examples.java[tags=construct-driver]
 ----
 --
 
@@ -31,3 +31,20 @@ COMING SOON
 ----
 --
 ====
+
+
+[[url-format]]
+== Bolt URL Format
+
+The Bolt URL follows the standard URL pattern of `scheme://hostname:port`.
+
+The simplest Bolt URL, `bolt://localhost:7687`, has `bolt` as scheme and connects to localhost on the default port `7687`.
+
+In order to do the following, the server must be configured accordingly:
+
+* To connect to Neo4j on a different port.
+* To disable default security.
+* To manually control the use of a WebSocket.
+
+The driver is then configured to connect to the server in the desired way by altering the URL.
+For example, `bolt://server:1234` would connect using the Bolt protocol to `server` on port `1234`.

@@ -1,27 +1,37 @@
 [[configuration]]
 = Configuration
 
-// TODO: NS said there isn't anything to configuring a driver except the URL, but the JavaDocs talk about controlling the connection pool policy by passing a configuration object when constructing it.
+
+[.tabbed-example]
+.Create a driver with default configuration
+====
+[include-with-java]
+--
+[source,java]
+----
+include::{java-examples}/Examples.java[tags=configuration]
+----
+--
+
+[include-with-javascript]
+--
+[source,javascript]
+----
+COMING SOON
+----
+--
+
+[include-with-python]
+--
+[source,python]
+----
+COMING SOON
+----
+--
+====
+
 
 The minimal configuration necessary to use a Neo4j driver is a Bolt URL.
-
-[[url-format]]
-== Bolt URL Format
-
-The Bolt URL follows the standard URL pattern of `scheme://hostname:port`.
-
-The simplest Bolt URL has `bolt` as scheme and uses the default Neo4j port `7474`, for example `bolt://localhost:7474`.
-
-In order to do the following, the server must be configured accordingly:
-
-* To connect to Neo4j on a different port.
-* To disable default security.
-* To manually control the use of a WebSocket.
-
-// TODO: Better example
-
-The driver is then configured to connect to the server in the desired way by altering the URL.
-For example, `bolt+ssl://server:1234` would connect using SSL to `server` on port `1234`.
 
 [[ssl-tls]]
 == SSL / TLS
@@ -33,18 +43,16 @@ Please see \{some-handy-attribute-for-the-correct-page-in-the-manual\} for infor
 // Nigel: It looks like there will be no way to turn on/off in Driver.
 // Possibly not mention this much beyond: "Please see server docs for configuration."
 
+
 [[configuration]]
 == Configuration
 
-// Below is taken from Javadoc for `org.neo4j.driver.v1.Config`.
-// Not all information is included and the defaults are made up.
-
 In addition to the Bolt URL, the driver can be configured for:
 
-* logging
 * connection pool size
 * connection pool behavior
 * authentication strategies
+* logging
 
 [options='header', cols='2,5,1m']
 |===
@@ -54,3 +62,96 @@ In addition to the Bolt URL, the driver can be configured for:
 | Idle time            | Connections that have been unused for longer than this threshold will be tested to verify that they are still alive. | 10
 | Logging              | Provide a logging facility for the driver.                                                                           | ?
 |===
+
+
+=== Security
+
+The driver can be configured to use TLS encryption.
+
+[.tabbed-example]
+.Configure driver to require TLS encryption
+====
+[include-with-java]
+--
+[source,java]
+----
+include::{java-examples}/Examples.java[tags=tls-require-encryption]
+----
+--
+[include-with-javascript]
+--
+[source,javascript]
+----
+COMING SOON
+----
+--
+[include-with-python]
+--
+[source,python]
+----
+COMING SOON
+----
+--
+====
+
+Two authentication strategies are available:
+
+* Trust on first use.
+* Trust signed certificate.
+
+_Trust on first use_ means that the driver will trust the first connection to a host to be safe and intentional.
+On subsequent connections, the driver will verify that the host is the same as on that first connection.
+
+[.tabbed-example]
+.Configure driver to trust on first use
+====
+[include-with-java]
+--
+[source,java]
+----
+include::{java-examples}/Examples.java[tags=tls-trust-on-first-use]
+----
+--
+[include-with-javascript]
+--
+[source,javascript]
+----
+COMING SOON
+----
+--
+[include-with-python]
+--
+[source,python]
+----
+COMING SOON
+----
+--
+====
+
+_Trust signed certificate_ means that the driver will only connect to a host if it presents a trusted, signed certificate.
+
+[.tabbed-example]
+.Configure driver to trust signed certificate
+====
+[include-with-java]
+--
+[source,java]
+----
+include::{java-examples}/Examples.java[tags=tls-signed]
+----
+--
+[include-with-javascript]
+--
+[source,javascript]
+----
+COMING SOON
+----
+--
+[include-with-python]
+--
+[source,python]
+----
+COMING SOON
+----
+--
+====

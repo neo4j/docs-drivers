@@ -9,7 +9,7 @@
 ifndef::java-root[:java-root: ../../../build/driver-sources/java-driver]
 ifndef::javascript-root[:javascript-root: ../../../build/driver-sources/javascript-driver]
 ifndef::python-root[:python-root: ../../../build/driver-sources/python-driver]
-:java-examples: {java-root}/driver/src/test/java/org/neo4j/driver/v1/integration
+:java-examples: {java-root}/examples/src/main/java/org/neo4j/docs/driver
 :javascript-examples: {javascript-root}/test/v1
 :python-examples: {python-root}/test
 
@@ -31,6 +31,8 @@ include::result/index.adoc[leveloffset=+1]
 include::types/index.adoc[leveloffset=+1]
 
 include::errors/index.adoc[leveloffset=+1]
+
+include::advanced/index.adoc[leveloffset=+1]
 
 include::terminology.adoc[leveloffset=+1]
 

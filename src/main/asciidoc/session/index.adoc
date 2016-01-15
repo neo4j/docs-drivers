@@ -14,8 +14,6 @@ It allows for running statements against the database.
 
 include::run-statement.adoc[leveloffset=+1]
 
-include::session-state.adoc[leveloffset=+1]
-
-include::syncing.adoc[leveloffset=+1]
+// include::syncing.adoc[leveloffset=+1]
 
 include::transactions.adoc[leveloffset=+1]

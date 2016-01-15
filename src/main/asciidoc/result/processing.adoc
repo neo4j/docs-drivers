@@ -13,7 +13,7 @@ How to use the results from the database.
 --
 [source,java]
 ----
-COMING SOON
+include::{java-examples}/Examples.java[tags=retain-result-process]
 ----
 --
 

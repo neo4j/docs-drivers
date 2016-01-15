@@ -18,9 +18,18 @@ Remember to exhaust the returned results so that the session is ready to run the
 ====
 [include-with-java]
 --
+For a minimal working example, the following imports are necessary.
+
 [source,java]
 ----
-include::{java-examples}/ImportExample.java[tags=minimum-snippet]
+include::{java-examples}/MinimalWorkingExample.java[tags=minimal-example-import]
+----
+
+These can then be used to run a statement against the server.
+
+[source,java]
+----
+include::{java-examples}/MinimalWorkingExample.java[tags=minimal-example]
 ----
 --
 

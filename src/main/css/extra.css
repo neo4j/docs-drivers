@@ -32,13 +32,16 @@ html, body {
     background: #fff3b8;
 }
 
-pre code {
-    font-size: 85%;
+pre {
     line-height: 1;
 }
 
-pre {
+pre code {
+    font-size: .85em;
     line-height: 1;
+    word-wrap: normal;
+    overflow-wrap: normal;
+    white-space: pre;
 }
 
 .tabbed-example .content > div:last-child,

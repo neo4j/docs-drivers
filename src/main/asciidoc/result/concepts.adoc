@@ -8,29 +8,29 @@ A _record cursor_ walks through the stream, giving access to individual _record 
 --
 
 When a statement is run, results are returned as a record stream.
-The stream itself is represented by a record cursor (see <<record-cursor>>), which is used to access the individual records.
+The stream itself is represented by a result cursor (see <<result-cursor>>), which is used to access the individual records.
 The individual records can be accessed one at a time, or all at once.
 
 Results are valid until the next statement is run, or until the end of the current transaction, whichever comes first.
 To hold on to the results while running further statements, or to use the results outside of the scope of the current transaction, the results must be retained (see <<result-retain>>).
 
 
-[[record-cursor]]
-== Record Cursor
+[[result-cursor]]
+== Result Cursor
 
-A record cursor provides access to the stream of records that make up the results.
+A result cursor provides access to the stream of records that make up the results.
 Initially, before the stream has begun to be consumed, all field values are `null`.
 // TODO: What does that mean? Why does the developer care?
 // TODO: Would it be possible to be trapped by this in some language?
 
 [.tabbed-example]
-.Record cursor example
+.Result cursor example
 ====
 [include-with-java]
 --
 [source, java]
 ----
-COMING SOON
+include::{java-examples}/Examples.java[tags=result-cursor]
 ----
 --
 

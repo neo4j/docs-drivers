@@ -1,20 +1,281 @@
 [[result]]
 = Result
 
+:neo4j-manual-profile-query: http://neo4j.com/docs/stable/how-do-i-profile-a-query.html
+
+// TODO https://github.com/neo-technology/driver-compliance-kit/blob/08-results/08-results-synchronous.adoc
+
 [abstract]
 --
-Running a statement returns a result.
+Results returned from Neo4j are presented as a stream of records.
 --
 
 To successfully process the results from running a statement it is important to know about the following:
 
-* Record cursors and record views
+* Result cursors and records
 * Result lifetime
+* Result types and type mapping
 * Result summary
-* Result mapping
 
-include::concepts.adoc[leveloffset=+1]
+// include::concepts.adoc[leveloffset=+1]
 
-include::processing.adoc[leveloffset=+1]
+[[concepts]]
+== Concepts
 
-include::summary.adoc[leveloffset=+1]
+// [abstract]
+// --
+// Results are returned from Neo4j as a _stream of records_.
+// A _result cursor_ walks through the stream, giving access to individual _record views_.
+// --
+
+When a statement is run, results are returned as a record stream.
+The stream itself is represented by a result cursor (see <<result-cursor>>), which is used to access the individual records.
+The individual records can be accessed one at a time, or all at once.
+
+Results are valid until the next statement is run, or until the end of the current transaction, whichever comes first.
+To hold on to the results while running additional statements, or to use the results outside of the scope of the current transaction, the results must be retained (see <<result-retain>>).
+
+
+[[result-cursor]]
+=== Result Cursor
+
+A result cursor provides access to the stream of records that make up the results.
+Initially, before the stream has begun to be consumed, all field values are `null`.
+// TODO: What does that mean? Why does the developer care?
+// TODO: Would it be possible to be trapped by this in some language?
+
+[.tabbed-example]
+.Result cursor example
+====
+[include-with-java]
+--
+[source, java]
+----
+include::{java-examples}/Examples.java[tags=result-cursor]
+----
+--
+
+[include-with-javascript]
+--
+[source, javascript]
+----
+COMING SOON
+----
+--
+
+[include-with-python]
+--
+[source, python]
+----
+COMING SOON
+----
+--
+====
+
+
+[[record-view]]
+=== Record View
+
+The result record stream is made up of individual records.
+These are accessed as record views.
+The record view provides immutable access to a single record.
+
+The underlying record is an ordered map of keys and values.
+These key-value pairs are called _fields_.
+As the fields are both keyed and ordered, the value of a field can be accessed either by position _(0-based integer)_ or by key _(string)_.
+
+[NOTE]
+.Access values by key or position
+--
+* To access values by key, use a string.
+* To access values by position, use a ``0``-based integer.
+--
+
+[.tabbed-example]
+.Record view example
+====
+[include-with-java]
+--
+[source,java]
+----
+COMING SOON
+----
+--
+
+[include-with-javascript]
+--
+[source,javascript]
+----
+COMING SOON
+----
+--
+
+[include-with-python]
+--
+[source,python]
+----
+COMING SOON
+----
+--
+====
+
+
+// include::processing.adoc[leveloffset=+1]
+[[processing]]
+== Process results
+
+[.tabbed-example]
+.Process results
+====
+[include-with-java]
+--
+[source,java]
+----
+include::{java-examples}/Examples.java[tags=retain-result-process]
+----
+--
+[include-with-javascript]
+--
+[source,javascript]
+----
+COMING SOON
+----
+--
+[include-with-python]
+--
+[source,python]
+----
+COMING SOON
+----
+--
+====
+
+
+[[result-retain]]
+=== Retaining Results
+
+The result record stream is available until another statement is run in the session, or until the current transaction is closed.
+To hold on to the results beyond this scope, the results need to be explicitly _retained_.
+For retaining results, each driver offers methods that collect the result stream and translate it into standard data structures for each language.
+
+[.tabbed-example]
+.Retaining results example
+====
+[include-with-java]
+--
+[source,java]
+----
+include::{java-examples}/Examples.java[tags=retain-result-process]
+----
+--
+[include-with-javascript]
+--
+[source,javascript]
+----
+COMING SOON
+----
+--
+[include-with-python]
+--
+[source,python]
+----
+COMING SOON
+----
+--
+====
+
+Retained results can be processed, while the session is free to take on the next workload.
+The translated results can also be used directly to run a new statement.
+
+[.tabbed-example]
+.Use results in a new query
+====
+[include-with-java]
+--
+[source,java]
+----
+include::{java-examples}/Examples.java[tags=retain-result-query]
+----
+--
+[include-with-javascript]
+--
+[source,javascript]
+----
+COMING SOON
+----
+--
+[include-with-python]
+--
+[source,python]
+----
+COMING SOON
+----
+--
+====
+
+
+// include::summary.adoc[leveloffset=+1]
+[[result-summary]]
+== Result summary
+
+Metadata can be retrieved along with the result stream.
+An example is the query plan obtained by prepending a Cypher query with `PROFILE` or `EXPLAIN`.
+
+[.tabbed-example]
+.Result summary with query profile
+====
+[include-with-java]
+--
+[source, java]
+----
+include::{java-examples}/Examples.java[tags=result-summary-query-profile]
+----
+--
+[include-with-javascript]
+--
+[source, javascript]
+----
+COMING SOON
+----
+--
+[include-with-python]
+--
+[source, python]
+----
+COMING SOON
+----
+--
+====
+
+This will output a query profile (see the {neo4j-manual-profile-query}[Neo4j Manual] for more information about query profiling).
+
+Neo4j may also provide notifications for your query, for example, warning when a query will cause the execution engine to build a cartesian product.
+
+[.tabbed-example]
+.Result summary with notifications
+====
+[include-with-java]
+--
+[source, java]
+----
+include::{java-examples}/Examples.java[tags=result-summary-notifications]
+----
+--
+[include-with-javascript]
+--
+[source, javascript]
+----
+COMING SOON
+----
+--
+[include-with-python]
+--
+[source, python]
+----
+COMING SOON
+----
+--
+====
+
+The output may be something like: _This query builds a cartesian product between disconnected patterns._
+
