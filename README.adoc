@@ -15,7 +15,7 @@ Gradle is used for the build.
 The _gradlew_ / _gradlew.bat_ script will download Gradle on first run.
 No previous install is needed (if one exists, it will be ignored).
 
-[source,bash]
+[source, bash]
 ----
 ./gradlew
 ----
@@ -25,28 +25,28 @@ One PDF per programming language is built.
 
 To exclude building the PDF output, do like this:
 
-[source,bash]
+[source, bash]
 ----
 ./gradlew -PnoPdf
 ----
 
 To do a clean build of all outputs do:
 
-[source,bash]
+[source, bash]
 ----
 ./gradlew clean dist
 ----
 
 Execute a new build automatically as soon as there are file changes:
 
-[source,bash]
+[source, bash]
 ----
 ./gradlew -t
 ----
 
 Use local clones of the driver projects:
 
-[source,bash]
+[source, bash]
 ----
 ./gradlew -PlocalDriverSources
 ----

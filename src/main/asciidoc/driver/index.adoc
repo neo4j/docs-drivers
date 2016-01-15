@@ -7,11 +7,8 @@ A driver is used to connect to a Neo4j server.
 It provides <<term-session, sessions>> that are used to execute statements and retrieve <<term-result, results>>.
 --
 
-
-include::dependencies.adoc[leveloffset=+1]
-
 include::construction.adoc[leveloffset=+1]
 
-include::lifecycle.adoc[leveloffset=+1]
-
 include::configuration.adoc[leveloffset=+1]
+
+include::lifecycle.adoc[leveloffset=+1]
