@@ -16,7 +16,7 @@ The Neo4j types:
 ====
 [include-with-java]
 --
-[source,java]
+[source, java]
 ----
 COMING SOON
 ----
@@ -24,7 +24,7 @@ COMING SOON
 
 [include-with-javascript]
 --
-[source,javascript]
+[source, javascript]
 ----
 COMING SOON
 ----
@@ -32,7 +32,7 @@ COMING SOON
 
 [include-with-python]
 --
-[source,python]
+[source, python]
 ----
 COMING SOON
 ----

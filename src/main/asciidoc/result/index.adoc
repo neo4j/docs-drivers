@@ -96,7 +96,7 @@ As the fields are both keyed and ordered, the value of a field can be accessed e
 ====
 [include-with-java]
 --
-[source,java]
+[source, java]
 ----
 COMING SOON
 ----
@@ -104,7 +104,7 @@ COMING SOON
 
 [include-with-javascript]
 --
-[source,javascript]
+[source, javascript]
 ----
 COMING SOON
 ----
@@ -112,7 +112,7 @@ COMING SOON
 
 [include-with-python]
 --
-[source,python]
+[source, python]
 ----
 COMING SOON
 ----
@@ -129,21 +129,21 @@ COMING SOON
 ====
 [include-with-java]
 --
-[source,java]
+[source, java]
 ----
 include::{java-examples}/Examples.java[tags=retain-result-process]
 ----
 --
 [include-with-javascript]
 --
-[source,javascript]
+[source, javascript]
 ----
 COMING SOON
 ----
 --
 [include-with-python]
 --
-[source,python]
+[source, python]
 ----
 COMING SOON
 ----
@@ -163,21 +163,21 @@ For retaining results, each driver offers methods that collect the result stream
 ====
 [include-with-java]
 --
-[source,java]
+[source, java]
 ----
 include::{java-examples}/Examples.java[tags=retain-result-process]
 ----
 --
 [include-with-javascript]
 --
-[source,javascript]
+[source, javascript]
 ----
 COMING SOON
 ----
 --
 [include-with-python]
 --
-[source,python]
+[source, python]
 ----
 COMING SOON
 ----
@@ -192,21 +192,21 @@ The translated results can also be used directly to run a new statement.
 ====
 [include-with-java]
 --
-[source,java]
+[source, java]
 ----
 include::{java-examples}/Examples.java[tags=retain-result-query]
 ----
 --
 [include-with-javascript]
 --
-[source,javascript]
+[source, javascript]
 ----
 COMING SOON
 ----
 --
 [include-with-python]
 --
-[source,python]
+[source, python]
 ----
 COMING SOON
 ----

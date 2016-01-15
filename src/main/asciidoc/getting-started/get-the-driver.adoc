@@ -16,7 +16,7 @@ To prepare the driver for usage follow the instructions:
 --
 When using Maven, add this to your _pom.xml_ file:
 
-[source,xml,subs="attributes,specialcharacters"]
+[source, xml, subs="attributes, specialcharacters"]
 ----
 <dependencies>
     <dependency>
@@ -29,7 +29,7 @@ When using Maven, add this to your _pom.xml_ file:
 
 For Gradle or Grails, this is how to add the dependency:
 
-[source,groovy,subs="attributes,specialcharacters"]
+[source, groovy, subs="attributes, specialcharacters"]
 ----
 compile 'org.neo4j.driver:neo4j-java-driver:{java-driver-version}'
 ----
@@ -39,7 +39,7 @@ For other build systems, see {maven-artifact-info}[information available at Mave
 
 [include-with-javascript]
 --
-[source,shell,subs="attributes,specialcharacters"]
+[source, shell, subs="attributes, specialcharacters"]
 ----
 npm install neo4j-driver@{javascript-driver-version}
 ----
@@ -47,7 +47,7 @@ npm install neo4j-driver@{javascript-driver-version}
 
 [include-with-python]
 --
-[source,shell,subs="attributes,specialcharacters"]
+[source, shell, subs="attributes, specialcharacters"]
 ----
 pip install neo4j-driver=={python-driver-version}
 ----

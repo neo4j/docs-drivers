@@ -7,7 +7,7 @@
 ====
 [include-with-java]
 --
-[source,java]
+[source, java]
 ----
 include::{java-examples}/Examples.java[tags=configuration]
 ----
@@ -15,7 +15,7 @@ include::{java-examples}/Examples.java[tags=configuration]
 
 [include-with-javascript]
 --
-[source,javascript]
+[source, javascript]
 ----
 COMING SOON
 ----
@@ -23,7 +23,7 @@ COMING SOON
 
 [include-with-python]
 --
-[source,python]
+[source, python]
 ----
 COMING SOON
 ----
@@ -73,21 +73,21 @@ The driver can be configured to use TLS encryption.
 ====
 [include-with-java]
 --
-[source,java]
+[source, java]
 ----
 include::{java-examples}/Examples.java[tags=tls-require-encryption]
 ----
 --
 [include-with-javascript]
 --
-[source,javascript]
+[source, javascript]
 ----
 COMING SOON
 ----
 --
 [include-with-python]
 --
-[source,python]
+[source, python]
 ----
 COMING SOON
 ----
@@ -107,21 +107,21 @@ On subsequent connections, the driver will verify that the host is the same as o
 ====
 [include-with-java]
 --
-[source,java]
+[source, java]
 ----
 include::{java-examples}/Examples.java[tags=tls-trust-on-first-use]
 ----
 --
 [include-with-javascript]
 --
-[source,javascript]
+[source, javascript]
 ----
 COMING SOON
 ----
 --
 [include-with-python]
 --
-[source,python]
+[source, python]
 ----
 COMING SOON
 ----
@@ -135,21 +135,21 @@ _Trust signed certificate_ means that the driver will only connect to a host if 
 ====
 [include-with-java]
 --
-[source,java]
+[source, java]
 ----
 include::{java-examples}/Examples.java[tags=tls-signed]
 ----
 --
 [include-with-javascript]
 --
-[source,javascript]
+[source, javascript]
 ----
 COMING SOON
 ----
 --
 [include-with-python]
 --
-[source,python]
+[source, python]
 ----
 COMING SOON
 ----

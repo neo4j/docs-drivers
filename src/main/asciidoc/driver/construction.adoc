@@ -9,7 +9,7 @@ This object is used to create a driver.
 ====
 [include-with-java]
 --
-[source,java]
+[source, java]
 ----
 include::{java-examples}/Examples.java[tags=construct-driver]
 ----
@@ -17,7 +17,7 @@ include::{java-examples}/Examples.java[tags=construct-driver]
 
 [include-with-javascript]
 --
-[source,javascript]
+[source, javascript]
 ----
 COMING SOON
 ----
@@ -25,7 +25,7 @@ COMING SOON
 
 [include-with-python]
 --
-[source,python]
+[source, python]
 ----
 COMING SOON
 ----

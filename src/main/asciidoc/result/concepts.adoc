@@ -75,7 +75,7 @@ As the fields are both keyed and ordered, the value of a field can be accessed e
 ====
 [include-with-java]
 --
-[source,java]
+[source, java]
 ----
 COMING SOON
 ----
@@ -83,7 +83,7 @@ COMING SOON
 
 [include-with-javascript]
 --
-[source,javascript]
+[source, javascript]
 ----
 COMING SOON
 ----
@@ -91,7 +91,7 @@ COMING SOON
 
 [include-with-python]
 --
-[source,python]
+[source, python]
 ----
 COMING SOON
 ----
@@ -110,7 +110,7 @@ To hold on to the results beyond this scope, the results need to be explicitly _
 ====
 [include-with-java]
 --
-[source,java]
+[source, java]
 ----
 COMING SOON
 ----
@@ -118,7 +118,7 @@ COMING SOON
 
 [include-with-javascript]
 --
-[source,javascript]
+[source, javascript]
 ----
 COMING SOON
 ----
@@ -126,7 +126,7 @@ COMING SOON
 
 [include-with-python]
 --
-[source,python]
+[source, python]
 ----
 COMING SOON
 ----

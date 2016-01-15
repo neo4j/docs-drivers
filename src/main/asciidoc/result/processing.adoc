@@ -11,7 +11,7 @@ How to use the results from the database.
 ====
 [include-with-java]
 --
-[source,java]
+[source, java]
 ----
 include::{java-examples}/Examples.java[tags=retain-result-process]
 ----
@@ -19,7 +19,7 @@ include::{java-examples}/Examples.java[tags=retain-result-process]
 
 [include-with-javascript]
 --
-[source,javascript]
+[source, javascript]
 ----
 COMING SOON
 ----
@@ -27,7 +27,7 @@ COMING SOON
 
 [include-with-python]
 --
-[source,python]
+[source, python]
 ----
 COMING SOON
 ----
