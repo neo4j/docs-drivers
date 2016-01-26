@@ -14,6 +14,14 @@ The Neo4j types:
 [.tabbed-example]
 .Language type mapping example
 ====
+[include-with-dotnet]
+--
+[source, csharp]
+----
+COMING SOON
+----
+--
+
 [include-with-java]
 --
 [source, java]

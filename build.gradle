@@ -39,7 +39,13 @@ ext {
     projectVersionTitle = '1.0 ALPHA'
     projectVersion = '1.0'
     driverLanguages = [
-            'java'      : [
+            'dotnet': [
+                    'name'   : 'C#',
+                    'version': '1.0.0-M01',
+                    'gitref' : '1.0',
+                    'url'    : 'PLACEHOLDER_FOR_REPOSITORY_CONTAINING_THE_RELEASED_DOT_NET_DRIVER_ARTIFACT'
+            ],
+            'java': [
                     'name'   : 'Java',
                     'version': '1.0.0-M01',
                     'gitref' : '1.0',

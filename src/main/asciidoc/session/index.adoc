@@ -24,6 +24,4 @@ Make sure that the exceptional path of execution, as well as the ordinary, close
 
 include::run-statement.adoc[leveloffset=+1]
 
-// include::syncing.adoc[leveloffset=+1]
-
 include::transactions.adoc[leveloffset=+1]

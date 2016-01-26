@@ -7,6 +7,14 @@ This object is used to create a driver.
 [.tabbed-example]
 .Create a Driver object
 ====
+[include-with-dotnet]
+--
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=construct-driver]
+----
+--
+
 [include-with-java]
 --
 [source, java]
@@ -19,7 +27,7 @@ include::{java-examples}/Examples.java[tags=construct-driver]
 --
 [source, javascript]
 ----
-COMING SOON
+include::{javascript-examples}/examples.test.js[tags=construct-driver]
 ----
 --
 
@@ -27,7 +35,7 @@ COMING SOON
 --
 [source, python]
 ----
-COMING SOON
+include::{python-examples}/test_examples.py[tag=construct-driver]
 ----
 --
 ====

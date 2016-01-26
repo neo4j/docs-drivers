@@ -5,6 +5,14 @@
 [.tabbed-example]
 .Create a driver with default configuration
 ====
+[include-with-dotnet]
+--
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=configuration]
+----
+--
+
 [include-with-java]
 --
 [source, java]
@@ -17,7 +25,7 @@ include::{java-examples}/Examples.java[tags=configuration]
 --
 [source, javascript]
 ----
-COMING SOON
+include::{javascript-examples}/examples.test.js[tags=configuration]
 ----
 --
 
@@ -25,7 +33,7 @@ COMING SOON
 --
 [source, python]
 ----
-COMING SOON
+include::{python-examples}/test_examples.py[tag=configuration]
 ----
 --
 ====
@@ -71,6 +79,14 @@ The driver can be configured to use TLS encryption.
 [.tabbed-example]
 .Configure driver to require TLS encryption
 ====
+[include-with-dotnet]
+--
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=tls-require-encryption]
+----
+--
+
 [include-with-java]
 --
 [source, java]
@@ -82,14 +98,14 @@ include::{java-examples}/Examples.java[tags=tls-require-encryption]
 --
 [source, javascript]
 ----
-COMING SOON
+include::{javascript-examples}/examples.test.js[tags=tls-require-encryption]
 ----
 --
 [include-with-python]
 --
 [source, python]
 ----
-COMING SOON
+include::{python-examples}/test_examples.py[tag=tls-require-encryption]
 ----
 --
 ====
@@ -105,6 +121,14 @@ On subsequent connections, the driver will verify that the host is the same as o
 [.tabbed-example]
 .Configure driver to trust on first use
 ====
+[include-with-dotnet]
+--
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=tls-trust-on-first-use]
+----
+--
+
 [include-with-java]
 --
 [source, java]
@@ -116,14 +140,14 @@ include::{java-examples}/Examples.java[tags=tls-trust-on-first-use]
 --
 [source, javascript]
 ----
-COMING SOON
+include::{javascript-examples}/examples.test.js[tags=tls-trust-on-first-use]
 ----
 --
 [include-with-python]
 --
 [source, python]
 ----
-COMING SOON
+include::{python-examples}/test_examples.py[tag=tls-trust-on-first-use]
 ----
 --
 ====
@@ -133,6 +157,14 @@ _Trust signed certificate_ means that the driver will only connect to a host if 
 [.tabbed-example]
 .Configure driver to trust signed certificate
 ====
+[include-with-dotnet]
+--
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=tls-signed]
+----
+--
+
 [include-with-java]
 --
 [source, java]
@@ -144,14 +176,14 @@ include::{java-examples}/Examples.java[tags=tls-signed]
 --
 [source, javascript]
 ----
-COMING SOON
+include::{javascript-examples}/examples.test.js[tags=tls-signed]
 ----
 --
 [include-with-python]
 --
 [source, python]
 ----
-COMING SOON
+include::{python-examples}/test_examples.py[tag=tls-signed]
 ----
 --
 ====
