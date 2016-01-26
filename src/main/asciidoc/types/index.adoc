@@ -1,18 +1,47 @@
 [[types]]
 = Types
 
-The Neo4j types:
+[abstract]
+--
+A driver translates between the type system of its language and the type system used in Neo4j.
+--
 
-// this might be a good place to use a labeled list when we have descriptions to fill in
-* string
-* number
-* boolean
+Neo4j has a system of data types for processing and storing data.
+Drivers translate between user types and the Neo4j type system.
+To pass parameters and process results, it is important to know the basics of the Neo4j type system, and to understand how the Neo4j types are mapped in the driver.
+
+The following Neo4j types are valid both for parameters and results:
+
+* Null
+* Boolean
+* Integer
+* Float
+* String
+* List
+* Map
+
+Maps and lists can be processed by the database and used in a statement.
+Lists in which the elements share a single type can also be stored as properties on nodes and relationships.
+Maps, and lists in which the elements have mixed types, can not be stored as properties.
+
+In addition to the types valid both for parameters and results, the following Neo4j types are valid for results only:
+
 * Node
 * Relationship
 * Path
 
+// [options="header"]
+// |===
+// | Neo4j   | C#   | Java    | JavaScript | Python
+// | Integer | int  | Integer | Integer    | int
+// | Node    | Node | Node    | node       | node
+// |===
+
+Finally there is a type which stands for the individuality of a node or relationship, called _Identity_.
+Identity is a wrapper around the internal ID of the node or relationship.
+
 [.tabbed-example]
-.Language type mapping example
+.Type mapping
 ====
 [include-with-dotnet]
 --
