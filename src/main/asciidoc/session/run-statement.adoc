@@ -4,10 +4,17 @@
 The session can run statements directly.
 If a statement is run directly from a session, the session will take care of wrapping it in a transaction.
 
-
 .Running a statement
 [.tabbed-example]
 ====
+[include-with-dotnet]
+--
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=statement]
+----
+--
+
 [include-with-java]
 --
 [source, java]
@@ -47,6 +54,14 @@ Using parameters have significant performance and security benefits, including:
 .Running a statement without parameters
 [.tabbed-example]
 ====
+[include-with-dotnet]
+--
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=statement-without-parameters]
+----
+--
+
 [include-with-java]
 --
 [source, java]
@@ -71,65 +86,3 @@ include::{python-examples}/test_examples.py[tags=statement-without-parameters]
 ----
 --
 ====
-
-
-== Manual Transaction Management
-
-The session can also create explicit transactions to be managed manually.
-This allows for more fine-grained control.
-
-.Running a statement in a manually managed transaction
-[.tabbed-example]
-====
-[include-with-java]
---
-[source, java]
-----
-include::{java-examples}/Examples.java[tags=transaction-commit]
-----
---
-
-[include-with-javascript]
---
-[source, javascript]
-----
-include::{javascript-examples}/examples.test.js[tags=transaction-commit]
-----
---
-
-[include-with-python]
---
-[source, python]
-----
-include::{python-examples}/test_examples.py[tags=transaction-commit]
-----
---
-====
-
-The manually managed transaction can also be rolled back.
-
-[.tabbed-example]
-.Rolling back a manually managed transaction
-====
-[include-with-java]
---
-[source, java]
-----
-include::{java-examples}/Examples.java[tags=transaction-rollback]
-----
---
-[include-with-javascript]
---
-[source, javascript]
-----
-include::{javascript-examples}/examples.test.js[tags=transaction-rollback]
-----
---
-[include-with-python]
---
-[source, python]
-----
-include::{python-examples}/test_examples.py[tags=transaction-rollback]
-----
---
-==== 

@@ -6,12 +6,14 @@
 :icons: font
 :example-caption!:
 :table-caption!:
+ifndef::dotnet-root[:dotnet-root: ../../../build/driver-sources/dotnet-driver]
 ifndef::java-root[:java-root: ../../../build/driver-sources/java-driver]
 ifndef::javascript-root[:javascript-root: ../../../build/driver-sources/javascript-driver]
 ifndef::python-root[:python-root: ../../../build/driver-sources/python-driver]
+:dotnet-examples: {dotnet-root}/Neo4j.Driver/Neo4j.Driver.IntegrationTests
 :java-examples: {java-root}/examples/src/main/java/org/neo4j/docs/driver
 :javascript-examples: {javascript-root}/test/v1
-:python-examples: {python-root}/test
+:python-examples: {python-root}/examples
 
 :neo4j-url: http://neo4j.com/
 

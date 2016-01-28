@@ -47,6 +47,14 @@ Initially, before the stream has begun to be consumed, all field values are `nul
 [.tabbed-example]
 .Result cursor example
 ====
+[include-with-dotnet]
+--
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=result-cursor]
+----
+--
+
 [include-with-java]
 --
 [source, java]
@@ -59,7 +67,7 @@ include::{java-examples}/Examples.java[tags=result-cursor]
 --
 [source, javascript]
 ----
-COMING SOON
+include::{javascript-examples}/examples.test.js[tags=result-cursor]
 ----
 --
 
@@ -67,7 +75,7 @@ COMING SOON
 --
 [source, python]
 ----
-COMING SOON
+include::{python-examples}/test_examples.py[tag=result-cursor]
 ----
 --
 ====
@@ -94,6 +102,14 @@ As the fields are both keyed and ordered, the value of a field can be accessed e
 [.tabbed-example]
 .Record view example
 ====
+[include-with-dotnet]
+--
+[source, csharp]
+----
+COMING SOON
+----
+--
+
 [include-with-java]
 --
 [source, java]
@@ -127,6 +143,14 @@ COMING SOON
 [.tabbed-example]
 .Process results
 ====
+[include-with-dotnet]
+--
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=retain-result-process]
+----
+--
+
 [include-with-java]
 --
 [source, java]
@@ -138,14 +162,14 @@ include::{java-examples}/Examples.java[tags=retain-result-process]
 --
 [source, javascript]
 ----
-COMING SOON
+include::{javascript-examples}/examples.test.js[tags=retain-result-process]
 ----
 --
 [include-with-python]
 --
 [source, python]
 ----
-COMING SOON
+include::{python-examples}/test_examples.py[tags=retain-result-process]
 ----
 --
 ====
@@ -161,6 +185,13 @@ For retaining results, each driver offers methods that collect the result stream
 [.tabbed-example]
 .Retaining results example
 ====
+[include-with-dotnet]
+--
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=retain-result-process]
+----
+--
 [include-with-java]
 --
 [source, java]
@@ -172,14 +203,14 @@ include::{java-examples}/Examples.java[tags=retain-result-process]
 --
 [source, javascript]
 ----
-COMING SOON
+include::{javascript-examples}/examples.test.js[tags=retain-result-process]
 ----
 --
 [include-with-python]
 --
 [source, python]
 ----
-COMING SOON
+include::{python-examples}/test_examples.py[tags=retain-result-process]
 ----
 --
 ====
@@ -190,6 +221,14 @@ The translated results can also be used directly to run a new statement.
 [.tabbed-example]
 .Use results in a new query
 ====
+[include-with-dotnet]
+--
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=retain-result-query]
+----
+--
+
 [include-with-java]
 --
 [source, java]
@@ -201,14 +240,14 @@ include::{java-examples}/Examples.java[tags=retain-result-query]
 --
 [source, javascript]
 ----
-COMING SOON
+include::{javascript-examples}/examples.test.js[tags=retain-result-query]
 ----
 --
 [include-with-python]
 --
 [source, python]
 ----
-COMING SOON
+include::{python-examples}/test_examples.py[tags=retain-result-query]
 ----
 --
 ====
@@ -224,6 +263,14 @@ An example is the query plan obtained by prepending a Cypher query with `PROFILE
 [.tabbed-example]
 .Result summary with query profile
 ====
+[include-with-dotnet]
+--
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=result-summary-query-profile]
+----
+--
+
 [include-with-java]
 --
 [source, java]
@@ -235,14 +282,14 @@ include::{java-examples}/Examples.java[tags=result-summary-query-profile]
 --
 [source, javascript]
 ----
-COMING SOON
+include::{javascript-examples}/examples.test.js[tags=result-summary-query-profile]
 ----
 --
 [include-with-python]
 --
 [source, python]
 ----
-COMING SOON
+include::{python-examples}/test_examples.py[tag=result-summary-query-profile]
 ----
 --
 ====
@@ -254,6 +301,14 @@ Neo4j may also provide notifications for your query, for example, warning when a
 [.tabbed-example]
 .Result summary with notifications
 ====
+[include-with-dotnet]
+--
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=result-summary-notifications]
+----
+--
+
 [include-with-java]
 --
 [source, java]
@@ -265,14 +320,14 @@ include::{java-examples}/Examples.java[tags=result-summary-notifications]
 --
 [source, javascript]
 ----
-COMING SOON
+include::{javascript-examples}/examples.test.js[tags=result-summary-notification]
 ----
 --
 [include-with-python]
 --
 [source, python]
 ----
-COMING SOON
+include::{python-examples}/test_examples.py[tags=result-summary-notifications]
 ----
 --
 ====

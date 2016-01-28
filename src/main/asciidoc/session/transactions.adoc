@@ -3,8 +3,87 @@
 
 :manual-transactions: http://neo4j.com/docs/stable/transactions.html
 
-Read about how transactions in general work in the {manual-transactions}[chapter on transactions in the Neo4j Manual].
-
 When the session runs a statement directly, it creates an implicit transaction.
 
-The transaction object can be controlled with `BEGIN`, `COMMIT`, and `ROLLBACK`.
+[NOTE]
+--
+Read about how transactions in general work in the {manual-transactions}[chapter on transactions in the Neo4j Manual].
+--
+
+
+== Manual Transaction Management
+
+The session can also create explicit transactions to be managed manually.
+This allows for more fine-grained control.
+
+.Running a statement in a manually managed transaction
+[.tabbed-example]
+====
+[include-with-dotnet]
+--
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=transaction-commit]
+----
+--
+
+[include-with-java]
+--
+[source, java]
+----
+include::{java-examples}/Examples.java[tags=transaction-commit]
+----
+--
+
+[include-with-javascript]
+--
+[source, javascript]
+----
+include::{javascript-examples}/examples.test.js[tags=transaction-commit]
+----
+--
+
+[include-with-python]
+--
+[source, python]
+----
+include::{python-examples}/test_examples.py[tags=transaction-commit]
+----
+--
+====
+
+The manually managed transaction can also be rolled back.
+
+[.tabbed-example]
+.Rolling back a manually managed transaction
+====
+[include-with-dotnet]
+--
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=transaction-rollback]
+----
+--
+
+[include-with-java]
+--
+[source, java]
+----
+include::{java-examples}/Examples.java[tags=transaction-rollback]
+----
+--
+[include-with-javascript]
+--
+[source, javascript]
+----
+include::{javascript-examples}/examples.test.js[tags=transaction-rollback]
+----
+--
+[include-with-python]
+--
+[source, python]
+----
+include::{python-examples}/test_examples.py[tags=transaction-rollback]
+----
+--
+====

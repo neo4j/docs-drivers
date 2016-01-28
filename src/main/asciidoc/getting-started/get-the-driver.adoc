@@ -12,6 +12,14 @@ To prepare the driver for usage follow the instructions:
 
 [.tabbed-example]
 ====
+[include-with-dotnet]
+--
+[source, csharp, subs="attributes, specialcharacters"]
+----
+nuget install Neo4j.Driver-{dotnet-driver-version}
+----
+--
+
 [include-with-java]
 --
 When using Maven, add this to your _pom.xml_ file:

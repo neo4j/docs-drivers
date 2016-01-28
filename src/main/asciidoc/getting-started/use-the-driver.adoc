@@ -16,6 +16,23 @@ Remember to exhaust the returned results so that the session is ready to run the
 [.tabbed-example]
 .Usage example
 ====
+[include-with-dotnet]
+--
+For a minimal working example, the following imports are necessary.
+
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=minimal-example-import]
+----
+
+These can then be used to run a statement against the server.
+
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=minimal-example]
+----
+--
+
 [include-with-java]
 --
 For a minimal working example, the following imports are necessary.
@@ -35,17 +52,35 @@ include::{java-examples}/MinimalWorkingExample.java[tags=minimal-example]
 
 [include-with-javascript]
 --
+For a minimal working example, the following imports are necessary.
+
 [source, javascript]
 ----
-include::{javascript-examples}/examples.test.js[tags=minimum-snippet]
+include::{javascript-examples}/examples.test.js[tags=minimal-example-import]
+----
+
+These can then be used to run a statement against the server.
+
+[source, javascript]
+----
+include::{javascript-examples}/examples.test.js[tags=minimal-example]
 ----
 --
 
 [include-with-python]
 --
+For a minimal working example, the following imports are necessary.
+
 [source, python]
 ----
-include::{python-examples}/test_examples.py[tags=minimum-snippet]
+include::{python-examples}/test_examples.py[tags=minimal-example-import]
+----
+
+These can then be used to run a statement against the server.
+
+[source, python]
+----
+include::{python-examples}/test_examples.py[tags=minimal-example]
 ----
 --
 ====
