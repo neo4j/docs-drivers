@@ -192,6 +192,7 @@ task('copyHtmlResources', type: Copy) {
     from("${projectDir}/src/main") {
         include 'css/**'
         include 'javascript/**'
+        include 'logo/**'
     }
     into htmlOutputDir
 }

@@ -89,7 +89,7 @@ title_page:
   align: right
   logo:
     top: 0
-    image: image:neo4j_logo.svg[width=240pt,align=left]
+    image: image:../logo/neo4j_logo.svg[width=240pt,align=left]
   title:
     top: 55%
     font_family: Open Sans Light

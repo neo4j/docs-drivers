@@ -49,3 +49,62 @@ pre code {
 .tabbed-example .content > div:last-child .highlight:last-child {
     margin-bottom: 0px;
 }
+
+html, body, p, ul, ol, dl {
+    font-family: "Open Sans", "DejaVu Sans", sans-serif;
+}
+
+#header > h1:first-child, h1, h2, h3, h4, h5, h6, #toctitle {
+    font-family: "Open Sans", "DejaVu Sans", sans-serif;
+    color: #3d5360;
+    font-weight: 300;
+}
+
+#toctitle, h3, h4, h5, h6 {
+    font-weight: normal;
+    color: #000000;
+}
+
+h1 {
+    font-size: 42px;
+}
+
+h2 {
+    font-size: 34px;
+}
+
+#content ul {
+    list-style: outside disc;
+    margin-left: 1em;
+}
+
+#content ul li {
+    position: relative;
+    left: 1em;
+    padding-right: 1em;
+    background: none;
+}
+
+div.admonitionblock td.content > div.title,
+div.exampleblock > div.title {
+    color: #000000;
+    font-size: 20px;
+}
+
+div.exampleblock > div.title {
+    font-size: 18px;
+}
+
+a:hover, a:focus, a:hover:visited {
+    color: #5dade2;
+}
+a:hover {
+    cursor: pointer;
+    text-decoration: none;
+}
+a {
+    font-weight: 400;
+    color: #428bca;
+    text-decoration: none;
+    line-height: inherit;
+}
