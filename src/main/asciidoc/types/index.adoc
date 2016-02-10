@@ -8,7 +8,8 @@ A driver translates between the type system of its language and the type system 
 
 Neo4j has a system of data types for processing and storing data.
 Drivers translate between user types and the Neo4j type system.
-To pass parameters and process results, it is important to know the basics of the Neo4j type system, and to understand how the Neo4j types are mapped in the driver.
+To pass parameters and process results, it is important to know the basics of the Neo4j type system and to understand how the Neo4j types are mapped in the driver.
+//                                                                                                                                                   to the types in the driver's native language.
 
 The following Neo4j types are valid both for parameters and results:
 
@@ -30,49 +31,127 @@ In addition to the types valid both for parameters and results, the following Ne
 * Relationship
 * Path
 
-// [options="header"]
+// [options="header", cols="2m,3m,3m,2m,2m"]
 // |===
-// | Neo4j   | C#   | Java    | JavaScript | Python
-// | Integer | int  | Integer | Integer    | int
-// | Node    | Node | Node    | node       | node
+// | Neo4j        | .NET                                                 | Java                         | JavaScript | Python
+// | Null         |                                                      |                              |            |
+// | Boolean      | System.Boolean                                       | Boolean                      |            |
+// | Integer      | System.Int32                                         | Integer                      | Integer    | int
+// | Float        | System.Double                                        | Float                        |            |
+// | String       | System.String                                        | java.lang.String             |            |
+// | List         | System.Collections.Generic.IList<T>                  | java.util.List<T>            | Array      | List
+// | Map          | System.Collections.Generic.IDictionary<TKey, TValue> | java.util.Map<String, Value> | Object     | Dictionary
+// | Node         | Node                                                 | Node                         | node       | node
+// | Relationship | Relationship                                         |                              |            |
+// | Path         | Path                                                 |                              |            |
+// | Identity     |                                                      |                              |            |
 // |===
 
-Finally there is a type which stands for the individuality of a node or relationship, called _Identity_.
-Identity is a wrapper around the internal ID of the node or relationship.
+// [options="header", cols="2m,3m,3m,2m,2m"]
+// |===
+// | Neo4j        | .NET                                         | Java                             | JavaScript       | Python
+// | Null         | null                                         | null                             | null             | None
+// | Boolean      | System.Boolean                               | Boolean                          | Boolean          | bool
+// | Integer      | System.Int32                                 | Integer                          | Integer (*)      | int/long (†)
+// | Float        | System.Double                                | Double                           | Number           | float
+// | String       | System.String                                | java.lang.String                 | String           | str/unicode (†)
+// | List         | System.Collections.Generic.IList<T>          | java.util.List<T>                | Array            | list
+// | Map          | System.Collections.IDictionary<TKey, TValue> | java.util.Map<String, Value> (*) | Object           | dict
+// | Node         | Node (*)                                     | Node (*)                         | Node (*)         | Node (*)
+// | Relationship | Relationship (*)                             | Relationship (*)                 | Relationship (*) | Relationship (*)
+// | Path         | Path (*)                                     | Path (*)                         | Path (*)         | Path (*)
+// | Identity     | ?                                            | ?                                | ?                | ?
+// |===
+
+The Neo4j driver maps Neo4j types to native language types as follows:
+
+// TODO: Explain the Node, Relationship and Path types.
 
 [.tabbed-example]
-.Type mapping
+.Map Neo4j types to native language types
 ====
 [include-with-dotnet]
 --
-[source, csharp]
-----
-COMING SOON
-----
+[options="header", cols="m, m"]
+|===
+| Neo4j        | .NET
+| Null         | null
+| Boolean      | System.Boolean
+| Integer      | System.Int32
+| Float        | System.Double
+| String       | System.String
+| List         | System.Collections.Generic.IList<T>
+| Map          | System.Collections.IDictionary<TKey, TValue>
+| Node         | Node (*)
+| Relationship | Relationship (*)
+| Path         | Path (*)
+| Identity     | ?
+|===
 --
 
 [include-with-java]
 --
-[source, java]
-----
-COMING SOON
-----
+[options="header", cols="m, m"]
+|===
+| Neo4j        | Java
+| Null         | null
+| Boolean      | Boolean
+| Integer      | Integer
+| Float        | Double
+| String       | java.lang.String
+| List         | java.util.List<T>
+| Map          | java.util.Map<String, Value> (*)
+| Node         | Node (*)
+| Relationship | Relationship (*)
+| Path         | Path (*)
+| Identity     | ?
+|===
+// TODO: Explain `Value`.
 --
 
 [include-with-javascript]
 --
-[source, javascript]
-----
-COMING SOON
-----
+[options="header", cols="m, m"]
+|===
+| Neo4j        | JavaScript
+| Null         | null
+| Boolean      | Boolean
+| Integer      | Integer (*)
+| Float        | Number
+| String       | String
+| List         | Array
+| Map          | Object
+| Node         | Node (*)
+| Relationship | Relationship (*)
+| Path         | Path (*)
+| Identity     |
+|===
+// TODO: Explain `Integer`.
 --
 
 [include-with-python]
 --
-[source, python]
-----
-COMING SOON
-----
+[options="header", cols="m, m"]
+|===
+| Neo4j        | Python
+| Null         | None
+| Boolean      | bool
+| Integer      | int/long (†)
+| Float        | float
+| String       | str/unicode (†)
+| List         | list
+| Map          | dict
+| Node         | Node (*)
+| Relationship | Relationship (*)
+| Path         | Path (*)
+| Identity     |
+|===
+
+.(†) Python versions
+****
+In Python 2, a Neo4j `Integer` is mapped to `int` and a Neo4j `String` to `str`.
+In Python 3 `long` and `unicode` are mapped instead.
+****
+
 --
 ====
-

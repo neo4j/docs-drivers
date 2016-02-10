@@ -14,8 +14,10 @@ This includes the Neo4j Browser, Neo4j Shell, the Cypher REST endpoint, the embe
 The Neo4j Manual contains a {neo4j-manual-status-codes}[list of all the Cypher errors].
 --
 
+// The other type of error is protocol error.
+
 // TODO: The list of status codes is broader than Cypher.
-// Will these not be returned by the drivers?
+//       Will these not be returned by the drivers?
 
 
 [.tabbed-example]

@@ -16,8 +16,4 @@ When the entire result stream is consumed, the session returns to the `READY` st
 
 If the execution is not successful, the session enters the `FAILED` state.
 
-// TODO:
-// 1) How does the user handle the failed state?
-// 2) Document the `IGNORED` that happens when client has not acknowledged `FAILED` state.
-
 image::bolt-session-state-machine.svg[]

@@ -3,20 +3,32 @@
 
 :maven-artifact-info: http://search.maven.org/#artifactdetails%7Corg.neo4j.driver%7Cneo4j-java-driver%7C{java-driver-version}%7Cjar
 
+
+[[versions]]
+== Versions
+
+Consult the version table to determine which version of the driver to use with a particular Neo4j server.
+
+.Supported versions
+[options='header']
+|===
+| Driver version | Neo4j version | Bolt protocol version
+
+| 1.0            | 3.0           | 1
+|===
+
 You can download the driver source or acquire it with one of the dependency managers of your language.
 
-[[download]]
-== Download
-
-To prepare the driver for usage follow the instructions:
-
+.Example: Acquire the driver
 [.tabbed-example]
 ====
 [include-with-dotnet]
 --
+Using NuGet in Visual Studio:
+
 [source, csharp, subs="attributes, specialcharacters"]
 ----
-nuget install Neo4j.Driver-{dotnet-driver-version}
+PM> Install-Package Neo4j.Driver-{dotnet-driver-version}
 ----
 --
 
@@ -61,19 +73,6 @@ pip install neo4j-driver=={python-driver-version}
 ----
 --
 ====
-
-[[versions]]
-== Versions
-
-.Supported versions
-[options='header']
-|===
-| Driver version | Neo4j version | Bolt protocol version
-
-| 1.0            | 3.0           | 1
-|===
-
-NOTE: The table will get updated with future releases.
 
 // TODO: Add this back if/when it's useful for users.
 //Each version of a Driver supports up to four different versions of the Bolt protocol.

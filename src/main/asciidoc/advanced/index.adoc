@@ -1,3 +1,8 @@
 = Advanced
+:neo4j-manual-bolt: http://neo4j.com/docs/milestone/bolt.html
 
 include::session-state.adoc[leveloffset=+1]
+
+To help implement a Neo4j driver in a new language, the following resources are available:
+
+* link:{neo4j-manual-bolt}[Bolt documentation]
