@@ -34,8 +34,8 @@ include::types/index.adoc[leveloffset=+1]
 
 include::errors/index.adoc[leveloffset=+1]
 
-include::advanced/index.adoc[leveloffset=+1]
-
 include::terminology.adoc[leveloffset=+1]
 
 include::colophon.adoc[leveloffset=+1]
+
+// TODO: Remove the advanced section include and file (including the image file).

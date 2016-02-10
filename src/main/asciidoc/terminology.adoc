@@ -11,7 +11,8 @@ In some cases, multiple terms may be used for the same or a similar concept.
 
 [glossary]
 [[term-bolt]]bolt::
-The protocol used by Neo4j drivers to communicate with the server.
+Bolt is a Neo4j proprietary, binary protocol used by the drivers to communicate with the server.
+Bolt is versioned independently from the database and the drivers.
 
 [[term-driver]]driver::
 An interface for operating the Neo4j database.

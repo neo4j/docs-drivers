@@ -1,5 +1,5 @@
-[[result]]
-= Result
+[[results]]
+= Results
 
 :neo4j-manual-profile-query: http://neo4j.com/docs/stable/how-do-i-profile-a-query.html
 
@@ -10,42 +10,30 @@
 Results returned from Neo4j are presented as a stream of records.
 --
 
-To successfully process the results from running a statement it is important to know about the following:
-
-* Result cursors and records
-* Result lifetime
-* Result types and type mapping
-* Result summary
-
-// include::concepts.adoc[leveloffset=+1]
-
-[[concepts]]
-== Concepts
-
-// [abstract]
-// --
-// Results are returned from Neo4j as a _stream of records_.
-// A _result cursor_ walks through the stream, giving access to individual _record views_.
-// --
-
 When a statement is run, results are returned as a record stream.
-The stream itself is represented by a result cursor (see <<result-cursor>>), which is used to access the individual records.
+The stream itself is represented by a result cursor which is used to access the individual records.
 The individual records can be accessed one at a time, or all at once.
-
-Results are valid until the next statement is run, or until the end of the current transaction, whichever comes first.
-To hold on to the results while running additional statements, or to use the results outside of the scope of the current transaction, the results must be retained (see <<result-retain>>).
+Results are valid until the next statement is run or until the end of the current transaction, whichever comes first.
+To hold on to the results while running additional statements, or to use the results outside of the scope of the current transaction, the results must be retained by assigning them to a variable.
 
 
 [[result-cursor]]
-=== Result Cursor
+== The result cursor
 
 A result cursor provides access to the stream of records that make up the results.
-Initially, before the stream has begun to be consumed, all field values are `null`.
-// TODO: What does that mean? Why does the developer care?
-// TODO: Would it be possible to be trapped by this in some language?
+The cursor is moved through the stream and points to each record in turn.
+Before the cursor is moved onto the first record, it points _before_ the first record.
+When the cursor has traversed to the end of the result stream, summary information and metadata are available.
+
+[NOTE]
+--
+Result records are loaded lazily as the cursor is moved through the stream.
+This means that the cursor must be moved to the first result before this result can be consumed.
+It also means that the entire stream must be explicitly consumed before summary information and metadata is available.
+--
 
 [.tabbed-example]
-.Result cursor example
+.Example: Use a result cursor
 ====
 [include-with-dotnet]
 --
@@ -81,26 +69,24 @@ include::{python-examples}/test_examples.py[tag=result-cursor]
 ====
 
 
-[[record-view]]
-=== Record View
+[[result-record]]
+== The record
 
 The result record stream is made up of individual records.
-These are accessed as record views.
-The record view provides immutable access to a single record.
-
-The underlying record is an ordered map of keys and values.
+A record provides an immutable view of a part of a result.
+It is an ordered map of keys and values.
 These key-value pairs are called _fields_.
-As the fields are both keyed and ordered, the value of a field can be accessed either by position _(0-based integer)_ or by key _(string)_.
+As the fields are both keyed and ordered, the value of a field can be accessed either by position _(0-based Integer)_ or by key _(String)_.
 
 [NOTE]
 .Access values by key or position
 --
-* To access values by key, use a string.
 * To access values by position, use a ``0``-based integer.
+* To access values by key, use a string.
 --
 
 [.tabbed-example]
-.Record view example
+.Example: Use a record
 ====
 [include-with-dotnet]
 --
@@ -131,45 +117,6 @@ COMING SOON
 [source, python]
 ----
 COMING SOON
-----
---
-====
-
-
-// include::processing.adoc[leveloffset=+1]
-[[processing]]
-== Process results
-
-[.tabbed-example]
-.Process results
-====
-[include-with-dotnet]
---
-[source, csharp]
-----
-include::{dotnet-examples}/Examples.cs[tags=retain-result-process]
-----
---
-
-[include-with-java]
---
-[source, java]
-----
-include::{java-examples}/Examples.java[tags=retain-result-process]
-----
---
-[include-with-javascript]
---
-[source, javascript]
-----
-include::{javascript-examples}/examples.test.js[tags=retain-result-process]
-----
---
-[include-with-python]
---
-[source, python]
-----
-include::{python-examples}/test_examples.py[tags=retain-result-process]
 ----
 --
 ====
@@ -181,9 +128,13 @@ include::{python-examples}/test_examples.py[tags=retain-result-process]
 The result record stream is available until another statement is run in the session, or until the current transaction is closed.
 To hold on to the results beyond this scope, the results need to be explicitly _retained_.
 For retaining results, each driver offers methods that collect the result stream and translate it into standard data structures for each language.
+Retained results can be processed, while the session is free to take on the next workload.
+The saved results can also be used directly to run a new statement.
+
+
 
 [.tabbed-example]
-.Retaining results example
+.Example: Retain results for further processing
 ====
 [include-with-dotnet]
 --
@@ -215,11 +166,8 @@ include::{python-examples}/test_examples.py[tags=retain-result-process]
 --
 ====
 
-Retained results can be processed, while the session is free to take on the next workload.
-The translated results can also be used directly to run a new statement.
-
 [.tabbed-example]
-.Use results in a new query
+.Example: Use results in a new query
 ====
 [include-with-dotnet]
 --
@@ -253,15 +201,16 @@ include::{python-examples}/test_examples.py[tags=retain-result-query]
 ====
 
 
-// include::summary.adoc[leveloffset=+1]
 [[result-summary]]
 == Result summary
 
 Metadata can be retrieved along with the result stream.
 An example is the query plan obtained by prepending a Cypher query with `PROFILE` or `EXPLAIN`.
+The following example will produce an explain plan with accurate numbers by running the query in the database.
+This will output a query profile (see the {neo4j-manual-profile-query}[Neo4j Manual] for more information about query profiling).
 
 [.tabbed-example]
-.Result summary with query profile
+.Example: Profile query and print execution plan
 ====
 [include-with-dotnet]
 --
@@ -294,12 +243,11 @@ include::{python-examples}/test_examples.py[tag=result-summary-query-profile]
 --
 ====
 
-This will output a query profile (see the {neo4j-manual-profile-query}[Neo4j Manual] for more information about query profiling).
-
-Neo4j may also provide notifications for your query, for example, warning when a query will cause the execution engine to build a cartesian product.
+Neo4j may also provide notifications for a query, for example, warning when a query will cause the execution engine to build a cartesian product.
+The following example will produce an explain plan with estimated numbers, without actually running the query in the database.
 
 [.tabbed-example]
-.Result summary with notifications
+.Example: Explain query and print notifications
 ====
 [include-with-dotnet]
 --
@@ -331,6 +279,4 @@ include::{python-examples}/test_examples.py[tags=result-summary-notifications]
 ----
 --
 ====
-
-The output may be something like: _This query builds a cartesian product between disconnected patterns._
 

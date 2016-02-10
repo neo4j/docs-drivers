@@ -1,22 +1,22 @@
 [[transactions]]
-= Transactions
+= Transaction management
 
 :manual-transactions: http://neo4j.com/docs/stable/transactions.html
 
 When the session runs a statement directly, it creates an implicit transaction.
+The session can also create explicit transactions to be managed manually.
+When explicitly told to begin a new transaction, the session will return a transaction object.
+The transaction object allows for fine-grained transaction control.
 
 [NOTE]
 --
 Read about how transactions in general work in the {manual-transactions}[chapter on transactions in the Neo4j Manual].
 --
 
+// TODO: This and the following examples are not realistic and don't explain the use of manual transaction management.
+//       We need realistic examples.
 
-== Manual Transaction Management
-
-The session can also create explicit transactions to be managed manually.
-This allows for more fine-grained control.
-
-.Running a statement in a manually managed transaction
+.Example: Run a statement in a manually managed transaction
 [.tabbed-example]
 ====
 [include-with-dotnet]
@@ -55,7 +55,7 @@ include::{python-examples}/test_examples.py[tags=transaction-commit]
 The manually managed transaction can also be rolled back.
 
 [.tabbed-example]
-.Rolling back a manually managed transaction
+.Example: Roll back a manually managed transaction
 ====
 [include-with-dotnet]
 --

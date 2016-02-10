@@ -1,7 +1,7 @@
 [[use-the-driver]]
 = Use the driver
 
-Each Neo4j Driver has a database object for creating a driver.
+Each Neo4j driver has a database object for creating a driver.
 To use a driver, follow this pattern:
 
 . Ask the _database_ object for a new driver.
@@ -9,12 +9,10 @@ To use a driver, follow this pattern:
 . Use the _session_ object to run statements.
   It returns an object representing the results.
 . Process the _results_.
-
-[NOTE]
-Remember to exhaust the returned results so that the session is ready to run the next statement!
+. Close the session.
 
 [.tabbed-example]
-.Usage example
+.Example: Use the driver
 ====
 [include-with-dotnet]
 --
@@ -87,7 +85,5 @@ include::{python-examples}/test_examples.py[tags=minimal-example]
 
 As seen above, it is possible to run statements directly from the session object.
 The session will take care of opening and closing the transaction.
-The session also provides the opportunity for a user to manage the transaction.
-When explicitly told to begin a new transaction, the session will return a transaction object.
-The transaction object allows for fine-grained transaction control.
+The session also provides the opportunity for a user to manage the transaction explicitly.
 See <<transactions>> for details.
