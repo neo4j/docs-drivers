@@ -5,8 +5,8 @@
 
 In addition to the Bolt URL, the driver can be configured for:
 
-* connection pool size
-* connection pool behavior
+* session pool size
+* session pool behavior
 * authentication strategies
 * logging
 
@@ -14,12 +14,12 @@ In addition to the Bolt URL, the driver can be configured for:
 |===
 | Name                 | Description                                                                                                          | Default
 
-| Connection pool size | Max number of connections per URL.                                                                                   | 10
-| Idle time            | Connections that have been unused for longer than this threshold will be tested to verify that they are still alive. | 10
+| Session pool size* | Max number of sessions per URL.                                                                                   | 50
+//This config is actually not valid anymore. | Idle time            | Connections that have been unused for longer than this threshold will be tested to verify that they are still alive. | 10
 | Logging              | Provide a logging facility for the driver.                                                                           | N/A
 |===
 
-// TODO: Fix C# example to configure connection pool size.
+*For .Net and Python driver, instead of using session pool size, we provide idle session pool size, which is the maximum number of idle sessions that would be pooled by the driver. That is to say, for .Net and Python driver, there is no maximum limits on how many sessions that could be created, but a maximum limits on how many sessions that would be buffered after they are returned back to the sesssion pool.
 
 [.tabbed-example]
 .Example: Create a driver with configuration
@@ -59,27 +59,24 @@ include::{python-examples}/test_examples.py[tag=configuration]
 
 
 [[authentication-encryption]]
-== Authentication and encryption
+== Encryption and authentication
 
-All Neo4j drivers support encrypting the traffic between the Neo4j driver and the Neo4j instance using SSL/TLS.
+The Neo4j drivers support encrypting the traffic between the Neo4j driver and the Neo4j instance using SSL/TLS.
 Neo4j will by default allow both encrypted and unencrypted connections from drivers.
 This can be modified to require encryption for all connections.
 Please see \{some-handy-attribute-for-the-correct-page-in-the-manual\} for information on how to do that.
 
 We strongly encourage using encryption to keep authentication credentials and data stored in Neo4j secure.
-Because of this most drivers will turn encryption on by default.
-However, due to technical limitations, the .NET driver does not have encryption enabled by default.
-For similar reasons, the JavaScript driver does not have encryption enabled by default when running inside a Web Browser.
-
-// TODO: What are we trying to say here?
-//       If we want to say that the server can be configured to use a different port and to not use encryption,
-//       they need to find (create) content in the Manual that we can link to.
+Those drivers that are able to do so will use encryption by default.
+Because of technical limitations, the .NET driver does not have encryption enabled by default.
+Similarly, JavaScript driver does not have encryption enabled by default when running inside a web browser.
 
 
 === Enabling encryption
 
 While most drivers default to enabling encryption, it is good practice to configure encryption explicitly.
-This makes it clear encryption is used for other developers reading the code and minimizes the risk of mistakes from relying on defaults.
+This makes it clear that encryption is used for other developers reading the code and minimizes the risk of mistakes from relying on defaults.
+Encryption should only be turned off in a trusted internal network.
 
 [.tabbed-example]
 .Example: Configure driver to require TLS encryption
@@ -115,10 +112,11 @@ include::{python-examples}/test_examples.py[tag=tls-require-encryption]
 --
 ====
 
+
 === Trust
 
-When establishing an encrypted connection, it needs to be verified that the remote peer is who we expected to connect to.
-Without verifying this, an attacker can easily perform a so-called "man-in-the-middle" attack, tricking the driver to establish an encrypted connection with her instead of the Neo4j Instance.
+When establishing an encrypted connection the identity of the remote peer must be verified.
+Without verification of identity, communication is vulnerable to so-called "man-in-the-middle" attacks.
 Because of this, Neo4j drivers do not offer a way to establish encrypted connections without also establishing trust.
 
 Two trust strategies are available:
@@ -127,13 +125,15 @@ Two trust strategies are available:
 * Trust signed certificate.
 
 _Trust on first use_ means that the driver will trust the first connection to a host to be safe and intentional.
-On subsequent connections, the driver will verify that the host is the same as on that first connection.
+On subsequent connections, the driver will verify that the host is the same as on that first connection. To ensure this authentication strategy is valid, the first connection with the server should be established in a trusted network environment.
 
-Users of the `ssh` command line tool will recognize this as similar to the default trust strategy used there.
-This strategy allows a good degree of security with no configuration.
-Because of this, it is the default strategy on all platforms that support it.
+This strategy is similar to the default strategy used by the `ssh` command line tool and provides a good degree of security with no configuration.
+For this reason it is the default strategy on all platforms that support it.
 
+[CAUTION]
+--
 Due to technical limitations, this strategy is not available if you are using the .NET platform or if you are using the JavaScript driver inside a Web Browser.
+--
 
 // TODO: Why is trust-on-first-use not implemented in the C# driver? Will it be?
 // Answer: Because .NET's cross-platform APIs don't give us what we need to do it :( There's work underway to remedy this.
@@ -148,7 +148,6 @@ Due to technical limitations, this strategy is not available if you are using th
 include::{dotnet-examples}/Examples.cs[tags=tls-trust-on-first-use]
 ----
 --
-
 [include-with-java]
 --
 [source, java]
@@ -172,9 +171,13 @@ include::{python-examples}/test_examples.py[tag=tls-trust-on-first-use]
 --
 ====
 
-_Trust signed certificate_ means that the driver will only connect to a host if it presents a trusted certificate.
-A trusted certificate means either a certificate explicitly configured to be trusted by the driver or, more commonly, a certificate signed by a certificate the driver trusts.
-All drivers support this trust strategy.
+_Trust signed certificate_ means that the driver will only connect to a Neo4j instance if it provides a certificate trusted by the driver.
+In this scenario, one or more trusted certificate are installed in the driver.
+The server then authenticates itself to the driver with a certificate signed by one of the trusted certificates known to the driver.
+
+The way to install a trusted certificate into a driver varies for differ drivers.
+The Java driver directly accepts the file path to the trusted certificate and would load the certificate automatically during runtime.
+The .NET and Python drivers require that the certificate be imported into the operating system's trusted certificate store.
 
 [.tabbed-example]
 .Example: Configure driver to trust signed certificate
@@ -209,3 +212,49 @@ include::{python-examples}/test_examples.py[tag=tls-signed]
 ----
 --
 ====
+
+=== Authenticate user
+ 
+While the encrypted communication is established between a Neo4j driver and the server, the server might also require the driver to provide authentication credentials to authenticate who is connecting to the database.
+The authentication credentials is required if the server is configured to have authentication enabled. 
+// See 'Securing Neo4j Server' (http://neo4j.com/docs/3.0.0-SNAPSHOT/security-server.html) for more information.
+
+[.tabbed-example]
+.Example: Connecting the driver to the server with authentication credentials
+====
+[include-with-dotnet]
+--
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=connect-with-basic-auth]
+----
+--
+
+[include-with-java]
+--
+[source, java]
+----
+include::{java-examples}/Examples.java[tags=connect-with-basic-auth]
+----
+--
+[include-with-javascript]
+--
+[source, javascript]
+----
+include::{javascript-examples}/examples.test.js[tags=connect-with-basic-auth]
+----
+--
+[include-with-python]
+--
+[source, python]
+----
+include::{python-examples}/test_examples.py[tag=connect-with-basic-auth]
+----
+--
+====
+
+The authentication credentials would be sent in plain text directly, therefore it is highly recommended to use authentication with encryption.
+
+The first time to connect to a Neo4j server, the Neo4j server would require a user to change the default password once he or she logged in. 
+This rule applies to the connections provided via a driver too.
+Given a fresh installed Neo4j server, if a driver tries to connect to the Neo4j server with the default password, the attempt would probably fail with an error saying that the credentials are expired and a password reset is required. In this case, the user need to log in the Neo4j server via the browser to change the default password.
