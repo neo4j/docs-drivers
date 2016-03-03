@@ -12,7 +12,8 @@ The URL declares the protocol, host name, and port for the Neo4j server.
 == Bolt URL Format
 
 The Bolt URL follows the standard URL pattern of `scheme://hostname:port`.
-For example, `bolt://server:1234` would connect using the Bolt protocol to `server` on port `1234`.
+For example, `bolt://server:1234` would connect using the Bolt protocol to `server` on port `1234`. 
+If no port is provided in a Bolt URL, then default port `7687` will be appended at the end of the URL. For example, `bolt://server` would be the same with `bolt://server:7687`.
 
 [.tabbed-example]
 .Example: Create a driver
