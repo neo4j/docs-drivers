@@ -12,14 +12,13 @@ In addition to the Bolt URL, the driver can be configured for:
 
 [options='header', cols='2,5,1m']
 |===
-| Name                 | Description                                                                                                          | Default
-
-| Session pool size* | Max number of sessions per URL.                                                                                   | 50
-//This config is actually not valid anymore. | Idle time            | Connections that have been unused for longer than this threshold will be tested to verify that they are still alive. | 10
-| Logging              | Provide a logging facility for the driver.                                                                           | N/A
+| Name                  | Description                                | Default
+| Session pool size (*) | Max number of sessions per URL.            | 50
+| Logging               | Provide a logging facility for the driver. | N/A
 |===
 
-*For .Net and Python driver, instead of using session pool size, we provide idle session pool size, which is the maximum number of idle sessions that would be pooled by the driver. That is to say, for .Net and Python driver, there is no maximum limits on how many sessions that could be created, but a maximum limits on how many sessions that would be buffered after they are returned back to the sesssion pool.
+(*) The .NET and Python drivers provide _idle session pool size_, which is the maximum number of idle sessions to be pooled by the driver.
+There is no limit to how many sessions that can be created, but a maximum limits how many sessions will be buffered after they are returned to the session pool.
 
 [.tabbed-example]
 .Example: Create a driver with configuration
@@ -72,7 +71,7 @@ Because of technical limitations, the .NET driver does not have encryption enabl
 Similarly, JavaScript driver does not have encryption enabled by default when running inside a web browser.
 
 
-=== Enabling encryption
+== Enabling encryption
 
 While most drivers default to enabling encryption, it is good practice to configure encryption explicitly.
 This makes it clear that encryption is used for other developers reading the code and minimizes the risk of mistakes from relying on defaults.
@@ -113,7 +112,7 @@ include::{python-examples}/test_examples.py[tag=tls-require-encryption]
 ====
 
 
-=== Trust
+== Trust
 
 When establishing an encrypted connection the identity of the remote peer must be verified.
 Without verification of identity, communication is vulnerable to so-called "man-in-the-middle" attacks.
@@ -125,14 +124,15 @@ Two trust strategies are available:
 * Trust signed certificate.
 
 _Trust on first use_ means that the driver will trust the first connection to a host to be safe and intentional.
-On subsequent connections, the driver will verify that the host is the same as on that first connection. To ensure this authentication strategy is valid, the first connection with the server should be established in a trusted network environment.
+On subsequent connections, the driver will verify that it communicates with the same host as on the first connection.
+To ensure that this authentication strategy is valid the first connection to the server must be established in a trusted network environment.
 
 This strategy is similar to the default strategy used by the `ssh` command line tool and provides a good degree of security with no configuration.
 For this reason it is the default strategy on all platforms that support it.
 
 [CAUTION]
 --
-Due to technical limitations, this strategy is not available if you are using the .NET platform or if you are using the JavaScript driver inside a Web Browser.
+Due to technical limitations, this strategy is not available if you are using the .NET platform or if you are using the JavaScript driver inside a web browser.
 --
 
 // TODO: Why is trust-on-first-use not implemented in the C# driver? Will it be?
@@ -213,10 +213,11 @@ include::{python-examples}/test_examples.py[tag=tls-signed]
 --
 ====
 
-=== Authenticate user
- 
-While the encrypted communication is established between a Neo4j driver and the server, the server might also require the driver to provide authentication credentials to authenticate who is connecting to the database.
-The authentication credentials is required if the server is configured to have authentication enabled. 
+
+== Authenticate user
+
+While the encrypted communication is established between a Neo4j driver and the server, the server may also require the driver to provide authentication credentials for the user connecting to the database.
+Authentication credentials are required if the server is configured to have authentication enabled.
 // See 'Securing Neo4j Server' (http://neo4j.com/docs/3.0.0-SNAPSHOT/security-server.html) for more information.
 
 [.tabbed-example]
@@ -253,8 +254,12 @@ include::{python-examples}/test_examples.py[tag=connect-with-basic-auth]
 --
 ====
 
-The authentication credentials would be sent in plain text directly, therefore it is highly recommended to use authentication with encryption.
+If communication between driver and server are is not encrypted, authentication credentials are sent as plain text.
+It is highly recommended to use authentication with encryption.
 
-The first time to connect to a Neo4j server, the Neo4j server would require a user to change the default password once he or she logged in. 
-This rule applies to the connections provided via a driver too.
-Given a fresh installed Neo4j server, if a driver tries to connect to the Neo4j server with the default password, the attempt would probably fail with an error saying that the credentials are expired and a password reset is required. In this case, the user need to log in the Neo4j server via the browser to change the default password.
+[NOTE]
+--
+When connecting to Neo4j for the first time, the user must change the default password.
+Given a fresh installed Neo4j server, if a driver tries to connect to the Neo4j server with the default password, the attempt would probably fail with an error saying that the credentials are expired and a password reset is required.
+In this case, the user need to log in the Neo4j server via the browser to change the default password.
+--
