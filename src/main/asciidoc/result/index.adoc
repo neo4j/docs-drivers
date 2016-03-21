@@ -30,6 +30,9 @@ When the cursor has traversed to the end of the result stream, summary informati
 Result records are loaded lazily as the cursor is moved through the stream.
 This means that the cursor must be moved to the first result before this result can be consumed.
 It also means that the entire stream must be explicitly consumed before summary information and metadata is available.
+It is generally best practice to explicitly consume results and close sessions, in particular when running update statements.
+This applies even if the summary information is not required.
+Failing to consume a result can lead to unpredictable behaviour as there will be no guarantee that the server has seen and handled the Cypher statement.
 --
 
 [.tabbed-example]
