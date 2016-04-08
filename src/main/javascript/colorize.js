@@ -28,7 +28,7 @@ CodeMirror.colorize = (function() {
                 theme = " cm-s-neo";
             } else if (mode === "java") {
                 mode = "text/x-java";
-            } else if (mode == "csharp") {
+            } else if (mode === "csharp") {
                 mode = "text/x-csharp";
             } else if (mode  === "properties") {
                 mode = "text/x-properties";
