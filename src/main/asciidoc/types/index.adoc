@@ -20,7 +20,7 @@ The following Neo4j types are valid both for parameters and results:
 * Map
 
 Maps and lists can be processed by the database and used in a statement.
-Lists in which the elements share a single type can also be stored as properties on nodes and relationships.
+Lists in which the elements share a single primitive Neo4j type can be stored as properties on nodes and relationships.
 Maps, and lists in which the elements have mixed types, can not be stored as properties.
 
 In addition to the types valid both for parameters and results, the following Neo4j types are valid for results only:
@@ -28,38 +28,6 @@ In addition to the types valid both for parameters and results, the following Ne
 * Node
 * Relationship
 * Path
-
-// [options="header", cols="2m,3m,3m,2m,2m"]
-// |===
-// | Neo4j        | .NET                                                 | Java                         | JavaScript | Python
-// | Null         |                                                      |                              |            |
-// | Boolean      | System.Boolean                                       | Boolean                      |            |
-// | Integer      | System.Int32                                         | Integer                      | Integer    | int
-// | Float        | System.Double                                        | Float                        |            |
-// | String       | System.String                                        | java.lang.String             |            |
-// | List         | System.Collections.Generic.IList<T>                  | java.util.List<T>            | Array      | List
-// | Map          | System.Collections.Generic.IDictionary<TKey, TValue> | java.util.Map<String, Value> | Object     | Dictionary
-// | Node         | Node                                                 | Node                         | node       | node
-// | Relationship | Relationship                                         |                              |            |
-// | Path         | Path                                                 |                              |            |
-// | Identity     |                                                      |                              |            |
-// |===
-
-// [options="header", cols="2m,3m,3m,2m,2m"]
-// |===
-// | Neo4j        | .NET                                         | Java                             | JavaScript       | Python
-// | Null         | null                                         | null                             | null             | None
-// | Boolean      | System.Boolean                               | Boolean                          | Boolean          | bool
-// | Integer      | System.Int32                                 | Integer                          | Integer (*)      | int/long (†)
-// | Float        | System.Double                                | Double                           | Number           | float
-// | String       | System.String                                | java.lang.String                 | String           | str/unicode (†)
-// | List         | System.Collections.Generic.IList<T>          | java.util.List<T>                | Array            | list
-// | Map          | System.Collections.IDictionary<TKey, TValue> | java.util.Map<String, Value> (*) | Object           | dict
-// | Node         | Node (*)                                     | Node (*)                         | Node (*)         | Node (*)
-// | Relationship | Relationship (*)                             | Relationship (*)                 | Relationship (*) | Relationship (*)
-// | Path         | Path (*)                                     | Path (*)                         | Path (*)         | Path (*)
-// | Identity     | ?                                            | ?                                | ?                | ?
-// |===
 
 The Neo4j driver maps Neo4j types to native language types as follows:
 
@@ -80,9 +48,9 @@ The Neo4j driver maps Neo4j types to native language types as follows:
 | String       | System.String
 | List         | System.Collections.Generic.IList<T>
 | Map          | System.Collections.IDictionary<TKey, TValue>
-| Node         | Node (*)
-| Relationship | Relationship (*)
-| Path         | Path (*)
+| Node         | Neo4j.Driver.INode (*)
+| Relationship | Neo4j.Driver.IRelationship (*)
+| Path         | Neo4j.Driver.IPath (*)
 |===
 --
 
@@ -92,15 +60,15 @@ The Neo4j driver maps Neo4j types to native language types as follows:
 |===
 | Neo4j        | Java
 | Null         | null
-| Boolean      | Boolean
-| Integer      | Integer
-| Float        | Double
+| Boolean      | java.lang.Boolean
+| Integer      | java.lang.Integer
+| Float        | java.lang.Double
 | String       | java.lang.String
 | List         | java.util.List<T>
 | Map          | java.util.Map<String, Value> (*)
-| Node         | Node (*)
-| Relationship | Relationship (*)
-| Path         | Path (*)
+| Node         | org.neo4j.driver.v1.types.Node (*)
+| Relationship | org.neo4j.driver.v1.types.Relationship (*)
+| Path         | org.neo4j.driver.v1.types.Path (*)
 |===
 // TODO: Explain `Value`.
 --
