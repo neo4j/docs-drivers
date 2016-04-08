@@ -66,7 +66,7 @@ include::{javascript-examples}/examples.test.js[tags=result-cursor]
 --
 [source, python]
 ----
-include::{python-examples}/test_examples.py[tag=result-cursor]
+include::{python-examples}/test_examples.py[tag=result-traversal]
 ----
 --
 ====
@@ -164,7 +164,7 @@ include::{javascript-examples}/examples.test.js[tags=retain-result-process]
 --
 [source, python]
 ----
-include::{python-examples}/test_examples.py[tags=retain-result-process]
+include::{python-examples}/test_examples.py[tags=retain-result]
 ----
 --
 ====
@@ -198,7 +198,7 @@ include::{javascript-examples}/examples.test.js[tags=retain-result-query]
 --
 [source, python]
 ----
-include::{python-examples}/test_examples.py[tags=retain-result-query]
+include::{python-examples}/test_examples.py[tags=nested-statements]
 ----
 --
 ====
@@ -241,7 +241,7 @@ include::{javascript-examples}/examples.test.js[tags=result-summary-query-profil
 --
 [source, python]
 ----
-include::{python-examples}/test_examples.py[tag=result-summary-query-profile]
+include::{python-examples}/test_examples.py[tags=result-summary-query-profile]
 ----
 --
 ====

@@ -51,7 +51,7 @@ include::{javascript-examples}/examples.test.js[tags=configuration]
 --
 [source, python]
 ----
-include::{python-examples}/test_examples.py[tag=configuration]
+include::{python-examples}/test_examples.py[tags=configuration]
 ----
 --
 ====
@@ -107,7 +107,7 @@ include::{javascript-examples}/examples.test.js[tags=tls-require-encryption]
 --
 [source, python]
 ----
-include::{python-examples}/test_examples.py[tag=tls-require-encryption]
+include::{python-examples}/test_examples.py[tags=tls-require-encryption]
 ----
 --
 ====
@@ -163,7 +163,7 @@ include::{javascript-examples}/examples.test.js[tags=tls-trust-on-first-use]
 --
 [source, python]
 ----
-include::{python-examples}/test_examples.py[tag=tls-trust-on-first-use]
+include::{python-examples}/test_examples.py[tags=tls-trust-on-first-use]
 ----
 --
 ====
@@ -205,7 +205,7 @@ include::{javascript-examples}/examples.test.js[tags=tls-signed]
 --
 [source, python]
 ----
-include::{python-examples}/test_examples.py[tag=tls-signed]
+include::{python-examples}/test_examples.py[tags=tls-signed]
 ----
 --
 ====
@@ -246,7 +246,7 @@ include::{javascript-examples}/examples.test.js[tags=connect-with-basic-auth]
 --
 [source, python]
 ----
-include::{python-examples}/test_examples.py[tag=connect-with-basic-auth]
+include::{python-examples}/test_examples.py[tags=connect-with-basic-auth]
 ----
 --
 ====

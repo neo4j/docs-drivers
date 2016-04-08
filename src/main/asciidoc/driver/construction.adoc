@@ -47,7 +47,7 @@ include::{javascript-examples}/examples.test.js[tags=construct-driver]
 --
 [source, python]
 ----
-include::{python-examples}/test_examples.py[tag=construct-driver]
+include::{python-examples}/test_examples.py[tags=construct-driver]
 ----
 --
 ====
