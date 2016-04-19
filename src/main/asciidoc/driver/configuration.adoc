@@ -213,18 +213,17 @@ include::{python-examples}/test_examples.py[tags=tls-signed]
 
 === Authenticate user
 
-While the encrypted communication is established between a Neo4j driver and the server, the server may also require the driver to provide authentication credentials for the user connecting to the database.
-Authentication credentials are required if the server is configured to have authentication enabled.
+The server will require the driver to provide authentication credentials for the user to connect to the database, unless authentication has been disabled.
 // See 'Securing Neo4j Server' (http://neo4j.com/docs/3.0.0-SNAPSHOT/security-server.html) for more information.
 
 [.tabbed-example]
-.Example: Connecting the driver to the server with authentication credentials
+.Example: Connecting the driver to a server with authentication disabled
 ====
 [include-with-dotnet]
 --
 [source, csharp]
 ----
-include::{dotnet-examples}/Examples.cs[tags=connect-with-basic-auth]
+include::{dotnet-examples}/Examples.cs[tags=connect-with-auth-disabled]
 ----
 --
 
@@ -232,31 +231,31 @@ include::{dotnet-examples}/Examples.cs[tags=connect-with-basic-auth]
 --
 [source, java]
 ----
-include::{java-examples}/Examples.java[tags=connect-with-basic-auth]
+include::{java-examples}/Examples.java[tags=connect-with-auth-disabled]
 ----
 --
 [include-with-javascript]
 --
 [source, javascript]
 ----
-include::{javascript-examples}/examples.test.js[tags=connect-with-basic-auth]
+include::{javascript-examples}/examples.test.js[tags=connect-with-auth-disabled]
 ----
 --
 [include-with-python]
 --
 [source, python]
 ----
-include::{python-examples}/test_examples.py[tags=connect-with-basic-auth]
+include::{python-examples}/test_examples.py[tags=connect-with-auth-disabled]
 ----
 --
 ====
 
-If communication between driver and server are is not encrypted, authentication credentials are sent as plain text.
-It is highly recommended to use authentication with encryption.
+If communication between the driver and the server is not encrypted, authentication credentials are sent as plain text.
+It is highly recommended to use encryption when using authentication.
 
 [NOTE]
 --
 When connecting to Neo4j for the first time, the user must change the default password.
-Given a fresh installed Neo4j server, if a driver tries to connect to the Neo4j server with the default password, the attempt would probably fail with an error saying that the credentials are expired and a password reset is required.
-In this case, the user need to log in the Neo4j server via the browser to change the default password.
+Given a fresh Neo4j server installation, any attempt to connect to the Neo4j server with the default password will provide a notifcation indicating that the credentials have expired and the password needs to be updated.
+The browser can be used to change the expired password.
 --
