@@ -41,25 +41,25 @@ ext {
     driverLanguages = [
             'dotnet': [
                     'name'   : 'C#',
-                    'version': '1.0.0-M01',
+                    'version': '1.0.0-RC2',
                     'gitref' : '1.0',
                     'url'    : 'PLACEHOLDER_FOR_REPOSITORY_CONTAINING_THE_RELEASED_DOT_NET_DRIVER_ARTIFACT'
             ],
             'java': [
                     'name'   : 'Java',
-                    'version': '1.0.0-M01',
+                    'version': '1.0.0-RC2',
                     'gitref' : '1.0',
                     'url'    : 'http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.neo4j.driver%22%20AND%20a%3A%22neo4j-java-driver%22'
             ],
             'javascript': [
                     'name'   : 'JavaScript',
-                    'version': '1.0.0-M01',
+                    'version': '1.0.0-RC2',
                     'gitref' : '1.0',
                     'url'    : 'https://www.npmjs.com/package/neo4j-driver'
             ],
             'python'    : [
                     'name'   : 'Python',
-                    'version': '1.0.0b1',
+                    'version': '1.0.0rc2',
                     'gitref' : '1.0',
                     'url'    : 'https://pypi.python.org/pypi/neo4j-driver'
             ]
