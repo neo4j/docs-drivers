@@ -43,7 +43,7 @@ ext {
                     'name'   : 'C#',
                     'version': '1.0.0-RC2',
                     'gitref' : '1.0',
-                    'url'    : 'PLACEHOLDER_FOR_REPOSITORY_CONTAINING_THE_RELEASED_DOT_NET_DRIVER_ARTIFACT'
+                    'url'    : 'https://www.nuget.org/packages/Neo4j.Driver'
             ],
             'java': [
                     'name'   : 'Java',
