@@ -191,7 +191,7 @@ include::{java-examples}/Examples.java[tags=nested-statements]
 --
 [source, javascript]
 ----
-include::{javascript-examples}/examples.test.js[tags=nested-statement]
+include::{javascript-examples}/examples.test.js[tags=nested-statements]
 ----
 --
 [include-with-python]
