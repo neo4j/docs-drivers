@@ -1,5 +1,6 @@
 [[configuration]]
 = Configuration
+:configuring-bolt-connectors-uri: {operations-manual-base-uri}/#_configuring_bolt_connectors
 
 // TODO: Confirm which configuration items are actually _uniform_.
 
@@ -63,7 +64,7 @@ include::{python-examples}/test_examples.py[tags=configuration]
 All Neo4j drivers support encrypting the traffic between the Neo4j driver and the Neo4j instance using SSL/TLS.
 Neo4j will by default allow both encrypted and unencrypted connections from drivers.
 This can be modified to require encryption for all connections.
-Please see \{some-handy-attribute-for-the-correct-page-in-the-manual\} for information on how to do that.
+Please see the {configuring-bolt-connectors-uri}[Neo4j Operations Manual -> Configuring Bolt Connectors] for more information.
 
 We strongly encourage using encryption to keep authentication credentials and data stored in Neo4j secure.
 Because of this most drivers will turn encryption on by default.
