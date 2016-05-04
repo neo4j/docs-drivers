@@ -43,14 +43,14 @@ The Neo4j driver maps Neo4j types to native language types as follows:
 | Neo4j        | .NET
 | Null         | null
 | Boolean      | System.Boolean
-| Integer      | System.Int32
+| Integer      | System.Int64
 | Float        | System.Double
 | String       | System.String
 | List         | System.Collections.Generic.IList<T>
 | Map          | System.Collections.IDictionary<TKey, TValue>
-| Node         | Neo4j.Driver.INode (*)
-| Relationship | Neo4j.Driver.IRelationship (*)
-| Path         | Neo4j.Driver.IPath (*)
+| Node         | Neo4j.Driver.V1.INode (*)
+| Relationship | Neo4j.Driver.V1.IRelationship (*)
+| Path         | Neo4j.Driver.V1.IPath (*)
 |===
 --
 
@@ -61,16 +61,15 @@ The Neo4j driver maps Neo4j types to native language types as follows:
 | Neo4j        | Java
 | Null         | null
 | Boolean      | java.lang.Boolean
-| Integer      | java.lang.Integer
+| Integer      | java.lang.Long
 | Float        | java.lang.Double
 | String       | java.lang.String
 | List         | java.util.List<T>
-| Map          | java.util.Map<String, Value> (*)
+| Map          | java.util.Map<K, V>
 | Node         | org.neo4j.driver.v1.types.Node (*)
 | Relationship | org.neo4j.driver.v1.types.Relationship (*)
 | Path         | org.neo4j.driver.v1.types.Path (*)
 |===
-// TODO: Explain `Value`.
 --
 
 [include-with-javascript]
