@@ -1,7 +1,7 @@
 [[transactions]]
 = Transaction management
 
-:manual-transactions: http://neo4j.com/docs/stable/transactions.html
+:java-reference-transactions: {java-reference-base-uri}/#transactions
 
 When the session runs a statement directly, it creates an implicit transaction.
 The session can also create explicit transactions to be managed manually.
@@ -10,7 +10,7 @@ The transaction object allows for fine-grained transaction control.
 
 [NOTE]
 --
-Read about how transactions in general work in the {manual-transactions}[chapter on transactions in the Neo4j Manual].
+For details on transactions in Neo4j see the {java-reference-transactions}[Neo4j Java Developer Reference].
 --
 
 // TODO: This and the following examples are not realistic and don't explain the use of manual transaction management.
