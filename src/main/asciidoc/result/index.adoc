@@ -1,8 +1,6 @@
 [[results]]
 = Results
 
-:neo4j-manual-profile-query: http://neo4j.com/docs/stable/how-do-i-profile-a-query.html
-
 // TODO https://github.com/neo-technology/driver-compliance-kit/blob/08-results/08-results-synchronous.adoc
 
 [abstract]
@@ -210,7 +208,7 @@ include::{python-examples}/test_examples.py[tags=nested-statements]
 Metadata can be retrieved along with the result stream.
 An example is the query plan obtained by prepending a Cypher query with `PROFILE` or `EXPLAIN`.
 The following example will produce an explain plan with accurate numbers by running the query in the database.
-This will output a query profile (see the {neo4j-manual-profile-query}[Neo4j Manual] for more information about query profiling).
+This will output a query profile (see <<how-do-i-profile-a-query>> for more information about query profiling).
 
 [.tabbed-example]
 .Example: Profile query and print execution plan
