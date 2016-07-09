@@ -1,4 +1,4 @@
-[[lifecycle]]
+[[driver-lifecycle]]
 = Lifecycle
 
 For most use cases it is recommended to use a single driver instance throughout an application.

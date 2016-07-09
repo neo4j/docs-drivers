@@ -1,5 +1,5 @@
 [colophon]
-[[colophon]]
+[[driver-colophon]]
 = Colophon
 
 (C) 2015 Neo Technology

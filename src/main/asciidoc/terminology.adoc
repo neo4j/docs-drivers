@@ -1,5 +1,5 @@
 [glossary]
-[[terminology]]
+[[driver-terminology]]
 = Terminology
 
 This chapter explains the terminology used in the Neo4j Driver manual.

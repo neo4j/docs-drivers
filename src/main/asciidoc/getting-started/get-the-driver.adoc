@@ -1,10 +1,10 @@
-[[get-the-driver]]
+[[driver-get-the-driver]]
 = Get the driver
 
 :maven-artifact-info: http://search.maven.org/#artifactdetails%7Corg.neo4j.driver%7Cneo4j-java-driver%7C{java-driver-version}%7Cjar
 
 
-[[versions]]
+[[driver-versions]]
 == Versions
 
 Consult the version table to determine which version of the driver to use with a particular Neo4j server.

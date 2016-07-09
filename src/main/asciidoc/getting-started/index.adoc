@@ -1,4 +1,4 @@
-[[getting-started]]
+[[driver-getting-started]]
 = Getting Started
 
 [abstract]

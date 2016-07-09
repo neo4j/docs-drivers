@@ -1,4 +1,4 @@
-[[configuration]]
+[[driver-configuration]]
 = Configuration
 :configuring-bolt-connectors-uri: {operations-manual-base-uri}/#_configuring_bolt_connectors
 
@@ -58,7 +58,7 @@ include::{python-examples}/test_examples.py[tags=configuration]
 ====
 
 
-[[authentication-encryption]]
+[[driver-authentication-encryption]]
 == Encryption and authentication
 
 All Neo4j drivers support encrypting the traffic between the Neo4j driver and the Neo4j instance using SSL/TLS.

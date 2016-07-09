@@ -1,4 +1,4 @@
-[[driver]]
+[[driver-driver]]
 = Driver
 
 [abstract]

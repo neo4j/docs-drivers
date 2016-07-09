@@ -1,4 +1,4 @@
-[[transactions]]
+[[driver-transactions]]
 = Transaction management
 
 :java-reference-transactions: {java-reference-base-uri}/#transactions

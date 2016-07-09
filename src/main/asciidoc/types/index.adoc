@@ -1,4 +1,4 @@
-[[types]]
+[[driver-types]]
 = Types
 
 [abstract]

@@ -1,4 +1,4 @@
-[[run-statement]]
+[[driver-run-statement]]
 = Run a statement
 
 The session can run statements directly.

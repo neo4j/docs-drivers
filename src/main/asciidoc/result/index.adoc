@@ -1,4 +1,4 @@
-[[results]]
+[[driver-results]]
 = Results
 
 // TODO https://github.com/neo-technology/driver-compliance-kit/blob/08-results/08-results-synchronous.adoc
@@ -15,7 +15,7 @@ Results are valid until the next statement is run or until the end of the curren
 To hold on to the results while running additional statements, or to use the results outside of the scope of the current transaction, the results must be retained by assigning them to a variable.
 
 
-[[result-cursor]]
+[[driver-result-cursor]]
 == The result cursor
 
 A result cursor provides access to the stream of records that make up the results.
@@ -70,7 +70,7 @@ include::{python-examples}/test_examples.py[tag=result-traversal]
 ====
 
 
-[[result-record]]
+[[driver-result-record]]
 == The record
 
 The result record stream is made up of individual records.
@@ -123,7 +123,7 @@ include::{python-examples}/test_examples.py[tag=access-record]
 ====
 
 
-[[result-retain]]
+[[driver-result-retain]]
 === Retaining Results
 
 The result record stream is available until another statement is run in the session, or until the current transaction is closed.

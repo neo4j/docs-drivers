@@ -1,4 +1,4 @@
-[[use-the-driver]]
+[[driver-use-the-driver]]
 = Use the driver
 
 Each Neo4j driver has a database object for creating a driver.

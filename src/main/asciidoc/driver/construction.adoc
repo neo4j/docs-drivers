@@ -1,4 +1,4 @@
-[[construction]]
+[[driver-construction]]
 = Construction
 
 The driver package includes a graph database object.
@@ -8,7 +8,7 @@ When requesting a driver instance from the database object a URL is provided.
 The URL declares the protocol, host name, and port for the Neo4j server.
 
 
-[[url-format]]
+[[driver-url-format]]
 == Bolt URL format
 
 A Bolt URL follows the standard URL pattern of `scheme://hostname:port`.

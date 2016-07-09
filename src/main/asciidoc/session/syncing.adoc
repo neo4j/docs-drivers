@@ -1,4 +1,4 @@
-[[syncing]]
+[[driver-syncing]]
 = Syncing
 
 The Neo4j drivers support syncing to reduce network traffic.
