@@ -28,7 +28,7 @@ Using NuGet in Visual Studio:
 
 [source, csharp, subs="attributes, specialcharacters"]
 ----
-PM> Install-Package Neo4j.Driver-{dotnet-driver-version}
+PM> Install-Package Neo4j.Driver -Version {dotnet-driver-version}
 ----
 --
 
