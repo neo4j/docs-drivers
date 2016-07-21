@@ -24,7 +24,7 @@ There is no limit to how many sessions that can be created, but a maximum limits
 [.tabbed-example]
 .Example: Create a driver with configuration
 ====
-[include-with-dotnet]
+[.include-with-dotnet]
 ======
 [source, csharp]
 ----
@@ -32,7 +32,7 @@ include::{dotnet-examples}/Examples.cs[tags=configuration]
 ----
 ======
 
-[include-with-java]
+[.include-with-java]
 ======
 [source, java]
 ----
@@ -40,7 +40,7 @@ include::{java-examples}/Examples.java[tags=configuration]
 ----
 ======
 
-[include-with-javascript]
+[.include-with-javascript]
 ======
 [source, javascript]
 ----
@@ -48,7 +48,7 @@ include::{javascript-examples}/examples.test.js[tags=configuration]
 ----
 ======
 
-[include-with-python]
+[.include-with-python]
 ======
 [source, python]
 ----
@@ -82,7 +82,7 @@ This makes it clear encryption is used for other developers reading the code and
 [.tabbed-example]
 .Example: Configure driver to require TLS encryption
 ====
-[include-with-dotnet]
+[.include-with-dotnet]
 ======
 [source, csharp]
 ----
@@ -90,21 +90,21 @@ include::{dotnet-examples}/Examples.cs[tags=tls-require-encryption]
 ----
 ======
 
-[include-with-java]
+[.include-with-java]
 ======
 [source, java]
 ----
 include::{java-examples}/Examples.java[tags=tls-require-encryption]
 ----
 ======
-[include-with-javascript]
+[.include-with-javascript]
 ======
 [source, javascript]
 ----
 include::{javascript-examples}/examples.test.js[tags=tls-require-encryption]
 ----
 ======
-[include-with-python]
+[.include-with-python]
 ======
 [source, python]
 ----
@@ -138,7 +138,7 @@ Because of technical limitations this strategy is not available for the .NET pla
 [.tabbed-example]
 .Example: Configure driver to trust on first use
 ====
-[include-with-dotnet]
+[.include-with-dotnet]
 ======
 [source, csharp]
 ----
@@ -146,21 +146,21 @@ include::{dotnet-examples}/Examples.cs[tags=tls-trust-on-first-use]
 ----
 ======
 
-[include-with-java]
+[.include-with-java]
 ======
 [source, java]
 ----
 include::{java-examples}/Examples.java[tags=tls-trust-on-first-use]
 ----
 ======
-[include-with-javascript]
+[.include-with-javascript]
 ======
 [source, javascript]
 ----
 include::{javascript-examples}/examples.test.js[tags=tls-trust-on-first-use]
 ----
 ======
-[include-with-python]
+[.include-with-python]
 ======
 [source, python]
 ----
@@ -180,7 +180,7 @@ The .NET and Python drivers require the certificate to first be installed into t
 [.tabbed-example]
 .Example: Configure driver to trust signed certificate
 ====
-[include-with-dotnet]
+[.include-with-dotnet]
 ======
 [source, csharp]
 ----
@@ -188,21 +188,21 @@ include::{dotnet-examples}/Examples.cs[tags=tls-signed]
 ----
 ======
 
-[include-with-java]
+[.include-with-java]
 ======
 [source, java]
 ----
 include::{java-examples}/Examples.java[tags=tls-signed]
 ----
 ======
-[include-with-javascript]
+[.include-with-javascript]
 ======
 [source, javascript]
 ----
 include::{javascript-examples}/examples.test.js[tags=tls-signed]
 ----
 ======
-[include-with-python]
+[.include-with-python]
 ======
 [source, python]
 ----
@@ -220,7 +220,7 @@ The server will require the driver to provide authentication credentials for the
 [.tabbed-example]
 .Example: Connecting the driver to a server with authentication disabled
 ====
-[include-with-dotnet]
+[.include-with-dotnet]
 ======
 [source, csharp]
 ----
@@ -228,21 +228,21 @@ include::{dotnet-examples}/Examples.cs[tags=connect-with-auth-disabled]
 ----
 ======
 
-[include-with-java]
+[.include-with-java]
 ======
 [source, java]
 ----
 include::{java-examples}/Examples.java[tags=connect-with-auth-disabled]
 ----
 ======
-[include-with-javascript]
+[.include-with-javascript]
 ======
 [source, javascript]
 ----
 include::{javascript-examples}/examples.test.js[tags=connect-with-auth-disabled]
 ----
 ======
-[include-with-python]
+[.include-with-python]
 ======
 [source, python]
 ----

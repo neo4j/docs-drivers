@@ -36,7 +36,7 @@ Failing to consume a result can lead to unpredictable behaviour as there will be
 [.tabbed-example]
 .Example: Use a result cursor
 ====
-[include-with-dotnet]
+[.include-with-dotnet]
 ======
 [source, csharp]
 ----
@@ -44,7 +44,7 @@ include::{dotnet-examples}/Examples.cs[tags=result-traversal]
 ----
 ======
 
-[include-with-java]
+[.include-with-java]
 ======
 [source, java]
 ----
@@ -52,7 +52,7 @@ include::{java-examples}/Examples.java[tags=result-traversal]
 ----
 ======
 
-[include-with-javascript]
+[.include-with-javascript]
 ======
 [source, javascript]
 ----
@@ -60,7 +60,7 @@ include::{javascript-examples}/examples.test.js[tags=result-traversal]
 ----
 ======
 
-[include-with-python]
+[.include-with-python]
 ======
 [source, python]
 ----
@@ -89,7 +89,7 @@ As the fields are both keyed and ordered, the value of a field can be accessed e
 [.tabbed-example]
 .Example: Use a record
 ====
-[include-with-dotnet]
+[.include-with-dotnet]
 ======
 [source, csharp]
 ----
@@ -97,7 +97,7 @@ include::{dotnet-examples}/Examples.cs[tags=access-record]
 ----
 ======
 
-[include-with-java]
+[.include-with-java]
 ======
 [source, java]
 ----
@@ -105,7 +105,7 @@ include::{java-examples}/Examples.java[tags=access-record]
 ----
 ======
 
-[include-with-javascript]
+[.include-with-javascript]
 ======
 [source, javascript]
 ----
@@ -113,7 +113,7 @@ include::{javascript-examples}/examples.test.js[tags=access-record]
 ----
 ======
 
-[include-with-python]
+[.include-with-python]
 ======
 [source, python]
 ----
@@ -137,28 +137,28 @@ The saved results can also be used directly to run a new statement.
 [.tabbed-example]
 .Example: Retain results for further processing
 ====
-[include-with-dotnet]
+[.include-with-dotnet]
 ======
 [source, csharp]
 ----
 include::{dotnet-examples}/Examples.cs[tags=retain-result]
 ----
 ======
-[include-with-java]
+[.include-with-java]
 ======
 [source, java]
 ----
 include::{java-examples}/Examples.java[tags=retain-result]
 ----
 ======
-[include-with-javascript]
+[.include-with-javascript]
 ======
 [source, javascript]
 ----
 include::{javascript-examples}/examples.test.js[tags=retain-result]
 ----
 ======
-[include-with-python]
+[.include-with-python]
 ======
 [source, python]
 ----
@@ -170,7 +170,7 @@ include::{python-examples}/test_examples.py[tags=retain-result]
 [.tabbed-example]
 .Example: Use results in a new query
 ====
-[include-with-dotnet]
+[.include-with-dotnet]
 ======
 [source, csharp]
 ----
@@ -178,21 +178,21 @@ include::{dotnet-examples}/Examples.cs[tags=nested-statements]
 ----
 ======
 
-[include-with-java]
+[.include-with-java]
 ======
 [source, java]
 ----
 include::{java-examples}/Examples.java[tags=nested-statements]
 ----
 ======
-[include-with-javascript]
+[.include-with-javascript]
 ======
 [source, javascript]
 ----
 include::{javascript-examples}/examples.test.js[tags=nested-statements]
 ----
 ======
-[include-with-python]
+[.include-with-python]
 ======
 [source, python]
 ----
@@ -213,7 +213,7 @@ This will output a query profile (see <<how-do-i-profile-a-query>> for more info
 [.tabbed-example]
 .Example: Profile query and print execution plan
 ====
-[include-with-dotnet]
+[.include-with-dotnet]
 ======
 [source, csharp]
 ----
@@ -221,21 +221,21 @@ include::{dotnet-examples}/Examples.cs[tags=result-summary-query-profile]
 ----
 ======
 
-[include-with-java]
+[.include-with-java]
 ======
 [source, java]
 ----
 include::{java-examples}/Examples.java[tags=result-summary-query-profile]
 ----
 ======
-[include-with-javascript]
+[.include-with-javascript]
 ======
 [source, javascript]
 ----
 include::{javascript-examples}/examples.test.js[tags=result-summary-query-profile]
 ----
 ======
-[include-with-python]
+[.include-with-python]
 ======
 [source, python]
 ----
@@ -250,7 +250,7 @@ The following example will produce an explain plan with estimated numbers, witho
 [.tabbed-example]
 .Example: Explain query and print notifications
 ====
-[include-with-dotnet]
+[.include-with-dotnet]
 ======
 [source, csharp]
 ----
@@ -258,21 +258,21 @@ include::{dotnet-examples}/Examples.cs[tags=result-summary-notifications]
 ----
 ======
 
-[include-with-java]
+[.include-with-java]
 ======
 [source, java]
 ----
 include::{java-examples}/Examples.java[tags=result-summary-notifications]
 ----
 ======
-[include-with-javascript]
+[.include-with-javascript]
 ======
 [source, javascript]
 ----
 include::{javascript-examples}/examples.test.js[tags=result-summary-notifications]
 ----
 ======
-[include-with-python]
+[.include-with-python]
 ======
 [source, python]
 ----

@@ -14,7 +14,7 @@ To use a driver, follow this pattern:
 [.tabbed-example]
 .Example: Use the driver
 ====
-[include-with-dotnet]
+[.include-with-dotnet]
 ======
 For a minimal working example, the following imports are necessary.
 
@@ -31,7 +31,7 @@ include::{dotnet-examples}/Examples.cs[tags=minimal-example]
 ----
 ======
 
-[include-with-java]
+[.include-with-java]
 ======
 For a minimal working example, the following imports are necessary.
 
@@ -48,7 +48,7 @@ include::{java-examples}/MinimalWorkingExample.java[tags=minimal-example]
 ----
 ======
 
-[include-with-javascript]
+[.include-with-javascript]
 ======
 For a minimal working example, the following imports are necessary.
 
@@ -65,7 +65,7 @@ include::{javascript-examples}/examples.test.js[tags=minimal-example]
 ----
 ======
 
-[include-with-python]
+[.include-with-python]
 ======
 For a minimal working example, the following imports are necessary.
 

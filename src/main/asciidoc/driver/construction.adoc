@@ -19,7 +19,7 @@ For example, `bolt://server` amounts to the same as `bolt://server:7687`.
 [.tabbed-example]
 .Example: Create a driver
 ====
-[include-with-dotnet]
+[.include-with-dotnet]
 ======
 [source, csharp]
 ----
@@ -27,7 +27,7 @@ include::{dotnet-examples}/Examples.cs[tags=construct-driver]
 ----
 ======
 
-[include-with-java]
+[.include-with-java]
 ======
 [source, java]
 ----
@@ -35,7 +35,7 @@ include::{java-examples}/Examples.java[tags=construct-driver]
 ----
 ======
 
-[include-with-javascript]
+[.include-with-javascript]
 ======
 [source, javascript]
 ----
@@ -43,7 +43,7 @@ include::{javascript-examples}/examples.test.js[tags=construct-driver]
 ----
 ======
 
-[include-with-python]
+[.include-with-python]
 ======
 [source, python]
 ----

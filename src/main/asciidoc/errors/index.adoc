@@ -21,7 +21,7 @@ See <<status-codes>> for further details.
 [.tabbed-example]
 .Handling a Cypher error
 ====
-[include-with-dotnet]
+[.include-with-dotnet]
 ======
 [source, csharp]
 ----
@@ -29,7 +29,7 @@ include::{dotnet-examples}/Examples.cs[tags=handle-cypher-error]
 ----
 ======
 
-[include-with-java]
+[.include-with-java]
 ======
 [source, java]
 ----
@@ -37,7 +37,7 @@ include::{java-examples}/Examples.java[tags=handle-cypher-error]
 ----
 ======
 
-[include-with-javascript]
+[.include-with-javascript]
 ======
 [source, javascript]
 ----
@@ -45,7 +45,7 @@ include::{javascript-examples}/examples.test.js[tags=handle-cypher-error]
 ----
 ======
 
-[include-with-python]
+[.include-with-python]
 ======
 [source, python]
 ----

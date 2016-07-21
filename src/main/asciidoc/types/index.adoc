@@ -36,7 +36,7 @@ The Neo4j driver maps Neo4j types to native language types as follows:
 [.tabbed-example]
 .Map Neo4j types to native language types
 ====
-[include-with-dotnet]
+[.include-with-dotnet]
 ======
 [options="header", cols="m, m"]
 |===
@@ -54,7 +54,7 @@ The Neo4j driver maps Neo4j types to native language types as follows:
 |===
 ======
 
-[include-with-java]
+[.include-with-java]
 ======
 [options="header", cols="m, m"]
 |===
@@ -72,7 +72,7 @@ The Neo4j driver maps Neo4j types to native language types as follows:
 |===
 ======
 
-[include-with-javascript]
+[.include-with-javascript]
 ======
 [options="header", cols="m, m"]
 |===
@@ -91,7 +91,7 @@ The Neo4j driver maps Neo4j types to native language types as follows:
 // TODO: Explain `Integer`.
 ======
 
-[include-with-python]
+[.include-with-python]
 ======
 [options="header", cols="m, m"]
 |===

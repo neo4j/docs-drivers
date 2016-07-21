@@ -7,7 +7,7 @@ If a statement is run directly from a session, the session will take care of wra
 .Example: Run a statement
 [.tabbed-example]
 ====
-[include-with-dotnet]
+[.include-with-dotnet]
 ======
 [source, csharp]
 ----
@@ -15,7 +15,7 @@ include::{dotnet-examples}/Examples.cs[tags=statement]
 ----
 ======
 
-[include-with-java]
+[.include-with-java]
 ======
 [source, java]
 ----
@@ -23,7 +23,7 @@ include::{java-examples}/Examples.java[tags=statement]
 ----
 ======
 
-[include-with-javascript]
+[.include-with-javascript]
 ======
 [source, javascript]
 ----
@@ -31,7 +31,7 @@ include::{javascript-examples}/examples.test.js[tags=statement]
 ----
 ======
 
-[include-with-python]
+[.include-with-python]
 ======
 [source, python]
 ----
@@ -54,7 +54,7 @@ Using parameters have significant performance and security benefits, including:
 .Example: Run a statement without parameters
 [.tabbed-example]
 ====
-[include-with-dotnet]
+[.include-with-dotnet]
 ======
 [source, csharp]
 ----
@@ -62,7 +62,7 @@ include::{dotnet-examples}/Examples.cs[tags=statement-without-parameters]
 ----
 ======
 
-[include-with-java]
+[.include-with-java]
 ======
 [source, java]
 ----
@@ -70,7 +70,7 @@ include::{java-examples}/Examples.java[tags=statement-without-parameters]
 ----
 ======
 
-[include-with-javascript]
+[.include-with-javascript]
 ======
 [source, javascript]
 ----
@@ -78,7 +78,7 @@ include::{javascript-examples}/examples.test.js[tags=statement-without-parameter
 ----
 ======
 
-[include-with-python]
+[.include-with-python]
 ======
 [source, python]
 ----
