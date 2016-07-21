@@ -22,34 +22,34 @@ See <<status-codes>> for further details.
 .Handling a Cypher error
 ====
 [include-with-dotnet]
---
+======
 [source, csharp]
 ----
 include::{dotnet-examples}/Examples.cs[tags=handle-cypher-error]
 ----
---
+======
 
 [include-with-java]
---
+======
 [source, java]
 ----
 include::{java-examples}/Examples.java[tags=handle-cypher-error]
 ----
---
+======
 
 [include-with-javascript]
---
+======
 [source, javascript]
 ----
 include::{javascript-examples}/examples.test.js[tags=handle-cypher-error]
 ----
---
+======
 
 [include-with-python]
---
+======
 [source, python]
 ----
 include::{python-examples}/test_examples.py[tags=handle-cypher-error]
 ----
---
+======
 ====

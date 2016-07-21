@@ -15,7 +15,7 @@ To use a driver, follow this pattern:
 .Example: Use the driver
 ====
 [include-with-dotnet]
---
+======
 For a minimal working example, the following imports are necessary.
 
 [source, csharp]
@@ -29,10 +29,10 @@ These can then be used to run a statement against the server.
 ----
 include::{dotnet-examples}/Examples.cs[tags=minimal-example]
 ----
---
+======
 
 [include-with-java]
---
+======
 For a minimal working example, the following imports are necessary.
 
 [source, java]
@@ -46,10 +46,10 @@ These can then be used to run a statement against the server.
 ----
 include::{java-examples}/MinimalWorkingExample.java[tags=minimal-example]
 ----
---
+======
 
 [include-with-javascript]
---
+======
 For a minimal working example, the following imports are necessary.
 
 [source, javascript]
@@ -63,10 +63,10 @@ These can then be used to run a statement against the server.
 ----
 include::{javascript-examples}/examples.test.js[tags=minimal-example]
 ----
---
+======
 
 [include-with-python]
---
+======
 For a minimal working example, the following imports are necessary.
 
 [source, python]
@@ -80,7 +80,7 @@ These can then be used to run a statement against the server.
 ----
 include::{python-examples}/test_examples.py[tags=minimal-example]
 ----
---
+======
 ====
 
 As seen above, it is possible to run statements directly from the session object.

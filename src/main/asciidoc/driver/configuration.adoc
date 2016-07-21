@@ -25,36 +25,36 @@ There is no limit to how many sessions that can be created, but a maximum limits
 .Example: Create a driver with configuration
 ====
 [include-with-dotnet]
---
+======
 [source, csharp]
 ----
 include::{dotnet-examples}/Examples.cs[tags=configuration]
 ----
---
+======
 
 [include-with-java]
---
+======
 [source, java]
 ----
 include::{java-examples}/Examples.java[tags=configuration]
 ----
---
+======
 
 [include-with-javascript]
---
+======
 [source, javascript]
 ----
 include::{javascript-examples}/examples.test.js[tags=configuration]
 ----
---
+======
 
 [include-with-python]
---
+======
 [source, python]
 ----
 include::{python-examples}/test_examples.py[tags=configuration]
 ----
---
+======
 ====
 
 
@@ -83,34 +83,34 @@ This makes it clear encryption is used for other developers reading the code and
 .Example: Configure driver to require TLS encryption
 ====
 [include-with-dotnet]
---
+======
 [source, csharp]
 ----
 include::{dotnet-examples}/Examples.cs[tags=tls-require-encryption]
 ----
---
+======
 
 [include-with-java]
---
+======
 [source, java]
 ----
 include::{java-examples}/Examples.java[tags=tls-require-encryption]
 ----
---
+======
 [include-with-javascript]
---
+======
 [source, javascript]
 ----
 include::{javascript-examples}/examples.test.js[tags=tls-require-encryption]
 ----
---
+======
 [include-with-python]
---
+======
 [source, python]
 ----
 include::{python-examples}/test_examples.py[tags=tls-require-encryption]
 ----
---
+======
 ====
 
 
@@ -139,34 +139,34 @@ Because of technical limitations this strategy is not available for the .NET pla
 .Example: Configure driver to trust on first use
 ====
 [include-with-dotnet]
---
+======
 [source, csharp]
 ----
 include::{dotnet-examples}/Examples.cs[tags=tls-trust-on-first-use]
 ----
---
+======
 
 [include-with-java]
---
+======
 [source, java]
 ----
 include::{java-examples}/Examples.java[tags=tls-trust-on-first-use]
 ----
---
+======
 [include-with-javascript]
---
+======
 [source, javascript]
 ----
 include::{javascript-examples}/examples.test.js[tags=tls-trust-on-first-use]
 ----
---
+======
 [include-with-python]
---
+======
 [source, python]
 ----
 include::{python-examples}/test_examples.py[tags=tls-trust-on-first-use]
 ----
---
+======
 ====
 
 _Trust signed certificate_ means that the driver will only connect to a Neo4j server if it provides a certificate trusted by the driver.
@@ -181,34 +181,34 @@ The .NET and Python drivers require the certificate to first be installed into t
 .Example: Configure driver to trust signed certificate
 ====
 [include-with-dotnet]
---
+======
 [source, csharp]
 ----
 include::{dotnet-examples}/Examples.cs[tags=tls-signed]
 ----
---
+======
 
 [include-with-java]
---
+======
 [source, java]
 ----
 include::{java-examples}/Examples.java[tags=tls-signed]
 ----
---
+======
 [include-with-javascript]
---
+======
 [source, javascript]
 ----
 include::{javascript-examples}/examples.test.js[tags=tls-signed]
 ----
---
+======
 [include-with-python]
---
+======
 [source, python]
 ----
 include::{python-examples}/test_examples.py[tags=tls-signed]
 ----
---
+======
 ====
 
 
@@ -221,34 +221,34 @@ The server will require the driver to provide authentication credentials for the
 .Example: Connecting the driver to a server with authentication disabled
 ====
 [include-with-dotnet]
---
+======
 [source, csharp]
 ----
 include::{dotnet-examples}/Examples.cs[tags=connect-with-auth-disabled]
 ----
---
+======
 
 [include-with-java]
---
+======
 [source, java]
 ----
 include::{java-examples}/Examples.java[tags=connect-with-auth-disabled]
 ----
---
+======
 [include-with-javascript]
---
+======
 [source, javascript]
 ----
 include::{javascript-examples}/examples.test.js[tags=connect-with-auth-disabled]
 ----
---
+======
 [include-with-python]
---
+======
 [source, python]
 ----
 include::{python-examples}/test_examples.py[tags=connect-with-auth-disabled]
 ----
---
+======
 ====
 
 If communication between the driver and the server is not encrypted, authentication credentials are sent as plain text.

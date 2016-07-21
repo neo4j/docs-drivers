@@ -20,36 +20,36 @@ For details on transactions in Neo4j see the {java-reference-transactions}[Neo4j
 [.tabbed-example]
 ====
 [include-with-dotnet]
---
+======
 [source, csharp]
 ----
 include::{dotnet-examples}/Examples.cs[tags=transaction-commit]
 ----
---
+======
 
 [include-with-java]
---
+======
 [source, java]
 ----
 include::{java-examples}/Examples.java[tags=transaction-commit]
 ----
---
+======
 
 [include-with-javascript]
---
+======
 [source, javascript]
 ----
 include::{javascript-examples}/examples.test.js[tags=transaction-commit]
 ----
---
+======
 
 [include-with-python]
---
+======
 [source, python]
 ----
 include::{python-examples}/test_examples.py[tags=transaction-commit]
 ----
---
+======
 ====
 
 The manually managed transaction can also be rolled back.
@@ -58,32 +58,32 @@ The manually managed transaction can also be rolled back.
 .Example: Roll back a manually managed transaction
 ====
 [include-with-dotnet]
---
+======
 [source, csharp]
 ----
 include::{dotnet-examples}/Examples.cs[tags=transaction-rollback]
 ----
---
+======
 
 [include-with-java]
---
+======
 [source, java]
 ----
 include::{java-examples}/Examples.java[tags=transaction-rollback]
 ----
---
+======
 [include-with-javascript]
---
+======
 [source, javascript]
 ----
 include::{javascript-examples}/examples.test.js[tags=transaction-rollback]
 ----
---
+======
 [include-with-python]
---
+======
 [source, python]
 ----
 include::{python-examples}/test_examples.py[tags=transaction-rollback]
 ----
---
+======
 ====

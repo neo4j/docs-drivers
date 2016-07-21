@@ -37,7 +37,7 @@ The Neo4j driver maps Neo4j types to native language types as follows:
 .Map Neo4j types to native language types
 ====
 [include-with-dotnet]
---
+======
 [options="header", cols="m, m"]
 |===
 | Neo4j        | .NET
@@ -52,10 +52,10 @@ The Neo4j driver maps Neo4j types to native language types as follows:
 | Relationship | Neo4j.Driver.V1.IRelationship (*)
 | Path         | Neo4j.Driver.V1.IPath (*)
 |===
---
+======
 
 [include-with-java]
---
+======
 [options="header", cols="m, m"]
 |===
 | Neo4j        | Java
@@ -70,10 +70,10 @@ The Neo4j driver maps Neo4j types to native language types as follows:
 | Relationship | org.neo4j.driver.v1.types.Relationship (*)
 | Path         | org.neo4j.driver.v1.types.Path (*)
 |===
---
+======
 
 [include-with-javascript]
---
+======
 [options="header", cols="m, m"]
 |===
 | Neo4j        | JavaScript
@@ -89,10 +89,10 @@ The Neo4j driver maps Neo4j types to native language types as follows:
 | Path         | Path (*)
 |===
 // TODO: Explain `Integer`.
---
+======
 
 [include-with-python]
---
+======
 [options="header", cols="m, m"]
 |===
 | Neo4j        | Python
@@ -114,5 +114,5 @@ In Python 2, a Neo4j `Integer` is mapped to `int` and a Neo4j `String` to `str`.
 In Python 3 `long` and `unicode` are mapped instead.
 ****
 
---
+======
 ====
