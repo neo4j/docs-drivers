@@ -86,4 +86,4 @@ include::{python-examples}/test_examples.py[tags=minimal-example]
 As seen above, it is possible to run statements directly from the session object.
 The session will take care of opening and closing the transaction.
 The session also provides the opportunity for a user to manage the transaction explicitly.
-See <<transactions>> for details.
+See <<driver-transactions>> for details.
