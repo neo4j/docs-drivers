@@ -35,6 +35,12 @@ apply plugin: 'base'
 
 defaultTasks 'asciidoctorHtml', 'asciidoctorPdf'
 
+//
+// THIS BUILD SCRIPT IS NOT KEPT UP-TO-DATE
+// THE DRIVER DOCUMENTATION IS A PART OF THE NEO4J DEVELOPER MANUAL
+// TO BUILD THE DRIVER MANUAL INDEPENDENTLY, UPDATE THE VERSIONS BELOW
+//
+
 ext {
     projectVersionTitle = '1.0 ALPHA'
     projectVersion = '1.0'
