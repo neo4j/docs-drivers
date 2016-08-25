@@ -7,8 +7,7 @@ The preferred way to access a Neo4j server from an application is to use a Neo4j
 --
 
 The Neo4j Driver API is the preferred means of programmatic interaction with a Neo4j database server.
-It implements the Bolt protocol and is available in four languages: C#.NET, Java, JavaScript, and Python.
-// TODO: decide how to talk about C#/.NET driver
+It implements the Bolt protocol and is available for .NET, Java, JavaScript, and Python.
 
 The API is defined independently of any programming language.
 This allows for a high degree of uniformity across languages.
