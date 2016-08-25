@@ -8,7 +8,7 @@ A Cypher error occurs when the server is unable to run the statement that it rec
 [NOTE]
 --
 Cypher errors encountered using a Neo4j driver are the same as those that can be encountered anywhere Cypher is used.
-This includes the Neo4j Browser, Neo4j Shell, the Cypher HTTP endpoint, the embedded API, and within a Java stored procedure.
+This includes the Neo4j Browser, Cypher Shell, the Cypher HTTP endpoint, the embedded API, and within a Java stored procedure.
 See <<status-codes>> for further details.
 --
 
