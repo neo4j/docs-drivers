@@ -1,6 +1,6 @@
 [[driver-configuration]]
 = Configuration
-:configuring-bolt-connectors-uri: {operations-manual-base-uri}/#_configuring_bolt_connectors
+:configuring-bolt-connectors-uri: {operations-manual-base-uri}/deployment/#bolt-connector
 
 // TODO: Confirm which configuration items are actually _uniform_.
 
