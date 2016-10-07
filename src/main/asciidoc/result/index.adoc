@@ -34,7 +34,7 @@ Failing to consume a result can lead to unpredictable behaviour as there will be
 --
 
 [.tabbed-example]
-.Example: Use a result cursor
+.Use a result cursor
 ====
 [.include-with-dotnet]
 ======
@@ -87,7 +87,7 @@ As the fields are both keyed and ordered, the value of a field can be accessed e
 --
 
 [.tabbed-example]
-.Example: Use a record
+.Use a record
 ====
 [.include-with-dotnet]
 ======
@@ -135,7 +135,7 @@ The saved results can also be used directly to run a new statement.
 
 
 [.tabbed-example]
-.Example: Retain results for further processing
+.Retain results for further processing
 ====
 [.include-with-dotnet]
 ======
@@ -168,7 +168,7 @@ include::{python-examples}/test_examples.py[tags=retain-result]
 ====
 
 [.tabbed-example]
-.Example: Use results in a new query
+.Use results in a new query
 ====
 [.include-with-dotnet]
 ======
@@ -211,7 +211,7 @@ The following example will produce an explain plan with accurate numbers by runn
 This will output a query profile (see <<how-do-i-profile-a-query>> for more information about query profiling).
 
 [.tabbed-example]
-.Example: Profile query and print execution plan
+.Profile query and print execution plan
 ====
 [.include-with-dotnet]
 ======
@@ -248,7 +248,7 @@ Neo4j may also provide notifications for a query, for example, warning when a qu
 The following example will produce an explain plan with estimated numbers, without actually running the query in the database.
 
 [.tabbed-example]
-.Example: Explain query and print notifications
+.Explain query and print notifications
 ====
 [.include-with-dotnet]
 ======

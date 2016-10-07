@@ -22,7 +22,7 @@ In addition to the Bolt URL, the driver can be configured for:
 There is no limit to how many sessions that can be created, but a maximum limits how many sessions will be buffered after they are returned to the session pool.
 
 [.tabbed-example]
-.Example: Create a driver with configuration
+.Create a driver with configuration
 ====
 [.include-with-dotnet]
 ======
@@ -80,7 +80,7 @@ While most drivers default to enabling encryption, it is good practice to config
 This makes it clear encryption is used for other developers reading the code and minimizes the risk of mistakes from relying on defaults.
 
 [.tabbed-example]
-.Example: Configure driver to require TLS encryption
+.Configure driver to require TLS encryption
 ====
 [.include-with-dotnet]
 ======
@@ -136,7 +136,7 @@ For this reason it is the default strategy on all platforms that support it.
 Because of technical limitations this strategy is not available for the .NET platform or when using the JavaScript driver inside a web browser.
 
 [.tabbed-example]
-.Example: Configure driver to trust on first use
+.Configure driver to trust on first use
 ====
 [.include-with-dotnet]
 ======
@@ -178,7 +178,7 @@ The Java driver directly accepts the file path to the trusted certificate and lo
 The .NET and Python drivers require the certificate to first be installed into the operating system's trusted certificate store.
 
 [.tabbed-example]
-.Example: Configure driver to trust signed certificate
+.Configure driver to trust signed certificate
 ====
 [.include-with-dotnet]
 ======
@@ -218,7 +218,7 @@ The server will require the driver to provide authentication credentials for the
 // See 'Securing Neo4j Server' (http://neo4j.com/docs/3.0.0-SNAPSHOT/security-server.html) for more information.
 
 [.tabbed-example]
-.Example: Connecting the driver to a server with authentication disabled
+.Connecting the driver to a server with authentication disabled
 ====
 [.include-with-dotnet]
 ======

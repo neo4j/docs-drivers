@@ -17,7 +17,7 @@ If no port is provided in the URL, the default port `7687` is used.
 For example, `bolt://server` amounts to the same as `bolt://server:7687`.
 
 [.tabbed-example]
-.Example: Create a driver
+.Create a driver
 ====
 [.include-with-dotnet]
 ======

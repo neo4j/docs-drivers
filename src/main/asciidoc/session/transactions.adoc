@@ -16,8 +16,8 @@ For details on transactions in Neo4j see the {java-reference-transactions}[Neo4j
 // TODO: This and the following examples are not realistic and don't explain the use of manual transaction management.
 //       We need realistic examples.
 
-.Example: Run a statement in a manually managed transaction
 [.tabbed-example]
+.Run a statement in a manually managed transaction
 ====
 [.include-with-dotnet]
 ======
@@ -55,7 +55,7 @@ include::{python-examples}/test_examples.py[tags=transaction-commit]
 The manually managed transaction can also be rolled back.
 
 [.tabbed-example]
-.Example: Roll back a manually managed transaction
+.Roll back a manually managed transaction
 ====
 [.include-with-dotnet]
 ======
