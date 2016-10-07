@@ -19,7 +19,7 @@ Consult the version table to determine which version of the driver to use with a
 
 You can download the driver source or acquire it with one of the dependency managers of your language.
 
-.Example: Acquire the driver
+.Acquire the driver
 [.tabbed-example]
 ====
 [.include-with-dotnet]

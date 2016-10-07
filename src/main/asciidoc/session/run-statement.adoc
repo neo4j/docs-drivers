@@ -4,8 +4,8 @@
 The session can run statements directly.
 If a statement is run directly from a session, the session will take care of wrapping it in a transaction.
 
-.Example: Run a statement
 [.tabbed-example]
+.Run a statement
 ====
 [.include-with-dotnet]
 ======
@@ -51,8 +51,8 @@ Using parameters have significant performance and security benefits, including:
 * It protects the database from Cypher injection attacks, where malicious query clauses are added from poorly typed or filtered input.
 ====
 
-.Example: Run a statement without parameters
 [.tabbed-example]
+.Run a statement without parameters
 ====
 [.include-with-dotnet]
 ======
