@@ -271,6 +271,6 @@ It is highly recommended to use encryption when using authentication.
 [NOTE]
 --
 When connecting to Neo4j for the first time, the user must change the default password.
-Given a fresh Neo4j server installation, any attempt to connect to the Neo4j server with the default password will provide a notifcation indicating that the credentials have expired and the password needs to be updated.
+Given a fresh Neo4j server installation, any attempt to connect to the Neo4j server with the default password will provide a notification indicating that the credentials have expired and the password needs to be updated.
 The browser can be used to change the expired password.
 --

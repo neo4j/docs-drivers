@@ -20,7 +20,8 @@ NoSuchRecordException::
 Thrown whenever a client expected to read a record that was not available (i.e. because it wasn't returned by the server).
 This usually indicates an expectation mismatch between client code and database application logic.
 ServiceUnavailableException::
-A `ServiceUnavailableException` indicates that the driver cannot communicate with the cluster.
+A `ServiceUnavailableException` indicates that the driver cannot communicate with the endpoint provided at creation time.
+It may be necessary, in the case of a routing URI (`bolt+routing`) to recreate the driver to resolve this error.
 SessionExpiredException::
 A `SessionExpiredException` indicates that the session can no longer satisfy the criteria under which it was acquired.
 For example, a server no longer accepts write requests.

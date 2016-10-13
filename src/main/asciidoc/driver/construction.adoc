@@ -7,10 +7,10 @@ This object provides driver instances.
 When requesting a driver instance from the database object, a URI is provided.
 The URI declares the protocol, host name, and port for the Neo4j server.
 
-A Bolt URI is either either direct our routing.
-The direct URI is used to connect to a single instance.
+There are two kinds of Bolt URIs: direct URIs and routing URIs.
+A direct URI is used to connect to a single instance.
 If the application relies on routing and load balancing, these must be provided separately.
-The driver is not aware of the cluster, only of the direct connection to a single server.
+The driver is not aware of any cluster it might be connected to, only of the direct connection to a single server.
 This mode is appropriate for working with a standalone instance or when deploying custom load balancing, for example using a Neo4j Highly Available cluster and HAProxy.
 
 A routing URI is used to create a cluster-aware driver.
