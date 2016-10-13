@@ -4,7 +4,7 @@
 
 // TODO: Confirm which configuration items are actually _uniform_.
 
-In addition to the Bolt URL, the driver can be configured for:
+In addition to the Bolt URI, the driver can be configured for:
 
 * session pool size
 * session pool behavior
@@ -14,7 +14,7 @@ In addition to the Bolt URL, the driver can be configured for:
 [options='header', cols='2,5,1m']
 |===
 | Name                  | Description                                | Default
-| Session pool size (*) | Max number of sessions per URL.            | 50
+| Session pool size (*) | Max number of sessions per URI.            | 50
 | Logging               | Provide a logging facility for the driver. | N/A
 |===
 
