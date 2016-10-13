@@ -1,16 +1,43 @@
 [[driver-errors]]
 = Errors
 
-There are two types of errors that the user of a driver may need to be aware of.
-The more likely error to encounter is the Cypher error.
-A Cypher error occurs when the server is unable to run the statement that it receives from the driver.
+// There are two types of errors that the user of a driver may need to be aware of.
+// The more likely error to encounter is the Cypher error.
+// A Cypher error occurs when the server is unable to run the statement that it receives from the driver.
 
-[NOTE]
---
-Cypher errors encountered using a Neo4j driver are the same as those that can be encountered anywhere Cypher is used.
-This includes the Neo4j Browser, Cypher Shell, the Cypher HTTP endpoint, the embedded API, and within a Java stored procedure.
-See <<status-codes>> for further details.
---
+[.comapact]
+.List of exceptions
+ClientException::
+A `ClientException` indicates that the client has carried out an operation incorrectly.
+The error code provided can be used to determine further detail for the problem.
+ConnectionFailureException::
+A `ConnectionFailureException` indicates that there is a problem within the underlying connection.
+Likely it has been terminated.
+DatabaseException::
+A `DatabaseException` indicates that there is a problem within the underlying database.
+The error code provided can be used to determine further detail for the problem.
+NoSuchRecordException::
+Thrown whenever a client expected to read a record that was not available (i.e. because it wasn't returned by the server).
+This usually indicates an expectation mismatch between client code and database application logic.
+ServiceUnavailableException::
+A `ServiceUnavailableException` indicates that the driver cannot communicate with the cluster.
+SessionExpiredException::
+A `SessionExpiredException` indicates that the session can no longer satisfy the criteria under which it was acquired.
+For example, a server no longer accepts write requests.
+A new session needs to be acquired from the driver and all actions taken on the expired session must be replayed.
+TransientException::
+A `TransientException` signals a temporary fault that may be worked around by retrying.
+The error code provided can be used to determine further detail for the problem.
+
+
+// See <<status-codes>> for further details.
+
+// [NOTE]
+// --
+// Cypher errors encountered using a Neo4j driver are the same as those that can be encountered anywhere Cypher is used.
+// This includes the Neo4j Browser, Cypher Shell, the Cypher HTTP endpoint, the embedded API, and within a Java stored procedure.
+// See <<status-codes>> for further details.
+// --
 
 // The other type of error is protocol error.
 
