@@ -42,31 +42,31 @@ defaultTasks 'asciidoctorHtml', 'asciidoctorPdf'
 //
 
 ext {
-    projectVersionTitle = '1.0 ALPHA'
-    projectVersion = '1.0'
+    projectVersionTitle = '1.1 ALPHA'
+    projectVersion = '1.1'
     driverLanguages = [
             'dotnet': [
                     'name'   : 'C#',
-                    'version': '1.0.0-RC2',
-                    'gitref' : '1.0',
+                    'version': '1.1.0-M02',
+                    'gitref' : '1.1.0-M02',
                     'url'    : 'https://www.nuget.org/packages/Neo4j.Driver'
             ],
             'java': [
                     'name'   : 'Java',
-                    'version': '1.0.0-RC2',
-                    'gitref' : '1.0',
+                    'version': '1.1.0-M05',
+                    'gitref' : '1.1.0-M05',
                     'url'    : 'http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.neo4j.driver%22%20AND%20a%3A%22neo4j-java-driver%22'
             ],
             'javascript': [
                     'name'   : 'JavaScript',
-                    'version': '1.0.0-RC2',
-                    'gitref' : '1.0',
+                    'version': '1.1.0-M02',
+                    'gitref' : '1.1.0-M02',
                     'url'    : 'https://www.npmjs.com/package/neo4j-driver'
             ],
             'python'    : [
                     'name'   : 'Python',
-                    'version': '1.0.0rc2',
-                    'gitref' : '1.0',
+                    'version': '1.1.0b1',
+                    'gitref' : '1.1.0b1',
                     'url'    : 'https://pypi.python.org/pypi/neo4j-driver'
             ]
     ]
