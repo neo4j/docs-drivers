@@ -20,8 +20,8 @@ It is important to provide for the closing of a session in the case where an exc
 Make sure that the exceptional path of execution, as well as the ordinary, closes the session.
 --
 
-// TODO: connection pooling and importance of closing sessions.
-
 include::run-statement.adoc[leveloffset=+1]
 
 include::transactions.adoc[leveloffset=+1]
+
+include::bookmarking.adoc[leveloffset=+1]

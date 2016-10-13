@@ -69,19 +69,25 @@ include::{python-examples}/test_examples.py[tags=construct-driver]
 
 The routing URI is used to create a cluster-aware routing driver for working with a Neo4j Causal Cluster.
 
+.Create a driver with a routing URI
+====
 [source, java]
 ----
 include::{extended-examples-java}/ExtendedExamples.java[tags=construct-routing-driver]
 ----
+====
 
 Only a single URI is passed to the driver at creation.
 If no server is available to respond at that URI a `ServiceUnavailableException` is thrown.
 It may be useful therefore to construct the driver in a loop over multiple seed URIs.
 
+.Create a driver with multiple routing URIs
+====
 [source, java]
 ----
 include::{extended-examples-java}/ExtendedExamples.java[tags=construct-routing-driver-multiple-uris]
 ----
+====
 
 For some configurations, it is also worth considering using a host name within the Bolt URI instead of an IP address.
 This allows an extra layer of address resolution which can be tweaked at DNS level instead of through application configuration should a redirection to an alternative server be required.
