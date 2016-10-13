@@ -3,17 +3,32 @@
 
 [abstract]
 --
-The preferred way to access a Neo4j server from an application is to use a Neo4j driver.
+The preferred way to access Neo4j from an application is to use a Neo4j driver.
 --
 
-The Neo4j Driver API is the preferred means of programmatic interaction with a Neo4j database server.
-It implements the Bolt protocol and is available for .NET, Java, JavaScript, and Python.
+Neo4j drivers provide access to Neo4j for the application.
+A driver instance is configured and provides sessions to use for one or more transactional interactions with the database.
+The session runs statements to create and query data, define schema, and call procedures for monitoring and administration.
+When Neo4j is deployed in a Causal Cluster the driver handles routing of read and write operations and configurable consistency per session.
 
-The API is defined independently of any programming language.
-This allows for a high degree of uniformity across languages.
-Uniformity means that the same features are included in all the drivers.
-The uniformity also influences the design of the API in each language.
-This provides consistency across drivers, while retaining affinity with the idioms of each programming language.
-// TODO: "API" used in conflicting ways.
-// Rework this paragraph, spell out verbosely in causal language what we are trying to say first.
-// Then tighten it up and make it concise and precise.
+The Neo4j drivers use the Bolt protocol for communication.
+This allows for a high degree of feature sympathy between driver and database, and across drivers.
+Since the Causal Cluster also uses Bolt for communication it allows the driver to be aware of the cluster.
+A cluster-aware driver provides routing and load balancing.
+The cluster-aware driver also provides the application with tunable consistency through bookmarking.
+
+Finally using Bolt provides backwards compatibility, as each driver supports three previous versions of the protocol.
+
+Official drivers exist for four languages:
+
+* .NET
+* Java
+* JavaScript
+* Python
+
+[TIP]
+Click the corresponding tab on any of the examples to switch language.
+
+The Java driver can be used from other JVM languages, such as Groovy, Clojure, or Kotlin.
+The .NET driver is written in C# and can be used from other .NET languages, including F#, C++, and even directly from PowerShell.
+
