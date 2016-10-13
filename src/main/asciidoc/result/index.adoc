@@ -12,7 +12,7 @@ When a statement is run, results are returned as a record stream.
 The stream itself is represented by a result cursor which is used to access the individual records.
 The individual records can be accessed one at a time, or all at once.
 Results are valid until the next statement is run or until the end of the current transaction, whichever comes first.
-To hold on to the results while running additional statements, or to use the results outside of the scope of the current transaction, the results must be retained by assigning them to a variable.
+To hold on to the results while running additional statements, or to use the results outside the scope of the current transaction, the results must be retained by assigning them to a variable.
 
 
 [[driver-result-cursor]]
@@ -27,7 +27,7 @@ When the cursor has traversed to the end of the result stream, summary informati
 --
 Result records are loaded lazily as the cursor is moved through the stream.
 This means that the cursor must be moved to the first result before this result can be consumed.
-It also means that the entire stream must be explicitly consumed before summary information and metadata is available.
+It also means that the entire stream must be explicitly consumed before summary information and metadata are available.
 It is generally best practice to explicitly consume results and close sessions, in particular when running update statements.
 This applies even if the summary information is not required.
 Failing to consume a result can lead to unpredictable behaviour as there will be no guarantee that the server has seen and handled the Cypher statement.

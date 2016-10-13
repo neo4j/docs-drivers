@@ -5,14 +5,14 @@
 // The more likely error to encounter is the Cypher error.
 // A Cypher error occurs when the server is unable to run the statement that it receives from the driver.
 
-[.comapact]
+[.compact]
 .List of exceptions
 ClientException::
 A `ClientException` indicates that the client has carried out an operation incorrectly.
 The error code provided can be used to determine further detail for the problem.
 ConnectionFailureException::
 A `ConnectionFailureException` indicates that there is a problem within the underlying connection.
-Likely it has been terminated.
+It is likely that it has been terminated.
 DatabaseException::
 A `DatabaseException` indicates that there is a problem within the underlying database.
 The error code provided can be used to determine further detail for the problem.
@@ -46,7 +46,7 @@ The error code provided can be used to determine further detail for the problem.
 
 
 [.tabbed-example]
-.Handling a Cypher error
+.Handling a client error
 ====
 [.include-with-dotnet]
 ======

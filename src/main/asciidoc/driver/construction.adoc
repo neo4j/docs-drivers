@@ -4,18 +4,18 @@
 The driver package includes a graph database object.
 // This object is used to create a driver.
 This object provides driver instances.
-When requesting a driver instance from the database object a URI is provided.
+When requesting a driver instance from the database object, a URI is provided.
 The URI declares the protocol, host name, and port for the Neo4j server.
 
 A Bolt URI is either either direct our routing.
 The direct URI is used to connect to a single instance.
-If the application relies on routing and load balancing these must be provided separately.
-The driver is not aware of the cluster, only the direct connection to a single server.
+If the application relies on routing and load balancing, these must be provided separately.
+The driver is not aware of the cluster, only of the direct connection to a single server.
 This mode is appropriate for working with a standalone instance or when deploying custom load balancing, for example using a Neo4j Highly Available cluster and HAProxy.
 
 A routing URI is used to create a cluster-aware driver.
 The routing driver connects to a cluster and handles routing and load balancing.
-Providing the driver with a seed URI it connects and requests an overview of the cluster topology.
+After providing the driver with a seed URI, it connects and requests an overview of the cluster topology.
 The driver is then able to create sessions against the cluster member best suited to service a particular item of work.
 This mode is appropriate for working with a Neo4j Causal Cluster.
 
@@ -26,7 +26,7 @@ This mode is appropriate for working with a Neo4j Causal Cluster.
 A Bolt URI follows the standard URI pattern of `scheme://hostname:port`.
 For example, the direct Bolt URI `bolt://server:1234` would connect using the Bolt protocol to `server` on port `1234`.
 If no port is provided in the URI, the default port `7687` is used.
-For example, `bolt://server` amounts to the same as `bolt://server:7687`.
+For example, `bolt://server` is equivalent `bolt://server:7687`.
 
 A routing URI uses the scheme `bolt+routing://server:1234`.
 
@@ -78,7 +78,7 @@ include::{extended-examples-java}/ExtendedExamples.java[tags=construct-routing-d
 ====
 
 Only a single URI is passed to the driver at creation.
-If no server is available to respond at that URI a `ServiceUnavailableException` is thrown.
+If no server is available to respond at that URI, a `ServiceUnavailableException` is thrown.
 It may be useful therefore to construct the driver in a loop over multiple seed URIs.
 
 .Create a driver with multiple routing URIs

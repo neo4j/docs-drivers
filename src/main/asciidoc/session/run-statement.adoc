@@ -40,16 +40,13 @@ include::{python-examples}/test_examples.py[tags=statement]
 ======
 ====
 
-It is always recommended to use parameters, but it is possible to run a query with literal values as well.
-
-[IMPORTANT]
-.Why it's important to use parameters
-====
-Using parameters have significant performance and security benefits, including:
+It is always recommended to use parameters.
+Using parameters has significant performance and security benefits:
 
 * It allows the query planner to reuse its plans, which makes queries much more efficient.
 * It protects the database from Cypher injection attacks, where malicious query clauses are added from poorly typed or filtered input.
-====
+
+It is possible, however, to run a query with literal values.
 
 [.tabbed-example]
 .Run a statement without parameters

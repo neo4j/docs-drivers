@@ -25,7 +25,7 @@ To take advantage of the new cluster mode in Neo4j 3.1 and use the new features,
 
 == Acquire the driver
 
-You can download the driver source or acquire it with one of the dependency managers of your language.
+You can download the driver source or acquire it with one of the dependency managers for your language.
 
 .Acquire the driver
 [.tabbed-example]

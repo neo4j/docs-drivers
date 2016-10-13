@@ -12,12 +12,12 @@ It allows for running statements against the database.
 
 The driver has a session pool which can be configured.
 Sessions are returned to the pool when they are closed.
-It is important to close sessions, to allow them to return to the pool and be reused.
+It is important to close sessions in order to allow them to return to the pool and be reused.
 
 [CAUTION]
 --
 It is important to provide for the closing of a session in the case where an exception is thrown.
-Make sure that the exceptional path of execution, as well as the ordinary, closes the session.
+Make sure that the exceptional path of execution, as well as the expected one, closes the session.
 --
 
 include::run-statement.adoc[leveloffset=+1]

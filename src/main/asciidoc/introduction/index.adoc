@@ -7,17 +7,20 @@ The preferred way to access Neo4j from an application is to use a Neo4j driver.
 --
 
 Neo4j drivers provide access to Neo4j for the application.
-A driver instance is configured and provides sessions to use for one or more transactional interactions with the database.
-The session runs statements to create and query data, define schema, and call procedures for monitoring and administration.
-When Neo4j is deployed in a Causal Cluster the driver handles routing of read and write operations and configurable consistency per session.
+A driver instance is configured and provides sessions to use for multiple transactional interactions with the database.
+The session runs statements to create and query data, define the schema, and call procedures for monitoring and administration.
+When Neo4j is deployed in a Causal Cluster, the driver handles the routing of read and write operations.
+With Causal Clustering the driver also provides bookmarking.
+Bookmarking is used to ensure causal consistency: the application can run multiple queries on different members of the cluster while maintining a guaranteed consistent view of the data.
+Each query sees the state of graph at least as up-to-date as the graph seen by the previous query.
 
 The Neo4j drivers use the Bolt protocol for communication.
 This allows for a high degree of feature sympathy between driver and database, and across drivers.
 Since the Causal Cluster also uses Bolt for communication it allows the driver to be aware of the cluster.
 A cluster-aware driver provides routing and load balancing.
-The cluster-aware driver also provides the application with tunable consistency through bookmarking.
+// The cluster-aware driver also provides the application with tunable consistency through bookmarking.
 
-Finally using Bolt provides backwards compatibility, as each driver supports three previous versions of the protocol.
+Finally, using Bolt provides backwards compatibility, as each driver supports three previous versions of the protocol.
 
 Official drivers exist for four languages:
 
@@ -27,7 +30,7 @@ Official drivers exist for four languages:
 * Python
 
 [TIP]
-Click the corresponding tab on any of the examples to switch language.
+Click the corresponding tab on any of the examples to switch to the selected language.
 
 The Java driver can be used from other JVM languages, such as Groovy, Clojure, or Kotlin.
 The .NET driver is written in C# and can be used from other .NET languages, including F#, C++, and even directly from PowerShell.
