@@ -5,7 +5,7 @@ The driver package includes a graph database object.
 // This object is used to create a driver.
 This object provides driver instances.
 When requesting a driver instance from the database object, a URI is provided.
-The URI declares the protocol, host name, and port for the Neo4j server.
+The URI declares the protocol, host, and port of a Neo4j server.
 
 There are two kinds of Bolt URIs: direct URIs and routing URIs.
 A direct URI is used to connect to a single instance.
@@ -23,10 +23,13 @@ This mode is appropriate for working with a Neo4j Causal Cluster.
 [[driver-uri-format]]
 == Bolt URI format
 
-A Bolt URI follows the standard URI pattern of `scheme://hostname:port`.
-For example, the direct Bolt URI `bolt://server:1234` would connect using the Bolt protocol to `server` on port `1234`.
-If no port is provided in the URI, the default port `7687` is used.
-For example, `bolt://server` is equivalent `bolt://server:7687`.
+A Bolt URI follows the standard URI pattern of `scheme://host:port`.
+For example, `bolt://203.0.113.1:1234` would connect using the Bolt protocol to `203.0.113.1` on port `1234`.
+A hostname can be used instead of an IP address: `bolt://server:1234`.
+The default Bolt port is `7687`.
+
+// If no port is provided in the URI, the default port `7687` is used.
+// For example, `bolt://server` amounts to the same as `bolt://server:7687`.
 
 A routing URI uses the scheme `bolt+routing://server:1234`.
 

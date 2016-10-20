@@ -7,8 +7,8 @@ To use a driver, follow this pattern:
 . Ask the _database_ object for a new driver.
 . Ask the _driver_ object for a new session.
 . Use the _session_ object to run statements.
-  It returns an object representing the results.
-. Process the _results_.
+  It returns an object representing the result.
+. Process the _result_.
 . Close the session.
 
 [.tabbed-example]
