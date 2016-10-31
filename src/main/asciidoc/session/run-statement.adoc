@@ -1,5 +1,5 @@
 [[driver-run-statement]]
-= Run a statement
+= Auto-commit transactions
 
 The session can run statements directly.
 If a statement is run directly from a session, the session will take care of wrapping it in a transaction.
@@ -39,6 +39,11 @@ include::{python-examples}/test_examples.py[tags=statement]
 ----
 ======
 ====
+
+// TODO: Consider dropping the literal values example.
+// Does it add anything?
+// Are we teaching about parameters here?
+// About security, or performance?
 
 It is always recommended to use parameters.
 Using parameters has significant performance and security benefits:

@@ -3,22 +3,37 @@
 
 [abstract]
 --
-All interactions with a Neo4j server take place within a session.
+All interactions with a Neo4j database take place within a session.
 --
 
-A session is used to run statements against Neo4j.
+A session is a lightweight container for a sequence of transactions.
 A session is obtained from a driver object.
-It allows for running statements against the database.
+It provides the context of work for individual transactions.
 
-The driver has a session pool which can be configured.
-Sessions are returned to the pool when they are closed.
-It is important to close sessions in order to allow them to return to the pool and be reused.
+// TODO: Talk about read and write sessions here, rather than about running statement (cover that more in the "Transactions" section).
+
+In the ordinary case, the transactions are explicitly managed.
+This means that the transaction is created and one or more statements are run within the transaction.
+For each statement that is run, any result is processed and any exceptions are handled.
+When the sequence of transactions have all been executed, the session is closed.
+
+// TODO: Suggest already here how closing a session relates to consuming results and to exceptions.
+
+The driver has a connection pool and a session will borrow a connection to carry out its work.
+When the session is closed, the connection is returned to the pool.
+It is important to ensure that sessions are closed properly so that results and errors are fully received by the client and so that connections can be reused.
 
 [CAUTION]
 --
 It is important to provide for the closing of a session in the case where an exception is thrown.
 Ensure that the exceptional path of execution, as well as the expected one, closes the session.
 --
+
+While the ordinary case is to use explicit transactions, the session also provides auto-commit transactions.
+The session has a `run()` method which implicitly begins and commits a transaction in which the statement is run.
+This is sometimes convenient for single read-only queries.
+If it is used for write queries, it can be difficult to track exactly where something has gone wrong.
+// TODO: Is that true? Why is it bad to use auto-commit transactions when writing?
 
 include::run-statement.adoc[leveloffset=+1]
 
