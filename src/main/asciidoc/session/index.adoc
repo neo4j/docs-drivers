@@ -37,6 +37,6 @@ If it is used for write queries, it can be difficult to track exactly where some
 
 include::run-statement.adoc[leveloffset=+1]
 
-include::transactions.adoc[leveloffset=+1]
+// include::transactions.adoc[leveloffset=+1]
 
 include::bookmarking.adoc[leveloffset=+1]
