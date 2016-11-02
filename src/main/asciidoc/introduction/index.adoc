@@ -31,6 +31,6 @@ Official drivers exist for:
 [TIP]
 Click the corresponding tab on any of the examples to switch to the selected language.
 
-The Java driver can be used from other JVM languages, such as Groovy, Clojure, or Kotlin.
-The .NET driver is written in C# and can be used from other .NET languages, including F#, C++, and even directly from PowerShell.
+The Java driver can be used from any JVM language, including Java, Groovy, Clojure, or Kotlin.
+The .NET driver is written in C# and can be used from any .NET language, including C#, F#, and VB; or even directly from PowerShell.
 
