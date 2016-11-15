@@ -1,10 +1,10 @@
 [[driver-lifecycle]]
 = Lifecycle
 
-For most use cases it is recommended to use a single driver instance throughout an application.
+For most use cases, it is recommended to use a single driver instance throughout an application.
 The only reason to create multiple driver instances is to connect to multiple servers.
 This may be useful when connecting to multiple members of a cluster, or for pulling data out of one database to push to another.
-In other cases, a single driver instance usually serves the needs of a single application.
+In other cases, a single driver instance usually serves the requirements of a single application.
 
 // TODO: "Driver" is ambiguous above: The Java driver may maintain _a connection pool for each Neo4j instance_,
 //       but the single _driver object_ can only connect to one Neo4j instance and therefore can only have one connection pool.

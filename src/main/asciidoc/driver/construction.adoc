@@ -4,7 +4,7 @@
 The driver package includes a graph database object.
 // This object is used to create a driver.
 This object provides driver instances.
-When requesting a driver instance from the database object a URI is provided.
+When requesting a driver instance from the database object, a URI is provided.
 The URI declares the protocol, host, and port of a Neo4j server.
 
 

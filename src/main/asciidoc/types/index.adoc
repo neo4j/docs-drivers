@@ -20,8 +20,8 @@ The following Neo4j types are valid both for parameters and results:
 * Map
 
 Maps and lists can be processed by the database and used in a statement.
-Lists in which the elements share a single primitive Neo4j type can be stored as properties on nodes and relationships.
-Maps, and lists in which the elements have mixed types, can not be stored as properties.
+Lists -- in which the elements share a single primitive Neo4j type -- can be stored as properties on nodes and relationships.
+Maps and lists in which the elements have mixed types cannot be stored as properties.
 
 In addition to the types valid both for parameters and results, the following Neo4j types are valid for results only:
 
