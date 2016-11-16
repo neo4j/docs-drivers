@@ -3,7 +3,7 @@
 
 [abstract]
 --
-All interaction with a Neo4j server takes place within a session.
+All interactions with a Neo4j server take place within a session.
 --
 
 A session is used to run statements against Neo4j.
@@ -17,7 +17,7 @@ It is important to close sessions in order to allow them to return to the pool a
 [CAUTION]
 --
 It is important to provide for the closing of a session in the case where an exception is thrown.
-Make sure that the exceptional path of execution, as well as the expected one, closes the session.
+Ensure that the exceptional path of execution, as well as the expected one, closes the session.
 --
 
 include::run-statement.adoc[leveloffset=+1]

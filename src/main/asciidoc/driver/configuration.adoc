@@ -19,10 +19,10 @@ In addition to the Bolt URI, the driver can be configured for:
 |===
 
 (*) The .NET and Python drivers provide _idle session pool size_, which is the maximum number of idle sessions to be pooled by the driver.
-There is no limit to how many sessions that can be created, but setting a maximum limits how many sessions will be buffered after they are returned to the session pool.
+There is no limit as to how many sessions can be created, but setting a maximum limits how many sessions will be buffered after they are returned to the session pool.
 
 [.tabbed-example]
-.Create a driver with configuration
+.Create the driver with a configuration
 ====
 [.include-with-dotnet]
 ======
@@ -91,10 +91,10 @@ The JavaScript driver does not have encryption enabled by default when running i
 The driver can be configured to turn on or off TLS encryption.
 Encryption should only be turned off in a trusted, internal network.
 While most drivers default to enabling encryption, it is good practice to configure encryption explicitly.
-This makes it clear encryption is used for other developers reading the code and minimizes the risk of mistakes from relying on defaults.
+This makes it clear encryption is used when other developers read the code, and minimizes the risk of mistakes arising by relying on defaults.
 
 [.tabbed-example]
-.Configure driver to require TLS encryption
+.Configure the driver to require TLS encryption
 ====
 [.include-with-dotnet]
 ======
@@ -131,7 +131,7 @@ include::{python-examples}/test_examples.py[tags=tls-require-encryption]
 === Trust
 
 When establishing an encrypted connection, it needs to be verified that the remote peer is who we expected to connect to.
-Without verifying this, an attacker can easily perform a so-called "man-in-the-middle" attack, tricking the driver to establish an encrypted connection with her instead of the Neo4j Instance.
+Without verifying this, an attacker can easily perform a so-called "man-in-the-middle" attack, tricking the driver into establishing an encrypted connection with her instead of the Neo4j instance.
 Because of this, Neo4j drivers do not offer a way to establish encrypted connections without also establishing trust.
 
 Two trust strategies are available:
@@ -145,12 +145,12 @@ To ensure that this authentication strategy is valid, the first connection to th
 
 This strategy is the same as the default strategy used by the `ssh` command line tool.
 It provides a good degree of security with no configuration.
-For this reason it is the default strategy on all platforms that support it.
+For this reason, it is the default strategy on all platforms that support it.
 
 Because of technical limitations this strategy is not available for the .NET platform or when using the JavaScript driver inside a web browser.
 
 [.tabbed-example]
-.Configure driver to trust on first use
+.Configure the driver to trust on first use
 ====
 [.include-with-dotnet]
 ======
@@ -192,7 +192,7 @@ The Java driver directly accepts the file path to the trusted certificate and lo
 The .NET and Python drivers require the certificate to first be installed into the operating system's trusted certificate store.
 
 [.tabbed-example]
-.Configure driver to trust signed certificate
+.Configure the driver to trust signed certificate
 ====
 [.include-with-dotnet]
 ======
@@ -271,6 +271,6 @@ It is highly recommended to use encryption when using authentication.
 [NOTE]
 --
 When connecting to Neo4j for the first time, the user must change the default password.
-Given a fresh Neo4j server installation, any attempt to connect to the Neo4j server with the default password will provide a notification indicating that the credentials have expired and the password needs to be updated.
+Given a fresh Neo4j server installation, any attempt to connect to the Neo4j server with the default password will provide a notification indicating that the credentials have expired and that the password needs to be updated.
 The browser can be used to change the expired password.
 --
