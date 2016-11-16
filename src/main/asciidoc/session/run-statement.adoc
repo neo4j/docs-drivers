@@ -45,7 +45,7 @@ It is always recommended to use parameters, but it is possible to run a query wi
 [IMPORTANT]
 .Why it's important to use parameters
 ====
-Using parameters have significant performance and security benefits, including:
+Using parameters has significant performance and security benefits, including:
 
 * It allows the query planner to reuse its plans, which makes queries much more efficient.
 * It protects the database from Cypher injection attacks, where malicious query clauses are added from poorly typed or filtered input.

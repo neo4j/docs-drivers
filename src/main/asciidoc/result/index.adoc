@@ -12,20 +12,20 @@ When a statement is run, results are returned as a record stream.
 The stream itself is represented by a result cursor which is used to access the individual records.
 The individual records can be accessed one at a time, or all at once.
 Results are valid until the next statement is run or until the end of the current transaction, whichever comes first.
-To hold on to the results while running additional statements, or to use the results outside of the scope of the current transaction, the results must be retained by assigning them to a variable.
+To hold on to the results while running additional statements, or to use the results outside the scope of the current transaction, the results must be retained by assigning them to a variable.
 
 
 [[driver-result-cursor]]
 == The result cursor
 
-A result cursor provides access to the stream of records that make up the results.
-The cursor is moved through the stream and points to each record in turn.
+A result cursor provides access to the stream of records that comprise the results.
+The cursor is advanced through the stream, pointing to each record in turn.
 Before the cursor is moved onto the first record, it points _before_ the first record.
-When the cursor has traversed to the end of the result stream, summary information and metadata are available.
+Summary information and metadata are available once the cursor has traversed to the end of the result stream.
 
 [NOTE]
 --
-Result records are loaded lazily as the cursor is moved through the stream.
+Result records are loaded lazily as the cursor is advanced through the stream.
 This means that the cursor must be moved to the first result before this result can be consumed.
 It also means that the entire stream must be explicitly consumed before summary information and metadata is available.
 It is generally best practice to explicitly consume results and close sessions, in particular when running update statements.
@@ -73,7 +73,7 @@ include::{python-examples}/test_examples.py[tag=result-traversal]
 [[driver-result-record]]
 == The record
 
-The result record stream is made up of individual records.
+The result record stream is comprised of individual records.
 A record provides an immutable view of a part of a result.
 It is an ordered map of keys and values.
 These key-value pairs are called _fields_.
@@ -124,12 +124,12 @@ include::{python-examples}/test_examples.py[tag=access-record]
 
 
 [[driver-result-retain]]
-=== Retaining Results
+=== Retaining results
 
 The result record stream is available until another statement is run in the session, or until the current transaction is closed.
 To hold on to the results beyond this scope, the results need to be explicitly _retained_.
 For retaining results, each driver offers methods that collect the result stream and translate it into standard data structures for each language.
-Retained results can be processed, while the session is free to take on the next workload.
+Retained results can be processed while the session is free to take on the next workload.
 The saved results can also be used directly to run a new statement.
 
 
@@ -244,7 +244,7 @@ include::{python-examples}/test_examples.py[tags=result-summary-query-profile]
 ======
 ====
 
-Neo4j may also provide notifications for a query, for example, warning when a query will cause the execution engine to build a cartesian product.
+Neo4j may also provide notifications for a query -- for example, warning when a query will cause the execution engine to build a cartesian product.
 The following example will produce an explain plan with estimated numbers, without actually running the query in the database.
 
 [.tabbed-example]
