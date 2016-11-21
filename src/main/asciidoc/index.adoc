@@ -28,6 +28,8 @@ include::driver/index.adoc[leveloffset=+1]
 
 include::session/index.adoc[leveloffset=+1]
 
+include::transaction/index.adoc[leveloffset=+1]
+
 include::result/index.adoc[leveloffset=+1]
 
 include::types/index.adoc[leveloffset=+1]

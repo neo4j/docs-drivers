@@ -6,10 +6,13 @@ To use a driver, follow this pattern:
 
 . Ask the _database_ object for a new driver.
 . Ask the _driver_ object for a new session.
-. Use the _session_ object to run statements.
+. Ask the _session_ object to create a transaction.
+. Use the _transaction_ object to run statements.
   It returns an object representing the result.
 . Process the _result_.
 . Close the session.
+
+// TODO: Below example should use explicit transactions.
 
 [.tabbed-example]
 .Use the driver
@@ -83,7 +86,7 @@ include::{python-examples}/test_examples.py[tags=minimal-example]
 ======
 ====
 
-As can be seen above, it is possible to run statements directly from the session object.
-The session will take care of opening and closing the transaction.
-The session also provides the opportunity for a user to manage the transaction explicitly.
-See <<driver-transactions>> for details.
+It is also possible to run statements directly from the session object.
+The session will then take care of opening and closing the transaction.
+This can be convenient for individual read-only queries.
+// TODO: Insert why it is not advisable for write queries.

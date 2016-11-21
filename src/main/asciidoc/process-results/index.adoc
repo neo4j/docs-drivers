@@ -1,5 +1,5 @@
-[[driver-results]]
-= Results
+[[driver-process-results]]
+= Process results
 
 // TODO https://github.com/neo-technology/driver-compliance-kit/blob/08-results/08-results-synchronous.adoc
 
