@@ -1,5 +1,5 @@
-[[driver-driver]]
-= Driver
+[[driver-configure-connect]]
+= Configure and connect
 
 [abstract]
 --

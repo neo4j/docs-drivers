@@ -1,5 +1,5 @@
-[[driver-types]]
-= Types
+[[driver-understand-types]]
+= Understand types
 
 [abstract]
 --

@@ -1,5 +1,5 @@
-[[driver-session]]
-= Session
+[[driver-run-statements]]
+= Run statements
 
 [abstract]
 --

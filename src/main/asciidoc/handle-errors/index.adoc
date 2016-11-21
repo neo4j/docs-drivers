@@ -1,5 +1,5 @@
-[[driver-errors]]
-= Errors
+[[driver-handle-errors]]
+= Handle errors
 
 // There are two types of errors that the user of a driver may need to be aware of.
 // The more likely error to encounter is the Cypher error.

@@ -1,5 +1,5 @@
-[[driver-getting-started]]
-= Getting started
+[[driver-get-started]]
+= Get started
 
 [abstract]
 --
