@@ -2,61 +2,8 @@
 = Configuration
 :configuring-bolt-connectors-uri: {operations-manual-base-uri}/deployment/post-installation/#bolt-connector
 
-// TODO: Confirm which configuration items are actually _uniform_.
-
-In addition to the Bolt URI, the driver can be configured for:
-
-* session pool size
-* session pool behavior
-* authentication strategies
-* logging
-
-[options='header', cols='2,5,1m']
-|===
-| Name                  | Description                                | Default
-| Session pool size (*) | Max number of sessions per URI.            | 50
-| Logging               | Provide a logging facility for the driver. | N/A
-|===
-
-(*) The .NET and Python drivers provide _idle session pool size_, which is the maximum number of idle sessions to be pooled by the driver.
-There is no limit as to how many sessions can be created, but setting a maximum limits how many sessions will be buffered after they are returned to the session pool.
-
-[.tabbed-example]
-.Create the driver with a configuration
-====
-[.include-with-dotnet]
-======
-[source, csharp]
-----
-include::{dotnet-examples}/Examples.cs[tags=configuration]
-----
-======
-
-[.include-with-java]
-======
-[source, java]
-----
-include::{java-examples}/Examples.java[tags=configuration]
-----
-======
-
-[.include-with-javascript]
-======
-[source, javascript]
-----
-include::{javascript-examples}/examples.test.js[tags=configuration]
-----
-======
-
-[.include-with-python]
-======
-[source, python]
-----
-include::{python-examples}/test_examples.py[tags=configuration]
-----
-======
-====
-
+Configuration settings are supplied to the driver constructor.
+We illustrate the use of these in the examples that follow in the remainder of this section.
 
 [[driver-authentication-encryption]]
 == Encryption and authentication
