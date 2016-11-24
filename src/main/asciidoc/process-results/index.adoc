@@ -205,8 +205,8 @@ include::{python-examples}/test_examples.py[tags=nested-statements]
 [[result-summary]]
 == Result summary
 
-Metadata can be retrieved along with the result stream.
-An example is the query plan obtained by prepending a Cypher query with `PROFILE` or `EXPLAIN`.
+Metadata can be retrieved along with the result stream, an example being the query plan obtained by prepending a Cypher query with `PROFILE` or `EXPLAIN`.
+
 The following example will produce an explain plan with accurate numbers by running the query in the database.
 This will output a query profile (see <<how-do-i-profile-a-query>> for more information about query profiling).
 
@@ -281,3 +281,5 @@ include::{python-examples}/test_examples.py[tags=result-summary-notifications]
 ======
 ====
 
+The driver additionally exposes timings for query execution, such as `resultAvailableAfter` which returns the time taken by the server to make the result available for consumption.
+Further details may be found in the driver API documentation.
