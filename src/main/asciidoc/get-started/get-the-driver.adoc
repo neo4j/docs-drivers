@@ -82,8 +82,3 @@ pip install neo4j-driver=={python-driver-version}
 ======
 ====
 
-// TODO: Add this back if/when it's useful for users.
-//Each version of a Driver supports up to four different versions of the Bolt protocol.
-//This means, that for immediate future each driver version will work with all available version of the protocol.
-//Once we start seeing Drivers that no longer support older versions of Bolt, we will make this information available here as an accessible overview.
-
