@@ -7,7 +7,7 @@
 [[driver-versions]]
 == Versions
 
-Consult the version table to determine which version of the driver to use with a particular Neo4j server.
+Consult the version table to determine which version of the driver to use with a particular version of Neo4j.
 
 .Supported versions
 [options='header']
@@ -20,7 +20,7 @@ Consult the version table to determine which version of the driver to use with a
 |===
 
 <*> Driver versions 1.0 and 1.1 work with both Neo4j 3.0 and 3.1.
-To take advantage of the new cluster mode in Neo4j 3.1 and use the new features, such as bookmarking and routing, it is necessary to use version 1.1 of the driver.
+To take advantage of the Causal Cluster mode in Neo4j 3.1 and use features such as bookmarking and routing, it is necessary to use version 1.1 of the driver.
 
 
 == Acquire the driver

@@ -3,8 +3,8 @@
 
 [abstract]
 --
-A driver is used to connect to a Neo4j server.
-It provides sessions that are used to execute statements and retrieve results.
+Configure a driver and use it to connect to Neo4j.
+The driver provides sessions that are the context of one or more transactions of work against the database.
 --
 
 include::construction.adoc[leveloffset=+1]

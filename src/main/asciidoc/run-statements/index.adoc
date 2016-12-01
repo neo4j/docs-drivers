@@ -4,6 +4,7 @@
 [abstract]
 --
 All interactions with a Neo4j database take place within a session.
+Each session is the context for one or more transactions of work against the database.
 --
 
 A session is a lightweight container for a sequence of transactions.
@@ -35,8 +36,14 @@ This is sometimes convenient for single read-only queries.
 If it is used for write queries, it can be difficult to track exactly where something has gone wrong.
 // TODO: Is that true? Why is it bad to use auto-commit transactions when writing?
 
+[CAUTION]
+--
+Auto-commit transactions cannot be used with bookmarks to achieve causal consistency.
+--
+
+
 include::run-statement.adoc[leveloffset=+1]
 
-// include::transactions.adoc[leveloffset=+1]
+include::transactions.adoc[leveloffset=+1]
 
 include::bookmarking.adoc[leveloffset=+1]

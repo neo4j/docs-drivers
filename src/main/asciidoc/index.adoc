@@ -22,13 +22,11 @@ The drivers use the <<term-bolt, Bolt>> protocol and have uniform design and use
 
 include::introduction/index.adoc[leveloffset=+1]
 
-include::getting-started/index.adoc[leveloffset=+1]
+include::get-started/index.adoc[leveloffset=+1]
 
-include::driver/index.adoc[leveloffset=+1]
+include::configure-connect/index.adoc[leveloffset=+1]
 
-include::session/index.adoc[leveloffset=+1]
-
-include::transaction/index.adoc[leveloffset=+1]
+include::run-statements/index.adoc[leveloffset=+1]
 
 include::result/index.adoc[leveloffset=+1]
 
