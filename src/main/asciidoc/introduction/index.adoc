@@ -8,7 +8,7 @@ The preferred way to access Neo4j from an application is to use a Neo4j driver.
 
 Neo4j drivers provide access to Neo4j for the application.
 A driver instance is configured and provides sessions to use for multiple transactional interactions with the database.
-Within a session transactions run statements to create and query data, define the schema, and call procedures for monitoring and administration.
+Within a session, transactions run statements to create and query data, define the schema, and call procedures for monitoring and administration.
 When Neo4j is deployed in a Causal Cluster, the driver handles the routing of read and write operations.
 With Causal Clustering the driver also provides bookmarking (see <<driver-bookmarking>>).
 Bookmarking is used to ensure causal consistency: the application can run multiple queries on different members of the cluster while maintaining a guaranteed consistent view of the data.

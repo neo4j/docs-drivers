@@ -16,7 +16,7 @@ The driver will create a session against a suitable cluster member for the selec
 
 In the ordinary case, transactions are explicitly managed.
 This means that a transaction is created from a session and used to run one or more statements.
-For each statement results may be processed and any exceptions are handled.
+For each statement, results may be processed and any exceptions handled.
 When the sequence of transactions have all been executed, the session is closed.
 
 // To run a statement, use the session to create a transaction.
@@ -61,7 +61,7 @@ include::{python-examples}/test_examples.py[tags=transaction-commit]
 
 == Sessions
 
-A Session is a wrapper around a connection that can be used to group units of work by a common end point.
+A session is a wrapper around a connection that can be used to group units of work with a common end point.
 To acquire a new session, use the `driver.session` method.
 Session creation is a cheap process.
 The underlying connection will be borrowed from the driver connection pool on construction and returned to the pool on closure.
@@ -75,10 +75,10 @@ When the driver has routing enabled, provide the desired access mode: `READ` or 
 If omitted, `WRITE` is assumed for backward compatibility.
 
 The routing driver will create the session against an endpoint which is suitable for writing or reading, respectively.
-Deploying against a Causal Cluster this means that the driver can route reads and writes efficiently.
+Deploying against a Causal Cluster means that the driver can route reads and writes efficiently.
 Reads are directed to the Read replicas, while writes go to the Core of the cluster for consensus commit and safekeeping.
 
-If the instance against which a session is created is no longer available for the declared access mode the application will receive a `SessionExpiredException`.
+If the instance against which a session is created is no longer available for the declared access mode, the application will receive a `SessionExpiredException`.
 When this occurs, the application should acquire another session from the driver and replay the failing transaction.
 
 
@@ -139,7 +139,7 @@ include::{python-examples}/test_examples.py[tags=transaction-rollback]
 == Auto-commit transactions
 
 While the ordinary case is to use explicit transactions, it is also possible to run statements directly from a session.
-The session's `run()` method implicitly begins and commits a transaction, in which the statement is run.
+The session's `run()` method implicitly begins and commits a transaction in which the statement is run.
 This is a convenience method for individual read-only queries.
 
 Auto-commit transactions do not support bookmarking and are difficult to diagnose on failure when pipelined.
@@ -190,10 +190,10 @@ include::{python-examples}/test_examples.py[tags=statement]
 
 == Query parameters
 
-It is always recommended to use parameters.
+It is recommended always to use parameters.
 Using parameters has significant performance and security benefits:
 
-* It allows the query planner to reuse its plans, which makes queries much more efficient.
+* It allows the query planner to reuse its plans, making queries much more efficient.
 * It protects the database from Cypher injection attacks, where malicious query clauses are added from poorly typed or filtered input.
 
 It is possible, however, to run a query with literal values.
