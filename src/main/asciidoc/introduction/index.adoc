@@ -8,7 +8,7 @@ The preferred way to access Neo4j from an application is to use a Neo4j driver.
 
 Neo4j drivers provide access to Neo4j for the application.
 A driver instance is configured and provides sessions to use for multiple transactional interactions with the database.
-The session runs statements to create and query data, define the schema, and call procedures for monitoring and administration.
+Within a session, transactions run statements to create and query data, define the schema, and call procedures for monitoring and administration.
 When Neo4j is deployed in a Causal Cluster, the driver handles the routing of read and write operations.
 With Causal Clustering the driver also provides bookmarking (see <<driver-bookmarking>>).
 Bookmarking is used to ensure causal consistency: the application can run multiple queries on different members of the cluster while maintaining a guaranteed consistent view of the data.
@@ -16,7 +16,7 @@ Each query sees the state of graph at least as up-to-date as the graph seen by t
 
 The Neo4j drivers use the Bolt protocol for communication.
 This allows for a high degree of feature sympathy between driver and database, and across drivers.
-A Causal Cluster provides discovery features that can be used by the driver to be aware of the cluster topology.
+A Causal Cluster provides discovery features that are used by the driver to be aware of the cluster topology.
 It is necessary for the driver to be cluster-aware to provide routing and load balancing.
 
 Finally, using Bolt provides compatibility across multiple versions of driver and database.
