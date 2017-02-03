@@ -1,6 +1,6 @@
 [[driver-configuration]]
 = Configuration
-:configuring-bolt-connectors-uri: {operations-manual-base-uri}/deployment/post-installation/#bolt-connector
+:configuring-bolt-connectors-uri: {operations-manual-base-uri}/configuration/connectors/
 
 Configuration settings are supplied to the driver constructor.
 We illustrate the use of these in the examples that follow in the remainder of this section.
