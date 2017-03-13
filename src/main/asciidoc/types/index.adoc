@@ -48,9 +48,9 @@ The Neo4j driver maps Neo4j types to native language types as follows:
 | String       | System.String
 | List         | System.Collections.Generic.IList<T>
 | Map          | System.Collections.IDictionary<TKey, TValue>
-| Node         | Neo4j.Driver.V1.INode (*)
-| Relationship | Neo4j.Driver.V1.IRelationship (*)
-| Path         | Neo4j.Driver.V1.IPath (*)
+| Node         | Neo4j.Driver.V1.INode
+| Relationship | Neo4j.Driver.V1.IRelationship
+| Path         | Neo4j.Driver.V1.IPath
 |===
 ======
 
@@ -66,9 +66,9 @@ The Neo4j driver maps Neo4j types to native language types as follows:
 | String       | java.lang.String
 | List         | java.util.List<T>
 | Map          | java.util.Map<K, V>
-| Node         | org.neo4j.driver.v1.types.Node (*)
-| Relationship | org.neo4j.driver.v1.types.Relationship (*)
-| Path         | org.neo4j.driver.v1.types.Path (*)
+| Node         | org.neo4j.driver.v1.types.Node
+| Relationship | org.neo4j.driver.v1.types.Relationship
+| Path         | org.neo4j.driver.v1.types.Path
 |===
 ======
 
@@ -84,11 +84,13 @@ The Neo4j driver maps Neo4j types to native language types as follows:
 | String       | String
 | List         | Array
 | Map          | Object
-| Node         | Node (*)
-| Relationship | Relationship (*)
-| Path         | Path (*)
+| Node         | Node
+| Relationship | Relationship
+| Path         | Path
 |===
-// TODO: Explain `Integer`.
+****
+(*) As JavaScript does not support 64-bit unsigned integers natively, the driver provides an `Integer` type to allow such values to be accurately represented in result data.
+****
 ======
 
 [.include-with-python]
@@ -103,15 +105,16 @@ The Neo4j driver maps Neo4j types to native language types as follows:
 | String       | str/unicode (†)
 | List         | list
 | Map          | dict
-| Node         | Node (*)
-| Relationship | Relationship (*)
-| Path         | Path (*)
+| Node         | Node
+| Relationship | Relationship
+| Path         | Path
 |===
 
 .(†) Python versions
 ****
 In Python 2, a Neo4j `Integer` is mapped to `int` and a Neo4j `String` to `str`.
-In Python 3 `long` and `unicode` are mapped instead.
+
+In Python 3, a Neo4j `Integer` is mapped to `long` and a Neo4j `String` to `unicode`.
 ****
 
 ======
