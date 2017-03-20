@@ -146,10 +146,9 @@ include::{python-examples}/test_examples.py[tags=tls-signed]
 ====
 
 
-== Authenticate user
+== Authentication
 
 The server will require the driver to provide authentication credentials for the user to connect to the database, unless authentication has been disabled.
-// See 'Securing Neo4j Server' (http://neo4j.com/docs/3.0.0-SNAPSHOT/security-server.html) for more information.
 
 [.tabbed-example]
 .Connecting the driver to a server with authentication disabled
