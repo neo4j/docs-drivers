@@ -4,51 +4,18 @@
 :openjdk-download: http://openjdk.java.net/install/
 :maven-download: https://maven.apache.org/download.cgi
 
-== Building
+== Contents
 
-Java JDK version 8 (preferred) or 7 is required.
-See {oracle-download}[Oracle Java SE Development Kit 8 Downloads] or {openjdk-download}[OpenJDK].
+This repository contains the Asciidoc source for the prose in the Drivers chapter in the Neo4j Developer Manual.
 
-Gradle is used for the build.
+The examples for each of the driver languages are generated out of each driver's source code repository:
 
-[TIP]
-The _gradlew_ / _gradlew.bat_ script will download Gradle on first run.
-No previous install is needed (if one exists, it will be ignored).
+* https://github.com/neo4j/neo4j-java-driver[`neo4j-java-driver`]
+* https://github.com/neo4j/neo4j-python-driver[`neo4j-python-driver`]
+* https://github.com/neo4j/neo4j-javascript-driver[`neo4j-javascript-driver`]
+* https://github.com/neo4j/neo4j-dotnet-driver[`neo4j-dotnet-driver`]
 
-[source, bash]
-----
-./gradlew
-----
+== Usage
 
-The HTML output will be generated in _build/html5/_, the PDF in _build/pdf/_.
-One PDF per programming language is built.
-
-To exclude building the PDF output, do like this:
-
-[source, bash]
-----
-./gradlew -PnoPdf
-----
-
-To do a clean build of all outputs do:
-
-[source, bash]
-----
-./gradlew clean dist
-----
-
-Execute a new build automatically as soon as there are file changes:
-
-[source, bash]
-----
-./gradlew -t
-----
-
-Use local clones of the driver projects:
-
-[source, bash]
-----
-./gradlew -PlocalDriverSources
-----
-
-The clones are expected to be located in parallel to this project.
+This repository is only used for managing content which is built elsewhere.
+While the build script remains, it is not being maintained and may not work
