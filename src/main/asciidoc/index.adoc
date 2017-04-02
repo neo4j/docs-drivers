@@ -1,41 +1,46 @@
-[[index]]
-= {manual-title}
+[[drivers]]
+= Drivers
 :project-version:
 :manual-title: Neo4j Driver Manual {project-version}
 :source-indent: 0
 :icons: font
-:example-caption!:
-:table-caption!:
-ifndef::dotnet-root[:dotnet-root: ../../../build/driver-sources/dotnet-driver]
-ifndef::java-root[:java-root: ../../../build/driver-sources/java-driver]
-ifndef::javascript-root[:javascript-root: ../../../build/driver-sources/javascript-driver]
-ifndef::python-root[:python-root: ../../../build/driver-sources/python-driver]
+:iconfont-cdn: https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.0.0/css/font-awesome.min.css
+// :example-caption!:
+// :table-caption!:
+ifndef::dotnet-root[:dotnet-root: {project-root}/build/driver-sources/dotnet-driver]
+ifndef::java-root[:java-root: {project-root}/build/driver-sources/java-driver]
+ifndef::javascript-root[:javascript-root: {project-root}/build/driver-sources/javascript-driver]
+ifndef::python-root[:python-root: {project-root}/build/driver-sources/python-driver]
 :dotnet-examples: {dotnet-root}/Neo4j.Driver/Neo4j.Driver.IntegrationTests
 :java-examples: {java-root}/examples/src/main/java/org/neo4j/docs/driver
 :javascript-examples: {javascript-root}/test/v1
 :python-examples: {python-root}/examples
 
-:neo4j-url: http://neo4j.com/
+:neo4j-url: https://neo4j.com/
 
-Neo4j Drivers are drivers for the {neo4j-url}[Neo4j database].
-The drivers use the <<term-bolt, Bolt>> protocol and have uniform design and use.
 
-include::introduction/index.adoc[leveloffset=+1]
+[abstract]
+--
+This chapter contains the complete documentation of the official Neo4j drivers.
+--
 
-include::get-started/index.adoc[leveloffset=+1]
+Driver version: {driver-version}.
 
-include::configure-connect/index.adoc[leveloffset=+1]
+Neo4j drivers provide application access to a Neo4j database.
+These official drivers use the Bolt protocol.
+They have been designed to strike a balance between an idiomatic API for each language, and a uniform surface across all supported languages.
 
-include::run-statements/index.adoc[leveloffset=+1]
+The chapter describes the following:
 
-include::result/index.adoc[leveloffset=+1]
+* <<getting-started>>
+* <<client-applications>>
+* <<sessions-and-transactions>>
+* <<drivers-working-with-cypher-values>>
+* <<driver-terminology>>
 
-include::types/index.adoc[leveloffset=+1]
 
-include::errors/index.adoc[leveloffset=+1]
-
-include::terminology.adoc[leveloffset=+1]
-
-include::colophon.adoc[leveloffset=+1]
-
-// TODO: Remove the advanced section include and file (including the image file).
+include::{driver-docs-source-dir}/getting-started.adoc[leveloffset=+1]
+include::{driver-docs-source-dir}/client-applications.adoc[leveloffset=+1]
+include::{driver-docs-source-dir}/sessions-and-transactions.adoc[leveloffset=+1]
+include::{driver-docs-source-dir}/working-with-cypher-values.adoc[leveloffset=+1]
+include::{driver-docs-source-dir}/terminology.adoc[leveloffset=+1]

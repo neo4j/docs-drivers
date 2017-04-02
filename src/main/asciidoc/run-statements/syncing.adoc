@@ -1,5 +1,0 @@
-[[driver-syncing]]
-= Syncing
-
-The Neo4j drivers support syncing to reduce network traffic.
-Requests are queued locally until it is efficient to send them to the server.

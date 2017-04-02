@@ -1,0 +1,197 @@
+[[getting-started]]
+= Getting Started
+
+[abstract]
+--
+This section gives an overview of the official Neo4j drivers and how to connect to a Neo4j database with a "Hello World" example.
+--
+
+
+== About the official drivers
+
+Both official and community database drivers are available to provide access to Neo4j for applications.
+The official drivers have been built for Neo4j 3.0 and above, and use the <<term-bolt, Bolt protocol>> for communication.
+Official drivers exist for:
+
+* C# -- works with any .NET language
+* Java -- works with any JVM language
+* JavaScript
+* Python
+
+The Bolt protocol has been designed by Neo Technology, specifically for use with Neo4j, and is fully aligned with the Cypher type system.
+
+The driver API is intended to be topologically agnostic.
+By this, we mean that the underlying database topology — single instance, causal cluster, etc. — can be altered without requiring a corresponding alteration to application code.
+In the general case, only the <<driver-connection-uris, connection URI>> needs to be modified when changes are made to the topology. 
+
+.Driver compatibility per Neo4j version
+[options="header", cols="^1,3*^"]
+|===
+|               3+^| Driver version
+s| Neo4j version ^s| 1.0                   ^s| 1.1                   ^s| 1.2
+s| 3.0             | Upgrade recommended (*) | Upgrade recommended (*) | Recommended
+s| 3.1             | Upgrade recommended (*) | Upgrade recommended (*) | Recommended
+s| 3.2             | Upgrade recommended (*) | Upgrade recommended (*) | Recommended
+|===
+
+(*) Regardless of which version of Neo4j you are using, it is strongly recommended to upgrade to the latest driver version.
+All 1.x drivers are compatible with all 3.x servers but earlier versions of the driver may not provide all features.
+
+NOTE: The official drivers do not support HTTP communication.
+If you need an HTTP driver, there are a number of community drivers to choose from.
+See also <<http-api>>.
+
+== Driver Installation
+
+.Acquire the driver
+[.tabbed-example]
+====
+
+[.include-with-dotnet]
+======
+
+To install the latest version of the driver, using NuGet in Visual Studio:
+
+[source, csharp, subs="attributes, specialcharacters"]
+----
+PM> Install-Package Neo4j.Driver
+----
+
+To install a certain version of the driver, using NuGet in Visual Studio:
+
+[source, csharp, subs="attributes, specialcharacters"]
+----
+PM> Install-Package Neo4j.Driver -Version {dotnet-driver-version}
+----
+======
+
+[.include-with-java]
+======
+When using Maven, add this to your _pom.xml_ file:
+
+[source, xml, subs="attributes, specialcharacters"]
+----
+<dependencies>
+    <dependency>
+        <groupId>org.neo4j.driver</groupId>
+        <artifactId>neo4j-java-driver</artifactId>
+        <version>{java-driver-version}</version>
+    </dependency>
+</dependencies>
+----
+
+For Gradle or Grails, this is how to add the dependency:
+
+[source, groovy, subs="attributes, specialcharacters"]
+----
+compile 'org.neo4j.driver:neo4j-java-driver:{java-driver-version}'
+----
+======
+
+[.include-with-javascript]
+======
+
+To install the latest version of the driver:
+
+[source, shell, subs="attributes, specialcharacters"]
+----
+npm install neo4j-driver
+----
+
+To install a certain version of the driver:
+
+[source, shell, subs="attributes, specialcharacters"]
+----
+npm install neo4j-driver@{javascript-driver-version}
+----
+======
+
+[.include-with-python]
+======
+
+To install the latest version of the driver:
+
+[source, shell, subs="attributes, specialcharacters"]
+----
+pip install neo4j-driver
+----
+
+To install a certain version of the driver:
+
+[source, shell, subs="attributes, specialcharacters"]
+----
+pip install neo4j-driver=={python-driver-version}
+----
+======
+====
+
+
+== A "Hello World" example
+
+The example below shows the minimal configuration necessary to interact with Neo4j through a driver.
+
+[.tabbed-example]
+.Hello World
+====
+[.include-with-dotnet]
+======
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=hello-world]
+----
+======
+
+[.include-with-java]
+======
+[source, java]
+----
+include::{java-examples}/HelloWorldExample.java[tags=hello-world]
+----
+======
+
+[.include-with-javascript]
+======
+[source, javascript]
+----
+include::{javascript-examples}/examples.test.js[tags=hello-world]
+----
+======
+
+[.include-with-python]
+======
+[source, python]
+----
+include::{python-examples}/test_examples.py[tag=hello-world]
+----
+======
+====
+
+[[driver-api-docs]]
+== Driver API docs
+
+For a comprehensive listing of all driver functionality, refer to the API documentation for the specific language driver.
+
+[.tabbed-example]
+.API docs
+====
+[.include-with-dotnet]
+======
+{neo4j-url}/docs/api/dotnet-driver
+======
+
+[.include-with-java]
+======
+{neo4j-url}/docs/api/java-driver
+======
+
+[.include-with-javascript]
+======
+{neo4j-url}/docs/api/javascript-driver
+======
+
+[.include-with-python]
+======
+{neo4j-url}/docs/api/python-driver
+======
+====
+
