@@ -1,0 +1,285 @@
+[[sessions-and-transactions]]
+= Sessions and transactions
+
+[abstract]
+--
+This section describes how to create units of work and provide a logical context for that work.
+--
+
+
+== Sessions
+
+A session is a container for a sequence of transactions.
+Sessions borrow connections from a pool as required and so should be considered lightweight and disposable.
+In languages where <<term-thread-safety, thread safety>> is an issue, a session should _not_ be considered thread-safe.
+
+In languages that support them, sessions are usually scoped within a context block.
+This ensures that they are properly closed and that any underlying connections are released and not leaked.
+
+[.tabbed-example]
+.Session
+====
+[.include-with-dotnet]
+======
+
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=session]
+----
+======
+
+[.include-with-java]
+======
+
+[source, java]
+----
+include::{java-examples}/SessionExample.java[tags=session]
+----
+======
+
+[.include-with-javascript]
+======
+
+[source, javascript]
+----
+include::{javascript-examples}/examples.test.js[tags=session]
+----
+======
+
+[.include-with-python]
+======
+
+[source, python]
+----
+include::{python-examples}/test_examples.py[tag=session]
+----
+======
+====
+
+
+== Transactions
+
+Transactions are atomic units of work consisting of one or more Cypher statement executions.
+A transaction is executed within a session.
+
+To execute a Cypher statement, two pieces of information are required: the statement template and a keyed set of parameters.
+The template is a string containing placeholders that are substituted with parameter values at runtime.
+While it is possible to run non-parameterized Cypher, good programming practice is to use parameters in Cypher statements.
+This allows for caching of statements within the Cypher engine, which is beneficial for performance.
+Parameter values should adhere to <<cypher-values>>.
+
+The Neo4j driver API provides for three forms of transaction:
+
+* Auto-commit transactions
+* Transaction functions
+* Explicit transactions
+
+Of these, only <<transaction_functions, transaction function>> can be automatically replayed on failure.
+
+
+=== Auto-commit Transactions
+
+An auto-commit transaction is a simple but limited form of transaction.
+Such a transaction consists of only one Cypher statement, cannot be automatically replayed on failure, and cannot take part in a <<causal-chaining, causal chain>>.
+
+An auto-commit transaction is invoked using the `session.run` method:
+
+[.tabbed-example]
+.Auto-commit transaction
+====
+[.include-with-dotnet]
+======
+
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=autocommit-transaction]
+----
+======
+
+[.include-with-java]
+======
+
+[source, java]
+----
+include::{java-examples}/AutocommitTransactionExample.java[tags=autocommit-transaction]
+----
+======
+
+[.include-with-javascript]
+======
+
+[source, javascript]
+----
+include::{javascript-examples}/examples.test.js[tags=autocommit-transaction]
+----
+======
+
+[.include-with-python]
+======
+
+[source, python]
+----
+include::{python-examples}/test_examples.py[tag=autocommit-transaction]
+----
+======
+====
+
+Auto-commit transactions are sent to the network and acknowledged immediately.
+This means that multiple transactions cannot share network packets, thereby exhibiting a lesser network efficiency than other forms of transaction.
+
+Auto-commit transactions are intended to be used for simple use cases such as when learning Cypher or writing one-off scripts.
+It is not recommended to use auto-commit transactions in production environments or when performance or resilience are a primary concern.
+
+However, Auto-commit transactions are the only way to execute `<<query-periodic-commit, USING PERIODIC COMMIT>>` Cypher statements.
+
+=== Transaction functions
+
+Transaction functions are the recommended form for containing transactional units of work.
+This form requires minimal boilerplate code and allows for a clear separation of database queries and application logic.
+
+[.tabbed-example]
+.Transaction function
+====
+[.include-with-dotnet]
+======
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=transaction-function]
+----
+======
+
+[.include-with-java]
+======
+[source, java]
+----
+include::{java-examples}/TransactionFunctionExample.java[tags=transaction-function]
+----
+======
+
+[.include-with-javascript]
+======
+[source, javascript]
+----
+include::{javascript-examples}/examples.test.js[tags=transaction-function]
+----
+======
+
+[.include-with-python]
+======
+[source, python]
+----
+include::{python-examples}/test_examples.py[tag=transaction-function]
+----
+======
+====
+
+Transaction functions are also able to handle connection problems and transient errors using an automatic retry mechanism.
+This retry capability can be <<max-retry-time, configured>> on Driver construction.
+
+Any query results obtained within a transaction function should be consumed within that function.
+Transaction functions can return values but these should be derived values rather than raw results.
+
+=== Explicit Transactions
+
+Explicit transactions are the longhand form of transaction functions, providing access to explicit `BEGIN`, `COMMIT` and `ROLLBACK` operations.
+While this form is useful for a handful of use cases, it is recommended to use transaction functions wherever possible.
+
+
+=== Cypher Errors
+
+When executing Cypher, it is possible for an exception to be thrown by the Cypher engine.
+Each such exception is associated with a <<status-codes, status code>> that describes the nature of the error and a message that provides more detail.
+
+The error classifications are listed in the table below.
+
+.Error classifications
+[options="header"]
+|===
+| Classification 	| Description
+|ClientError            | The client application has caused an error.
+The application should amend and retry the operation.
+
+|DatabaseError          | The server has caused an error.
+Retrying the operation will generally be unsuccessful.
+
+|TransientError         | A temporary error has occurred.
+The application should retry the operation.
+|===
+
+
+[[causal-chaining]]
+
+== Causal chaining
+
+// !!!!!!!!!!!!!!!!!! Causal Cluster, Causal cluster or causal cluster?
+When working with a causal cluster, the transactions in a session will automatically be causally chained.
+This means that for any two transactions, it is guaranteed that the second transaction will begin only after the first has been successfully committed. 
+This is true even if the transactions are physically carried out on different cluster members.
+
+Causal chaining is carried out internally by passing a <<term-bookmark, bookmark>> between transactions.
+The bookmark records a point in transactional history.
+When beginning a transaction on a server relative to a bookmark, transaction execution will block until the server has caught up with the bookmark stored in the session.
+If the transaction is carried out successfully, the bookmark will be updated.
+Should the transaction fail, no such update will be made.
+
+It is possible both to construct a session based on an existing bookmark, and to extract a bookmark from a session.
+// !!!!!!!!!!!!!!!!!! How do you pass bookmarks, or how can I find out how to? Example!
+These functions allow multiple sessions to be chained together.
+
+When running multiple independent transactions, it is recommended to use separate sessions.
+This avoids the small latency overhead of the causal chain.
+
+[TIP]
+--
+If you try to extract a bookmark from a database which is not running in Causal Cluster mode, you will receive a `null` result.
+--
+
+
+== Access modes
+
+Transactions can be executed in either `read` or `write` mode.
+In a causal cluster, each transaction will be routed to an appropriate server based on the mode.
+When using a single instance, all transactions will be passed to that one server.
+Routing Cypher by identifying reads and writes can improve the utilization of available cluster resources:
+as read servers are typically more plentiful than write servers, it is beneficial to direct as much as possible of read transactions to read servers.
+Doing so helps keeping write servers available for write transactions.
+
+Note that the driver does not parse Cypher and cannot determine whether a transaction is intended to carry out read or write operations.
+As a result of this, a `write` transaction tagged for `read` will be sent to a read server, but will fail on execution.
+
+[.tabbed-example]
+.Read-write transaction
+====
+[.include-with-dotnet]
+======
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=read-write-transaction]
+----
+======
+
+[.include-with-java]
+======
+[source, java]
+----
+include::{java-examples}/ReadWriteTransactionExample.java[tags=read-write-transaction]
+----
+======
+
+[.include-with-javascript]
+======
+[source, javascript]
+----
+include::{javascript-examples}/examples.test.js[tags=read-write-transaction]
+----
+======
+
+[.include-with-python]
+======
+[source, python]
+----
+include::{python-examples}/test_examples.py[tag=read-write-transaction]
+----
+======
+====
+

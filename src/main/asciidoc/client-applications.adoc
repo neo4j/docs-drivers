@@ -1,0 +1,432 @@
+[[client-applications]]
+= Client applications
+
+[abstract]
+--
+This section describes how to manage database connections within an application.
+--
+
+
+== The driver object
+
+A Neo4j client application will require a driver object instance in order to provide access to the database.
+This object instance should be made available to all parts of the application that need to interact with Neo4j.
+In languages where <<term-thread-safety, thread safety>> is an issue, the driver can be considered thread-safe.
+
+[TIP]
+.A note on lifecycle
+--
+Applications will typically construct a driver instance on startup and destroy it on exit.
+Destroying a driver instance will immediately shut down any connections previously opened via that driver; for drivers that contain a connection pool, the entire pool will be shut down.
+--
+
+To construct a driver instance, a <<driver-connection-uris, connection URI>> and <<drivers-authentication, authentication information>> must be supplied.
+Additional configuration details can be supplied if required.
+All of these details are immutable for the lifetime of the driver.
+Therefore, if multiple configurations are required (such as when working with multiple database users) then multiple driver objects must be used.
+
+An example of driver construction and destruction can be seen below:
+
+[.tabbed-example]
+.The driver lifecycle
+====
+[.include-with-dotnet]
+======
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=driver-lifecycle]
+----
+======
+
+[.include-with-java]
+======
+[source, java]
+----
+include::{java-examples}/DriverLifecycleExample.java[tags=driver-lifecycle]
+----
+======
+
+[.include-with-javascript]
+======
+[source, javascript]
+----
+include::{javascript-examples}/examples.test.js[tags=driver-lifecycle]
+----
+======
+
+[.include-with-python]
+======
+[source, python]
+----
+include::{python-examples}/test_examples.py[tag=driver-lifecycle]
+----
+======
+====
+
+[[driver-connection-uris]]
+== Connection URIs
+
+A connection URI identifies a graph database and how to connect to it.
+The official Neo4j drivers currently support the following URI schemes and driver object types:
+
+.Driver compatibility per Neo4j version
+[options="header"]
+|===
+| URI Scheme     | Driver object type
+| bolt           | Direct driver
+| bolt+routing   | Routing driver
+|===
+
+
+
+
+=== Direct drivers (bolt)
+
+A Direct driver is created via a `bolt` URI, for example: `bolt://localhost:7687`.
+This kind of driver is used to maintain connections to a single database server and is typically used when working with a single Neo4j instance or when targeting a specific member of a cluster.
+Note that a Routing driver is preferable when working with a causal cluster.
+
+=== Routing drivers (bolt+routing)
+
+A Routing driver is created via a `bolt+routing` URI, for example: `bolt+routing://graph.example.com:7687`.
+This kind of driver uses the <<term-bolt-routing-protocol, Bolt Routing Protocol>> and works in tandem with the cluster to route transactions to available cluster members.
+
+[[drivers-authentication]]
+== Authentication
+
+Authentication details are provided as an auth token which contains the user names, passwords or other credentials required to access the database.
+Neo4j supports multiple authentication standards but uses basic authentication by default.
+
+=== Basic Authentication
+
+The basic authentication scheme is backed by a password file stored within the server and requires applications to provide a user name and password.
+For this, use the basic auth helper:
+
+[.tabbed-example]
+.Basic authentication
+====
+[.include-with-dotnet]
+======
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=basic-auth]
+----
+======
+
+[.include-with-java]
+======
+[source, java]
+----
+include::{java-examples}/BasicAuthExample.java[tags=basic-auth]
+----
+======
+
+[.include-with-javascript]
+======
+[source, javascript]
+----
+include::{javascript-examples}/examples.test.js[tags=basic-auth]
+----
+======
+
+[.include-with-python]
+======
+[source, python]
+----
+include::{python-examples}/test_examples.py[tag=basic-auth]
+----
+======
+====
+
+[NOTE]
+--
+The basic authentication scheme can also be used to authenticate against an LDAP server.
+--
+
+=== Custom Authentication
+
+For advanced deployments, where a custom security provider has been built, the custom authentication helper can be used.
+
+[.tabbed-example]
+.Custom authentication
+====
+[.include-with-dotnet]
+======
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=custom-auth]
+----
+======
+
+[.include-with-java]
+======
+[source, java]
+----
+include::{java-examples}/CustomAuthExample.java[tags=custom-auth]
+----
+======
+
+[.include-with-javascript]
+======
+[source, javascript]
+----
+include::{javascript-examples}/examples.test.js[tags=custom-auth]
+----
+======
+
+[.include-with-python]
+======
+[source, python]
+----
+include::{python-examples}/test_examples.py[tag=custom-auth]
+----
+======
+====
+
+[[driver-configuration]]
+== Configuration
+
+
+=== Encryption
+
+TLS encryption is enabled for all connections by default.
+This can be disabled through configuration as follows:
+
+[.tabbed-example]
+.Unencrypted
+====
+[.include-with-dotnet]
+======
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=config-unencrypted]
+----
+======
+
+[.include-with-java]
+======
+[source, java]
+----
+include::{java-examples}/ConfigUnencryptedExample.java[tags=config-unencrypted]
+----
+======
+
+[.include-with-javascript]
+======
+[source, javascript]
+----
+include::{javascript-examples}/examples.test.js[tags=config-unencrypted]
+----
+======
+
+[.include-with-python]
+======
+[source, python]
+----
+include::{python-examples}/test_examples.py[tag=config-unencrypted]
+----
+======
+====
+
+The server can be modified to require encryption for all connections.
+Please see the <<operations-manual#connectors, Operations Manual -> Configure Neo4j connectors>> for more information.
+// !!!!!!!!!!!!!!!!!!!!! fix bug - tls_level not documented in Ops manual!
+
+An attempt to connect to a server using an encryption setting not allowed by that server will result in a <<service-unavailable, _Service unavailable_>> status.
+
+=== Trust
+
+//!!!!!!!!!!!!!!!!!! Do we want to put TLS handshake in glossary? 
+During a TLS handshake, the server provides a certificate to the client application.
+The application can choose to accept or reject this certificate based on one of the following trust strategies:
+
+.Trust strategies
+[options="header"]
+|===
+| Trust strategy                        | Description
+| `TRUST_ALL_CERTIFICATES` (default)    | Accept any certificate provided by the server
+| `TRUST_CUSTOM_CA_SIGNED_CERTIFICATES` | Accept any certificate that can be verified against a custom CA
+| `TRUST_SYSTEM_CA_SIGNED_CERTIFICATES` | Accept any certificate that can be verified against the system store
+|===
+
+
+
+[.tabbed-example]
+.Trust
+====
+[.include-with-dotnet]
+======
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=config-trust]
+----
+======
+
+[.include-with-java]
+======
+[source, java]
+----
+include::{java-examples}/ConfigTrustExample.java[tags=config-trust]
+----
+======
+
+[.include-with-javascript]
+======
+[source, javascript]
+----
+include::{javascript-examples}/examples.test.js[tags=config-trust]
+----
+======
+
+[.include-with-python]
+======
+[source, python]
+----
+include::{python-examples}/test_examples.py[tag=config-trust]
+----
+======
+====
+
+=== Connection timeout
+
+To configure the maximum time allowed to establish a connection, pass a duration value to the driver configuration.
+// !!!!!!!!!!!!!!!!!!!!!! Is it important to state that this is a `TCP` connection?
+// To configure the maximum time allowed to establish a TCP connection, pass a duration value to the driver configuration.
+For example:
+
+[.tabbed-example]
+.Connection timeout
+====
+[.include-with-dotnet]
+======
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=config-connection-timeout]
+----
+======
+
+[.include-with-java]
+======
+[source, java]
+----
+include::{java-examples}/ConfigConnectionTimeoutExample.java[tags=config-connection-timeout]
+----
+======
+
+[.include-with-javascript]
+======
+[source, javascript]
+----
+This feature is not available in the Javascript driver.
+----
+======
+
+[.include-with-python]
+======
+[source, python]
+----
+include::{python-examples}/test_examples.py[tag=config-connection-timeout]
+----
+======
+====
+
+[[max-retry-time]]
+=== Max retry time
+
+To configure retry behavior, supply a value for the maximum time in which to keep attempting retries of transaction functions.
+For example:
+
+[.tabbed-example]
+.Max retry time
+====
+[.include-with-dotnet]
+======
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=config-max-retry-time]
+----
+======
+
+[.include-with-java]
+======
+[source, java]
+----
+include::{java-examples}/ConfigMaxRetryTimeExample.java[tags=config-max-retry-time]
+----
+======
+
+[.include-with-javascript]
+======
+[source, javascript]
+----
+include::{javascript-examples}/examples.test.js[tags=config-max-retry-time]
+----
+======
+
+[.include-with-python]
+======
+[source, python]
+----
+include::{python-examples}/test_examples.py[tag=config-max-retry-time]
+----
+======
+====
+
+Note that the time specified here does not take into account the running time of the unit of work itself, merely a limit after which retries will no longer be attempted.
+
+[[service-unavailable]]
+== Service unavailable
+
+A Service unavailable status will be signalled when the driver is no longer able to establish communication with the server, even after retries.
+Encountering this condition usually indicates a fundamental networking or database problem.
+Applications should be designed to cater for this eventuality.
+
+[.tabbed-example]
+.Service unavailable
+====
+[.include-with-dotnet]
+======
+
+Catch ServiceUnavailableException as follows:
+
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=service-unavailable]
+----
+======
+
+[.include-with-java]
+======
+
+Catch ServiceUnavailableException as follows:
+
+[source, java]
+----
+include::{java-examples}/ServiceUnavailableExample.java[tags=service-unavailable]
+----
+======
+
+[.include-with-javascript]
+======
+
+//TODO!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Javascript specifics
+
+[source, javascript]
+----
+include::{javascript-examples}/examples.test.js[tags=service-unavailable]
+----
+======
+
+[.include-with-python]
+======
+
+Catch the ServiceUnavailable exception as follows:
+
+[source, python]
+----
+include::{python-examples}/test_examples.py[tag=service-unavailable]
+----
+======
+====
+
+
