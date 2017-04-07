@@ -14,7 +14,7 @@ ifndef::python-root[:python-root: {project-root}/build/driver-sources/python-dri
 :dotnet-examples: {dotnet-root}/Neo4j.Driver/Neo4j.Driver.IntegrationTests
 :java-examples: {java-root}/examples/src/main/java/org/neo4j/docs/driver
 :javascript-examples: {javascript-root}/test/v1
-:python-examples: {python-root}/examples
+:python-examples: {python-root}/test/examples
 
 :neo4j-url: https://neo4j.com/
 
@@ -32,15 +32,17 @@ They have been designed to strike a balance between an idiomatic API for each la
 
 The chapter describes the following:
 
-* <<getting-started>>
+* <<drivers-get-started>>
 * <<client-applications>>
 * <<sessions-and-transactions>>
 * <<drivers-working-with-cypher-values>>
-* <<driver-terminology>>
 
 
-include::{driver-docs-source-dir}/getting-started.adoc[leveloffset=+1]
-include::{driver-docs-source-dir}/client-applications.adoc[leveloffset=+1]
-include::{driver-docs-source-dir}/sessions-and-transactions.adoc[leveloffset=+1]
-include::{driver-docs-source-dir}/working-with-cypher-values.adoc[leveloffset=+1]
-include::{driver-docs-source-dir}/terminology.adoc[leveloffset=+1]
+include::get-started.adoc[leveloffset=+1]
+
+include::client-applications.adoc[leveloffset=+1]
+
+include::sessions-and-transactions.adoc[leveloffset=+1]
+
+include::working-with-cypher-values.adoc[leveloffset=+1]
+
