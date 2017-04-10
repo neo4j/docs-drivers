@@ -58,7 +58,7 @@ include::{javascript-examples}/examples.test.js[tags=driver-lifecycle]
 ======
 [source, python]
 ----
-include::{python-examples}/test_examples.py[tag=driver-lifecycle]
+include::{python-examples}/DriverLifecycleExample.py[tags=driver-lifecycle]
 ----
 ======
 ====
@@ -133,7 +133,7 @@ include::{javascript-examples}/examples.test.js[tags=basic-auth]
 ======
 [source, python]
 ----
-include::{python-examples}/test_examples.py[tag=basic-auth]
+include::{python-examples}/BasicAuthExample.py[tags=basic-auth]
 ----
 ======
 ====
@@ -178,7 +178,7 @@ include::{javascript-examples}/examples.test.js[tags=custom-auth]
 ======
 [source, python]
 ----
-include::{python-examples}/test_examples.py[tag=custom-auth]
+include::{python-examples}/CustomAuthExample.py[tags=custom-auth]
 ----
 ======
 ====
@@ -223,20 +223,18 @@ include::{javascript-examples}/examples.test.js[tags=config-unencrypted]
 ======
 [source, python]
 ----
-include::{python-examples}/test_examples.py[tag=config-unencrypted]
+include::{python-examples}/ConfigUnencryptedExample.py[tags=config-unencrypted]
 ----
 ======
 ====
 
 The server can be modified to require encryption for all connections.
 Please see the <<operations-manual#connectors, Operations Manual -> Configure Neo4j connectors>> for more information.
-// !!!!!!!!!!!!!!!!!!!!! fix bug - tls_level not documented in Ops manual!
 
 An attempt to connect to a server using an encryption setting not allowed by that server will result in a <<service-unavailable, _Service unavailable_>> status.
 
 === Trust
 
-//!!!!!!!!!!!!!!!!!! Do we want to put TLS handshake in glossary? 
 During a TLS handshake, the server provides a certificate to the client application.
 The application can choose to accept or reject this certificate based on one of the following trust strategies:
 
@@ -282,7 +280,7 @@ include::{javascript-examples}/examples.test.js[tags=config-trust]
 ======
 [source, python]
 ----
-include::{python-examples}/test_examples.py[tag=config-trust]
+include::{python-examples}/ConfigTrustExample.py[tags=config-trust]
 ----
 ======
 ====
@@ -290,8 +288,6 @@ include::{python-examples}/test_examples.py[tag=config-trust]
 === Connection timeout
 
 To configure the maximum time allowed to establish a connection, pass a duration value to the driver configuration.
-// !!!!!!!!!!!!!!!!!!!!!! Is it important to state that this is a `TCP` connection?
-// To configure the maximum time allowed to establish a TCP connection, pass a duration value to the driver configuration.
 For example:
 
 [.tabbed-example]
@@ -325,7 +321,7 @@ This feature is not available in the Javascript driver.
 ======
 [source, python]
 ----
-include::{python-examples}/test_examples.py[tag=config-connection-timeout]
+include::{python-examples}/ConfigConnectionTimeoutExample.py[tags=config-connection-timeout]
 ----
 ======
 ====
@@ -367,7 +363,7 @@ include::{javascript-examples}/examples.test.js[tags=config-max-retry-time]
 ======
 [source, python]
 ----
-include::{python-examples}/test_examples.py[tag=config-max-retry-time]
+include::{python-examples}/ConfigMaxRetryTimeExample.py[tags=config-max-retry-time]
 ----
 ======
 ====
@@ -387,8 +383,6 @@ Applications should be designed to cater for this eventuality.
 [.include-with-dotnet]
 ======
 
-Catch ServiceUnavailableException as follows:
-
 [source, csharp]
 ----
 include::{dotnet-examples}/Examples.cs[tags=service-unavailable]
@@ -397,8 +391,6 @@ include::{dotnet-examples}/Examples.cs[tags=service-unavailable]
 
 [.include-with-java]
 ======
-
-Catch ServiceUnavailableException as follows:
 
 [source, java]
 ----
@@ -409,8 +401,6 @@ include::{java-examples}/ServiceUnavailableExample.java[tags=service-unavailable
 [.include-with-javascript]
 ======
 
-//TODO!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Javascript specifics
-
 [source, javascript]
 ----
 include::{javascript-examples}/examples.test.js[tags=service-unavailable]
@@ -420,11 +410,9 @@ include::{javascript-examples}/examples.test.js[tags=service-unavailable]
 [.include-with-python]
 ======
 
-Catch the ServiceUnavailable exception as follows:
-
 [source, python]
 ----
-include::{python-examples}/test_examples.py[tag=service-unavailable]
+include::{python-examples}/ServiceUnavailableExample.py[tags=service-unavailable]
 ----
 ======
 ====

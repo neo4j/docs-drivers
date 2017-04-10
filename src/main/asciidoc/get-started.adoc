@@ -1,5 +1,5 @@
-[[getting-started]]
-= Getting Started
+[[drivers-get-started]]
+= Get started
 
 [abstract]
 --
@@ -161,7 +161,7 @@ include::{javascript-examples}/examples.test.js[tags=hello-world]
 ======
 [source, python]
 ----
-include::{python-examples}/test_examples.py[tag=hello-world]
+include::{python-examples}/HelloWorldExample.py[tags=hello-world]
 ----
 ======
 ====

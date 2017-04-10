@@ -12,11 +12,6 @@ This section describes the types and values used by Cypher and how they map to n
 [[drivers-neo4j-type-system]]
 == The Cypher type system
 
-//Cypher has a type system that is expressed through Bolt connections.
-//!!!!!!!!!!!!! PackStream has not been explained!
-//Cypher has a type system that is expressed through Bolt connections using PackStream.
-//The type system consists of the following:
-//Neo4j has a system of data types for processing and storing data.
 Drivers translate between application language types and the Cypher type system.
 To pass parameters and process results, it is important to know the basics of the Cypher type system and to understand how the Cypher types are mapped in the driver.
 
@@ -34,9 +29,6 @@ The basic types are:
 * List
 * Map
 
-//Maps and lists can be processed by the database and used in a statement.
-//Lists in which the elements share a single primitive Neo4j type can be stored as properties on nodes and relationships.
-//Maps and lists in which the elements have mixed types can not be stored as properties.
 
 [NOTE]
 --
@@ -214,7 +206,7 @@ include::{javascript-examples}/examples.test.js[tags=result-consume]
 ======
 [source, python]
 ----
-include::{python-examples}/test_examples.py[tag=result-consume]
+include::{python-examples}/ResultConsumeExample.py[tags=result-consume]
 ----
 ======
 ====
@@ -259,18 +251,11 @@ include::{javascript-examples}/examples.test.js[tags=result-retain]
 ======
 [source, python]
 ----
-include::{python-examples}/test_examples.py[tags=result-retain]
+include::{python-examples}/ResultRetainExample.py[tags=result-retain]
 ----
 ======
 ====
 
-//=== Single records
-//
-//TODO after 1.3
-
-//=== Single values
-//
-//TODO after 1.3
 
 == Statement result summaries
 

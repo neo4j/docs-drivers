@@ -51,7 +51,7 @@ include::{javascript-examples}/examples.test.js[tags=session]
 
 [source, python]
 ----
-include::{python-examples}/test_examples.py[tag=session]
+include::{python-examples}/SessionExample.py[tags=session]
 ----
 ======
 ====
@@ -74,7 +74,7 @@ The Neo4j driver API provides for three forms of transaction:
 * Transaction functions
 * Explicit transactions
 
-Of these, only <<transaction_functions, transaction function>> can be automatically replayed on failure.
+Of these, only <<transaction-functions, transaction function>> can be automatically replayed on failure.
 
 
 === Auto-commit Transactions
@@ -119,7 +119,7 @@ include::{javascript-examples}/examples.test.js[tags=autocommit-transaction]
 
 [source, python]
 ----
-include::{python-examples}/test_examples.py[tag=autocommit-transaction]
+include::{python-examples}/AutocommitTransactionExample.py[tags=autocommit-transaction]
 ----
 ======
 ====
@@ -130,8 +130,9 @@ This means that multiple transactions cannot share network packets, thereby exhi
 Auto-commit transactions are intended to be used for simple use cases such as when learning Cypher or writing one-off scripts.
 It is not recommended to use auto-commit transactions in production environments or when performance or resilience are a primary concern.
 
-However, Auto-commit transactions are the only way to execute `<<query-periodic-commit, USING PERIODIC COMMIT>>` Cypher statements.
+However, Auto-commit transactions are the only way to execute `<<query-using-periodic-commit-hint, USING PERIODIC COMMIT>>` Cypher statements.
 
+[[transaction-functions]]
 === Transaction functions
 
 Transaction functions are the recommended form for containing transactional units of work.
@@ -168,7 +169,7 @@ include::{javascript-examples}/examples.test.js[tags=transaction-function]
 ======
 [source, python]
 ----
-include::{python-examples}/test_examples.py[tag=transaction-function]
+include::{python-examples}/TransactionFunctionExample.py[tags=transaction-function]
 ----
 ======
 ====
@@ -211,7 +212,6 @@ The application should retry the operation.
 
 == Causal chaining
 
-// !!!!!!!!!!!!!!!!!! Causal Cluster, Causal cluster or causal cluster?
 When working with a causal cluster, the transactions in a session will automatically be causally chained.
 This means that for any two transactions, it is guaranteed that the second transaction will begin only after the first has been successfully committed. 
 This is true even if the transactions are physically carried out on different cluster members.
@@ -223,7 +223,6 @@ If the transaction is carried out successfully, the bookmark will be updated.
 Should the transaction fail, no such update will be made.
 
 It is possible both to construct a session based on an existing bookmark, and to extract a bookmark from a session.
-// !!!!!!!!!!!!!!!!!! How do you pass bookmarks, or how can I find out how to? Example!
 These functions allow multiple sessions to be chained together.
 
 When running multiple independent transactions, it is recommended to use separate sessions.
@@ -278,7 +277,7 @@ include::{javascript-examples}/examples.test.js[tags=read-write-transaction]
 ======
 [source, python]
 ----
-include::{python-examples}/test_examples.py[tag=read-write-transaction]
+include::{python-examples}/ReadWriteTransactionExample.py[tags=read-write-transaction]
 ----
 ======
 ====
