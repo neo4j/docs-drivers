@@ -181,22 +181,22 @@ For a comprehensive listing of all driver functionality, refer to the API docume
 ====
 [.include-with-dotnet]
 ======
-{neo4j-url}/docs/api/dotnet-driver
+{api-docs-base-uri}/dotnet-driver/{driver-version}/
 ======
 
 [.include-with-java]
 ======
-{neo4j-url}/docs/api/java-driver
+{api-docs-base-uri}/java-driver/{driver-version}/
 ======
 
 [.include-with-javascript]
 ======
-{neo4j-url}/docs/api/javascript-driver
+{api-docs-base-uri}/javascript-driver/{driver-version}/
 ======
 
 [.include-with-python]
 ======
-{neo4j-url}/docs/api/python-driver
+{api-docs-base-uri}/python-driver/{driver-version}/
 ======
 ====
 

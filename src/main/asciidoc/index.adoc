@@ -16,7 +16,7 @@ ifndef::python-root[:python-root: {project-root}/build/driver-sources/python-dri
 :javascript-examples: {javascript-root}/test/v1
 :python-examples: {python-root}/test/examples
 
-:neo4j-url: https://neo4j.com/
+:api-docs-base-uri: https://neo4j.com/docs/api
 
 
 [abstract]
