@@ -41,7 +41,8 @@ NOTE: The official drivers do not support HTTP communication.
 If you need an HTTP driver, there are a number of community drivers to choose from.
 See also <<http-api>>.
 
-== Driver Installation
+
+== Driver installation
 
 .Acquire the driver
 [.tabbed-example]
@@ -165,6 +166,7 @@ include::{python-examples}/hello_world_example.py[tags=hello-world]
 ----
 ======
 ====
+
 
 [[driver-api-docs]]
 == Driver API docs

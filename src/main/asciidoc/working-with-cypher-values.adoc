@@ -1,5 +1,3 @@
-:blank: pass:[ +]
-
 [[drivers-working-with-cypher-values]]
 = Working with Cypher values
 
@@ -7,6 +5,8 @@
 --
 This section describes the types and values used by Cypher and how they map to native language types.
 --
+
+:blank: pass:[ +]
 
 
 [[drivers-neo4j-type-system]]
@@ -17,6 +17,7 @@ To pass parameters and process results, it is important to know the basics of th
 
 Cypher types are split into two groups: basic types and graph structure types.
 While query results can contain any of these, only basic types can be used as parameters.
+
 
 === Basic types
 
@@ -43,6 +44,7 @@ In addition to the basic types which can be used both for parameters and results
 * Node
 * Relationship
 * Path
+
 
 === Type mappings
 
@@ -147,13 +149,15 @@ image::driver-result-stream.png[title="Result stream", width=150, role="middle"]
 
 {blank}
 
+
 === Records
 
 A record provides an immutable view of part of a result.
 It is an ordered map of keys and values.
 As values within a record are both keyed and ordered, that value can be accessed either by position (0-based integer) or by key (string).
 
-=== The Buffer
+
+=== The buffer
 
 {blank}
 
@@ -166,7 +170,6 @@ This provides a staging point for results, and divides result handling into _fet
 
 If results are consumed in the same order as they are produced, records merely pass through the buffer; if they are consumed out of order, the buffer will be utilized to retain records until they are consumed by the application.
 For large results, this may require a significant amount of memory and impact performance. For this reason, it is recommended to consume results in order wherever possible.
-
 
 
 === Consuming the stream

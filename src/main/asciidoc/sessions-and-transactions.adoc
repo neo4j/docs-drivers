@@ -132,6 +132,7 @@ It is not recommended to use auto-commit transactions in production environments
 
 However, Auto-commit transactions are the only way to execute `<<query-using-periodic-commit-hint, USING PERIODIC COMMIT>>` Cypher statements.
 
+
 [[transaction-functions]]
 === Transaction functions
 
@@ -180,13 +181,14 @@ This retry capability can be <<max-retry-time, configured>> on Driver constructi
 Any query results obtained within a transaction function should be consumed within that function.
 Transaction functions can return values but these should be derived values rather than raw results.
 
-=== Explicit Transactions
+
+=== Explicit transactions
 
 Explicit transactions are the longhand form of transaction functions, providing access to explicit `BEGIN`, `COMMIT` and `ROLLBACK` operations.
 While this form is useful for a handful of use cases, it is recommended to use transaction functions wherever possible.
 
 
-=== Cypher Errors
+=== Cypher errors
 
 When executing Cypher, it is possible for an exception to be thrown by the Cypher engine.
 Each such exception is associated with a <<status-codes, status code>> that describes the nature of the error and a message that provides more detail.
@@ -209,7 +211,6 @@ The application should retry the operation.
 
 
 [[causal-chaining]]
-
 == Causal chaining
 
 When working with a causal cluster, the transactions in a session will automatically be causally chained.
