@@ -1,4 +1,4 @@
-[[client-applications]]
+[[driver-client-applications]]
 = Client applications
 
 [abstract]
@@ -7,6 +7,7 @@ This section describes how to manage database connections within an application.
 --
 
 
+[[driver-driver-object]]
 == The driver object
 
 A Neo4j client application will require a driver object instance in order to provide access to the database.
@@ -92,13 +93,14 @@ A Routing driver is created via a `bolt+routing` URI, for example: `bolt+routing
 This kind of driver uses the <<term-bolt-routing-protocol, Bolt Routing Protocol>> and works in tandem with the cluster to route transactions to available cluster members.
 
 
-[[drivers-authentication]]
+[[driver-authentication]]
 == Authentication
 
 Authentication details are provided as an auth token which contains the user names, passwords or other credentials required to access the database.
 Neo4j supports multiple authentication standards but uses basic authentication by default.
 
 
+[[driver-authentication-basic]]
 === Basic authentication
 
 The basic authentication scheme is backed by a password file stored within the server and requires applications to provide a user name and password.
@@ -146,6 +148,7 @@ The basic authentication scheme can also be used to authenticate against an LDAP
 --
 
 
+[[driver-authentication-custom]]
 === Custom authentication
 
 For advanced deployments, where a custom security provider has been built, the custom authentication helper can be used.
@@ -191,6 +194,7 @@ include::{python-examples}/custom_auth_example.py[tags=custom-auth]
 == Configuration
 
 
+[[driver-configuration-encryption]]
 === Encryption
 
 TLS encryption is enabled for all connections by default.
@@ -238,6 +242,7 @@ Please see the <<operations-manual#connectors, Operations Manual -> Configure Ne
 An attempt to connect to a server using an encryption setting not allowed by that server will result in a <<service-unavailable, _Service unavailable_>> status.
 
 
+[[driver-configuration-trust]]
 === Trust
 
 During a TLS handshake, the server provides a certificate to the client application.
@@ -291,6 +296,7 @@ include::{python-examples}/config_trust_example.py[tags=config-trust]
 ====
 
 
+[[driver-configuration-connection-timeout]]
 === Connection timeout
 
 To configure the maximum time allowed to establish a connection, pass a duration value to the driver configuration.
@@ -333,7 +339,7 @@ include::{python-examples}/config_connection_timeout_example.py[tags=config-conn
 ====
 
 
-[[max-retry-time]]
+[[driver-configuration-max-retry-time]]
 === Max retry time
 
 To configure retry behavior, supply a value for the maximum time in which to keep attempting retries of transaction functions.
@@ -377,7 +383,8 @@ include::{python-examples}/config_max_retry_time_example.py[tags=config-max-retr
 
 Note that the time specified here does not take into account the running time of the unit of work itself, merely a limit after which retries will no longer be attempted.
 
-[[service-unavailable]]
+
+[[driver-service-unavailable]]
 == Service unavailable
 
 A Service unavailable status will be signalled when the driver is no longer able to establish communication with the server, even after retries.

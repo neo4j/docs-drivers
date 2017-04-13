@@ -1,4 +1,4 @@
-[[drivers-working-with-cypher-values]]
+[[driver-working-with-cypher-values]]
 = Working with Cypher values
 
 [abstract]
@@ -9,7 +9,7 @@ This section describes the types and values used by Cypher and how they map to n
 :blank: pass:[ +]
 
 
-[[drivers-neo4j-type-system]]
+[[driver-neo4j-type-system]]
 == The Cypher type system
 
 Drivers translate between application language types and the Cypher type system.
@@ -19,6 +19,7 @@ Cypher types are split into two groups: basic types and graph structure types.
 While query results can contain any of these, only basic types can be used as parameters.
 
 
+[[driver-basic-types]]
 === Basic types
 
 The basic types are:
@@ -37,6 +38,7 @@ For information on how to work with `null` in Cypher, please refer to <<cypher-w
 --
 
 
+[[driver-graph-types]]
 === Graph structure types
 
 In addition to the basic types which can be used both for parameters and results, the following Cypher types are valid for results only:
@@ -46,6 +48,7 @@ In addition to the basic types which can be used both for parameters and results
 * Path
 
 
+[[driver-type-mappings]]
 === Type mappings
 
 The Neo4j driver maps Cypher types to native language types as depicted in the table below.
@@ -138,6 +141,7 @@ In Python 3, a Cypher `Integer` is mapped to `long` and a Cypher `String` to `un
 ====
 
 
+[[driver-result]]
 == Statement results
 
 A statement result is comprised of a stream of records.
@@ -150,6 +154,7 @@ image::driver-result-stream.png[title="Result stream", width=150, role="middle"]
 {blank}
 
 
+[[driver-result-record]]
 === Records
 
 A record provides an immutable view of part of a result.
@@ -157,6 +162,7 @@ It is an ordered map of keys and values.
 As values within a record are both keyed and ordered, that value can be accessed either by position (0-based integer) or by key (string).
 
 
+[[driver-result-buffer]]
 === The buffer
 
 {blank}
@@ -172,8 +178,8 @@ If results are consumed in the same order as they are produced, records merely p
 For large results, this may require a significant amount of memory and impact performance. For this reason, it is recommended to consume results in order wherever possible.
 
 
+[[driver-result-consume]]
 === Consuming the stream
-
 
 Query results will often be consumed as a stream.
 Drivers provide a language-idiomatic way to iterate through a result stream.
@@ -260,6 +266,7 @@ include::{python-examples}/result_retain_example.py[tags=result-retain]
 ====
 
 
+[[driver-result-summary]]
 == Statement result summaries
 
 Supplementary information such as query statistics, timings and server information can be obtained from the statement result summary.

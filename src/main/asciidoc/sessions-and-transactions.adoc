@@ -1,4 +1,4 @@
-[[sessions-and-transactions]]
+[[driver-sessions-transactions]]
 = Sessions and transactions
 
 [abstract]
@@ -7,6 +7,7 @@ This section describes how to create units of work and provide a logical context
 --
 
 
+[[driver-sessions]]
 == Sessions
 
 A session is a container for a sequence of transactions.
@@ -57,6 +58,7 @@ include::{python-examples}/session_example.py[tags=session]
 ====
 
 
+[[driver-transactions]]
 == Transactions
 
 Transactions are atomic units of work consisting of one or more Cypher statement executions.
@@ -77,6 +79,7 @@ The Neo4j driver API provides for three forms of transaction:
 Of these, only <<transaction-functions, transaction function>> can be automatically replayed on failure.
 
 
+[[driver-transactions-auto-commit]]
 === Auto-commit Transactions
 
 An auto-commit transaction is a simple but limited form of transaction.
@@ -133,7 +136,7 @@ It is not recommended to use auto-commit transactions in production environments
 However, Auto-commit transactions are the only way to execute `<<query-using-periodic-commit-hint, USING PERIODIC COMMIT>>` Cypher statements.
 
 
-[[transaction-functions]]
+[[driver-transactions-transaction-functions]]
 === Transaction functions
 
 Transaction functions are the recommended form for containing transactional units of work.
@@ -182,12 +185,14 @@ Any query results obtained within a transaction function should be consumed with
 Transaction functions can return values but these should be derived values rather than raw results.
 
 
+[[driver-transactions-explicit]]
 === Explicit transactions
 
 Explicit transactions are the longhand form of transaction functions, providing access to explicit `BEGIN`, `COMMIT` and `ROLLBACK` operations.
 While this form is useful for a handful of use cases, it is recommended to use transaction functions wherever possible.
 
 
+[[driver-transactions-cypher-errors]]
 === Cypher errors
 
 When executing Cypher, it is possible for an exception to be thrown by the Cypher engine.
@@ -210,7 +215,7 @@ The application should retry the operation.
 |===
 
 
-[[causal-chaining]]
+[[driver-transactions-causal-chaining]]
 == Causal chaining
 
 When working with a causal cluster, the transactions in a session will automatically be causally chained.
@@ -235,6 +240,7 @@ If you try to extract a bookmark from a database which is not running in Causal 
 --
 
 
+[[driver-transactions-access-mode]]
 == Access modes
 
 Transactions can be executed in either `read` or `write` mode.

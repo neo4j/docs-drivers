@@ -1,4 +1,4 @@
-[[drivers-get-started]]
+[[driver-get-started]]
 = Get started
 
 [abstract]
@@ -7,6 +7,7 @@ This section gives an overview of the official Neo4j drivers and how to connect 
 --
 
 
+[[driver-get-started-about]]
 == About the official drivers
 
 Both official and community database drivers are available to provide access to Neo4j for applications.
@@ -42,6 +43,7 @@ If you need an HTTP driver, there are a number of community drivers to choose fr
 See also <<http-api>>.
 
 
+[[driver-get-started-installation]]
 == Driver installation
 
 .Acquire the driver
@@ -127,6 +129,7 @@ pip install neo4j-driver=={python-driver-version}
 ====
 
 
+[[driver-get-started-hello-world-example]]
 == A "Hello World" example
 
 The example below shows the minimal configuration necessary to interact with Neo4j through a driver.

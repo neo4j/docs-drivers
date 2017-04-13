@@ -32,10 +32,10 @@ They have been designed to strike a balance between an idiomatic API for each la
 
 The chapter describes the following:
 
-* <<drivers-get-started>>
-* <<client-applications>>
-* <<sessions-and-transactions>>
-* <<drivers-working-with-cypher-values>>
+* <<driver-get-started>>
+* <<driver-client-applications>>
+* <<driver-sessions-transactions>>
+* <<driver-working-with-cypher-values>>
 
 
 include::get-started.adoc[leveloffset=+1]
