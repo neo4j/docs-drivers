@@ -51,7 +51,7 @@ include::{javascript-examples}/examples.test.js[tags=session]
 
 [source, python]
 ----
-include::{python-examples}/SessionExample.py[tags=session]
+include::{python-examples}/session_example.py[tags=session]
 ----
 ======
 ====
@@ -119,7 +119,7 @@ include::{javascript-examples}/examples.test.js[tags=autocommit-transaction]
 
 [source, python]
 ----
-include::{python-examples}/AutocommitTransactionExample.py[tags=autocommit-transaction]
+include::{python-examples}/autocommit_transaction_example.py[tags=autocommit-transaction]
 ----
 ======
 ====
@@ -169,7 +169,7 @@ include::{javascript-examples}/examples.test.js[tags=transaction-function]
 ======
 [source, python]
 ----
-include::{python-examples}/TransactionFunctionExample.py[tags=transaction-function]
+include::{python-examples}/transaction_function_example.py[tags=transaction-function]
 ----
 ======
 ====
@@ -277,7 +277,7 @@ include::{javascript-examples}/examples.test.js[tags=read-write-transaction]
 ======
 [source, python]
 ----
-include::{python-examples}/ReadWriteTransactionExample.py[tags=read-write-transaction]
+include::{python-examples}/read_write_transaction_example.py[tags=read-write-transaction]
 ----
 ======
 ====

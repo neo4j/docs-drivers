@@ -206,7 +206,7 @@ include::{javascript-examples}/examples.test.js[tags=result-consume]
 ======
 [source, python]
 ----
-include::{python-examples}/ResultConsumeExample.py[tags=result-consume]
+include::{python-examples}/result_consume_example.py[tags=result-consume]
 ----
 ======
 ====
@@ -251,7 +251,7 @@ include::{javascript-examples}/examples.test.js[tags=result-retain]
 ======
 [source, python]
 ----
-include::{python-examples}/ResultRetainExample.py[tags=result-retain]
+include::{python-examples}/result_retain_example.py[tags=result-retain]
 ----
 ======
 ====

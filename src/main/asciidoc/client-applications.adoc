@@ -58,7 +58,7 @@ include::{javascript-examples}/examples.test.js[tags=driver-lifecycle]
 ======
 [source, python]
 ----
-include::{python-examples}/DriverLifecycleExample.py[tags=driver-lifecycle]
+include::{python-examples}/driver_lifecycle_example.py[tags=driver-lifecycle]
 ----
 ======
 ====
@@ -133,7 +133,7 @@ include::{javascript-examples}/examples.test.js[tags=basic-auth]
 ======
 [source, python]
 ----
-include::{python-examples}/BasicAuthExample.py[tags=basic-auth]
+include::{python-examples}/basic_auth_example.py[tags=basic-auth]
 ----
 ======
 ====
@@ -178,7 +178,7 @@ include::{javascript-examples}/examples.test.js[tags=custom-auth]
 ======
 [source, python]
 ----
-include::{python-examples}/CustomAuthExample.py[tags=custom-auth]
+include::{python-examples}/custom_auth_example.py[tags=custom-auth]
 ----
 ======
 ====
@@ -223,7 +223,7 @@ include::{javascript-examples}/examples.test.js[tags=config-unencrypted]
 ======
 [source, python]
 ----
-include::{python-examples}/ConfigUnencryptedExample.py[tags=config-unencrypted]
+include::{python-examples}/config_unencrypted_example.py[tags=config-unencrypted]
 ----
 ======
 ====
@@ -280,7 +280,7 @@ include::{javascript-examples}/examples.test.js[tags=config-trust]
 ======
 [source, python]
 ----
-include::{python-examples}/ConfigTrustExample.py[tags=config-trust]
+include::{python-examples}/config_trust_example.py[tags=config-trust]
 ----
 ======
 ====
@@ -321,7 +321,7 @@ This feature is not available in the Javascript driver.
 ======
 [source, python]
 ----
-include::{python-examples}/ConfigConnectionTimeoutExample.py[tags=config-connection-timeout]
+include::{python-examples}/config_connection_timeout_example.py[tags=config-connection-timeout]
 ----
 ======
 ====
@@ -363,7 +363,7 @@ include::{javascript-examples}/examples.test.js[tags=config-max-retry-time]
 ======
 [source, python]
 ----
-include::{python-examples}/ConfigMaxRetryTimeExample.py[tags=config-max-retry-time]
+include::{python-examples}/config_max_retry_time_example.py[tags=config-max-retry-time]
 ----
 ======
 ====
@@ -412,7 +412,7 @@ include::{javascript-examples}/examples.test.js[tags=service-unavailable]
 
 [source, python]
 ----
-include::{python-examples}/ServiceUnavailableExample.py[tags=service-unavailable]
+include::{python-examples}/service_unavailable_example.py[tags=service-unavailable]
 ----
 ======
 ====

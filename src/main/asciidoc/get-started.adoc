@@ -161,7 +161,7 @@ include::{javascript-examples}/examples.test.js[tags=hello-world]
 ======
 [source, python]
 ----
-include::{python-examples}/HelloWorldExample.py[tags=hello-world]
+include::{python-examples}/hello_world_example.py[tags=hello-world]
 ----
 ======
 ====
