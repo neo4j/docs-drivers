@@ -76,14 +76,14 @@ The Neo4j driver API provides for three forms of transaction:
 * Transaction functions
 * Explicit transactions
 
-Of these, only <<transaction-functions, transaction function>> can be automatically replayed on failure.
+Of these, only <<driver-transactions-transaction-functions, transaction function>> can be automatically replayed on failure.
 
 
 [[driver-transactions-auto-commit]]
 === Auto-commit Transactions
 
 An auto-commit transaction is a simple but limited form of transaction.
-Such a transaction consists of only one Cypher statement, cannot be automatically replayed on failure, and cannot take part in a <<causal-chaining, causal chain>>.
+Such a transaction consists of only one Cypher statement, cannot be automatically replayed on failure, and cannot take part in a <<driver-transactions-causal-chaining, causal chain>>.
 
 An auto-commit transaction is invoked using the `session.run` method:
 
@@ -179,7 +179,7 @@ include::{python-examples}/transaction_function_example.py[tags=transaction-func
 ====
 
 Transaction functions are also able to handle connection problems and transient errors using an automatic retry mechanism.
-This retry capability can be <<max-retry-time, configured>> on Driver construction.
+This retry capability can be <<driver-configuration-max-retry-time, configured>> on Driver construction.
 
 Any query results obtained within a transaction function should be consumed within that function.
 Transaction functions can return values but these should be derived values rather than raw results.
