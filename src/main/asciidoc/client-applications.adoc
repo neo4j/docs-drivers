@@ -21,7 +21,7 @@ Applications will typically construct a driver instance on startup and destroy i
 Destroying a driver instance will immediately shut down any connections previously opened via that driver; for drivers that contain a connection pool, the entire pool will be shut down.
 --
 
-To construct a driver instance, a <<driver-connection-uris, connection URI>> and <<drivers-authentication, authentication information>> must be supplied.
+To construct a driver instance, a <<driver-connection-uris, connection URI>> and <<driver-authentication, authentication information>> must be supplied.
 Additional configuration details can be supplied if required.
 All of these details are immutable for the lifetime of the driver.
 Therefore, if multiple configurations are required (such as when working with multiple database users) then multiple driver objects must be used.
@@ -239,7 +239,7 @@ include::{python-examples}/config_unencrypted_example.py[tags=config-unencrypted
 The server can be modified to require encryption for all connections.
 Please see the <<operations-manual#connectors, Operations Manual -> Configure Neo4j connectors>> for more information.
 
-An attempt to connect to a server using an encryption setting not allowed by that server will result in a <<service-unavailable, _Service unavailable_>> status.
+An attempt to connect to a server using an encryption setting not allowed by that server will result in a <<driver-service-unavailable, _Service unavailable_>> status.
 
 
 [[driver-configuration-trust]]
