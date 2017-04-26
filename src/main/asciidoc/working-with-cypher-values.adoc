@@ -1,4 +1,4 @@
-[[driver-working-with-cypher-values]]
+[[driver-cypher-values]]
 = Working with Cypher values
 
 [abstract]

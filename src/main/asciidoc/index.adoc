@@ -35,7 +35,7 @@ The chapter describes the following:
 * <<driver-get-started>>
 * <<driver-client-applications>>
 * <<driver-sessions-transactions>>
-* <<driver-working-with-cypher-values>>
+* <<driver-cypher-values>>
 
 
 include::get-started.adoc[leveloffset=+1]
