@@ -71,7 +71,7 @@ include::{python-examples}/driver_lifecycle_example.py[tags=driver-lifecycle]
 A connection URI identifies a graph database and how to connect to it.
 The official Neo4j drivers currently support the following URI schemes and driver object types:
 
-.Driver compatibility per Neo4j version
+.Available URI schemes
 [options="header"]
 |===
 | URI Scheme     | Driver object type
@@ -91,13 +91,18 @@ Note that a Routing driver is preferable when working with a causal cluster.
 
 A Routing driver is created via a `bolt+routing` URI, for example: `bolt+routing://graph.example.com:7687`.
 This kind of driver uses the <<term-bolt-routing-protocol, Bolt Routing Protocol>> and works in tandem with the cluster to route transactions to available cluster members.
-
+ 
 === Routing drivers with routing context
 
-A routing driver could accept routing context via the query part of `bolt+routing` URI, for example: `bolt+routing://graph.example.com:7687/?region=europe&country=sw`, where the routing context is `{region: europe, conutry: sw}`.
+Routing drivers with routing context are an available option when using drivers of version 1.3 or above together with a Neo4j cluster of version 3.2 or above.
+In such a setup, a routing driver can include a preferred routing context via the query part of the `bolt+routing` URI.
+Below is an example using a routing context of `{region: europe, country: sw}`:
 
-When using a 1.3+ driver with a 3.2+ cluster, the driver communicates the routing context (if present) with the cluster to obtain refined routing information based on geography locations information suggested by the routing context. In the example given at the begining of this section, the driver is suggesting that it prefers to route queries to the servers located in the Europe country Sweden. For how to configure the cluster to return routing information based on routing context provided by the driver, read more in <link?>
+`bolt+routing://graph.example.com:7687/?region=europe&country=sw`
 
+The driver communicates the routing context to the cluster.
+It then obtains refined routing information back from the cluster, based on information suggested in the routing context.
+In the example above, the driver communicates that it prefers to route queries to the servers located in the country Sweden in the region Europe.
 
 [[driver-authentication]]
 == Authentication
@@ -156,7 +161,7 @@ The basic authentication scheme can also be used to authenticate against an LDAP
 === Kerberos authentication
 
 The Kerberos authentication scheme provides a simple way to create a Kerberos authentication token with a base64 encoded server authentication ticket. 
-The best way to create a Kerberos authentication token is shown as bellow:
+The best way to create a Kerberos authentication token is shown below:
 
 [.tabbed-example]
 .Kerberos authentication
@@ -196,7 +201,7 @@ include::{python-examples}/basic_auth_example.py[tags=kerberos-auth]
 
 [NOTE]
 --
-The Kerberos authentication token can only be understand by the server when the Kerberos plugin <link?> is installed on the server.
+The Kerberos authentication token can only be understood by the server if the server has the <<kerberos-add-on#kerberos-add-on, Kerberos Add-on>> installed.
 --
 
 
