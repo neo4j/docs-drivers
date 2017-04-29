@@ -71,7 +71,7 @@ include::{python-examples}/driver_lifecycle_example.py[tags=driver-lifecycle]
 A connection URI identifies a graph database and how to connect to it.
 The official Neo4j drivers currently support the following URI schemes and driver object types:
 
-.Driver compatibility per Neo4j version
+.Available URI schemes
 [options="header"]
 |===
 | URI Scheme     | Driver object type
@@ -91,7 +91,18 @@ Note that a Routing driver is preferable when working with a causal cluster.
 
 A Routing driver is created via a `bolt+routing` URI, for example: `bolt+routing://graph.example.com:7687`.
 This kind of driver uses the <<term-bolt-routing-protocol, Bolt Routing Protocol>> and works in tandem with the cluster to route transactions to available cluster members.
+ 
+=== Routing drivers with routing context
 
+Routing drivers with routing context are an available option when using drivers of version 1.3 or above together with a Neo4j cluster of version 3.2 or above.
+In such a setup, a routing driver can include a preferred routing context via the query part of the `bolt+routing` URI.
+Below is an example using a routing context of `{region: europe, country: sw}`:
+
+`bolt+routing://graph.example.com:7687/?region=europe&country=sw`
+
+The driver communicates the routing context to the cluster.
+It then obtains refined routing information back from the cluster, based on information suggested in the routing context.
+In the example above, the driver communicates that it prefers to route queries to the servers located in the country Sweden in the region Europe.
 
 [[driver-authentication]]
 == Authentication
@@ -145,6 +156,52 @@ include::{python-examples}/basic_auth_example.py[tags=basic-auth]
 [NOTE]
 --
 The basic authentication scheme can also be used to authenticate against an LDAP server.
+--
+
+=== Kerberos authentication
+
+The Kerberos authentication scheme provides a simple way to create a Kerberos authentication token with a base64 encoded server authentication ticket. 
+The best way to create a Kerberos authentication token is shown below:
+
+[.tabbed-example]
+.Kerberos authentication
+====
+[.include-with-dotnet]
+======
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=kerberos-auth]
+----
+======
+
+[.include-with-java]
+======
+[source, java]
+----
+include::{java-examples}/BasicAuthExample.java[tags=kerberos-auth]
+----
+======
+
+[.include-with-javascript]
+======
+[source, javascript]
+----
+include::{javascript-examples}/examples.test.js[tags=kerberos-auth]
+----
+======
+
+[.include-with-python]
+======
+[source, python]
+----
+include::{python-examples}/basic_auth_example.py[tags=kerberos-auth]
+----
+======
+====
+
+[NOTE]
+--
+The Kerberos authentication token can only be understood by the server if the server has the <<kerberos-add-on#kerberos-add-on, Kerberos Add-on>> installed.
 --
 
 
