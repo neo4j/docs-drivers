@@ -148,7 +148,7 @@ include::{javascript-examples}/examples.test.js[tags=basic-auth]
 ======
 [source, python]
 ----
-include::{python-examples}/basic_auth_example.py[tags=basic-auth]
+include::{python-examples}/auth_example.py[tags=basic-auth]
 ----
 ======
 ====
@@ -194,7 +194,7 @@ include::{javascript-examples}/examples.test.js[tags=kerberos-auth]
 ======
 [source, python]
 ----
-include::{python-examples}/basic_auth_example.py[tags=kerberos-auth]
+include::{python-examples}/auth_example.py[tags=kerberos-auth]
 ----
 ======
 ====
@@ -241,7 +241,7 @@ include::{javascript-examples}/examples.test.js[tags=custom-auth]
 ======
 [source, python]
 ----
-include::{python-examples}/custom_auth_example.py[tags=custom-auth]
+include::{python-examples}/auth_example.py[tags=custom-auth]
 ----
 ======
 ====
