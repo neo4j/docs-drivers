@@ -201,7 +201,7 @@ include::{python-examples}/auth_example.py[tags=kerberos-auth]
 
 [NOTE]
 --
-The Kerberos authentication token can only be understood by the server if the server has the link:{kerberos-uri}[Kerberos Add-on] installed.
+The Kerberos authentication token can only be understood by the server if the server has the link:{kerberos-add-on-base-uri}[Kerberos Add-on] installed.
 --
 
 
