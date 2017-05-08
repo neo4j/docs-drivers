@@ -178,7 +178,7 @@ include::{dotnet-examples}/Examples.cs[tags=kerberos-auth]
 ======
 [source, java]
 ----
-include::{java-examples}/BasicAuthExample.java[tags=kerberos-auth]
+include::{java-examples}/KerberosAuthExample.java[tags=kerberos-auth]
 ----
 ======
 
