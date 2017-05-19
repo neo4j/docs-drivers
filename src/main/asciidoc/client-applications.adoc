@@ -90,6 +90,7 @@ Note that a Routing driver is preferable when working with a causal cluster.
 === Routing drivers (bolt+routing)
 
 A Routing driver is created via a `bolt+routing` URI, for example: `bolt+routing://graph.example.com:7687`.
+The address in the URI must be that of a core server.
 This kind of driver uses the <<term-bolt-routing-protocol, Bolt Routing Protocol>> and works in tandem with the cluster to route transactions to available cluster members.
  
 === Routing drivers with routing context
