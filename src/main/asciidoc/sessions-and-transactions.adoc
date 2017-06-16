@@ -219,17 +219,16 @@ The application should retry the operation.
 == Causal chaining
 
 When working with a causal cluster, the transactions in a session will automatically be causally chained.
-This means that for any two transactions, it is guaranteed that the second transaction will begin only after the first has been successfully committed. 
+This means that for any two transactions, it is guaranteed that the second transaction will begin only after the first has been successfully committed.
 This is true even if the transactions are physically carried out on different cluster members.
 
-Causal chaining is carried out internally by passing a <<term-bookmark, bookmark>> between transactions.
-The bookmark records a point in transactional history.
-When beginning a transaction on a server relative to a bookmark, transaction execution will block until the server has caught up with the bookmark stored in the session.
-If the transaction is carried out successfully, the bookmark will be updated.
-Should the transaction fail, no such update will be made.
+Causal chaining is carried out by passing <<term-bookmark, bookmarks>> between transactions in a session.
+Each bookmark records a point in transactional history and is used to instruct the cluster to carry out work in a particular sequence.
+Bookmarks are returned from the server to the client on the successful commit of a transaction and may be supplied as parameters to new transactions.
+Passing bookmarks into a transaction causes the executing server to block until it has caught up with the latest of these bookmarks.
 
-It is possible both to construct a session based on an existing bookmark, and to extract a bookmark from a session.
-These functions allow multiple sessions to be chained together.
+It is possible both to construct a session based on one or more existing bookmarks, and to extract a bookmark from a session.
+This functionality allows multiple sessions to be chained together.
 
 When running multiple independent transactions, it is recommended to use separate sessions.
 This avoids the small latency overhead of the causal chain.

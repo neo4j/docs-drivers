@@ -63,6 +63,7 @@ The Neo4j driver maps Cypher types to native language types as depicted in the t
 | Boolean      | System.Boolean
 | Integer      | System.Int64
 | Float        | System.Double
+| Bytes        | System.Byte[]
 | String       | System.String
 | List         | System.Collections.Generic.IList<T>
 | Map          | System.Collections.IDictionary<TKey, TValue>
@@ -81,6 +82,7 @@ The Neo4j driver maps Cypher types to native language types as depicted in the t
 | Boolean      | java.lang.Boolean
 | Integer      | java.lang.Long
 | Float        | java.lang.Double
+| Bytes        | byte[]
 | String       | java.lang.String
 | List         | java.util.List<T>
 | Map          | java.util.Map<K, V>
@@ -99,6 +101,7 @@ The Neo4j driver maps Cypher types to native language types as depicted in the t
 | Boolean      | Boolean
 | Integer      | Integer (*)
 | Float        | Number
+| Bytes        | Int8Array
 | String       | String
 | List         | Array
 | Map          | Object
@@ -120,6 +123,7 @@ The Neo4j driver maps Cypher types to native language types as depicted in the t
 | Boolean      | bool
 | Integer      | int/long (†)
 | Float        | float
+| Bytes        | bytes
 | String       | str/unicode (†)
 | List         | list
 | Map          | dict
