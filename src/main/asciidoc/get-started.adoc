@@ -26,13 +26,13 @@ By this, we mean that the underlying database topology — single instance, 
 In the general case, only the <<driver-connection-uris, connection URI>> needs to be modified when changes are made to the topology. 
 
 .Driver compatibility per Neo4j version
-[options="header", cols="^1,4*^"]
+[options="header", cols="^1,5*^"]
 |===
 |               4+^| Driver version
-s| Neo4j version ^s| 1.0                   ^s| 1.1                   ^s| 1.2                   ^s| 1.3
-s| 3.0             | Upgrade recommended (*) | Upgrade recommended (*) | Upgrade recommended (*) | Recommended
-s| 3.1             | Upgrade recommended (*) | Upgrade recommended (*) | Upgrade recommended (*) | Recommended
-s| 3.2             | Upgrade recommended (*) | Upgrade recommended (*) | Upgrade recommended (*) | Recommended
+s| Neo4j version ^s| 1.0                   ^s| 1.1                   ^s| 1.2                   ^s| 1.3                   ^s| 1.4
+s| 3.0             | Upgrade recommended (*) | Upgrade recommended (*) | Upgrade recommended (*) | Upgrade recommended (*) | Recommended
+s| 3.1             | Upgrade recommended (*) | Upgrade recommended (*) | Upgrade recommended (*) | Upgrade recommended (*) | Recommended
+s| 3.2             | Upgrade recommended (*) | Upgrade recommended (*) | Upgrade recommended (*) | Upgrade recommended (*) | Recommended
 |===
 
 (*) Regardless of which version of Neo4j you are using, it is strongly recommended to upgrade to the latest driver version.
