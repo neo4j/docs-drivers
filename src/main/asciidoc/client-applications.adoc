@@ -195,7 +195,7 @@ include::{javascript-examples}/examples.test.js[tags=kerberos-auth]
 ======
 [source, python]
 ----
-include::{python-examples}/auth_example.py[tags=kerberos-auth]
+include::{python-examples}/kerberos_auth_example.py[tags=kerberos-auth]
 ----
 ======
 ====
@@ -242,7 +242,7 @@ include::{javascript-examples}/examples.test.js[tags=custom-auth]
 ======
 [source, python]
 ----
-include::{python-examples}/auth_example.py[tags=custom-auth]
+include::{python-examples}/custom_auth_example.py[tags=custom-auth]
 ----
 ======
 ====
