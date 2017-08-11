@@ -11,7 +11,6 @@ This section gives an overview of the official Neo4j drivers and how to connect 
 == About the official drivers
 
 Both official and community database drivers are available to provide access to Neo4j for applications.
-The official drivers have been built for Neo4j 3.0 and above, and use the <<term-bolt, Bolt protocol>> for communication.
 Official drivers exist for:
 
 * C# -- works with any .NET language
@@ -19,32 +18,24 @@ Official drivers exist for:
 * JavaScript
 * Python
 
-The Bolt protocol has been designed by Neo Technology, specifically for use with Neo4j, and is fully aligned with the Cypher type system.
-
 The driver API is intended to be topologically agnostic.
 By this, we mean that the underlying database topology — single instance, causal cluster, etc. — can be altered without requiring a corresponding alteration to application code.
 In the general case, only the <<driver-connection-uris, connection URI>> needs to be modified when changes are made to the topology. 
-
-.Driver compatibility per Neo4j version
-[options="header", cols="^1,5*^"]
-|===
-|               4+^| Driver version
-s| Neo4j version ^s| 1.0                   ^s| 1.1                   ^s| 1.2                   ^s| 1.3                   ^s| 1.4
-s| 3.0             | Upgrade recommended (*) | Upgrade recommended (*) | Upgrade recommended (*) | Upgrade recommended (*) | Recommended
-s| 3.1             | Upgrade recommended (*) | Upgrade recommended (*) | Upgrade recommended (*) | Upgrade recommended (*) | Recommended
-s| 3.2             | Upgrade recommended (*) | Upgrade recommended (*) | Upgrade recommended (*) | Upgrade recommended (*) | Recommended
-|===
-
-(*) Regardless of which version of Neo4j you are using, it is strongly recommended to upgrade to the latest driver version.
-All 1.x drivers are compatible with all 3.x servers but earlier versions of the driver may not provide all features.
 
 NOTE: The official drivers do not support HTTP communication.
 If you need an HTTP driver, there are a number of community drivers to choose from.
 See also <<http-api>>.
 
-
 [[driver-get-started-installation]]
-== Driver installation
+== Driver versions and installation
+
+The 1.x series drivers have been built for Neo4j 3.x.
+The driver major version number correlates with the  <<term-bolt, Bolt protocol>> version, the minor version number describes the driver feature set and the patch number defines the patch level of the driver in the regular sense.
+While minor versions of drivers will generally be released at the same time across languages, patch levels may vary.
+
+It is recommended to always use the latest driver release within a major series.
+This will ensure that all server functionality is made available to client applications.
+To install a driver or to find out more about which driver versions are available, use the relevant language distribution system.
 
 .Acquire the driver
 [.tabbed-example]
@@ -53,24 +44,62 @@ See also <<http-api>>.
 [.include-with-dotnet]
 ======
 
-To install the latest version of the driver, using NuGet in Visual Studio:
+To find out the latest version of the driver, visit https://www.nuget.org/packages/Neo4j.Driver/.
+
+To install the latest version of the driver using NuGet in Visual Studio:
 
 [source, csharp, subs="attributes, specialcharacters"]
 ----
 PM> Install-Package Neo4j.Driver
 ----
 
-To install a certain version of the driver, using NuGet in Visual Studio:
+You can also choose to install a certain version of the driver.
+
+========
+
+Below is the syntax for installing a certain version of the driver.
+
+[source, csharp, subs="attributes, specialcharacters"]
+----
+PM> Install-Package Neo4j.Driver -Version $DOTNET_DRIVER_VERSION
+----
+
+In the following example we are installing driver version {dotnet-driver-version}.
 
 [source, csharp, subs="attributes, specialcharacters"]
 ----
 PM> Install-Package Neo4j.Driver -Version {dotnet-driver-version}
 ----
+========
+
+You can review the release notes for this driver https://github.com/neo4j/neo4j-dotnet-driver/releases[here].
+
 ======
 
 [.include-with-java]
 ======
-When using Maven, add this to your _pom.xml_ file:
+
+To find out the latest version of the driver, visit the https://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22org.neo4j.driver%22%20AND%20a%3A%22neo4j-java-driver%22[maven repository].
+
+.Install the Java driver using Maven
+========
+
+When using Maven, add the following block to your _pom.xml_ file.
+Note the placeholder for the driver version.
+You will have to find out the exact patch version that you wish to install.
+
+[source, xml, subs="attributes, specialcharacters"]
+----
+<dependencies>
+    <dependency>
+        <groupId>org.neo4j.driver</groupId>
+        <artifactId>neo4j-java-driver</artifactId>
+        <version>$JAVA_DRIVER_VERSION</version>
+    </dependency>
+</dependencies>
+----
+
+In the following example we are adding driver version {java-driver-version}.
 
 [source, xml, subs="attributes, specialcharacters"]
 ----
@@ -82,17 +111,41 @@ When using Maven, add this to your _pom.xml_ file:
     </dependency>
 </dependencies>
 ----
+========
 
-For Gradle or Grails, this is how to add the dependency:
+.Add the dependency for the Java driver for Gradle or Grails
+========
+
+For Gradle or Grails, this is how to add the dependency.
+Again, note the placeholder for the driver version.
+You will have to find out the exact patch version that you wish to install.
+
+[source, groovy, subs="attributes, specialcharacters"]
+----
+compile 'org.neo4j.driver:neo4j-java-driver:$JAVA_DRIVER_VERSION'
+----
+
+In the following example we are adding driver version {java-driver-version}.
 
 [source, groovy, subs="attributes, specialcharacters"]
 ----
 compile 'org.neo4j.driver:neo4j-java-driver:{java-driver-version}'
 ----
+========
+
+You can review the release notes for this driver https://github.com/neo4j/neo4j-java-driver/releases[here].
+
 ======
 
 [.include-with-javascript]
 ======
+
+Use `npm` to find out the latest version of the driver:
+
+[source, shell, subs="attributes, specialcharacters"]
+----
+npm show neo4j-driver@* version
+----
 
 To install the latest version of the driver:
 
@@ -101,16 +154,33 @@ To install the latest version of the driver:
 npm install neo4j-driver
 ----
 
-To install a certain version of the driver:
+You can also choose to install a certain version of the driver.
+
+========
+
+Below is the syntax for installing a certain version of the driver.
+
+[source, shell, subs="attributes, specialcharacters"]
+----
+npm install neo4j-driver@$JAVASCRIPT-DRIVER-VERSION
+----
+
+In the following example we are installing driver version {javascript-driver-version}.
 
 [source, shell, subs="attributes, specialcharacters"]
 ----
 npm install neo4j-driver@{javascript-driver-version}
 ----
+========
+
+You can review the release notes for this driver https://github.com/neo4j/neo4j-javascript-driver/releases[here].
+
 ======
 
 [.include-with-python]
 ======
+
+To find out the latest version of the driver, visit https://pypi.python.org/pypi/neo4j-driver.
 
 To install the latest version of the driver:
 
@@ -119,14 +189,45 @@ To install the latest version of the driver:
 pip install neo4j-driver
 ----
 
-To install a certain version of the driver:
+You can also choose to install a certain version of the driver.
+
+========
+
+The following is the syntax for installing a certain version of the driver.
+
+[source, shell, subs="attributes, specialcharacters"]
+----
+pip install neo4j-driver==$PYTHON_DRIVER_VERSION
+----
+
+In the following example we are installing driver version {python-driver-version}.
 
 [source, shell, subs="attributes, specialcharacters"]
 ----
 pip install neo4j-driver=={python-driver-version}
 ----
+
+========
+
+You can review the release notes for this driver https://github.com/neo4j/neo4j-python-driver/releases[here].
+
 ======
 ====
+
+
+== Supported language and framework versions
+
+For each language/framework, there is a set of versions that are officially supported by Neo4j.
+
+.Supported languages/frameworks for the 1.x driver series
+[options="header"]
+|===
+| Language/framework | Versions supported
+| Java               | Oracle JDK 7/8 and OpenJDK 7/8 (latest patch releases)
+| Python             | CPython 2.7, 3.4, 3.5 and 3.6 (latest patch releases)
+| JavaScript         | our drivers are built to work with all LTS versions of Node.JS, specifically the 4.x and 6.x series runtimes (see https://github.com/nodejs/LTS).
+| .NET               | our drivers target the .NET standard 1.3 (see https://github.com/dotnet/standard/blob/master/docs/versions.md).
+|===
 
 
 [[driver-get-started-hello-world-example]]
