@@ -363,6 +363,101 @@ include::{python-examples}/config_trust_example.py[tags=config-trust]
 ====
 
 
+[[driver-config-connection-pool-management]]
+=== Connection pool management
+
+The driver maintains a pool of connections. The pooled connections are reused by sessions and transaction to avoid overhead added by establishing new connections every time to run a query.
+The connections in the pool are created on demand. The connection pool always start with no pooled connection. New connections are created on demand by sessions and/or transactions. When sessions and/or transactions finished using connections, healthy ones are returned to the pool. These pooled connections are then reused by new sessions and transactions to execute queries.
+
+Three connection pool related configuration settings are exposed via driver configuration, namely `maxConnectionLifetime`, `maxConnectionPoolSize` and `connectionAcquisitionTimeout`.
+Application users could tune these settings to fit the driver into application adoption based on appliation's performace requirement and resourse consumption limit on remote servers. 
+
+The detailed description of the available connection pool settings are listed bellow:
+
+* `maxConnectionLifetime` - Default value: Infinite. Pooled connections older than this threshold will be closed and removed from the pool. Such removal happens during connection acquisition so that new session is never backed by an old connection. Setting this option to a low value will cause a high connection churn and might result in a performance drop. It is recommended to set driver's maximum lifetime to a value smaller than the maximum lifetime configured in its adopted application network infrastructure (such as router, load balancer, proxy, firewall, etc.). No maximum lifetime limit is imposed by default. Zero and negative values result in lifetime not being checked.
+
+* `maxConnectionPoolSize` - Default value: Infinite. It defines the maximum total number of connections allowed to be managed by the connection pool per host. In other words, for direct driver (with “bolt” uri scheme) this sets the max amount of connections towards a single database. While for routing driver (with “bolt+routing” uri scheme) this sets the max amount of connections towards each cluster member. When a session or transaction tries to acquire connection and pool is at its full capacity, then the session or transaction has to wait until a free connection is availble in the pool or the request to acquire a new connection times out. The connection acquiring timeout is configured via `connectionAcquisitionTimeout`.
+
+* `connectionAcquisitionTimeout` - Default value: 1m. This setting limits amount of time a session or transaction can spend waiting for a free connection to appear in the pool before throwing an exception. Exception in this case is `ClientException`. Timeout only applies when connection pool is at its max capacity.
+
+[.tabbed-example]
+.Connection pool management
+====
+[.include-with-dotnet]
+======
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=config-connection-pool]
+----
+======
+
+[.include-with-java]
+======
+[source, java]
+----
+include::{java-examples}/ConfigConnectionPoolExample.java[tags=config-connection-pool]
+----
+======
+
+[.include-with-javascript]
+======
+[source, javascript]
+----
+include::{javascript-examples}/examples.test.js[tags=config-connection-pool]
+----
+======
+
+[.include-with-python]
+======
+[source, python]
+----
+include::{python-examples}/config_connection_pool_example.py[tags=config-connection-pool]
+----
+======
+====
+
+
+[[driver-load-balancing-strategy]]
+=== Load balancing strategy
+For the routing driver, the driver contains a simple load balancer to route queries evenly among many cluster members. The built-in load balancer provides two strategies: `Least-connected` (Default) and `round-robin`. The `least-connection` strategy in general gives a better performance as it takes query execution time and server load into consideration when distrbuting queries among the cluster memebers. The 1.5 drivers adopt `least-connected` as default load balancing strategy. 
+
+[.tabbed-example]
+.Load balancing strategy
+====
+[.include-with-dotnet]
+======
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=config-load-balancing-strategy]
+----
+======
+
+[.include-with-java]
+======
+[source, java]
+----
+include::{java-examples}/ConfigLoadBalancingStrategyExample.java[tags=config-load-balancing-strategy]
+----
+======
+
+[.include-with-javascript]
+======
+[source, javascript]
+----
+include::{javascript-examples}/examples.test.js[tags=config-load-balancing-strategy]
+----
+======
+
+[.include-with-python]
+======
+[source, python]
+----
+include::{python-examples}/config_load_balancing_strategy_example.py[tags=config-load-balancing-strategy]
+----
+======
+====
+
+
 [[driver-configuration-connection-timeout]]
 === Connection timeout
 
