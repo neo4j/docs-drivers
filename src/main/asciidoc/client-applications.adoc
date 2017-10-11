@@ -363,6 +363,79 @@ include::{python-examples}/config_trust_example.py[tags=config-trust]
 ====
 
 
+[[driver-config-connection-pool-management]]
+=== Connection pool management
+
+The driver maintains a pool of connections.
+The pooled connections are reused by sessions and transactions to avoid the overhead added by establishing new connections for every query.
+The connection pool always starts up empty.
+New connections are created on demand by sessions and transactions.
+When a session or a transaction is done with its execution, the connection will be returned to the pool to be reused.
+
+Application users can tune connection pool settings to configure the driver for different use cases based on client performance requirements and database resource consumption limits.
+
+Detailed descriptions of connection pool settings available via driver configuration are listed below:
+
+`MaxConnectionLifetime`::
+Pooled connections older than this threshold will be closed and removed from the pool.
+Such removal happens during connection acquisition so that new session is never backed by an old connection.
+Setting this option to a low value will cause a high connection churn and might result in a performance drop.
+It is recommended to set driver's maximum lifetime to a value smaller than the maximum lifetime configured in its application system infrastructure (such as operation system, router, load balancer, proxy and firewall).
+Negative values result in lifetime not being checked.
+Default value: 1h.
+
+`MaxConnectionPoolSize`::
+This setting defines the maximum total number of connections allowed to be managed by the connection pool on each host.
+In other words, for a direct driver, this sets the maximum amount of connections towards a single database.
+For a routing driver this sets the maximum amount of connections towards each cluster member.
+If a session or transaction tries to acquire a connection at a time when the pool size is at its full capacity, it must wait until a free connection is available in the pool or the request to acquire a new connection times out.
+The connection acquiring timeout is configured via `ConnectionAcquisitionTimeout`.
+Default value: This is different for different drivers, but is a number in the order of 100.
+
+`ConnectionAcquisitionTimeout`::
+This setting limits the amount of time a session or transaction can spend waiting for a free connection to appear in the pool before throwing an exception.
+The exception thrown in this case is `ClientException`.
+Timeout only applies when connection pool is at its max capacity.
+Default value: 1m.
+
+
+[.tabbed-example]
+.Connection pool management
+====
+[.include-with-dotnet]
+======
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=config-connection-pool]
+----
+======
+
+[.include-with-java]
+======
+[source, java]
+----
+include::{java-examples}/ConfigConnectionPoolExample.java[tags=config-connection-pool]
+----
+======
+
+[.include-with-javascript]
+======
+[source, javascript]
+----
+include::{javascript-examples}/examples.test.js[tags=config-connection-pool]
+----
+======
+
+[.include-with-python]
+======
+[source, python]
+----
+include::{python-examples}/config_connection_pool_example.py[tags=config-connection-pool]
+----
+======
+====
+
+
 [[driver-configuration-connection-timeout]]
 === Connection timeout
 
@@ -401,6 +474,51 @@ This feature is not available in the Javascript driver.
 [source, python]
 ----
 include::{python-examples}/config_connection_timeout_example.py[tags=config-connection-timeout]
+----
+======
+====
+
+
+[[driver-load-balancing-strategy]]
+=== Load balancing strategy
+
+A routing driver contains a load balancer to route queries evenly among many cluster members.
+The built-in load balancer provides two strategies: `least-connected` and `round-robin`.
+The `least-connected` strategy in general gives a better performance as it takes query execution time and server load into consideration when distributing queries among the cluster members.
+Default value: `least-connected`.
+
+[.tabbed-example]
+.Load balancing strategy
+====
+[.include-with-dotnet]
+======
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=config-load-balancing-strategy]
+----
+======
+
+[.include-with-java]
+======
+[source, java]
+----
+include::{java-examples}/ConfigLoadBalancingStrategyExample.java[tags=config-load-balancing-strategy]
+----
+======
+
+[.include-with-javascript]
+======
+[source, javascript]
+----
+include::{javascript-examples}/examples.test.js[tags=config-load-balancing-strategy]
+----
+======
+
+[.include-with-python]
+======
+[source, python]
+----
+include::{python-examples}/config_load_balancing_strategy_example.py[tags=config-load-balancing-strategy]
 ----
 ======
 ====
