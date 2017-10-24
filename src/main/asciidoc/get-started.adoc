@@ -282,22 +282,22 @@ For a comprehensive listing of all driver functionality, refer to the API docume
 ====
 [.include-with-dotnet]
 ======
-{api-docs-base-uri}/dotnet-driver/{driver-version}/
+{api-docs-base-uri}/dotnet-driver/{dotnet-driver-apidoc-version}/
 ======
 
 [.include-with-java]
 ======
-{api-docs-base-uri}/java-driver/{driver-version}/
+{api-docs-base-uri}/java-driver/{java-driver-apidoc-version}/
 ======
 
 [.include-with-javascript]
 ======
-{api-docs-base-uri}/javascript-driver/{driver-version}/
+{api-docs-base-uri}/javascript-driver/{javascript-driver-apidoc-version}/
 ======
 
 [.include-with-python]
 ======
-{api-docs-base-uri}/python-driver/{driver-version}/
+{api-docs-base-uri}/python-driver/{python-driver-apidoc-version}/
 ======
 ====
 
