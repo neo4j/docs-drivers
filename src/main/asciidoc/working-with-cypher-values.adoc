@@ -45,6 +45,12 @@ In addition to the basic types which can be used both for parameters and results
 * Relationship
 * Path
 
+When streaming a result, the server takes snapshots of the original graph structure values to pass back to the client.
+While the original entity IDs are included in these snapshots, no permanent link is retained back to the underlying server-side entities, which may be deleted or otherwise altered independently of the client copies.
+
+Graph structures may not be used as parameters because it depends on application context whether such a parameter would be passed by reference or by value, and Cypher provides no mechanism to denote this.
+Equivalent functionality is available by simply passing either the ID for pass by reference, or an extracted map of properties for pass by value.
+
 
 [[driver-type-mappings]]
 === Type mappings
