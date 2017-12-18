@@ -291,7 +291,7 @@ include::{python-examples}/read_write_transaction_example.py[tags=read-write-tra
 
 == Asynchronous programming
 
-NOTE: The async API is only available with the .NET driver.
+NOTE: The async API is only available with the .NET and Java drivers.
 
 In addition to the methods listed in the previous sections, there also exist several asynchronous methods which allow for better integration with applications written in an asynchronous style.
 Asynchronous methods are named as their synchronous counterparts but with an additional _async_ prefix.
@@ -320,11 +320,41 @@ include::{dotnet-examples}/ExamplesAsync.cs[tags=async-transaction-function]
 include::{dotnet-examples}/ExamplesAsync.cs[tags=async-explicit-transaction]
 ----
 
+[IMPORTANT]
+--
+It is always important to close the session object and it is suggested to keep *session.CloseAsync* in a _finally_ block to make sure all resources (such as network connection) obtained by the session will always be cleaned up properly.
+The session *close* method also enforces rolling back of the last uncommitted or failed transaction in this session.
+Thus it is optional to put *tx.CommitAsync* or *tx.RollbackAsync* in a _finally_ block as long as the *close* of session where the transaction is created will be executed in an outer _finally_ block.
+--
+
 ======
 
 [.include-with-java]
 ======
-This functionality is not available with this driver.
+
+.Auto-commit transactions
+[source, java]
+----
+include::{java-examples}/AsyncAutocommitTransactionExample.java[tags=async-autocommit-transaction]
+----
+
+.Transaction functions
+[source, java]
+----
+include::{java-examples}/AsyncTransactionFunctionExample.java[tags=async-transaction-function]
+----
+
+.Explicit transactions
+[source, java]
+----
+include::{java-examples}/AsyncExplicitTransactionExample.java[tags=async-explicit-transaction]
+----
+
+[IMPORTANT]
+--
+Text for Java driver.
+--
+
 ======
 
 [.include-with-javascript]
@@ -338,9 +368,4 @@ This functionality is not available with this driver.
 ======
 ========
 
-[IMPORTANT]
---
-It is always important to close the session object and it is suggested to keep *session.CloseAsync* in a _finally_ block to make sure all resources (such as network connection) obtained by the session will always be cleaned up properly.
-The session *close* method also enforces rolling back of the last uncommitted or failed transaction in this session.
-Thus it is optional to put *tx.CommitAsync* or *tx.RollbackAsync* in a _finally_ block as long as the *close* of session where the transaction is created will be executed in an outer _finally_ block.
---
+
