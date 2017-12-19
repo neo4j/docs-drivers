@@ -293,8 +293,8 @@ include::{python-examples}/read_write_transaction_example.py[tags=read-write-tra
 
 [NOTE]
 --
-These special async methods are only available with the .NET and Java drivers.
-For Javascript, the default methods described earlier in this chapter are asynchronous, since that is the nature of the lanugage.
+Java, .NET and JavaScript all support asynchronous programming.
+The examples here highlight specifically how Java and .NET provide for this programming model alongside their blocking API.
 --
 
 In addition to the methods listed in the previous sections, there also exist several asynchronous methods which allow for better integration with applications written in an asynchronous style.
