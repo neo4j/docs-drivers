@@ -352,7 +352,11 @@ include::{java-examples}/AsyncExplicitTransactionExample.java[tags=async-explici
 
 [IMPORTANT]
 --
-Text for Java driver.
+It is important to close the session object to make sure all resources (such as network connections) obtained by the session are cleaned up properly.
+It is therefore suggested to always do `Session#closeAsync()` at the end of the `CompletionStage` chain.
+Sessions should be closed regardless of whether the completes normally or exceptionally.
+Closing the session also enforces the rollback of the last uncommitted or failed transaction in the session.
+Thus it is optional to roll back the transaction using `Transaction#rollbackAsync()`, as long as the session is closed at the end of the full chain.
 --
 
 ======
