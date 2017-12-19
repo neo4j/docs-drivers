@@ -291,7 +291,11 @@ include::{python-examples}/read_write_transaction_example.py[tags=read-write-tra
 
 == Asynchronous programming
 
-NOTE: The async API is only available with the .NET and Java drivers.
+[NOTE]
+--
+These special async methods are only available with the .NET and Java drivers.
+For Javascript, the default methods described earlier in this chapter are asynchronous, since that is the nature of the lanugage.
+--
 
 In addition to the methods listed in the previous sections, there also exist several asynchronous methods which allow for better integration with applications written in an asynchronous style.
 Asynchronous methods are named as their synchronous counterparts but with an additional _async_ prefix.
@@ -353,23 +357,11 @@ include::{java-examples}/AsyncExplicitTransactionExample.java[tags=async-explici
 [IMPORTANT]
 --
 It is important to close the session object to make sure all resources (such as network connections) obtained by the session are cleaned up properly.
-It is therefore suggested to always do `Session#closeAsync()` at the end of the `CompletionStage` chain.
+It is therefore suggested to always do `Session#closeAsync()` at the end of the whole `CompletionStage` chain.
 Sessions should be closed regardless of whether the completes normally or exceptionally.
 Closing the session also enforces the rollback of the last uncommitted or failed transaction in the session.
 Thus it is optional to roll back the transaction using `Transaction#rollbackAsync()`, as long as the session is closed at the end of the full chain.
 --
 
 ======
-
-[.include-with-javascript]
-======
-This functionality is not available with this driver.
-======
-
-[.include-with-python]
-======
-This functionality is not available with this driver.
-======
 ========
-
-
