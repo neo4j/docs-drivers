@@ -218,20 +218,81 @@ The application should retry the operation.
 [[driver-transactions-causal-chaining]]
 == Causal chaining
 
-When working with a causal cluster, the transactions in a session will automatically be causally chained.
+When working with a causal cluster, transactions can be chained to ensure causal consistency.
 This means that for any two transactions, it is guaranteed that the second transaction will begin only after the first has been successfully committed.
-This is true even if the transactions are physically carried out on different cluster members.
+This is true even if the transactions are carried out on different physical cluster members.
 
-Causal chaining is carried out by passing <<term-bookmark, bookmarks>> between transactions in a session.
-Each bookmark records a point in transactional history and is used to instruct the cluster to carry out work in a particular sequence.
-Bookmarks are returned from the server to the client on the successful commit of a transaction and may be supplied as parameters to new transactions.
-Passing bookmarks into a transaction causes the executing server to block until it has caught up with the latest of these bookmarks.
+Causal chaining is carried out by passing <<term-bookmark, bookmarks>> between transactions.
+Each bookmark records a point in transactional history and can be used to inform cluster members to carry out units of work in a particular sequence.
+Internally, a bookmark is passed from server to client on a successful COMMIT and back from client to server on BEGIN.
+On receipt of one or more bookmarks, the transaction server will block until it has fast forwarded to catch up with the latest of these.
 
-It is possible both to construct a session based on one or more existing bookmarks, and to extract a bookmark from a session.
-This functionality allows multiple sessions to be chained together.
-
-When running multiple independent transactions, it is recommended to use separate sessions.
+Within a session, bookmark propagation is carried out automatically and does not require any explicit signal or setting from the application.
+To opt out of this mechanism for unrelated units of work, applications can use multiple sessions.
 This avoids the small latency overhead of the causal chain.
+Propagation between sessions can be achieved by extracting the last bookmarks from one or more sessions and passing these into the construction of another.
+This is generally the only case in which an application will need to work with bookmarks directly.
+
+image::driver-passing-bookmarks.png[title="Passing bookmarks", width=800, role="middle"]
+
+[.tabbed-example]
+.Passing bookmarks between sessions
+====
+
+This example illustrates the passing of bookmarks between sessions.
+
+We are using three separate sessions: a, b and c.
+In _session a_ we run two separate transactions. 
+In the first one we create the person `Alice`, and in the second one we record that she works at `Wayne Enterprises`.
+The bookmark being passed between the two transactions is handled by the session.
+The bookmark from the last transaction is saved into an array for future use.
+
+In _session b_ we also run two separate transactions. 
+In the first one we create the person `Bob`, and in the second one we record that he works at `LexCorp`.
+Again, the bookmark being passed between the two transactions is handled by the session.
+The bookmark from the last transaction is saved into an array for future use.
+
+In the last session, _session c_, we wish to create a friendship between Alice and Bob.
+This can only be done if both `Alice` and `Bob` have been created first.
+In order to ensure this, we pass the bookmarks from the last transactions in _session a_ and _session b_, respectively.
+
+[.include-with-dotnet]
+======
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=pass-bookmarks]
+----
+======
+
+[.include-with-java]
+======
+[source, java]
+----
+include::{java-examples}/PassBookmarkExample.java[tags=pass-bookmarks]
+----
+======
+
+[.include-with-javascript]
+======
+[source, javascript]
+----
+include::{javascript-examples}/examples.test.js[tags=pass-bookmarks]
+----
+======
+
+[.include-with-python]
+======
+
+
+[source, python]
+----
+
+include::{python-examples}/pass_bookmarks_example.py[tags=pass-bookmarks]
+----
+======
+
+====
+
 
 [TIP]
 --
