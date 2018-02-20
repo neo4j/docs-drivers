@@ -95,15 +95,23 @@ This kind of driver uses the <<term-bolt-routing-protocol, Bolt Routing Protocol
  
 === Routing drivers with routing context
 
-Routing drivers with routing context are an available option when using drivers of version 1.3 or above together with a Neo4j cluster of version 3.2 or above.
-In such a setup, a routing driver can include a preferred routing context via the query part of the `bolt+routing` URI.
-Below is an example using a routing context of `{region: europe, country: sw}`:
+Routing drivers with routing context are an available option when using drivers of version 1.3 or above together with a Neo4j Causal Cluster of version 3.2 or above.
+In such a setup, a Routing driver can include a preferred routing context via the query part of the `bolt+routing` URI.
 
-`bolt+routing://graph.example.com:7687/?region=europe&country=sw`
+In the standard Neo4j configuration, routing contexts are defined on the server side by means of _server policies_.
+Thus the driver communicates the routing context to the cluster in the form of a server policy.
+It then obtains refined routing information back from the cluster, based on the server policy.
 
-The driver communicates the routing context to the cluster.
-It then obtains refined routing information back from the cluster, based on information suggested in the routing context.
-In the example above, the driver communicates that it prefers to route queries to the servers located in the country Sweden in the region Europe.
+.Configure a Routing driver with routing context
+====
+This example will assume that Neo4j has been configured for server policies as described in <<operations-manual#multi-dc-load-balancing, Neo4j Operations Manual -> Load balancing for multi-data center systems>>.
+In particular, a server policy called `europe` has been defined.
+Additionally, we have a server `core1.example.neo4j.com` to which we wish to connect.
+
+This URI will use the server policy `europe`:
+
+`bolt+routing://core1.graph.example.com?policy=europe`
+====
 
 [NOTE]
 .Server-side configuration to enable Routing drivers with routing context
