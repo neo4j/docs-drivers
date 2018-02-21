@@ -90,7 +90,7 @@ Note that a Routing driver is preferable when working with a causal cluster.
 === Routing drivers (bolt+routing)
 
 A Routing driver is created via a `bolt+routing` URI, for example: `bolt+routing://graph.example.com:7687`.
-The address in the URI must be that of a core server.
+The address in the URI must be that of a Core server.
 This kind of driver uses the <<term-bolt-routing-protocol, Bolt Routing Protocol>> and works in tandem with the cluster to route transactions to available cluster members.
  
 === Routing drivers with routing context
@@ -102,15 +102,17 @@ In the standard Neo4j configuration, routing contexts are defined on the server 
 Thus the driver communicates the routing context to the cluster in the form of a server policy.
 It then obtains refined routing information back from the cluster, based on the server policy.
 
+The address in the URI of a Routing driver with routing context must be that of a Core server.
+
 .Configure a Routing driver with routing context
 ====
 This example will assume that Neo4j has been configured for server policies as described in <<operations-manual#multi-dc-load-balancing, Neo4j Operations Manual -> Load balancing for multi-data center systems>>.
 In particular, a server policy called `europe` has been defined.
-Additionally, we have a server `core1.example.neo4j.com` to which we wish to connect.
+Additionally, we have a server `neo01.graph.example.com` to which we wish to direct the driver.
 
 This URI will use the server policy `europe`:
 
-`bolt+routing://core1.graph.example.com?policy=europe`
+`bolt+routing://neo01.graph.example.com?policy=europe`
 ====
 
 [NOTE]
