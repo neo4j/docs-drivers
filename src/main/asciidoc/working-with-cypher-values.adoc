@@ -151,7 +151,7 @@ In Python 3, a Cypher `Integer` is mapped to `long` and a Cypher `String` to `un
 A statement result is comprised of a stream of records.
 The result is typically handled by the receiving application as it arrives, although it is also possible to retain all or part of a result for future consumption.
 
-image::driver-result-stream.png[title="Result stream", width=150, role="middle"]
+image::driver-result-stream.svg[title="Result stream", role="middle"]
 
 
 [[driver-result-record]]
@@ -165,7 +165,7 @@ As values within a record are both keyed and ordered, that value can be accessed
 [[driver-result-buffer]]
 === The buffer
 
-image::driver-result-buffer.png[title="Result buffer", width=700, role="middle"]
+image::driver-result-buffer.svg[title="Result buffer", role="middle"]
 
 Most drivers contain a result buffer.
 This provides a staging point for results, and divides result handling into _fetching_ (moving from the network to the buffer) and _consuming_ (moving from the buffer to the application).
@@ -269,4 +269,3 @@ Supplementary information such as query statistics, timings and server informati
 If this detail is accessed before the entire result has been consumed, the remainder of the result will be buffered.
 
 See also the <<driver-api-docs, language-specific driver API documentation>>.
-
