@@ -233,7 +233,7 @@ This avoids the small latency overhead of the causal chain.
 Propagation between sessions can be achieved by extracting the last bookmarks from one or more sessions and passing these into the construction of another.
 This is generally the only case in which an application will need to work with bookmarks directly.
 
-image::driver-passing-bookmarks.png[title="Passing bookmarks", width=800, role="middle"]
+image::driver-passing-bookmarks.svg[title="Passing bookmarks", role="middle"]
 
 [.tabbed-example]
 .Passing bookmarks between sessions
@@ -242,12 +242,12 @@ image::driver-passing-bookmarks.png[title="Passing bookmarks", width=800, role="
 This example illustrates the passing of bookmarks between sessions.
 
 We are using three separate sessions: a, b and c.
-In _session a_ we run two separate transactions. 
+In _session a_ we run two separate transactions.
 In the first one we create the person `Alice`, and in the second one we record that she works at `Wayne Enterprises`.
 The bookmark being passed between the two transactions is handled by the session.
 The bookmark from the last transaction is saved into an array for future use.
 
-In _session b_ we also run two separate transactions. 
+In _session b_ we also run two separate transactions.
 In the first one we create the person `Bob`, and in the second one we record that he works at `LexCorp`.
 Again, the bookmark being passed between the two transactions is handled by the session.
 The bookmark from the last transaction is saved into an array for future use.
