@@ -48,11 +48,11 @@ For information on how to work with null in Cypher, please refer to <<cypher-wor
    Equivalent functionality is available by simply passing either the ID for pass-by-reference, or an extracted map of properties for pass-by-value.
 
 The Neo4j driver maps Cypher types to and from native language types as depicted in the table below.
-Custom types (those not available in the language or standard library are highlighted in bold.
+Custom types (those not available in the language or standard library are highlighted in *bold*.
 
 
 [[driver-type-mappings]]
-=== Type mappings
+=== Type mappings 
 
 The Neo4j driver maps Cypher types to native language types as depicted in the table below.
 
@@ -84,7 +84,8 @@ The Neo4j driver maps Cypher types to native language types as depicted in the t
 | Path | IPath
 |===
 
-+*+ Time zone names adhere to the IANA system, rather than the Windows system. Inbound conversion is carried out using Extended Windows-Olson zid mapping as defined by Unicode CLDR.
++*+ Time zone names adhere to the https://www.iana.org/time-zones[IANA system], rather than the https://docs.microsoft.com/en-us/windows-hardware/manufacture/desktop/default-time-zones[Windows system].
+Inbound conversion is carried out using http://cldr.unicode.org/development/development-process/design-proposals/extended-windows-olson-zid-mapping[Extended Windows-Olson zid mapping] as defined by Unicode CLDR.
 
 +**+ The variant used depends on whether the value contains a numeric offset from UTC or a time zone name string.
 ======
@@ -114,7 +115,7 @@ The Neo4j driver maps Cypher types to native language types as depicted in the t
 | Path | Path
 |===
 
-+*+ A Duration or Period passed as a parameter will always be implicitly converted to IsoDuration.    
++*+ A `Duration` or `Period` passed as a parameter will always be implicitly converted to `IsoDuration`.    
 ======
 
 [.include-with-javascript]
@@ -170,11 +171,11 @@ The Neo4j driver maps Cypher types to native language types as depicted in the t
 | Path | Path | Path
 |===
 
-+*+ While Cypher uses 64-bit signed integers, int can only hold integers up to sys.maxint in Python 2; long is used for values above this.
++*+ While Cypher uses 64-bit signed integers, `int` can only hold integers up to `sys.maxint` in Python 2; `long` is used for values above this.
 
-+**+ In Python 2, a str passed as a parameter will always be implicitly converted to unicode via UTF-8.
++**+ In Python 2, a `str` passed as a parameter will always be implicitly converted to `unicode` via UTF-8.
 
-+***+ A timespan passed as a parameter will always be implicitly converted to duration.
++***+ A `timespan` passed as a parameter will always be implicitly converted to `duration`.
 
 † Where tzinfo is not None.
 
