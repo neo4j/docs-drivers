@@ -11,45 +11,44 @@ This section describes the types and values used by Cypher and how they map to n
 == The Cypher type system
 
 Drivers translate between application language types and the Cypher type system.
-To pass parameters and process results, it is important to know the basics of the Cypher type system and to understand how the Cypher types are mapped in the driver.
+To pass parameters and process results, it is important to know the basics of how Cypher works with types and to understand how the Cypher types are mapped in the driver.
 
-Cypher types are split into two groups: basic types and graph structure types.
-While query results can contain any of these, only basic types can be used as parameters.
+The table below shows the available data types.
+All can be potentially found in results although not all can be used as parameters.
 
+[options="header"]
+|===
+| Cypher Type | Parameter | Result
+| null* | ✔ | ✔
+| List  | ✔ | ✔
+| Map   | ✔ | ✔
+| Boolean | ✔ | ✔
+| Integer | ✔ | ✔
+| Float | ✔ | ✔
+| String | ✔ | ✔
+| ByteArray | ✔ | ✔
+| Date | ✔ | ✔
+| Time | ✔ | ✔
+| LocalTime | ✔ | ✔
+| DateTime | ✔ | ✔
+| LocalDateTime | ✔ | ✔
+| Duration | ✔ | ✔
+| Point | ✔ | ✔
+| Node** | | ✔
+| Relationship** | | ✔
+| Path** | | ✔
+|===
 
-[[driver-basic-types]]
-=== Basic types
++*+ The null marker is not a type but a placeholder for absence of value.
+For information on how to work with null in Cypher, please refer to <<cypher-working-with-null>>.
 
-The basic types are:
++**+ Nodes, relationships and paths are passed in results as snapshots of the original graph entities.
+   While the original entity IDs are included in these snapshots, no permanent link is retained back to the underlying server-side entities, which may be deleted or otherwise altered independently of the client copies.
+   Graph structures may not be used as parameters because it depends on application context whether such a parameter would be passed by reference or by value, and Cypher provides no mechanism to denote this.
+   Equivalent functionality is available by simply passing either the ID for pass-by-reference, or an extracted map of properties for pass-by-value.
 
-* Boolean
-* Integer
-* Float
-* String
-* List
-* Map
-
-
-[NOTE]
---
-For information on how to work with `null` in Cypher, please refer to <<cypher-working-with-null>>.
---
-
-
-[[driver-graph-types]]
-=== Graph structure types
-
-In addition to the basic types which can be used both for parameters and results, the following Cypher types are valid for results only:
-
-* Node
-* Relationship
-* Path
-
-When streaming a result, the server takes snapshots of the original graph structure values to pass back to the client.
-While the original entity IDs are included in these snapshots, no permanent link is retained back to the underlying server-side entities, which may be deleted or otherwise altered independently of the client copies.
-
-Graph structures may not be used as parameters because it depends on application context whether such a parameter would be passed by reference or by value, and Cypher provides no mechanism to denote this.
-Equivalent functionality is available by simply passing either the ID for pass by reference, or an extracted map of properties for pass by value.
+The Neo4j driver maps Cypher types to and from native language types as depicted in the table below.
+Custom types (those not available in the language or standard library are highlighted in bold.
 
 
 [[driver-type-mappings]]
@@ -64,87 +63,122 @@ The Neo4j driver maps Cypher types to native language types as depicted in the t
 ======
 [options="header", cols="m, m"]
 |===
-| Neo4j        | .NET
-| Null         | null
-| Boolean      | System.Boolean
-| Integer      | System.Int64
-| Float        | System.Double
-| Bytes        | System.Byte[]
-| String       | System.String
-| List         | System.Collections.Generic.IList<T>
-| Map          | System.Collections.IDictionary<TKey, TValue>
-| Node         | Neo4j.Driver.V1.INode
-| Relationship | Neo4j.Driver.V1.IRelationship
-| Path         | Neo4j.Driver.V1.IPath
+| Neo4j type        | .NET type
+| null | null
+| List | IList<object>
+| Map | IDictionary<string, object>
+| Boolean | bool
+| Integer | long
+| Float | double
+| String | string
+| ByteArray | byte[]
+| Date | CypherDate
+| Time | CypherTimeWithOffset
+| LocalTime | CypherTime
+| DateTime* | CypherDateTimeWithOffset / CypherDateTimeWithZoneId**
+| LocalDateTime | CypherDateTime
+| Duration | CypherDuration
+| Point | CypherPoint
+| Node | INode
+| Relationship | IRelationship
+| Path | IPath
 |===
+
++*+ Time zone names adhere to the IANA system, rather than the Windows system. Inbound conversion is carried out using Extended Windows-Olson zid mapping as defined by Unicode CLDR.
+
++**+ The variant used depends on whether the value contains a numeric offset from UTC or a time zone name string.
 ======
 
 [.include-with-java]
 ======
 [options="header", cols="m, m"]
 |===
-| Neo4j        | Java
-| Null         | null
-| Boolean      | java.lang.Boolean
-| Integer      | java.lang.Long
-| Float        | java.lang.Double
-| Bytes        | byte[]
-| String       | java.lang.String
-| List         | java.util.List<T>
-| Map          | java.util.Map<K, V>
-| Node         | org.neo4j.driver.v1.types.Node
-| Relationship | org.neo4j.driver.v1.types.Relationship
-| Path         | org.neo4j.driver.v1.types.Path
+| Neo4j type        | Java type
+| null | null
+| List | List<Object>
+| Map | Map<String, Object>
+| Boolean | boolean
+| Integer | long
+| Float | double
+| String | String
+| ByteArray | byte[]
+| Date | LocalDate
+| Time | OffsetTime
+| LocalTime | LocalTime
+| DateTime | ZonedDateTime
+| LocalDateTime | LocalDateTime
+| Duration | IsoDuration*
+| Point | Point
+| Node | Node
+| Relationship | Relationship
+| Path | Path
 |===
+
++*+ A Duration or Period passed as a parameter will always be implicitly converted to IsoDuration.    
 ======
 
 [.include-with-javascript]
 ======
 [options="header", cols="m, m"]
 |===
-| Neo4j        | JavaScript
-| Null         | null
-| Boolean      | Boolean
-| Integer      | Integer (*)
-| Float        | Number
-| Bytes        | Int8Array
-| String       | String
-| List         | Array
-| Map          | Object
-| Node         | Node
+| Neo4j type        | JavaScript type
+| null | null
+| List | Array
+| Map | Object
+| Boolean | Boolean
+| Integer | Integer*
+| Float | Number
+| String | String
+| ByteArray | Int8Array
+| Date | Date
+| Time | Time
+| LocalTime | LocalTime
+| DateTime | DateTime
+| LocalDateTime | LocalDateTime
+| Duration | Duration
+| Point | Point
+| Node | Node
 | Relationship | Relationship
-| Path         | Path
+| Path | Path
 |===
-****
-(*) As JavaScript does not support 64-bit unsigned integers natively, the driver provides an `Integer` type to allow such values to be accurately represented in result data.
-****
+
++*+ JavaScript has no native integer type so a custom type is provided. For convenience, this can be disabled through configuration so that the native Number type is used instead. Note that this can lead to a loss of precision.
 ======
 
 [.include-with-python]
 ======
-[options="header", cols="m, m"]
+[options="header", cols="m, m, m"]
 |===
-| Neo4j        | Python
-| Null         | None
-| Boolean      | bool
-| Integer      | int/long (†)
-| Float        | float
-| Bytes        | bytes
-| String       | str/unicode (†)
-| List         | list
-| Map          | dict
-| Node         | Node
-| Relationship | Relationship
-| Path         | Path
+| Neo4j type        | Python 2 type | Python 3 Type
+| null | None | None
+| List | list | list
+| Map | dict | dict
+| Boolean | bool | bool
+| Integer | int / long* | int
+| Float | float | float
+| String | unicode** | str
+| ByteArray | bytearray | bytearray
+| Date | datetime.date | datetime.date
+| Time | datetime.time† | datetime.time†
+| LocalTime | datetime.time†† | datetime.time††
+| DateTime | datetime.datetime† | datetime.datetime†
+| LocalDateTime | datetime.datetime†† | datetime.datetime††
+| Duration | duration*** | duration***
+| Point | Point | Point
+| Node | Node | Node
+| Relationship | Relationship | Relationship
+| Path | Path | Path
 |===
 
-.(†) Python versions
-****
-In Python 2, a Cypher `Integer` is mapped to `int` and a Cypher `String` to `str`.
++*+ While Cypher uses 64-bit signed integers, int can only hold integers up to sys.maxint in Python 2; long is used for values above this.
 
-In Python 3, a Cypher `Integer` is mapped to `long` and a Cypher `String` to `unicode`.
-****
++**+ In Python 2, a str passed as a parameter will always be implicitly converted to unicode via UTF-8.
 
++***+ A timespan passed as a parameter will always be implicitly converted to duration.
+
+† Where tzinfo is not None.
+
+†† Where tzinfo is None.
 ======
 ====
 
