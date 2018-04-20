@@ -16,7 +16,8 @@ To pass parameters and process results, it is important to know the basics of ho
 The table below shows the available data types.
 All can be potentially found in results although not all can be used as parameters.
 
-[options="header"]
+====
+[options="header", cols="m,,"]
 |===
 | Cypher Type | Parameter | Result
 | null* | ✔ | ✔
@@ -46,73 +47,70 @@ For information on how to work with null in Cypher, please refer to <<cypher-wor
    While the original entity IDs are included in these snapshots, no permanent link is retained back to the underlying server-side entities, which may be deleted or otherwise altered independently of the client copies.
    Graph structures may not be used as parameters because it depends on application context whether such a parameter would be passed by reference or by value, and Cypher provides no mechanism to denote this.
    Equivalent functionality is available by simply passing either the ID for pass-by-reference, or an extracted map of properties for pass-by-value.
+====
 
 The Neo4j driver maps Cypher types to and from native language types as depicted in the table below.
-Custom types (those not available in the language or standard library are highlighted in *bold*.
+Custom types (those not available in the language or standard library) are highlighted in *bold*.
 
 
-[[driver-type-mappings]]
-=== Type mappings 
-
-The Neo4j driver maps Cypher types to native language types as depicted in the table below.
+//[[driver-type-mappings]]
+//=== Type mappings 
 
 [.tabbed-example]
 .Map Neo4j types to native language types
 ====
 [.include-with-dotnet]
 ======
-[options="header", cols="m, m"]
+[options="header", cols="m,"]
 |===
 | Neo4j type        | .NET type
-| null | null
-| List | IList<object>
-| Map | IDictionary<string, object>
-| Boolean | bool
-| Integer | long
-| Float | double
-| String | string
-| ByteArray | byte[]
-| Date | CypherDate
-| Time | CypherTimeWithOffset
-| LocalTime | CypherTime
-| DateTime* | CypherDateTimeWithOffset / CypherDateTimeWithZoneId**
-| LocalDateTime | CypherDateTime
-| Duration | CypherDuration
-| Point | CypherPoint
-| Node | INode
-| Relationship | IRelationship
-| Path | IPath
+| null | `null`
+| List | `IList<object>`
+| Map | `IDictionary<string, object>`
+| Boolean | `bool`
+| Integer | `long`
+| Float | `double`
+| String | `string`
+| ByteArray | `byte[]`
+| Date | *`LocalDate`*
+| Time | *`OffsetTime`*
+| LocalTime | *`LocalTime`*
+| DateTime* | *`ZonedDateTime`*
+| LocalDateTime | *`LocalDateTime`*
+| Duration | *`Duration`*
+| Point | *`Point`*
+| Node | *`INode`*
+| Relationship | *`IRelationship`*
+| Path | *`IPath`*
 |===
 
 +*+ Time zone names adhere to the https://www.iana.org/time-zones[IANA system], rather than the https://docs.microsoft.com/en-us/windows-hardware/manufacture/desktop/default-time-zones[Windows system].
 Inbound conversion is carried out using http://cldr.unicode.org/development/development-process/design-proposals/extended-windows-olson-zid-mapping[Extended Windows-Olson zid mapping] as defined by Unicode CLDR.
-
-+**+ The variant used depends on whether the value contains a numeric offset from UTC or a time zone name string.
 ======
 
 [.include-with-java]
 ======
-[options="header", cols="m, m"]
+[options="header", cols="m,"]
 |===
 | Neo4j type        | Java type
-| null | null
-| List | List<Object>
-| Map | Map<String, Object>
-| Boolean | boolean
-| Integer | long
-| Float | double
-| String | String
-| ByteArray | byte[]
-| Date | LocalDate
-| Time | OffsetTime
-| LocalTime | LocalTime
-| DateTime | ZonedDateTime
-| LocalDateTime | LocalDateTime
-| Duration | IsoDuration*
-| Point | Point
-| Node | Node
-| Relationship | Relationship
-| Path | Path
+| null | `null`
+| List | `List<Object>`
+| Map | `Map<String, Object>`
+| Boolean | `boolean`
+| Integer | `long`
+| Float | `double`
+| String | `String`
+| ByteArray | `byte[]`
+| Date | `LocalDate`
+| Time | `OffsetTime`
+| LocalTime | `LocalTime`
+| DateTime | `ZonedDateTime`
+| LocalDateTime | `LocalDateTime`
+| Duration | *`IsoDuration`**
+| Point | *`Point`*
+| Node | *`Node`*
+| Relationship | *`Relationship`*
+| Path | *`Path`*
 |===
 
 +*+ A `Duration` or `Period` passed as a parameter will always be implicitly converted to `IsoDuration`.    
@@ -120,27 +118,27 @@ Inbound conversion is carried out using http://cldr.unicode.org/development/deve
 
 [.include-with-javascript]
 ======
-[options="header", cols="m, m"]
+[options="header", cols="m,"]
 |===
 | Neo4j type        | JavaScript type
-| null | null
-| List | Array
-| Map | Object
-| Boolean | Boolean
-| Integer | Integer*
-| Float | Number
-| String | String
-| ByteArray | Int8Array
-| Date | Date
-| Time | Time
-| LocalTime | LocalTime
-| DateTime | DateTime
-| LocalDateTime | LocalDateTime
-| Duration | Duration
-| Point | Point
-| Node | Node
-| Relationship | Relationship
-| Path | Path
+| null | `null`
+| List | `Array`
+| Map | `Object`
+| Boolean | `Boolean`
+| Integer | *`Integer`**
+| Float | `Number`
+| String | `String`
+| ByteArray | `Int8Array`
+| Date | *`Date`*
+| Time | *`Time`*
+| LocalTime | *`LocalTime`*
+| DateTime | *`DateTime`*
+| LocalDateTime | *`LocalDateTime`*
+| Duration | *`Duration`*
+| Point | *`Point`*
+| Node | *`Node`*
+| Relationship | *`Relationship`*
+| Path | *`Path`*
 |===
 
 +*+ JavaScript has no native integer type so a custom type is provided. For convenience, this can be disabled through configuration so that the native Number type is used instead. Note that this can lead to a loss of precision.
@@ -148,27 +146,27 @@ Inbound conversion is carried out using http://cldr.unicode.org/development/deve
 
 [.include-with-python]
 ======
-[options="header", cols="m, m, m"]
+[options="header", cols="m,,"]
 |===
-| Neo4j type        | Python 2 type | Python 3 Type
+| Neo4j type        | Python 2 type | Python 3 type
 | null | None | None
-| List | list | list
-| Map | dict | dict
-| Boolean | bool | bool
-| Integer | int / long* | int
-| Float | float | float
-| String | unicode** | str
-| ByteArray | bytearray | bytearray
-| Date | datetime.date | datetime.date
-| Time | datetime.time† | datetime.time†
-| LocalTime | datetime.time†† | datetime.time††
-| DateTime | datetime.datetime† | datetime.datetime†
-| LocalDateTime | datetime.datetime†† | datetime.datetime††
-| Duration | duration*** | duration***
-| Point | Point | Point
-| Node | Node | Node
-| Relationship | Relationship | Relationship
-| Path | Path | Path
+| List | `list` | `list`
+| Map | `dict` | `dict`
+| Boolean | `bool` | `bool`
+| Integer | `int / long`* | `int`
+| Float | `float` | `float`
+| String | `unicode`** | `str`
+| ByteArray | `bytearray` | `bytearray`
+| Date | `datetime.date` | `datetime.date`
+| Time | `datetime.time`† | `datetime.time`†
+| LocalTime | `datetime.time`†† | `datetime.time`††
+| DateTime | `datetime.datetime`† | `datetime.datetime`†
+| LocalDateTime | `datetime.datetime`†† | `datetime.datetime`††
+| Duration | *`duration`**** | *`duration`****
+| Point | *`Point`* | *`Point`*
+| Node | *`Node`* | *`Node`*
+| Relationship | *`Relationship`* | *`Relationship`*
+| Path | *`Path`* | *`Path`*
 |===
 
 +*+ While Cypher uses 64-bit signed integers, `int` can only hold integers up to `sys.maxint` in Python 2; `long` is used for values above this.
