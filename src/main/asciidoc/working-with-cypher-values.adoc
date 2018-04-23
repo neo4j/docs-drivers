@@ -17,27 +17,27 @@ The table below shows the available data types.
 All can be potentially found in results although not all can be used as parameters.
 
 ====
-[options="header", cols="m,,"]
+[options="header", cols=",,"]
 |===
 | Cypher Type | Parameter | Result
-| null* | ✔ | ✔
-| List  | ✔ | ✔
-| Map   | ✔ | ✔
-| Boolean | ✔ | ✔
-| Integer | ✔ | ✔
-| Float | ✔ | ✔
-| String | ✔ | ✔
-| ByteArray | ✔ | ✔
-| Date | ✔ | ✔
-| Time | ✔ | ✔
-| LocalTime | ✔ | ✔
-| DateTime | ✔ | ✔
-| LocalDateTime | ✔ | ✔
-| Duration | ✔ | ✔
-| Point | ✔ | ✔
-| Node** | | ✔
-| Relationship** | | ✔
-| Path** | | ✔
+| `null`* | ✔ | ✔
+| `List`  | ✔ | ✔
+| `Map`   | ✔ | ✔
+| `Boolean` | ✔ | ✔
+| `Integer` | ✔ | ✔
+| `Float` | ✔ | ✔
+| `String` | ✔ | ✔
+| `ByteArray` | ✔ | ✔
+| `Date` | ✔ | ✔
+| `Time` | ✔ | ✔
+| `LocalTime` | ✔ | ✔
+| `DateTime` | ✔ | ✔
+| `LocalDateTime` | ✔ | ✔
+| `Duration` | ✔ | ✔
+| `Point` | ✔ | ✔
+| `Node`** | | ✔
+| `Relationship`** | | ✔
+| `Path`** | | ✔
 |===
 
 +*+ The null marker is not a type but a placeholder for absence of value.
@@ -52,36 +52,32 @@ For information on how to work with null in Cypher, please refer to <<cypher-wor
 The Neo4j driver maps Cypher types to and from native language types as depicted in the table below.
 Custom types (those not available in the language or standard library) are highlighted in *bold*.
 
-
-//[[driver-type-mappings]]
-//=== Type mappings 
-
 [.tabbed-example]
 .Map Neo4j types to native language types
 ====
 [.include-with-dotnet]
 ======
-[options="header", cols="m,"]
+[options="header", cols=","]
 |===
 | Neo4j type        | .NET type
-| null | `null`
-| List | `IList<object>`
-| Map | `IDictionary<string, object>`
-| Boolean | `bool`
-| Integer | `long`
-| Float | `double`
-| String | `string`
-| ByteArray | `byte[]`
-| Date | *`LocalDate`*
-| Time | *`OffsetTime`*
-| LocalTime | *`LocalTime`*
-| DateTime* | *`ZonedDateTime`*
-| LocalDateTime | *`LocalDateTime`*
-| Duration | *`Duration`*
-| Point | *`Point`*
-| Node | *`INode`*
-| Relationship | *`IRelationship`*
-| Path | *`IPath`*
+| `null` | `null`
+| `List` | `IList<object>`
+| `Map` | `IDictionary<string, object>`
+| `Boolean` | `bool`
+| `Integer` | `long`
+| `Float` | `double`
+| `String` | `string`
+| `ByteArray` | `byte[]`
+| `Date` | *`LocalDate`*
+| `Time` | *`OffsetTime`*
+| `LocalTime` | *`LocalTime`*
+| `DateTime`* | *`ZonedDateTime`*
+| `LocalDateTime` | *`LocalDateTime`*
+| `Duration` | *`Duration`*
+| `Point` | *`Point`*
+| `Node` | *`INode`*
+| `Relationship` | *`IRelationship`*
+| `Path` | *`IPath`*
 |===
 
 +*+ Time zone names adhere to the https://www.iana.org/time-zones[IANA system], rather than the https://docs.microsoft.com/en-us/windows-hardware/manufacture/desktop/default-time-zones[Windows system].
@@ -149,7 +145,7 @@ Inbound conversion is carried out using http://cldr.unicode.org/development/deve
 [options="header", cols="m,,"]
 |===
 | Neo4j type        | Python 2 type | Python 3 type
-| null | None | None
+| null | `None` | `None`
 | List | `list` | `list`
 | Map | `dict` | `dict`
 | Boolean | `bool` | `bool`
