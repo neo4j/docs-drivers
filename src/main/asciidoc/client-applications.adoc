@@ -395,7 +395,7 @@ Negative values result in lifetime not being checked.
 Default value: 1h.
 
 `MaxConnectionPoolSize`::
-This setting defines the maximum total number of connections allowed to be managed by the connection pool per host.
+This setting defines the maximum total number of connections allowed, per host, to be managed by the connection pool.
 In other words, for a direct driver, this sets the maximum number of connections towards a single database server.
 For a routing driver this sets the maximum amount of connections per cluster member.
 If a session or transaction tries to acquire a connection at a time when the pool size is at its full capacity, it must wait until a free connection is available in the pool or the request to acquire a new connection times out.
