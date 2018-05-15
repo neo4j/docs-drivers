@@ -153,12 +153,12 @@ Inbound conversion is carried out using http://cldr.unicode.org/development/deve
 | Float | `float` | `float`
 | String | `unicode`** | `str`
 | ByteArray | `bytearray` | `bytearray`
-| Date | `datetime.date` | `datetime.date`
-| Time | `datetime.time`† | `datetime.time`†
-| LocalTime | `datetime.time`†† | `datetime.time`††
-| DateTime | `datetime.datetime`† | `datetime.datetime`†
-| LocalDateTime | `datetime.datetime`†† | `datetime.datetime`††
-| Duration | *`duration`**** | *`duration`****
+| Date | *`neotime.Date`* | *`neotime.Date`*
+| Time | *`neotime.Time`*† | *`neotime.Time`*†
+| LocalTime | *`neotime.Time`*†† | *`neotime.Time`*††
+| DateTime | *`neotime.DateTime`*† | *`neotime.DateTime`*†
+| LocalDateTime | *`neotime.DateTime`*†† | *`neotime.DateTime`*††
+| Duration | *`neotime.Duration`**** | *`neotime.Duration`****
 | Point | *`Point`* | *`Point`*
 | Node | *`Node`* | *`Node`*
 | Relationship | *`Relationship`* | *`Relationship`*
@@ -169,7 +169,7 @@ Inbound conversion is carried out using http://cldr.unicode.org/development/deve
 
 +**+ In Python 2, a `str` passed as a parameter will always be implicitly converted to `unicode` via UTF-8.
 
-+***+ A `timespan` passed as a parameter will always be implicitly converted to `duration`.
++***+ A `timedelta` passed as a parameter will always be implicitly converted to `neotime.Duration`.
 
 † Where tzinfo is not None.
 
