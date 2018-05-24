@@ -73,6 +73,27 @@ h2 {
     font-size: 34px;
 }
 
+h3 {
+    font-size: 28px;
+}
+
+h4 {
+    font-size: 22px;
+}
+
+h5 {
+    font-size: 20px;
+}
+
+h6 {
+    font-size: 18px;
+}
+
+.h4, .h5, .h6, h4, h5, h6 {
+    margin-top: 1.2em;
+    margin-bottom: 0.6em;
+}
+
 #content ul {
     list-style: outside disc;
     margin-left: 1em;
@@ -107,4 +128,10 @@ a {
     color: #428bca;
     text-decoration: none;
     line-height: inherit;
+}
+
+/* No italics in TOC */
+
+#toc ul.sectlevel0 > li > a {
+    font-style: normal;
 }

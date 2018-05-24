@@ -3,13 +3,16 @@ import org.asciidoctor.groovydsl.AsciidoctorExtensions
 import org.asciidoctor.Asciidoctor
 import org.asciidoctor.OptionsBuilder
 import org.asciidoctor.SafeMode
+import org.neo4j.doc.build.xslt.XsltTask
+import org.neo4j.doc.build.docbook.DocBookPlugin
 
 buildscript {
     ext {
-        asciidoctorjVersion = '1.5.4.1'
-        asciidoctorjPdfVersion = '1.5.0-alpha.11'
+        asciidoctorjVersion = '1.5.6'
+        asciidoctorjPdfVersion = '1.5.0-alpha.16'
         asciidoctorGroovyDslVersion = '1.0.0.Alpha2'
         gradleGitVersion = '1.4.2'
+        catalogDir = "$projectDir/docbook/catalog"
     }
 
     repositories {
@@ -21,21 +24,26 @@ buildscript {
         classpath "org.asciidoctor:asciidoctorj-pdf:$asciidoctorjPdfVersion"
         classpath "org.asciidoctor:asciidoctorj-groovy-dsl:$asciidoctorGroovyDslVersion"
         classpath "org.ajoberstar:gradle-git:$gradleGitVersion"
+        classpath 'net.sf.docbook:docbook-xsl:1.79.1:ns-resources@zip'
+        classpath fileTree(dir: "${rootProject.projectDir}/lib", include: '*.jar')
+        classpath files(catalogDir)
     }
 }
 
 plugins {
-    id "de.undercouch.download" version "3.2.0"
+    id 'base'
+    id 'de.undercouch.download' version '3.2.0'
+    id 'org.neo4j.doc.build.vale' version '1.0-alpha01'
+    id 'org.neo4j.doc.build.saxon' version '1.0-alpha01'
+    id 'org.neo4j.doc.build.docbook' version '1.0-alpha04'
 }
 
-version = '3.2'
+version '1.6'
 
-def docsRepository = System.env.MAVEN_REPO_LOCAL
-
+def traceDocbook = hasProperty('traceDocbook') ? true : false
 if (!project.hasProperty("neo4jVersion")) { ext.neo4jVersion = "3.2.0-SNAPSHOT" }
-if (!project.hasProperty("driverVersion")) { ext.driverVersion = "1.1" }
+if (!project.hasProperty("driverVersion")) { ext.driverVersion = "1.6" }
 if (!project.hasProperty("ogmVersion")) { ext.ogmVersion = "2.1.2" }
-if (null == docsRepository) { ext.docsRepository = "https://m2.neo4j.org/content/repositories/snapshots/" }
 
 ext {
     // Set `neo4jDocVersion` for use in the generated docs
@@ -51,130 +59,122 @@ ext {
     ogmDocVersion = ogmVersion.tokenize('.')[0..1].join(".")
     if (ogmVersion.contains("-")) {ogmDocVersion += "-pre"}
 
-}
-
-configurations {
-    docs {
-        description "docs configuration"
-    }
-}
-
-dependencies {
-    docs(
-        "org.neo4j.doc:neo4j-manual-contents:${neo4jVersion}:docs@jar",
-    )
-}
+    versions = [
+        'driverDocs' : version,
+        'neo4jDocs' : neo4jDocVersion,
+        'ogmDocs' : ogmDocVersion,
+    ]
 
 
-apply plugin: 'base'
-
-defaultTasks 'asciidoctorHtml', 'asciidoctorPdf'
-
-//
-// THIS BUILD SCRIPT IS NOT KEPT UP-TO-DATE
-// THE DRIVER DOCUMENTATION IS A PART OF THE NEO4J DEVELOPER MANUAL
-// TO BUILD THE DRIVER MANUAL INDEPENDENTLY, UPDATE THE VERSIONS BELOW
-//
-allprojects {
-
-    apply plugin: 'base'
-
-    repositories {
-        // NB: "However, as Gradle prefers to use modules whose descriptor has been created from real meta-data rather than
-        // being generated, flat directory repositories cannot be used to override artifacts with real meta-data from other
-        // repositories." https://docs.gradle.org/current/userguide/dependency_management.html#sec:flat_dir_resolver
-        flatDir {
-            dirs "${rootProject.projectDir}/shared"
+    copyrightYear = '2018'
+    docsBaseUri = "https://neo4j.com/docs"
+    crossReferenceBase = [ // We have no strategy for cross references; always link to current.
+            'cypher-manual'     : "${docsBaseUri}/cypher-manual/current",
+            'operations-manual' : "${docsBaseUri}/operations-manual/current",
+            'java-reference'    : "${docsBaseUri}/java-reference/current",
+            'rest-docs'         : "${docsBaseUri}/rest-docs/current",
+            'ogm-manual'        : "${docsBaseUri}/ogm-manual/current",
+            'kerberos-add-on'   : "${docsBaseUri}/add-on/kerberos/current"
+    ]
+    asciidoctorAttributes = [
+        'common': [
+            'copyright-year'                   : copyrightYear,
+            'copyright'                        : "${copyrightYear} Neo Technology",
+            'common-license-page-uri'          : "${docsBaseUri}/license",
+            'driver-version'     : driverVersion,
+            'doctype'            : 'book',
+            'icons'              : 'font',
+            'attribute-missing'  : 'warn',
+            'docs-version'       : versions.driverDocs,
+            'common-license-page-uri': "$docsBaseUri/license/",
+        ],
+        'docbook': [
+            'imagesdir'          : 'images',
+        ],
+        'html': [
+            'stylesdir'          : 'css',
+            'linkcss'            : '',
+            'imagesdir'          : 'images',
+        ],
+        'pdf': [
+            'source-highlighter': 'rouge',
+            'toc'               : '',
+            'showlinks'         : '',
+            'nonhtmloutput'     : '',
+            'pdf-fontsdir'      : "$rootProject.buildDir/fonts".toString(),
+        ]
+    ]
+    asciidocSourceDir = "$projectDir/src/main/asciidoc"
+    distDir = "$buildDir/distributions"
+    docId = 'driver-manual'
+    fonts = [
+            'Open Sans.zip'  : 'https://www.google.com/fonts/download?kit=3hvsV99qyKCBS55e5pvb3ltkqrIMaAZWyLYEoB48lSQ',
+            'Inconsolata.zip': 'https://www.google.com/fonts/download?kit=CNj0Ze1H6w4FVgc32wmZS4fD-WQWLbF4rYwcBGowFYY',
+            'Lora.zip'       : 'https://www.google.com/fonts/download?kit=iwrHM7FQEcKgsUvDuXxrPg',
+    ]
+    driverVersionMapUrl = 'https://s3-eu-west-1.amazonaws.com/drivers.neo4j.com/version-tracker/version.json'
+    getDriverVersionMap = {
+        if (!project.hasProperty('driverVersionMap')) {
+            def versionsFile = "$buildDir/driverVersions.json"
+            download {
+                src driverVersionMapUrl
+                dest versionsFile
+                onlyIfNewer true
+                overwrite true
+            }
+            ext.driverVersionMap = new groovy.json.JsonSlurper().parseText(file(versionsFile).text)
+        } else {
+            ext.driverVersionMap
         }
-        maven {
-            url "${docsRepository}"
-        }
-        maven {
-            url "https://m2.neo4j.org/content/repositories/snapshots/"
-        }
-        mavenCentral()
     }
 
-    ext {
-        neo4jManualContentsDir = "${rootProject.buildDir}/neo4j-docs-content/neo4j-manual-contents/${neo4jVersion}"
-        neo4jJavadocsDir = "${rootProject.buildDir}/neo4j-docs-content/neo4j-javadocs/${neo4jVersion}"
-        driverDocVersion = driverVersion
-        copyrightYear = '2017'
-        docsBaseUri = "https://neo4j.com/docs"
-        docsCrossReferenceBaseUris = [
-                'operations-manual-base-uri' : "${docsBaseUri}/operations-manual/${neo4jDocVersion}",
-                'developer-manual-base-uri'  : "${docsBaseUri}/developer-manual/${neo4jDocVersion}",
-                'java-reference-base-uri'    : "${docsBaseUri}/java-reference/${neo4jDocVersion}",
-                'rest-docs-base-uri'         : "${docsBaseUri}/rest-docs/${neo4jDocVersion}",
-                'ogm-manual-base-uri'        : "${docsBaseUri}/ogm-manual/${ogmDocVersion}"
-        ]
-        commonAsciidoctorAttributes = [
-                'copyright-year'                   : copyrightYear,
-                'copyright'                        : "${copyrightYear} Neo Technology",
-                'common-license-page-uri'          : "${docsBaseUri}/license",
-                'neo4j-version'                    : neo4jDocVersion,
-                'neo4j-version-exact'              : neo4jVersion,
-                'neo4j-git-version'                : neo4jDocVersion,
-                'doctype'                          : 'book',
-                'icons'                            : 'font',
-                'imagesdir'                        : './images',
-                'attribute-missing'                : 'warn',
-                'neo4j-server-docs-dir'            : "${neo4jManualContentsDir}/docs/neo4j-server-docs-docs-jar",
-                'neo4j-enterprise-server-docs-dir' : "${neo4jManualContentsDir}/docs/neo4j-server-enterprise-docs-docs-jar",
-        ] + docsCrossReferenceBaseUris
-        htmlAsciidoctorAttributes = [
-                'toc'        : 'left',
-                'stylesdir'  : 'css',
-                'stylesheet' : 'style.css',
-                'sectanchors': '',
-                'docinfo1'   : '',
-                'linkcss'    : ''
-        ]
-        docbookAsciidoctorAttributes = [:]
-        pdfAsciidoctorAttributes = [
-                'source-highlighter': 'rouge',
-                'pdf-style'         : 'neo',
-                'pdf-fontsdir'      : "$rootProject.buildDir/fonts".toString(),
-                'doctype'           : 'book',
-                'toc'               : '',
-                'showlinks'         : '',
-                'nonhtmloutput'     : '',
-        ]
-        fonts = [
-                'Open Sans.zip'  : 'https://www.google.com/fonts/download?kit=3hvsV99qyKCBS55e5pvb3ltkqrIMaAZWyLYEoB48lSQ',
-                'Inconsolata.zip': 'https://www.google.com/fonts/download?kit=CNj0Ze1H6w4FVgc32wmZS4fD-WQWLbF4rYwcBGowFYY',
-                'Lora.zip'       : 'https://www.google.com/fonts/download?kit=iwrHM7FQEcKgsUvDuXxrPg',
-        ]
+    // Driver version can be overridden: `-PdriverVersion=`
+    if (!project.hasProperty('driverVersion')) {
+        ext.driverVersion = getDriverVersionMap().serverSeries[neo4jSeries].recommendedDriverSeries
     }
-}
 
-ext {
+    // Driver API doc versions can be overridden: `-PdotnetDriverApiDocVersion=`
+    // Default to `driverVersion`
+    ["dotnetDriverApiDocVersion", "javaDriverApiDocVersion", "javascriptDriverApiDocVersion", "pythonDriverApiDocVersion"].each {
+        if (!project.hasProperty(it)) { ext."$it" = driverVersion }
+    }
+
     driverLanguages = [
             'dotnet': [
                     'name'   : 'C#',
-                    'version': '1.2.0',
-                    'gitref' : '1.2.0',
+                    'version': getDriverVersionMap().driverLanguages.dotnet.driverSeries[driverVersion],
+                    'gitref' : getDriverVersionMap().driverLanguages.dotnet.driverSeries[driverVersion],
                     'url'    : 'https://www.nuget.org/packages/Neo4j.Driver'
             ],
             'java': [
                     'name'   : 'Java',
-                    'version': '1.2.0',
-                    'gitref' : '1.2.0',
+                    'version': getDriverVersionMap().driverLanguages.java.driverSeries[driverVersion],
+                    'gitref' : getDriverVersionMap().driverLanguages.java.driverSeries[driverVersion],
                     'url'    : 'http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.neo4j.driver%22%20AND%20a%3A%22neo4j-java-driver%22'
             ],
             'javascript': [
                     'name'   : 'JavaScript',
-                    'version': '1.1.0',
-                    'gitref' : '1.1.0',
+                    'version': getDriverVersionMap().driverLanguages.javascript.driverSeries[driverVersion],
+                    'gitref' : getDriverVersionMap().driverLanguages.javascript.driverSeries[driverVersion],
                     'url'    : 'https://www.npmjs.com/package/neo4j-driver'
             ],
             'python'    : [
                     'name'   : 'Python',
-                    'version': '1.1.0',
-                    'gitref' : '1.1.0',
+                    'version': getDriverVersionMap().driverLanguages.python.driverSeries[driverVersion],
+                    'gitref' : getDriverVersionMap().driverLanguages.python.driverSeries[driverVersion],
                     'url'    : 'https://pypi.python.org/pypi/neo4j-driver'
             ]
     ]
+    driverLanguages.each { lang, info ->
+        println "$lang driver version: $info.version"
+    }
+    driverDocVersion = driverVersion
+
+}
+
+defaultTasks 'asciidoctorHtml', 'asciidoctorPdf'
+
+ext {
     resourcesDir = "${projectDir}/src/main/resources"
     adoc = null
 
@@ -205,10 +205,13 @@ ext {
 }
 
 project.ext.driverLanguages.each { lang, info ->
+    project.ext.asciidoctorAttributes.common["$lang-driver-version"] = info['version']
+    project.ext.asciidoctorAttributes.common["$lang-root"] = targetGitdir(lang, info['gitref'])
+    project.ext.asciidoctorAttributes.html["include-with-$lang"] = ''
+    project.ext.asciidoctorAttributes.docbook["include-with-$lang"] = ''
+
     task ("${lang}DriverApiDocs", type: Tar) {
         description "Package API docs for the ${lang} driver."
-        println "Packaging API docs for the ${lang} driver from a manually build, local, static copy."
-        println "This should be fixed to use proper dependencies ASAP."
         baseName "${lang}-driver"
         version driverVersion
         extension "tar.gz"
@@ -236,169 +239,201 @@ project.ext.driverLanguages.each { lang, info ->
     }
 }
 
+def targetGitdir(lang, gitref) {
+    if (project.hasProperty('localDriverSources')) {
+        file("$projectDir/../neo4j-$lang-driver")
+    } else {
+        file("${rootProject.buildDir}/driver-sources/${lang}-driver/${gitref}")
+    }
+}
+
 def deps = driverLanguages.collect {"${it.getKey()}DriverApiDocs"}
 task driverApiDocsPackage(dependsOn: deps) {
     description 'Package the driver API docs.'
 }
 
-def getAsciidoctor(sourceDir, imagesDir, doConsole, filterTabbedExamples) {
+def driverSourcesTasks = driverLanguages.collect {"${it.getKey()}DriverSources"}
+task prepareDriverSources(dependsOn: driverSourcesTasks){
+    description "Prepare driver sources."
+}
 
-    AsciidoctorExtensions.extensions {
-
-        if (sourceDir && imagesDir) {
-            block(name: 'dot', contexts: [':listing']) {
-                parent, reader, attributes ->
-                    def indata = reader.readLines().join("\n");
-                    def svgfile = attributes[2]
-                    def svgfilepath = "${sourceDir}/${imagesDir}/${svgfile}"
-                    def cmd = ["$projectDir/src/main/extensions/filters/dot/dot.sh", indata, "dummy", svgfilepath]
-                    if (attributes[3] != null) {
-                        cmd.add(attributes[3])
-                    }
-                    if (attributes[4] != null) {
-                        cmd.add(attributes[4])
-                    }
-                    runCommand(cmd)
-                    attributes['target'] = svgfile
-                    attributes['alt'] = 'alt'
-                    createBlock(parent, 'image', [], attributes, [:])
-            }
-        }
-
-        block(name: 'queryresult', contexts: [':listing']) {
-            parent, reader, attributes ->
-                createBlock(parent, 'listing', reader.readLines(), attributes + ['role': 'queryresult'], [:])
-        }
-
-        block(name: 'console', contexts: [':listing']) {
-            parent, reader, attributes ->
-                if (doConsole) {
-                    def content = reader.readLines()
-                    def db = []
-                    def query = []
-                    def foundEmptyLine = false
-                    content.each {
-                        if (foundEmptyLine) {
-                            query.add(it)
-                        } else {
-                            if (it.trim()) {
-                                db.add(it)
-                            } else {
-                                foundEmptyLine = true
-                            }
-                        }
-                    }
-                    if (!db) {
-                        db.add("none")
-                    }
-                    if (!query) {
-                        throw new IllegalArgumentException("A query has to be defined.")
-                    }
-                    def body = []
-                    body.add('<p class="cypherconsole">')
-                    body.add('<span class="database">')
-                    body.add(db)
-                    body.add('</span><span class="command"><strong>')
-                    body.add(query.join(' '))
-                    body.add('</strong></span></p>')
-                    createBlock(parent, 'pass', body, attributes, [:])
-                } else {
-                    null
-                }
-        }
-
-        block(name: 'snippet', contexts: [':listing']) {
-            parent, reader, attributes ->
-                def lang = attributes[2]
-                def lines = reader.readLines()
-                def config = [
-                    'classifier': 'test-sources',
-                ]
-                lines.each {
-                    def l = it.trim()
-                    if (!l.isEmpty()) {
-                        def (key, value) = it.split('=', 2)
-                        config[key] = value
-                    }
-                }
-                if (!config.containsKey("tag")) {throw new IllegalArgumentException("'tag' must be specified")}
-                if (!config.containsKey("source")) {throw new IllegalArgumentException("'source' must be specified")}
-                if (!config.containsKey("component")) {throw new IllegalArgumentException("'component' must be specified")}
-                if (!config.containsKey("classifier")) {throw new IllegalArgumentException("'classifier' must be specified")}
-                def tablength = "    "
-                if (config.containsKey("tablength")) {
-                    tablength = " " * config["tablength"].toInteger()
-                }
-                def START = "START SNIPPET: ${config['tag']}"
-                def END = "END SNIPPET: ${config['tag']}"
-                def path = "${neo4jManualContentsDir}/${config['classifier']}/${config['component']}-${config['classifier']}-jar/${config['source']}"
-                def emit = false
-                def mindent = Integer.MAX_VALUE
-                def buf = []
-                def f = new File(path)
-                if (f.exists()) {
-                    f.eachLine { line ->
-                        if (-1 < line.indexOf(END)) {
-                            emit = false
-                        }
-                        if (emit) {
-                            def meat = line.replaceAll(/^\s+/, '')
-                            if (!meat.isEmpty()) {
-                                def indent = line.substring(0, (line.length() - meat.length())).replaceAll(/\t/, tablength)
-                                mindent = Math.min(mindent, indent.length())
-                                buf.add(indent + meat)
-                            } else {
-                                buf.add('')
-                            }
-                        }
-                        if (-1 < line.indexOf(START)) {
-                            emit = true
-                        }
-                    }
-                }
-                def snippet = []
-                if (buf.isEmpty()) {
-                    println('  [xxx] Missing snippet for tag "' + config['tag']
-                        + '" in file "' + config['source']
-                        + '" in component "' + config['component']
-                        +'" with classifier "' + config['classifier'] + '".'
-                        + "\n" + "Path=" + path
-                        )
-                    throw new IllegalArgumentException('Missing snippet for tag "' + config['tag']
-                        + '" in file "' + config['source'] 
-                        + '" in component "' + config['component'] 
-                        +'" with classifier "' + config['classifier'] + '".'
-                    )
-
-                } else {
-                    buf.each {
-                        if (it.length() < mindent) {
-                            snippet.add(it)
-                        } else {
-                            snippet.add(it.substring(mindent))
-                        }
-                    }
-                }
-                def newAttributes = ['style': 'source', 'language': lang]
-                if (attributes.containsKey('title')) {
-                    newAttributes['title'] = attributes['title']
-                }
-                createBlock(parent, 'listing', snippet, newAttributes, [:])
-        }
-
-    }
+def getAsciidoctor(withTabbedExampleProcessor) {
     project.ext.adoc = Asciidoctor.Factory.create()
-    if (filterTabbedExamples) {
+    if (withTabbedExampleProcessor) {
         adoc.rubyExtensionRegistry()
             .loadClass(new FileInputStream(file("${rootProject.projectDir}/src/main/extensions/tabbed_example_processor.rb")))
             .treeprocessor("TabbedExampleProcessor")
     }
-
     project.ext.adoc
 }
-asciidoctorPdf.onlyIf { !project.hasProperty('noPdf') }
 
-task('dist', dependsOn: ['asciidoctorHtml', 'asciidoctorPdf']) {
+task docbook(dependsOn: prepareDriverSources) {
+    description 'Build DocBook.'
+    ext.sourceDir = asciidocSourceDir
+    ext.sourceFile = file("$sourceDir/index.adoc")
+    ext.outputDir = "$buildDir/docbook/${versions.driverDocs}"
+    inputs.dir sourceDir
+    outputs.dir outputDir
+    def templateDir = "${rootProject.projectDir}/common/templates/docbook"
+    def driverDocsSourceDir = "${projectDir}/src/main/asciidoc"
+    doLast {
+        def attrs = asciidoctorAttributes.common + asciidoctorAttributes.docbook + [
+                    'driver-docs-source-dir' : driverDocsSourceDir,
+                    'driver-manual-version'  : versions.driverDocs,
+                    'driver-manual-title'    : "Drivers",
+                    'project-root'           : "${rootProject.projectDir}",
+        ]
+        def opts = org.asciidoctor.OptionsBuilder.options()
+                .backend('docbook5')
+                .safe(org.asciidoctor.SafeMode.UNSAFE)
+                .toDir(file(outputDir))
+                .templateDir(new File(templateDir))
+                .mkDirs(true)
+                .attributes(attrs)
+        getAsciidoctor(true).convertFile(sourceFile, opts.get())
+    }
+    doLast {
+        copy {
+            from(projectDir) {
+                include 'images/**'
+            }
+            into outputDir
+        }
+    }
+    finalizedBy 'preprocess'
+}
+
+preprocess {
+    dependsOn docbook
+    def sourceFile = "${buildDir}/docbook/${versions.driverDocs}/index.xml"
+    input sourceFile
+    outFile sourceFile
+    parameters([
+        "book-id": "$docId"
+    ])
+    doFirst {
+        def cmd = ["${projectDir}/bin/post-process.sh", sourceFile, "${projectDir}/bin/post-process.sed"]
+        runCommand(cmd)
+    }
+}
+
+task makeToc(type: XsltTask, dependsOn: docbook) {
+    description 'Create a table of contents aka complete content map.'
+    ext.sourceDir = docbook.outputDir
+    ext.sourceFile = "$sourceDir/index.xml"
+    ext.outputFile = "$buildDir/docbook/${versions.driverDocs}/toc.xml"
+    def outputDir = "$buildDir/docbook/${versions.driverDocs}/_trash"
+
+    def url = DocBookPlugin.getClassLoader().getResource("xsl/create-toc/xhtml/maketoc.xsl")
+    stylesheet url
+    input sourceFile
+    outFile outputFile
+
+    sourceSaxParser "org.apache.xml.resolver.tools.ResolvingXMLReader"
+    stylesheetSaxParser "org.apache.xml.resolver.tools.ResolvingXMLReader"
+    uriResolver "org.apache.xml.resolver.tools.CatalogResolver"
+
+    usingUrls true
+    usingClasspathUrls true
+    if (hasProperty('traceDocbook')) { verbose true }
+
+    parameters([
+        "base.dir": "${outputDir}",
+        "chunk.section.depth": "8",
+        "chunk.first.sections": "1",
+        "use.id.as.dirname": "1",
+    ])
+}
+
+html {
+    dependsOn docbook
+    ext.sourceDir = docbook.outputDir
+    ext.sourceFile = "$sourceDir/index.xml"
+    ext.outputDir = "$buildDir/html/${versions.driverDocs}"
+    ext.contentMap = "$projectDir/src/main/docbook/content-map.xml"
+    inputs.file sourceFile
+    inputs.dir 'css'
+    inputs.dir 'images'
+    inputs.dir 'javascript'
+    outputs.dir outputDir
+
+    def libraryLinks = [
+        "Operations_Manual=${crossReferenceBase['operations-manual']}",
+        "Cypher_Manual=${crossReferenceBase['cypher-manual']}/",
+        "OGM_Manual=${crossReferenceBase['ogm-manual']}/",
+        "Java_Reference=${crossReferenceBase['java-reference']}/",
+        "REST_Docs=${crossReferenceBase['rest-docs']}/",
+    ].join(" ")
+    def scripts = [
+        '//ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js',
+        '//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js',
+        '//cdnjs.cloudflare.com/ajax/libs/codemirror/5.11.0/codemirror.min.js',
+        '//cdnjs.cloudflare.com/ajax/libs/codemirror/5.11.0/addon/runmode/runmode.min.js',
+        '//cdnjs.cloudflare.com/ajax/libs/codemirror/5.11.0/mode/cypher/cypher.min.js',
+        'javascript/colorize.js',
+        'javascript/tabs-for-chunked.js',
+        'javascript/mp-nav.js',
+        'javascript/versionswitcher.js',
+        'javascript/version.js',
+        '//s3-eu-west-1.amazonaws.com/alpha.neohq.net/docs/new-manual/assets/search.js',
+    ].join(" ")
+    def styles = [
+        '//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css',
+        '//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.1.0/css/font-awesome.min.css',
+        '//fonts.googleapis.com/css?family=Open+Sans:400,300,400italic,600,300italic',
+        '//cdnjs.cloudflare.com/ajax/libs/codemirror/5.11.0/codemirror.min.css',
+        '//cdnjs.cloudflare.com/ajax/libs/codemirror/5.11.0/theme/neo.min.css',
+        'css/chunked-base.css',
+        'css/extra.css'
+    ].join(" ")
+
+    stylesheet "classpath:xsl/chunk-from-toc/xhtml/chunktoc.xsl"
+    input sourceFile
+
+    // Stylesheet parameters
+    parameters ([
+        "base.dir": "${outputDir}",
+        "html.ext": ".html",
+        "make.clean.html": "1",
+        "chunker.output.method": "html",
+        "chunker.output.indent": "yes",
+        "use.id.as.dirname": "1",
+        "neo.documentation.library.links": libraryLinks,
+        "generate.toc": "''",
+        "header.rule": "0",
+        "neo.newsearch": "1",
+        "html.script": scripts,
+        "html.stylesheet": styles,
+        "chunk.toc": "${contentMap}",
+        "current.docid": "$docId",
+    ])
+    doLast {
+        copy {
+            from(docbook.outputDir) {
+                include 'images/**'
+            }
+            from("$projectDir/src/main") {
+                include 'javascript/**'
+                include 'css/**'
+            }
+            into outputDir
+        }
+    }
+}
+
+task packageHtml(type: Tar, dependsOn: html) {
+    description 'Package HTML for distribution.'
+    baseName 'driver-manual'
+    extension 'tar.gz'
+    version versions.driverDocs
+    compression = Compression.GZIP
+    from { html }
+    into "$baseName/$version"
+    destinationDir file(distDir)
+}
+
+task dist(dependsOn: [packageHtml]) {
     description 'Build HTML and PDF outputs.'
 }
 
+// vim: set fdm=expr:
