@@ -70,7 +70,7 @@ ext {
     docsBaseUri = "https://neo4j.com/docs"
     crossReferenceBase = [ // We have no strategy for cross references yet; always link to current.
             'cypher-manual'     : "${docsBaseUri}/cypher-manual/current",
-            'driver-manual'     : "${docsBeseUri}/driver-manual/current",
+            'driver-manual'     : "${docsBaseUri}/driver-manual/current",
             'operations-manual' : "${docsBaseUri}/operations-manual/current",
             'java-reference'    : "${docsBaseUri}/java-reference/current",
             'rest-docs'         : "${docsBaseUri}/rest-docs/current",
@@ -105,7 +105,7 @@ ext {
             'pdf-fontsdir'      : "$rootProject.buildDir/fonts".toString(),
         ]
     ]
-    asciidocSourceDir = "$projectDir/src/main/asciidoc"
+    asciidocSourceDir = "$projectDir/asciidoc"
     distDir = "$buildDir/distributions"
     docId = 'driver-manual'
     fonts = [
@@ -173,7 +173,7 @@ ext {
 
 }
 
-defaultTasks 'asciidoctorHtml', 'asciidoctorPdf'
+// defaultTasks 'asciidoctorHtml', 'asciidoctorPdf'
 
 ext {
     resourcesDir = "${projectDir}/src/main/resources"
@@ -262,7 +262,7 @@ def getAsciidoctor(withTabbedExampleProcessor) {
     project.ext.adoc = Asciidoctor.Factory.create()
     if (withTabbedExampleProcessor) {
         adoc.rubyExtensionRegistry()
-            .loadClass(new FileInputStream(file("${rootProject.projectDir}/src/main/extensions/tabbed_example_processor.rb")))
+            .loadClass(new FileInputStream(file("${rootProject.projectDir}/extensions/tabbed_example_processor.rb")))
             .treeprocessor("TabbedExampleProcessor")
     }
     project.ext.adoc
@@ -275,13 +275,10 @@ task docbook(dependsOn: prepareDriverSources) {
     ext.outputDir = "$buildDir/docbook/${versions.driverDocs}"
     inputs.dir sourceDir
     outputs.dir outputDir
-    def templateDir = "${rootProject.projectDir}/src/main/templates/docbook"
-    def driverDocsSourceDir = "${projectDir}/src/main/asciidoc"
+    def templateDir = "${rootProject.projectDir}/templates/docbook"
     doLast {
         def attrs = asciidoctorAttributes.common + asciidoctorAttributes.docbook + [
-                    'driver-docs-source-dir' : driverDocsSourceDir,
                     'driver-manual-version'  : versions.driverDocs,
-                    'driver-manual-title'    : "Drivers",
                     'project-root'           : "${rootProject.projectDir}",
         ]
         def opts = org.asciidoctor.OptionsBuilder.options()
@@ -295,7 +292,7 @@ task docbook(dependsOn: prepareDriverSources) {
     }
     doLast {
         copy {
-            from(projectDir) {
+            from("$projectDir/asciidoc") {
                 include 'images/**'
             }
             into outputDir
@@ -306,7 +303,7 @@ task docbook(dependsOn: prepareDriverSources) {
 
 preprocess {
     dependsOn docbook
-    def sourceFile = "${buildDir}/docbook/${versions.driverDocs}/index.xml"
+    def sourceFile = "${docbook.outputDir}/index.xml"
     input sourceFile
     outFile sourceFile
     parameters([
@@ -351,7 +348,7 @@ html {
     ext.sourceDir = docbook.outputDir
     ext.sourceFile = "$sourceDir/index.xml"
     ext.outputDir = "$buildDir/html/${versions.driverDocs}"
-    ext.contentMap = "$projectDir/src/main/docbook/content-map.xml"
+    ext.contentMap = "$projectDir/docbook/content-map.xml"
     inputs.file sourceFile
     inputs.dir 'css'
     inputs.dir 'images'
@@ -414,7 +411,7 @@ html {
             from(docbook.outputDir) {
                 include 'images/**'
             }
-            from("$projectDir/src/main") {
+            from(projectDir) {
                 include 'javascript/**'
                 include 'css/**'
             }
