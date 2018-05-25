@@ -2,7 +2,6 @@ import org.ajoberstar.grgit.*
 import org.asciidoctor.groovydsl.AsciidoctorExtensions
 import org.asciidoctor.Asciidoctor
 import org.asciidoctor.OptionsBuilder
-import org.asciidoctor.SafeMode
 import org.neo4j.doc.build.xslt.XsltTask
 import org.neo4j.doc.build.docbook.DocBookPlugin
 
@@ -59,60 +58,6 @@ ext {
     ogmDocVersion = ogmVersion.tokenize('.')[0..1].join(".")
     if (ogmVersion.contains("-")) {ogmDocVersion += "-pre"}
 
-    versions = [
-        'driverDocs' : version,
-        'neo4jDocs' : neo4jDocVersion,
-        'ogmDocs' : ogmDocVersion,
-    ]
-
-
-    copyrightYear = '2018'
-    docsBaseUri = "https://neo4j.com/docs"
-    crossReferenceBase = [ // We have no strategy for cross references yet; always link to current.
-            'cypher-manual'     : "${docsBaseUri}/cypher-manual/current",
-            'driver-manual'     : "${docsBaseUri}/driver-manual/current",
-            'operations-manual' : "${docsBaseUri}/operations-manual/current",
-            'java-reference'    : "${docsBaseUri}/java-reference/current",
-            'rest-docs'         : "${docsBaseUri}/rest-docs/current",
-            'ogm-manual'        : "${docsBaseUri}/ogm-manual/current",
-            'kerberos-add-on'   : "${docsBaseUri}/add-on/kerberos/current"
-    ]
-    asciidoctorAttributes = [
-        'common': [
-            'copyright-year'                   : copyrightYear,
-            'copyright'                        : "${copyrightYear} Neo Technology",
-            'common-license-page-uri'          : "${docsBaseUri}/license",
-            'driver-version'     : driverVersion,
-            'doctype'            : 'book',
-            'icons'              : 'font',
-            'attribute-missing'  : 'warn',
-            'docs-version'       : versions.driverDocs,
-            'common-license-page-uri': "$docsBaseUri/license/",
-        ],
-        'docbook': [
-            'imagesdir'          : 'images',
-        ],
-        'html': [
-            'stylesdir'          : 'css',
-            'linkcss'            : '',
-            'imagesdir'          : 'images',
-        ],
-        'pdf': [
-            'source-highlighter': 'rouge',
-            'toc'               : '',
-            'showlinks'         : '',
-            'nonhtmloutput'     : '',
-            'pdf-fontsdir'      : "$rootProject.buildDir/fonts".toString(),
-        ]
-    ]
-    asciidocSourceDir = "$projectDir/asciidoc"
-    distDir = "$buildDir/distributions"
-    docId = 'driver-manual'
-    fonts = [
-            'Open Sans.zip'  : 'https://www.google.com/fonts/download?kit=3hvsV99qyKCBS55e5pvb3ltkqrIMaAZWyLYEoB48lSQ',
-            'Inconsolata.zip': 'https://www.google.com/fonts/download?kit=CNj0Ze1H6w4FVgc32wmZS4fD-WQWLbF4rYwcBGowFYY',
-            'Lora.zip'       : 'https://www.google.com/fonts/download?kit=iwrHM7FQEcKgsUvDuXxrPg',
-    ]
     driverVersionMapUrl = 'https://s3-eu-west-1.amazonaws.com/drivers.neo4j.com/version-tracker/version.json'
     getDriverVersionMap = {
         if (!project.hasProperty('driverVersionMap')) {
@@ -171,12 +116,72 @@ ext {
     }
     driverDocVersion = driverVersion
 
+    versions = [
+        'driverDocs'    : version,
+        'neo4jDocs'     : neo4jDocVersion,
+        'ogmDocs'       : ogmDocVersion,
+        'kerberosAddOn' : '1.0',
+    ]
+
+
+    copyrightYear = '2018'
+    docsBaseUri = "https://neo4j.com/docs"
+    crossReferenceBase = [ // We have no strategy for cross references yet; always link to current.
+            'cypher-manual'     : "${docsBaseUri}/cypher-manual/current",
+            'driver-manual'     : "${docsBaseUri}/driver-manual/current",
+            'operations-manual' : "${docsBaseUri}/operations-manual/current",
+            'java-reference'    : "${docsBaseUri}/java-reference/current",
+            'rest-docs'         : "${docsBaseUri}/rest-docs/current",
+            'ogm-manual'        : "${docsBaseUri}/ogm-manual/current",
+            'kerberos-add-on'   : "${docsBaseUri}/add-on/kerberos/current"
+    ]
+    asciidoctorAttributes = [
+        'common': [
+            'copyright-year'                   : copyrightYear,
+            'copyright'                        : "${copyrightYear} Neo Technology",
+            'common-license-page-uri'          : "${docsBaseUri}/license",
+            'driver-version'                   : driverVersion,
+            'doctype'                          : 'book',
+            'icons'                            : 'font',
+            'attribute-missing'                : 'warn',
+            'docs-version'                     : versions.driverDocs,
+            'common-license-page-uri'          : "$docsBaseUri/license/",
+            'dotnet-driver-apidoc-version'     : dotnetDriverApiDocVersion,
+            'java-driver-apidoc-version'       : javaDriverApiDocVersion,
+            'javascript-driver-apidoc-version' : javascriptDriverApiDocVersion,
+            'python-driver-apidoc-version'     : pythonDriverApiDocVersion,
+            'kerberos-add-on-base-uri'          : crossReferenceBase['kerberos-add-on'],
+        ],
+        'docbook': [
+            'imagesdir'          : 'images',
+        ],
+        'html': [
+            'stylesdir'          : 'css',
+            'linkcss'            : '',
+            'imagesdir'          : 'images',
+        ],
+        'pdf': [
+            'source-highlighter': 'rouge',
+            'toc'               : '',
+            'showlinks'         : '',
+            'nonhtmloutput'     : '',
+            // 'pdf-fontsdir'      : "$rootProject.buildDir/fonts".toString(),
+        ]
+    ]
+    asciidocSourceDir = "$projectDir/asciidoc"
+    distDir = "$buildDir/distributions"
+    docId = 'driver-manual'
+    fonts = [
+            'Open Sans.zip'  : 'https://www.google.com/fonts/download?kit=3hvsV99qyKCBS55e5pvb3ltkqrIMaAZWyLYEoB48lSQ',
+            'Inconsolata.zip': 'https://www.google.com/fonts/download?kit=CNj0Ze1H6w4FVgc32wmZS4fD-WQWLbF4rYwcBGowFYY',
+            'Lora.zip'       : 'https://www.google.com/fonts/download?kit=iwrHM7FQEcKgsUvDuXxrPg',
+    ]
+
 }
 
 // defaultTasks 'asciidoctorHtml', 'asciidoctorPdf'
 
 ext {
-    resourcesDir = "${projectDir}/src/main/resources"
     adoc = null
 
     // a wrapper closure around executing a string
@@ -420,6 +425,7 @@ html {
     }
 }
 
+
 task packageHtml(type: Tar, dependsOn: html) {
     description 'Package HTML for distribution.'
     baseName 'driver-manual'
@@ -431,8 +437,47 @@ task packageHtml(type: Tar, dependsOn: html) {
     destinationDir file(distDir)
 }
 
-task dist(dependsOn: [packageHtml]) {
-    description 'Build HTML and PDF outputs.'
+task pdf(dependsOn: prepareDriverSources) {
+    description 'Build PDF.'
+    ext.sourceDir = asciidocSourceDir
+    ext.sourceFile = file("$sourceDir/index.adoc")
+    ext.outputDir = "$buildDir/pdf/"
+    ext.outputFilename = "neo4j-driver-manual-${versions.driverDocs}.pdf"
+    ext.imagesDir = "images"
+    inputs.dir sourceDir
+    // outputs.dir outputDir
+    doLast {
+        project.ext.driverLanguages.each { lang, info ->
+            println "[+] Driver Manual PDF for ${lang}"
+            def attrs = asciidoctorAttributes.common + asciidoctorAttributes.pdf + [
+                    ('include-with-' + lang) : true,
+                    'driver-manual-version'  : versions.driverDocs,
+                    'project-root'           : "${rootProject.projectDir}",
+                    'imagesdir'              : imagesDir.toString(),
+            ]
+            def opts = org.asciidoctor.OptionsBuilder.options()
+                    .backend('pdf')
+                    .safe(org.asciidoctor.SafeMode.UNSAFE)
+                    .toFile(file("$outputDir/neo4j-driver-manual-${versions.driverDocs}-${lang}.pdf"))
+                    .mkDirs(true)
+                    .attributes(attrs)
+            getAsciidoctor(true).convertFile(sourceFile, opts.get())
+        }
+    }
+}
+
+task packagePdf(type: Copy, dependsOn: pdf) {
+    from (pdf.outputDir) {
+        include '*.pdf'
+    }
+    into "$distDir/pdf"
+}
+
+task dist(dependsOn: [packageHtml, pdf]) {
+    description 'Build and package HTML and PDF outputs.'
+    doLast {
+
+    }
 }
 
 // vim: set fdm=expr:
