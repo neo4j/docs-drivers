@@ -68,8 +68,9 @@ ext {
 
     copyrightYear = '2018'
     docsBaseUri = "https://neo4j.com/docs"
-    crossReferenceBase = [ // We have no strategy for cross references; always link to current.
+    crossReferenceBase = [ // We have no strategy for cross references yet; always link to current.
             'cypher-manual'     : "${docsBaseUri}/cypher-manual/current",
+            'driver-manual'     : "${docsBeseUri}/driver-manual/current",
             'operations-manual' : "${docsBaseUri}/operations-manual/current",
             'java-reference'    : "${docsBaseUri}/java-reference/current",
             'rest-docs'         : "${docsBaseUri}/rest-docs/current",
@@ -274,7 +275,7 @@ task docbook(dependsOn: prepareDriverSources) {
     ext.outputDir = "$buildDir/docbook/${versions.driverDocs}"
     inputs.dir sourceDir
     outputs.dir outputDir
-    def templateDir = "${rootProject.projectDir}/common/templates/docbook"
+    def templateDir = "${rootProject.projectDir}/src/main/templates/docbook"
     def driverDocsSourceDir = "${projectDir}/src/main/asciidoc"
     doLast {
         def attrs = asciidoctorAttributes.common + asciidoctorAttributes.docbook + [
@@ -358,11 +359,12 @@ html {
     outputs.dir outputDir
 
     def libraryLinks = [
-        "Operations_Manual=${crossReferenceBase['operations-manual']}",
+        "Operations_Manual=${crossReferenceBase['operations-manual']}/",
         "Cypher_Manual=${crossReferenceBase['cypher-manual']}/",
+        "Driver_Manual=${crossReferenceBase['driver-manual']}/",
         "OGM_Manual=${crossReferenceBase['ogm-manual']}/",
+        "Graph_Algorithms=${crossReferenceBase['graph-algorithms']}/",
         "Java_Reference=${crossReferenceBase['java-reference']}/",
-        "REST_Docs=${crossReferenceBase['rest-docs']}/",
     ].join(" ")
     def scripts = [
         '//ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js',
