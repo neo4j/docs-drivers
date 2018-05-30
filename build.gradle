@@ -74,10 +74,17 @@ ext {
         }
     }
 
+    getVersionFromSeries = { series, language ->
+        version = getDriverVersionMap().driverLanguages[language].driverSeries[series]
+        if (null == version) { version = series }
+        version
+    }
+
     // Driver version can be overridden: `-PdriverVersion=`
     if (!project.hasProperty('driverVersion')) {
         ext.driverVersion = getDriverVersionMap().serverSeries[neo4jSeries].recommendedDriverSeries
     }
+    driverSeries = driverVersion.tokenize('.-')[0..1].join('.')
 
     // Driver API doc versions can be overridden: `-PdotnetDriverApiDocVersion=`
     // Default to `driverVersion`
@@ -88,26 +95,26 @@ ext {
     driverLanguages = [
             'dotnet': [
                     'name'   : 'C#',
-                    'version': getDriverVersionMap().driverLanguages.dotnet.driverSeries[driverVersion],
-                    'gitref' : getDriverVersionMap().driverLanguages.dotnet.driverSeries[driverVersion],
+                    'version': getVersionFromSeries(driverSeries, 'dotnet'),
+                    'gitref' : getVersionFromSeries(driverSeries, 'dotnet'),
                     'url'    : 'https://www.nuget.org/packages/Neo4j.Driver'
             ],
             'java': [
                     'name'   : 'Java',
-                    'version': getDriverVersionMap().driverLanguages.java.driverSeries[driverVersion],
-                    'gitref' : getDriverVersionMap().driverLanguages.java.driverSeries[driverVersion],
+                    'version': getVersionFromSeries(driverSeries, 'java'),
+                    'gitref' : getVersionFromSeries(driverSeries, 'java'),
                     'url'    : 'http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.neo4j.driver%22%20AND%20a%3A%22neo4j-java-driver%22'
             ],
             'javascript': [
                     'name'   : 'JavaScript',
-                    'version': getDriverVersionMap().driverLanguages.javascript.driverSeries[driverVersion],
-                    'gitref' : getDriverVersionMap().driverLanguages.javascript.driverSeries[driverVersion],
+                    'version': getVersionFromSeries(driverSeries, 'javascript'),
+                    'gitref' : getVersionFromSeries(driverSeries, 'javascript'),
                     'url'    : 'https://www.npmjs.com/package/neo4j-driver'
             ],
             'python'    : [
                     'name'   : 'Python',
-                    'version': getDriverVersionMap().driverLanguages.python.driverSeries[driverVersion],
-                    'gitref' : getDriverVersionMap().driverLanguages.python.driverSeries[driverVersion],
+                    'version': getVersionFromSeries(driverSeries, 'python'),
+                    'gitref' : getVersionFromSeries(driverSeries, 'python'),
                     'url'    : 'https://pypi.python.org/pypi/neo4j-driver'
             ]
     ]
@@ -117,7 +124,7 @@ ext {
     driverDocVersion = driverVersion
 
     versions = [
-        'driverDocs'    : version,
+        'driverDocs'    : driverVersion,
         'neo4jDocs'     : neo4jDocVersion,
         'ogmDocs'       : ogmDocVersion,
         'kerberosAddOn' : '1.0',
