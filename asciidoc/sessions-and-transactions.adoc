@@ -310,6 +310,11 @@ Routing Cypher by identifying reads and writes can improve the utilization of av
 as read servers are typically more plentiful than write servers, it is beneficial to direct as much as possible of read transactions to read servers.
 Doing so helps keeping write servers available for write transactions.
 
+Access modes can be supplied in two ways: per transaction or per session.
+An access mode specified at session level can be overridden by the access mode of a transaction within that session.
+In the general case, access mode should always be specified at transaction level, using transaction functions.
+The session-level setting is only necessary for explicit and auto-commit transactions.
+
 Note that the driver does not parse Cypher and cannot determine whether a transaction is intended to carry out read or write operations.
 As a result of this, a `write` transaction tagged for `read` will be sent to a read server, but will fail on execution.
 
