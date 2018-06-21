@@ -87,6 +87,7 @@ This kind of driver is used to maintain connections to a single database server 
 Note that a Routing driver is preferable when working with a causal cluster.
 
 
+[[routing_drivers_bolt_routing]]
 === Routing drivers (bolt+routing)
 
 A Routing driver is created via a `bolt+routing` URI, for example: `bolt+routing://graph.example.com:7687`.
