@@ -87,6 +87,7 @@ This kind of driver is used to maintain connections to a single database server 
 Note that a Routing driver is preferable when working with a causal cluster.
 
 
+[[routing_drivers_bolt_routing]]
 === Routing drivers (bolt+routing)
 
 A Routing driver is created via a `bolt+routing` URI, for example: `bolt+routing://graph.example.com:7687`.
@@ -118,7 +119,7 @@ This URI will use the server policy `europe`:
 [NOTE]
 .Server-side configuration to enable Routing drivers with routing context
 ====
-A prerequisite for using a Routing driver with routing context is that the Neo4j database is operated on a <<operations-manual#causal-clustering, Causal Cluster>> with the <<operations-manual#multi-dc-intro, Multi-data center licensing option>> enabled.
+A prerequisite for using a Routing driver with routing context is that the Neo4j database is operated on a <<operations-manual#clustering, Causal Cluster>> with the <<operations-manual#multi-dc, Multi-data center licensing option>> enabled.
 Additionally, the routing contexts must be defined within the cluster as routing _policies_.
 For details on how to configure multi-data center routing policies for a Causal Cluster, please refer to <<operations-manual#multi-dc-load-balancing, Operations Manual -> Causal Clustering>>.
 ====
