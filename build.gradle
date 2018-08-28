@@ -145,7 +145,7 @@ ext {
     asciidoctorAttributes = [
         'common': [
             'copyright-year'                   : copyrightYear,
-            'copyright'                        : "${copyrightYear} Neo Technology",
+            'copyright'                        : "${copyrightYear} Neo4j, Inc.",
             'common-license-page-uri'          : "${docsBaseUri}/license",
             'driver-version'                   : driverVersion,
             'doctype'                          : 'book',
