@@ -1,5 +1,5 @@
 [[drivers]]
-= Drivers
+= The Neo4j Drivers Manual v{driver-version}
 :project-version:
 :manual-title: Neo4j Driver Manual {project-version}
 :source-indent: 0
@@ -15,28 +15,32 @@ ifndef::python-root[:python-root: {project-root}/build/driver-sources/python-dri
 :java-examples: {java-root}/examples/src/main/java/org/neo4j/docs/driver
 :javascript-examples: {javascript-root}/test/v1
 :python-examples: {python-root}/test/examples
-
 :api-docs-base-uri: https://neo4j.com/docs/api
 
+Copyright (C) {copyright}
+
+ifndef::backend-pdf[]
+License: link:{common-license-page-uri}[Creative Commons 4.0]
+endif::[]
+ifdef::backend-pdf[]
+License: <<license, Creative Commons 4.0>>
+endif::[]
 
 [abstract]
 --
-This chapter contains the complete documentation of the official Neo4j drivers.
+This is the driver manual for Neo4j official drivers version {driver-version}, authored by the Neo4j Team.
 --
 
-Driver version: {driver-version}.
+This manual covers the following areas:
 
-Neo4j drivers provide application access to a Neo4j database.
-These official drivers use the Bolt protocol.
-They have been designed to strike a balance between an idiomatic API for each language, and a uniform surface across all supported languages.
+* <<driver-get-started>> -- An overview of the official Neo4j drivers and how to connect to a Neo4j database.
+* <<driver-client-applications>> -- How to manage database connections within an application.
+* <<driver-sessions-transactions>> -- How to create units of work and provide a logical context for that work.
+* <<driver-cypher-values>> -- How the types and values used by Cypher map to native language types.
 
-The chapter describes the following:
+_Who should read this?_
 
-* <<driver-get-started, Get started>> -- An overview of the official Neo4j drivers and how to connect to a Neo4j database.
-* <<driver-client-applications, Client applications>> -- How to manage database connections within an application.
-* <<driver-sessions-transactions, Sessions and transactions>> -- How to create units of work and provide a logical context for that work.
-* <<driver-cypher-values, Working with Cypher values>> -- The types and values used by Cypher and how they map to native language types.
-
+This manual is written for the developer of a Neo4j client application.
 
 include::get-started.adoc[leveloffset=+1]
 

@@ -145,7 +145,7 @@ ext {
     asciidoctorAttributes = [
         'common': [
             'copyright-year'                   : copyrightYear,
-            'copyright'                        : "${copyrightYear} Neo Technology",
+            'copyright'                        : "${copyrightYear} Neo4j, Inc.",
             'common-license-page-uri'          : "${docsBaseUri}/license",
             'driver-version'                   : driverVersion,
             'doctype'                          : 'book',
@@ -169,6 +169,7 @@ ext {
         ],
         'pdf': [
             'source-highlighter': 'rouge',
+            'pdf-style'         : 'neo',
             'toc'               : '',
             'showlinks'         : '',
             'nonhtmloutput'     : '',
@@ -184,6 +185,33 @@ ext {
             'Lora.zip'       : 'https://www.google.com/fonts/download?kit=iwrHM7FQEcKgsUvDuXxrPg',
     ]
 
+}
+
+task('downloadFonts') {
+    description 'Download from Google Fonts.'
+    outputs.dir "$buildDir/font-downloads"
+    outputs.upToDateWhen {
+        file("$buildDir/font-downloads").exists()
+    }
+    doLast {
+        fonts.each { name, url ->
+            download {
+                src url
+                dest "$buildDir/font-downloads/${name}"
+                overwrite false
+            }
+        }
+    }
+}
+
+downloadFonts.finalizedBy 'unzipDownloadedFonts'
+
+task('unzipDownloadedFonts', dependsOn: 'downloadFonts', type: Copy) {
+    description 'Unzip zip files with fonts.'
+    fonts.each { name, url ->
+        from zipTree("$buildDir/font-downloads/${name}")
+    }
+    into "$buildDir/fonts"
 }
 
 // defaultTasks 'asciidoctorHtml', 'asciidoctorPdf'
@@ -444,7 +472,7 @@ task packageHtml(type: Tar, dependsOn: html) {
     destinationDir file(distDir)
 }
 
-task pdf(dependsOn: prepareDriverSources) {
+task pdf(dependsOn: [prepareDriverSources, unzipDownloadedFonts]) {
     description 'Build PDF.'
     ext.sourceDir = asciidocSourceDir
     ext.sourceFile = file("$sourceDir/index.adoc")
@@ -452,6 +480,8 @@ task pdf(dependsOn: prepareDriverSources) {
     ext.outputFilename = "neo4j-driver-manual-${versions.driverDocs}.pdf"
     ext.imagesDir = "images"
     inputs.dir sourceDir
+    def pdfStylesDir = "${rootProject.projectDir}/src/main/pdf-theme"
+    def pdfFontDir = "${buildDir}/fonts"
     // outputs.dir outputDir
     doLast {
         project.ext.driverLanguages.each { lang, info ->
@@ -461,6 +491,8 @@ task pdf(dependsOn: prepareDriverSources) {
                     'driver-manual-version'  : versions.driverDocs,
                     'project-root'           : "${rootProject.projectDir}",
                     'imagesdir'              : imagesDir.toString(),
+                    'pdf-stylesdir'          : pdfStylesDir.toString(),
+                    'pdf-fontsdir'           : pdfFontDir.toString(),
             ]
             def opts = org.asciidoctor.OptionsBuilder.options()
                     .backend('pdf')

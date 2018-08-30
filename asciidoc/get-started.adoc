@@ -6,11 +6,10 @@
 This section gives an overview of the official Neo4j drivers and how to connect to a Neo4j database with a "Hello World" example.
 --
 
-
 [[driver-get-started-about]]
 == About the official drivers
 
-Both official and community database drivers are available to provide access to Neo4j for applications.
+Both official and community database drivers are available to provide access to a Neo4j database for applications.
 Official drivers exist for:
 
 * C# -- works with any .NET language
