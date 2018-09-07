@@ -10,6 +10,8 @@
     </d:tocentry>
     <d:tocentry linkend="driver-cypher-values"><?dbhtml filename="cypher-values/index.html"?>
     </d:tocentry>
+    <d:tocentry linkend="driver-terminology"><?dbhtml filename="terminology/index.html"?>
+    </d:tocentry>
   </d:tocentry>
 </d:toc>
 <!-- vim: set ts=2 sw=2: -->
