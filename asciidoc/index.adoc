@@ -8,10 +8,12 @@
 // :example-caption!:
 // :table-caption!:
 ifndef::dotnet-root[:dotnet-root: {project-root}/build/driver-sources/dotnet-driver]
+ifndef::go-root[:go-root: {project-root}/build/driver-sources/go-driver]
 ifndef::java-root[:java-root: {project-root}/build/driver-sources/java-driver]
 ifndef::javascript-root[:javascript-root: {project-root}/build/driver-sources/javascript-driver]
 ifndef::python-root[:python-root: {project-root}/build/driver-sources/python-driver]
 :dotnet-examples: {dotnet-root}/Neo4j.Driver/Neo4j.Driver.IntegrationTests
+:go-examples: {go-root}/neo4j/test-integration
 :java-examples: {java-root}/examples/src/main/java/org/neo4j/docs/driver
 :javascript-examples: {javascript-root}/test/v1
 :python-examples: {python-root}/test/examples

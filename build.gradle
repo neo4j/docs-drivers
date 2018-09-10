@@ -88,7 +88,7 @@ ext {
 
     // Driver API doc versions can be overridden: `-PdotnetDriverApiDocVersion=`
     // Default to `driverVersion`
-    ["dotnetDriverApiDocVersion", "javaDriverApiDocVersion", "javascriptDriverApiDocVersion", "pythonDriverApiDocVersion"].each {
+    ["dotnetDriverApiDocVersion", "goDriverApiDocVersion", "javaDriverApiDocVersion", "javascriptDriverApiDocVersion", "pythonDriverApiDocVersion"].each {
         if (!project.hasProperty(it)) { ext."$it" = driverVersion }
     }
 
@@ -98,6 +98,12 @@ ext {
                     'version': getVersionFromSeries(driverSeries, 'dotnet'),
                     'gitref' : getVersionFromSeries(driverSeries, 'dotnet'),
                     'url'    : 'https://www.nuget.org/packages/Neo4j.Driver'
+            ],
+            'go': [
+                    'name'   : 'Go',
+                    'version': getVersionFromSeries(driverSeries, 'go'),
+                    'gitref' : getVersionFromSeries(driverSeries, 'go'),
+                    'url'    : 'https://github.com/neo4j/neo4j-go-driver'
             ],
             'java': [
                     'name'   : 'Java',
@@ -154,6 +160,7 @@ ext {
             'docs-version'                     : versions.driverDocs,
             'common-license-page-uri'          : "$docsBaseUri/license/",
             'dotnet-driver-apidoc-version'     : dotnetDriverApiDocVersion,
+            'go-driver-apidoc-version'         : goDriverApiDocVersion,
             'java-driver-apidoc-version'       : javaDriverApiDocVersion,
             'javascript-driver-apidoc-version' : javascriptDriverApiDocVersion,
             'python-driver-apidoc-version'     : pythonDriverApiDocVersion,

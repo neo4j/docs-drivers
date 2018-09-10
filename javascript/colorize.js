@@ -33,6 +33,8 @@ CodeMirror.colorize = (function() {
         mode = "text/x-java";
       } else if (mode === "csharp") {
         mode = "text/x-csharp";
+      } else if (mode === "go") {
+        mode = "text/x-go";
       } else if (mode === "sql") {
         mode = "text/x-sql";
       } else if (mode  === "properties") {

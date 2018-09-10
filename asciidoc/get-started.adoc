@@ -245,6 +245,14 @@ include::{dotnet-examples}/Examples.cs[tags=hello-world]
 ----
 ======
 
+[.include-with-go]
+======
+[source, go]
+----
+include::{go-examples}/examples_test.go[tags=hello-world]
+----
+======
+
 [.include-with-java]
 ======
 [source, java]
