@@ -2,6 +2,7 @@ function tabTheSource($content) {
     var storedLanguage = getCodeExampleLanguage();
     var LANGUAGES = {
         'dotnet': 'C#',
+        'go': 'Go',
         'java': 'Java',
         'javascript': 'JavaScript',
         'python': 'Python'
