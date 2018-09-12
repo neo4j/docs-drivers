@@ -68,7 +68,7 @@ To execute a Cypher statement, two pieces of information are required: the state
 The template is a string containing placeholders that are substituted with parameter values at runtime.
 While it is possible to run non-parameterized Cypher, good programming practice is to use parameters in Cypher statements.
 This allows for caching of statements within the Cypher engine, which is beneficial for performance.
-Parameter values should adhere to <<cypher-values>>.
+Parameter values should adhere to <<driver-cypher-values>>.
 
 The Neo4j driver API provides for three forms of transaction:
 
@@ -133,7 +133,7 @@ This means that multiple transactions cannot share network packets, thereby exhi
 Auto-commit transactions are intended to be used for simple use cases such as when learning Cypher or writing one-off scripts.
 It is not recommended to use auto-commit transactions in production environments or when performance or resilience are a primary concern.
 
-However, Auto-commit transactions are the only way to execute `<<query-using-periodic-commit-hint, USING PERIODIC COMMIT>>` Cypher statements.
+However, Auto-commit transactions are the only way to execute `<<cypher-manual#query-using-periodic-commit-hint, USING PERIODIC COMMIT>>` Cypher statements.
 
 
 [[driver-transactions-transaction-functions]]
