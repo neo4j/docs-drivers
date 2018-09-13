@@ -1,7 +1,4 @@
 import org.ajoberstar.grgit.*
-import org.asciidoctor.groovydsl.AsciidoctorExtensions
-import org.asciidoctor.Asciidoctor
-import org.asciidoctor.OptionsBuilder
 import org.neo4j.doc.build.xslt.XsltTask
 import org.neo4j.doc.build.docbook.DocBookPlugin
 
@@ -34,11 +31,15 @@ plugins {
     id 'de.undercouch.download' version '3.2.0'
     id 'org.neo4j.doc.build.vale' version '1.0-alpha01'
     id 'org.neo4j.doc.build.saxon' version '1.0-alpha01'
-    id 'org.neo4j.doc.build.docbook' version '1.0-alpha04'
+    id 'org.neo4j.doc.build.docbook' version '1.0-alpha05'
     id 'maven-publish'
 }
 
 version '1.7'
+
+repositories {
+    mavenLocal()
+}
 
 configurations {
     olinkdb {
@@ -48,7 +49,7 @@ configurations {
 
 def traceDocbook = hasProperty('traceDocbook') ? true : false
 if (!project.hasProperty("neo4jVersion")) { ext.neo4jVersion = "3.5.0-SNAPSHO" }
-if (!project.hasProperty("driverVersion")) { ext.driverVersion = "1.7" }
+if (!project.hasProperty("driverVersion")) { ext.driverVersion = "1.7-preview" }
 if (!project.hasProperty("ogmVersion")) { ext.ogmVersion = "2.1.2" }
 
 ext {
@@ -58,7 +59,7 @@ ext {
     neo4jVersionParts = neo4jVersion.split('-')
     neo4jDocVersion = neo4jVersionParts[0][0..2]
     if (1 < neo4jVersionParts.size()) {
-        neo4jDocVersion += "-alpha"
+        neo4jDocVersion += "-preview"
     }
 
     // Make it a little easier to build release and pre-release OGM docs.
@@ -201,6 +202,7 @@ ext {
 }
 
 dependencies {
+    olinkdb "org.neo4j.doc:driver-manual:$driverDocVersion:olinkdb@jar"
     olinkdb "org.neo4j.doc:http-api:$neo4jDocVersion:olinkdb@jar"
     olinkdb "org.neo4j.doc:operations-manual:$neo4jDocVersion:olinkdb@jar"
     olinkdb "org.neo4j.doc:cypher-manual:$neo4jDocVersion:olinkdb@jar"
@@ -368,7 +370,7 @@ task prepareDriverSources(dependsOn: driverSourcesTasks){
 }
 
 def getAsciidoctor(withTabbedExampleProcessor) {
-    project.ext.adoc = Asciidoctor.Factory.create()
+    project.ext.adoc = org.asciidoctor.Asciidoctor.Factory.create()
     if (withTabbedExampleProcessor) {
         adoc.rubyExtensionRegistry()
             .loadClass(new FileInputStream(file("${rootProject.projectDir}/extensions/tabbed_example_processor.rb")))
@@ -426,14 +428,14 @@ preprocess {
 
 task makeTargetDb(type: XsltTask, dependsOn: docbook) {
     description 'Create database of olink targets.'
-    ext.docVersion = neo4jDocVersion
+    ext.docVersion = driverDocVersion
     ext.docbookSourceDir = "${projectDir}/docbook"
     ext.sourceFile = "${buildDir}/docbook/${docVersion}/index.xml"
     ext.contentMap = "${docbookSourceDir}/content-map.xml"
-    ext.targetDbFilename = "${rootProject.buildDir}/docbook/${docId}/${docVersion}/target.db"
-    ext.outputDir = "${rootProject.buildDir}/docbook/${docVersion}/_trash"
-    ext.toolsDir = "${rootProject.projectDir}/docbook"
-    ext.stylesheet = "${toolsDir}/xsl-ns/chunk-from-toc/xhtml/chunktoc.xsl"
+    ext.targetDbFilename = "${buildDir}/docbook/${docId}/${docVersion}/target.db"
+    ext.outputDir = "${buildDir}/docbook/${docVersion}/_trash"
+    ext.toolsDir = "${projectDir}/docbook"
+    ext.stylesheet = "xsl/chunk-from-toc/xhtml/chunktoc.xsl"
 
     inputs.file {sourceFile}
     inputs.file {contentMap}
@@ -482,7 +484,7 @@ publishing {
         maven(MavenPublication) {
             groupId = 'org.neo4j.doc'
             artifactId = docId
-            version = neo4jDocVersion
+            version = driverDocVersion
             artifact packageOlinkDb
         }
     }
@@ -560,25 +562,28 @@ html {
         'css/extra.css'
     ].join(" ")
 
-    stylesheet "classpath:xsl/chunk-from-toc/xhtml/chunktoc.xsl"
+    inputs.dir sourceDir
     input sourceFile
 
     // Stylesheet parameters
-    parameters ([
+    parameters([
         "base.dir": "${outputDir}",
         "html.ext": ".html",
         "make.clean.html": "1",
         "chunker.output.method": "html",
+        "chunker.output.encoding": "UTF-8",
         "chunker.output.indent": "yes",
         "use.id.as.dirname": "1",
-        "neo.documentation.library.links": libraryLinks,
-        "generate.toc": "''",
-        "header.rule": "0",
-        "neo.newsearch": "1",
-        "html.script": scripts,
         "html.stylesheet": styles,
+        "html.script": scripts,
+        "neo.newsearch": "1",
+        "neo.documentation.library.links": libraryLinks,
+        "toc-filename": "${outputDir}/toc.html",
+        "generate.toc": "''",
         "chunk.toc": "${contentMap}",
-        "current.docid": "$docId",
+        "header.rule": "0",
+        "target.database.document": "file://${olinkdb}",
+        "current.docid": docId,
     ])
     doLast {
         copy {
