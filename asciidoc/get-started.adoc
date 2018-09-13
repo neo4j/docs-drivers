@@ -23,7 +23,7 @@ In the general case, only the <<driver-connection-uris, connection URI>> needs t
 
 NOTE: The official drivers do not support HTTP communication.
 If you need an HTTP driver, there are a number of community drivers to choose from.
-See also <<http-api>>.
+See also <<http-api#http-api>>.
 
 [[driver-get-started-installation]]
 == Driver versions and installation
