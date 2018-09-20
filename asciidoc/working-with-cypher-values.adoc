@@ -41,7 +41,7 @@ All can be potentially found in results although not all can be used as paramete
 |===
 
 +*+ The null marker is not a type but a placeholder for absence of value.
-For information on how to work with null in Cypher, please refer to <<cypher-working-with-null>>.
+For information on how to work with null in Cypher, please refer to <<cypher-manual#cypher-working-with-null>>.
 
 +**+ Nodes, relationships and paths are passed in results as snapshots of the original graph entities.
    While the original entity IDs are included in these snapshots, no permanent link is retained back to the underlying server-side entities, which may be deleted or otherwise altered independently of the client copies.
