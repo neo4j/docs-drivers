@@ -39,6 +39,7 @@ This manual covers the following areas:
 * <<driver-client-applications>> -- How to manage database connections within an application.
 * <<driver-sessions-transactions>> -- How to create units of work and provide a logical context for that work.
 * <<driver-cypher-values>> -- How the types and values used by Cypher map to native language types.
+* <<driver-terminology>> -- Terminology for drivers.
 
 _Who should read this?_
 
@@ -52,3 +53,4 @@ include::sessions-and-transactions.adoc[leveloffset=+1]
 
 include::working-with-cypher-values.adoc[leveloffset=+1]
 
+include::terminology.adoc[leveloffset=+1]
