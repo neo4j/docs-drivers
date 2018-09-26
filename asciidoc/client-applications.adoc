@@ -384,11 +384,13 @@ The application can choose to accept or reject this certificate based on one of 
 [options="header"]
 |===
 | Trust strategy                        | Description
-| `TRUST_ALL_CERTIFICATES` (default)    | Accept any certificate provided by the server
+| `TRUST_ALL_CERTIFICATES` (default)    | Accept any certificate provided by the server, regardless of CA chain
 | `TRUST_CUSTOM_CA_SIGNED_CERTIFICATES` | Accept any certificate that can be verified against a custom CA
 | `TRUST_SYSTEM_CA_SIGNED_CERTIFICATES` | Accept any certificate that can be verified against the system store
 |===
 
+The driver will automatically verify the server name and expiry date for any certificate received.
+https://en.wikipedia.org/wiki/Server_Name_Indication[Server Name Indication (SNI)] is also enabled by default, allowing proxy middleware to route encrypted Bolt connections to the correct backend server.
 
 
 [.tabbed-example]
