@@ -133,18 +133,21 @@ For details on how to configure multi-data center routing policies for a Causal 
 ====
 
 
-=== Custom domain resolution and multiple initial routers
+=== Cluster bootstrap address resolution
 
-The 1.7 series drivers introduced the ability to intercept domain name resolution performed by a driver instance.
-This can be useful to avoid or augment DNS and is carried out _before_ DNS itself.
+The 1.7 series drivers introduced the ability to intercept bootstrap address resolution.
+This is generally performed by a driver object on construction or after complete contact has been lost with a cluster.
+This hook can be useful to augment regular DNS resolution and can be used to initialize a routing driver with multiple server addresses.
 
 The intercept hook is provided as a driver configuration option and takes the form of a callback function that accepts a single input address and yields or returns multiple output addresses.
 This function may hard code the output addresses or may draw them from another configuration source, as required.
 Output addresses can contain host names or IP addresses and are forwarded to the connection pool as initial routers.
 
+image::resolution.svg[title="Cluster bootstrap address resolution", role="middle"]
+
 The example below shows how to expand a single address into multiple (hard coded) output addresses:
 
-TODO: example
+TODO: example code
 
 
 [[driver-authentication]]
