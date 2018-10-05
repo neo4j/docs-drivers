@@ -241,26 +241,12 @@ This is generally the only case in which an application will need to work with b
 
 image::driver-passing-bookmarks.svg[title="Passing bookmarks", role="middle"]
 
+The following example illustrates the passing of bookmarks between sessions.
+First consider the code:
+
 [.tabbed-example]
 .Passing bookmarks between sessions
 ====
-
-This example illustrates the passing of bookmarks between sessions.
-
-We are using three separate sessions: a, b and c.
-In _session a_ we run two separate transactions.
-In the first one we create the person `Alice`, and in the second one we record that she works at `Wayne Enterprises`.
-The bookmark being passed between the two transactions is handled by the session.
-The bookmark from the last transaction is saved into an array for future use.
-
-In _session b_ we also run two separate transactions.
-In the first one we create the person `Bob`, and in the second one we record that he works at `LexCorp`.
-Again, the bookmark being passed between the two transactions is handled by the session.
-The bookmark from the last transaction is saved into an array for future use.
-
-In the last session, _session c_, we wish to create a friendship between Alice and Bob.
-This can only be done if both `Alice` and `Bob` have been created first.
-In order to ensure this, we pass the bookmarks from the last transactions in _session a_ and _session b_, respectively.
 
 [.include-with-dotnet]
 ======
@@ -296,8 +282,22 @@ include::{javascript-examples}/examples.test.js[tags=pass-bookmarks]
 include::{python-examples}/pass_bookmarks_example.py[tags=pass-bookmarks]
 ----
 ======
-
 ====
+
+We are using three separate sessions: a, b and c.
+In _session a_ we run two separate transactions.
+In the first one we create the person `Alice`, and in the second one we record that she works at `Wayne Enterprises`.
+The bookmark being passed between the two transactions is handled by the session.
+The bookmark from the last transaction is saved into an array for future use.
+
+In _session b_ we also run two separate transactions.
+In the first one we create the person `Bob`, and in the second one we record that he works at `LexCorp`.
+Again, the bookmark being passed between the two transactions is handled by the session.
+The bookmark from the last transaction is saved into an array for future use.
+
+In the last session, _session c_, we wish to create a friendship between Alice and Bob.
+This can only be done if both `Alice` and `Bob` have been created first.
+In order to ensure this, we pass the bookmarks from the last transactions in _session a_ and _session b_, respectively.
 
 
 [TIP]
