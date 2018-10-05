@@ -224,6 +224,14 @@ include::{dotnet-examples}/Examples.cs[tags=result-consume]
 ----
 ======
 
+[.include-with-go]
+======
+[source, go]
+----
+include::{go-examples}/examples_test.go[tags=result-consume]
+----
+======
+
 [.include-with-java]
 ======
 [source, java]
@@ -269,6 +277,13 @@ The saved results can also be used directly to run a new statement.
 [source, csharp]
 ----
 include::{dotnet-examples}/Examples.cs[tags=result-retain]
+----
+======
+[.include-with-go]
+======
+[source, go]
+----
+include::{go-examples}/examples_test.go[tags=result-retain]
 ----
 ======
 [.include-with-java]

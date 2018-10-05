@@ -29,6 +29,15 @@ include::{dotnet-examples}/Examples.cs[tags=session]
 ----
 ======
 
+[.include-with-go]
+======
+
+[source, go]
+----
+include::{go-examples}/examples_test.go[tags=session]
+----
+======
+
 [.include-with-java]
 ======
 
@@ -99,6 +108,15 @@ include::{dotnet-examples}/Examples.cs[tags=autocommit-transaction]
 ----
 ======
 
+[.include-with-go]
+======
+
+[source, go]
+----
+include::{go-examples}/examples_test.go[tags=autocommit-transaction]
+----
+======
+
 [.include-with-java]
 ======
 
@@ -150,6 +168,14 @@ This form requires minimal boilerplate code and allows for a clear separation of
 [source, csharp]
 ----
 include::{dotnet-examples}/Examples.cs[tags=transaction-function]
+----
+======
+
+[.include-with-go]
+======
+[source, go]
+----
+include::{go-examples}/examples_test.go[tags=transaction-function]
 ----
 ======
 
@@ -256,6 +282,14 @@ include::{dotnet-examples}/Examples.cs[tags=pass-bookmarks]
 ----
 ======
 
+[.include-with-go]
+======
+[source, go]
+----
+include::{go-examples}/examples_test.go[tags=pass-bookmarks]
+----
+======
+
 [.include-with-java]
 ======
 [source, java]
@@ -332,6 +366,14 @@ As a result of this, a `write` transaction tagged for `read` will be sent to a r
 [source, csharp]
 ----
 include::{dotnet-examples}/Examples.cs[tags=read-write-transaction]
+----
+======
+
+[.include-with-go]
+======
+[source, go]
+----
+include::{go-examples}/examples_test.go[tags=read-write-transaction]
 ----
 ======
 

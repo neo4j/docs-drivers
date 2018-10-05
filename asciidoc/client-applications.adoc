@@ -39,6 +39,14 @@ include::{dotnet-examples}/Examples.cs[tags=driver-lifecycle]
 ----
 ======
 
+[.include-with-go]
+======
+[source, go]
+----
+include::{go-examples}/examples_test.go[tags=driver-lifecycle]
+----
+======
+
 [.include-with-java]
 ======
 [source, java]
@@ -149,6 +157,14 @@ include::{dotnet-examples}/Examples.cs[tags=basic-auth]
 ----
 ======
 
+[.include-with-go]
+======
+[source, go]
+----
+include::{go-examples}/examples_test.go[tags=basic-auth]
+----
+======
+
 [.include-with-java]
 ======
 [source, java]
@@ -192,6 +208,14 @@ The best way to create a Kerberos authentication token is shown below:
 [source, csharp]
 ----
 include::{dotnet-examples}/Examples.cs[tags=kerberos-auth]
+----
+======
+
+[.include-with-go]
+======
+[source, go]
+----
+include::{go-examples}/examples_test.go[tags=kerberos-auth]
 ----
 ======
 
@@ -242,6 +266,14 @@ include::{dotnet-examples}/Examples.cs[tags=custom-auth]
 ----
 ======
 
+[.include-with-go]
+======
+[source, go]
+----
+include::{go-examples}/examples_test.go[tags=custom-auth]
+----
+======
+
 [.include-with-java]
 ======
 [source, java]
@@ -286,6 +318,14 @@ This can be disabled through configuration as follows:
 [source, csharp]
 ----
 include::{dotnet-examples}/Examples.cs[tags=config-unencrypted]
+----
+======
+
+[.include-with-go]
+======
+[source, go]
+----
+include::{go-examples}/examples_test.go[tags=config-unencrypted]
 ----
 ======
 
@@ -345,6 +385,14 @@ The application can choose to accept or reject this certificate based on one of 
 [source, csharp]
 ----
 include::{dotnet-examples}/Examples.cs[tags=config-trust]
+----
+======
+
+[.include-with-go]
+======
+[source, go]
+----
+include::{go-examples}/examples_test.go[tags=config-trust]
 ----
 ======
 
@@ -552,6 +600,14 @@ include::{dotnet-examples}/Examples.cs[tags=config-max-retry-time]
 ----
 ======
 
+[.include-with-go]
+======
+[source, go]
+----
+include::{go-examples}/examples_test.go[tags=config-max-retry-time]
+----
+======
+
 [.include-with-java]
 ======
 [source, java]
@@ -596,6 +652,14 @@ Applications should be designed to cater for this eventuality.
 [source, csharp]
 ----
 include::{dotnet-examples}/Examples.cs[tags=service-unavailable]
+----
+======
+
+[.include-with-go]
+======
+[source, go]
+----
+include::{go-examples}/examples_test.go[tags=service-unavailable]
 ----
 ======
 
