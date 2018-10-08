@@ -147,8 +147,49 @@ image::resolution.svg[title="Cluster bootstrap address resolution", role="middle
 
 The example below shows how to expand a single address into multiple (hard coded) output addresses:
 
-TODO: example code
+[.tabbed-example]
+.Custom Address Resolver
+====
+[.include-with-dotnet]
+======
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=config-custom-resolver]
+----
+======
 
+[.include-with-go]
+======
+[source, go]
+----
+include::{go-examples}/examples_test.go[tags=config-custom-resolver]
+----
+======
+
+[.include-with-java]
+======
+[source, java]
+----
+include::{java-examples}/ConfigCustomResolverExample.java[tags=config-custom-resolver]
+----
+======
+
+[.include-with-javascript]
+======
+[source, javascript]
+----
+include::{javascript-examples}/examples.test.js[tags=config-custom-resolver]
+----
+======
+
+[.include-with-python]
+======
+[source, python]
+----
+include::{python-examples}/config_custom_resolver.py[tags=config-custom-resolver]
+----
+======
+====
 
 [[driver-authentication]]
 == Authentication
@@ -392,9 +433,7 @@ The application can choose to accept or reject this certificate based on one of 
 | `TRUST_SYSTEM_CA_SIGNED_CERTIFICATES` | Accept any certificate that can be verified against the system store
 |===
 
-The driver will automatically verify the server name and expiry date for any certificate received.
-https://en.wikipedia.org/wiki/Server_Name_Indication[Server Name Indication (SNI)] is also enabled by default, allowing proxy middleware to route encrypted Bolt connections to the correct backend server.
-
+https://en.wikipedia.org/wiki/Server_Name_Indication[Server Name Indication (SNI)] is enabled by default, allowing proxy middleware to route encrypted Bolt connections to the correct backend server.
 
 [.tabbed-example]
 .Trust
