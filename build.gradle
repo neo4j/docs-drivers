@@ -657,11 +657,8 @@ task packagePdf(type: Copy, dependsOn: pdf) {
     into "$distDir/pdf"
 }
 
-task dist(dependsOn: [packageHtml, pdf]) {
-    description 'Build and package HTML and PDF outputs.'
-    doLast {
+assemble.dependsOn packageHtml, pdf
 
-    }
-}
+check.dependsOn vale
 
 // vim: set fdm=expr:

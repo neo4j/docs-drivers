@@ -6,16 +6,25 @@
 
 == Contents
 
-This repository contains the Asciidoc source for the prose in the Drivers chapter in the Neo4j Developer Manual.
+This repository contains the AsciiDoc and other sources to build the Neo4j Driver Manual.
 
 The examples for each of the driver languages are generated out of each driver's source code repository:
 
-* https://github.com/neo4j/neo4j-java-driver[`neo4j-java-driver`]
-* https://github.com/neo4j/neo4j-python-driver[`neo4j-python-driver`]
-* https://github.com/neo4j/neo4j-javascript-driver[`neo4j-javascript-driver`]
 * https://github.com/neo4j/neo4j-dotnet-driver[`neo4j-dotnet-driver`]
+* https://github.com/neo4j/neo4j-go-driver[`neo4j-go-driver`]
+* https://github.com/neo4j/neo4j-java-driver[`neo4j-java-driver`]
+* https://github.com/neo4j/neo4j-javascript-driver[`neo4j-javascript-driver`]
+* https://github.com/neo4j/neo4j-python-driver[`neo4j-python-driver`]
+
 
 == Usage
 
-This repository is only used for managing content which is built elsewhere.
-While the build script remains, it is not being maintained and may not work
+First, set up your environment.
+
+If this is your first time, make a copy of _devenv.local.template_ called _devenv.local_.
+Fill in the necessary values.
+
+Source the common _devenv_: `source devenv`.
+
+Build stuff by running `./gralew <task>`, for example `./gradlew build`.
+Run `./gradlew tasks --all` to see all available tasks.
