@@ -144,7 +144,7 @@ Inbound conversion is carried out using http://cldr.unicode.org/development/deve
 ======
 [options="header", cols="m,,"]
 |===
-| Neo4j type        | Python 2 type | Python 3 type
+| Neo4j type        | [deprecated]#Python 2 type# | Python 3 type
 | null | `None` | `None`
 | List | `list` | `list`
 | Map | `dict` | `dict`
