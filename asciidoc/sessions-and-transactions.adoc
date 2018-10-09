@@ -244,7 +244,7 @@ The application should retry the operation.
 [[driver-transactions-causal-chaining]]
 == Causal chaining
 
-When working with a causal cluster, transactions can be chained to ensure causal consistency.
+When working with a Causal Cluster, transactions can be chained to ensure causal consistency.
 This means that for any two transactions, it is guaranteed that the second transaction will begin only after the first has been successfully committed.
 This is true even if the transactions are carried out on different physical cluster members.
 
@@ -344,7 +344,7 @@ If you try to extract a bookmark from a database which is not running in Causal 
 == Access modes
 
 Transactions can be executed in either `read` or `write` mode.
-In a causal cluster, each transaction will be routed to an appropriate server based on the mode.
+In a Causal Cluster, each transaction will be routed to an appropriate server based on the mode.
 When using a single instance, all transactions will be passed to that one server.
 Routing Cypher by identifying reads and writes can improve the utilization of available cluster resources:
 as read servers are typically more plentiful than write servers, it is beneficial to direct as much as possible of read transactions to read servers.

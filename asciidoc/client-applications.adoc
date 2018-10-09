@@ -92,14 +92,14 @@ The official Neo4j drivers currently support the following URI schemes and drive
 
 A direct driver is created via a `bolt` URI, for example: `bolt://localhost:7687`.
 This kind of driver is used to maintain connections to a single database server and is typically used when working with a single Neo4j instance or when targeting a specific member of a cluster.
-Note that a routing driver is generally preferable when working with a causal cluster.
+Note that a routing driver is generally preferable when working with a Causal Cluster.
 
 
 [[routing_drivers_bolt_routing]]
 === Routing drivers (bolt+routing)
 
 A routing driver is created via a `bolt+routing` URI, for example: `bolt+routing://graph.example.com:7687`.
-The address in the URI must be that of a Core server.
+The address in the URI must be that of a Core Server.
 This kind of driver uses the <<term-bolt-routing-protocol, Bolt Routing Protocol>> and works in tandem with the cluster to route transactions to available cluster members.
  
 === Routing drivers with routing context
@@ -111,7 +111,7 @@ In the standard Neo4j configuration, routing contexts are defined on the server 
 Thus the driver communicates the routing context to the cluster in the form of a server policy.
 It then obtains refined routing information back from the cluster, based on the server policy.
 
-The address in the URI of a routing driver with routing context must be that of a Core server.
+The address in the URI of a routing driver with routing context must be that of a Core Server.
 
 .Configure a routing driver with routing context
 ====
@@ -428,9 +428,9 @@ The application can choose to accept or reject this certificate based on one of 
 [options="header"]
 |===
 | Trust strategy                        | Description
-| `TRUST_ALL_CERTIFICATES` (default)    | Accept any certificate provided by the server, regardless of CA chain
-| `TRUST_CUSTOM_CA_SIGNED_CERTIFICATES` | Accept any certificate that can be verified against a custom CA
-| `TRUST_SYSTEM_CA_SIGNED_CERTIFICATES` | Accept any certificate that can be verified against the system store
+| `TRUST_ALL_CERTIFICATES` (default)    | Accept any certificate provided by the server, regardless of CA chain.
+| `TRUST_CUSTOM_CA_SIGNED_CERTIFICATES` | Accept any certificate that can be verified against a custom CA.
+| `TRUST_SYSTEM_CA_SIGNED_CERTIFICATES` | Accept any certificate that can be verified against the system store.
 |===
 
 https://en.wikipedia.org/wiki/Server_Name_Indication[Server Name Indication (SNI)] is enabled by default, allowing proxy middleware to route encrypted Bolt connections to the correct backend server.

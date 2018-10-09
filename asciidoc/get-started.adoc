@@ -23,18 +23,18 @@ The following languages and frameworks are officially supported by Neo4j:
 | Language/framework | Versions supported
 | Java               | Java 8+ (latest patch releases).
 | Python             | CPython 2.7, 3.4, 3.5, 3.6 and 3.7 (latest patch releases). Note that Python 2 support is deprecated and will be discontinued in the 2.x series drivers.
-| JavaScript         | all LTS versions of Node.JS, specifically the 4.x and 6.x series runtimes (https://github.com/nodejs/LTS).
+| JavaScript         | All LTS versions of Node.JS, specifically the 4.x and 6.x series runtimes (https://github.com/nodejs/LTS).
 | .NET               | .NET standard 1.3 (https://github.com/dotnet/standard/blob/master/docs/versions.md) and .NET 4.5.2 and above.
-| Go                 | 1.10 and above
+| Go                 | 1.10 and above.
 |===
 
 The driver API is intended to be topologically agnostic.
-This means that the underlying database topology — single instance, causal cluster, etc. — can be altered without requiring a corresponding alteration to application code.
+This means that the underlying database topology — single instance, Causal Cluster, etc. — can be altered without requiring a corresponding alteration to application code.
 In the general case, only the <<driver-connection-uris, connection URI>> needs to be modified when changes are made to the topology. 
 
 NOTE: The official drivers do not support HTTP communication.
 If you need an HTTP driver, choose one of the community drivers.
-See also <<http-api>>.
+See also the <<http-api#http-api, HTTP API documentation>>.
 
 [[driver-get-started-installation]]
 == Driver versions and installation
