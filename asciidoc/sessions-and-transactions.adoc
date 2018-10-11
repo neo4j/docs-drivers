@@ -221,20 +221,17 @@ While this form is useful for a handful of use cases, it is recommended to use t
 [[driver-transactions-configuration]]
 === Transaction configuration
 
-Both auto-commit and explicit transactions can be assigned a timeout and metadata.
-
-
-Timeout applies to the related transaction and will be terminated by the database if it is executed longer than the provided value.
-This functionality allows to limit query/transaction execution time. 
-Specified timeout overrides the default timeout configured in the database (<<operations-manual#config_dbms.transaction.timeout>>).
-
+Both auto-commit and explicit transactions can be assigned _metadata_, and a _timeout_.
 
 Metadata is a map of arbitrary values that will be attached to the executing transaction. 
-It will be visible in the output of `dbms.listQueries` (<<operations-manual#query-management-list-queries>>) and `dbms.listTransactions` (<<operations-manual#query-management-list-transactions>>) procedures. 
-It will also get logged to the `query.log` (<<operations-manual#query-logging>>).
+It will be visible in the output of the procedures `<<operations-manual#query-management-list-queries, dbms.listQueries>>` and `<<operations-manual#query-management-list-transactions, dbms.listTransactions>>`. 
+It will also get logged to the `<<operations-manual#query-logging, query.log>>`.
 
+A timeout will cause the related transaction to be terminated by the database if its execution time is longer than the provided value.
+This functionality allows to limit query/transaction execution time. 
+A specified timeout overrides the default timeout defined by the configuration setting `<<operations-manual#config_dbms.transaction.timeout, config_dbms.transaction.timeout>>`.
 
-Please refer to <<#driver-api-docs>> for usage patterns across driver languages.
+For usage patterns, please refer to the <<driver-api-docs, API documentation>> for your specific language.
 
 [[driver-transactions-cypher-errors]]
 === Cypher errors
