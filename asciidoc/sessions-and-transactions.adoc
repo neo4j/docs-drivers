@@ -218,6 +218,24 @@ Explicit transactions are the longhand form of transaction functions, providing 
 While this form is useful for a handful of use cases, it is recommended to use transaction functions wherever possible.
 
 
+[[driver-transactions-configuration]]
+=== Transaction configuration
+
+Both auto-commit and explicit transactions can be assigned a timeout and metadata.
+
+
+Timeout applies to the related transaction and will be terminated by the database if it is executed longer than the provided value.
+This functionality allows to limit query/transaction execution time. 
+Specified timeout overrides the default timeout configured in the database (<<operations-manual#config_dbms.transaction.timeout>>).
+
+
+Metadata is a map of arbitrary values that will be attached to the executing transaction. 
+It will be visible in the output of `dbms.listQueries` (<<operations-manual#query-management-list-queries>>) and `dbms.listTransactions` (<<operations-manual#query-management-list-transactions>>) procedures. 
+It will also get logged to the `query.log` (<<operations-manual#query-logging>>).
+
+
+Please refer to <<#driver-api-docs>> for usage patterns across driver languages.
+
 [[driver-transactions-cypher-errors]]
 === Cypher errors
 
