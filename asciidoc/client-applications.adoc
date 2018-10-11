@@ -135,8 +135,8 @@ For details on how to configure multi-data center routing policies for a Causal 
 
 === Cluster bootstrap address resolution
 
-The 1.7 series drivers introduced the ability to intercept bootstrap address resolution.
-This is generally performed by a driver object on construction or after complete contact has been lost with a cluster.
+Drivers have the ability to intercept cluster bootstrap address resolution.
+This is generally performed by a routing driver on construction or after complete contact has been lost with a cluster.
 This hook can be useful to augment regular DNS resolution and can be used to initialize a routing driver with multiple server addresses.
 
 The intercept hook is provided as a driver configuration option and takes the form of a callback function that accepts a single input address and yields or returns multiple output addresses.
