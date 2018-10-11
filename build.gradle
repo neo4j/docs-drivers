@@ -159,6 +159,8 @@ ext {
             'operations-manual' : "${docsBaseUri}/operations-manual/current",
             'java-reference'    : "${docsBaseUri}/java-reference/current",
             'rest-docs'         : "${docsBaseUri}/rest-docs/current",
+            'getting-started'   : "${docsBaseUri}/getting-started/current",
+            'status-codes'      : "${docsBaseUri}/status-codes/current",
             'ogm-manual'        : "${docsBaseUri}/ogm-manual/current",
             'kerberos-add-on'   : "${docsBaseUri}/add-on/kerberos/current"
     ]
@@ -213,6 +215,8 @@ dependencies {
     olinkdb "org.neo4j.doc:http-api:$neo4jDocVersion:olinkdb@jar"
     olinkdb "org.neo4j.doc:operations-manual:$neo4jDocVersion:olinkdb@jar"
     olinkdb "org.neo4j.doc:cypher-manual:$neo4jDocVersion:olinkdb@jar"
+    olinkdb "org.neo4j.doc:getting-started:$neo4jDocVersion:olinkdb@jar"
+    olinkdb "org.neo4j.doc:status-codes:$neo4jDocVersion:olinkdb@jar"
 }
 
 

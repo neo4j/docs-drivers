@@ -237,7 +237,7 @@ For usage patterns, please refer to the <<driver-api-docs, API documentation>> f
 === Cypher errors
 
 When executing Cypher, it is possible for an exception to be thrown by the Cypher engine.
-Each such exception is associated with a <<status-codes, status code>> that describes the nature of the error and a message that provides more detail.
+Each such exception is associated with a <<status-codes#status-codes, status code>> that describes the nature of the error and a message that provides more detail.
 
 The error classifications are listed in the table below.
 
