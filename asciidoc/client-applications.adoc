@@ -186,7 +186,7 @@ include::{javascript-examples}/examples.test.js[tags=config-custom-resolver]
 ======
 [source, python]
 ----
-include::{python-examples}/config_custom_resolver.py[tags=config-custom-resolver]
+include::{python-examples}/custom_resolver_example.py[tags=custom-resolver]
 ----
 ======
 ====
