@@ -10,8 +10,8 @@ This section describes how to manage database connections within an application.
 [[driver-driver-object]]
 == The driver object
 
-A Neo4j client application will require a driver object instance in order to provide access to the database.
-This object instance should be made available to all parts of the application that need to interact with Neo4j.
+A Neo4j client application will require a driver instance in order to provide access to the database.
+This driver should be made available to all parts of the application that need to interact with Neo4j.
 In languages where <<term-thread-safety, thread safety>> is an issue, the driver can be considered thread-safe.
 
 [TIP]
@@ -24,7 +24,7 @@ Destroying a driver instance will immediately shut down any connections previous
 To construct a driver instance, a <<driver-connection-uris, connection URI>> and <<driver-authentication, authentication information>> must be supplied.
 Additional configuration details can be supplied if required.
 All of these details are immutable for the lifetime of the driver.
-Therefore, if multiple configurations are required (such as when working with multiple database users) then multiple driver objects must be used.
+Therefore, if multiple configurations are required (such as when working with multiple database users) then multiple driver instances must be used.
 
 An example of driver construction and destruction can be seen below:
 
@@ -90,30 +90,30 @@ The official Neo4j drivers currently support the following URI schemes and drive
 
 === Direct drivers (bolt)
 
-A Direct driver is created via a `bolt` URI, for example: `bolt://localhost:7687`.
+A direct driver is created via a `bolt` URI, for example: `bolt://localhost:7687`.
 This kind of driver is used to maintain connections to a single database server and is typically used when working with a single Neo4j instance or when targeting a specific member of a cluster.
-Note that a Routing driver is preferable when working with a causal cluster.
+Note that a routing driver is generally preferable when working with a Causal Cluster.
 
 
 [[routing_drivers_bolt_routing]]
 === Routing drivers (bolt+routing)
 
-A Routing driver is created via a `bolt+routing` URI, for example: `bolt+routing://graph.example.com:7687`.
-The address in the URI must be that of a Core server.
+A routing driver is created via a `bolt+routing` URI, for example: `bolt+routing://graph.example.com:7687`.
+The address in the URI must be that of a Core Server.
 This kind of driver uses the <<term-bolt-routing-protocol, Bolt Routing Protocol>> and works in tandem with the cluster to route transactions to available cluster members.
  
 === Routing drivers with routing context
 
 Routing drivers with routing context are an available option when using drivers of version 1.3 or above together with a Neo4j Causal Cluster of version 3.2 or above.
-In such a setup, a Routing driver can include a preferred routing context via the query part of the `bolt+routing` URI.
+In such a setup, a routing driver can include a preferred routing context via the query part of the `bolt+routing` URI.
 
 In the standard Neo4j configuration, routing contexts are defined on the server side by means of _server policies_.
 Thus the driver communicates the routing context to the cluster in the form of a server policy.
 It then obtains refined routing information back from the cluster, based on the server policy.
 
-The address in the URI of a Routing driver with routing context must be that of a Core server.
+The address in the URI of a routing driver with routing context must be that of a Core Server.
 
-.Configure a Routing driver with routing context
+.Configure a routing driver with routing context
 ====
 This example will assume that Neo4j has been configured for server policies as described in <<operations-manual#multi-dc-load-balancing, Neo4j Operations Manual -> Load balancing for multi-data center systems>>.
 In particular, a server policy called `europe` has been defined.
@@ -132,6 +132,64 @@ Additionally, the routing contexts must be defined within the cluster as routing
 For details on how to configure multi-data center routing policies for a Causal Cluster, please refer to <<operations-manual#multi-dc-load-balancing, Operations Manual -> Causal Clustering>>.
 ====
 
+
+=== Cluster bootstrap address resolution
+
+Drivers have the ability to intercept cluster bootstrap address resolution.
+This is generally performed by a routing driver on construction or after complete contact has been lost with a cluster.
+This hook can be useful to augment regular DNS resolution and can be used to initialize a routing driver with multiple server addresses.
+
+The intercept hook is provided as a driver configuration option and takes the form of a callback function that accepts a single input address and yields or returns multiple output addresses.
+This function may hard code the output addresses or may draw them from another configuration source, as required.
+Output addresses can contain host names or IP addresses and are forwarded to the connection pool as initial routers.
+
+image::resolution.svg[title="Cluster bootstrap address resolution", role="middle"]
+
+The example below shows how to expand a single address into multiple (hard coded) output addresses:
+
+[.tabbed-example]
+.Custom Address Resolver
+====
+[.include-with-dotnet]
+======
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=config-custom-resolver]
+----
+======
+
+[.include-with-go]
+======
+[source, go]
+----
+include::{go-examples}/examples_test.go[tags=config-custom-resolver]
+----
+======
+
+[.include-with-java]
+======
+[source, java]
+----
+include::{java-examples}/ConfigCustomResolverExample.java[tags=config-custom-resolver]
+----
+======
+
+[.include-with-javascript]
+======
+[source, javascript]
+----
+include::{javascript-examples}/examples.test.js[tags=config-custom-resolver]
+----
+======
+
+[.include-with-python]
+======
+[source, python]
+----
+include::{python-examples}/custom_resolver_example.py[tags=custom-resolver]
+----
+======
+====
 
 [[driver-authentication]]
 == Authentication
@@ -370,12 +428,12 @@ The application can choose to accept or reject this certificate based on one of 
 [options="header"]
 |===
 | Trust strategy                        | Description
-| `TRUST_ALL_CERTIFICATES` (default)    | Accept any certificate provided by the server
-| `TRUST_CUSTOM_CA_SIGNED_CERTIFICATES` | Accept any certificate that can be verified against a custom CA
-| `TRUST_SYSTEM_CA_SIGNED_CERTIFICATES` | Accept any certificate that can be verified against the system store
+| `TRUST_ALL_CERTIFICATES` (default)    | Accept any certificate provided by the server, regardless of CA chain.
+| `TRUST_CUSTOM_CA_SIGNED_CERTIFICATES` | Accept any certificate that can be verified against a custom CA.
+| `TRUST_SYSTEM_CA_SIGNED_CERTIFICATES` | Accept any certificate that can be verified against the system store.
 |===
 
-
+https://en.wikipedia.org/wiki/Server_Name_Indication[Server Name Indication (SNI)] is enabled by default, allowing proxy middleware to route encrypted Bolt connections to the correct backend server.
 
 [.tabbed-example]
 .Trust
