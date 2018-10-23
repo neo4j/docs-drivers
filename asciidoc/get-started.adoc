@@ -27,7 +27,7 @@ The following languages and frameworks are officially supported by Neo4j:
 [deprecated]#Note that Python 2 support is deprecated and will be discontinued in the 2.x series drivers.#
 | JavaScript         | All LTS versions of Node.JS, specifically the 4.x and 6.x series runtimes (https://github.com/nodejs/LTS).
 | .NET               | .NET standard 1.3 (https://github.com/dotnet/standard/blob/master/docs/versions.md) and .NET 4.5.2 and above.
-| Go                 | 1.10 and above.
+| Go                 | Go 1.10, 1.11 (latest patch releases).
 |===
 
 The driver API is intended to be topologically agnostic.
@@ -85,6 +85,51 @@ PM> Install-Package Neo4j.Driver -Version {dotnet-driver-version}
 ========
 
 You can review the release notes for this driver https://github.com/neo4j/neo4j-dotnet-driver/releases[here].
+
+======
+
+[.include-with-go]
+======
+
+To find out the latest version of the driver, visit https://github.com/neo4j/neo4j-go-driver/releases.
+
+In order to get go driver running, you need to install our C connector, seabolt, on your build and production environments.
+Follow instructions at https://github.com/neo4j-drivers/seabolt for installing seabolt through one of our binary packages or by building from scratch.
+
+The go driver makes use of `cgo` and `pkg-config` to build against `seabolt` and thus requires a working `cgo` and `pkg-config` environment on your build environment.
+
+========
+
+To install the latest version of the driver using `go get`:
+
+[source, shell, subs="attributes, specialcharacters"]
+----
+go get github.com/neo4j/neo4j-go-driver
+----
+
+========
+
+========
+
+To install the latest version of the driver using `dep`:
+
+[source, shell, subs="attributes, specialcharacters"]
+----
+dep ensure github.com/neo4j/neo4j-go-driver
+----
+
+You can also choose to install a certain version of the driver.
+Below is the syntax for using a certain minor version of the driver. 
+Visit https://golang.github.io/dep/docs/Gopkg.toml.html#version-rules for a detailed description of version rules that can be used.
+
+[source, shell, subs="attributes, specialcharacters"]
+----
+dep ensure github.com/neo4j/neo4j-go-driver@1.7.x
+----
+
+========
+
+You can review the release notes for this driver https://github.com/neo4j/neo4j-go-driver/releases[here].
 
 ======
 
@@ -288,6 +333,11 @@ For a comprehensive listing of all driver functionality, refer to the API docume
 [.include-with-dotnet]
 ======
 {api-docs-base-uri}/dotnet-driver/{dotnet-driver-apidoc-version}/
+======
+
+[.include-with-go]
+======
+{api-docs-base-uri}/go-driver/{go-driver-apidoc-version}/
 ======
 
 [.include-with-java]
