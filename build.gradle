@@ -497,6 +497,16 @@ publishing {
             artifact packageOlinkDb
         }
     }
+    repositories {
+        maven {
+            name 'preview'
+            url System.env.PUBLISH_REPO
+            credentials {
+                username System.env.PUBLISH_USERNAME
+                password System.env.PUBLISH_PASSWORD
+            }
+        }
+    }
 }
 
 task makeToc(type: XsltTask, dependsOn: docbook) {
