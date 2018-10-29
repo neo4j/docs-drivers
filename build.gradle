@@ -219,8 +219,6 @@ dependencies {
     olinkdb "org.neo4j.doc:status-codes:$neo4jDocVersion:olinkdb@jar"
 }
 
-
-
 task prepareOlinkDb(dependsOn: configurations.olinkdb) {
     ext.outputDir = "$buildDir/olinkdb/"
     inputs.files configurations.olinkdb
@@ -236,31 +234,19 @@ task prepareOlinkDb(dependsOn: configurations.olinkdb) {
 <sitemap>
     <dir name="irrelevant-name">"""
         mkdir(outputDir)
-        configurations.olinkdb.files.each { dep ->
+        configurations.olinkdb.dependencies.each { dep ->
+            def files = configurations.olinkdb.files.grep {
+                it.name.contains(dep.name)
+            }
+            if (!1==files.size()) {
+                Logger.ERROR("Shit pommes frites, why are you doing this in a build script?")
+            }
             copy {
-                from zipTree(dep)
+                from zipTree(files[0])
                 into outputDir
             }
+            olinkdb += file("${outputDir}/${dep.name}-entry.xml").text
         }
-        java.nio.file.Files.walk(java.nio.file.Paths.get(outputDir))
-            .filter( { path -> java.nio.file.Files.isRegularFile(path) } )
-            .filter( { path -> path.endsWith("target.db") } )
-            .each { path ->
-                def relpath = java.nio.file.Paths.get(outputDir).relativize(path)
-                def before = ""
-                def after = ""
-                relpath.iterator().dropRight(1).each {
-                    before += "<dir name=\"$it\">"
-                    after += "</dir>"
-                }
-                olinkdb += """
-$before
-<document targetdoc=\"${relpath.getAt(0)}\">
-<xi:include href=\"$relpath\" xmlns:xi=\"http://www.w3.org/2001/XInclude\">
-</xi:include>
-</document>
-$after"""
-            }
         olinkdb += """
     </dir>
 </sitemap>
@@ -440,17 +426,15 @@ preprocess {
 task makeTargetDb(type: XsltTask, dependsOn: docbook) {
     description 'Create database of olink targets.'
     ext.docVersion = driverDocVersion
-    ext.docbookSourceDir = "${projectDir}/docbook"
     ext.sourceFile = "${buildDir}/docbook/${docVersion}/index.xml"
-    ext.contentMap = "${docbookSourceDir}/content-map.xml"
-    ext.targetDbFilename = "${buildDir}/docbook/${docId}/${docVersion}/target.db"
-    ext.outputDir = "${buildDir}/docbook/${docVersion}/_trash"
-    ext.toolsDir = "${projectDir}/docbook"
+    ext.contentMap = "${projectDir}/docbook/content-map.xml"
+    ext.outputDir = "${buildDir}/tmp/olinkdb"
+    ext.outputFile = "${outputDir}/${docId}/${docVersion}/target.db"
     ext.stylesheet = "xsl/chunk-from-toc/xhtml/chunktoc.xsl"
 
     inputs.file {sourceFile}
     inputs.file {contentMap}
-    outputs.file {targetDbFilename}
+    outputs.dir {outputDir}
 
     doFirst {
         def url = DocBookPlugin.getClassLoader().getResource(ext.stylesheet)
@@ -472,8 +456,25 @@ task makeTargetDb(type: XsltTask, dependsOn: docbook) {
             "use.id.as.dirname": "1",
             "chunk.toc": "${contentMap}",
             "collect.xref.targets": "only",
-            "targets.filename": "${targetDbFilename}",
+            "targets.filename": "${outputFile}",
         ])
+    }
+    doLast {
+        def relpath = java.nio.file.Paths.get(outputDir).relativize(java.nio.file.Paths.get(outputFile))
+        def before = ""
+        def after = ""
+        relpath.iterator().dropRight(1).each {
+            before += "<dir name=\"$it\">"
+            after += "</dir>"
+        }
+        def entry = """
+$before
+<document targetdoc=\"${docId}\">
+<xi:include href=\"${relpath}\" xmlns:xi=\"http://www.w3.org/2001/XInclude\">
+</xi:include>
+</document>
+$after"""
+        file("${outputDir}/${docId}-entry.xml").text = entry
     }
 }
 
@@ -484,9 +485,6 @@ task packageOlinkDb(type: Jar, dependsOn: [makeTargetDb, makeTargetDb]) {
     destinationDir file("$buildDir/distributions")
     from {
         makeTargetDb
-    }
-    into {
-        "${baseName}/${neo4jDocVersion}"
     }
 }
 
