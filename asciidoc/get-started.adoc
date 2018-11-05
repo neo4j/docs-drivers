@@ -337,7 +337,7 @@ For a comprehensive listing of all driver functionality, refer to the API docume
 
 [.include-with-go]
 ======
-{api-docs-base-uri}/go-driver/{go-driver-apidoc-version}/
+https://godoc.org/github.com/neo4j/neo4j-go-driver/neo4j
 ======
 
 [.include-with-java]
