@@ -1,5 +1,10 @@
 [[drivers]]
+ifndef::backend-pdf[]
 = The Neo4j Drivers Manual v{driver-version}
+endif::[]
+ifdef::backend-pdf[]
+= The Neo4j Drivers Manual v{driver-version} {for-lang}
+endif::[]
 :project-version:
 :manual-title: Neo4j Driver Manual {project-version}
 :source-indent: 0
