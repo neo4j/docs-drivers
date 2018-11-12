@@ -224,7 +224,7 @@ While this form is useful for a handful of use cases, it is recommended to use t
 Both auto-commit and explicit transactions can be assigned _metadata_, and a _timeout_.
 
 Metadata is a map of arbitrary values that will be attached to the executing transaction. 
-It will be visible in the output of the procedures `<<operations-manual#query-management-list-queries, dbms.listQueries>>` and `<<operations-manual#query-management-list-transactions, dbms.listTransactions>>`. 
+It will be visible in the output of the procedures `<<operations-manual#query-management-list-queries, dbms.listQueries>>` and `<<operations-manual#transaction-management-list-transactions, dbms.listTransactions>>`. 
 It will also get logged to the `<<operations-manual#query-logging, query.log>>`.
 
 A timeout will cause the related transaction to be terminated by the database if its execution time is longer than the provided value.
