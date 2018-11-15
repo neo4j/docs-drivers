@@ -437,6 +437,7 @@ task makeTargetDb(type: XsltTask, dependsOn: docbook) {
     outputs.dir {outputDir}
 
     doFirst {
+
         def url = DocBookPlugin.getClassLoader().getResource(ext.stylesheet)
         stylesheet url
         input sourceFile
@@ -639,10 +640,21 @@ task pdf(dependsOn: [prepareDriverSources, unzipDownloadedFonts]) {
     inputs.dir sourceDir
     def pdfStylesDir = "${rootProject.projectDir}/src/main/pdf-theme"
     def pdfFontDir = "${buildDir}/fonts"
+    def forLang
     // outputs.dir outputDir
+
     doLast {
         project.ext.driverLanguages.each { lang, info ->
             println "[+] Driver Manual PDF for ${lang}"
+            switch (lang) {
+                case "dotnet"     : forLang = "for C#"; break;
+                case "java"       : forLang = "for Java"; break;
+                case "javascript" : forLang = "for JavaScript"; break;
+                case "python"     : forLang = "for Python"; break;
+                case "go"         : forLang = "for Go"; break;
+                default:          forLang = ""; 
+           }
+
             def attrs = asciidoctorAttributes.common + asciidoctorAttributes.pdf + [
                     ('include-with-' + lang) : true,
                     'driver-manual-version'  : versions.driverDocs,
@@ -650,6 +662,7 @@ task pdf(dependsOn: [prepareDriverSources, unzipDownloadedFonts]) {
                     'imagesdir'              : imagesDir.toString(),
                     'pdf-stylesdir'          : pdfStylesDir.toString(),
                     'pdf-fontsdir'           : pdfFontDir.toString(),
+                    'for-lang'               : forLang
             ]
             def opts = org.asciidoctor.OptionsBuilder.options()
                     .backend('pdf')
