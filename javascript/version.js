@@ -1,11 +1,11 @@
 window.docMeta = (function () {
-  var version = '1.7-preview';
+  var version = '1.7';
   var name = 'driver-manual';
   var href = window.location.href;
   return {
     name: name,
     version: version,
-    availableDocVersions: ["1.7-preview"],
+    availableDocVersions: ["1.7"],
     thisPubBaseUri: href.substring(0, href.indexOf(name) + name.length) + '/' + version,
     unversionedDocBaseUri: href.substring(0, href.indexOf(name) + name.length) + '/',
     commonDocsBaseUri: href.substring(0, href.indexOf(name) - 1)
