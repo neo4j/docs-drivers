@@ -89,7 +89,7 @@ Inbound conversion is carried out using http://cldr.unicode.org/development/deve
 [options="header", cols="m,"]
 |===
 | Neo4j type        | Go type
-| null | `null`
+| null | `nil`
 | List | `[]interface{}`
 | Map | `map[string]interface{}`
 | Boolean | `bool`
