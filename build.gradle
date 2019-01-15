@@ -151,7 +151,7 @@ ext {
         'kerberosAddOn' : '1.0',
     ]
 
-    copyrightYear = '2018'
+    copyrightYear = '2019'
     docsBaseUri = "https://neo4j.com/docs"
     crossReferenceBase = [ // We have no strategy for cross references yet; always link to current.
             'cypher-manual'     : "${docsBaseUri}/cypher-manual/current",
@@ -185,6 +185,7 @@ ext {
         ],
         'docbook': [
             'imagesdir'          : 'images',
+            'docinfo1'           : '',
         ],
         'html': [
             'stylesdir'          : 'css',

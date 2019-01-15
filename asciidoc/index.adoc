@@ -24,12 +24,13 @@ ifndef::python-root[:python-root: {project-root}/build/driver-sources/python-dri
 :python-examples: {python-root}/test/examples
 :api-docs-base-uri: https://neo4j.com/docs/api
 
-Copyright (C) {copyright}
 
 ifndef::backend-pdf[]
 License: link:{common-license-page-uri}[Creative Commons 4.0]
 endif::[]
 ifdef::backend-pdf[]
+Copyright (C) {copyright}
+
 License: <<license, Creative Commons 4.0>>
 endif::[]
 
