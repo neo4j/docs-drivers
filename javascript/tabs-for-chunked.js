@@ -142,7 +142,7 @@ function updateSelectedLanguageFromQueryParams(availableLanguages) {
     if (languageFromParams && storageAvailable("sessionStorage")) {
         sessionStorage.setItem("code_example_language", languageFromParams);
     } else {
-        sessionStorage.setItem("code_example_language", availableLanguages[0]);
+        sessionStorage.setItem("code_example_language", Object.keys(availableLanguages)[0]);
     }
 }
   
