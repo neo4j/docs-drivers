@@ -23,6 +23,8 @@ buildscript {
         classpath 'net.sf.docbook:docbook-xsl:1.79.1:ns-resources@zip'
         classpath fileTree(dir: "${rootProject.projectDir}/lib", include: '*.jar')
         classpath files(catalogDir)
+        classpath "org.dom4j:dom4j:2.1.1"
+        classpath "jaxen:jaxen:1.1.6"
     }
 }
 
@@ -512,6 +514,32 @@ publishing {
     }
 }
 
+task sitemap() {
+    ext.contentMapXml = file("${projectDir}/docbook/content-map.xml")
+    def siteMapDir = "$buildDir/sitemap/$version"
+    outputs.dir siteMapDir
+
+    doLast {
+        def siteMap = org.dom4j.DocumentHelper.createDocument()
+        def urlset = siteMap.addElement("urlset", "http://www.sitemaps.org/schemas/sitemap/0.9")
+        def contentMap = new org.dom4j.io.SAXReader().read(contentMapXml)
+        contentMap.selectNodes('//processing-instruction("dbhtml")')
+            .collect { pi ->
+              pi.getText()                    // filename="installation/index.html"
+              .replaceAll("filename=|\"", "") // installation/index.html
+        }.each { filename ->
+               def url = "${docsBaseUri}/driver-manual/current" + "/" + filename
+               urlset.addElement("url").addElement("loc").addText(url)
+        }
+        mkdir(siteMapDir)
+        new org.dom4j.io.XMLWriter(
+            new FileOutputStream(file("$siteMapDir/sitemap.xml")),
+            org.dom4j.io.OutputFormat.createPrettyPrint()
+        ).write(siteMap)
+    }
+}
+
+
 task makeToc(type: XsltTask, dependsOn: docbook) {
     description 'Create a table of contents aka complete content map.'
     ext.sourceDir = docbook.outputDir
@@ -621,13 +649,14 @@ html {
     }
 }
 
-task packageHtml(type: Tar, dependsOn: html) {
+task packageHtml(type: Tar, dependsOn: [html, sitemap]) {
     description 'Package HTML for distribution.'
     baseName 'driver-manual'
     extension 'tar.gz'
     version versions.driverDocs
     compression = Compression.GZIP
     from { html }
+    from { sitemap }
     into "$baseName/$version"
     destinationDir file(distDir)
 }
