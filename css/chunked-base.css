@@ -239,6 +239,14 @@ h1 > a.link:hover, h2 > a.link:hover, h3 > a.link:hover, h4 > a.link:hover, h5 >
  * END Tide over until github
  */
 
+ .copy-to-clipboard {
+  vertical-align: top;
+  cursor: pointer;
+  top: 0.325rem;
+  right: 0.325rem;
+  position: absolute;
+}
+
 .programlisting { position: relative; }
 .programlisting code[data-lang]:before {
     display: none;

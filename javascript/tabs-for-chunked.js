@@ -1,3 +1,26 @@
+function copyToClipboardBind() {
+    var onClick = function copyToClipboardOnClick(element) {
+        var $temp = $("<textarea>");
+        $("body").append($temp);
+        text = element
+            .parent()
+            .text()
+            .replace("PM>", "");
+        $temp.val(text).select();
+        document.execCommand("copy");
+        $temp.remove();
+    };
+    elems = $($("code"));
+    elems.each(function(i, elem) {
+        elem = $(elem);
+        text = elem.text();
+        elem.append("<i class='copy fa fa-copy' />");
+        elem.find("i").click(function() {
+            onClick($(this));
+        });
+    });
+}
+
 function tabTheSource($content) {
     var LANGUAGES = {
         'dotnet': 'C#',
