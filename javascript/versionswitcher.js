@@ -25,18 +25,24 @@ function versionSwitcher( $ )
   function loadVersions() {
     var $navHeader = $( 'header' );
     var $additionalVersions = $( '<ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="dropdownMenu1"/>' );
+    var versionCount = 0;
     $.each( window.docMeta.availableDocVersions, function( index, version ) {
       if ( version === currentVersion ) {
         return;
       }
       else {
         addVersion( version, $additionalVersions );
+        versionCount++;
       }
     } );
 
     var $dropdown = $( '<div id="additional-versions"><div class="dropdown"><a class="dropdown-toggle"id="dropdownMenu1" data-toggle="dropdown">Versions <i class="fa fa-caret-down"></i></a></div></div>' );
     $dropdown.children().first().append( $additionalVersions );
     $navHeader.append( $dropdown );
+    if ( versionCount == 0)
+    {
+      $dropdown.css('visibility', 'hidden');
+    }
   }
 
   function addVersion( version, $container ) {
