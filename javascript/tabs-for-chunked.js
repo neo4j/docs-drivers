@@ -14,7 +14,7 @@ function copyToClipboardBind() {
     elems.each(function(i, elem) {
         elem = $(elem);
         text = elem.text();
-        elem.append("<i class='copy fa fa-copy' />");
+        elem.append("<i class='copy-to-clipboard fa fa-copy' />");
         elem.find("i").click(function() {
             onClick($(this));
         });
@@ -140,6 +140,7 @@ function tabTheSource($content) {
         $exampleBlock.children('div.example-title', this).first().after($ul);
         $exampleBlock.append($wrapper);
     }
+    copyToClipboardBind();
 }
 
 function storageAvailable(type) {

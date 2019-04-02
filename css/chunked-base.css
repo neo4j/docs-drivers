@@ -239,14 +239,6 @@ h1 > a.link:hover, h2 > a.link:hover, h3 > a.link:hover, h4 > a.link:hover, h5 >
  * END Tide over until github
  */
 
- .copy-to-clipboard {
-  vertical-align: top;
-  cursor: pointer;
-  top: 0.325rem;
-  right: 0.325rem;
-  position: absolute;
-}
-
 .programlisting { position: relative; }
 .programlisting code[data-lang]:before {
     display: none;
@@ -254,7 +246,7 @@ h1 > a.link:hover, h2 > a.link:hover, h3 > a.link:hover, h4 > a.link:hover, h5 >
     position: absolute;
     font-size: 0.8em;
     top: 0.425rem;
-    right: 0.5rem;
+    right: 1.3rem;
     line-height: 1;
     text-transform: uppercase;
     color: #999;
@@ -262,6 +254,24 @@ h1 > a.link:hover, h2 > a.link:hover, h3 > a.link:hover, h4 > a.link:hover, h5 >
 
 .programlisting:hover code[data-lang]:before {
     display: block;
+}
+
+.programlisting .copy-to-clipboard {
+  display: none;
+  position: absolute;
+  vertical-align: top;
+  cursor: pointer;
+  top: 0.325rem;
+  right: 0.325rem;
+  color: #999;
+}
+
+.programlisting:hover .copy-to-clipboard {
+    display: block;
+}
+
+.copy-to-clipboard:hover {
+    color: #000;
 }
 
 div.toc ul {
