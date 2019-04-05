@@ -499,6 +499,7 @@ The actual removal happens during connection acquisition so that the new session
 Setting this option to a low value will cause a high connection churn, and can result in a performance drop.
 It is recommended to pick a value smaller than the maximum lifetime exposed by the surrounding system infrastructure (such as operating system, router, load balancer, proxy and firewall).
 Negative values result in lifetime not being checked.
++
 Default value: 1h.
 
 `MaxConnectionPoolSize`::
@@ -507,12 +508,14 @@ In other words, for a direct driver, this sets the maximum number of connections
 For a routing driver this sets the maximum amount of connections per cluster member.
 If a session or transaction tries to acquire a connection at a time when the pool size is at its full capacity, it must wait until a free connection is available in the pool or the request to acquire a new connection times out.
 The connection acquiring timeout is configured via `ConnectionAcquisitionTimeout`.
++
 Default value: This is different for different drivers, but is a number in the order of 100.
 
 `ConnectionAcquisitionTimeout`::
 This setting limits the amount of time a session or transaction can spend waiting for a free connection to appear in the pool before throwing an exception.
 The exception thrown in this case is `ClientException`.
 Timeout only applies when connection pool is at its max capacity.
++
 Default value: 1m.
 
 
