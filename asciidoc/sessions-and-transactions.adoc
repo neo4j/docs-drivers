@@ -223,12 +223,12 @@ While this form is useful for a handful of use cases, it is recommended to use t
 
 Both auto-commit and explicit transactions can be assigned _metadata_, and a _timeout_.
 
-Metadata is a map of arbitrary values that will be attached to the executing transaction. 
-It will be visible in the output of the procedures `<<operations-manual#query-management-list-queries, dbms.listQueries>>` and `<<operations-manual#transaction-management-list-transactions, dbms.listTransactions>>`. 
+Metadata is a map of arbitrary values that will be attached to the executing transaction.
+It will be visible in the output of the procedures `<<operations-manual#query-management-list-queries, dbms.listQueries>>` and `<<operations-manual#transaction-management-list-transactions, dbms.listTransactions>>`.
 It will also get logged to the `<<operations-manual#query-logging, query.log>>`.
 
 A timeout will cause the related transaction to be terminated by the database if its execution time is longer than the provided value.
-This functionality allows to limit query/transaction execution time. 
+This functionality allows to limit query/transaction execution time.
 A specified timeout overrides the default timeout defined by the configuration setting `<<operations-manual#config_dbms.transaction.timeout, config_dbms.transaction.timeout>>`.
 
 For usage patterns, please refer to the <<driver-api-docs, API documentation>> for your specific language.
@@ -333,20 +333,20 @@ include::{python-examples}/pass_bookmarks_example.py[tags=pass-bookmarks]
 ======
 ====
 
-We are using three separate sessions: a, b and c.
-In _session a_ we run two separate transactions.
+We are using three separate sessions: A, B and C.
+In _Session A_ we run two separate transactions.
 In the first one we create the person `Alice`, and in the second one we record that she works at `Wayne Enterprises`.
 The bookmark being passed between the two transactions is handled by the session.
 The bookmark from the last transaction is saved into an array for future use.
 
-In _session b_ we also run two separate transactions.
+In _Session B_ we also run two separate transactions.
 In the first one we create the person `Bob`, and in the second one we record that he works at `LexCorp`.
 Again, the bookmark being passed between the two transactions is handled by the session.
 The bookmark from the last transaction is saved into an array for future use.
 
-In the last session, _session c_, we wish to create a friendship between Alice and Bob.
+In the last session, _Session C_, we wish to create a friendship between Alice and Bob.
 This can only be done if both `Alice` and `Bob` have been created first.
-In order to ensure this, we pass the bookmarks from the last transactions in _session a_ and _session b_, respectively.
+In order to ensure this, we pass the bookmarks from the last transactions in _Session A_ and _Session B_, respectively.
 
 
 [TIP]
