@@ -101,7 +101,7 @@ Note that a routing driver is generally preferable when working with a Causal Cl
 A routing driver is created via a `bolt+routing` URI, for example: `bolt+routing://graph.example.com:7687`.
 The address in the URI must be that of a Core Server.
 This kind of driver uses the <<term-bolt-routing-protocol, Bolt Routing Protocol>> and works in tandem with the cluster to route transactions to available cluster members.
- 
+
 === Routing drivers with routing context
 
 Routing drivers with routing context are an available option when using drivers of version 1.3 or above together with a Neo4j Causal Cluster of version 3.2 or above.
@@ -255,7 +255,7 @@ The basic authentication scheme can also be used to authenticate against an LDAP
 
 === Kerberos authentication
 
-The Kerberos authentication scheme provides a simple way to create a Kerberos authentication token with a base64 encoded server authentication ticket. 
+The Kerberos authentication scheme provides a simple way to create a Kerberos authentication token with a base64 encoded server authentication ticket.
 The best way to create a Kerberos authentication token is shown below:
 
 [.tabbed-example]
@@ -721,3 +721,64 @@ include::{python-examples}/service_unavailable_example.py[tags=service-unavailab
 ====
 
 
+[[driver-transactions-access-mode]]
+== Access modes
+
+Transactions can be executed in either `read` or `write` mode.
+In a Causal Cluster, each transaction will be routed to an appropriate server based on the mode.
+When using a single instance, all transactions will be passed to that one server.
+Routing Cypher by identifying reads and writes can improve the utilization of available cluster resources:
+as read servers are typically more plentiful than write servers, it is beneficial to direct as much as possible of read transactions to read servers.
+Doing so helps keeping write servers available for write transactions.
+
+Access modes can be supplied in two ways: per transaction or per session.
+An access mode specified at session creation can be overridden by the access mode of a transaction within that session.
+In the general case, access mode should always be specified at transaction level, using <<driver-transactions-transaction-functions, transaction functions>>.
+The session-level setting is only necessary for explicit and auto-commit transactions.
+
+Note that the driver does not parse Cypher and cannot determine whether a transaction is intended to carry out read or write operations.
+As a result of this, a `write` transaction tagged for `read` will be sent to a read server, but will fail on execution.
+
+[.tabbed-example]
+.Read-write transaction
+====
+[.include-with-dotnet]
+======
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=read-write-transaction]
+----
+======
+
+[.include-with-go]
+======
+[source, go]
+----
+include::{go-examples}/examples_test.go[tags=read-write-transaction]
+----
+======
+
+[.include-with-java]
+======
+[source, java]
+----
+include::{java-examples}/ReadWriteTransactionExample.java[tags=read-write-transaction]
+----
+======
+
+[.include-with-javascript]
+======
+[source, javascript]
+----
+include::{javascript-examples}/examples.test.js[tags=read-write-transaction]
+----
+======
+
+[.include-with-python]
+======
+[source, python]
+----
+include::{python-examples}/read_write_transaction_example.py[tags=read-write-transaction]
+----
+======
+====
