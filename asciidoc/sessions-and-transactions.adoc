@@ -16,7 +16,7 @@ This section describes how to create units of work and provide a logical context
 | Java | ✔ | ✔ | ✔
 | Python | ✔ | ? | ✔
 | JavaScript | x | ✔ | ✔
-| .Net | ✔ | ✔ | ✔
+| .NET | ✔ | ✔ | ✔
 | Go | ✔ | ? | ?
 |===
 
