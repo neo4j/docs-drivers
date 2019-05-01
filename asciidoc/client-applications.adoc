@@ -101,7 +101,7 @@ Note that a routing driver is generally preferable when working with a Causal Cl
 A routing driver is created via a `bolt+routing` URI, for example: `bolt+routing://graph.example.com:7687`.
 The address in the URI must be that of a Core Server.
 This kind of driver uses the <<term-bolt-routing-protocol, Bolt Routing Protocol>> and works in tandem with the cluster to route transactions to available cluster members.
- 
+
 === Routing drivers with routing context
 
 Routing drivers with routing context are an available option when using drivers of version 1.3 or above together with a Neo4j Causal Cluster of version 3.2 or above.
@@ -255,7 +255,7 @@ The basic authentication scheme can also be used to authenticate against an LDAP
 
 === Kerberos authentication
 
-The Kerberos authentication scheme provides a simple way to create a Kerberos authentication token with a base64 encoded server authentication ticket. 
+The Kerberos authentication scheme provides a simple way to create a Kerberos authentication token with a base64 encoded server authentication ticket.
 The best way to create a Kerberos authentication token is shown below:
 
 [.tabbed-example]
@@ -496,9 +496,10 @@ Detailed descriptions of connection pool settings available via driver configura
 `MaxConnectionLifetime`::
 Pooled connections older than this threshold will be closed and removed from the pool.
 The actual removal happens during connection acquisition so that the new session returned is never backed by an old connection.
-Setting this option to a low value will cause a high connection churn and might result in a performance drop.
+Setting this option to a low value will cause a high connection churn, and can result in a performance drop.
 It is recommended to pick a value smaller than the maximum lifetime exposed by the surrounding system infrastructure (such as operating system, router, load balancer, proxy and firewall).
 Negative values result in lifetime not being checked.
++
 Default value: 1h.
 
 `MaxConnectionPoolSize`::
@@ -507,12 +508,14 @@ In other words, for a direct driver, this sets the maximum number of connections
 For a routing driver this sets the maximum amount of connections per cluster member.
 If a session or transaction tries to acquire a connection at a time when the pool size is at its full capacity, it must wait until a free connection is available in the pool or the request to acquire a new connection times out.
 The connection acquiring timeout is configured via `ConnectionAcquisitionTimeout`.
++
 Default value: This is different for different drivers, but is a number in the order of 100.
 
 `ConnectionAcquisitionTimeout`::
 This setting limits the amount of time a session or transaction can spend waiting for a free connection to appear in the pool before throwing an exception.
 The exception thrown in this case is `ClientException`.
 Timeout only applies when connection pool is at its max capacity.
++
 Default value: 1m.
 
 
@@ -719,5 +722,3 @@ include::{python-examples}/service_unavailable_example.py[tags=service-unavailab
 ----
 ======
 ====
-
-
