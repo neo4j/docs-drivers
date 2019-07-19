@@ -601,7 +601,7 @@ include::{java-examples}/ConfigConnectionTimeoutExample.java[tags=config-connect
 ======
 [source, javascript]
 ----
-This feature is not available in the JavaScript driver.
+include::{javascript-examples}/examples.test.js[tags=config-connection-timeout]
 ----
 ======
 
