@@ -3,7 +3,7 @@ font:
     Open Sans:
       normal: OpenSans-Regular.ttf
       bold: OpenSans-SemiBold.ttf
-      italic: OpenSans-Italic.ttf
+      italic: OpenSans-RegularItalic.ttf
       bold_italic: OpenSans-SemiBoldItalic.ttf
     Open Sans Light:
       normal: OpenSans-Light.ttf
@@ -16,7 +16,7 @@ font:
     Lora:
       normal: Lora-Regular.ttf
       bold: Lora-Bold.ttf
-      italic: Lora-Italic.ttf
+      italic: Lora-RegularItalic.ttf
       bold_italic: Lora-BoldItalic.ttf
 page:
   background_color: ffffff
@@ -264,4 +264,3 @@ footer:
     #left: '{page-number} | {chapter-title}'
     center: '{page-number}'
     #center: '{page-number}'
-
