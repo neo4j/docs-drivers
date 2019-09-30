@@ -3,7 +3,7 @@ font:
     Open Sans:
       normal: OpenSans-Regular.ttf
       bold: OpenSans-SemiBold.ttf
-      italic: OpenSans-RegularItalic.ttf
+      italic: OpenSans-Italic.ttf
       bold_italic: OpenSans-SemiBoldItalic.ttf
     Open Sans Light:
       normal: OpenSans-Light.ttf
@@ -16,7 +16,7 @@ font:
     Lora:
       normal: Lora-Regular.ttf
       bold: Lora-Bold.ttf
-      italic: Lora-RegularItalic.ttf
+      italic: Lora-Italic.ttf
       bold_italic: Lora-BoldItalic.ttf
 page:
   background_color: ffffff
