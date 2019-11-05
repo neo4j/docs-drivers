@@ -586,9 +586,7 @@ html {
         "Operations_Manual=${crossReferenceBase['operations-manual']}/",
         "Cypher_Manual=${crossReferenceBase['cypher-manual']}/",
         "Driver_Manual=${crossReferenceBase['driver-manual']}/",
-        "OGM_Manual=${crossReferenceBase['ogm-manual']}/",
-        "Graph_Algorithms=${crossReferenceBase['graph-algorithms']}/",
-        "Java_Reference=${crossReferenceBase['java-reference']}/",
+        "Docs_Library=${docsBaseUri}/",
     ].join(" ")
     def scripts = [
         '//ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js',
