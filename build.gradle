@@ -180,6 +180,7 @@ ext {
             'docs-version'                     : versions.driverDocs,
             'common-license-page-uri'          : "$docsBaseUri/license/",
             'dotnet-driver-apidoc-version'     : dotnetDriverApiDocVersion,
+            'docs-base-uri'                    : docsBaseUri,
             'go-driver-apidoc-version'         : goDriverApiDocVersion,
             'java-driver-apidoc-version'       : javaDriverApiDocVersion,
             'javascript-driver-apidoc-version' : javascriptDriverApiDocVersion,
