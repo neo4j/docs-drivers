@@ -690,7 +690,7 @@ task pdf(dependsOn: [prepareDriverSources, unzipDownloadedFonts]) {
                 case "javascript" : forLang = "for JavaScript"; break;
                 case "python"     : forLang = "for Python"; break;
                 case "go"         : forLang = "for Go"; break;
-                default:          forLang = ""; 
+                default:          forLang = "";
            }
 
             def attrs = asciidoctorAttributes.common + asciidoctorAttributes.pdf + [
