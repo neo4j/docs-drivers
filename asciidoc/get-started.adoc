@@ -28,8 +28,7 @@ The following languages and frameworks are officially supported by Neo4j:
 
 [NOTE]
 --
-* Python - The Python driver 4.0 GA will be delayed until 2020.
-* Go - There will be no Go driver release at this time.
+The 4.0 release of the Python and Go drivers are a work in progress. There is currently no release date available.
 
 See the 1.7 Driver documentation: {docs-base-uri}/driver-manual/1.7 for these drivers.
 --

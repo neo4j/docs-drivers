@@ -8,25 +8,26 @@ This section describes how to manage database connections within an application.
 
 
 [[driver-driver-object]]
-== The driver object
+== The Driver object
 
-A Neo4j client application will require a driver instance in order to provide access to the database.
-This driver should be made available to all parts of the application that need to interact with Neo4j.
-In languages where <<term-thread-safety, thread safety>> is an issue, the driver can be considered thread-safe.
+Neo4j client applications require a Driver object which, from a data access perspective, forms the backbone of the application.
+It is through this object that all Neo4j interaction is carried out, and it should therefore be made available to all parts of the application that require data access.
+In languages where <<term-thread-safety, thread safety>> is an issue, this Driver object can be considered thread-safe.
+
 
 [TIP]
 .A note on lifecycle
 --
-Applications will typically construct a driver instance on startup and destroy it on exit.
-Destroying a driver instance will immediately shut down any connections previously opened via that driver; for drivers that contain a connection pool, the entire pool will be shut down.
+Applications will typically construct a Driver object on startup and destroy it on exit.
+Destroying a Driver object will immediately shut down any connections previously opened via that driver, by closing the associated connection pool.
+This will have the consequence of rolling back any open transactions, and closing any unconsumed results.
 --
 
 To construct a driver instance, a <<driver-connection-uris, connection URI>> and <<driver-authentication, authentication information>> must be supplied.
 Additional configuration details can be supplied if required.
-All of these details are immutable for the lifetime of the driver.
-Therefore, if multiple configurations are required (such as when working with multiple database users) then multiple driver instances must be used.
+All of these details are immutable for the lifetime of the Driver.
+Therefore, if multiple configurations are required (such as when working with multiple database users) then multiple Driver instances must be used.
 
-An example of driver construction and destruction can be seen below:
 
 [.tabbed-example]
 .The driver lifecycle
@@ -39,13 +40,6 @@ include::{dotnet-examples}/Examples.cs[tags=driver-lifecycle]
 ----
 ======
 
-[.include-with-go]
-======
-[source, go]
-----
-include::{go-examples}/examples_test.go[tags=driver-lifecycle]
-----
-======
 
 [.include-with-java]
 ======
@@ -63,55 +57,117 @@ include::{javascript-examples}/examples.test.js[tags=driver-lifecycle]
 ----
 ======
 
-[.include-with-python]
-======
-[source, python]
-----
-include::{python-examples}/driver_lifecycle_example.py[tags=driver-lifecycle]
-----
-======
+// [.include-with-python]
+// ======
+// [source, python]
+// ----
+// include::{python-examples}/driver_lifecycle_example.py[tags=driver-lifecycle]
+// ----
+// ======
 ====
 
 
 [[driver-connection-uris]]
 == Connection URIs
 
-A connection URI identifies a graph database and how to connect to it.
-The official Neo4j drivers currently support the following URI schemes and driver object types:
+Connection URIs are typically formed according to the following pattern:
 
-.Available URI schemes
-[options="header"]
-|===
-| URI Scheme     | Driver object type
-| bolt           | Direct driver
-| bolt+routing   | Routing driver
-|===
+----
+neo4j://<HOST>:<PORT>[?<ROUTING_CONTEXT>]
+----
 
+This targets a routed Neo4j service that may be fulfilled by either a cluster or a single instance.
+The HOST and PORT values contain a logical hostname and port number targeting the entry point to the Neo4j service (e.g. neo4j://graph.example.com:7687).
+In a clustered environment, this will resolve to one of more of the core members; for standalone installations, this will simply point to that server address.
+The ROUTING_CONTEXT option allows for customization of the routing table and is discussed in more detail in <<driver-routing-context>>.
 
-=== Direct drivers (bolt)
+An alternative URI form, using the bolt URI scheme (e.g. `bolt://graph.example.com:7687`), can be used when a single point-to-point connection is required.
+This variant is useful for the subset client applications (such as admin tooling) that need to be aware of individual servers, as opposed to those which require a highly available database service.
 
-A direct driver is created via a `bolt` URI, for example: `bolt://localhost:7687`.
-This kind of driver is used to maintain connections to a single database server and is typically used when working with a single Neo4j instance or when targeting a specific member of a cluster.
-Note that a routing driver is generally preferable when working with a Causal Cluster.
+----
+bolt://<HOST>:<PORT>
+----
 
+=== Initial address resolution
 
-[[routing_drivers_bolt_routing]]
-=== Routing drivers (bolt+routing)
+The address provided in a `neo4j:// URI` is used for initial and fallback communication only.
+This communication occurs to bootstrap the initial routing table, through which all subsequent communication is carried out.
+Fallback occurs when the driver is unable to contact any of the addresses held in the routing table, and the initial address is once again reused to bootstrap the system.
 
-A routing driver is created via a `bolt+routing` URI, for example: `bolt+routing://graph.example.com:7687`.
-The address in the URI must be that of a Core Server.
-This kind of driver uses the <<term-bolt-routing-protocol, Bolt Routing Protocol>> and works in tandem with the cluster to route transactions to available cluster members.
+Several options are available for providing this initial logical to physical host resolution.
+These include regular DNS, custom middleware such as a load balancer, and the Driver object _resolver function_.
 
-=== Routing drivers with routing context
+==== DNS resolution
 
-Routing drivers with routing context are an available option when using drivers of version 1.3 or above together with a Neo4j Causal Cluster of version 3.2 or above.
-In such a setup, a routing driver can include a preferred routing context via the query part of the `bolt+routing` URI.
+DNS resolution is the default, and always-available option.
+As it is possible to configure DNS to resolve a single host name down to multiple IP addresses, this can be used to expose all core server IP addresses under a single host name.
 
-In the standard Neo4j configuration, routing contexts are defined on the server side by means of _server policies_.
-Thus the driver communicates the routing context to the cluster in the form of a server policy.
-It then obtains refined routing information back from the cluster, based on the server policy.
+image::dns-resolution.png[title="DNS resolution", role="middle"]
 
-The address in the URI of a routing driver with routing context must be that of a Core Server.
+==== Custom middleware
+
+Middleware, such as a load balancer, can be used to group the core servers under a single public address.
+
+image::custom-middleware.png[title="Custom middleware"]
+
+[[driver-resolver-function]]
+==== Resolver function
+
+Neo4j drivers also present an address resolution intercept hook called the resolver function.
+This takes the form of a callback function that accepts a single input address and yields or returns multiple output addresses.
+The function may hard code the output addresses or may draw them from another configuration source, as required.
+
+image::resolver-function.png[title="Resolver function"]
+
+The example below shows how to expand a single address into multiple (hard coded) output addresses:
+
+[.tabbed-example]
+.Custom Address Resolver
+====
+[.include-with-dotnet]
+======
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=config-custom-resolver]
+----
+======
+
+[.include-with-java]
+======
+[source, java]
+----
+include::{java-examples}/ConfigCustomResolverExample.java[tags=config-custom-resolver]
+----
+======
+
+[.include-with-javascript]
+======
+[source, javascript]
+----
+include::{javascript-examples}/examples.test.js[tags=config-custom-resolver]
+----
+======
+
+// [.include-with-python]
+// ======
+// [source, python]
+// ----
+// include::{python-examples}/custom_resolver_example.py[tags=custom-resolver]
+// ----
+// ======
+====
+
+=== Routing table
+
+The routing table is the glue between the driver connectivity layer and the database surface.
+This table contains a list of server addresses, grouped as readers and writers, and is refreshed automatically by the driver as required.
+
+The driver does not expose any API to work directly with the routing table, but it can sometimes be useful to explore when troubleshooting a system.
+
+[[driver-routing-context]]
+=== Routing context
+
+A routing context can be included as the query part of a `neo4j:// URI`. Routing contexts are defined by means of server policies and allow customisation of the contents of the routing table.
 
 .Configure a routing driver with routing context
 ====
@@ -133,63 +189,7 @@ For details on how to configure multi-data center routing policies for a Causal 
 ====
 
 
-=== Cluster bootstrap address resolution
 
-Drivers have the ability to intercept cluster bootstrap address resolution.
-This is generally performed by a routing driver on construction or after complete contact has been lost with a cluster.
-This hook can be useful to augment regular DNS resolution and can be used to initialize a routing driver with multiple server addresses.
-
-The intercept hook is provided as a driver configuration option and takes the form of a callback function that accepts a single input address and yields or returns multiple output addresses.
-This function may hard code the output addresses or may draw them from another configuration source, as required.
-Output addresses can contain host names or IP addresses and are forwarded to the connection pool as initial routers.
-
-image::resolution.svg[title="Cluster bootstrap address resolution", role="middle"]
-
-The example below shows how to expand a single address into multiple (hard coded) output addresses:
-
-[.tabbed-example]
-.Custom Address Resolver
-====
-[.include-with-dotnet]
-======
-[source, csharp]
-----
-include::{dotnet-examples}/Examples.cs[tags=config-custom-resolver]
-----
-======
-
-[.include-with-go]
-======
-[source, go]
-----
-include::{go-examples}/examples_test.go[tags=config-custom-resolver]
-----
-======
-
-[.include-with-java]
-======
-[source, java]
-----
-include::{java-examples}/ConfigCustomResolverExample.java[tags=config-custom-resolver]
-----
-======
-
-[.include-with-javascript]
-======
-[source, javascript]
-----
-include::{javascript-examples}/examples.test.js[tags=config-custom-resolver]
-----
-======
-
-[.include-with-python]
-======
-[source, python]
-----
-include::{python-examples}/custom_resolver_example.py[tags=custom-resolver]
-----
-======
-====
 
 [[driver-authentication]]
 == Authentication
@@ -215,14 +215,6 @@ include::{dotnet-examples}/Examples.cs[tags=basic-auth]
 ----
 ======
 
-[.include-with-go]
-======
-[source, go]
-----
-include::{go-examples}/examples_test.go[tags=basic-auth]
-----
-======
-
 [.include-with-java]
 ======
 [source, java]
@@ -239,13 +231,13 @@ include::{javascript-examples}/examples.test.js[tags=basic-auth]
 ----
 ======
 
-[.include-with-python]
-======
-[source, python]
-----
-include::{python-examples}/auth_example.py[tags=basic-auth]
-----
-======
+// [.include-with-python]
+// ======
+// [source, python]
+// ----
+// include::{python-examples}/auth_example.py[tags=basic-auth]
+// ----
+// ======
 ====
 
 [NOTE]
@@ -269,14 +261,6 @@ include::{dotnet-examples}/Examples.cs[tags=kerberos-auth]
 ----
 ======
 
-[.include-with-go]
-======
-[source, go]
-----
-include::{go-examples}/examples_test.go[tags=kerberos-auth]
-----
-======
-
 [.include-with-java]
 ======
 [source, java]
@@ -293,13 +277,13 @@ include::{javascript-examples}/examples.test.js[tags=kerberos-auth]
 ----
 ======
 
-[.include-with-python]
-======
-[source, python]
-----
-include::{python-examples}/kerberos_auth_example.py[tags=kerberos-auth]
-----
-======
+// [.include-with-python]
+// ======
+// [source, python]
+// ----
+// include::{python-examples}/kerberos_auth_example.py[tags=kerberos-auth]
+// ----
+// ======
 ====
 
 [NOTE]
@@ -324,14 +308,6 @@ include::{dotnet-examples}/Examples.cs[tags=custom-auth]
 ----
 ======
 
-[.include-with-go]
-======
-[source, go]
-----
-include::{go-examples}/examples_test.go[tags=custom-auth]
-----
-======
-
 [.include-with-java]
 ======
 [source, java]
@@ -348,19 +324,99 @@ include::{javascript-examples}/examples.test.js[tags=custom-auth]
 ----
 ======
 
-[.include-with-python]
-======
-[source, python]
-----
-include::{python-examples}/custom_auth_example.py[tags=custom-auth]
-----
-======
+// [.include-with-python]
+// ======
+// [source, python]
+// ----
+// include::{python-examples}/custom_auth_example.py[tags=custom-auth]
+// ----
+// ======
 ====
+
+
+[[driver-security]]
+== Security
+
+
+[CAUTION]
+There are significant changes to security settings in Neo4j 4.0. Please read this (and/or consult the migration guide) before upgrading from a previous version.
+
+Starting with Neo4j 4.0, client-server communication uses only *unencrypted local* connections by default.
+This is a change from previous versions, which switched on encryption by default, but generated a self-signed certificate out of the box.
+
+When a full certificate is installed, and encryption is enabled on the driver, full certificate checks are carried out (refer to <<operations-manual#ssl-framework, Operations Manual -> SSL framework >>).
+Full certificates provide better overall security than self-signed certificates as they include a complete chain of trust back to a root certificate authority.
+
+[NOTE]
+https://neo4j.com/aura/[Neo4j Aura] is a secure hosted service backed by full certificates signed by a root certificate authority.
+To connect to Neo4j Aura, driver users must enable encryption and the complete set of certificate checks (the latter of which are enabled by default).
+
+.Default settings
+[options="header"]
+|===
+| Setting | Neo4j 4.x | Neo4j 3.x (Drivers 1.x)
+| Bundled certificate | none | auto-generated, self-signed
+| Driver encryption   | off  | on
+| Bolt interface      | localhost |localhost
+| Certificate expiry check  | on  |on
+| Certificate CA check  | on  | off
+| Certificate hostname check  | on  | off
+|===
 
 
 [[driver-configuration]]
 == Configuration
 
+`ConnectionAcquisitionTimeout`::
+
+The maximum amount of time a session will wait when requesting a connection from the connection pool.
+For connection pools where all connections are currently being used and the `MaxConnectionPoolSize` limit has been reached, a session will wait this duration for a connection to be made available.
+
+Since the process of acquiring a connection may involve creating a new connection, ensure that the value of this configuration is higher than the configured `ConnectionTimeout`.
+Setting a low value will allow for transactions to “fail fast” when all connections in the pool have been acquired by other transactions.
+Setting a higher value will result in these transactions being queued, increasing the chances of eventually acquiring a connection at the cost of longer time to receive feedback on failure.
+Finding an optimal value may require an element of experimentation, taking into consideration the expected levels of parallelism within your application as well as the `MaxConnectionPoolSize.
+(Default: 60 seconds)
+
+`ConnectionTimeout`::
+
+The maximum amount of time to wait for a TCP connection to be established.
+Connections are only created when a session requires one unless there is an available connection in the connection pool.
+The driver maintains a pool of open connections which can be loaned to a session when one is available.
+If a connection is not available, then an attempt to create a new connection (provided the `MaxConnectionPoolSize` limit has not been reached) is made with this configuration option, providing the maximum amount of time to wait for the connection to be established.
+
+In environments with high latency and high occurences of connection timeouts it is recommended to configure a higher value.
+For lower latency environments and quicker feedback on potential network issues configure with a lower value.
+(Default: 30 seconds)
+
+`CustomResolver`::
+
+Specify a custom server address resolver used by the routing driver to resolve the initial address used to create the driver. See <<driver-resolver-function>> for more details.
+
+`Encryption`::
+
+Set whether the connections to the server uses encrypted connections.
+(Default: None)
+
+`MaxConnectionLifetime`::
+
+The maximum duration a connection can exist before being removed from the pool.
+The check on the connection’s lifetime happens when a session requires a connection.
+If the available connection’s lifetime is over this limit it is closed and a new connection is created, added to the pool and returned to the requesting session.
+Changing this configuration value would be useful in environments where users don’t have full control over the network environment and wish to proactively ensure all connections are ready.
+
+Setting this option to a low value will cause a high connection churn rate, and can result in a performance drop.
+It is recommended to pick a value smaller than the maximum lifetime exposed by the surrounding system infrastructure (such as operating system, router, load balancer, proxy and firewall).
+Negative values result in lifetime not being checked.
+(Default: 1 hour)
+
+`MaxConnectionPoolSize`::
+
+This setting defines the maximum total number of connections allowed, per host (i.e. cluster nodes), to be managed by the connection pool.
+In other words, for a direct driver using the `bolt://` scheme, this sets the maximum number of connections towards a single database server.
+For a driver connected to a cluster using the `neo4j://` scheme, this sets the maximum amount of connections per cluster member.
+If a session or transaction tries to acquire a connection at a time when the pool size is at its full capacity, it must wait until a free connection is available in the pool or the request to acquire a new connection times out.
+The connection acquiring timeout is configured via `ConnectionAcquisitionTimeout`.
 
 [[driver-configuration-encryption]]
 === Encryption
