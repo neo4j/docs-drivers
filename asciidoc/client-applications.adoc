@@ -371,8 +371,8 @@ To connect to Neo4j Aura, driver users must enable encryption and the complete s
 
 The maximum amount of time a session will wait when requesting a connection from the connection pool.
 For connection pools where all connections are currently being used and the `MaxConnectionPoolSize` limit has been reached, a session will wait this duration for a connection to be made available.
-
 Since the process of acquiring a connection may involve creating a new connection, ensure that the value of this configuration is higher than the configured `ConnectionTimeout`.
+
 Setting a low value will allow for transactions to “fail fast” when all connections in the pool have been acquired by other transactions.
 Setting a higher value will result in these transactions being queued, increasing the chances of eventually acquiring a connection at the cost of longer time to receive feedback on failure.
 Finding an optimal value may require an element of experimentation, taking into consideration the expected levels of parallelism within your application as well as the `MaxConnectionPoolSize.
@@ -395,7 +395,7 @@ Specify a custom server address resolver used by the routing driver to resolve t
 
 `Encryption`::
 
-Set whether the connections to the server uses encrypted connections.
+Specify whether to use an encrypted connection between the driver and server.
 (Default: None)
 
 `MaxConnectionLifetime`::
@@ -418,363 +418,46 @@ For a driver connected to a cluster using the `neo4j://` scheme, this sets the m
 If a session or transaction tries to acquire a connection at a time when the pool size is at its full capacity, it must wait until a free connection is available in the pool or the request to acquire a new connection times out.
 The connection acquiring timeout is configured via `ConnectionAcquisitionTimeout`.
 
-[[driver-configuration-encryption]]
-=== Encryption
+This configuration option allows you to manage the memory and I/O resources being used by the driver and tuning this option is dependent on these factors, in addition to number of cluster members.
+(Default: 100 connections [except .NET driver with 500 connections])
 
-TLS encryption is enabled for all connections by default.
-This can be disabled through configuration as follows:
+`MaxRetryTime`::
 
-[.tabbed-example]
-.Unencrypted
-====
-[.include-with-dotnet]
-======
-[source, csharp]
-----
-include::{dotnet-examples}/Examples.cs[tags=config-unencrypted]
-----
-======
+The maximum amount of time that a managed transaction will retry for before failing. Queries that are executed within a managed transaction gain the benefit of being retried when a transient error occurs.
+When this happens the transaction is retired multiple times up to the `MaxRetryTime`.
 
-[.include-with-go]
-======
-[source, go]
-----
-include::{go-examples}/examples_test.go[tags=config-unencrypted]
-----
-======
+Configure this option higher in high latency environments or if you are executing many large transactions which could limit the number of times that they are retired and therefore their chance to succeed.
+Configure lower in low latency environments and where your workload mainly consists of many smaller transactions.
+Failing transactions faster may highlight the reasons behind the transient errors making it easier to fix underlying issues.
+(Default: 30 seconds)
 
-[.include-with-java]
-======
-[source, java]
-----
-include::{java-examples}/ConfigUnencryptedExample.java[tags=config-unencrypted]
-----
-======
+`TrustStrategy`::
 
-[.include-with-javascript]
-======
-[source, javascript]
-----
-include::{javascript-examples}/examples.test.js[tags=config-unencrypted]
-----
-======
+Specify how to determine the authenticity of encryption certificates provided by the Neo4j instance that you are connecting to.
+There are three choices as to which strategy to use:
 
-[.include-with-python]
-======
-[source, python]
-----
-include::{python-examples}/config_unencrypted_example.py[tags=config-unencrypted]
-----
-======
-====
+* TRUST_SYSTEM_CA_SIGNED_CERTIFICATES - Trust strategy for certificates that can be verified through the local system store.
 
-The server can be modified to require encryption for all connections.
-Please see the <<operations-manual#connectors, Operations Manual -> Configure Neo4j connectors>> for more information.
+* TRUST_CUSTOM_CA_SIGNED_CERTIFICATES - Only encrypted connections to Neo4j instances with certificates signed by a trusted certificate will be accepted.
+To use this option you should configure the driver with a file containing the signed certificates. one or more trusted X.509 certificates.
 
-An attempt to connect to a server using an encryption setting not allowed by that server will result in a <<driver-service-unavailable, _Service unavailable_>> status.
+* TRUST_ALL_CERTIFICATES - Trust any certificate provided. This is intended for use with self-signed certificates. *We do not recommend using this setting for production environments.*
+
+(Default: TRUST_SYSTEM_CA_SIGNED_CERTIFICATES (Note - only when encryption is enabled))
+
+`KeepAlive`::
+
+Specify whether TCP keep-alive should be enabled. To ensure that the connection between the driver and server is still operational, the TCP layer can periodically send messages to check the connection.
+
+Please note that this is currently only configurable in the .NET driver.
+
+(Default value: true)
 
 
-[[driver-configuration-trust]]
-=== Trust
+[[driver-logging]]
+== Logging
 
-During a TLS handshake, the server provides a certificate to the client application.
-The application can choose to accept or reject this certificate based on one of the following trust strategies:
+All official Neo4j drivers log information to standard logging channels.
+This can typically be accessed in an ecosystem-specific way.
 
-.Trust strategies
-[options="header"]
-|===
-| Trust strategy                        | Description
-| `TRUST_ALL_CERTIFICATES` (default)    | Accept any certificate provided by the server, regardless of CA chain.
-| `TRUST_CUSTOM_CA_SIGNED_CERTIFICATES` | Accept any certificate that can be verified against a custom CA.
-| `TRUST_SYSTEM_CA_SIGNED_CERTIFICATES` | Accept any certificate that can be verified against the system store.
-|===
-
-https://en.wikipedia.org/wiki/Server_Name_Indication[Server Name Indication (SNI)] is enabled by default, allowing proxy middleware to route encrypted Bolt connections to the correct backend server.
-
-[.tabbed-example]
-.Trust
-====
-[.include-with-dotnet]
-======
-[source, csharp]
-----
-include::{dotnet-examples}/Examples.cs[tags=config-trust]
-----
-======
-
-[.include-with-go]
-======
-[source, go]
-----
-include::{go-examples}/examples_test.go[tags=config-trust]
-----
-======
-
-[.include-with-java]
-======
-[source, java]
-----
-include::{java-examples}/ConfigTrustExample.java[tags=config-trust]
-----
-======
-
-[.include-with-javascript]
-======
-[source, javascript]
-----
-include::{javascript-examples}/examples.test.js[tags=config-trust]
-----
-======
-
-[.include-with-python]
-======
-[source, python]
-----
-include::{python-examples}/config_trust_example.py[tags=config-trust]
-----
-======
-====
-
-
-[[driver-config-connection-pool-management]]
-=== Connection pool management
-
-The driver maintains a pool of connections.
-The pooled connections are reused by sessions and transactions to avoid the overhead added by establishing new connections for every query.
-The connection pool always starts up empty.
-New connections are created on demand by sessions and transactions.
-When a session or a transaction is done with its execution, the connection will be returned to the pool to be reused.
-
-Application users can tune connection pool settings to configure the driver for different use cases based on client performance requirements and database resource consumption limits.
-
-Detailed descriptions of connection pool settings available via driver configuration are listed below:
-
-`MaxConnectionLifetime`::
-Pooled connections older than this threshold will be closed and removed from the pool.
-The actual removal happens during connection acquisition so that the new session returned is never backed by an old connection.
-Setting this option to a low value will cause a high connection churn, and can result in a performance drop.
-It is recommended to pick a value smaller than the maximum lifetime exposed by the surrounding system infrastructure (such as operating system, router, load balancer, proxy and firewall).
-Negative values result in lifetime not being checked.
-+
-Default value: 1h.
-
-`MaxConnectionPoolSize`::
-This setting defines the maximum total number of connections allowed, per host, to be managed by the connection pool.
-In other words, for a direct driver, this sets the maximum number of connections towards a single database server.
-For a routing driver this sets the maximum amount of connections per cluster member.
-If a session or transaction tries to acquire a connection at a time when the pool size is at its full capacity, it must wait until a free connection is available in the pool or the request to acquire a new connection times out.
-The connection acquiring timeout is configured via `ConnectionAcquisitionTimeout`.
-+
-Default value: This is different for different drivers, but is a number in the order of 100.
-
-`ConnectionAcquisitionTimeout`::
-This setting limits the amount of time a session or transaction can spend waiting for a free connection to appear in the pool before throwing an exception.
-The exception thrown in this case is `ClientException`.
-Timeout only applies when connection pool is at its max capacity.
-+
-Default value: 1m.
-
-
-[.tabbed-example]
-.Connection pool management
-====
-[.include-with-dotnet]
-======
-[source, csharp]
-----
-include::{dotnet-examples}/Examples.cs[tags=config-connection-pool]
-----
-======
-
-[.include-with-go]
-======
-[source, go]
-----
-include::{go-examples}/examples_test.go[tags=config-connection-pool]
-----
-======
-
-[.include-with-java]
-======
-[source, java]
-----
-include::{java-examples}/ConfigConnectionPoolExample.java[tags=config-connection-pool]
-----
-======
-
-[.include-with-javascript]
-======
-[source, javascript]
-----
-include::{javascript-examples}/examples.test.js[tags=config-connection-pool]
-----
-======
-
-[.include-with-python]
-======
-[source, python]
-----
-include::{python-examples}/config_connection_pool_example.py[tags=config-connection-pool]
-----
-======
-====
-
-
-[[driver-configuration-connection-timeout]]
-=== Connection timeout
-
-To configure the maximum time allowed to establish a connection, pass a duration value to the driver configuration.
-For example:
-
-[.tabbed-example]
-.Connection timeout
-====
-[.include-with-dotnet]
-======
-[source, csharp]
-----
-include::{dotnet-examples}/Examples.cs[tags=config-connection-timeout]
-----
-======
-
-[.include-with-go]
-======
-[source, go]
-----
-include::{go-examples}/examples_test.go[tags=config-connection-timeout]
-----
-======
-
-[.include-with-java]
-======
-[source, java]
-----
-include::{java-examples}/ConfigConnectionTimeoutExample.java[tags=config-connection-timeout]
-----
-======
-
-[.include-with-javascript]
-======
-[source, javascript]
-----
-include::{javascript-examples}/examples.test.js[tags=config-connection-timeout]
-----
-======
-
-[.include-with-python]
-======
-[source, python]
-----
-include::{python-examples}/config_connection_timeout_example.py[tags=config-connection-timeout]
-----
-======
-====
-
-
-[[driver-configuration-max-retry-time]]
-=== Max retry time
-
-To configure retry behavior, supply a value for the maximum time in which to keep attempting retries of transaction functions.
-For example:
-
-[.tabbed-example]
-.Max retry time
-====
-[.include-with-dotnet]
-======
-[source, csharp]
-----
-include::{dotnet-examples}/Examples.cs[tags=config-max-retry-time]
-----
-======
-
-[.include-with-go]
-======
-[source, go]
-----
-include::{go-examples}/examples_test.go[tags=config-max-retry-time]
-----
-======
-
-[.include-with-java]
-======
-[source, java]
-----
-include::{java-examples}/ConfigMaxRetryTimeExample.java[tags=config-max-retry-time]
-----
-======
-
-[.include-with-javascript]
-======
-[source, javascript]
-----
-include::{javascript-examples}/examples.test.js[tags=config-max-retry-time]
-----
-======
-
-[.include-with-python]
-======
-[source, python]
-----
-include::{python-examples}/config_max_retry_time_example.py[tags=config-max-retry-time]
-----
-======
-====
-
-Note that the time specified here does not take into account the running time of the unit of work itself, merely a limit after which retries will no longer be attempted.
-
-
-[[driver-service-unavailable]]
-== Service unavailable
-
-A Service unavailable status will be signalled when the driver is no longer able to establish communication with the server, even after retries.
-Encountering this condition usually indicates a fundamental networking or database problem.
-Applications should be designed to cater for this eventuality.
-
-[.tabbed-example]
-.Service unavailable
-====
-[.include-with-dotnet]
-======
-
-[source, csharp]
-----
-include::{dotnet-examples}/Examples.cs[tags=service-unavailable]
-----
-======
-
-[.include-with-go]
-======
-[source, go]
-----
-include::{go-examples}/examples_test.go[tags=service-unavailable]
-----
-======
-
-[.include-with-java]
-======
-
-[source, java]
-----
-include::{java-examples}/ServiceUnavailableExample.java[tags=service-unavailable]
-----
-======
-
-[.include-with-javascript]
-======
-
-[source, javascript]
-----
-include::{javascript-examples}/examples.test.js[tags=service-unavailable]
-----
-======
-
-[.include-with-python]
-======
-
-[source, python]
-----
-include::{python-examples}/service_unavailable_example.py[tags=service-unavailable]
-----
-======
-====
+The code snippets below show how to redirect log messages to standard output.
