@@ -461,3 +461,23 @@ All official Neo4j drivers log information to standard logging channels.
 This can typically be accessed in an ecosystem-specific way.
 
 The code snippets below show how to redirect log messages to standard output.
+
+[cols="2,2a"]
+|===
+| .NET
+| [source, csharp]
+IDriver driver = GraphDatabase.Driver("neo4j://localhost:7687", AuthTokens.Basic("username", "pasSW0rd"), o => o.WithLogger(logger));
+| Java
+| [source, java]
+ ConfigBuilder.withLogging(Logging.console(Level.DEBUG))
+| JavaScript
+| [source, javascript]
+const loggingConfig = {logging: neo4j.logging.console('debug')};
+const driver = neo4j.driver(..., loggingConfig);
+| Python
+| [source, python]
+from logging import getLogger, StreamHandler, DEBUG
+handler = StreamHandler()
+handler.setLevel(DEBUG)
+getLogger("neo4j").addHandler(handler)
+|===
