@@ -8,20 +8,83 @@ This section describes how to create units of work and provide a logical context
 
 == Overview
 
-The Neo4j driver exposes a Cypher channel over which database work can be carried out.
+The Neo4j driver exposes a Cypher channel over which database work can be carried out (see the <<cypher-manual#cypher-manual, Cypher Manual>> for more information on the Cypher query language).
 Work itself is organized into sessions, transactions and queries as follows:
 
-image::<<TBA>>.svg[title="Sessions, queries and transactions", role="middle"]
+image::sessions-queries-transactions.png[title="Sessions, queries and transactions", role="middle"]
 
 Sessions are always bound to a single Cypher execution context, which is typically an individual database.
 Using the bookmark mechanism, sessions also provide a guarantee of correct transaction sequencing, even when transactions occur over multiple cluster members.
 This effect is known as causal chaining.
 
-== Bookmarks and causal chaining
+[[driver-sessions]]
+== Sessions
+
+Sessions are lightweight containers for causally chained sequences of transactions (see <<operations-manual#causal-consistency-explained, Operations Manual -> Causal consistency>>).
+They essentially provide context for storing transaction sequencing information in the form of bookmarks.
+
+When a transaction begins, the session in which it is contained acquires a connection from the Driver connection pool.
+On commit (or rollback) of the transaction, the session releases that connection again.
+This means that it is only when a session is carrying out work that it occupies a connection resource.
+When idle, no such resource is in use.
+
+Due to the sequencing guaranteed by a session, sessions may only host one transaction at a time. For parallel execution, multiple sessions should be used.
+In languages where <<term-thread-safety, thread safety>> is an issue, sessions should not be considered thread-safe.
+
+Closing a session forces any open transaction to be rolled back, and its associated connection to consequently be released back into the pool.
+
+Sessions are bound to a single transactional context, specified on construction. Neo4j exposes each database inside its own context, thereby prohibiting cross-database transactions (or sessions) by design.
+Similarly, sessions bound to different databases may not be causally chained by propagating bookmarks between them.
+
+Individual language drivers provide several session classes, each oriented around a particular programming style.
+Each class provides a similar set of functionality but offers client applications a choice based on how the application is structured and what frameworks are in use, if any.
+The session classes are described in Chapter 4 and detailed further in the relevant API documentation.
+
+
+[[driver-transactions]]
+== Transactions
+
+Transactions are atomic units of work containing one or more Cypher queries.
+These may contain read or write work, and will generally be routed to an appropriate server for execution, where they will be carried out in their entirety.
+If a transaction fails, it will need to be retried from the beginning, which is generally the responsibility of a transaction manager.
+
+The Neo4j driver provides transaction management via the transaction function mechanism.
+This mechanism is exposed through methods on the Session object which accept a function object that can be played multiple times against different servers until it either succeeds or a timeout is reached.
+This approach is recommended for most client applications.
+
+A convenient short-form alternative is the auto-commit transaction mechanism.
+This provides a limited form of transaction management for single-query transactions, as a trade-off for a slightly smaller code overhead.
+This form of transaction is useful for quick scripts and environments where high availability guarantees are not required.
+It is also the required form of transaction for running `PERIODIC COMMIT` queries, which are the only type of Cypher query to manage their own transactions.
+
+A lower-level unmanaged transaction API is also available for advanced use cases.
+This is useful when an alternative transaction management layer is applied by the client, in which error handling and retries need to be managed in a custom way.
+To find out more about how to use unmanaged transactions, look at the API docs for the relevant language.
+
+
+[[driver-queries-results]]
+== Queries and results
+
+_Queries_ consist of a request to the server to execute a Cypher statement, followed by a response back to the client with the result.
+Results are transmitted as a stream of records, along with header and footer metadata, and can be incrementally consumed by a client application.
+Neo4j 4.0 also introduces https://en.wikipedia.org/wiki/Reactive_programming[reactive capabilities], enhancing the semantics of the record stream by allowing a Cypher result to be paused or cancelled part way through.
+
+To execute a Cypher query, the query text is required along with an optional set of named parameters.
+The text can contain parameter placeholders that are substituted with the corresponding values at runtime.
+While it is possible to run non-parameterized Cypher, good programming practice is to use parameters in Cypher queries whenever possible.
+This allows for the caching of queries within the Cypher engine, which is beneficial for performance. Parameter values should adhere to <<driver-cypher-values>>.
+
+A result summary is also generally available.
+This contains additional information relating to the query execution and the result content. For an `EXPLAIN` or `PROFILE` query, this is where the query plan is returned.
+
+
+[[driver-causal-chaining]]
+== Causal chaining and bookmarks
 
 When working with a Causal Cluster, transactions can be chained, via a session, to ensure causal consistency.
 This means that for any two transactions, it is guaranteed that the second transaction will begin only after the first has been successfully committed.
 This is true even if the transactions are carried out on different physical cluster members.
+For more information on Causal Clusters, please refer to <<operations-manual#clustering, Operations Manual -> Clustering>>.
 
 Internally, causal chaining is carried out by passing bookmarks between transactions.
 Each bookmark records one or more points in transactional history for a particular database, and can be used to inform cluster members to carry out units of work in a particular sequence.
@@ -35,374 +98,30 @@ To opt out of this mechanism, for unrelated units of work, applications can use 
 This avoids the small latency overhead of the causal chain.
 
 Bookmarks can be passed between sessions by extracting the last bookmark from a session and passing this into the construction of another.
-Multiple bookmarks can also be combined if a transaction has more than one logical predecessor. 
+Multiple bookmarks can also be combined if a transaction has more than one logical predecessor.
 Note that it is only when chaining across sessions that an application will need to work with bookmarks directly.
 
-[[driver-sessions]]
-== Sessions
 
-A session is a container for a sequence of transactions.
-Sessions borrow connections from a pool as required and so should be considered lightweight and disposable.
-In languages where <<term-thread-safety, thread safety>> is an issue, a session should _not_ be considered thread-safe.
+[[driver-access-modes-transaction]]
+== Routing transactions using access modes
 
-In languages that support them, sessions are usually scoped within a context block.
-This ensures that they are properly closed and that any underlying connections are released and not leaked.
-
-[.tabbed-example]
-.Session
-====
-[.include-with-dotnet]
-======
-
-[source, csharp]
-----
-include::{dotnet-examples}/Examples.cs[tags=session]
-----
-======
-
-[.include-with-go]
-======
-
-[source, go]
-----
-include::{go-examples}/examples_test.go[tags=session]
-----
-======
-
-[.include-with-java]
-======
-
-[source, java]
-----
-include::{java-examples}/SessionExample.java[tags=session]
-----
-======
-
-[.include-with-javascript]
-======
-
-[source, javascript]
-----
-include::{javascript-examples}/examples.test.js[tags=session]
-----
-======
-
-[.include-with-python]
-======
-
-[source, python]
-----
-include::{python-examples}/session_example.py[tags=session]
-----
-======
-====
-
-
-[[driver-transactions]]
-== Transactions
-
-Transactions are atomic units of work consisting of one or more Cypher statement executions.
-A transaction is executed within a session.
-
-To execute a Cypher statement, two pieces of information are required: the statement template and a keyed set of parameters.
-The template is a string containing placeholders that are substituted with parameter values at runtime.
-While it is possible to run non-parameterized Cypher, good programming practice is to use parameters in Cypher statements.
-This allows for caching of statements within the Cypher engine, which is beneficial for performance.
-Parameter values should adhere to <<driver-cypher-values>>.
-
-The Neo4j driver API provides for three forms of transaction:
-
-* Auto-commit transactions
-* Transaction functions
-* Explicit transactions
-
-Of these, only <<driver-transactions-transaction-functions, transaction function>> can be automatically replayed on failure.
-
-
-[[driver-transactions-auto-commit]]
-=== Auto-commit Transactions
-
-An auto-commit transaction is a simple but limited form of transaction.
-Such a transaction consists of only one Cypher statement, cannot be automatically replayed on failure, and cannot take part in a <<driver-transactions-causal-chaining, causal chain>>.
-
-An auto-commit transaction is invoked using the `session.run` method:
-
-[.tabbed-example]
-.Auto-commit transaction
-====
-[.include-with-dotnet]
-======
-
-[source, csharp]
-----
-include::{dotnet-examples}/Examples.cs[tags=autocommit-transaction]
-----
-======
-
-[.include-with-go]
-======
-
-[source, go]
-----
-include::{go-examples}/examples_test.go[tags=autocommit-transaction]
-----
-======
-
-[.include-with-java]
-======
-
-[source, java]
-----
-include::{java-examples}/AutocommitTransactionExample.java[tags=autocommit-transaction]
-----
-======
-
-[.include-with-javascript]
-======
-
-[source, javascript]
-----
-include::{javascript-examples}/examples.test.js[tags=autocommit-transaction]
-----
-======
-
-[.include-with-python]
-======
-
-[source, python]
-----
-include::{python-examples}/autocommit_transaction_example.py[tags=autocommit-transaction]
-----
-======
-====
-
-Auto-commit transactions are sent to the network and acknowledged immediately.
-This means that multiple transactions cannot share network packets, thereby exhibiting a lesser network efficiency than other forms of transaction.
-
-Auto-commit transactions are intended to be used for simple use cases such as when learning Cypher or writing one-off scripts.
-It is not recommended to use auto-commit transactions in production environments or when performance or resilience are a primary concern.
-
-However, Auto-commit transactions are the only way to execute `<<cypher-manual#query-using-periodic-commit-hint, USING PERIODIC COMMIT>>` Cypher statements.
-
-
-[[driver-transactions-transaction-functions]]
-=== Transaction functions
-
-Transaction functions are the recommended form for containing transactional units of work.
-This form requires minimal boilerplate code and allows for a clear separation of database queries and application logic.
-
-[.tabbed-example]
-.Transaction function
-====
-[.include-with-dotnet]
-======
-[source, csharp]
-----
-include::{dotnet-examples}/Examples.cs[tags=transaction-function]
-----
-======
-
-[.include-with-go]
-======
-[source, go]
-----
-include::{go-examples}/examples_test.go[tags=transaction-function]
-----
-======
-
-[.include-with-java]
-======
-[source, java]
-----
-include::{java-examples}/TransactionFunctionExample.java[tags=transaction-function]
-----
-======
-
-[.include-with-javascript]
-======
-[source, javascript]
-----
-include::{javascript-examples}/examples.test.js[tags=transaction-function]
-----
-======
-
-[.include-with-python]
-======
-[source, python]
-----
-include::{python-examples}/transaction_function_example.py[tags=transaction-function]
-----
-======
-====
-
-Transaction functions are also able to handle connection problems and transient errors using an automatic retry mechanism.
-This retry capability can be <<driver-configuration-max-retry-time, configured>> on Driver construction.
-
-Any query results obtained within a transaction function should be consumed within that function.
-Transaction functions can return values but these should be derived values rather than raw results.
-
-
-[[driver-transactions-explicit]]
-=== Explicit transactions
-
-Explicit transactions are the longhand form of transaction functions, providing access to explicit `BEGIN`, `COMMIT` and `ROLLBACK` operations.
-While this form is useful for a handful of use cases, it is recommended to use transaction functions wherever possible.
-
-
-[[driver-transactions-configuration]]
-=== Transaction configuration
-
-Both auto-commit and explicit transactions can be assigned _metadata_, and a _timeout_.
-
-Metadata is a map of arbitrary values that will be attached to the executing transaction.
-It will be visible in the output of the procedures `<<operations-manual#query-management-list-queries, dbms.listQueries>>` and `<<operations-manual#transaction-management-list-transactions, dbms.listTransactions>>`.
-It will also get logged to the `<<operations-manual#query-logging, query.log>>`.
-
-A timeout will cause the related transaction to be terminated by the database if its execution time is longer than the provided value.
-This functionality allows to limit query/transaction execution time.
-A specified timeout overrides the default timeout defined by the configuration setting `<<operations-manual#config_dbms.transaction.timeout, config_dbms.transaction.timeout>>`.
-
-For usage patterns, please refer to the <<driver-api-docs, API documentation>> for your specific language.
-
-[[driver-transactions-cypher-errors]]
-=== Cypher errors
-
-When executing Cypher, it is possible for an exception to be thrown by the Cypher engine.
-Each such exception is associated with a <<status-codes#status-codes, status code>> that describes the nature of the error and a message that provides more detail.
-
-The error classifications are listed in the table below.
-
-.Error classifications
-[options="header"]
-|===
-| Classification 	| Description
-|ClientError            | The client application has caused an error.
-The application should amend and retry the operation.
-
-|DatabaseError          | The server has caused an error.
-Retrying the operation will generally be unsuccessful.
-
-|TransientError         | A temporary error has occurred.
-The application should retry the operation.
-|===
-
-
-[[driver-transactions-causal-chaining]]
-== Causal chaining
-
-When working with a Causal Cluster, transactions can be chained to ensure causal consistency.
-This means that for any two transactions, it is guaranteed that the second transaction will begin only after the first has been successfully committed.
-This is true even if the transactions are carried out on different physical cluster members.
-
-Causal chaining is carried out by passing <<term-bookmark, bookmarks>> between transactions.
-Each bookmark records a point in transactional history and can be used to inform cluster members to carry out units of work in a particular sequence.
-Internally, a bookmark is passed from server to client on successful completion of a transaction and back from client to server on start of a new transaction, even if the transaction is an <<driver-transactions-auto-commit, auto-commit transaction>>.
-On receipt of one or more bookmarks, the transaction will block until the server has fast forwarded to catch up with the latest of these.
-
-[NOTE]
---
-If you use the {driver-version} driver to connect to a Neo4j database that is version 3.4 or earlier, <<driver-transactions-auto-commit, auto-commit transactions>> cannot take part in the causal chain.
-In that configuration, session.run calls should be avoided in places where causal consistency is important.
---
-
-Within a session, bookmark propagation is carried out automatically and does not require any explicit signal or setting from the application.
-To opt out of this mechanism for unrelated units of work, applications can use multiple sessions.
-This avoids the small latency overhead of the causal chain.
-Propagation between sessions can be achieved by extracting the last bookmarks from one or more sessions and passing these into the construction of another.
-This is generally the only case in which an application will need to work with bookmarks directly.
-
-image::driver-passing-bookmarks.svg[title="Passing bookmarks", role="middle"]
-
-The following example illustrates the passing of bookmarks between sessions.
-First consider the code:
-
-[.tabbed-example]
-.Passing bookmarks between sessions
-====
-
-[.include-with-dotnet]
-======
-[source, csharp]
-----
-include::{dotnet-examples}/Examples.cs[tags=pass-bookmarks]
-----
-======
-
-[.include-with-go]
-======
-[source, go]
-----
-include::{go-examples}/examples_test.go[tags=pass-bookmarks]
-----
-======
-
-[.include-with-java]
-======
-[source, java]
-----
-include::{java-examples}/PassBookmarkExample.java[tags=pass-bookmarks]
-----
-======
-
-[.include-with-javascript]
-======
-[source, javascript]
-----
-include::{javascript-examples}/examples.test.js[tags=pass-bookmarks]
-----
-======
-
-[.include-with-python]
-======
-
-
-[source, python]
-----
-
-include::{python-examples}/pass_bookmarks_example.py[tags=pass-bookmarks]
-----
-======
-====
-
-We are using three separate sessions: A, B and C.
-In _Session A_ we run two separate transactions.
-In the first one we create the person `Alice`, and in the second one we record that she works at `Wayne Enterprises`.
-The bookmark being passed between the two transactions is handled by the session.
-The bookmark from the last transaction is saved into an array for future use.
-
-In _Session B_ we also run two separate transactions.
-In the first one we create the person `Bob`, and in the second one we record that he works at `LexCorp`.
-Again, the bookmark being passed between the two transactions is handled by the session.
-The bookmark from the last transaction is saved into an array for future use.
-
-In the last session, _Session C_, we wish to create a friendship between Alice and Bob.
-This can only be done if both `Alice` and `Bob` have been created first.
-In order to ensure this, we pass the bookmarks from the last transactions in _Session A_ and _Session B_, respectively.
-
-
-[TIP]
---
-If you try to extract a bookmark from a database which is not running in Causal Cluster mode, you will receive a `null` result.
---
-
-
-[[driver-transactions-access-mode]]
-== Access modes
-
-Transactions can be executed in either `read` or `write` mode.
+Transactions can be executed in either read or write mode; this is known as the access mode.
 In a Causal Cluster, each transaction will be routed to an appropriate server based on the mode.
 When using a single instance, all transactions will be passed to that one server.
-Routing Cypher by identifying reads and writes can improve the utilization of available cluster resources:
-as read servers are typically more plentiful than write servers, it is beneficial to direct as much as possible of read transactions to read servers.
-Doing so helps keeping write servers available for write transactions.
 
-Access modes can be supplied in two ways: per transaction or per session.
-An access mode specified at session creation can be overridden by the access mode of a transaction within that session.
-In the general case, access mode should always be specified at transaction level, using <<driver-transactions-transaction-functions, transaction functions>>.
-The session-level setting is only necessary for explicit and auto-commit transactions.
+Routing Cypher by identifying reads and writes can improve the utilization of available cluster resources.
+Since read servers are typically more plentiful than write servers, it is beneficial to direct read traffic to read servers instead of the write server.
+Doing so helps in keeping write servers available for write transactions.
 
-Note that the driver does not parse Cypher and cannot determine whether a transaction is intended to carry out read or write operations.
-As a result of this, a `write` transaction tagged for `read` will be sent to a read server, but will fail on execution.
+Access mode is generally specified by the method used to call the transaction function.
+Session classes provide a method for calling reads and another for writes.
+
+As a fallback for auto-commit and unmanaged transactions, a default access mode can also be provided at session level.
+This is only used in cases when the access mode cannot otherwise be specified, and will be overridden should a transaction function be used within that session.
+
+[NOTE]
+The driver does not parse Cypher and therefore cannot automatically determine whether a transaction is intended to carry out read or write operations.
+As a result, a write transaction tagged as a read will still be sent to a read server, but will fail on execution.
 
 [.tabbed-example]
 .Read-write transaction
@@ -415,13 +134,13 @@ include::{dotnet-examples}/Examples.cs[tags=read-write-transaction]
 ----
 ======
 
-[.include-with-go]
-======
-[source, go]
-----
-include::{go-examples}/examples_test.go[tags=read-write-transaction]
-----
-======
+// [.include-with-go]
+// ======
+// [source, go]
+// ----
+// include::{go-examples}/examples_test.go[tags=read-write-transaction]
+// ----
+// ======
 
 [.include-with-java]
 ======
@@ -439,89 +158,639 @@ include::{javascript-examples}/examples.test.js[tags=read-write-transaction]
 ----
 ======
 
-[.include-with-python]
-======
-[source, python]
-----
-include::{python-examples}/read_write_transaction_example.py[tags=read-write-transaction]
-----
-======
+// [.include-with-python]
+// ======
+// [source, python]
+// ----
+// include::{python-examples}/read_write_transaction_example.py[tags=read-write-transaction]
+// ----
+// ======
 ====
 
+[[driver-databases]]
+== Databases and execution context
 
-== Asynchronous programming
+Neo4j 4.0 introduces the ability to work with multiple databases within the same DBMS.
+For a single instance, this is limited to one user database, plus the `system` database.
+From a driver API perspective, a database can be selected on session construction, and is used as an execution context for the transactions within that session.
+It is not currently possible to execute a transaction across multiple databases.
 
-[NOTE]
---
-Java, .NET and JavaScript all support asynchronous programming.
-The examples here highlight specifically how Java and .NET provide for this programming model alongside their blocking API.
---
+In a multi-database environment, the server tags one database as default.
+This is selected whenever a session is created without naming a particular database as default.
 
-In addition to the methods listed in the previous sections, there also exist several asynchronous methods which allow for better integration with applications written in an asynchronous style.
-Asynchronous methods are named as their synchronous counterparts but with an additional _async_ prefix.
+In an environment with only a single database, that database is always the default.
+
+For more information about the multi-database feature, refer to the <<cypher-manual#cypher-manual, Cypher manual>> which has a full breakdown of the Neo4j data storage hierarchy.
+
+=== The `system` database
+
+Some administrative operations must be carried out against the `system` database.
+To do this, construct a session targeting the database called `system` and execute Cypher as usual.
+
+
+[[driver-type-mapping]]
+== Type mapping
+
+
+
+Drivers translate between application language types and the Cypher type system.
+To pass parameters and process results, it is important to know the basics of how Cypher works with types and to understand how the Cypher types are mapped in the driver.
+
+The table below shows the available data types.
+All can be potentially found in results although not all can be used as parameters.
+
+====
+[options="header", cols=",,"]
+|===
+| Cypher Type | Parameter | Result
+| `null`* | ✔ | ✔
+| `List`  | ✔ | ✔
+| `Map`   | ✔ | ✔
+| `Boolean` | ✔ | ✔
+| `Integer` | ✔ | ✔
+| `Float` | ✔ | ✔
+| `String` | ✔ | ✔
+| `ByteArray` | ✔ | ✔
+| `Date` | ✔ | ✔
+| `Time` | ✔ | ✔
+| `LocalTime` | ✔ | ✔
+| `DateTime` | ✔ | ✔
+| `LocalDateTime` | ✔ | ✔
+| `Duration` | ✔ | ✔
+| `Point` | ✔ | ✔
+| `Node`** | | ✔
+| `Relationship`** | | ✔
+| `Path`** | | ✔
+|===
+
++*+ The null marker is not a type but a placeholder for absence of value.
+For information on how to work with null in Cypher, please refer to <<cypher-manual#cypher-working-with-null, Cypher Manual -> Working with `null`>>.
+
++**+ Nodes, relationships and paths are passed in results as snapshots of the original graph entities.
+   While the original entity IDs are included in these snapshots, no permanent link is retained back to the underlying server-side entities, which may be deleted or otherwise altered independently of the client copies.
+   Graph structures may not be used as parameters because it depends on application context whether such a parameter would be passed by reference or by value, and Cypher provides no mechanism to denote this.
+   Equivalent functionality is available by simply passing either the ID for pass-by-reference, or an extracted map of properties for pass-by-value.
+====
+
+The Neo4j driver maps Cypher types to and from native language types as depicted in the table below.
+Custom types (those not available in the language or standard library) are highlighted in *bold*.
 
 [.tabbed-example]
-.Asynchronous programming examples
-========
+.Map Neo4j types to native language types
+====
 [.include-with-dotnet]
 ======
+[options="header", cols=","]
+|===
+| Neo4j type        | .NET type
+| `null` | `null`
+| `List` | `IList<object>`
+| `Map` | `IDictionary<string, object>`
+| `Boolean` | `bool`
+| `Integer` | `long`
+| `Float` | `double`
+| `String` | `string`
+| `ByteArray` | `byte[]`
+| `Date` | *`LocalDate`*
+| `Time` | *`OffsetTime`*
+| `LocalTime` | *`LocalTime`*
+| `DateTime`* | *`ZonedDateTime`*
+| `LocalDateTime` | *`LocalDateTime`*
+| `Duration` | *`Duration`*
+| `Point` | *`Point`*
+| `Node` | *`INode`*
+| `Relationship` | *`IRelationship`*
+| `Path` | *`IPath`*
+|===
 
-.Auto-commit transactions
-[source, csharp]
-----
-include::{dotnet-examples}/ExamplesAsync.cs[tags=async-autocommit-transaction]
-----
-
-.Transaction functions
-[source, csharp]
-----
-include::{dotnet-examples}/ExamplesAsync.cs[tags=async-transaction-function]
-----
-
-.Explicit transactions
-[source, csharp]
-----
-include::{dotnet-examples}/ExamplesAsync.cs[tags=async-explicit-transaction]
-----
-
-[IMPORTANT]
---
-It is always important to close the session object and it is suggested to keep *session.CloseAsync* in a _finally_ block to make sure all resources (such as network connection) obtained by the session will always be cleaned up properly.
-The session *close* method also enforces rolling back of the last uncommitted or failed transaction in this session.
-Thus it is optional to put *tx.CommitAsync* or *tx.RollbackAsync* in a _finally_ block as long as the *close* of session where the transaction is created will be executed in an outer _finally_ block.
---
-
++*+ Time zone names adhere to the https://www.iana.org/time-zones[IANA system], rather than the https://docs.microsoft.com/en-us/windows-hardware/manufacture/desktop/default-time-zones[Windows system].
+Inbound conversion is carried out using http://cldr.unicode.org/development/development-process/design-proposals/extended-windows-olson-zid-mapping[Extended Windows-Olson zid mapping] as defined by Unicode CLDR.
 ======
+
+// [.include-with-go]
+// ======
+// [options="header", cols="m,"]
+// |===
+// | Neo4j type        | Go type
+// | null | `nil`
+// | List | `[]interface{}`
+// | Map | `map[string]interface{}`
+// | Boolean | `bool`
+// | Integer | `int64`
+// | Float | `float64`
+// | String | `string`
+// | ByteArray | `[]byte`
+// | Date | *`neo4j.Date`*
+// | Time | *`neo4j.OffsetTime`*
+// | LocalTime | *`neo4j.LocalTime`*
+// | DateTime | *`time.Time`**
+// | LocalDateTime | *`neo4j.LocalDateTime`*
+// | Duration | *`neo4j.Duration`*
+// | Point | *`neo4j.Point`*
+// | Node | *`neo4j.Node`*
+// | Relationship | *`neo4j.Relationship`*
+// | Path | *`neo4j.Path`*
+// |===
+//
+// +*+ When a `time.Time` value is sent/received through the driver and its `Zone()` returns a name of `Offset`, the value is stored with its offset value rather than its zone name.
+// ======
 
 [.include-with-java]
 ======
+[options="header", cols="m,"]
+|===
+| Neo4j type        | Java type
+| null | `null`
+| List | `List<Object>`
+| Map | `Map<String, Object>`
+| Boolean | `boolean`
+| Integer | `long`
+| Float | `double`
+| String | `String`
+| ByteArray | `byte[]`
+| Date | `LocalDate`
+| Time | `OffsetTime`
+| LocalTime | `LocalTime`
+| DateTime | `ZonedDateTime`
+| LocalDateTime | `LocalDateTime`
+| Duration | *`IsoDuration`**
+| Point | *`Point`*
+| Node | *`Node`*
+| Relationship | *`Relationship`*
+| Path | *`Path`*
+|===
 
-.Auto-commit transactions
-[source, java]
-----
-include::{java-examples}/AsyncAutocommitTransactionExample.java[tags=async-autocommit-transaction]
-----
-
-.Transaction functions
-[source, java]
-----
-include::{java-examples}/AsyncTransactionFunctionExample.java[tags=async-transaction-function]
-----
-
-.Explicit transactions
-[source, java]
-----
-include::{java-examples}/AsyncExplicitTransactionExample.java[tags=async-explicit-transaction]
-----
-
-[IMPORTANT]
---
-It is important to close the session object to make sure all resources (such as network connections) obtained by the session are cleaned up properly.
-It is therefore suggested to always do `Session#closeAsync()` at the end of the whole `CompletionStage` chain.
-Sessions should be closed regardless of whether the completes normally or exceptionally.
-Closing the session also enforces the rollback of the last uncommitted or failed transaction in the session.
-Thus it is optional to roll back the transaction using `Transaction#rollbackAsync()`, as long as the session is closed at the end of the full chain.
---
-
++*+ A `Duration` or `Period` passed as a parameter will always be implicitly converted to `IsoDuration`.
 ======
-========
+
+[.include-with-javascript]
+======
+[options="header", cols="m,"]
+|===
+| Neo4j type        | JavaScript type
+| null | `null`
+| List | `Array`
+| Map | `Object`
+| Boolean | `Boolean`
+| Integer | *`Integer`**
+| Float | `Number`
+| String | `String`
+| ByteArray | `Int8Array`
+| Date | *`Date`*
+| Time | *`Time`*
+| LocalTime | *`LocalTime`*
+| DateTime | *`DateTime`*
+| LocalDateTime | *`LocalDateTime`*
+| Duration | *`Duration`*
+| Point | *`Point`*
+| Node | *`Node`*
+| Relationship | *`Relationship`*
+| Path | *`Path`*
+|===
+
++*+ JavaScript has no native integer type so a custom type is provided. For convenience, this can be disabled through configuration so that the native Number type is used instead. Note that this can lead to a loss of precision.
+======
+
+// [.include-with-python]
+// ======
+// [options="header", cols="m,,"]
+// |===
+// | Neo4j type        | [deprecated]#Python 2 type# | Python 3 type
+// | null | `None` | `None`
+// | List | `list` | `list`
+// | Map | `dict` | `dict`
+// | Boolean | `bool` | `bool`
+// | Integer | `int / long`* | `int`
+// | Float | `float` | `float`
+// | String | `unicode`** | `str`
+// | ByteArray | `bytearray` | `bytearray`
+// | Date | *`neotime.Date`* | *`neotime.Date`*
+// | Time | *`neotime.Time`*† | *`neotime.Time`*†
+// | LocalTime | *`neotime.Time`*†† | *`neotime.Time`*††
+// | DateTime | *`neotime.DateTime`*† | *`neotime.DateTime`*†
+// | LocalDateTime | *`neotime.DateTime`*†† | *`neotime.DateTime`*††
+// | Duration | *`neotime.Duration`**** | *`neotime.Duration`****
+// | Point | *`Point`* | *`Point`*
+// | Node | *`Node`* | *`Node`*
+// | Relationship | *`Relationship`* | *`Relationship`*
+// | Path | *`Path`* | *`Path`*
+// |===
+//
+// +*+ While Cypher uses 64-bit signed integers, `int` can only hold integers up to `sys.maxint` in Python 2; `long` is used for values above this.
+//
+// +**+ In Python 2, a `str` passed as a parameter will always be implicitly converted to `unicode` via UTF-8.
+//
+// +***+ A `timedelta` passed as a parameter will always be implicitly converted to `neotime.Duration`.
+//
+// † Where tzinfo is not None.
+//
+// †† Where tzinfo is None.
+// ======
+====
+
+
+[[driver-exceptions-errors]]
+== Exceptions and error handling
+
+When executing Cypher or carrying out other operations with the driver, certain exceptions and error cases may arise.
+Server-generated exceptions are each associated with a <<status-codes#status-codes, status code>> that describes the nature of the problem and a message that provides more detail.
+
+The classifications are listed in the table below.
+
+.Server status code classifications
+[options="header"]
+|===
+| Classification 	| Description
+|ClientError            | The client application has caused an error.
+The application should amend and retry the operation.
+
+|DatabaseError          | The server has caused an error.
+Retrying the operation will generally be unsuccessful.
+
+|TransientError         | A temporary error has occurred.
+The application should retry the operation.
+|===
+
+=== Service unavailable
+
+A _Service Unavailable_ exception will be signalled when the driver is no longer able to establish communication with the server, even after retries.
+Encountering this condition usually indicates a fundamental networking or database problem.
+
+
+// [.tabbed-example]
+// .Session
+// ====
+// [.include-with-dotnet]
+// ======
+//
+// [source, csharp]
+// ----
+// include::{dotnet-examples}/Examples.cs[tags=session]
+// ----
+// ======
+//
+// [.include-with-go]
+// ======
+//
+// [source, go]
+// ----
+// include::{go-examples}/examples_test.go[tags=session]
+// ----
+// ======
+//
+// [.include-with-java]
+// ======
+//
+// [source, java]
+// ----
+// include::{java-examples}/SessionExample.java[tags=session]
+// ----
+// ======
+//
+// [.include-with-javascript]
+// ======
+//
+// [source, javascript]
+// ----
+// include::{javascript-examples}/examples.test.js[tags=session]
+// ----
+// ======
+//
+// [.include-with-python]
+// ======
+//
+// [source, python]
+// ----
+// include::{python-examples}/session_example.py[tags=session]
+// ----
+// ======
+// ====
+//
+//
+//
+//
+// [[driver-transactions-auto-commit]]
+// === Auto-commit Transactions
+//
+// An auto-commit transaction is a simple but limited form of transaction.
+// Such a transaction consists of only one Cypher statement, cannot be automatically replayed on failure, and cannot take part in a <<driver-transactions-causal-chaining, causal chain>>.
+//
+// An auto-commit transaction is invoked using the `session.run` method:
+//
+// [.tabbed-example]
+// .Auto-commit transaction
+// ====
+// [.include-with-dotnet]
+// ======
+//
+// [source, csharp]
+// ----
+// include::{dotnet-examples}/Examples.cs[tags=autocommit-transaction]
+// ----
+// ======
+//
+// [.include-with-go]
+// ======
+//
+// [source, go]
+// ----
+// include::{go-examples}/examples_test.go[tags=autocommit-transaction]
+// ----
+// ======
+//
+// [.include-with-java]
+// ======
+//
+// [source, java]
+// ----
+// include::{java-examples}/AutocommitTransactionExample.java[tags=autocommit-transaction]
+// ----
+// ======
+//
+// [.include-with-javascript]
+// ======
+//
+// [source, javascript]
+// ----
+// include::{javascript-examples}/examples.test.js[tags=autocommit-transaction]
+// ----
+// ======
+//
+// [.include-with-python]
+// ======
+//
+// [source, python]
+// ----
+// include::{python-examples}/autocommit_transaction_example.py[tags=autocommit-transaction]
+// ----
+// ======
+// ====
+//
+// Auto-commit transactions are sent to the network and acknowledged immediately.
+// This means that multiple transactions cannot share network packets, thereby exhibiting a lesser network efficiency than other forms of transaction.
+//
+// Auto-commit transactions are intended to be used for simple use cases such as when learning Cypher or writing one-off scripts.
+// It is not recommended to use auto-commit transactions in production environments or when performance or resilience are a primary concern.
+//
+// However, Auto-commit transactions are the only way to execute `<<cypher-manual#query-using-periodic-commit-hint, USING PERIODIC COMMIT>>` Cypher statements.
+//
+//
+// [[driver-transactions-transaction-functions]]
+// === Transaction functions
+//
+// Transaction functions are the recommended form for containing transactional units of work.
+// This form requires minimal boilerplate code and allows for a clear separation of database queries and application logic.
+//
+// [.tabbed-example]
+// .Transaction function
+// ====
+// [.include-with-dotnet]
+// ======
+// [source, csharp]
+// ----
+// include::{dotnet-examples}/Examples.cs[tags=transaction-function]
+// ----
+// ======
+//
+// [.include-with-go]
+// ======
+// [source, go]
+// ----
+// include::{go-examples}/examples_test.go[tags=transaction-function]
+// ----
+// ======
+//
+// [.include-with-java]
+// ======
+// [source, java]
+// ----
+// include::{java-examples}/TransactionFunctionExample.java[tags=transaction-function]
+// ----
+// ======
+//
+// [.include-with-javascript]
+// ======
+// [source, javascript]
+// ----
+// include::{javascript-examples}/examples.test.js[tags=transaction-function]
+// ----
+// ======
+//
+// [.include-with-python]
+// ======
+// [source, python]
+// ----
+// include::{python-examples}/transaction_function_example.py[tags=transaction-function]
+// ----
+// ======
+// ====
+//
+// Transaction functions are also able to handle connection problems and transient errors using an automatic retry mechanism.
+// This retry capability can be <<driver-configuration-max-retry-time, configured>> on Driver construction.
+//
+// Any query results obtained within a transaction function should be consumed within that function.
+// Transaction functions can return values but these should be derived values rather than raw results.
+//
+//
+// [[driver-transactions-explicit]]
+// === Explicit transactions
+//
+// Explicit transactions are the longhand form of transaction functions, providing access to explicit `BEGIN`, `COMMIT` and `ROLLBACK` operations.
+// While this form is useful for a handful of use cases, it is recommended to use transaction functions wherever possible.
+//
+//
+// [[driver-transactions-configuration]]
+// === Transaction configuration
+//
+// Both auto-commit and explicit transactions can be assigned _metadata_, and a _timeout_.
+//
+// Metadata is a map of arbitrary values that will be attached to the executing transaction.
+// It will be visible in the output of the procedures `<<operations-manual#query-management-list-queries, dbms.listQueries>>` and `<<operations-manual#transaction-management-list-transactions, dbms.listTransactions>>`.
+// It will also get logged to the `<<operations-manual#query-logging, query.log>>`.
+//
+// A timeout will cause the related transaction to be terminated by the database if its execution time is longer than the provided value.
+// This functionality allows to limit query/transaction execution time.
+// A specified timeout overrides the default timeout defined by the configuration setting `<<operations-manual#config_dbms.transaction.timeout, config_dbms.transaction.timeout>>`.
+//
+// For usage patterns, please refer to the <<driver-api-docs, API documentation>> for your specific language.
+//
+//
+//
+// [[driver-transactions-causal-chaining]]
+// == Causal chaining
+//
+// When working with a Causal Cluster, transactions can be chained to ensure causal consistency.
+// This means that for any two transactions, it is guaranteed that the second transaction will begin only after the first has been successfully committed.
+// This is true even if the transactions are carried out on different physical cluster members.
+//
+// Causal chaining is carried out by passing <<term-bookmark, bookmarks>> between transactions.
+// Each bookmark records a point in transactional history and can be used to inform cluster members to carry out units of work in a particular sequence.
+// Internally, a bookmark is passed from server to client on successful completion of a transaction and back from client to server on start of a new transaction, even if the transaction is an <<driver-transactions-auto-commit, auto-commit transaction>>.
+// On receipt of one or more bookmarks, the transaction will block until the server has fast forwarded to catch up with the latest of these.
+//
+// [NOTE]
+// --
+// If you use the {driver-version} driver to connect to a Neo4j database that is version 3.4 or earlier, <<driver-transactions-auto-commit, auto-commit transactions>> cannot take part in the causal chain.
+// In that configuration, session.run calls should be avoided in places where causal consistency is important.
+// --
+//
+// Within a session, bookmark propagation is carried out automatically and does not require any explicit signal or setting from the application.
+// To opt out of this mechanism for unrelated units of work, applications can use multiple sessions.
+// This avoids the small latency overhead of the causal chain.
+// Propagation between sessions can be achieved by extracting the last bookmarks from one or more sessions and passing these into the construction of another.
+// This is generally the only case in which an application will need to work with bookmarks directly.
+//
+// image::driver-passing-bookmarks.svg[title="Passing bookmarks", role="middle"]
+//
+// The following example illustrates the passing of bookmarks between sessions.
+// First consider the code:
+//
+// [.tabbed-example]
+// .Passing bookmarks between sessions
+// ====
+//
+// [.include-with-dotnet]
+// ======
+// [source, csharp]
+// ----
+// include::{dotnet-examples}/Examples.cs[tags=pass-bookmarks]
+// ----
+// ======
+//
+// [.include-with-go]
+// ======
+// [source, go]
+// ----
+// include::{go-examples}/examples_test.go[tags=pass-bookmarks]
+// ----
+// ======
+//
+// [.include-with-java]
+// ======
+// [source, java]
+// ----
+// include::{java-examples}/PassBookmarkExample.java[tags=pass-bookmarks]
+// ----
+// ======
+//
+// [.include-with-javascript]
+// ======
+// [source, javascript]
+// ----
+// include::{javascript-examples}/examples.test.js[tags=pass-bookmarks]
+// ----
+// ======
+//
+// [.include-with-python]
+// ======
+//
+//
+// [source, python]
+// ----
+//
+// include::{python-examples}/pass_bookmarks_example.py[tags=pass-bookmarks]
+// ----
+// ======
+// ====
+//
+// We are using three separate sessions: A, B and C.
+// In _Session A_ we run two separate transactions.
+// In the first one we create the person `Alice`, and in the second one we record that she works at `Wayne Enterprises`.
+// The bookmark being passed between the two transactions is handled by the session.
+// The bookmark from the last transaction is saved into an array for future use.
+//
+// In _Session B_ we also run two separate transactions.
+// In the first one we create the person `Bob`, and in the second one we record that he works at `LexCorp`.
+// Again, the bookmark being passed between the two transactions is handled by the session.
+// The bookmark from the last transaction is saved into an array for future use.
+//
+// In the last session, _Session C_, we wish to create a friendship between Alice and Bob.
+// This can only be done if both `Alice` and `Bob` have been created first.
+// In order to ensure this, we pass the bookmarks from the last transactions in _Session A_ and _Session B_, respectively.
+//
+//
+// [TIP]
+// --
+// If you try to extract a bookmark from a database which is not running in Causal Cluster mode, you will receive a `null` result.
+// --
+//
+//
+//
+//
+//
+// == Asynchronous programming
+//
+// [NOTE]
+// --
+// Java, .NET and JavaScript all support asynchronous programming.
+// The examples here highlight specifically how Java and .NET provide for this programming model alongside their blocking API.
+// --
+//
+// In addition to the methods listed in the previous sections, there also exist several asynchronous methods which allow for better integration with applications written in an asynchronous style.
+// Asynchronous methods are named as their synchronous counterparts but with an additional _async_ prefix.
+//
+// [.tabbed-example]
+// .Asynchronous programming examples
+// ========
+// [.include-with-dotnet]
+// ======
+//
+// .Auto-commit transactions
+// [source, csharp]
+// ----
+// include::{dotnet-examples}/ExamplesAsync.cs[tags=async-autocommit-transaction]
+// ----
+//
+// .Transaction functions
+// [source, csharp]
+// ----
+// include::{dotnet-examples}/ExamplesAsync.cs[tags=async-transaction-function]
+// ----
+//
+// .Explicit transactions
+// [source, csharp]
+// ----
+// include::{dotnet-examples}/ExamplesAsync.cs[tags=async-explicit-transaction]
+// ----
+//
+// [IMPORTANT]
+// --
+// It is always important to close the session object and it is suggested to keep *session.CloseAsync* in a _finally_ block to make sure all resources (such as network connection) obtained by the session will always be cleaned up properly.
+// The session *close* method also enforces rolling back of the last uncommitted or failed transaction in this session.
+// Thus it is optional to put *tx.CommitAsync* or *tx.RollbackAsync* in a _finally_ block as long as the *close* of session where the transaction is created will be executed in an outer _finally_ block.
+// --
+//
+// ======
+//
+// [.include-with-java]
+// ======
+//
+// .Auto-commit transactions
+// [source, java]
+// ----
+// include::{java-examples}/AsyncAutocommitTransactionExample.java[tags=async-autocommit-transaction]
+// ----
+//
+// .Transaction functions
+// [source, java]
+// ----
+// include::{java-examples}/AsyncTransactionFunctionExample.java[tags=async-transaction-function]
+// ----
+//
+// .Explicit transactions
+// [source, java]
+// ----
+// include::{java-examples}/AsyncExplicitTransactionExample.java[tags=async-explicit-transaction]
+// ----
+//
+// [IMPORTANT]
+// --
+// It is important to close the session object to make sure all resources (such as network connections) obtained by the session are cleaned up properly.
+// It is therefore suggested to always do `Session#closeAsync()` at the end of the whole `CompletionStage` chain.
+// Sessions should be closed regardless of whether the completes normally or exceptionally.
+// Closing the session also enforces the rollback of the last uncommitted or failed transaction in the session.
+// Thus it is optional to roll back the transaction using `Transaction#rollbackAsync()`, as long as the session is closed at the end of the full chain.
+// --
+//
+// ======
+// ========
