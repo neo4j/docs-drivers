@@ -49,6 +49,14 @@ pre code {
 .tabbed-example .content > div:last-child .highlight:last-child {
     margin-bottom: 0px;
 }
+td pre.programlisting {
+    background: transparent;
+    border: transparent;
+}
+td p code {
+    background: transparent;
+    border: transparent;
+}
 
 html, body, p, ul, ol, dl {
     font-family: "Open Sans", "DejaVu Sans", sans-serif;
