@@ -466,7 +466,8 @@ The code snippets below show how to redirect log messages to standard output.
 |===
 | .NET
 | [source, csharp]
-IDriver driver = GraphDatabase.Driver("neo4j://localhost:7687", AuthTokens.Basic("username", "pasSW0rd"), o => o.WithLogger(logger));
+#Please note that you will have to provide your own console logger implementing the ILogger interface.
+IDriver driver = GraphDatabase.Driver(..., o => o.WithLogger(logger));
 | Java
 | [source, java]
  ConfigBuilder.withLogging(Logging.console(Level.DEBUG))
