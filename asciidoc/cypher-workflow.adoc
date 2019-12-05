@@ -180,7 +180,7 @@ This is selected whenever a session is created without naming a particular datab
 
 In an environment with only a single database, that database is always the default.
 
-For more information about the multi-database feature, refer to the <<cypher-manual#cypher-manual, Cypher manual>> which has a full breakdown of the Neo4j data storage hierarchy.
+For more information about the multi-database feature, refer to the <<cypher-manual#cypher-manual, Cypher Manual>> which has a full breakdown of the Neo4j data storage hierarchy.
 
 === The `system` database
 
