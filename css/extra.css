@@ -42,6 +42,17 @@ pre code {
     word-wrap: normal;
     overflow-wrap: normal;
     white-space: pre;
+
+}
+
+td pre.programlisting {
+    background: transparent;
+    border: transparent;
+}
+
+td p code {
+    background: transparent;
+    border: transparent;
 }
 
 .tabbed-example .content > div:last-child,
