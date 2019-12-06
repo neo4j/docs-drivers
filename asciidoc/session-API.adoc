@@ -6,7 +6,7 @@
 This section details the Session API that are made available by the driver, with each Session class oriented towards a different form of programming.
 --
 
-
+[[driver-simple-sessions]]
 == Simple sessions
 
 [NOTE]
@@ -20,7 +20,97 @@ In general, simple sessions provide the easiest programming style to work with s
 Session lifetime extends from session construction to session closure.
 In languages that support them, simple sessions are usually scoped within a context block; this ensures that they are properly closed and that any underlying connections are released and not leaked.
 
+.Session construction and closure
+[cols="2,2a"]
+|===
+| .NET
+| [source, csharp]
+using (var session = driver.Session(...)) {
+    // transactions go here
+}
+| Java
+| [source, java]
+try (Session session = driver.session(...)) {
+    // transactions go here
+}
+| JavaScript
+| [source, javascript]
+ // Not available as JavaScript does not
+ // support blocking I/O
+| Python
+| [source, python]
+with driver.session(...) as session:
+    # transactions go here
+|===
 
+Sessions can be configured in a number of different ways.
+This is carried out by supplying configuration inside the session constructor.
+See 4.4. <<Session configuration>> for more details.
+
+=== Transaction functions
+
+Transaction functions are the recommended form for containing transactional units of work.
+This form of transaction requires minimal boilerplate code and allows for a clear separation of database queries and application logic.
+Transaction functions are also desirable since they encapsulate retry logic and allow for the greatest degree of flexibility when swapping out a single instance of server for a cluster.
+
+Functions can be called as either read or write operations.
+This choice will route the transaction to an appropriate server within a clustered environment.
+If you are in a single instance environment, this routing has no impact but it does give you the flexibility should you choose to later adopt a clustered environment.
+
+Before writing a transaction function it is important to ensure that any side-effects carried out by a transaction function should be designed to be idempotent.
+This is because a function may be executed multiple times if initial runs fail.
+
+Any query results obtained within a transaction function should be consumed within that function, as connection-bound resources cannot be managed correctly when out of scope.
+To that end, transaction functions can return values but these should be derived values rather than raw results.
+
+[NOTE]
+When a transaction fails, the driver retry logic is invoked. For several failure cases, the transaction can be immediately retried against a different server.
+These cases include connection issues, server role changes (e.g. leadership elections) and transient errors.
+Retry logic can be configured when creating a session.
+
+[.tabbed-example]
+.Transaction function
+====
+[.include-with-dotnet]
+======
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=transaction-function]
+----
+======
+
+[.include-with-go]
+======
+[source, go]
+----
+include::{go-examples}/examples_test.go[tags=transaction-function]
+----
+======
+
+[.include-with-java]
+======
+[source, java]
+----
+include::{java-examples}/TransactionFunctionExample.java[tags=transaction-function]
+----
+======
+
+[.include-with-javascript]
+======
+[source, javascript]
+----
+include::{javascript-examples}/examples.test.js[tags=transaction-function]
+----
+======
+
+[.include-with-python]
+======
+[source, python]
+----
+include::{python-examples}/transaction_function_example.py[tags=transaction-function]
+----
+======
+====
 
 
 [[driver-result]]
