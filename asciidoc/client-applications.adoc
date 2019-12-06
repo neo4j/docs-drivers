@@ -372,11 +372,11 @@ To connect to Neo4j Aura, driver users must enable encryption and the complete s
 The maximum amount of time a session will wait when requesting a connection from the connection pool.
 For connection pools where all connections are currently being used and the `MaxConnectionPoolSize` limit has been reached, a session will wait this duration for a connection to be made available.
 Since the process of acquiring a connection may involve creating a new connection, ensure that the value of this configuration is higher than the configured `ConnectionTimeout`.
-
++
 Setting a low value will allow for transactions to “fail fast” when all connections in the pool have been acquired by other transactions.
 Setting a higher value will result in these transactions being queued, increasing the chances of eventually acquiring a connection at the cost of longer time to receive feedback on failure.
 Finding an optimal value may require an element of experimentation, taking into consideration the expected levels of parallelism within your application as well as the `MaxConnectionPoolSize.
-(Default: 60 seconds)
+Default: 60 seconds
 
 `ConnectionTimeout`::
 
@@ -384,7 +384,7 @@ The maximum amount of time to wait for a TCP connection to be established.
 Connections are only created when a session requires one unless there is an available connection in the connection pool.
 The driver maintains a pool of open connections which can be loaned to a session when one is available.
 If a connection is not available, then an attempt to create a new connection (provided the `MaxConnectionPoolSize` limit has not been reached) is made with this configuration option, providing the maximum amount of time to wait for the connection to be established.
-
++
 In environments with high latency and high occurences of connection timeouts it is recommended to configure a higher value.
 For lower latency environments and quicker feedback on potential network issues configure with a lower value.
 (Default: 30 seconds)
@@ -396,7 +396,7 @@ Specify a custom server address resolver used by the routing driver to resolve t
 `Encryption`::
 
 Specify whether to use an encrypted connection between the driver and server.
-(Default: None)
+Default: None
 
 `MaxConnectionLifetime`::
 
@@ -404,11 +404,11 @@ The maximum duration a connection can exist before being removed from the pool.
 The check on the connection’s lifetime happens when a session requires a connection.
 If the available connection’s lifetime is over this limit it is closed and a new connection is created, added to the pool and returned to the requesting session.
 Changing this configuration value would be useful in environments where users don’t have full control over the network environment and wish to proactively ensure all connections are ready.
-
++
 Setting this option to a low value will cause a high connection churn rate, and can result in a performance drop.
 It is recommended to pick a value smaller than the maximum lifetime exposed by the surrounding system infrastructure (such as operating system, router, load balancer, proxy and firewall).
 Negative values result in lifetime not being checked.
-(Default: 1 hour)
+Default: 1 hour
 
 `MaxConnectionPoolSize`::
 
@@ -417,41 +417,42 @@ In other words, for a direct driver using the `bolt://` scheme, this sets the ma
 For a driver connected to a cluster using the `neo4j://` scheme, this sets the maximum amount of connections per cluster member.
 If a session or transaction tries to acquire a connection at a time when the pool size is at its full capacity, it must wait until a free connection is available in the pool or the request to acquire a new connection times out.
 The connection acquiring timeout is configured via `ConnectionAcquisitionTimeout`.
-
++
 This configuration option allows you to manage the memory and I/O resources being used by the driver and tuning this option is dependent on these factors, in addition to number of cluster members.
-(Default: 100 connections [except .NET driver with 500 connections])
+Default: 100 connections (except .NET driver with 500 connections)
 
 `MaxRetryTime`::
 
 The maximum amount of time that a managed transaction will retry for before failing. Queries that are executed within a managed transaction gain the benefit of being retried when a transient error occurs.
 When this happens the transaction is retired multiple times up to the `MaxRetryTime`.
-
++
 Configure this option higher in high latency environments or if you are executing many large transactions which could limit the number of times that they are retired and therefore their chance to succeed.
 Configure lower in low latency environments and where your workload mainly consists of many smaller transactions.
 Failing transactions faster may highlight the reasons behind the transient errors making it easier to fix underlying issues.
-(Default: 30 seconds)
+Default: 30 seconds
 
 `TrustStrategy`::
 
 Specify how to determine the authenticity of encryption certificates provided by the Neo4j instance that you are connecting to.
 There are three choices as to which strategy to use:
 
-* TRUST_SYSTEM_CA_SIGNED_CERTIFICATES - Trust strategy for certificates that can be verified through the local system store.
+* `TRUST_SYSTEM_CA_SIGNED_CERTIFICATES` - Trust strategy for certificates that can be verified through the local system store.
 
-* TRUST_CUSTOM_CA_SIGNED_CERTIFICATES - Only encrypted connections to Neo4j instances with certificates signed by a trusted certificate will be accepted.
+* `TRUST_CUSTOM_CA_SIGNED_CERTIFICATES` - Only encrypted connections to Neo4j instances with certificates signed by a trusted certificate will be accepted.
 To use this option you should configure the driver with a file containing the signed certificates. one or more trusted X.509 certificates.
 
-* TRUST_ALL_CERTIFICATES - Trust any certificate provided. This is intended for use with self-signed certificates. *We do not recommend using this setting for production environments.*
+* `TRUST_ALL_CERTIFICATES` - Trust any certificate provided. This is intended for use with self-signed certificates. *We do not recommend using this setting for production environments.*
 
-(Default: TRUST_SYSTEM_CA_SIGNED_CERTIFICATES (Note - only when encryption is enabled))
++
+Default: `TRUST_SYSTEM_CA_SIGNED_CERTIFICATES` (Note - only when encryption is enabled)
 
 `KeepAlive`::
 
 Specify whether TCP keep-alive should be enabled. To ensure that the connection between the driver and server is still operational, the TCP layer can periodically send messages to check the connection.
-
++
 Please note that this is currently only configurable in the .NET driver.
-
-(Default value: true)
++
+Default value: true
 
 
 [[driver-logging]]
