@@ -71,13 +71,18 @@ To find out the latest version of the driver, visit https://www.nuget.org/packag
 
 *Dependencies*
 
-* NETStandard.Library (^1.6.1)
+* .NETStandard (^2.0)
 * System.Net.NameResolution (^4.3.0)
-* System.Net.Security (^4.3.1)
+* System.Net.Security (^4.3.2)
 * System.Net.Sockets (^4.3.0)
-* System.Runtime.InteropServices.RuntimeInformation (^ .3.0)
+* System.Runtime.InteropServices.RuntimeInformation (^ 4.3.0)
 * System.Runtime.Serialization.Primitives (^4.3.0)
 * System.Threading.Thread (^4.3.0)
+* System.ValueTuple (^4.5.0)
+
+The .NET Reactive API is under package `Neo4j.Driver.Reactive`.
+It is built upon https://github.com/dotnet/reactive[`System.Reactive`].
+There is no extra dependency required use .NET reactive API.
 
 .Installation via Install-package
 ========
@@ -163,7 +168,7 @@ To find out the latest version of the driver, visit the https://search.maven.org
 * org.reactivestreams:reactive-streams
 * org.apache.logging.log4j:log4j (optional)
 
-The driver is dependent on the https://www.reactive-streams.org/[Reactive Streams API], thus maintaining JDK 8 compatibility. 
+The driver is dependent on the https://www.reactive-streams.org/[Reactive Streams API], thus maintaining JDK 8 compatibility.
 To make optimal use of the reactive APIs, we suggest an additional framework like Project Reactor or RxJava2.
 Both implement the Reactive Streams API and provide an exhaustive set of operators.
 
@@ -235,9 +240,13 @@ npm show neo4j-driver@* version
 *Dependencies*
 
 * Babel/Runtime (^7.5.5)
-* rxjs (^6.5.2)
+* RxJS (^6.5.2)
 * text-encoding-utf-8 (^1.0.2)
-* uri-js (^4.2.2)
+* URI-js (^4.2.2)
+
+
+The JavaScript Reactive API is built and exposed via RxJs.
+A dependency of RxJs is automatically installed with the driver.
 
 .Installation via npm
 ========
@@ -271,7 +280,7 @@ The release notes for this driver are available https://github.com/neo4j/neo4j-j
 // [.include-with-python]
 // ======
 //
-// To find out the latest version of the driver, visit https://pypi.python.org/pypi/neo4j-driver.
+// To find out the latest version of the driver, visit https://pypi.org/project/neo4j/.
 //
 // To install the latest version of the driver:
 //
