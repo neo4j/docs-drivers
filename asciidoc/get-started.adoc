@@ -163,6 +163,10 @@ To find out the latest version of the driver, visit the https://search.maven.org
 * org.reactivestreams:reactive-streams
 * org.apache.logging.log4j:log4j (optional)
 
+The driver is dependent on the https://www.reactive-streams.org/[Reactive Streams API], thus maintaining JDK 8 compatibility. 
+To make optimal use of the reactive APIs, we suggest an additional framework like Project Reactor or RxJava2.
+Both implement the Reactive Streams API and provide an exhaustive set of operators.
+
 
 .Installation via Maven
 ========
