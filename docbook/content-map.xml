@@ -8,7 +8,7 @@
     </d:tocentry>
     <d:tocentry linkend="driver-cypher-workflow"><?dbhtml filename="cypher-workflow/index.html"?>
     </d:tocentry>
-    <d:tocentry linkend="driver-cypher-values"><?dbhtml filename="cypher-values/index.html"?>
+    <d:tocentry linkend="driver-session-API"><?dbhtml filename="session-API/index.html"?>
     </d:tocentry>
     <d:tocentry linkend="driver-terminology"><?dbhtml filename="terminology/index.html"?>
     </d:tocentry>
