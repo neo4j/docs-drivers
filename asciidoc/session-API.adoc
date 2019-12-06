@@ -1,0 +1,151 @@
+[[driver-session-API]]
+= The Session API
+
+[abstract]
+--
+This section describes the types and values used by Cypher and how they map to native language types.
+--
+
+
+
+
+
+[[driver-result]]
+== Statement results
+
+A statement result is comprised of a stream of records.
+The result is typically handled by the receiving application as it arrives, although it is also possible to retain all or part of a result for future consumption.
+
+image::driver-result-stream.svg[title="Result stream", role="middle"]
+
+
+[[driver-result-record]]
+=== Records
+
+A record provides an immutable view of part of a result.
+It is an ordered map of keys and values.
+As values within a record are both keyed and ordered, that value can be accessed either by position (0-based integer) or by key (string).
+
+
+[[driver-result-buffer]]
+=== The buffer
+
+image::driver-result-buffer.svg[title="Result buffer", role="middle"]
+
+Most drivers contain a result buffer.
+This provides a staging point for results, and divides result handling into _fetching_ (moving from the network to the buffer) and _consuming_ (moving from the buffer to the application).
+
+If results are consumed in the same order as they are produced, records merely pass through the buffer; if they are consumed out of order, the buffer will be utilized to retain records until they are consumed by the application.
+For large results, this may require a significant amount of memory and impact performance. For this reason, it is recommended to consume results in order wherever possible.
+
+
+[[driver-result-consume]]
+=== Consuming the stream
+
+Query results will often be consumed as a stream.
+Drivers provide a language-idiomatic way to iterate through a result stream.
+
+[.tabbed-example]
+.Consuming the stream
+====
+[.include-with-dotnet]
+======
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=result-consume]
+----
+======
+
+[.include-with-go]
+======
+[source, go]
+----
+include::{go-examples}/examples_test.go[tags=result-consume]
+----
+======
+
+[.include-with-java]
+======
+[source, java]
+----
+include::{java-examples}/ResultConsumeExample.java[tags=result-consume]
+----
+======
+
+[.include-with-javascript]
+======
+[source, javascript]
+----
+include::{javascript-examples}/examples.test.js[tags=result-consume]
+----
+======
+
+[.include-with-python]
+======
+[source, python]
+----
+include::{python-examples}/result_consume_example.py[tags=result-consume]
+----
+======
+====
+
+
+[[driver-result-retain]]
+=== Retaining results
+
+The result record stream is available until another statement is run in the session, or until the current transaction is closed.
+To hold on to the results beyond this scope, the results need to be explicitly retained.
+For retaining results, each driver offers methods that collect the result stream and translate it into standard data structures for that language.
+Retained results can be processed while the session is free to take on the next workload.
+The saved results can also be used directly to run a new statement.
+
+
+
+[.tabbed-example]
+.Retain results for further processing
+====
+[.include-with-dotnet]
+======
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=result-retain]
+----
+======
+[.include-with-go]
+======
+[source, go]
+----
+include::{go-examples}/examples_test.go[tags=result-retain]
+----
+======
+[.include-with-java]
+======
+[source, java]
+----
+include::{java-examples}/ResultRetainExample.java[tags=result-retain]
+----
+======
+[.include-with-javascript]
+======
+[source, javascript]
+----
+include::{javascript-examples}/examples.test.js[tags=result-retain]
+----
+======
+[.include-with-python]
+======
+[source, python]
+----
+include::{python-examples}/result_retain_example.py[tags=result-retain]
+----
+======
+====
+
+
+[[driver-result-summary]]
+== Statement result summaries
+
+Supplementary information such as query statistics, timings and server information can be obtained from the statement result summary.
+If this detail is accessed before the entire result has been consumed, the remainder of the result will be buffered.
+
+See also the <<driver-api-docs, language-specific driver API documentation>>.
