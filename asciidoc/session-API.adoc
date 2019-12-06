@@ -3,9 +3,22 @@
 
 [abstract]
 --
-This section describes the types and values used by Cypher and how they map to native language types.
+This section details the Session API that are made available by the driver, with each Session class oriented towards a different form of programming.
 --
 
+
+== Simple sessions
+
+[NOTE]
+Available in .NET and Java
+
+Simple sessions provide a "classic" blocking style API for Cypher execution and are available for most languages.
+In general, simple sessions provide the easiest programming style to work with since API calls are executed in a strictly sequential fashion.
+
+=== Lifecycle
+
+Session lifetime extends from session construction to session closure.
+In languages that support them, simple sessions are usually scoped within a context block; this ensures that they are properly closed and that any underlying connections are released and not leaked.
 
 
 
