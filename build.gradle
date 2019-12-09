@@ -37,7 +37,7 @@ plugins {
     id 'maven-publish'
 }
 
-version '1.7'
+version '4.0'
 
 repositories {
     mavenLocal()
@@ -57,7 +57,7 @@ configurations {
 }
 
 def traceDocbook = hasProperty('traceDocbook') ? true : false
-if (!project.hasProperty("neo4jVersion")) { ext.neo4jVersion = "3.5.0-SNAPSHO" }
+if (!project.hasProperty("neo4jVersion")) { ext.neo4jVersion = "4.0.0-SNAPSHOT" }
 if (!project.hasProperty("driverVersion")) { ext.driverVersion = version }
 if (!project.hasProperty("ogmVersion")) { ext.ogmVersion = "2.1.2" }
 
