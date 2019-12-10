@@ -95,11 +95,11 @@ neo4j://<HOST>:<PORT>[?<ROUTING_CONTEXT>]
 ----
 
 This targets a routed Neo4j service that may be fulfilled by either a cluster or a single instance.
-The HOST and PORT values contain a logical hostname and port number targeting the entry point to the Neo4j service (e.g. neo4j://graph.example.com:7687).
-In a clustered environment, this will resolve to one of more of the core members; for standalone installations, this will simply point to that server address.
-The ROUTING_CONTEXT option allows for customization of the routing table and is discussed in more detail in <<driver-routing-context>>.
+The `HOST` and `PORT` values contain a logical hostname and port number targeting the entry point to the Neo4j service (e.g. `neo4j://graph.example.com:7687).
+In a clustered environment, the URI address will resolve to one of more of the core members; for standalone installations, this will simply point to that server address.
+The `ROUTING_CONTEXT` option allows for customization of the routing table and is discussed in more detail in <<driver-routing-context>>.
 
-An alternative URI form, using the bolt URI scheme (e.g. `bolt://graph.example.com:7687`), can be used when a single point-to-point connection is required.
+An alternative URI form, using the `bolt` URI scheme (e.g. `bolt://graph.example.com:7687`), can be used when a single point-to-point connection is required.
 This variant is useful for the subset client applications (such as admin tooling) that need to be aware of individual servers, as opposed to those which require a highly available database service.
 
 ----
@@ -108,12 +108,13 @@ bolt://<HOST>:<PORT>
 
 === Initial address resolution
 
-The address provided in a `neo4j:// URI` is used for initial and fallback communication only.
-This communication occurs to bootstrap the initial routing table, through which all subsequent communication is carried out.
-Fallback occurs when the driver is unable to contact any of the addresses held in the routing table, and the initial address is once again reused to bootstrap the system.
+The address provided in a `neo4j://` URI is used for initial and fallback communication only.
+This communication occurs to bootstrap the routing table, through which all subsequent communication is carried out.
+Fallback occurs when the driver is unable to contact any of the addresses held in the routing table.
+The initial address is once again reused to bootstrap the system.
 
-Several options are available for providing this initial logical to physical host resolution.
-These include regular DNS, custom middleware such as a load balancer, and the Driver object _resolver function_.
+Several options are available for providing this initial logical-to-physical host resolution.
+These include regular DNS, custom middleware such as a load balancer, and the Driver object _resolver function_, all of which are described in the following sections.
 
 ==== DNS resolution
 
@@ -131,13 +132,13 @@ image::custom-middleware.png[title="Initial address resolution using custom midd
 [[driver-resolver-function]]
 ==== Resolver function
 
-Neo4j drivers also present an address resolution intercept hook called the resolver function.
-This takes the form of a callback function that accepts a single input address and yields or returns multiple output addresses.
+Neo4j drivers also present an address resolution intercept hook called the _resolver function_.
+This takes the form of a callback function that accepts a single input address and returns multiple output addresses.
 The function may hard code the output addresses or may draw them from another configuration source, as required.
 
 image::resolver-function.png[title="Initial address resolution using resolver function"]
 
-The example below shows how to expand a single address into multiple (hard coded) output addresses:
+The example below shows how to expand a single address into multiple (hard-coded) output addresses:
 
 [.tabbed-example]
 .Custom Address Resolver
@@ -177,7 +178,7 @@ include::{javascript-examples}/examples.test.js[tags=config-custom-resolver]
 
 === Routing table
 
-The routing table is the glue between the driver connectivity layer and the database surface.
+The routing table acts like the glue between the driver connectivity layer and the database surface.
 This table contains a list of server addresses, grouped as readers and writers, and is refreshed automatically by the driver as required.
 
 The driver does not expose any API to work directly with the routing table, but it can sometimes be useful to explore when troubleshooting a system.
@@ -185,7 +186,7 @@ The driver does not expose any API to work directly with the routing table, but 
 [[driver-routing-context]]
 === Routing context
 
-A routing context can be included as the query part of a `neo4j:// URI`. Routing contexts are defined by means of server policies and allow customisation of the contents of the routing table.
+A routing context can be included as the query part of a `neo4j://` URI. Routing contexts are defined by means of server policies and allow customization of the contents of the routing table.
 
 .Configure a routing driver with routing context
 ====
@@ -199,9 +200,9 @@ This URI will use the server policy `europe`:
 ====
 
 [NOTE]
-.Server-side configuration to enable Routing drivers with routing context
+.Server-side configuration to enable routing drivers with routing context
 ====
-A prerequisite for using a Routing driver with routing context is that the Neo4j database is operated on a <<operations-manual#clustering, Causal Cluster>> with the <<operations-manual#multi-dc, Multi-data center licensing option>> enabled.
+A prerequisite for using a routing driver with routing context is that the Neo4j database is operated on a <<operations-manual#clustering, Causal Cluster>> with the <<operations-manual#multi-dc, Multi-data center licensing option>> enabled.
 Additionally, the routing contexts must be defined within the cluster as routing _policies_.
 For details on how to configure multi-data center routing policies for a Causal Cluster, please refer to <<operations-manual#multi-dc-load-balancing, Operations Manual -> Causal Clustering>>.
 ====
@@ -410,7 +411,9 @@ include::{javascript-examples}/examples.test.js[tags=custom-auth]
 
 
 [CAUTION]
-There are significant changes to security settings in Neo4j 4.0. Please read this (and/or consult the migration guide) before upgrading from a previous version.
+There are significant changes to security settings between Neo4j 3.x and Neo4j 4.x.
+Please consider the information in this section before upgrading from a previous version.
+The <<migration-guide#migration-guide, Migration Guide>> is also a good source of information about changes in functionality.
 
 Starting with Neo4j 4.0, client-server communication uses only *unencrypted local* connections by default.
 This is a change from previous versions, which switched on encryption by default, but generated a self-signed certificate out of the box.
@@ -422,7 +425,7 @@ Full certificates provide better overall security than self-signed certificates 
 https://neo4j.com/aura/[Neo4j Aura] is a secure hosted service backed by full certificates signed by a root certificate authority.
 To connect to Neo4j Aura, driver users must enable encryption and the complete set of certificate checks (the latter of which are enabled by default).
 
-.Default settings
+.Changes in default security settings between 3.x and 4.x
 [options="header"]
 |===
 | Setting | Neo4j 4.x | Neo4j 3.x (Drivers 1.x)
