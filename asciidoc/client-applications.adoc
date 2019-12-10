@@ -38,6 +38,12 @@ Therefore, if multiple configurations are required (such as when working with mu
 ----
 include::{dotnet-examples}/Examples.cs[tags=driver-lifecycle]
 ----
+
+// .Import driver lifecycle
+// [source, csharp]
+// ----
+// include::{dotnet-examples}/Examples.cs[tags=driver-lifecycle-import]
+// ----
 ======
 
 
@@ -47,6 +53,12 @@ include::{dotnet-examples}/Examples.cs[tags=driver-lifecycle]
 ----
 include::{java-examples}/DriverLifecycleExample.java[tags=driver-lifecycle]
 ----
+
+.Import driver lifecycle
+[source, java]
+----
+include::{java-examples}/DriverLifecycleExample.java[tags=driver-lifecycle-import]
+----
 ======
 
 [.include-with-javascript]
@@ -55,6 +67,12 @@ include::{java-examples}/DriverLifecycleExample.java[tags=driver-lifecycle]
 ----
 include::{javascript-examples}/examples.test.js[tags=driver-lifecycle]
 ----
+//
+// .Import driver lifecycle
+// [source, javascript]
+// ----
+// include::{javascript-examples}/examples.test.js[tags=driver-lifecycle-import]
+// ----
 ======
 
 // [.include-with-python]
@@ -213,6 +231,12 @@ For this, use the basic auth helper:
 ----
 include::{dotnet-examples}/Examples.cs[tags=basic-auth]
 ----
+
+// .Import basic authentication
+// [source, csharp]
+// ----
+// include::{dotnet-examples}/Examples.cs[tags=basic-auth-import]
+// ----
 ======
 
 [.include-with-java]
@@ -220,6 +244,12 @@ include::{dotnet-examples}/Examples.cs[tags=basic-auth]
 [source, java]
 ----
 include::{java-examples}/BasicAuthExample.java[tags=basic-auth]
+----
+
+.Import basic authentication
+[source, java]
+----
+include::{java-examples}/BasicAuthExample.java[tags=basic-auth-import]
 ----
 ======
 
@@ -229,6 +259,12 @@ include::{java-examples}/BasicAuthExample.java[tags=basic-auth]
 ----
 include::{javascript-examples}/examples.test.js[tags=basic-auth]
 ----
+
+// .Import basic authentication
+// [source, javascript]
+// ----
+// include::{javascript-examples}/examples.test.js[tags=basic-auth-import]
+// ----
 ======
 
 // [.include-with-python]
@@ -259,6 +295,12 @@ The best way to create a Kerberos authentication token is shown below:
 ----
 include::{dotnet-examples}/Examples.cs[tags=kerberos-auth]
 ----
+
+// .Import Kerberos authentication
+// [source, csharp]
+// ----
+// include::{dotnet-examples}/Examples.cs[tags=kerberos-auth-import]
+// ----
 ======
 
 [.include-with-java]
@@ -266,6 +308,12 @@ include::{dotnet-examples}/Examples.cs[tags=kerberos-auth]
 [source, java]
 ----
 include::{java-examples}/KerberosAuthExample.java[tags=kerberos-auth]
+----
+
+.Import Kerberos authentication
+[source, java]
+----
+include::{java-examples}/KerberosAuthExample.java[tags=kerberos-auth-import]
 ----
 ======
 
@@ -275,6 +323,12 @@ include::{java-examples}/KerberosAuthExample.java[tags=kerberos-auth]
 ----
 include::{javascript-examples}/examples.test.js[tags=kerberos-auth]
 ----
+
+// .Import Kerberos authentication
+// [source, javascript]
+// ----
+// include::{javascript-examples}/examples.test.js[tags=kerberos-auth-import]
+// ----
 ======
 
 // [.include-with-python]
@@ -306,6 +360,12 @@ For advanced deployments, where a custom security provider has been built, the c
 ----
 include::{dotnet-examples}/Examples.cs[tags=custom-auth]
 ----
+
+// .Import custom authentication
+// [source, csharp]
+// ----
+// include::{dotnet-examples}/Examples.cs[tags=custom-auth-import]
+// ----
 ======
 
 [.include-with-java]
@@ -313,6 +373,12 @@ include::{dotnet-examples}/Examples.cs[tags=custom-auth]
 [source, java]
 ----
 include::{java-examples}/CustomAuthExample.java[tags=custom-auth]
+----
+
+.Import custom authentication
+[source, java]
+----
+include::{java-examples}/CustomAuthExample.java[tags=custom-auth-import]
 ----
 ======
 
@@ -322,6 +388,11 @@ include::{java-examples}/CustomAuthExample.java[tags=custom-auth]
 ----
 include::{javascript-examples}/examples.test.js[tags=custom-auth]
 ----
+// .Import custom authentication
+// [source, javascript]
+// ----
+// include::{javascript-examples}/examples.test.js[tags=custom-auth-import]
+// ----
 ======
 
 // [.include-with-python]
@@ -387,6 +458,11 @@ Default: 60 seconds
 ----
 include::{dotnet-examples}/Examples.cs[tags=config-connection-pool]
 ----
+// .Import connection pool configuration
+// [source, csharp]
+// ----
+// include::{dotnet-examples}/Examples.cs[tags=config-connection-pool-import]
+// ----
 ======
 
 
@@ -396,6 +472,12 @@ include::{dotnet-examples}/Examples.cs[tags=config-connection-pool]
 ----
 include::{java-examples}/ConfigConnectionPoolExample.java[tags=config-connection-pool]
 ----
+
+// .Import connection pool configuration
+// [source, java]
+// ----
+// include::{java-examples}/ConfigConnectionPoolExample.java[tags=config-connection-pool-import]
+// ----
 ======
 
 [.include-with-javascript]
@@ -404,6 +486,12 @@ include::{java-examples}/ConfigConnectionPoolExample.java[tags=config-connection
 ----
 include::{javascript-examples}/examples.test.js[tags=config-connection-pool]
 ----
+
+// .Import connection pool configuration
+// [source, javascript]
+// ----
+// include::{javascript-examples}/examples.test.js[tags=config-connection-pool-import]
+// ----
 ======
 
 // [.include-with-python]
@@ -422,9 +510,10 @@ Connections are only created when a session requires one unless there is an avai
 The driver maintains a pool of open connections which can be loaned to a session when one is available.
 If a connection is not available, then an attempt to create a new connection (provided the `MaxConnectionPoolSize` limit has not been reached) is made with this configuration option, providing the maximum amount of time to wait for the connection to be established.
 +
-In environments with high latency and high occurences of connection timeouts it is recommended to configure a higher value.
+In environments with high latency and high occurrences of connection timeouts it is recommended to configure a higher value.
 For lower latency environments and quicker feedback on potential network issues configure with a lower value.
 Default: 30 seconds
+
 
 [.tabbed-example]
 .Configure connection timeout
@@ -435,6 +524,12 @@ Default: 30 seconds
 ----
 include::{dotnet-examples}/Examples.cs[tags=config-connection-timeout]
 ----
+
+// .Import connection timeout configuration
+// [source, csharp]
+// ----
+// include::{dotnet-examples}/Examples.cs[tags=config-connection-timeout-import]
+// ----
 ======
 
 
@@ -444,6 +539,11 @@ include::{dotnet-examples}/Examples.cs[tags=config-connection-timeout]
 ----
 include::{java-examples}/ConfigConnectionTimeoutExample.java[tags=config-connection-timeout]
 ----
+.Import connection timeout configuration
+[source, java]
+----
+include::{java-examples}/ConfigConnectionTimeoutExample.java[tags=config-connection-timeout-import]
+----
 ======
 
 [.include-with-javascript]
@@ -452,6 +552,11 @@ include::{java-examples}/ConfigConnectionTimeoutExample.java[tags=config-connect
 ----
 include::{javascript-examples}/examples.test.js[tags=config-connection-timeout]
 ----
+// .Import connection timeout configuration
+// [source, javascript]
+// ----
+// include::{javascript-examples}/examples.test.js[tags=config-connection-timeout-import]
+// ----
 ======
 ====
 
@@ -473,6 +578,11 @@ Default: None
 ----
 include::{dotnet-examples}/Examples.cs[tags=config-unencrypted]
 ----
+.Import unencrypted configuration
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=config-unencrypted-import]
+----
 ======
 
 
@@ -482,6 +592,11 @@ include::{dotnet-examples}/Examples.cs[tags=config-unencrypted]
 ----
 include::{java-examples}/ConfigUnencryptedExample.java[tags=config-unencrypted]
 ----
+.Import unencrypted configuration
+[source, java]
+----
+include::{java-examples}/ConfigUnencryptedExample.java[tags=config-unencrypted-import]
+----
 ======
 
 [.include-with-javascript]
@@ -489,6 +604,11 @@ include::{java-examples}/ConfigUnencryptedExample.java[tags=config-unencrypted]
 [source, javascript]
 ----
 include::{javascript-examples}/examples.test.js[tags=config-unencrypted]
+----
+.Import unencrypted configuration
+[source, javascript]
+----
+include::{javascript-examples}/examples.test.js[tags=config-unencrypted-import]
 ----
 ======
 ====
@@ -535,6 +655,13 @@ Default: 30 seconds
 ----
 include::{dotnet-examples}/Examples.cs[tags=config-max-retry-time]
 ----
+// .Import maximum retry time configuration
+// [.include-with-dotnet]
+// ======
+// [source, csharp]
+// ----
+// include::{dotnet-examples}/Examples.cs[tags=config-max-retry-time-import]
+// ----
 ======
 
 
@@ -544,6 +671,11 @@ include::{dotnet-examples}/Examples.cs[tags=config-max-retry-time]
 ----
 include::{java-examples}/ConfigMaxRetryTimeExample.java[tags=config-max-retry-time]
 ----
+.Import maximum retry time configuration
+[source, java]
+----
+include::{java-examples}/ConfigMaxRetryTimeExample.java[tags=config-max-retry-time-import]
+----
 ======
 
 [.include-with-javascript]
@@ -552,6 +684,11 @@ include::{java-examples}/ConfigMaxRetryTimeExample.java[tags=config-max-retry-ti
 ----
 include::{javascript-examples}/examples.test.js[tags=config-max-retry-time]
 ----
+// .Import maximum retry time configuration
+// [source, javascript]
+// ----
+// include::{javascript-examples}/examples.test.js[tags=config-max-retry-time-import]
+// ----
 ======
 
 // [.include-with-python]
@@ -586,6 +723,11 @@ Default: `TRUST_SYSTEM_CA_SIGNED_CERTIFICATES` (Note - only when encryption is e
 ----
 include::{dotnet-examples}/Examples.cs[tags=config-trust]
 ----
+// .Import trusted certificate configuration
+// [source, csharp]
+// ----
+// include::{dotnet-examples}/Examples.cs[tags=config-trust-import]
+// ----
 ======
 
 
@@ -595,6 +737,11 @@ include::{dotnet-examples}/Examples.cs[tags=config-trust]
 ----
 include::{java-examples}/ConfigTrustExample.java[tags=config-trust]
 ----
+.Import trusted certificate configuration
+[source, java]
+----
+include::{java-examples}/ConfigTrustExample.java[tags=config-trust-import]
+----
 ======
 
 [.include-with-javascript]
@@ -603,6 +750,11 @@ include::{java-examples}/ConfigTrustExample.java[tags=config-trust]
 ----
 include::{javascript-examples}/examples.test.js[tags=config-trust]
 ----
+// .Import trusted certificate configuration
+// [source, javascript]
+// ----
+// include::{javascript-examples}/examples.test.js[tags=config-trust-import]
+// ----
 ======
 
 // [.include-with-python]
