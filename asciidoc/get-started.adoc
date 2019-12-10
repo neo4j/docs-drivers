@@ -330,6 +330,11 @@ The example below shows the minimal configuration necessary to interact with Neo
 ----
 include::{dotnet-examples}/Examples.cs[tags=hello-world]
 ----
+
+// [source, csharp]
+// ----
+// include::{dotnet-examples}/Examples.cs[tags=hello-world-import]
+// ----
 ======
 
 //[.include-with-go]
@@ -346,6 +351,11 @@ include::{dotnet-examples}/Examples.cs[tags=hello-world]
 ----
 include::{java-examples}/HelloWorldExample.java[tags=hello-world]
 ----
+
+[source, java]
+----
+include::{java-examples}/HelloWorldExample.java[tags=hello-world-import]
+----
 ======
 
 [.include-with-javascript]
@@ -354,6 +364,11 @@ include::{java-examples}/HelloWorldExample.java[tags=hello-world]
 ----
 include::{javascript-examples}/examples.test.js[tags=hello-world]
 ----
+
+// [source, javascript]
+// ----
+// include::{javascript-examples}/examples.test.js[tags=hello-world-import]
+// ----
 ======
 
 //[.include-with-python]
@@ -379,10 +394,17 @@ For a comprehensive listing of all driver functionality, refer to the API docume
 {api-docs-base-uri}/dotnet-driver/{dotnet-driver-apidoc-version}/
 ======
 
+<<<<<<< HEAD
 //[.include-with-go]
 //======
 //https://godoc.org/github.com/neo4j/neo4j-go-driver/neo4j
 //======
+=======
+// [.include-with-go]
+// ======
+// https://godoc.org/github.com/neo4j/neo4j-go-driver/neo4j
+// ======
+>>>>>>> amended hello-world example
 
 [.include-with-java]
 ======
@@ -394,8 +416,15 @@ For a comprehensive listing of all driver functionality, refer to the API docume
 {api-docs-base-uri}/javascript-driver/{javascript-driver-apidoc-version}/
 ======
 
+<<<<<<< HEAD
 //[.include-with-python]
 //======
 //{api-docs-base-uri}/python-driver/{python-driver-apidoc-version}/
 //======
+=======
+// [.include-with-python]
+// ======
+// {api-docs-base-uri}/python-driver/{python-driver-apidoc-version}/
+// ======
+>>>>>>> amended hello-world example
 ====
