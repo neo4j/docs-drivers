@@ -378,6 +378,43 @@ Setting a higher value will result in these transactions being queued, increasin
 Finding an optimal value may require an element of experimentation, taking into consideration the expected levels of parallelism within your application as well as the `MaxConnectionPoolSize.
 Default: 60 seconds
 
+[.tabbed-example]
+.Configure connection pool
+====
+[.include-with-dotnet]
+======
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=config-connection-pool]
+----
+======
+
+
+[.include-with-java]
+======
+[source, java]
+----
+include::{java-examples}/ConfigConnectionPoolExample.java[tags=config-connection-pool]
+----
+======
+
+[.include-with-javascript]
+======
+[source, javascript]
+----
+include::{javascript-examples}/examples.test.js[tags=config-connection-pool]
+----
+======
+
+// [.include-with-python]
+// ======
+// [source, python]
+// ----
+// include::{python-examples}/test_config_connection_pool_example.py[tags=config-connection-pool]
+// ----
+// ======
+====
+
 `ConnectionTimeout`::
 
 The maximum amount of time to wait for a TCP connection to be established.
@@ -387,7 +424,36 @@ If a connection is not available, then an attempt to create a new connection (pr
 +
 In environments with high latency and high occurences of connection timeouts it is recommended to configure a higher value.
 For lower latency environments and quicker feedback on potential network issues configure with a lower value.
-(Default: 30 seconds)
+Default: 30 seconds
+
+[.tabbed-example]
+.Configure connection timeout
+====
+[.include-with-dotnet]
+======
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=config-connection-timeout]
+----
+======
+
+
+[.include-with-java]
+======
+[source, java]
+----
+include::{java-examples}/ConfigConnectionTimeoutExample.java[tags=config-connection-timeout]
+----
+======
+
+[.include-with-javascript]
+======
+[source, javascript]
+----
+include::{javascript-examples}/examples.test.js[tags=config-connection-timeout]
+----
+======
+====
 
 `CustomResolver`::
 
@@ -397,6 +463,35 @@ Specify a custom server address resolver used by the routing driver to resolve t
 
 Specify whether to use an encrypted connection between the driver and server.
 Default: None
+
+[.tabbed-example]
+.Unencrypted configuration
+====
+[.include-with-dotnet]
+======
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=config-unencrypted]
+----
+======
+
+
+[.include-with-java]
+======
+[source, java]
+----
+include::{java-examples}/ConfigUnencryptedExample.java[tags=config-unencrypted]
+----
+======
+
+[.include-with-javascript]
+======
+[source, javascript]
+----
+include::{javascript-examples}/examples.test.js[tags=config-unencrypted]
+----
+======
+====
 
 `MaxConnectionLifetime`::
 
@@ -431,20 +526,93 @@ Configure lower in low latency environments and where your workload mainly consi
 Failing transactions faster may highlight the reasons behind the transient errors making it easier to fix underlying issues.
 Default: 30 seconds
 
+[.tabbed-example]
+.Configure maximum retry time
+====
+[.include-with-dotnet]
+======
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=config-max-retry-time]
+----
+======
+
+
+[.include-with-java]
+======
+[source, java]
+----
+include::{java-examples}/ConfigMaxRetryTimeExample.java[tags=config-max-retry-time]
+----
+======
+
+[.include-with-javascript]
+======
+[source, javascript]
+----
+include::{javascript-examples}/examples.test.js[tags=config-max-retry-time]
+----
+======
+
+// [.include-with-python]
+// ======
+// [source, python]
+// ----
+// include::{python-examples}/test_config_max_retry_time_example.py[tags=config-max-retry-time]
+// ----
+// ======
+====
+
 `TrustStrategy`::
 
 Specify how to determine the authenticity of encryption certificates provided by the Neo4j instance that you are connecting to.
 There are three choices as to which strategy to use:
 
-* `TRUST_SYSTEM_CA_SIGNED_CERTIFICATES` - Trust strategy for certificates that can be verified through the local system store.
+* `TRUST_SYSTEM_CA_SIGNED_CERTIFICATES` - Accept any certificate that can be verified against a custom CA.
 
-* `TRUST_CUSTOM_CA_SIGNED_CERTIFICATES` - Only encrypted connections to Neo4j instances with certificates signed by a trusted certificate will be accepted.
-To use this option you should configure the driver with a file containing the signed certificates one or more trusted X.509 certificates.
+* `TRUST_CUSTOM_CA_SIGNED_CERTIFICATES` - Accept any certificate that can be verified against the system store.
 
-* `TRUST_ALL_CERTIFICATES` - Trust any certificate provided. This is intended for use with self-signed certificates. *We do not recommend using this setting for production environments.*
+* `TRUST_ALL_CERTIFICATES` - Accept any certificate provided by the server, regardless of CA chain. *We do not recommend using this setting for production environments.*
 
 +
 Default: `TRUST_SYSTEM_CA_SIGNED_CERTIFICATES` (Note - only when encryption is enabled)
+
+[.tabbed-example]
+.Configure trusted certificates
+====
+[.include-with-dotnet]
+======
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=config-trust]
+----
+======
+
+
+[.include-with-java]
+======
+[source, java]
+----
+include::{java-examples}/ConfigTrustExample.java[tags=config-trust]
+----
+======
+
+[.include-with-javascript]
+======
+[source, javascript]
+----
+include::{javascript-examples}/examples.test.js[tags=config-trust]
+----
+======
+
+// [.include-with-python]
+// ======
+// [source, python]
+// ----
+// include::{python-examples}/test_config_trust_example.py[tags=config-trust]
+// ----
+// ======
+====
 
 `KeepAlive`::
 
