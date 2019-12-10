@@ -55,7 +55,7 @@ In cases where at least one peer is below version 4.0, communication will occur 
 Wherever possible, it is recommended to use the latest driver release available.
 This will provide the greatest degree of stability and will ensure that the full set of server functionality is available.
 The drivers, when used with Neo4j Enterprise Edition, come with full cluster routing support.
-The drivers make no explicit distinction between Enterprise Edition and Community Edition, however, and simply operate with the functionality made available by Neo4j itself.
+The drivers make no explicit distinction between Enterprise Edition and Community Edition however, and simply operate with the functionality made available by Neo4j itself.
 
 To install a driver or to find out more about which driver versions are available, use the relevant language distribution system, described below.
 
