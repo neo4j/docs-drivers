@@ -6,7 +6,7 @@
     </d:tocentry>
     <d:tocentry linkend="driver-client-applications"><?dbhtml filename="client-applications/index.html"?>
     </d:tocentry>
-    <d:tocentry linkend="driver-sessions-transactions"><?dbhtml filename="sessions-transactions/index.html"?>
+    <d:tocentry linkend="driver-cypher-workflow"><?dbhtml filename="cypher-workflow/index.html"?>
     </d:tocentry>
     <d:tocentry linkend="driver-cypher-values"><?dbhtml filename="cypher-values/index.html"?>
     </d:tocentry>

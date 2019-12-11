@@ -7,8 +7,14 @@
 This section lists the relevant terminology related to Neo4j drivers.
 --
 
+[[term-access-mode]]access mode::
+The mode in which a transaction is executed, either read or write.
+
 [[term-acquire-connection]]acquire (connection)::
 To borrow a driver connection that is not currently in use from a connection pool.
+
+[[term-auto-commit]]auto-commit::
+A single query which is wrapped in a transaction and committed automatically.
 
 [[term-bolt]]Bolt::
 Bolt is a Neo4j proprietary, binary protocol used for communication between client applications and database servers.
@@ -22,6 +28,9 @@ A Neo4j instance that can accept incoming Bolt connections.
 
 [[term-bookmark]]bookmark::
 A marker for a point in the transactional history of Neo4j.
+
+[[term-causal-chaining]]causal chaining::
+A mechanism to ensure that the transactions carried out in a session are executed in order, even when each transaction may be carried out on different cluster members.
 
 [[term-client-application]]client application::
 A piece of software that interacts with a database server via a driver.
@@ -67,3 +76,9 @@ See https://en.wikipedia.org/wiki/Thread_safety.
 A transaction comprises a unit of work performed against a database.
 It is treated in a coherent and reliable way, independent of other transactions.
 A transaction, by definition, must be atomic, consistent, isolated, and durable.
+
+[[term-transaction-function]]transaction function::
+The method of grouping a number of queries together which, when run in a session, are retried on failure.
+
+[[term-transaction-manager]]transaction manager::
+The component/code responsible for deciding what to do if a transaction fails, i.e to retry, give up or do something else.
