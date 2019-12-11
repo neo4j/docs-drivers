@@ -7,6 +7,9 @@
 This section lists the relevant terminology related to Neo4j drivers.
 --
 
+[[term-access-mode]]access mode::
+The mode in which a transaction is executed, either read or write.
+
 [[term-acquire-connection]]acquire (connection)::
 To borrow a driver connection that is not currently in use from a connection pool.
 

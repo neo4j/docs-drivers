@@ -78,6 +78,7 @@ This allows for the caching of queries within the Cypher engine, which is benefi
 A result summary is also generally available.
 This contains additional information relating to the query execution and the result content.
 For an `EXPLAIN` or `PROFILE` query, this is where the query plan is returned.
+See <<cypher-manual#how-do-i-profile-a-query, Cypher Manual -> Profiling a query>> for more information on these queries.
 
 
 [[driver-causal-chaining]]
@@ -102,6 +103,8 @@ This avoids the small latency overhead of the causal chain.
 Bookmarks can be passed between sessions by extracting the last bookmark from a session and passing this into the construction of another.
 Multiple bookmarks can also be combined if a transaction has more than one logical predecessor.
 Note that it is only when chaining across sessions that an application will need to work with bookmarks directly.
+
+image::driver-passing-bookmarks.svg[title="Passing bookmarks", role="middle"]
 
 [.tabbed-example]
 .Pass bookmarks
@@ -166,7 +169,7 @@ include::{javascript-examples}/examples.test.js[tags=pass-bookmarks]
 [[driver-access-modes-transaction]]
 == Routing transactions using access modes
 
-Transactions can be executed in either read or write mode; this is known as the access mode.
+Transactions can be executed in either read or write mode; this is known as the <<term-access-mode, access mode>>.
 In a Causal Cluster, each transaction will be routed to an appropriate server based on the mode.
 When using a single instance, all transactions will be passed to that one server.
 
@@ -178,7 +181,8 @@ Access mode is generally specified by the method used to call the transaction fu
 Session classes provide a method for calling reads and another for writes.
 
 As a fallback for auto-commit and unmanaged transactions, a default access mode can also be provided at session level.
-This is only used in cases when the access mode cannot otherwise be specified, and will be overridden should a transaction function be used within that session.
+This is only used in cases when the access mode cannot otherwise be specified.
+In case a transaction function is used within that session, the default access mode will be overridden.
 
 [NOTE]
 The driver does not parse Cypher and therefore cannot automatically determine whether a transaction is intended to carry out read or write operations.
@@ -253,23 +257,22 @@ include::{javascript-examples}/examples.test.js[tags=read-write-transaction]
 [[driver-databases]]
 == Databases and execution context
 
-Neo4j 4.0 introduces the ability to work with multiple databases within the same DBMS.
+Neo4j offers the ability to work with multiple databases within the same DBMS.
 For a single instance, this is limited to one user database, plus the `system` database.
 From a driver API perspective, a database can be selected on session construction, and is used as an execution context for the transactions within that session.
 It is not currently possible to execute a transaction across multiple databases.
 
 In a multi-database environment, the server tags one database as default.
 This is selected whenever a session is created without naming a particular database as default.
+In an environment with a single database, that database is always the default.
 
-In an environment with only a single database, that database is always the default.
-
-For more information about the multi-database feature, refer to the <<cypher-manual#cypher-manual, Cypher Manual>> which has a full breakdown of the Neo4j data storage hierarchy.
+For more information about managing multiple databases within the same DBMS, refer to <<cypher-manual#neo4j-databases-graphs, Cypher Manual -> Neo4j databases and graphs>> which has a full breakdown of the Neo4j data storage hierarchy.
 
 === The `system` database
 
 Some administrative operations must be carried out against the `system` database.
 To do this, construct a session targeting the database called `system` and execute Cypher as usual.
-
+Please see <<cypher-manual##administration-databases-introduction, Cypher Manual -> Databases>> for more information.
 
 [[driver-type-mapping]]
 == Type mapping
