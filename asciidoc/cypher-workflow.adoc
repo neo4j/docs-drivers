@@ -8,14 +8,14 @@ This section describes how to create units of work and provide a logical context
 
 == Overview
 
-The Neo4j driver exposes a Cypher channel over which database work can be carried out (see the <<cypher-manual#cypher-manual, Cypher Manual>> for more information on the Cypher query language).
+The Neo4j drivers expose a Cypher channel over which database work can be carried out (see the <<cypher-manual#cypher-manual, Cypher Manual>> for more information on the Cypher query language).
 Work itself is organized into sessions, transactions and queries as follows:
 
 image::sessions-queries-transactions.png[title="Sessions, queries and transactions", role="middle"]
 
 Sessions are always bound to a single transaction context, which is typically an individual database.
 Using the bookmark mechanism, sessions also provide a guarantee of correct transaction sequencing, even when transactions occur over multiple cluster members.
-This effect is known as causal chaining.
+This effect is known as <<term-causal-chaining, _causal chaining_>>.
 
 [[driver-sessions]]
 == Sessions
@@ -23,7 +23,7 @@ This effect is known as causal chaining.
 Sessions are lightweight containers for causally chained sequences of transactions (see <<operations-manual#causal-consistency-explained, Operations Manual -> Causal consistency>>).
 They essentially provide context for storing transaction sequencing information in the form of bookmarks.
 
-When a transaction begins, the session in which it is contained acquires a connection from the Driver connection pool.
+When a transaction begins, the session in which it is contained acquires a connection from the driver connection pool.
 On commit (or rollback) of the transaction, the session releases that connection again.
 This means that it is only when a session is carrying out work that it occupies a connection resource.
 When idle, no such resource is in use.
@@ -38,36 +38,37 @@ Similarly, sessions bound to different databases may not be causally chained by 
 
 Individual language drivers provide several session classes, each oriented around a particular programming style.
 Each class provides a similar set of functionality but offers client applications a choice based on how the application is structured and what frameworks are in use, if any.
-The session classes are described in Chapter 4 and detailed further in the relevant API documentation.
+The session classes are described in <<driver-cypher-values>>.
+For more details, please see the <<driver-api-docs, API documentation>> for your language.
 
 
 [[driver-transactions]]
 == Transactions
 
 Transactions are atomic units of work containing one or more Cypher queries.
-These may contain read or write work, and will generally be routed to an appropriate server for execution, where they will be carried out in their entirety.
-If a transaction fails, it will need to be retried from the beginning, which is generally the responsibility of a transaction manager.
+Transactions may contain read or write work, and will generally be routed to an appropriate server for execution, where they will be carried out in their entirety.
+In case of a transaction failure, the transaction needs to be retried from the beginning.
+This is the responsibility of the <<term-transaction-manager, transaction manager>>.
 
-The Neo4j driver provides transaction management via the transaction function mechanism.
+The Neo4j drivers provide transaction management via the <<term-transaction-function, transaction function>> mechanism.
 This mechanism is exposed through methods on the Session object which accept a function object that can be played multiple times against different servers until it either succeeds or a timeout is reached.
 This approach is recommended for most client applications.
 
-A convenient short-form alternative is the auto-commit transaction mechanism.
+A convenient short-form alternative is the <<term-auto-commit, auto-commit>> transaction mechanism.
 This provides a limited form of transaction management for single-query transactions, as a trade-off for a slightly smaller code overhead.
 This form of transaction is useful for quick scripts and environments where high availability guarantees are not required.
-It is also the required form of transaction for running `PERIODIC COMMIT` queries, which are the only type of Cypher query to manage their own transactions.
+It is also the required form of transaction for running <<cypher-manual#query-using-periodic-commit-hint, `PERIODIC COMMIT`>> queries, which are the only type of Cypher query to manage their own transactions.
 
 A lower-level unmanaged transaction API is also available for advanced use cases.
 This is useful when an alternative transaction management layer is applied by the client, in which error handling and retries need to be managed in a custom way.
-To find out more about how to use unmanaged transactions, look at the API docs for the relevant language.
-
+To learn more about how to use unmanaged transactions, see <<driver-api-docs, API documentation>> for the relevant language.
 
 [[driver-queries-results]]
 == Queries and results
 
-_Queries_ consist of a request to the server to execute a Cypher statement, followed by a response back to the client with the result.
+Queries consist of a request to the server to execute a Cypher statement, followed by a response back to the client with the result.
 Results are transmitted as a stream of records, along with header and footer metadata, and can be incrementally consumed by a client application.
-Neo4j 4.0 also introduces https://en.wikipedia.org/wiki/Reactive_programming[reactive capabilities], enhancing the semantics of the record stream by allowing a Cypher result to be paused or cancelled part way through.
+With https://en.wikipedia.org/wiki/Reactive_programming[reactive capabilities], the semantics of the record stream can be enhanced by allowing a Cypher result to be paused or cancelled part-way through.
 
 To execute a Cypher query, the query text is required along with an optional set of named parameters.
 The text can contain parameter placeholders that are substituted with the corresponding values at runtime.
@@ -75,7 +76,8 @@ While it is possible to run non-parameterized Cypher, good programming practice 
 This allows for the caching of queries within the Cypher engine, which is beneficial for performance. Parameter values should adhere to <<driver-cypher-values>>.
 
 A result summary is also generally available.
-This contains additional information relating to the query execution and the result content. For an `EXPLAIN` or `PROFILE` query, this is where the query plan is returned.
+This contains additional information relating to the query execution and the result content.
+For an `EXPLAIN` or `PROFILE` query, this is where the query plan is returned.
 
 
 [[driver-causal-chaining]]
@@ -313,7 +315,7 @@ For information on how to work with null in Cypher, please refer to <<cypher-man
    Equivalent functionality is available by simply passing either the ID for pass-by-reference, or an extracted map of properties for pass-by-value.
 ====
 
-The Neo4j driver maps Cypher types to and from native language types as depicted in the table below.
+The Neo4j drivers map Cypher types to and from native language types as depicted in the table below.
 Custom types (those not available in the language or standard library) are highlighted in *bold*.
 
 [.tabbed-example]
