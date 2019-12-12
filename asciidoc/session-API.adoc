@@ -165,8 +165,8 @@ Auto-commit transactions are intended to be used for simple use cases such as wh
 It is not recommended to use auto-commit transactions in production environments.
 
 [NOTE]
-The only way to execute `PERIODIC COMMIT` Cypher queries is to auto-commit the transaction.
 Unlike other kinds of Cypher query, `PERIODIC COMMIT` queries do not participate in the causal chain.
+Therefore, the only way to execute them from a driver is to use auto-commit transactions.
 Please refer to the <<cypher-manual#query-using-periodic-commit-hint, Cypher Manual -> `PERIODIC COMMIT` query hint>>.
 
 [.tabbed-example]
