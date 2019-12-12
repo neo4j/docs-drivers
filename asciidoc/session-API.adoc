@@ -1,4 +1,4 @@
-[[driver-session-API]]
+[[driver-session-api]]
 = The Session API
 
 [abstract]
@@ -6,13 +6,45 @@
 This section details the Session API that are made available by the driver, with each Session class oriented towards a different form of programming.
 --
 
+This chapter describes the following:
+
+* <<driver-simple-sessions, Simple sessions>> -- An introduction to simple sessions.
+** <<driver-simple-lifecycle, Lifecycle>> -- An overview of the lifecycle of a simple session.
+** <<driver-simple-transaction-fn, Transaction functions>> -- An overview of the transaction functions in a simple session.
+** <<driver-simple-autocommit-transactions, Auto-commit transactions>> --
+* <<connectors, Configure Neo4j connectors>> -- How to configure Neo4j connectors.
+* <<dynamic-settings, Configure dynamic settings>> -- How to configure certain Neo4j parameters while Neo4j is running.
+* <<transaction-logs, Transaction logs>> -- How to configure transaction logs.
+
+For a complete reference of Neo4j configuration settings, see <<configuration-settings>>.
+
+include::neo4j-conf.adoc[leveloffset=+1]
+
+include::file-locations.adoc[leveloffset=+1]
+
+include::ports.adoc[leveloffset=+1]
+
+include::set-initial-password.adoc[leveloffset=+1]
+
+include::connectors.adoc[leveloffset=+1]
+
+include::dynamic-settings.adoc[leveloffset=+1]
+
+include::transaction-logs.adoc[leveloffset=+1]
+
+
+
+
+
+
+
 [[driver-simple-sessions]]
 == Simple sessions
 
 [NOTE]
 Available in .NET and Java
 
-Simple sessions provide a "classic" blocking style API for Cypher execution and are available for most languages.
+Simple sessions provide a "classic" blocking style API for Cypher execution and are available for .NET and Java.
 In general, simple sessions provide the easiest programming style to work with since API calls are executed in a strictly sequential fashion.
 
 [[driver-simple-lifecycle]]

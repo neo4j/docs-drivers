@@ -44,7 +44,7 @@ This manual covers the following areas:
 * <<driver-get-started>> -- An overview of the official Neo4j drivers and how to connect to a Neo4j database.
 * <<driver-client-applications>> -- How to manage database connections within an application.
 * <<driver-cypher-workflow>> -- How to create units of work and provide a logical context for that work.
-* <<driver-session-API>> -- How the types and values used by Cypher map to native language types.
+* <<driver-session-api>> -- How the types and values used by Cypher map to native language types.
 * <<driver-terminology>> -- Terminology for drivers.
 
 _Who should read this?_
@@ -57,6 +57,6 @@ include::client-applications.adoc[leveloffset=+1]
 
 include::cypher-workflow.adoc[leveloffset=+1]
 
-include::session-API.adoc[leveloffset=+1]
+include::session-api.adoc[leveloffset=+1]
 
 include::terminology.adoc[leveloffset=+1]
