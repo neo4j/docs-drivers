@@ -394,17 +394,11 @@ For a comprehensive listing of all driver functionality, refer to the API docume
 {api-docs-base-uri}/dotnet-driver/{dotnet-driver-apidoc-version}/
 ======
 
-<<<<<<< HEAD
-//[.include-with-go]
-//======
-//https://godoc.org/github.com/neo4j/neo4j-go-driver/neo4j
-//======
-=======
 // [.include-with-go]
 // ======
 // https://godoc.org/github.com/neo4j/neo4j-go-driver/neo4j
 // ======
->>>>>>> amended hello-world example
+
 
 [.include-with-java]
 ======
@@ -416,15 +410,9 @@ For a comprehensive listing of all driver functionality, refer to the API docume
 {api-docs-base-uri}/javascript-driver/{javascript-driver-apidoc-version}/
 ======
 
-<<<<<<< HEAD
-//[.include-with-python]
-//======
-//{api-docs-base-uri}/python-driver/{python-driver-apidoc-version}/
-//======
-=======
 // [.include-with-python]
 // ======
 // {api-docs-base-uri}/python-driver/{python-driver-apidoc-version}/
 // ======
->>>>>>> amended hello-world example
+
 ====
