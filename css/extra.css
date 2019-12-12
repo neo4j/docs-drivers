@@ -55,10 +55,6 @@ td p code {
     border: transparent;
 }
 
-.tabbed-example .content > div:last-child,
-.tabbed-example .content > div:last-child p,
-.tabbed-example .content > div:last-child .highlight:last-child {
-    margin-bottom: 0px;
 }
 td pre.programlisting {
     background: transparent;
@@ -68,6 +64,12 @@ td p code {
     background: transparent;
     border: transparent;
 }
+
+.tabbed-example .content > div:last-child,
+.tabbed-example .content > div:last-child p,
+.tabbed-example .content > div:last-child .highlight:last-child {
+    margin-bottom: 0px;
+
 
 html, body, p, ul, ol, dl {
     font-family: "Open Sans", "DejaVu Sans", sans-serif;

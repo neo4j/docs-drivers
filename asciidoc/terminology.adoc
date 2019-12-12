@@ -41,15 +41,15 @@ A persistent communication channel between a client application and a database s
 [[term-connection-pool]]connection pool::
 A set of connections maintained for quick access, that can be acquired and released as required.
 
-[[term-direct-driver]]direct driver::
-A driver that can connect to a single server address.
-
 [[term-driver-object]]driver (object)::
 A globally accessible controller for all database access.
 
 [[term-driver-package]]driver (package)::
 A software library that provides access to Neo4j from a particular programming language.
 The Neo4j drivers implement the <<term-bolt, Bolt>> protocol.
+
+[[term-query-result]]query result::
+The stream of records that are returned on execution of a query.
 
 [[term-release-connection]]release (connection)::
 To return a connection back into a connection pool after use.
@@ -65,9 +65,6 @@ A combination of host name and port or IP address and port that targets a server
 
 [[term-session]]session::
 A causally linked sequence of transactions.
-
-[[term-statement-result]]statement result::
-The stream of records that are returned on execution of a statement.
 
 [[term-thread-safety]]thread safety::
 See https://en.wikipedia.org/wiki/Thread_safety.
