@@ -721,7 +721,7 @@ Default: Write
 `Database`::
 The database with which the session will interact.
 When you are working with a database which is not the default (i.e. the `system` database or another database in Neo4j 4.0 Enterprise Edition), you can explicitly configure the database which the driver is executing transactions against.
-See <<cypher-manual#administration-databases, Cypher Manual -> Databases>> for more information on databases.
+See <<operations-manual#manage-databases-default, Operations Manual -> The default database>> for more information on databases.
 Default: the default database as configured on the server.
 
 `Fetch Size`::
