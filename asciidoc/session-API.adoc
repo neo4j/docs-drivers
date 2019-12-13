@@ -170,13 +170,14 @@ Therefore, the only way to execute them from a driver is to use auto-commit tran
 Please refer to the <<cypher-manual#query-using-periodic-commit-hint, Cypher Manual -> `PERIODIC COMMIT` query hint>>.
 
 [.tabbed-example]
-.Simple auto-commit transaction example
+.Simple auto-commit transactions
 ====
 [.include-with-dotnet]
 ======
 
 [source, csharp]
 ----
+
 include::{dotnet-examples}/Examples.cs[tags=autocommit-transaction]
 ----
 ======
@@ -225,7 +226,7 @@ Query results are typically consumed as a stream of records.
 The drivers provide a language-idiomatic way to iterate through that stream.
 
 [.tabbed-example]
-.Consuming the stream
+.Consuming results
 ====
 [.include-with-dotnet]
 ======
@@ -373,36 +374,31 @@ These cases include connection issues, server role changes (e.g. leadership elec
 Retry logic can be configured when creating a session.
 
 [.tabbed-example]
-.Asynchronous programming examples
+.Asynchronous transaction functions
 ========
 [.include-with-dotnet]
 ======
 
 
-.Transaction functions
+.Transaction function
 [source, csharp]
 ----
 include::{dotnet-examples}/ExamplesAsync.cs[tags=async-transaction-function]
 ----
-
-
 ======
 
 [.include-with-java]
 ======
-
-
-.Transaction functions
+.Transaction function
 [source, java]
 ----
 include::{java-examples}/AsyncTransactionFunctionExample.java[tags=async-transaction-function]
 ----
-
-
 ======
 
 [.include-with-javascript]
 ======
+.Transaction function
 [source, javascript]
 ----
 include::{javascript-examples}/examples.test.js[tags=async-transaction-function]
@@ -426,12 +422,12 @@ Therefore, the only way to execute them from a driver is to use auto-commit tran
 Please refer to the <<cypher-manual#query-using-periodic-commit-hint, Cypher Manual -> `PERIODIC COMMIT` query hint>>.
 
 [.tabbed-example]
-.Auto-commit transactions
+.Asynchronous auto-commit transactions
 ========
 [.include-with-dotnet]
 ======
 
-.Auto-commit transactions
+.Auto-commit transaction
 [source, csharp]
 ----
 include::{dotnet-examples}/ExamplesAsync.cs[tags=async-autocommit-transaction]
@@ -441,7 +437,7 @@ include::{dotnet-examples}/ExamplesAsync.cs[tags=async-autocommit-transaction]
 [.include-with-java]
 ======
 
-.Auto-commit transactions
+.Auto-commit transaction
 [source, java]
 ----
 include::{java-examples}/AsyncAutocommitTransactionExample.java[tags=async-autocommit-transaction]
@@ -452,7 +448,7 @@ include::{java-examples}/AsyncAutocommitTransactionExample.java[tags=async-autoc
 [.include-with-javascript]
 ======
 
-.Auto-commit transactions
+.Auto-commit transaction
 [source, javascript]
 ----
 include::{javascript-examples}/examples.test.js[tags=async-autocommit-transaction]
@@ -567,7 +563,7 @@ Retry logic can be configured when creating a session.
 [.include-with-dotnet]
 ======
 
-.Reactive transaction function printing results
+.Reactive transaction function
 [source, csharp]
 ----
 include::{dotnet-examples}/ExamplesRx.cs[tags=rx-transaction-function]
@@ -577,7 +573,7 @@ include::{dotnet-examples}/ExamplesRx.cs[tags=rx-transaction-function]
 [.include-with-java]
 ======
 
-.Reactive transaction function printing results
+.Reactive transaction function
 [source, java]
 ----
 include::{java-examples}/RxTransactionFunctionExample.java[tags=rx-transaction-function]
@@ -588,7 +584,7 @@ include::{java-examples}/RxTransactionFunctionExample.java[tags=rx-transaction-f
 [.include-with-javascript]
 ======
 
-.Reactive transaction function printing results
+.Reactive transaction function
 [source, javascript]
 ----
 include::{javascript-examples}/examples.test.js[tags=rx-transaction-function]
@@ -634,7 +630,7 @@ include::{dotnet-examples}/ExamplesRx.cs[tags=rx-autocommit-transaction]
 .Auto-commit transactions
 [source, java]
 ----
-include::{java-examples}/RxTransactionFunctionExample.java[tags=rx-autocommit-transaction]
+include::{java-examples}/RxAutocommitTransactionExample.java[tags=rx-autocommit-transaction]
 ----
 ======
 
@@ -678,7 +674,7 @@ include::{dotnet-examples}/ExamplesRx.cs[tags=rx-result-consume]
 .Consuming results
 [source, java]
 ----
-include::{java-examples}/RxTransactionFunctionExample.java[tags=rx-result-consume]
+include::{java-examples}/RxResultConsume.java[tags=rx-result-consume]
 ----
 ======
 
@@ -725,7 +721,7 @@ Default: Write
 `Database`::
 The database with which the session will interact.
 When you are working with a database which is not the default (i.e. the `system` database or another database in Neo4j 4.0 Enterprise Edition), you can explicitly configure the database which the driver is executing transactions against.
-See <<cypher-manual#administration-databases, Cypher Manual -> Databases>> for more information on databases.
+See <<operations-manual#manage-databases-default, Operations Manual -> The default database>> for more information on databases.
 Default: the default database as configured on the server.
 
 `Fetch Size`::
