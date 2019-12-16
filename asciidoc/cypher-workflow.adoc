@@ -38,7 +38,7 @@ Similarly, sessions bound to different databases may not be causally chained by 
 
 Individual language drivers provide several session classes, each oriented around a particular programming style.
 Each class provides a similar set of functionality but offers client applications a choice based on how the application is structured and what frameworks are in use, if any.
-The session classes are described in <<driver-cypher-values>>.
+The session classes are described in <<driver-session-api>>.
 For more details, please see the <<driver-api-docs, API documentation>> for your language.
 
 
@@ -272,7 +272,7 @@ For more information about managing multiple databases within the same DBMS, ref
 
 Some administrative operations must be carried out against the `system` database.
 To do this, construct a session targeting the database called `system` and execute Cypher as usual.
-Please see <<cypher-manual##administration-databases-introduction, Cypher Manual -> Databases>> for more information.
+Please see <<cypher-manual#administration-databases-introduction, Cypher Manual -> Databases>> for more information.
 
 [[driver-type-mapping]]
 == Type mapping
