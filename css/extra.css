@@ -69,7 +69,7 @@ td p code {
 .tabbed-example .content > div:last-child p,
 .tabbed-example .content > div:last-child .highlight:last-child {
     margin-bottom: 0px;
-
+}
 
 html, body, p, ul, ol, dl {
     font-family: "Open Sans", "DejaVu Sans", sans-serif;
