@@ -1,5 +1,5 @@
 window.docMeta = (function () {
-  var version = '1.7';
+  var version = '4.0';
   var name = 'driver-manual';
   var href = window.location.href;
   return {
