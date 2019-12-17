@@ -71,16 +71,6 @@ try (Session session = driver.session(...)) {
 }
 ----
 ======
-
-[.include-with-javascript]
-======
-[source, javascript]
-----
- // Simple sessions are not available as
- // JavaScript does not support blocking I/O
-----
-======
-
 ====
 
 Sessions can be configured in a number of different ways.
@@ -120,14 +110,6 @@ include::{dotnet-examples}/Examples.cs[tags=transaction-function]
 ----
 ======
 
-// [.include-with-go]
-// ======
-// [source, go]
-// ----
-// include::{go-examples}/examples_test.go[tags=transaction-function]
-// ----
-// ======
-
 [.include-with-java]
 ======
 [source, java]
@@ -135,23 +117,6 @@ include::{dotnet-examples}/Examples.cs[tags=transaction-function]
 include::{java-examples}/TransactionFunctionExample.java[tags=transaction-function]
 ----
 ======
-
-[.include-with-javascript]
-======
-[source, javascript]
-----
- // Simple sessions are not available as
- // JavaScript does not support blocking I/O
-----
-======
-
-// [.include-with-python]
-// ======
-// [source, python]
-// ----
-// include::{python-examples}/transaction_function_example.py[tags=transaction-function]
-// ----
-// ======
 ====
 
 [[driver-simple-autocommit-transactions]]
@@ -182,15 +147,6 @@ include::{dotnet-examples}/Examples.cs[tags=autocommit-transaction]
 ----
 ======
 
-// [.include-with-go]
-// ======
-//
-// [source, go]
-// ----
-// include::{go-examples}/examples_test.go[tags=autocommit-transaction]
-// ----
-// ======
-
 [.include-with-java]
 ======
 
@@ -200,23 +156,6 @@ include::{java-examples}/AutocommitTransactionExample.java[tags=autocommit-trans
 ----
 ======
 
-[.include-with-javascript]
-======
-
-[source, javascript]
-----
-include::{javascript-examples}/examples.test.js[tags=autocommit-transaction]
-----
-======
-
-// [.include-with-python]
-// ======
-//
-// [source, python]
-// ----
-// include::{python-examples}/autocommit_transaction_example.py[tags=autocommit-transaction]
-// ----
-// ======
 ====
 
 [[driver-simple-result-consume]]
@@ -236,13 +175,6 @@ include::{dotnet-examples}/Examples.cs[tags=result-consume]
 ----
 ======
 
-// [.include-with-go]
-// ======
-// [source, go]
-// ----
-// include::{go-examples}/examples_test.go[tags=result-consume]
-// ----
-// ======
 
 [.include-with-java]
 ======
@@ -252,21 +184,6 @@ include::{java-examples}/ResultConsumeExample.java[tags=result-consume]
 ----
 ======
 
-[.include-with-javascript]
-======
-[source, javascript]
-----
-include::{javascript-examples}/examples.test.js[tags=result-consume]
-----
-======
-
-// [.include-with-python]
-// ======
-// [source, python]
-// ----
-// include::{python-examples}/result_consume_example.py[tags=result-consume]
-// ----
-// ======
 ====
 
 
@@ -297,13 +214,7 @@ The drivers offer support for this process, as per the example below:
 include::{dotnet-examples}/Examples.cs[tags=result-retain]
 ----
 ======
-// [.include-with-go]
-// ======
-// [source, go]
-// ----
-// include::{go-examples}/examples_test.go[tags=result-retain]
-// ----
-// ======
+
 [.include-with-java]
 ======
 [source, java]
@@ -311,20 +222,6 @@ include::{dotnet-examples}/Examples.cs[tags=result-retain]
 include::{java-examples}/ResultRetainExample.java[tags=result-retain]
 ----
 ======
-[.include-with-javascript]
-======
-[source, javascript]
-----
-include::{javascript-examples}/examples.test.js[tags=result-retain]
-----
-======
-// [.include-with-python]
-// ======
-// [source, python]
-// ----
-// include::{python-examples}/result_retain_example.py[tags=result-retain]
-// ----
-// ======
 ====
 
 
