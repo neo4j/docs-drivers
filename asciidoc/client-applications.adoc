@@ -476,11 +476,11 @@ include::{dotnet-examples}/Examples.cs[tags=config-connection-pool]
 include::{java-examples}/ConfigConnectionPoolExample.java[tags=config-connection-pool]
 ----
 
-// .Import connection pool configuration
-// [source, java]
-// ----
-// include::{java-examples}/ConfigConnectionPoolExample.java[tags=config-connection-pool-import]
-// ----
+.Import connection pool configuration
+[source, java]
+----
+include::{java-examples}/ConfigConnectionPoolExample.java[tags=config-connection-pool-import]
+----
 ======
 
 [.include-with-javascript]
@@ -581,11 +581,11 @@ Default: None
 ----
 include::{dotnet-examples}/Examples.cs[tags=config-unencrypted]
 ----
-.Import unencrypted configuration
-[source, csharp]
-----
-include::{dotnet-examples}/Examples.cs[tags=config-unencrypted-import]
-----
+// .Import unencrypted configuration
+// [source, csharp]
+// ----
+// include::{dotnet-examples}/Examples.cs[tags=config-unencrypted-import]
+// ----
 ======
 
 
@@ -608,11 +608,11 @@ include::{java-examples}/ConfigUnencryptedExample.java[tags=config-unencrypted-i
 ----
 include::{javascript-examples}/examples.test.js[tags=config-unencrypted]
 ----
-.Import unencrypted configuration
-[source, javascript]
-----
-include::{javascript-examples}/examples.test.js[tags=config-unencrypted-import]
-----
+// .Import unencrypted configuration
+// [source, javascript]
+// ----
+// include::{javascript-examples}/examples.test.js[tags=config-unencrypted-import]
+// ----
 ======
 ====
 
