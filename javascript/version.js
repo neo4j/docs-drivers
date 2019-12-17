@@ -5,7 +5,7 @@ window.docMeta = (function () {
   return {
     name: name,
     version: version,
-    availableDocVersions: ["1.7"],
+    availableDocVersions: ["1.7, 4.0-preview"],
     thisPubBaseUri: href.substring(0, href.indexOf(name) + name.length) + '/' + version,
     unversionedDocBaseUri: href.substring(0, href.indexOf(name) + name.length) + '/',
     commonDocsBaseUri: href.substring(0, href.indexOf(name) - 1)
