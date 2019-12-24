@@ -95,7 +95,7 @@ neo4j://<HOST>:<PORT>[?<ROUTING_CONTEXT>]
 ----
 
 This targets a routed Neo4j service that may be fulfilled by either a cluster or a single instance.
-The `HOST` and `PORT` values contain a logical hostname and port number targeting the entry point to the Neo4j service (e.g. `neo4j://graph.example.com:7687).
+The `HOST` and `PORT` values contain a logical hostname and port number targeting the entry point to the Neo4j service (e.g. `neo4j://graph.example.com:7687`).
 In a clustered environment, the URI address will resolve to one of more of the core members; for standalone installations, this will simply point to that server address.
 The `ROUTING_CONTEXT` option allows for customization of the routing table and is discussed in more detail in <<driver-routing-context>>.
 
