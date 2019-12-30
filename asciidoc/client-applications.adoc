@@ -105,6 +105,8 @@ This variant is useful for the subset client applications (such as admin tooling
 ----
 bolt://<HOST>:<PORT>
 ----
+[NOTE]
+Neo4j 3.x did not provide a routing table in single instance mode and therefore you should use a `bolt://` URI if targeting an older, non-clustered server.
 
 === Initial address resolution
 
