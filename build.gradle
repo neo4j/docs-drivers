@@ -40,6 +40,13 @@ plugins {
 version '4.0-preview'
 
 repositories {
+    // A flat directory repository. Note that this behaves differently than other repositories:
+    // "However, as Gradle prefers to use modules whose descriptor has been created from real meta-data rather than
+    // being generated, flat directory repositories cannot be used to override artifacts with real meta-data from other
+    // repositories." https://docs.gradle.org/current/userguide/dependency_management.html#sec:flat_dir_resolver
+    flatDir {
+        dirs "${rootProject.projectDir}/shared"
+    }
     mavenLocal()
     maven {
         url System.env.ARTIFACTORY_URI
