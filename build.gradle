@@ -37,7 +37,7 @@ plugins {
     id 'maven-publish'
 }
 
-version '4.0-preview'
+version '4.0'
 
 repositories {
     mavenLocal()
