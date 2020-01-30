@@ -198,7 +198,7 @@ Additionally, we have a server `neo01.graph.example.com` to which we wish to dir
 
 This URI will use the server policy `europe`:
 
-`bolt+routing://neo01.graph.example.com?policy=europe`
+`neo4j://neo01.graph.example.com?policy=europe`
 ====
 
 [NOTE]
