@@ -379,6 +379,9 @@ def getAsciidoctor(withTabbedExampleProcessor) {
             .loadClass(new FileInputStream(file("${rootProject.projectDir}/extensions/tabbed_example_processor.rb")))
             .treeprocessor("TabbedExampleProcessor")
     }
+        adoc.rubyExtensionRegistry()
+            .loadClass(new FileInputStream(file("${rootProject.projectDir}/src/main/ruby-extensions/aura_admonition.rb")))
+            .block("AURA", "AuraAdmonition")
     project.ext.adoc
 }
 
