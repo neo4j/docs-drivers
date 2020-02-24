@@ -366,6 +366,12 @@ include::{python-examples}/custom_auth_example.py[tags=custom-auth]
 === Encryption
 
 TLS encryption is enabled for all connections by default.
+
+[NOTE]
+====
+Please note that if you are using a Neo4j driver with Neo4j Aura, you must have encryption set to on.
+====
+
 This can be disabled through configuration as follows:
 
 [.tabbed-example]
