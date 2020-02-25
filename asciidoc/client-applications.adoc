@@ -369,10 +369,10 @@ TLS encryption is enabled for all connections by default.
 
 [NOTE]
 ====
-Please note that if you are using a Neo4j driver with Neo4j Aura, you must have encryption set to on.
+Please note that if you are using a Neo4j driver with Neo4j Aura, in addition to the default value of enabled encryption, you must also enable `TRUST_SYSTEM_CA_SIGNED_CERTIFICATES`.
 ====
 
-This can be disabled through configuration as follows:
+You can disable encryption through configuration, as follows:
 
 [.tabbed-example]
 .Unencrypted
