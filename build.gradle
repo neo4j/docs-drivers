@@ -37,7 +37,7 @@ plugins {
     id 'maven-publish'
 }
 
-version '4.0-preview'
+version '4.0'
 
 repositories {
     mavenLocal()
@@ -488,7 +488,7 @@ $after"""
 
 task packageOlinkDb(type: Jar, dependsOn: [makeTargetDb, makeTargetDb]) {
     baseName docId
-    version neo4jDocVersion
+//    version neo4jDocVersion
     classifier "olinkdb"
     destinationDir file("$buildDir/distributions")
     from {
