@@ -367,7 +367,6 @@ include::{python-examples}/custom_auth_example.py[tags=custom-auth]
 
 TLS encryption is enabled for all connections by default.
 
-
 If you are using a Neo4j driver with Neo4j Aura, in addition to the default value of enabled encryption, you must also enable `TRUST_SYSTEM_CA_SIGNED_CERTIFICATES`.
 
 .Examples of required encryption and trust settings:
