@@ -367,10 +367,21 @@ include::{python-examples}/custom_auth_example.py[tags=custom-auth]
 
 TLS encryption is enabled for all connections by default.
 
-[NOTE]
-====
-Please note that if you are using a Neo4j driver with Neo4j Aura, in addition to the default value of enabled encryption, you must also enable `TRUST_SYSTEM_CA_SIGNED_CERTIFICATES`.
-====
+
+If you are using a Neo4j driver with Neo4j Aura, in addition to the default value of enabled encryption, you must also enable `TRUST_SYSTEM_CA_SIGNED_CERTIFICATES`.
+
+.Examples of required encryption and trust settings:
+[cols="1h,1m"]
+|===
+|Neo4j 3.x
+|GraphDatabase.driver("bolt://graph.example.com:7687")
+
+|Neo4j 4.x
+|GraphDatabase.driver("bolt://graph.example.com:7687", encrypted=False)
+
+|Neo4j Aura
+|GraphDatabase.driver("neo4j://graph.example.com:7687", trust=TRUST_SYSTEM_CA_SIGNED_CERTIFICATES)
+|===
 
 You can disable encryption through configuration, as follows:
 
