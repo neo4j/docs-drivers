@@ -274,6 +274,58 @@ Some administrative operations must be carried out against the `system` database
 To do this, construct a session targeting the database called `system` and execute Cypher as usual.
 Please see <<cypher-manual#administration-databases-introduction, Cypher Manual -> Databases>> for more information.
 
+[role=enterprise-edition]
+[[database-selection]]
+=== Database selection
+
+The database selection on the client side happens on the <<driver-session-api>>.
+You pass the name of the database to the driver during session creation.
+The default database is used if you don't specify a name.
+A database name must not be literal `null` nor an empty string.
+
+NOTE: While there are no different versions of the driver for the community or enterprise edition of Neo4j, those methods
+      will only work when the driver is connected against the enterprise edition of Neo4j.
+
+The database that is requested must exist.
+
+[.tabbed-example]
+.Database selection on session creation
+====
+[.include-with-dotnet]
+======
+.Database selection on session creation
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=database-selection]
+----
+======
+
+[.include-with-java]
+======
+.Database selection on session creation
+[source, java]
+----
+include::{java-examples}/DatabaseSelectionExample.java[tags=database-selection]
+----
+
+.Import database selection on session creation
+[source, java]
+----
+include::{java-examples}/DatabaseSelectionExample.java[tags=database-selection-import]
+----
+======
+
+[.include-with-javascript]
+======
+.Read write transaction
+[source, javascript]
+----
+include::{javascript-examples}/examples.test.js[tags=database-selection]
+----
+======
+
+====
+
 [[driver-type-mapping]]
 == Type mapping
 
