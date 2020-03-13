@@ -95,10 +95,10 @@ String uri = "bolt+routing://graph.example.com:7687";
 IDriver driver = GraphDatabase.Driver(uri, auth,
            new Config {TrustStrategy = TrustStrategy.TrustSystemCaSignedCertificates});
 ----
-|This is the default (and only) option for Neo4j Aura
+| This is the default (and only option) for Neo4j Aura
 
 |Neo4j 4.x
-|Unsecured - this is the default for a Neo4j 4.x installation
+|Unsecured
 |
 [source, csharp]
 ----
@@ -140,7 +140,7 @@ IDriver driver = GraphDatabase.Driver(uri, auth,
 |
 
 |Neo4j 3.x
-|Secured with self-signed certificate - this is the default for a Neo4j 3.x installation
+|Secured with self-signed certificate
 |
 [source, csharp]
 ----
@@ -187,10 +187,10 @@ driver, err := neo4j.NewDriver(uri, auth, func(config *neo4j.Config) {
         config.TrustStrategy = neo4j.TrustSystem(true)
 })
 ----
-|This is the default (and only) option for Neo4j Aura
+| This is the default (and only option) for Neo4j Aura
 
 |Neo4j 4.x
-|Unsecured - this is the default for a Neo4j 4.x installation
+|Unsecured
 |
 [source, go]
 ----
@@ -238,7 +238,7 @@ driver, err := neo4j.NewDriver(uri, auth, func(config *neo4j.Config) {
 |
 
 |Neo4j 3.x
-|Secured with self-signed certificate - this is the default for a Neo4j 3.x installation
+|Secured with self-signed certificate
 |
 [source, go]
 ----
@@ -287,10 +287,10 @@ Config config = Config.build()
                       .withTrustStrategy( trustSystemCertificates() )
                       .build();
 ----
-|This is the default (and only) option for Neo4j Aura
+| This is the default (and only option) for Neo4j Aura
 
 |Neo4j 4.x
-|Unsecured - this is the default for a Neo4j 4.x installation
+|Unsecured
 |
 [source, java]
 ----
@@ -337,7 +337,7 @@ Config config = Config.build()
 |
 
 |Neo4j 3.x
-|Secured with self-signed certificate - this is the default for a Neo4j 3.x installation
+|Secured with self-signed certificate
 |
 [source, java]
 ----
@@ -387,10 +387,10 @@ const driver = neo4j.driver(uri,auth, {
     trust: 'TRUST_SYSTEM_CA_SIGNED_CERTIFICATES'
 })
 ----
-|This is the default (and only) option for Neo4j Aura
+| This is the default (and only option) for Neo4j Aura
 
 |Neo4j 4.x
-|Unsecured - this is the default for a Neo4j 4.x installation
+|Unsecured
 |
 [source, javascript]
 ----
@@ -435,7 +435,7 @@ const driver = neo4j.driver(uri,auth, {
 |
 
 |Neo4j 3.x
-|Secured with self-signed certificate - this is the default for a Neo4j 3.x installation
+|Secured with self-signed certificate
 |
 [source, javascript]
 ----
@@ -481,10 +481,10 @@ The table below illustrates examples of how to connect to a service with routing
 uri = "bolt+routing://graph.example.com:7687"
 GraphDatabase.driver(uri, auth, trust=TRUST_SYSTEM_CA_SIGNED_CERTIFICATES)
 ----
-|This is the default (and only) option for Neo4j Aura
+| This is the default (and only option) for Neo4j Aura
 
 |Neo4j 4.x
-|Unsecured - this is the default for a Neo4j 4.x installation
+|Unsecured
 |
 [source, python]
 ----
@@ -523,7 +523,7 @@ GraphDatabase.driver(uri, auth, trust=TRUST_SYSTEM_CA_SIGNED_CERTIFICATES)
 |
 
 |Neo4j 3.x
-|Secured with self-signed certificate - this is the default for a Neo4j 3.x installation
+|Secured with self-signed certificate
 |
 [source, python]
 ----
