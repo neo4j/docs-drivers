@@ -283,8 +283,9 @@ You pass the name of the database to the driver during session creation.
 The default database is used if you don't specify a name.
 A database name must not be literal `null` nor an empty string.
 
-NOTE: While there are no different versions of the driver for the community or enterprise edition of Neo4j, those methods
-      will only work when the driver is connected against the enterprise edition of Neo4j.
+NOTE: Selection of database is only possible when the driver is connected against Enterprise Edition of Neo4j.
+      Changing to any other database than the default database in Neo4j Community Edition will lead to a runtime error.
+
 
 The database that is requested must exist.
 
