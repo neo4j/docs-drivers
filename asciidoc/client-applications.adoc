@@ -72,6 +72,256 @@ include::{python-examples}/driver_lifecycle_example.py[tags=driver-lifecycle]
 ======
 ====
 
+
+
+[[driver-connection-uris-encryption-trust]]
+== Connection URIs, encryption and trust
+
+A connection URI identifies a graph database and how to connect to it.
+The encryption and trust settings provide detail to how that connection should be secured.
+
+
+[[driver-connection-uris]]
+=== Connection URIs
+
+The official Neo4j drivers currently support the following URI schemes and driver object types:
+
+.Available URI schemes
+[options="header"]
+|===
+| URI Scheme     | Driver object type
+| bolt           | Direct driver
+| bolt+routing   | Routing driver
+|===
+
+==== Direct drivers (bolt)
+
+A direct driver is created via a `bolt` URI, for example: `bolt://localhost:7687`.
+This kind of driver is used to maintain connections to a single database server and is typically used when working with a single Neo4j instance or when targeting a specific member of a cluster.
+Note that a routing driver is generally preferable when working with a Causal Cluster.
+
+
+[[routing_drivers_bolt_routing]]
+==== Routing drivers (bolt+routing)
+
+A routing driver is created via a `bolt+routing` URI, for example: `bolt+routing://graph.example.com:7687`.
+The address in the URI must be that of a Core Server.
+This kind of driver uses the <<term-bolt-routing-protocol, Bolt Routing Protocol>> and works in tandem with the cluster to route transactions to available cluster members.
+
+==== Routing drivers with routing context
+
+Routing drivers with routing context are an available option when using drivers of version 1.3 or above together with a Neo4j Causal Cluster of version 3.2 or above.
+In such a setup, a routing driver can include a preferred routing context via the query part of the `bolt+routing` URI.
+
+In the standard Neo4j configuration, routing contexts are defined on the server side by means of _server policies_.
+Thus the driver communicates the routing context to the cluster in the form of a server policy.
+It then obtains refined routing information back from the cluster, based on the server policy.
+
+The address in the URI of a routing driver with routing context must be that of a Core Server.
+
+.Configure a routing driver with routing context
+====
+This example will assume that Neo4j has been configured for server policies as described in <<operations-manual#multi-dc-load-balancing, Neo4j Operations Manual -> Load balancing for multi-data center systems>>.
+In particular, a server policy called `europe` has been defined.
+Additionally, we have a server `neo01.graph.example.com` to which we wish to direct the driver.
+
+This URI will use the server policy `europe`:
+
+`bolt+routing://neo01.graph.example.com?policy=europe`
+====
+
+[NOTE]
+.Server-side configuration to enable Routing drivers with routing context
+====
+A prerequisite for using a Routing driver with routing context is that the Neo4j database is operated on a <<operations-manual#clustering, Causal Cluster>> with the <<operations-manual#multi-dc, Multi-data center licensing option>> enabled.
+Additionally, the routing contexts must be defined within the cluster as routing _policies_.
+For details on how to configure multi-data center routing policies for a Causal Cluster, please refer to <<operations-manual#multi-dc-load-balancing, Operations Manual -> Causal Clustering>>.
+====
+
+
+==== Cluster bootstrap address resolution
+
+Drivers have the ability to intercept cluster bootstrap address resolution.
+This is generally performed by a routing driver on construction or after complete contact has been lost with a cluster.
+This hook can be useful to augment regular DNS resolution and can be used to initialize a routing driver with multiple server addresses.
+
+The intercept hook is provided as a driver configuration option and takes the form of a callback function that accepts a single input address and yields or returns multiple output addresses.
+This function may hard code the output addresses or may draw them from another configuration source, as required.
+Output addresses can contain host names or IP addresses and are forwarded to the connection pool as initial routers.
+
+image::resolution.svg[title="Cluster bootstrap address resolution", role="middle"]
+
+The example below shows how to expand a single address into multiple (hard coded) output addresses:
+
+[.tabbed-example]
+.Custom Address Resolver
+====
+[.include-with-dotnet]
+======
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=config-custom-resolver]
+----
+======
+
+[.include-with-go]
+======
+[source, go]
+----
+include::{go-examples}/examples_test.go[tags=config-custom-resolver]
+----
+======
+
+[.include-with-java]
+======
+[source, java]
+----
+include::{java-examples}/ConfigCustomResolverExample.java[tags=config-custom-resolver]
+----
+======
+
+[.include-with-javascript]
+======
+[source, javascript]
+----
+include::{javascript-examples}/examples.test.js[tags=config-custom-resolver]
+----
+======
+
+[.include-with-python]
+======
+[source, python]
+----
+include::{python-examples}/custom_resolver_example.py[tags=custom-resolver]
+----
+======
+====
+
+
+[[driver-configuration-encryption]]
+=== Encryption
+
+TLS encryption is enabled for all connections by default.
+This can be disabled through configuration as follows:
+
+[.tabbed-example]
+.Unencrypted
+====
+[.include-with-dotnet]
+======
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=config-unencrypted]
+----
+======
+
+[.include-with-go]
+======
+[source, go]
+----
+include::{go-examples}/examples_test.go[tags=config-unencrypted]
+----
+======
+
+[.include-with-java]
+======
+[source, java]
+----
+include::{java-examples}/ConfigUnencryptedExample.java[tags=config-unencrypted]
+----
+======
+
+[.include-with-javascript]
+======
+[source, javascript]
+----
+include::{javascript-examples}/examples.test.js[tags=config-unencrypted]
+----
+======
+
+[.include-with-python]
+======
+[source, python]
+----
+include::{python-examples}/config_unencrypted_example.py[tags=config-unencrypted]
+----
+======
+====
+
+The server can be modified to require encryption for all connections.
+Please see the <<operations-manual#connectors, Operations Manual -> Configure Neo4j connectors>> for more information.
+
+An attempt to connect to a server using an encryption setting not allowed by that server will result in a <<driver-service-unavailable, _Service unavailable_>> status.
+
+
+[[driver-configuration-trust]]
+=== Trust
+
+During a TLS handshake, the server provides a certificate to the client application.
+The application can choose to accept or reject this certificate based on one of the following trust strategies:
+
+.Trust strategies
+[options="header"]
+|===
+| Trust strategy                        | Description
+| `TRUST_ALL_CERTIFICATES` (default)    | Accept any certificate provided by the server, regardless of CA chain.
+| `TRUST_CUSTOM_CA_SIGNED_CERTIFICATES` | Accept any certificate that can be verified against a custom CA.
+| `TRUST_SYSTEM_CA_SIGNED_CERTIFICATES` | Accept any certificate that can be verified against the system store.
+|===
+
+https://en.wikipedia.org/wiki/Server_Name_Indication[Server Name Indication (SNI)] is enabled by default, allowing proxy middleware to route encrypted Bolt connections to the correct backend server.
+
+[.tabbed-example]
+.Trust
+====
+[.include-with-dotnet]
+======
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=config-trust]
+----
+======
+
+[.include-with-go]
+======
+[source, go]
+----
+include::{go-examples}/examples_test.go[tags=config-trust]
+----
+======
+
+[.include-with-java]
+======
+[source, java]
+----
+include::{java-examples}/ConfigTrustExample.java[tags=config-trust]
+----
+======
+
+[.include-with-javascript]
+======
+[source, javascript]
+----
+include::{javascript-examples}/examples.test.js[tags=config-trust]
+----
+======
+
+[.include-with-python]
+======
+[source, python]
+----
+include::{python-examples}/config_trust_example.py[tags=config-trust]
+----
+======
+====
+
+
+[[driver-configuration-examples]]
+=== Examples
+
+The table below provides example code snippets for different deployment configurations.
+Each snippet expects an `auth` variable to have been previously defined, containing the authentication details for that connection.
+
 [.tabbed-example]
 .Connecting to a service
 ====
@@ -549,123 +799,6 @@ To connect to a service without routing, you can replace `bolt+routing` with `bo
 
 ====
 
-[[driver-connection-uris]]
-== Connection URIs
-
-A connection URI identifies a graph database and how to connect to it.
-The official Neo4j drivers currently support the following URI schemes and driver object types:
-
-.Available URI schemes
-[options="header"]
-|===
-| URI Scheme     | Driver object type
-| bolt           | Direct driver
-| bolt+routing   | Routing driver
-|===
-
-
-=== Direct drivers (bolt)
-
-A direct driver is created via a `bolt` URI, for example: `bolt://localhost:7687`.
-This kind of driver is used to maintain connections to a single database server and is typically used when working with a single Neo4j instance or when targeting a specific member of a cluster.
-Note that a routing driver is generally preferable when working with a Causal Cluster.
-
-
-[[routing_drivers_bolt_routing]]
-=== Routing drivers (bolt+routing)
-
-A routing driver is created via a `bolt+routing` URI, for example: `bolt+routing://graph.example.com:7687`.
-The address in the URI must be that of a Core Server.
-This kind of driver uses the <<term-bolt-routing-protocol, Bolt Routing Protocol>> and works in tandem with the cluster to route transactions to available cluster members.
-
-=== Routing drivers with routing context
-
-Routing drivers with routing context are an available option when using drivers of version 1.3 or above together with a Neo4j Causal Cluster of version 3.2 or above.
-In such a setup, a routing driver can include a preferred routing context via the query part of the `bolt+routing` URI.
-
-In the standard Neo4j configuration, routing contexts are defined on the server side by means of _server policies_.
-Thus the driver communicates the routing context to the cluster in the form of a server policy.
-It then obtains refined routing information back from the cluster, based on the server policy.
-
-The address in the URI of a routing driver with routing context must be that of a Core Server.
-
-.Configure a routing driver with routing context
-====
-This example will assume that Neo4j has been configured for server policies as described in <<operations-manual#multi-dc-load-balancing, Neo4j Operations Manual -> Load balancing for multi-data center systems>>.
-In particular, a server policy called `europe` has been defined.
-Additionally, we have a server `neo01.graph.example.com` to which we wish to direct the driver.
-
-This URI will use the server policy `europe`:
-
-`bolt+routing://neo01.graph.example.com?policy=europe`
-====
-
-[NOTE]
-.Server-side configuration to enable Routing drivers with routing context
-====
-A prerequisite for using a Routing driver with routing context is that the Neo4j database is operated on a <<operations-manual#clustering, Causal Cluster>> with the <<operations-manual#multi-dc, Multi-data center licensing option>> enabled.
-Additionally, the routing contexts must be defined within the cluster as routing _policies_.
-For details on how to configure multi-data center routing policies for a Causal Cluster, please refer to <<operations-manual#multi-dc-load-balancing, Operations Manual -> Causal Clustering>>.
-====
-
-
-=== Cluster bootstrap address resolution
-
-Drivers have the ability to intercept cluster bootstrap address resolution.
-This is generally performed by a routing driver on construction or after complete contact has been lost with a cluster.
-This hook can be useful to augment regular DNS resolution and can be used to initialize a routing driver with multiple server addresses.
-
-The intercept hook is provided as a driver configuration option and takes the form of a callback function that accepts a single input address and yields or returns multiple output addresses.
-This function may hard code the output addresses or may draw them from another configuration source, as required.
-Output addresses can contain host names or IP addresses and are forwarded to the connection pool as initial routers.
-
-image::resolution.svg[title="Cluster bootstrap address resolution", role="middle"]
-
-The example below shows how to expand a single address into multiple (hard coded) output addresses:
-
-[.tabbed-example]
-.Custom Address Resolver
-====
-[.include-with-dotnet]
-======
-[source, csharp]
-----
-include::{dotnet-examples}/Examples.cs[tags=config-custom-resolver]
-----
-======
-
-[.include-with-go]
-======
-[source, go]
-----
-include::{go-examples}/examples_test.go[tags=config-custom-resolver]
-----
-======
-
-[.include-with-java]
-======
-[source, java]
-----
-include::{java-examples}/ConfigCustomResolverExample.java[tags=config-custom-resolver]
-----
-======
-
-[.include-with-javascript]
-======
-[source, javascript]
-----
-include::{javascript-examples}/examples.test.js[tags=config-custom-resolver]
-----
-======
-
-[.include-with-python]
-======
-[source, python]
-----
-include::{python-examples}/custom_resolver_example.py[tags=custom-resolver]
-----
-======
-====
 
 [[driver-authentication]]
 == Authentication
@@ -836,124 +969,6 @@ include::{python-examples}/custom_auth_example.py[tags=custom-auth]
 
 [[driver-configuration]]
 == Configuration
-
-
-[[driver-configuration-encryption]]
-=== Encryption
-
-TLS encryption is enabled for all connections by default.
-This can be disabled through configuration as follows:
-
-[.tabbed-example]
-.Unencrypted
-====
-[.include-with-dotnet]
-======
-[source, csharp]
-----
-include::{dotnet-examples}/Examples.cs[tags=config-unencrypted]
-----
-======
-
-[.include-with-go]
-======
-[source, go]
-----
-include::{go-examples}/examples_test.go[tags=config-unencrypted]
-----
-======
-
-[.include-with-java]
-======
-[source, java]
-----
-include::{java-examples}/ConfigUnencryptedExample.java[tags=config-unencrypted]
-----
-======
-
-[.include-with-javascript]
-======
-[source, javascript]
-----
-include::{javascript-examples}/examples.test.js[tags=config-unencrypted]
-----
-======
-
-[.include-with-python]
-======
-[source, python]
-----
-include::{python-examples}/config_unencrypted_example.py[tags=config-unencrypted]
-----
-======
-====
-
-The server can be modified to require encryption for all connections.
-Please see the <<operations-manual#connectors, Operations Manual -> Configure Neo4j connectors>> for more information.
-
-An attempt to connect to a server using an encryption setting not allowed by that server will result in a <<driver-service-unavailable, _Service unavailable_>> status.
-
-
-[[driver-configuration-trust]]
-=== Trust
-
-During a TLS handshake, the server provides a certificate to the client application.
-The application can choose to accept or reject this certificate based on one of the following trust strategies:
-
-.Trust strategies
-[options="header"]
-|===
-| Trust strategy                        | Description
-| `TRUST_ALL_CERTIFICATES` (default)    | Accept any certificate provided by the server, regardless of CA chain.
-| `TRUST_CUSTOM_CA_SIGNED_CERTIFICATES` | Accept any certificate that can be verified against a custom CA.
-| `TRUST_SYSTEM_CA_SIGNED_CERTIFICATES` | Accept any certificate that can be verified against the system store.
-|===
-
-https://en.wikipedia.org/wiki/Server_Name_Indication[Server Name Indication (SNI)] is enabled by default, allowing proxy middleware to route encrypted Bolt connections to the correct backend server.
-
-[.tabbed-example]
-.Trust
-====
-[.include-with-dotnet]
-======
-[source, csharp]
-----
-include::{dotnet-examples}/Examples.cs[tags=config-trust]
-----
-======
-
-[.include-with-go]
-======
-[source, go]
-----
-include::{go-examples}/examples_test.go[tags=config-trust]
-----
-======
-
-[.include-with-java]
-======
-[source, java]
-----
-include::{java-examples}/ConfigTrustExample.java[tags=config-trust]
-----
-======
-
-[.include-with-javascript]
-======
-[source, javascript]
-----
-include::{javascript-examples}/examples.test.js[tags=config-trust]
-----
-======
-
-[.include-with-python]
-======
-[source, python]
-----
-include::{python-examples}/config_trust_example.py[tags=config-trust]
-----
-======
-====
 
 
 [[driver-config-connection-pool-management]]
