@@ -6,6 +6,24 @@
 This section describes how to manage database connections within an application.
 --
 
+This section contains the following:
+
+* <<driver-driver-object,The driver object>>
+* <<driver-connection-uris-encryption-trust,Connection URIs, encryption and trust>>
+** <<driver-connection-uris,Connection URIs>>
+** <<driver-configuration-encryption,Encryption>>
+** <<driver-configuration-trust,Trust>>
+** <<driver-configuration-examples,Examples>>
+* <<driver-authentication,Authentication>>
+** <<driver-authentication-basic,Basic authentication>>
+** <<driver-authentication-kerberos,Kerberos authentication>>
+** <<driver-authentication-custom,Custom authentication>>
+* <<driver-configuration,Configuration>>
+** <<driver-config-connection-pool-management,Connection pool management>>
+** <<driver-configuration-connection-timeout,Connection timeout>>
+** <<driver-configuration-max-retry-time,Max retry time>>
+* <<driver-service-unavailable,Service unavailable>>
+
 
 [[driver-driver-object]]
 == The driver object
@@ -71,7 +89,6 @@ include::{python-examples}/driver_lifecycle_example.py[tags=driver-lifecycle]
 ----
 ======
 ====
-
 
 
 [[driver-connection-uris-encryption-trust]]
@@ -862,6 +879,8 @@ include::{python-examples}/auth_example.py[tags=basic-auth]
 The basic authentication scheme can also be used to authenticate against an LDAP server.
 --
 
+
+[[driver-authentication-kerberos]]
 === Kerberos authentication
 
 The Kerberos authentication scheme provides a simple way to create a Kerberos authentication token with a base64 encoded server authentication ticket.
