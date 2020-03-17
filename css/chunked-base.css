@@ -164,6 +164,7 @@ dl dd:last-child, dl dd:last-child > :last-child {
 .admonitionblock td.icon .icon-warning:before { content: "\f071"; color: #bf6900; }
 .admonitionblock td.icon .icon-caution:before { content: "\f06d"; color: #bf3400; }
 .admonitionblock td.icon .icon-important:before { content: "\f06a"; color: #bf0000; }
+.admonitionblock td.icon .icon-aura:before { content: "\f0c2"; color: #C5C8FF; }
 
 .admonitionblock table tr { background-color: white !important; border-width: 0; }
 .admonitionblock table tr th { font-weight: bold; font-size: 1em; border-width: 0; }
@@ -713,6 +714,52 @@ table span.deprecated:after {
   }
 }
 
+/*
+ * Aura
+ */
+
+ /* Provide for highlighting of Aura features */
+ section.aura > div.titlepage .title:after, p.aura:after, span.aura:after, table.aura > caption:after {
+   content: "Aura";
+   text-align: center;
+   font-family: "Roboto",-apple-system,BlinkMacSystemFont,"Segoe UI","Roboto","Oxygen","Ubuntu","Cantarell","Fira Sans","Droid Sans","Helvetica Neue","Helvetica","Arial",sans-serif;
+   font-weight: normal;
+   font-size: 0.5em;
+   color: #C5C8FF;
+   position: relative;
+   box-sizing: border-box;
+   padding: 4px 8px;
+   border-color: #C5C8FF;
+   border-style: solid;
+   border-width: 1px;
+   border-radius: 6px;
+   margin-left: 10px;
+   margin-right: 10px;
+ }
+
+ p.aura:after, table.aura > caption:after {
+   font-size: 0.8em;
+   display: inline;
+   white-space: nowrap;
+ }
+
+ span.aura:after {
+   font-size: 0.8em;
+   display: inline;
+   white-space: nowrap;
+ }
+
+ section.aura > div.titlepage .title:after {
+   bottom: 4px;
+ }
+
+ @media only screen and (min-width: 1280px) {
+   p.aura:before {
+     display: inline;
+     left: -120px;
+     margin-right: -88px;
+   }
+ }
 
 /* Provide for highlighting of Enterprise Edition features */
 section.enterprise-edition > div.titlepage .title:after, p.enterprise-edition:after, span.enterprise-edition:after, table.enterprise-edition > caption:after {
