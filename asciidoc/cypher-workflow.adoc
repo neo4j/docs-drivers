@@ -278,7 +278,7 @@ Please see <<cypher-manual#administration-databases-introduction, Cypher Manual 
 [[database-selection]]
 === Database selection
 
-The database selection on the client side happens on the <<driver-session-api>>.
+The database selection on the client side happens on the <<driver-session-api, session API>>.
 You pass the name of the database to the driver during session creation.
 The default database is used if you don't specify a name.
 A database name must not be literal `null` nor an empty string.
