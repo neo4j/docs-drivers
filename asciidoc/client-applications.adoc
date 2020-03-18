@@ -296,9 +296,9 @@ The table below illustrates examples of how to connect to a service with routing
 ----
 GraphDatabase.Driver("neo4j+s://graph.example.com:7687", auth)
 ----
-
++
 If you do not have at least the .NET Driver 4.0.1 patch installed, you will need this snippet instead:
-
++
 [source, csharp]
 ----
 String uri = "neo4j://graph.example.com:7687";
