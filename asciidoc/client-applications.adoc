@@ -423,6 +423,18 @@ The table below illustrates examples of how to connect to a service with routing
 |
 [source, java]
 ----
+GraphDatabase.driver("neo4j+s://graph.example.com:7687", auth)
+----
+
+If you do not have at least the .NET Driver 4.0.1 patch installed, you will need this snippet instead:
+
+[source, java]
+----
+String uri = "neo4j://graph.example.com:7687";
+Config config = Config.builder()
+                     .withEncryption()
+                     .build();
+Driver driver = GraphDatabase.driver(uri, auth, config);
 ----
 | This is the default (and only option) for Neo4j Aura
 
@@ -431,6 +443,7 @@ The table below illustrates examples of how to connect to a service with routing
 |
 [source, java]
 ----
+GraphDatabase.driver("neo4j://graph.example.com:7687", auth)
 ----
 |This is the default for Neo4j 4.x series
 
@@ -439,6 +452,18 @@ The table below illustrates examples of how to connect to a service with routing
 |
 [source, java]
 ----
+GraphDatabase.driver("neo4j+s://graph.example.com:7687", auth)
+----
+
+If you do not have at least the .NET Driver 4.0.1 patch installed, you will need this snippet instead:
+
+[source, java]
+----
+String uri = "neo4j://graph.example.com:7687";
+Config config = Config.builder()
+                     .withEncryption()
+                     .build();
+Driver driver = GraphDatabase.driver(uri, auth, config);
 ----
 |
 
@@ -447,6 +472,19 @@ The table below illustrates examples of how to connect to a service with routing
 |
 [source, java]
 ----
+GraphDatabase.driver("neo4j+ssc://graph.example.com:7687", auth)
+----
+
+If you do not have at least the .NET Driver 4.0.1 patch installed, you will need this snippet instead:
+
+[source, java]
+----
+String uri = "neo4j://graph.example.com:7687";
+Config config = Config.builder()
+                    .withEncryption()
+                    .withTrustStrategy( trustAllCertificates() )
+                    .build();
+Driver driver = GraphDatabase.driver(uri, auth, config);
 ----
 |
 
@@ -455,6 +493,18 @@ The table below illustrates examples of how to connect to a service with routing
 |
 [source, java]
 ----
+GraphDatabase.driver("neo4j+s://graph.example.com:7687", auth)
+----
+
+If you do not have at least the .NET Driver 4.0.1 patch installed, you will need this snippet instead:
+
+[source, java]
+----
+String uri = "neo4j://graph.example.com:7687";
+Config config = Config.builder()
+                     .withEncryption()
+                     .build();
+Driver driver = GraphDatabase.driver(uri, auth, config);
 ----
 |
 
@@ -463,6 +513,19 @@ The table below illustrates examples of how to connect to a service with routing
 |
 [source, java]
 ----
+GraphDatabase.driver("neo4j+ssc://graph.example.com:7687", auth)
+----
+
+If you do not have at least the .NET Driver 4.0.1 patch installed, you will need this snippet instead:
+
+[source, java]
+----
+String uri = "neo4j://graph.example.com:7687";
+Config config = Config.builder()
+                    .withEncryption()
+                    .withTrustStrategy( trustAllCertificates() )
+                    .build();
+Driver driver = GraphDatabase.driver(uri, auth, config);
 ----
 |This is the default for Neo4j 3.x series
 
@@ -471,6 +534,7 @@ The table below illustrates examples of how to connect to a service with routing
 |
 [source, java]
 ----
+GraphDatabase.driver("neo4j://graph.example.com:7687", auth)
 ----
 |
 
@@ -497,6 +561,17 @@ The table below illustrates examples of how to connect to a service with routing
 |
 [source, javascript]
 ----
+neo4j.driver("neo4j+s://graph.example.com:7687", auth)
+----
+
+If you do not have at least the .NET Driver 4.0.1 patch installed, you will need this snippet instead:
+
+[source, javascript]
+----
+const uri = 'neo4j://graph.example.com:7687'
+const driver = neo4j.driver(uri, auth, {
+  encrypted: 'ENCRYPTION_ON'
+})
 ----
 | This is the default (and only option) for Neo4j Aura
 
@@ -505,6 +580,7 @@ The table below illustrates examples of how to connect to a service with routing
 |
 [source, javascript]
 ----
+neo4j.driver("neo4j://graph.example.com:7687", auth)
 ----
 |This is the default for Neo4j 4.x series
 
@@ -513,6 +589,17 @@ The table below illustrates examples of how to connect to a service with routing
 |
 [source, javascript]
 ----
+neo4j.driver("neo4j+s://graph.example.com:7687", auth)
+----
+
+If you do not have at least the .NET Driver 4.0.1 patch installed, you will need this snippet instead:
+
+[source, javascript]
+----
+const uri = 'neo4j://graph.example.com:7687'
+const driver = neo4j.driver(uri, auth, {
+  encrypted: 'ENCRYPTION_ON'
+})
 ----
 |
 
@@ -521,6 +608,18 @@ The table below illustrates examples of how to connect to a service with routing
 |
 [source, javascript]
 ----
+neo4j.driver("neo4j+ssc://graph.example.com:7687", auth)
+----
+
+If you do not have at least the .NET Driver 4.0.1 patch installed, you will need this snippet instead:
+
+[source, javascript]
+----
+const uri = 'neo4j://graph.example.com:7687'
+const driver = neo4j.driver(uri, auth, {
+  encrypted: 'ENCRYPTION_ON',
+  trust: 'TRUST_ALL_CERTIFICATES'
+})
 ----
 |
 
@@ -529,6 +628,17 @@ The table below illustrates examples of how to connect to a service with routing
 |
 [source, javascript]
 ----
+neo4j.driver("neo4j+s://graph.example.com:7687", auth)
+----
+
+If you do not have at least the .NET Driver 4.0.1 patch installed, you will need this snippet instead:
+
+[source, javascript]
+----
+const uri = 'neo4j://graph.example.com:7687'
+const driver = neo4j.driver(uri, auth, {
+  encrypted: 'ENCRYPTION_ON'
+})
 ----
 |
 
@@ -537,6 +647,18 @@ The table below illustrates examples of how to connect to a service with routing
 |
 [source, javascript]
 ----
+neo4j.driver("neo4j+ssc://graph.example.com:7687", auth)
+----
+
+If you do not have at least the .NET Driver 4.0.1 patch installed, you will need this snippet instead:
+
+[source, javascript]
+----
+const uri = 'neo4j://graph.example.com:7687'
+const driver = neo4j.driver(uri, auth, {
+  encrypted: 'ENCRYPTION_ON',
+  trust: 'TRUST_ALL_CERTIFICATES'
+})
 ----
 |This is the default for Neo4j 3.x series
 
@@ -545,6 +667,7 @@ The table below illustrates examples of how to connect to a service with routing
 |
 [source, javascript]
 ----
+neo4j.driver("neo4j://graph.example.com:7687", auth)
 ----
 |
 
