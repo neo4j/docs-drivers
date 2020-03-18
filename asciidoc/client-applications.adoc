@@ -6,6 +6,24 @@
 This section describes how to manage database connections within an application.
 --
 
+This section contains the following:
+
+* <<driver-driver-object,The driver object>>
+* <<driver-connection-uris-encryption-trust,Connection URIs, encryption and trust>>
+** <<driver-connection-uris,Connection URIs>>
+** <<driver-configuration-encryption,Encryption>>
+** <<driver-configuration-trust,Trust>>
+** <<driver-configuration-examples,Examples>>
+* <<driver-authentication,Authentication>>
+** <<driver-authentication-basic,Basic authentication>>
+** <<driver-authentication-kerberos,Kerberos authentication>>
+** <<driver-authentication-custom,Custom authentication>>
+* <<driver-configuration,Configuration>>
+** <<driver-config-connection-pool-management,Connection pool management>>
+** <<driver-configuration-connection-timeout,Connection timeout>>
+** <<driver-configuration-max-retry-time,Max retry time>>
+* <<driver-service-unavailable,Service unavailable>>
+
 
 [[driver-driver-object]]
 == The driver object
@@ -73,10 +91,16 @@ include::{python-examples}/driver_lifecycle_example.py[tags=driver-lifecycle]
 ====
 
 
-[[driver-connection-uris]]
-== Connection URIs
+[[driver-connection-uris-encryption-trust]]
+== Connection URIs, encryption and trust
 
 A connection URI identifies a graph database and how to connect to it.
+The encryption and trust settings provide detail to how that connection should be secured.
+
+
+[[driver-connection-uris]]
+=== Connection URIs
+
 The official Neo4j drivers currently support the following URI schemes and driver object types:
 
 .Available URI schemes
@@ -87,8 +111,7 @@ The official Neo4j drivers currently support the following URI schemes and drive
 | bolt+routing   | Routing driver
 |===
 
-
-=== Direct drivers (bolt)
+==== Direct drivers (bolt)
 
 A direct driver is created via a `bolt` URI, for example: `bolt://localhost:7687`.
 This kind of driver is used to maintain connections to a single database server and is typically used when working with a single Neo4j instance or when targeting a specific member of a cluster.
@@ -96,13 +119,13 @@ Note that a routing driver is generally preferable when working with a Causal Cl
 
 
 [[routing_drivers_bolt_routing]]
-=== Routing drivers (bolt+routing)
+==== Routing drivers (bolt+routing)
 
 A routing driver is created via a `bolt+routing` URI, for example: `bolt+routing://graph.example.com:7687`.
 The address in the URI must be that of a Core Server.
 This kind of driver uses the <<term-bolt-routing-protocol, Bolt Routing Protocol>> and works in tandem with the cluster to route transactions to available cluster members.
 
-=== Routing drivers with routing context
+==== Routing drivers with routing context
 
 Routing drivers with routing context are an available option when using drivers of version 1.3 or above together with a Neo4j Causal Cluster of version 3.2 or above.
 In such a setup, a routing driver can include a preferred routing context via the query part of the `bolt+routing` URI.
@@ -133,7 +156,7 @@ For details on how to configure multi-data center routing policies for a Causal 
 ====
 
 
-=== Cluster bootstrap address resolution
+==== Cluster bootstrap address resolution
 
 Drivers have the ability to intercept cluster bootstrap address resolution.
 This is generally performed by a routing driver on construction or after complete contact has been lost with a cluster.
@@ -190,176 +213,6 @@ include::{python-examples}/custom_resolver_example.py[tags=custom-resolver]
 ----
 ======
 ====
-
-[[driver-authentication]]
-== Authentication
-
-Authentication details are provided as an auth token which contains the user names, passwords or other credentials required to access the database.
-Neo4j supports multiple authentication standards but uses basic authentication by default.
-
-
-[[driver-authentication-basic]]
-=== Basic authentication
-
-The basic authentication scheme is backed by a password file stored within the server and requires applications to provide a user name and password.
-For this, use the basic auth helper:
-
-[.tabbed-example]
-.Basic authentication
-====
-[.include-with-dotnet]
-======
-[source, csharp]
-----
-include::{dotnet-examples}/Examples.cs[tags=basic-auth]
-----
-======
-
-[.include-with-go]
-======
-[source, go]
-----
-include::{go-examples}/examples_test.go[tags=basic-auth]
-----
-======
-
-[.include-with-java]
-======
-[source, java]
-----
-include::{java-examples}/BasicAuthExample.java[tags=basic-auth]
-----
-======
-
-[.include-with-javascript]
-======
-[source, javascript]
-----
-include::{javascript-examples}/examples.test.js[tags=basic-auth]
-----
-======
-
-[.include-with-python]
-======
-[source, python]
-----
-include::{python-examples}/auth_example.py[tags=basic-auth]
-----
-======
-====
-
-[NOTE]
---
-The basic authentication scheme can also be used to authenticate against an LDAP server.
---
-
-=== Kerberos authentication
-
-The Kerberos authentication scheme provides a simple way to create a Kerberos authentication token with a base64 encoded server authentication ticket.
-The best way to create a Kerberos authentication token is shown below:
-
-[.tabbed-example]
-.Kerberos authentication
-====
-[.include-with-dotnet]
-======
-[source, csharp]
-----
-include::{dotnet-examples}/Examples.cs[tags=kerberos-auth]
-----
-======
-
-[.include-with-go]
-======
-[source, go]
-----
-include::{go-examples}/examples_test.go[tags=kerberos-auth]
-----
-======
-
-[.include-with-java]
-======
-[source, java]
-----
-include::{java-examples}/KerberosAuthExample.java[tags=kerberos-auth]
-----
-======
-
-[.include-with-javascript]
-======
-[source, javascript]
-----
-include::{javascript-examples}/examples.test.js[tags=kerberos-auth]
-----
-======
-
-[.include-with-python]
-======
-[source, python]
-----
-include::{python-examples}/kerberos_auth_example.py[tags=kerberos-auth]
-----
-======
-====
-
-[NOTE]
---
-The Kerberos authentication token can only be understood by the server if the server has the link:{kerberos-add-on-base-uri}[Kerberos Add-on] installed.
---
-
-
-[[driver-authentication-custom]]
-=== Custom authentication
-
-For advanced deployments, where a custom security provider has been built, the custom authentication helper can be used.
-
-[.tabbed-example]
-.Custom authentication
-====
-[.include-with-dotnet]
-======
-[source, csharp]
-----
-include::{dotnet-examples}/Examples.cs[tags=custom-auth]
-----
-======
-
-[.include-with-go]
-======
-[source, go]
-----
-include::{go-examples}/examples_test.go[tags=custom-auth]
-----
-======
-
-[.include-with-java]
-======
-[source, java]
-----
-include::{java-examples}/CustomAuthExample.java[tags=custom-auth]
-----
-======
-
-[.include-with-javascript]
-======
-[source, javascript]
-----
-include::{javascript-examples}/examples.test.js[tags=custom-auth]
-----
-======
-
-[.include-with-python]
-======
-[source, python]
-----
-include::{python-examples}/custom_auth_example.py[tags=custom-auth]
-----
-======
-====
-
-
-[[driver-configuration]]
-== Configuration
 
 
 [[driver-configuration-encryption]]
@@ -478,6 +331,663 @@ include::{python-examples}/config_trust_example.py[tags=config-trust]
 ----
 ======
 ====
+
+
+[[driver-configuration-examples]]
+=== Examples
+
+The table below provides example code snippets for different deployment configurations.
+Each snippet expects an `auth` variable to have been previously defined, containing the authentication details for that connection.
+
+[.tabbed-example]
+.Connecting to a service
+====
+[.include-with-dotnet]
+======
+The table below illustrates examples of how to connect to a service with routing:
+
+[options="header", cols="a,a,a,a"]
+|===
+|Product
+|Security
+|Code snippet
+|Comments
+
+|Neo4j Aura
+|Secured with full certificate
+|
+[source, csharp]
+----
+String uri = "bolt+routing://graph.example.com:7687";
+IDriver driver = GraphDatabase.Driver(uri, auth,
+           new Config {TrustStrategy = TrustStrategy.TrustSystemCaSignedCertificates});
+----
+| This is the default (and only option) for Neo4j Aura
+
+|Neo4j 4.x
+|Unsecured
+|
+[source, csharp]
+----
+String uri = "bolt+routing://graph.example.com:7687";
+IDriver driver = GraphDatabase.Driver(uri, auth,
+                     new Config {EncryptionLevel = EncryptionLevel.None});
+----
+|This is the default for Neo4j 4.x series
+
+|Neo4j 4.x
+|Secured with full certificate
+|
+[source, csharp]
+----
+String uri = "bolt+routing://graph.example.com:7687";
+IDriver driver = GraphDatabase.Driver(uri, auth,
+           new Config {TrustStrategy = TrustStrategy.TrustSystemCaSignedCertificates});
+----
+|
+
+|Neo4j 4.x
+|Secured with self-signed certificate
+|
+[source, csharp]
+----
+GraphDatabase.Driver("bolt+routing://graph.example.com:7687", auth)
+----
+|
+
+|Neo4j 3.x
+|Secured with full certificate
+|
+[source, csharp]
+----
+String uri = "bolt+routing://graph.example.com:7687";
+IDriver driver = GraphDatabase.Driver(uri, auth,
+           new Config {TrustStrategy = TrustStrategy.TrustSystemCaSignedCertificates});
+----
+|
+
+|Neo4j 3.x
+|Secured with self-signed certificate
+|
+[source, csharp]
+----
+GraphDatabase.Driver("bolt+routing://graph.example.com:7687", auth)
+----
+|This is the default for Neo4j 3.x series
+
+|Neo4j 3.x
+|Unsecured
+|
+[source, csharp]
+----
+String uri = "bolt+routing://graph.example.com:7687";
+IDriver driver = GraphDatabase.Driver(uri, auth,
+                     new Config {EncryptionLevel = EncryptionLevel.None});
+----
+|
+|===
+
+[NOTE]
+To connect to a service without routing, you can replace `bolt+routing` with `bolt`.
+
+======
+
+[.include-with-go]
+======
+The table below illustrates examples of how to connect to a service with routing.
+
+[options="header", cols="a,a,a,a"]
+|===
+|Product
+|Security
+|Code snippet
+|Comments
+
+|Neo4j Aura
+|Secured with full certificate
+|
+[source, go]
+----
+uri := "bolt+routing://graph.example.com:7687"
+
+driver, err := neo4j.NewDriver(uri, auth, func(config *neo4j.Config) {
+        config.TrustStrategy = neo4j.TrustSystem(true)
+})
+----
+| This is the default (and only option) for Neo4j Aura
+
+|Neo4j 4.x
+|Unsecured
+|
+[source, go]
+----
+uri := "bolt+routing://graph.example.com:7687"
+
+driver, err := neo4j.NewDriver(uri, auth, func(config *neo4j.Config) {
+        config.Encrypted = false
+})
+----
+|This is the default for Neo4j 4.x series
+
+|Neo4j 4.x
+|Secured with full certificate
+|
+[source, go]
+----
+uri := "bolt+routing://graph.example.com:7687"
+
+driver, err := neo4j.NewDriver(uri, auth, func(config *neo4j.Config) {
+        config.TrustStrategy = neo4j.TrustSystem(true)
+})
+----
+|
+
+|Neo4j 4.x
+|Secured with self-signed certificate
+|
+[source, go]
+----
+driver, err := neo4j.NewDriver("bolt+routing://graph.example.com:7687", auth)
+----
+|
+
+|Neo4j 3.x
+|Secured with full certificate
+|
+[source, go]
+----
+uri := "bolt+routing://graph.example.com:7687"
+
+driver, err := neo4j.NewDriver(uri, auth, func(config *neo4j.Config) {
+        config.TrustStrategy = neo4j.TrustSystem(true)
+})
+----
+|
+
+|Neo4j 3.x
+|Secured with self-signed certificate
+|
+[source, go]
+----
+driver, err := neo4j.NewDriver("bolt+routing://graph.example.com:7687", auth)
+----
+|This is the default for Neo4j 3.x series
+
+|Neo4j 3.x
+|Unsecured
+|
+[source, go]
+----
+uri := "bolt+routing://graph.example.com:7687"
+
+driver, err := neo4j.NewDriver(uri, auth, func(config *neo4j.Config) {
+        config.Encrypted = false
+})
+----
+|
+
+|===
+
+[NOTE]
+To connect to a service without routing, you can replace `bolt+routing` with `bolt`.
+
+======
+
+[.include-with-java]
+======
+The table below illustrates examples of how to connect to a service with routing.
+
+[options="header", cols="a,a,a,a"]
+|===
+|Product
+|Security
+|Code snippet
+|Comments
+
+|Neo4j Aura
+|Secured with full certificate
+|
+[source, java]
+----
+String uri = "bolt+routing://graph.example.com:7687";
+Config config = Config.build()
+                      .withTrustStrategy( trustSystemCertificates() )
+                      .build();
+----
+| This is the default (and only option) for Neo4j Aura
+
+|Neo4j 4.x
+|Unsecured
+|
+[source, java]
+----
+String uri = "bolt+routing://graph.example.com:7687";
+Config config = Config.build()
+                      .withoutEncryption()
+                      .build();
+
+GraphDatabase.driver( uri, auth, config );
+----
+|This is the default for Neo4j 4.x series
+
+|Neo4j 4.x
+|Secured with full certificate
+|
+[source, java]
+----
+String uri = "bolt+routing://graph.example.com:7687";
+Config config = Config.build()
+                      .withTrustStrategy( trustSystemCertificates() )
+                      .build();
+----
+|
+
+|Neo4j 4.x
+|Secured with self-signed certificate
+|
+[source, java]
+----
+GraphDatabase.driver("bolt+routing://graph.example.com:7687", auth)
+----
+|
+
+|Neo4j 3.x
+|Secured with full certificate
+|
+[source, java]
+----
+String uri = "bolt+routing://graph.example.com:7687";
+Config config = Config.build()
+                      .withTrustStrategy( trustSystemCertificates() )
+                      .build();
+----
+|
+
+|Neo4j 3.x
+|Secured with self-signed certificate
+|
+[source, java]
+----
+GraphDatabase.driver("bolt+routing://graph.example.com:7687", auth)
+----
+|This is the default for Neo4j 3.x series
+
+|Neo4j 3.x
+|Unsecured
+|
+[source, java]
+----
+String uri = "bolt+routing://graph.example.com:7687";
+Config config = Config.build()
+                      .withoutEncryption()
+                      .build();
+
+GraphDatabase.driver( uri, auth, config );
+----
+|
+
+|===
+
+[NOTE]
+To connect to a service without routing, you can replace `bolt+routing` with `bolt`.
+
+======
+
+[.include-with-javascript]
+======
+The table below illustrates examples of how to connect to a service with routing.
+
+[options="header", cols="a,a,a,a"]
+|===
+|Product
+|Security
+|Code snippet
+|Comments
+
+|Neo4j Aura
+|Secured with full certificate
+|
+[source, javascript]
+----
+const uri = 'bolt+routing://graph.example.com:7687'
+const driver = neo4j.driver(uri,auth, {
+    trust: 'TRUST_SYSTEM_CA_SIGNED_CERTIFICATES'
+})
+----
+| This is the default (and only option) for Neo4j Aura
+
+|Neo4j 4.x
+|Unsecured
+|
+[source, javascript]
+----
+const uri = 'bolt+routing://graph.example.com:7687'
+const driver = neo4j.driver(uri, auth, {
+  encrypted: 'ENCRYPTION_OFF'
+})
+----
+|This is the default for Neo4j 4.x series
+
+|Neo4j 4.x
+|Secured with full certificate
+|
+[source, javascript]
+----
+const uri = 'bolt+routing://graph.example.com:7687'
+const driver = neo4j.driver(uri,auth, {
+    trust: 'TRUST_SYSTEM_CA_SIGNED_CERTIFICATES'
+})
+----
+|
+
+|Neo4j 4.x
+|Secured with self-signed certificate
+|
+[source, javascript]
+----
+neo4j.driver("bolt+routing://graph.example.com:7687", auth)
+----
+|
+
+|Neo4j 3.x
+|Secured with full certificate
+|
+[source, javascript]
+----
+const uri = 'bolt+routing://graph.example.com:7687'
+const driver = neo4j.driver(uri,auth, {
+    trust: 'TRUST_SYSTEM_CA_SIGNED_CERTIFICATES'
+})
+----
+|
+
+|Neo4j 3.x
+|Secured with self-signed certificate
+|
+[source, javascript]
+----
+neo4j.driver("bolt+routing://graph.example.com:7687", auth)
+----
+|This is the default for Neo4j 3.x series
+
+|Neo4j 3.x
+|Unsecured
+|
+[source, javascript]
+----
+const uri = 'bolt+routing://graph.example.com:7687'
+const driver = neo4j.driver(uri, auth, {
+  encrypted: 'ENCRYPTION_OFF'
+})
+----
+|
+
+|===
+
+[NOTE]
+To connect to a service without routing, you can replace `bolt+routing` with `bolt`.
+
+======
+
+[.include-with-python]
+======
+The table below illustrates examples of how to connect to a service with routing.
+
+[options="header", cols="a,a,a,a"]
+|===
+|Product
+|Security
+|Code snippet
+|Comments
+
+|Neo4j Aura
+|Secured with full certificate
+|
+[source, python]
+----
+uri = "bolt+routing://graph.example.com:7687"
+GraphDatabase.driver(uri, auth, trust=TRUST_SYSTEM_CA_SIGNED_CERTIFICATES)
+----
+| This is the default (and only option) for Neo4j Aura
+
+|Neo4j 4.x
+|Unsecured
+|
+[source, python]
+----
+uri = "bolt+routing://graph.example.com:7687"
+GraphDatabase.driver(uri, auth, encrypted=False)
+----
+|This is the default for Neo4j 4.x series
+
+|Neo4j 4.x
+|Secured with full certificate
+|
+[source, python]
+----
+uri = "bolt+routing://graph.example.com:7687"
+GraphDatabase.driver(uri, auth, trust=TRUST_SYSTEM_CA_SIGNED_CERTIFICATES)
+----
+|
+
+|Neo4j 4.x
+|Secured with self-signed certificate
+|
+[source, python]
+----
+GraphDatabase.driver("bolt+routing://graph.example.com:7687", auth)
+----
+|
+
+|Neo4j 3.x
+|Secured with full certificate
+|
+[source, python]
+----
+uri = "bolt+routing://graph.example.com:7687"
+GraphDatabase.driver(uri, auth, trust=TRUST_SYSTEM_CA_SIGNED_CERTIFICATES)
+----
+|
+
+|Neo4j 3.x
+|Secured with self-signed certificate
+|
+[source, python]
+----
+GraphDatabase.driver("bolt+routing://graph.example.com:7687", auth)
+----
+|This is the default for Neo4j 3.x series
+
+|Neo4j 3.x
+|Unsecured
+|
+[source, python]
+----
+uri = "bolt+routing://graph.example.com:7687"
+GraphDatabase.driver(uri, auth, encrypted=False)
+----
+|
+|===
+
+[NOTE]
+To connect to a service without routing, you can replace `bolt+routing` with `bolt`.
+
+======
+
+====
+
+
+[[driver-authentication]]
+== Authentication
+
+Authentication details are provided as an auth token which contains the user names, passwords or other credentials required to access the database.
+Neo4j supports multiple authentication standards but uses basic authentication by default.
+
+
+[[driver-authentication-basic]]
+=== Basic authentication
+
+The basic authentication scheme is backed by a password file stored within the server and requires applications to provide a user name and password.
+For this, use the basic auth helper:
+
+[.tabbed-example]
+.Basic authentication
+====
+[.include-with-dotnet]
+======
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=basic-auth]
+----
+======
+
+[.include-with-go]
+======
+[source, go]
+----
+include::{go-examples}/examples_test.go[tags=basic-auth]
+----
+======
+
+[.include-with-java]
+======
+[source, java]
+----
+include::{java-examples}/BasicAuthExample.java[tags=basic-auth]
+----
+======
+
+[.include-with-javascript]
+======
+[source, javascript]
+----
+include::{javascript-examples}/examples.test.js[tags=basic-auth]
+----
+======
+
+[.include-with-python]
+======
+[source, python]
+----
+include::{python-examples}/auth_example.py[tags=basic-auth]
+----
+======
+====
+
+[NOTE]
+--
+The basic authentication scheme can also be used to authenticate against an LDAP server.
+--
+
+
+[[driver-authentication-kerberos]]
+=== Kerberos authentication
+
+The Kerberos authentication scheme provides a simple way to create a Kerberos authentication token with a base64 encoded server authentication ticket.
+The best way to create a Kerberos authentication token is shown below:
+
+[.tabbed-example]
+.Kerberos authentication
+====
+[.include-with-dotnet]
+======
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=kerberos-auth]
+----
+======
+
+[.include-with-go]
+======
+[source, go]
+----
+include::{go-examples}/examples_test.go[tags=kerberos-auth]
+----
+======
+
+[.include-with-java]
+======
+[source, java]
+----
+include::{java-examples}/KerberosAuthExample.java[tags=kerberos-auth]
+----
+======
+
+[.include-with-javascript]
+======
+[source, javascript]
+----
+include::{javascript-examples}/examples.test.js[tags=kerberos-auth]
+----
+======
+
+[.include-with-python]
+======
+[source, python]
+----
+include::{python-examples}/kerberos_auth_example.py[tags=kerberos-auth]
+----
+======
+====
+
+[NOTE]
+--
+The Kerberos authentication token can only be understood by the server if the server has the link:{kerberos-add-on-base-uri}[Kerberos Add-on] installed.
+--
+
+
+[[driver-authentication-custom]]
+=== Custom authentication
+
+For advanced deployments, where a custom security provider has been built, the custom authentication helper can be used.
+
+[.tabbed-example]
+.Custom authentication
+====
+[.include-with-dotnet]
+======
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=custom-auth]
+----
+======
+
+[.include-with-go]
+======
+[source, go]
+----
+include::{go-examples}/examples_test.go[tags=custom-auth]
+----
+======
+
+[.include-with-java]
+======
+[source, java]
+----
+include::{java-examples}/CustomAuthExample.java[tags=custom-auth]
+----
+======
+
+[.include-with-javascript]
+======
+[source, javascript]
+----
+include::{javascript-examples}/examples.test.js[tags=custom-auth]
+----
+======
+
+[.include-with-python]
+======
+[source, python]
+----
+include::{python-examples}/custom_auth_example.py[tags=custom-auth]
+----
+======
+====
+
+
+[[driver-configuration]]
+== Configuration
 
 
 [[driver-config-connection-pool-management]]
