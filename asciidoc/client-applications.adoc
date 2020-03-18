@@ -294,15 +294,17 @@ The table below illustrates examples of how to connect to a service with routing
 |
 [source, csharp]
 ----
-GraphDatabase.driver("neo4j+s://graph.example.com:7687", auth)
+GraphDatabase.Driver("neo4j+s://graph.example.com:7687", auth)
+----
 
-// If you do not have at least the Java Driver 4.0.1
-// patch installed, you will need this snippet instead
+If you do not have at least the .NET Driver 4.0.1 patch installed, you will need this snippet instead:
+
+[source, csharp]
+----
 String uri = "neo4j://graph.example.com:7687";
-Config config = Config.builder()
-                     .withEncryption()
-                     .build();
-Driver driver = GraphDatabase.driver(uri, auth, config);
+IDriver driver = GraphDatabase.Driver(uri, auth,
+           o => o.WithEncryptionLevel(EncryptionLevel.Encrypted));
+                 .WithTrustManager(TrustManager.CreateChainTrust()));
 ----
 | This is the default (and only option) for Neo4j Aura
 
@@ -311,7 +313,7 @@ Driver driver = GraphDatabase.driver(uri, auth, config);
 |
 [source, csharp]
 ----
-GraphDatabase.driver("neo4j://graph.example.com:7687", auth)
+GraphDatabase.Driver("neo4j://graph.example.com:7687", auth);
 ----
 |This is the default for Neo4j 4.x series
 
@@ -320,15 +322,16 @@ GraphDatabase.driver("neo4j://graph.example.com:7687", auth)
 |
 [source, csharp]
 ----
-GraphDatabase.driver("neo4j+s://graph.example.com:7687", auth)
+GraphDatabase.Driver("neo4j+s://graph.example.com:7687", auth)
+----
 
-// If you do not have at least the Java Driver 4.0.1
-// patch installed, you will need this snippet instead
+If you do not have at least the .NET Driver 4.0.1 patch installed, you will need this snippet instead:
+
+[source, csharp]
+----
 String uri = "neo4j://graph.example.com:7687";
-Config config = Config.builder()
-                     .withEncryption()
-                     .build();
-Driver driver = GraphDatabase.driver(uri, auth, config);
+IDriver driver = GraphDatabase.Driver(uri, auth,
+           o => o.WithEncryptionLevel(EncryptionLevel.Encrypted));
 ----
 |
 
@@ -337,16 +340,17 @@ Driver driver = GraphDatabase.driver(uri, auth, config);
 |
 [source, csharp]
 ----
-GraphDatabase.driver("neo4j+ssc://graph.example.com:7687", auth)
+GraphDatabase.Driver("neo4j+ssc://graph.example.com:7687", auth)
+----
 
-// If you do not have at least the Java Driver 4.0.1
-// patch installed, you will need this snippet instead
+If you do not have at least the .NET Driver 4.0.1 patch installed, you will need this snippet instead:
+
+[source, csharp]
+----
 String uri = "neo4j://graph.example.com:7687";
-Config config = Config.builder()
-                    .withEncryption()
-                    .withTrustStrategy( trustAllCertificates() )
-                    .build();
-Driver driver = GraphDatabase.driver(uri, auth, config);
+IDriver driver = GraphDatabase.Driver(uri, auth,
+           o => o.WithEncryptionLevel(EncryptionLevel.Encrypted)
+                 .WithTrustManager(TrustManager.CreateInsecure()));
 ----
 |
 
@@ -355,15 +359,16 @@ Driver driver = GraphDatabase.driver(uri, auth, config);
 |
 [source, csharp]
 ----
-GraphDatabase.driver("neo4j+s://graph.example.com:7687", auth)
+GraphDatabase.Driver("neo4j+s://graph.example.com:7687", auth)
+----
 
-// If you do not have at least the Java Driver 4.0.1
-// patch installed, you will need this snippet instead
+If you do not have at least the .NET Driver 4.0.1 patch installed, you will need this snippet instead:
+
+[source, csharp]
+----
 String uri = "neo4j://graph.example.com:7687";
-Config config = Config.builder()
-                     .withEncryption()
-                     .build();
-Driver driver = GraphDatabase.driver(uri, auth, config);
+IDriver driver = GraphDatabase.Driver(uri, auth,
+           o => o.WithEncryptionLevel(EncryptionLevel.Encrypted));
 ----
 |
 
@@ -372,16 +377,17 @@ Driver driver = GraphDatabase.driver(uri, auth, config);
 |
 [source, csharp]
 ----
-GraphDatabase.driver("neo4j+ssc://graph.example.com:7687", auth)
+GraphDatabase.Driver("neo4j+ssc://graph.example.com:7687", auth)
+----
 
-// If you do not have at least the Java Driver 4.0.1
-// patch installed, you will need this snippet instead
+If you do not have at least the .NET Driver 4.0.1 patch installed, you will need this snippet instead:
+
+[source, csharp]
+----
 String uri = "neo4j://graph.example.com:7687";
-Config config = Config.builder()
-                    .withEncryption()
-                    .withTrustStrategy( trustAllCertificates() )
-                    .build();
-Driver driver = GraphDatabase.driver(uri, auth, config);
+IDriver driver = GraphDatabase.Driver(uri, auth,
+           o => o.WithEncryptionLevel(EncryptionLevel.Encrypted)
+                 .WithTrustManager(TrustManager.CreateInsecure()));
 ----
 |This is the default for Neo4j 3.x series
 
@@ -390,13 +396,13 @@ Driver driver = GraphDatabase.driver(uri, auth, config);
 |
 [source, csharp]
 ----
-GraphDatabase.driver("neo4j://graph.example.com:7687", auth)
+GraphDatabase.Driver("neo4j://graph.example.com:7687", auth);
 ----
 |
 |===
 
 [NOTE]
-To connect to a service without routing, you can replace `bolt+routing` with `bolt`.
+To connect to a service without routing, you can replace `neo4j` with `bolt`.
 
 ======
 
@@ -471,7 +477,7 @@ The table below illustrates examples of how to connect to a service with routing
 |===
 
 [NOTE]
-To connect to a service without routing, you can replace `bolt+routing` with `bolt`.
+To connect to a service without routing, you can replace `neo4j` with `bolt`.
 
 ======
 
@@ -545,7 +551,7 @@ The table below illustrates examples of how to connect to a service with routing
 |===
 
 [NOTE]
-To connect to a service without routing, you can replace `bolt+routing` with `bolt`.
+To connect to a service without routing, you can replace `neo4j` with `bolt`.
 
 ======
 
