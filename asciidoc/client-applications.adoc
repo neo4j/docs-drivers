@@ -232,6 +232,7 @@ include::{javascript-examples}/examples.test.js[tags=config-custom-resolver]
 // include::{python-examples}/custom_resolver_example.py[tags=custom-resolver]
 // ----
 // ======
+
 ====
 
 
@@ -296,9 +297,9 @@ The table below illustrates examples of how to connect to a service with routing
 ----
 GraphDatabase.Driver("neo4j+s://graph.example.com:7687", auth)
 ----
-+
+
 If you do not have at least the .NET Driver 4.0.1 patch installed, you will need this snippet instead:
-+
+
 [source, csharp]
 ----
 String uri = "neo4j://graph.example.com:7687";
@@ -399,13 +400,13 @@ IDriver driver = GraphDatabase.Driver(uri, auth,
 GraphDatabase.Driver("neo4j://graph.example.com:7687", auth);
 ----
 |
+
 |===
 
 [NOTE]
 To connect to a service without routing, you can replace `neo4j` with `bolt`.
 
 ======
-
 
 [.include-with-java]
 ======
@@ -426,7 +427,7 @@ The table below illustrates examples of how to connect to a service with routing
 GraphDatabase.driver("neo4j+s://graph.example.com:7687", auth)
 ----
 
-If you do not have at least the .NET Driver 4.0.1 patch installed, you will need this snippet instead:
+If you do not have at least the Java Driver 4.0.1 patch installed, you will need this snippet instead:
 
 [source, java]
 ----
@@ -455,7 +456,7 @@ GraphDatabase.driver("neo4j://graph.example.com:7687", auth)
 GraphDatabase.driver("neo4j+s://graph.example.com:7687", auth)
 ----
 
-If you do not have at least the .NET Driver 4.0.1 patch installed, you will need this snippet instead:
+If you do not have at least the Java Driver 4.0.1 patch installed, you will need this snippet instead:
 
 [source, java]
 ----
@@ -475,7 +476,7 @@ Driver driver = GraphDatabase.driver(uri, auth, config);
 GraphDatabase.driver("neo4j+ssc://graph.example.com:7687", auth)
 ----
 
-If you do not have at least the .NET Driver 4.0.1 patch installed, you will need this snippet instead:
+If you do not have at least the Java Driver 4.0.1 patch installed, you will need this snippet instead:
 
 [source, java]
 ----
@@ -496,7 +497,7 @@ Driver driver = GraphDatabase.driver(uri, auth, config);
 GraphDatabase.driver("neo4j+s://graph.example.com:7687", auth)
 ----
 
-If you do not have at least the .NET Driver 4.0.1 patch installed, you will need this snippet instead:
+If you do not have at least the Java Driver 4.0.1 patch installed, you will need this snippet instead:
 
 [source, java]
 ----
@@ -516,7 +517,7 @@ Driver driver = GraphDatabase.driver(uri, auth, config);
 GraphDatabase.driver("neo4j+ssc://graph.example.com:7687", auth)
 ----
 
-If you do not have at least the .NET Driver 4.0.1 patch installed, you will need this snippet instead:
+If you do not have at least the Java Driver 4.0.1 patch installed, you will need this snippet instead:
 
 [source, java]
 ----
@@ -564,7 +565,7 @@ The table below illustrates examples of how to connect to a service with routing
 neo4j.driver("neo4j+s://graph.example.com:7687", auth)
 ----
 
-If you do not have at least the .NET Driver 4.0.1 patch installed, you will need this snippet instead:
+If you do not have at least the JavaScript Driver 4.0.2 patch installed, you will need this snippet instead:
 
 [source, javascript]
 ----
@@ -592,7 +593,7 @@ neo4j.driver("neo4j://graph.example.com:7687", auth)
 neo4j.driver("neo4j+s://graph.example.com:7687", auth)
 ----
 
-If you do not have at least the .NET Driver 4.0.1 patch installed, you will need this snippet instead:
+If you do not have at least the JavaScript Driver 4.0.2 patch installed, you will need this snippet instead:
 
 [source, javascript]
 ----
@@ -611,7 +612,7 @@ const driver = neo4j.driver(uri, auth, {
 neo4j.driver("neo4j+ssc://graph.example.com:7687", auth)
 ----
 
-If you do not have at least the .NET Driver 4.0.1 patch installed, you will need this snippet instead:
+If you do not have at least the JavaScript Driver 4.0.2 patch installed, you will need this snippet instead:
 
 [source, javascript]
 ----
@@ -631,7 +632,7 @@ const driver = neo4j.driver(uri, auth, {
 neo4j.driver("neo4j+s://graph.example.com:7687", auth)
 ----
 
-If you do not have at least the .NET Driver 4.0.1 patch installed, you will need this snippet instead:
+If you do not have at least the JavaScript Driver 4.0.2 patch installed, you will need this snippet instead:
 
 [source, javascript]
 ----
@@ -650,7 +651,7 @@ const driver = neo4j.driver(uri, auth, {
 neo4j.driver("neo4j+ssc://graph.example.com:7687", auth)
 ----
 
-If you do not have at least the .NET Driver 4.0.1 patch installed, you will need this snippet instead:
+If you do not have at least the JavaScript Driver 4.0.2 patch installed, you will need this snippet instead:
 
 [source, javascript]
 ----
