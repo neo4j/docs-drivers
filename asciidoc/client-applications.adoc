@@ -410,7 +410,7 @@ To connect to a service without routing, you can replace `neo4j` with `bolt`.
 
 [.include-with-java]
 ======
-The table below illustrates examples of how to connect to a service with routing.
+The table below illustrates examples of how to connect to a service with routing:
 
 [options="header", cols="a,a,a,a"]
 |===
@@ -548,7 +548,7 @@ To connect to a service without routing, you can replace `neo4j` with `bolt`.
 
 [.include-with-javascript]
 ======
-The table below illustrates examples of how to connect to a service with routing.
+The table below illustrates examples of how to connect to a service with routing:
 
 [options="header", cols="a,a,a,a"]
 |===
