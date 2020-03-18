@@ -17,7 +17,7 @@ This section contains the following:
 * <<driver-authentication,Authentication>>
 ** <<driver-authentication-basic,Basic authentication>>
 ** <<driver-authentication-kerberos,Kerberos authentication>>
-* <<driver-authentication-custom,Custom authentication>>
+** <<driver-authentication-custom,Custom authentication>>
 * <<driver-configuration,Configuration>>
 * <<driver-logging,Logging>>
 
@@ -294,9 +294,6 @@ The table below illustrates examples of how to connect to a service with routing
 |
 [source, csharp]
 ----
-String uri = "bolt+routing://graph.example.com:7687";
-IDriver driver = GraphDatabase.Driver(uri, auth,
-           new Config {TrustStrategy = TrustStrategy.TrustSystemCaSignedCertificates});
 ----
 | This is the default (and only option) for Neo4j Aura
 
@@ -305,9 +302,6 @@ IDriver driver = GraphDatabase.Driver(uri, auth,
 |
 [source, csharp]
 ----
-String uri = "bolt+routing://graph.example.com:7687";
-IDriver driver = GraphDatabase.Driver(uri, auth,
-                     new Config {EncryptionLevel = EncryptionLevel.None});
 ----
 |This is the default for Neo4j 4.x series
 
@@ -316,9 +310,6 @@ IDriver driver = GraphDatabase.Driver(uri, auth,
 |
 [source, csharp]
 ----
-String uri = "bolt+routing://graph.example.com:7687";
-IDriver driver = GraphDatabase.Driver(uri, auth,
-           new Config {TrustStrategy = TrustStrategy.TrustSystemCaSignedCertificates});
 ----
 |
 
@@ -327,7 +318,6 @@ IDriver driver = GraphDatabase.Driver(uri, auth,
 |
 [source, csharp]
 ----
-GraphDatabase.Driver("bolt+routing://graph.example.com:7687", auth)
 ----
 |
 
@@ -336,9 +326,6 @@ GraphDatabase.Driver("bolt+routing://graph.example.com:7687", auth)
 |
 [source, csharp]
 ----
-String uri = "bolt+routing://graph.example.com:7687";
-IDriver driver = GraphDatabase.Driver(uri, auth,
-           new Config {TrustStrategy = TrustStrategy.TrustSystemCaSignedCertificates});
 ----
 |
 
@@ -347,7 +334,6 @@ IDriver driver = GraphDatabase.Driver(uri, auth,
 |
 [source, csharp]
 ----
-GraphDatabase.Driver("bolt+routing://graph.example.com:7687", auth)
 ----
 |This is the default for Neo4j 3.x series
 
@@ -356,9 +342,6 @@ GraphDatabase.Driver("bolt+routing://graph.example.com:7687", auth)
 |
 [source, csharp]
 ----
-String uri = "bolt+routing://graph.example.com:7687";
-IDriver driver = GraphDatabase.Driver(uri, auth,
-                     new Config {EncryptionLevel = EncryptionLevel.None});
 ----
 |
 |===
@@ -368,106 +351,6 @@ To connect to a service without routing, you can replace `bolt+routing` with `bo
 
 ======
 
-[.include-with-go]
-======
-The table below illustrates examples of how to connect to a service with routing.
-
-[options="header", cols="a,a,a,a"]
-|===
-|Product
-|Security
-|Code snippet
-|Comments
-
-|Neo4j Aura
-|Secured with full certificate
-|
-[source, go]
-----
-uri := "bolt+routing://graph.example.com:7687"
-
-driver, err := neo4j.NewDriver(uri, auth, func(config *neo4j.Config) {
-        config.TrustStrategy = neo4j.TrustSystem(true)
-})
-----
-| This is the default (and only option) for Neo4j Aura
-
-|Neo4j 4.x
-|Unsecured
-|
-[source, go]
-----
-uri := "bolt+routing://graph.example.com:7687"
-
-driver, err := neo4j.NewDriver(uri, auth, func(config *neo4j.Config) {
-        config.Encrypted = false
-})
-----
-|This is the default for Neo4j 4.x series
-
-|Neo4j 4.x
-|Secured with full certificate
-|
-[source, go]
-----
-uri := "bolt+routing://graph.example.com:7687"
-
-driver, err := neo4j.NewDriver(uri, auth, func(config *neo4j.Config) {
-        config.TrustStrategy = neo4j.TrustSystem(true)
-})
-----
-|
-
-|Neo4j 4.x
-|Secured with self-signed certificate
-|
-[source, go]
-----
-driver, err := neo4j.NewDriver("bolt+routing://graph.example.com:7687", auth)
-----
-|
-
-|Neo4j 3.x
-|Secured with full certificate
-|
-[source, go]
-----
-uri := "bolt+routing://graph.example.com:7687"
-
-driver, err := neo4j.NewDriver(uri, auth, func(config *neo4j.Config) {
-        config.TrustStrategy = neo4j.TrustSystem(true)
-})
-----
-|
-
-|Neo4j 3.x
-|Secured with self-signed certificate
-|
-[source, go]
-----
-driver, err := neo4j.NewDriver("bolt+routing://graph.example.com:7687", auth)
-----
-|This is the default for Neo4j 3.x series
-
-|Neo4j 3.x
-|Unsecured
-|
-[source, go]
-----
-uri := "bolt+routing://graph.example.com:7687"
-
-driver, err := neo4j.NewDriver(uri, auth, func(config *neo4j.Config) {
-        config.Encrypted = false
-})
-----
-|
-
-|===
-
-[NOTE]
-To connect to a service without routing, you can replace `bolt+routing` with `bolt`.
-
-======
 
 [.include-with-java]
 ======
@@ -485,10 +368,6 @@ The table below illustrates examples of how to connect to a service with routing
 |
 [source, java]
 ----
-String uri = "bolt+routing://graph.example.com:7687";
-Config config = Config.build()
-                      .withTrustStrategy( trustSystemCertificates() )
-                      .build();
 ----
 | This is the default (and only option) for Neo4j Aura
 
@@ -497,12 +376,6 @@ Config config = Config.build()
 |
 [source, java]
 ----
-String uri = "bolt+routing://graph.example.com:7687";
-Config config = Config.build()
-                      .withoutEncryption()
-                      .build();
-
-GraphDatabase.driver( uri, auth, config );
 ----
 |This is the default for Neo4j 4.x series
 
@@ -511,10 +384,6 @@ GraphDatabase.driver( uri, auth, config );
 |
 [source, java]
 ----
-String uri = "bolt+routing://graph.example.com:7687";
-Config config = Config.build()
-                      .withTrustStrategy( trustSystemCertificates() )
-                      .build();
 ----
 |
 
@@ -523,7 +392,6 @@ Config config = Config.build()
 |
 [source, java]
 ----
-GraphDatabase.driver("bolt+routing://graph.example.com:7687", auth)
 ----
 |
 
@@ -532,10 +400,6 @@ GraphDatabase.driver("bolt+routing://graph.example.com:7687", auth)
 |
 [source, java]
 ----
-String uri = "bolt+routing://graph.example.com:7687";
-Config config = Config.build()
-                      .withTrustStrategy( trustSystemCertificates() )
-                      .build();
 ----
 |
 
@@ -544,7 +408,6 @@ Config config = Config.build()
 |
 [source, java]
 ----
-GraphDatabase.driver("bolt+routing://graph.example.com:7687", auth)
 ----
 |This is the default for Neo4j 3.x series
 
@@ -553,12 +416,6 @@ GraphDatabase.driver("bolt+routing://graph.example.com:7687", auth)
 |
 [source, java]
 ----
-String uri = "bolt+routing://graph.example.com:7687";
-Config config = Config.build()
-                      .withoutEncryption()
-                      .build();
-
-GraphDatabase.driver( uri, auth, config );
 ----
 |
 
@@ -585,10 +442,6 @@ The table below illustrates examples of how to connect to a service with routing
 |
 [source, javascript]
 ----
-const uri = 'bolt+routing://graph.example.com:7687'
-const driver = neo4j.driver(uri,auth, {
-    trust: 'TRUST_SYSTEM_CA_SIGNED_CERTIFICATES'
-})
 ----
 | This is the default (and only option) for Neo4j Aura
 
@@ -597,10 +450,6 @@ const driver = neo4j.driver(uri,auth, {
 |
 [source, javascript]
 ----
-const uri = 'bolt+routing://graph.example.com:7687'
-const driver = neo4j.driver(uri, auth, {
-  encrypted: 'ENCRYPTION_OFF'
-})
 ----
 |This is the default for Neo4j 4.x series
 
@@ -609,10 +458,6 @@ const driver = neo4j.driver(uri, auth, {
 |
 [source, javascript]
 ----
-const uri = 'bolt+routing://graph.example.com:7687'
-const driver = neo4j.driver(uri,auth, {
-    trust: 'TRUST_SYSTEM_CA_SIGNED_CERTIFICATES'
-})
 ----
 |
 
@@ -621,7 +466,6 @@ const driver = neo4j.driver(uri,auth, {
 |
 [source, javascript]
 ----
-neo4j.driver("bolt+routing://graph.example.com:7687", auth)
 ----
 |
 
@@ -630,10 +474,6 @@ neo4j.driver("bolt+routing://graph.example.com:7687", auth)
 |
 [source, javascript]
 ----
-const uri = 'bolt+routing://graph.example.com:7687'
-const driver = neo4j.driver(uri,auth, {
-    trust: 'TRUST_SYSTEM_CA_SIGNED_CERTIFICATES'
-})
 ----
 |
 
@@ -642,7 +482,6 @@ const driver = neo4j.driver(uri,auth, {
 |
 [source, javascript]
 ----
-neo4j.driver("bolt+routing://graph.example.com:7687", auth)
 ----
 |This is the default for Neo4j 3.x series
 
@@ -651,98 +490,9 @@ neo4j.driver("bolt+routing://graph.example.com:7687", auth)
 |
 [source, javascript]
 ----
-const uri = 'bolt+routing://graph.example.com:7687'
-const driver = neo4j.driver(uri, auth, {
-  encrypted: 'ENCRYPTION_OFF'
-})
 ----
 |
 
-|===
-
-[NOTE]
-To connect to a service without routing, you can replace `bolt+routing` with `bolt`.
-
-======
-
-[.include-with-python]
-======
-The table below illustrates examples of how to connect to a service with routing.
-
-[options="header", cols="a,a,a,a"]
-|===
-|Product
-|Security
-|Code snippet
-|Comments
-
-|Neo4j Aura
-|Secured with full certificate
-|
-[source, python]
-----
-uri = "bolt+routing://graph.example.com:7687"
-GraphDatabase.driver(uri, auth, trust=TRUST_SYSTEM_CA_SIGNED_CERTIFICATES)
-----
-| This is the default (and only option) for Neo4j Aura
-
-|Neo4j 4.x
-|Unsecured
-|
-[source, python]
-----
-uri = "bolt+routing://graph.example.com:7687"
-GraphDatabase.driver(uri, auth, encrypted=False)
-----
-|This is the default for Neo4j 4.x series
-
-|Neo4j 4.x
-|Secured with full certificate
-|
-[source, python]
-----
-uri = "bolt+routing://graph.example.com:7687"
-GraphDatabase.driver(uri, auth, trust=TRUST_SYSTEM_CA_SIGNED_CERTIFICATES)
-----
-|
-
-|Neo4j 4.x
-|Secured with self-signed certificate
-|
-[source, python]
-----
-GraphDatabase.driver("bolt+routing://graph.example.com:7687", auth)
-----
-|
-
-|Neo4j 3.x
-|Secured with full certificate
-|
-[source, python]
-----
-uri = "bolt+routing://graph.example.com:7687"
-GraphDatabase.driver(uri, auth, trust=TRUST_SYSTEM_CA_SIGNED_CERTIFICATES)
-----
-|
-
-|Neo4j 3.x
-|Secured with self-signed certificate
-|
-[source, python]
-----
-GraphDatabase.driver("bolt+routing://graph.example.com:7687", auth)
-----
-|This is the default for Neo4j 3.x series
-
-|Neo4j 3.x
-|Unsecured
-|
-[source, python]
-----
-uri = "bolt+routing://graph.example.com:7687"
-GraphDatabase.driver(uri, auth, encrypted=False)
-----
-|
 |===
 
 [NOTE]
@@ -751,8 +501,6 @@ To connect to a service without routing, you can replace `bolt+routing` with `bo
 ======
 
 ====
-
-
 
 
 [[driver-authentication]]
