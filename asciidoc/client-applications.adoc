@@ -305,7 +305,6 @@ If you do not have at least the .NET Driver 4.0.1 patch installed, you will need
 String uri = "neo4j://graph.example.com:7687";
 IDriver driver = GraphDatabase.Driver(uri, auth,
            o => o.WithEncryptionLevel(EncryptionLevel.Encrypted));
-                 .WithTrustManager(TrustManager.CreateChainTrust()));
 ----
 | This is the default (and only option) for Neo4j Aura
 
