@@ -6,6 +6,21 @@
 This section describes how to manage database connections within an application.
 --
 
+This section contains the following:
+
+* <<driver-driver-object,The Driver object>>
+* <<driver-connection-uris,Connection URIs>>
+** <<initial-address-resolution,Initial address resolution>>
+** <<driver-routing-table,Routing table>>
+** <<driver-routing-context,Routing context>>
+** <<driver-configuration-examples,Examples>>
+* <<driver-authentication,Authentication>>
+** <<driver-authentication-basic,Basic authentication>>
+** <<driver-authentication-kerberos,Kerberos authentication>>
+** <<driver-authentication-custom,Custom authentication>>
+* <<driver-configuration,Configuration>>
+* <<driver-logging,Logging>>
+
 
 [[driver-driver-object]]
 == The Driver object
@@ -88,26 +103,42 @@ include::{javascript-examples}/examples.test.js[tags=driver-lifecycle]
 [[driver-connection-uris]]
 == Connection URIs
 
-Connection URIs are typically formed according to the following pattern:
+A connection URI identifies a graph database and how to connect to it.
+The encryption and trust settings provide detail to how that connection should be secured.
 
-----
-neo4j://<HOST>:<PORT>[?<ROUTING_CONTEXT>]
-----
+[CAUTION]
+There are significant changes to security settings between Neo4j 3.x and Neo4j 4.x.
+Please consider the information in this section before upgrading from a previous version.
+The <<migration-guide#migration-guide, Migration Guide>> is also a good source of information about changes in functionality.
 
-This targets a routed Neo4j service that may be fulfilled by either a cluster or a single instance.
-The `HOST` and `PORT` values contain a logical hostname and port number targeting the entry point to the Neo4j service (e.g. `neo4j://graph.example.com:7687`).
-In a clustered environment, the URI address will resolve to one of more of the core members; for standalone installations, this will simply point to that server address.
-The `ROUTING_CONTEXT` option allows for customization of the routing table and is discussed in more detail in <<driver-routing-context>>.
+Starting with Neo4j 4.0, client-server communication uses only *unencrypted local* connections by default.
+This is a change from previous versions, which switched on encryption by default, but generated a self-signed certificate out of the box.
 
-An alternative URI form, using the `bolt` URI scheme (e.g. `bolt://graph.example.com:7687`), can be used when a single point-to-point connection is required.
-This variant is useful for the subset client applications (such as admin tooling) that need to be aware of individual servers, as opposed to those which require a highly available database service.
+When a full certificate is installed, and encryption is enabled on the driver, full certificate checks are carried out (refer to <<operations-manual#ssl-framework, Operations Manual -> SSL framework >>).
+Full certificates provide better overall security than self-signed certificates as they include a complete chain of trust back to a root certificate authority.
 
-----
-bolt://<HOST>:<PORT>
-----
 [NOTE]
-Neo4j 3.x did not provide a routing table in single instance mode and therefore you should use a `bolt://` URI if targeting an older, non-clustered server.
+====
+https://neo4j.com/aura/[Neo4j Aura] is a secure hosted service backed by full certificates signed by a root certificate authority.
+To connect to Neo4j Aura, driver users must enable encryption and the complete set of certificate checks (the latter of which are enabled by default).
 
+For more information, see <<driver-configuration-examples>>.
+====
+
+.Changes in default security settings between 3.x and 4.x
+[options="header"]
+|===
+| Setting | Neo4j 4.x | Neo4j 3.x (Drivers 1.x)
+| Bundled certificate | none | auto-generated, self-signed
+| Driver encryption   | off  | on
+| Bolt interface      | localhost |localhost
+| Certificate expiry check  | on  |on
+| Certificate CA check  | on  | off
+| Certificate hostname check  | on  | off
+|===
+
+
+[[initial-address-resolution]]
 === Initial address resolution
 
 The address provided in a `neo4j://` URI is used for initial and fallback communication only.
@@ -118,6 +149,8 @@ The initial address is once again reused to bootstrap the system.
 Several options are available for providing this initial logical-to-physical host resolution.
 These include regular DNS, custom middleware such as a load balancer, and the Driver object _resolver function_, all of which are described in the following sections.
 
+
+[[dns-resolution]]
 ==== DNS resolution
 
 DNS resolution is the default, and always-available option.
@@ -125,11 +158,14 @@ As it is possible to configure DNS to resolve a single host name down to multipl
 
 image::dns-resolution.png[title="Initial address resolution over DNS", role="middle"]
 
+
+[[custom-middleware]]
 ==== Custom middleware
 
 Middleware, such as a load balancer, can be used to group the core servers under a single public address.
 
 image::custom-middleware.png[title="Initial address resolution using custom middleware"]
+
 
 [[driver-resolver-function]]
 ==== Resolver function
@@ -176,14 +212,18 @@ include::{javascript-examples}/examples.test.js[tags=config-custom-resolver]
 // include::{python-examples}/custom_resolver_example.py[tags=custom-resolver]
 // ----
 // ======
+
 ====
 
+
+[[driver-routing-table]]
 === Routing table
 
 The routing table acts like the glue between the driver connectivity layer and the database surface.
 This table contains a list of server addresses, grouped as readers and writers, and is refreshed automatically by the driver as required.
 
 The driver does not expose any API to work directly with the routing table, but it can sometimes be useful to explore when troubleshooting a system.
+
 
 [[driver-routing-context]]
 === Routing context
@@ -210,6 +250,475 @@ For details on how to configure multi-data center routing policies for a Causal 
 ====
 
 
+[[driver-configuration-examples]]
+=== Examples
+
+Connection URIs are typically formed according to the following pattern:
+
+[source, shell]
+----
+neo4j://<HOST>:<PORT>[?<ROUTING_CONTEXT>]
+----
+
+This targets a routed Neo4j service that may be fulfilled by either a cluster or a single instance.
+The `HOST` and `PORT` values contain a logical hostname and port number targeting the entry point to the Neo4j service (e.g. `neo4j://graph.example.com:7687`).
+In a clustered environment, the URI address will resolve to one of more of the core members; for standalone installations, this will simply point to that server address.
+The `ROUTING_CONTEXT` option allows for customization of the routing table and is discussed in more detail in <<driver-routing-context>>.
+
+An alternative URI form, using the `bolt` URI scheme (e.g. `bolt://graph.example.com:7687`), can be used when a single point-to-point connection is required.
+This variant is useful for the subset client applications (such as admin tooling) that need to be aware of individual servers, as opposed to those which require a highly available database service.
+
+[source, shell]
+----
+bolt://<HOST>:<PORT>
+----
+
+Each of the `neo4j` and `bolt` URIs permit variants that contain extra encryption and trust information.
+The `+s` variants enable encryption with a full certificate check, and the `+ssc` variants enable encryption, but with no certificate check.
+This latter variant is designed specifically for use with self-signed certificates.
+
+.Available URIs
+[options="header", cols="m,a,a"]
+|===
+|URI
+|Routing
+|Description
+
+|neo4j
+|Yes
+|Unsecured
+
+|neo4j+s
+|Yes
+|Secured with full certificate
+
+|neo4j+ssc
+|Yes
+|Secured with self-signed certificate
+
+|bolt
+|No
+|Unsecured
+
+|bolt+s
+|No
+|Secured with full certificate
+
+|bolt+ssc
+|No
+|Secured with self-signed certificate
+
+|===
+
+[NOTE]
+Neo4j 3.x did not provide a routing table in single instance mode and therefore you should use a `bolt://` URI if targeting an older, non-clustered server.
+
+The table below provides example code snippets for different deployment configurations.
+Each snippet expects an `auth` variable to have been previously defined, containing the authentication details for that connection.
+
+[.tabbed-example]
+.Connecting to a service
+====
+[.include-with-dotnet]
+======
+The table below illustrates examples of how to connect to a service with routing:
+
+[options="header", cols="a,a,a,a"]
+|===
+|Product
+|Security
+|Code snippet
+|Comments
+
+|Neo4j Aura
+|Secured with full certificate
+|
+[source, csharp]
+----
+GraphDatabase.Driver("neo4j+s://graph.example.com:7687", auth)
+----
+
+If you do not have at least the .NET Driver 4.0.1 patch installed, you will need this snippet instead:
+
+[source, csharp]
+----
+String uri = "neo4j://graph.example.com:7687";
+IDriver driver = GraphDatabase.Driver(uri, auth,
+           o => o.WithEncryptionLevel(EncryptionLevel.Encrypted));
+----
+| This is the default (and only option) for Neo4j Aura
+
+|Neo4j 4.x
+|Unsecured
+|
+[source, csharp]
+----
+GraphDatabase.Driver("neo4j://graph.example.com:7687", auth);
+----
+|This is the default for Neo4j 4.x series
+
+|Neo4j 4.x
+|Secured with full certificate
+|
+[source, csharp]
+----
+GraphDatabase.Driver("neo4j+s://graph.example.com:7687", auth)
+----
+
+If you do not have at least the .NET Driver 4.0.1 patch installed, you will need this snippet instead:
+
+[source, csharp]
+----
+String uri = "neo4j://graph.example.com:7687";
+IDriver driver = GraphDatabase.Driver(uri, auth,
+           o => o.WithEncryptionLevel(EncryptionLevel.Encrypted));
+----
+|
+
+|Neo4j 4.x
+|Secured with self-signed certificate
+|
+[source, csharp]
+----
+GraphDatabase.Driver("neo4j+ssc://graph.example.com:7687", auth)
+----
+
+If you do not have at least the .NET Driver 4.0.1 patch installed, you will need this snippet instead:
+
+[source, csharp]
+----
+String uri = "neo4j://graph.example.com:7687";
+IDriver driver = GraphDatabase.Driver(uri, auth,
+           o => o.WithEncryptionLevel(EncryptionLevel.Encrypted)
+                 .WithTrustManager(TrustManager.CreateInsecure()));
+----
+|
+
+|Neo4j 3.x
+|Secured with full certificate
+|
+[source, csharp]
+----
+GraphDatabase.Driver("neo4j+s://graph.example.com:7687", auth)
+----
+
+If you do not have at least the .NET Driver 4.0.1 patch installed, you will need this snippet instead:
+
+[source, csharp]
+----
+String uri = "neo4j://graph.example.com:7687";
+IDriver driver = GraphDatabase.Driver(uri, auth,
+           o => o.WithEncryptionLevel(EncryptionLevel.Encrypted));
+----
+|
+
+|Neo4j 3.x
+|Secured with self-signed certificate
+|
+[source, csharp]
+----
+GraphDatabase.Driver("neo4j+ssc://graph.example.com:7687", auth)
+----
+
+If you do not have at least the .NET Driver 4.0.1 patch installed, you will need this snippet instead:
+
+[source, csharp]
+----
+String uri = "neo4j://graph.example.com:7687";
+IDriver driver = GraphDatabase.Driver(uri, auth,
+           o => o.WithEncryptionLevel(EncryptionLevel.Encrypted)
+                 .WithTrustManager(TrustManager.CreateInsecure()));
+----
+|This is the default for Neo4j 3.x series
+
+|Neo4j 3.x
+|Unsecured
+|
+[source, csharp]
+----
+GraphDatabase.Driver("neo4j://graph.example.com:7687", auth);
+----
+|
+
+|===
+
+[NOTE]
+To connect to a service without routing, you can replace `neo4j` with `bolt`.
+
+======
+
+[.include-with-java]
+======
+The table below illustrates examples of how to connect to a service with routing:
+
+[options="header", cols="a,a,a,a"]
+|===
+|Product
+|Security
+|Code snippet
+|Comments
+
+|Neo4j Aura
+|Secured with full certificate
+|
+[source, java]
+----
+GraphDatabase.driver("neo4j+s://graph.example.com:7687", auth)
+----
+
+If you do not have at least the Java Driver 4.0.1 patch installed, you will need this snippet instead:
+
+[source, java]
+----
+String uri = "neo4j://graph.example.com:7687";
+Config config = Config.builder()
+                     .withEncryption()
+                     .build();
+Driver driver = GraphDatabase.driver(uri, auth, config);
+----
+| This is the default (and only option) for Neo4j Aura
+
+|Neo4j 4.x
+|Unsecured
+|
+[source, java]
+----
+GraphDatabase.driver("neo4j://graph.example.com:7687", auth)
+----
+|This is the default for Neo4j 4.x series
+
+|Neo4j 4.x
+|Secured with full certificate
+|
+[source, java]
+----
+GraphDatabase.driver("neo4j+s://graph.example.com:7687", auth)
+----
+
+If you do not have at least the Java Driver 4.0.1 patch installed, you will need this snippet instead:
+
+[source, java]
+----
+String uri = "neo4j://graph.example.com:7687";
+Config config = Config.builder()
+                     .withEncryption()
+                     .build();
+Driver driver = GraphDatabase.driver(uri, auth, config);
+----
+|
+
+|Neo4j 4.x
+|Secured with self-signed certificate
+|
+[source, java]
+----
+GraphDatabase.driver("neo4j+ssc://graph.example.com:7687", auth)
+----
+
+If you do not have at least the Java Driver 4.0.1 patch installed, you will need this snippet instead:
+
+[source, java]
+----
+String uri = "neo4j://graph.example.com:7687";
+Config config = Config.builder()
+                    .withEncryption()
+                    .withTrustStrategy( trustAllCertificates() )
+                    .build();
+Driver driver = GraphDatabase.driver(uri, auth, config);
+----
+|
+
+|Neo4j 3.x
+|Secured with full certificate
+|
+[source, java]
+----
+GraphDatabase.driver("neo4j+s://graph.example.com:7687", auth)
+----
+
+If you do not have at least the Java Driver 4.0.1 patch installed, you will need this snippet instead:
+
+[source, java]
+----
+String uri = "neo4j://graph.example.com:7687";
+Config config = Config.builder()
+                     .withEncryption()
+                     .build();
+Driver driver = GraphDatabase.driver(uri, auth, config);
+----
+|
+
+|Neo4j 3.x
+|Secured with self-signed certificate
+|
+[source, java]
+----
+GraphDatabase.driver("neo4j+ssc://graph.example.com:7687", auth)
+----
+
+If you do not have at least the Java Driver 4.0.1 patch installed, you will need this snippet instead:
+
+[source, java]
+----
+String uri = "neo4j://graph.example.com:7687";
+Config config = Config.builder()
+                    .withEncryption()
+                    .withTrustStrategy( trustAllCertificates() )
+                    .build();
+Driver driver = GraphDatabase.driver(uri, auth, config);
+----
+|This is the default for Neo4j 3.x series
+
+|Neo4j 3.x
+|Unsecured
+|
+[source, java]
+----
+GraphDatabase.driver("neo4j://graph.example.com:7687", auth)
+----
+|
+
+|===
+
+[NOTE]
+To connect to a service without routing, you can replace `neo4j` with `bolt`.
+
+======
+
+[.include-with-javascript]
+======
+The table below illustrates examples of how to connect to a service with routing:
+
+[options="header", cols="a,a,a,a"]
+|===
+|Product
+|Security
+|Code snippet
+|Comments
+
+|Neo4j Aura
+|Secured with full certificate
+|
+[source, javascript]
+----
+neo4j.driver("neo4j+s://graph.example.com:7687", auth)
+----
+
+If you do not have at least the JavaScript Driver 4.0.2 patch installed, you will need this snippet instead:
+
+[source, javascript]
+----
+const uri = 'neo4j://graph.example.com:7687'
+const driver = neo4j.driver(uri, auth, {
+  encrypted: 'ENCRYPTION_ON'
+})
+----
+| This is the default (and only option) for Neo4j Aura
+
+|Neo4j 4.x
+|Unsecured
+|
+[source, javascript]
+----
+neo4j.driver("neo4j://graph.example.com:7687", auth)
+----
+|This is the default for Neo4j 4.x series
+
+|Neo4j 4.x
+|Secured with full certificate
+|
+[source, javascript]
+----
+neo4j.driver("neo4j+s://graph.example.com:7687", auth)
+----
+
+If you do not have at least the JavaScript Driver 4.0.2 patch installed, you will need this snippet instead:
+
+[source, javascript]
+----
+const uri = 'neo4j://graph.example.com:7687'
+const driver = neo4j.driver(uri, auth, {
+  encrypted: 'ENCRYPTION_ON'
+})
+----
+|
+
+|Neo4j 4.x
+|Secured with self-signed certificate
+|
+[source, javascript]
+----
+neo4j.driver("neo4j+ssc://graph.example.com:7687", auth)
+----
+
+If you do not have at least the JavaScript Driver 4.0.2 patch installed, you will need this snippet instead:
+
+[source, javascript]
+----
+const uri = 'neo4j://graph.example.com:7687'
+const driver = neo4j.driver(uri, auth, {
+  encrypted: 'ENCRYPTION_ON',
+  trust: 'TRUST_ALL_CERTIFICATES'
+})
+----
+|
+
+|Neo4j 3.x
+|Secured with full certificate
+|
+[source, javascript]
+----
+neo4j.driver("neo4j+s://graph.example.com:7687", auth)
+----
+
+If you do not have at least the JavaScript Driver 4.0.2 patch installed, you will need this snippet instead:
+
+[source, javascript]
+----
+const uri = 'neo4j://graph.example.com:7687'
+const driver = neo4j.driver(uri, auth, {
+  encrypted: 'ENCRYPTION_ON'
+})
+----
+|
+
+|Neo4j 3.x
+|Secured with self-signed certificate
+|
+[source, javascript]
+----
+neo4j.driver("neo4j+ssc://graph.example.com:7687", auth)
+----
+
+If you do not have at least the JavaScript Driver 4.0.2 patch installed, you will need this snippet instead:
+
+[source, javascript]
+----
+const uri = 'neo4j://graph.example.com:7687'
+const driver = neo4j.driver(uri, auth, {
+  encrypted: 'ENCRYPTION_ON',
+  trust: 'TRUST_ALL_CERTIFICATES'
+})
+----
+|This is the default for Neo4j 3.x series
+
+|Neo4j 3.x
+|Unsecured
+|
+[source, javascript]
+----
+neo4j.driver("neo4j://graph.example.com:7687", auth)
+----
+|
+
+|===
+
+[NOTE]
+To connect to a service without routing, you can replace `neo4j` with `bolt`.
+
+======
+
+====
 
 
 [[driver-authentication]]
@@ -284,6 +793,8 @@ include::{javascript-examples}/examples.test.js[tags=basic-auth]
 The basic authentication scheme can also be used to authenticate against an LDAP server.
 --
 
+
+[[driver-authentication-kerberos]]
 === Kerberos authentication
 
 The Kerberos authentication scheme provides a simple way to create a Kerberos authentication token with a base64 encoded server authentication ticket.
@@ -406,38 +917,6 @@ include::{javascript-examples}/examples.test.js[tags=custom-auth]
 // ----
 // ======
 ====
-
-
-[[driver-security]]
-== Security
-
-
-[CAUTION]
-There are significant changes to security settings between Neo4j 3.x and Neo4j 4.x.
-Please consider the information in this section before upgrading from a previous version.
-The <<migration-guide#migration-guide, Migration Guide>> is also a good source of information about changes in functionality.
-
-Starting with Neo4j 4.0, client-server communication uses only *unencrypted local* connections by default.
-This is a change from previous versions, which switched on encryption by default, but generated a self-signed certificate out of the box.
-
-When a full certificate is installed, and encryption is enabled on the driver, full certificate checks are carried out (refer to <<operations-manual#ssl-framework, Operations Manual -> SSL framework >>).
-Full certificates provide better overall security than self-signed certificates as they include a complete chain of trust back to a root certificate authority.
-
-[NOTE]
-https://neo4j.com/aura/[Neo4j Aura] is a secure hosted service backed by full certificates signed by a root certificate authority.
-To connect to Neo4j Aura, driver users must enable encryption and the complete set of certificate checks (the latter of which are enabled by default).
-
-.Changes in default security settings between 3.x and 4.x
-[options="header"]
-|===
-| Setting | Neo4j 4.x | Neo4j 3.x (Drivers 1.x)
-| Bundled certificate | none | auto-generated, self-signed
-| Driver encryption   | off  | on
-| Bolt interface      | localhost |localhost
-| Certificate expiry check  | on  |on
-| Certificate CA check  | on  | off
-| Certificate hostname check  | on  | off
-|===
 
 
 [[driver-configuration]]
