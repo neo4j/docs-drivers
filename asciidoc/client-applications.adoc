@@ -249,6 +249,17 @@ Additionally, the routing contexts must be defined within the cluster as routing
 For details on how to configure multi-data center routing policies for a Causal Cluster, please refer to <<operations-manual#multi-dc-load-balancing, Operations Manual -> Causal Clustering>>.
 ====
 
+[NOTE]
+.Exposing a single instance deployment on a remote host using the `neo4j` scheme
+====
+Additional configuration of the server is required when using a single instance of neo4j deployed on a remote machine
+whilst using the `neo4j` scheme. To make the server aware on its deployment environment you need to configure
+https://neo4j.com/docs/operations-manual/current/reference/configuration-settings/#config_dbms.default_advertised_addressAsciidoctor[`default_advertised_address`]
+with your deployment machine's host name as visible from the client machine.
+
+====
+
+
 
 [[driver-configuration-examples]]
 === Examples
