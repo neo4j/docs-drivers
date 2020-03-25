@@ -252,13 +252,12 @@ For details on how to configure multi-data center routing policies for a Causal 
 [NOTE]
 .Exposing a single instance deployment on a remote host using the `neo4j` scheme
 ====
-Additional configuration of the server is required when using a single instance of neo4j deployed on a remote machine
-whilst using the `neo4j` scheme. To make the server aware on its deployment environment you need to configure
-https://neo4j.com/docs/operations-manual/current/reference/configuration-settings/#config_dbms.default_advertised_addressAsciidoctor[`default_advertised_address`]
-with your deployment machine's host name as visible from the client machine.
+If you are using a single instance of Neo4j, deployed on a remote machine whilst using the `neo4j` scheme, you will need to complete additional configuration of the server.
 
+To make the server aware of its deployment environment, you need to configure
+<<operations-manual#config_dbms.default_advertised_address,`default_advertised_address`>>
+with your deployment machine's host name, as visible from the client machine.
 ====
-
 
 
 [[driver-configuration-examples]]
