@@ -274,20 +274,22 @@ Some administrative operations must be carried out against the `system` database
 To do this, construct a session targeting the database called `system` and execute Cypher as usual.
 Please see <<cypher-manual#administration-databases-introduction, Cypher Manual -> Databases>> for more information.
 
+
 [role=enterprise-edition]
 [[database-selection]]
 === Database selection
 
 The database selection on the client side happens on the <<driver-session-api, session API>>.
+
 You pass the name of the database to the driver during session creation.
-The default database is used if you don't specify a name.
-A database name must not be literal `null` nor an empty string.
+If you don't specify a name, the default database is used.
+The database name must not be `null`, nor an empty string.
 
-NOTE: Selection of database is only possible when the driver is connected against Enterprise Edition of Neo4j.
-      Changing to any other database than the default database in Neo4j Community Edition will lead to a runtime error.
+[NOTE]
+The selection of database is only possible when the driver is connected against Neo4j Enterprise Edition.
+Changing to any other database than the default database in Neo4j Community Edition will lead to a runtime error.
 
-
-The database that is requested must exist.
+Please note that the database that is requested must exist.
 
 [.tabbed-example]
 .Database selection on session creation
