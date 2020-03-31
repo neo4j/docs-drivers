@@ -283,14 +283,14 @@ This variant is useful for the subset client applications (such as admin tooling
 bolt://<HOST>:<PORT>
 ----
 
-Each of the `neo4j` and `bolt` URIs permit variants that contain extra encryption and trust information.
+Each of the `neo4j` and `bolt` URI schemes permit variants that contain extra encryption and trust information.
 The `+s` variants enable encryption with a full certificate check, and the `+ssc` variants enable encryption, but with no certificate check.
 This latter variant is designed specifically for use with self-signed certificates.
 
-.Available URIs
+.Available URI schemes
 [options="header", cols="m,a,a"]
 |===
-|URI
+|URI scheme
 |Routing
 |Description
 
