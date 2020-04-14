@@ -728,6 +728,122 @@ To connect to a service without routing, you can replace `neo4j` with `bolt`.
 
 ======
 
+[.include-with-python]
+======
+The table below illustrates examples of how to connect to a service with routing:
+
+[options="header", cols="a,a,a,a"]
+|===
+|Product
+|Security
+|Code snippet
+|Comments
+
+|Neo4j Aura
+|Secured with full certificate
+|
+[source, python]
+----
+GraphDatabase.driver("neo4j+s://graph.example.com:7687", auth)
+----
+
+For previous Python Driver versions before 4.0.0 you will need this snippet instead:
+
+[source, python]
+----
+GraphDatabase.driver("neo4j://graph.example.com:7687", auth, "encrypted"=True, "Trust"=TRUST_SYSTEM_CA_SIGNED_CERTIFICATES)
+----
+| This is the default (and only option) for Neo4j Aura
+
+|Neo4j 4.x
+|Unsecured
+|
+[source, python]
+----
+GraphDatabase.driver("neo4j://graph.example.com:7687", auth)
+----
+|This is the default for Neo4j 4.x series
+
+|Neo4j 4.x
+|Secured with full certificate
+|
+[source, python]
+----
+GraphDatabase.driver("neo4j+s://graph.example.com:7687", auth)
+----
+
+For previous Python Driver versions before 4.0.0 you will need this snippet instead:
+
+[source, python]
+----
+GraphDatabase.driver("neo4j://graph.example.com:7687", auth, "encrypted"=True, "Trust"=TRUST_SYSTEM_CA_SIGNED_CERTIFICATES)
+----
+|
+
+|Neo4j 4.x
+|Secured with self-signed certificate
+|
+[source, python]
+----
+neo4j.driver("neo4j+ssc://graph.example.com:7687", auth)
+----
+
+For previous Python Driver versions before 4.0.0 you will need this snippet instead:
+
+[source, python]
+----
+GraphDatabase.driver("neo4j://graph.example.com:7687", auth, "encrypted"=True, "Trust"=TRUST_ALL_CERTIFICATES)
+----
+|
+
+|Neo4j 3.x
+|Secured with full certificate
+|
+[source, python]
+----
+neo4j.driver("neo4j+s://graph.example.com:7687", auth)
+----
+
+For previous Python Driver versions before 4.0.0 you will need this snippet instead:
+
+[source, python]
+----
+GraphDatabase.driver("neo4j://graph.example.com:7687", auth, "encrypted"=True, "Trust"=TRUST_SYSTEM_CA_SIGNED_CERTIFICATES)
+----
+|
+
+|Neo4j 3.x
+|Secured with self-signed certificate
+|
+[source, python]
+----
+neo4j.driver("neo4j+ssc://graph.example.com:7687", auth)
+----
+
+For previous Python Driver versions before 4.0.0 you will need this snippet instead:
+
+[source, python]
+----
+GraphDatabase.driver("neo4j://graph.example.com:7687", auth, "encrypted"=True, "Trust"=TRUST_ALL_CERTIFICATES)
+----
+|This is the default for Neo4j 3.x series
+
+|Neo4j 3.x
+|Unsecured
+|
+[source, python]
+----
+neo4j.driver("neo4j://graph.example.com:7687", auth)
+----
+|
+
+|===
+
+[NOTE]
+To connect to a service without routing, you can replace `neo4j` with `bolt`.
+
+======
+
 ====
 
 
