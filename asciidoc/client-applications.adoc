@@ -751,7 +751,8 @@ For previous Python Driver versions before 4.0.0 you will need this snippet inst
 
 [source, python]
 ----
-GraphDatabase.driver("neo4j://graph.example.com:7687", auth, "encrypted"=True, "Trust"=TRUST_SYSTEM_CA_SIGNED_CERTIFICATES)
+GraphDatabase.driver("neo4j://graph.example.com:7687", auth,
+    "encrypted"=True, "trust"=TRUST_SYSTEM_CA_SIGNED_CERTIFICATES)
 ----
 | This is the default (and only option) for Neo4j Aura
 
@@ -776,7 +777,8 @@ For previous Python Driver versions before 4.0.0 you will need this snippet inst
 
 [source, python]
 ----
-GraphDatabase.driver("neo4j://graph.example.com:7687", auth, "encrypted"=True, "Trust"=TRUST_SYSTEM_CA_SIGNED_CERTIFICATES)
+GraphDatabase.driver("neo4j://graph.example.com:7687", auth,
+    "encrypted"=True, "trust"=TRUST_SYSTEM_CA_SIGNED_CERTIFICATES)
 ----
 |
 
@@ -792,7 +794,8 @@ For previous Python Driver versions before 4.0.0 you will need this snippet inst
 
 [source, python]
 ----
-GraphDatabase.driver("neo4j://graph.example.com:7687", auth, "encrypted"=True, "Trust"=TRUST_ALL_CERTIFICATES)
+GraphDatabase.driver("neo4j://graph.example.com:7687", auth,
+    "encrypted"=True, "trust"=TRUST_ALL_CERTIFICATES)
 ----
 |
 
@@ -808,7 +811,8 @@ For previous Python Driver versions before 4.0.0 you will need this snippet inst
 
 [source, python]
 ----
-GraphDatabase.driver("neo4j://graph.example.com:7687", auth, "encrypted"=True, "Trust"=TRUST_SYSTEM_CA_SIGNED_CERTIFICATES)
+GraphDatabase.driver("neo4j://graph.example.com:7687", auth,
+    "encrypted"=True, "trust"=TRUST_SYSTEM_CA_SIGNED_CERTIFICATES)
 ----
 |
 
@@ -824,7 +828,8 @@ For previous Python Driver versions before 4.0.0 you will need this snippet inst
 
 [source, python]
 ----
-GraphDatabase.driver("neo4j://graph.example.com:7687", auth, "encrypted"=True, "Trust"=TRUST_ALL_CERTIFICATES)
+GraphDatabase.driver("neo4j://graph.example.com:7687", auth,
+    "encrypted"=True, "trust"=TRUST_ALL_CERTIFICATES)
 ----
 |This is the default for Neo4j 3.x series
 
