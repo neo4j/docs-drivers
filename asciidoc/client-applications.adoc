@@ -747,7 +747,7 @@ The table below illustrates examples of how to connect to a service with routing
 GraphDatabase.driver("neo4j+s://graph.example.com:7687", auth)
 ----
 
-For previous Python Driver versions before 4.0.0 you will need this snippet instead:
+For Python Driver versions before 4.0.0 you need this snippet instead:
 
 [source, python]
 ----
@@ -773,7 +773,7 @@ GraphDatabase.driver("neo4j://graph.example.com:7687", auth)
 GraphDatabase.driver("neo4j+s://graph.example.com:7687", auth)
 ----
 
-For previous Python Driver versions before 4.0.0 you will need this snippet instead:
+For Python Driver versions before 4.0.0 you need this snippet instead:
 
 [source, python]
 ----
@@ -790,7 +790,7 @@ GraphDatabase.driver("neo4j://graph.example.com:7687", auth,
 neo4j.driver("neo4j+ssc://graph.example.com:7687", auth)
 ----
 
-For previous Python Driver versions before 4.0.0 you will need this snippet instead:
+For Python Driver versions before 4.0.0 you need this snippet instead:
 
 [source, python]
 ----
@@ -807,7 +807,7 @@ GraphDatabase.driver("neo4j://graph.example.com:7687", auth,
 neo4j.driver("neo4j+s://graph.example.com:7687", auth)
 ----
 
-For previous Python Driver versions before 4.0.0 you will need this snippet instead:
+For Python Driver versions before 4.0.0 you need this snippet instead:
 
 [source, python]
 ----
@@ -824,7 +824,7 @@ GraphDatabase.driver("neo4j://graph.example.com:7687", auth,
 neo4j.driver("neo4j+ssc://graph.example.com:7687", auth)
 ----
 
-For previous Python Driver versions before 4.0.0 you will need this snippet instead:
+For Python Driver versions before 4.0.0 you need this snippet instead:
 
 [source, python]
 ----
