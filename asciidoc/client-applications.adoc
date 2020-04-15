@@ -1253,10 +1253,10 @@ The connection acquiring timeout is configured via `ConnectionAcquisitionTimeout
 This configuration option allows you to manage the memory and I/O resources being used by the driver and tuning this option is dependent on these factors, in addition to number of cluster members.
 Default: 100 connections (except .NET driver with 500 connections)
 
-`MaxRetryTime`::
+`MaxTransactionRetryTime`::
 
 The maximum amount of time that a managed transaction will retry for before failing. Queries that are executed within a managed transaction gain the benefit of being retried when a transient error occurs.
-When this happens the transaction is retired multiple times up to the `MaxRetryTime`.
+When this happens the transaction is retired multiple times up to the `MaxTransactionRetryTime`.
 +
 Configure this option higher in high latency environments or if you are executing many large transactions which could limit the number of times that they are retired and therefore their chance to succeed.
 Configure lower in low latency environments and where your workload mainly consists of many smaller transactions.
