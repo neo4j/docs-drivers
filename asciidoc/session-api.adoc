@@ -37,15 +37,21 @@ This section describes simple sessions, transactions executed within a simple se
 --
 
 [NOTE]
-Available in .NET and Java
+====
+Available in:
 
-Simple sessions provide a "classic" blocking style API for Cypher execution and are available for .NET and Java.
+- *.NET Driver*
+- *Java Driver*
+- *Python Driver*
+====
+
+Simple sessions provide a "classic" *_blocking style_* API for Cypher execution.
 In general, simple sessions provide the easiest programming style to work with since API calls are executed in a strictly sequential fashion.
 
 [[driver-simple-lifecycle]]
 === Lifecycle
 
-Session lifetime extends from session construction to session closure.
+The session lifetime extends from session construction to session closure.
 In languages that support them, simple sessions are usually scoped within a context block; this ensures that they are properly closed and that any underlying connections are released and not leaked.
 
 
@@ -71,31 +77,42 @@ try (Session session = driver.session(...)) {
 }
 ----
 ======
+
+[.include-with-python]
+======
+[source, python]
+----
+with driver.session(...) as session:
+    // transactions go here
+----
+======
+
 ====
 
-Sessions can be configured in a number of different ways.
+*_Sessions can be configured in a number of different ways_*.
 This is carried out by supplying configuration inside the session constructor.
 See <<Session configuration>> for more details.
 
 [[driver-simple-transaction-fn]]
 === Transaction functions
 
-Transaction functions are the recommended form for containing transactional units of work.
+*_Transaction functions are the recommended form for containing transactional units of work_*.
 This form of transaction requires minimal boilerplate code and allows for a clear separation of database queries and application logic.
+
 Transaction functions are also desirable since they encapsulate retry logic and allow for the greatest degree of flexibility when swapping out a single instance of server for a cluster.
 
-Functions can be called as either read or write operations.
+Transaction functions can be called as either read or write operations.
 This choice will route the transaction to an appropriate server within a clustered environment.
 If you are operating in a single instance environment, this routing has no impact. It does give you flexibility if you choose to adopt a clustered environment later on.
 
-Before writing a transaction function it is important to ensure that it is designed to be idempotent.
+Before writing a transaction function *_it is important to ensure that it is designed to be idempotent_*.
 This is because a function may be executed multiple times if initial runs fail.
 
 Any query results obtained within a transaction function should be consumed within that function, as connection-bound resources cannot be managed correctly when out of scope.
 To that end, transaction functions can return values but these should be derived values rather than raw results.
 
 [NOTE]
-When a transaction fails, the driver retry logic is invoked. For several failure cases, the transaction can be immediately retried against a different server.
+*_When a transaction fails, the driver retry logic is invoked_*. For several failure cases, the transaction can be immediately retried against a different server.
 These cases include connection issues, server role changes (e.g. leadership elections) and transient errors.
 Retry logic can be configured when creating a session.
 
@@ -117,42 +134,70 @@ include::{dotnet-examples}/Examples.cs[tags=transaction-function]
 include::{java-examples}/TransactionFunctionExample.java[tags=transaction-function]
 ----
 ======
+
+[.include-with-python]
+======
+[source, python]
+----
+include::{python-examples}/test_transaction_function_example.py[tags=transaction-function]
+----
+[source, python]
+----
+include::{python-examples}/test_transaction_function_example.py[tags=transaction-function-import]
+----
+======
+
 ====
 
 [[driver-simple-autocommit-transactions]]
 === Auto-commit transactions
 
-An auto-commit transaction is a basic but limited form of transaction.
+An *_auto-commit transaction_* is a *_basic but limited form of transaction_*.
 Such a transaction consists of only one Cypher query and is not automatically replayed on failure.
 Therefore any error scenarios must be handled by the client application itself.
 
-Auto-commit transactions are intended to be used for simple use cases such as when learning Cypher or writing one-off scripts.
-It is not recommended to use auto-commit transactions in production environments.
+Auto-commit transactions are *_intended to be used for simple use cases_* such as when learning *Cypher* or writing one-off scripts.
+
+*_It is not recommended to use auto-commit transactions in production environments._*
 
 [NOTE]
-Unlike other kinds of Cypher query, `PERIODIC COMMIT` queries do not participate in the causal chain.
-Therefore, the only way to execute them from a driver is to use auto-commit transactions.
+====
+Unlike other kinds of Cypher Query, `PERIODIC COMMIT` queries do not participate in the causal chain.
+
+Therefore, the only way to execute `PERIODIC COMMIT` from a driver is to use auto-commit transactions.
+
 Please refer to the <<cypher-manual#query-using-periodic-commit-hint, Cypher Manual -> `PERIODIC COMMIT` query hint>>.
+====
 
 [.tabbed-example]
 .Simple auto-commit transactions
 ====
+
 [.include-with-dotnet]
 ======
-
 [source, csharp]
 ----
-
 include::{dotnet-examples}/Examples.cs[tags=autocommit-transaction]
 ----
 ======
 
 [.include-with-java]
 ======
-
 [source, java]
 ----
 include::{java-examples}/AutocommitTransactionExample.java[tags=autocommit-transaction]
+----
+======
+
+[.include-with-python]
+======
+[source, python]
+----
+include::{python-examples}/test_autocommit_transaction_example[tags=autocommit-transaction]
+----
+[source, python]
+----
+include::{python-examples}/test_autocommit_transaction_example[tags=autocommit-transaction-import]
 ----
 ======
 
@@ -167,6 +212,7 @@ The drivers provide a language-idiomatic way to iterate through that stream.
 [.tabbed-example]
 .Consuming results
 ====
+
 [.include-with-dotnet]
 ======
 [source, csharp]
@@ -174,7 +220,6 @@ The drivers provide a language-idiomatic way to iterate through that stream.
 include::{dotnet-examples}/Examples.cs[tags=result-consume]
 ----
 ======
-
 
 [.include-with-java]
 ======
@@ -184,21 +229,33 @@ include::{java-examples}/ResultConsumeExample.java[tags=result-consume]
 ----
 ======
 
+[.include-with-python]
+======
+[source, python]
+----
+include::{python-examples}/test_result_consume_example[tags=result-consume]
+----
+======
+
 ====
 
 
 [[driver-simple-result-retain]]
 === Retaining results
 
-Within a session, only one result stream can be active at any one time.
+Within a session, *_only one result stream can be active at any one time_*.
 Therefore, if the result of one query is not fully consumed before another query is executed, the remainder of the first result will be automatically buffered within the result object.
 
 image::driver-result-buffer.svg[title="Result buffer", role="middle"]
 
-This buffer provides a staging point for results, and divides result handling into _fetching_ (moving from the network to the buffer) and _consuming_ (moving from the buffer to the application).
+This buffer provides a staging point for results, and divides result handling into *_fetching_* (moving from the network to the buffer) and *_consuming_* (moving from the buffer to the application).
 
 [NOTE]
-For large results, the result buffer may require a significant amount of memory. For this reason, it is recommended to consume results in order wherever possible.
+====
+For large results, the result buffer may require a significant amount of memory.
+
+For this reason, *_it is recommended to consume results in order wherever possible_*.
+====
 
 Client applications can choose to take control of more advanced query patterns by explicitly retaining results.
 Such explicit retention may also be useful when a result needs to be saved for future processing.
@@ -207,6 +264,7 @@ The drivers offer support for this process, as per the example below:
 [.tabbed-example]
 .Retain results for further processing
 ====
+
 [.include-with-dotnet]
 ======
 [source, csharp]
@@ -222,6 +280,15 @@ include::{dotnet-examples}/Examples.cs[tags=result-retain]
 include::{java-examples}/ResultRetainExample.java[tags=result-retain]
 ----
 ======
+
+[.include-with-python]
+======
+[source, python]
+----
+include::{python-examples}/test_result_retain_example[tags=result-retain]
+----
+======
+
 ====
 
 
@@ -234,7 +301,13 @@ This section describes asynchronous sessions, transactions executed within an as
 --
 
 [NOTE]
-Available in .NET, Java and JavaScript.
+====
+Available in:
+
+- .NET Driver
+- Java Driver
+- JavaScript Driver
+====
 
 Asynchronous sessions provide an API wherein function calls typically return available objects such as futures.
 This allows client applications to work within asynchronous frameworks and take advantage of cooperative multitasking.
@@ -251,7 +324,7 @@ See <<Session configuration>> for more details.
 [[driver-async-transaction-fn]]
 === Transaction functions
 
-Transaction functions are the recommended form for containing transactional units of work.
+Transaction functions are *_the recommended form for containing transactional units of work_*.
 This form of transaction requires minimal boilerplate code and allows for a clear separation of database queries and application logic.
 Transaction functions are also desirable since they encapsulate retry logic and allow for the greatest degree of flexibility when swapping out a single instance of server for a cluster.
 
@@ -266,9 +339,12 @@ Any query results obtained within a transaction function should be consumed with
 To that end, transaction functions can return values but these should be derived values rather than raw results.
 
 [NOTE]
+====
 When a transaction fails, the driver retry logic is invoked. For several failure cases, the transaction can be immediately retried against a different server.
+
 These cases include connection issues, server role changes (e.g. leadership elections) and transient errors.
 Retry logic can be configured when creating a session.
+====
 
 [.tabbed-example]
 .Asynchronous transaction functions
@@ -314,9 +390,13 @@ Auto-commit transactions are intended to be used for simple use cases such as wh
 It is not recommended to use auto-commit transactions in production environments.
 
 [NOTE]
-Unlike other kinds of Cypher query, `PERIODIC COMMIT` queries do not participate in the causal chain.
+====
+Unlike other kinds of Cypher Query, `PERIODIC COMMIT` queries do not participate in the causal chain.
+
 Therefore, the only way to execute them from a driver is to use auto-commit transactions.
+
 Please refer to the <<cypher-manual#query-using-periodic-commit-hint, Cypher Manual -> `PERIODIC COMMIT` query hint>>.
+====
 
 [.tabbed-example]
 .Asynchronous auto-commit transactions
@@ -359,7 +439,7 @@ include::{javascript-examples}/examples.test.js[tags=async-autocommit-transactio
 The asynchronous session API provides language-idiomatic methods to aid integration with asynchronous applications and frameworks.
 
 [.tabbed-example]
-.Consuming results
+.Asynchronous consuming results
 ========
 [.include-with-dotnet]
 ======
@@ -402,9 +482,15 @@ This section describes reactive sessions, transactions executed within a reactiv
 --
 
 [NOTE]
-Available in .NET, Java and JavaScript
+====
+Available in:
 
-Starting with Neo4j 4.0, the reactive processing of queries is supported.
+- .NET Driver
+- Java Driver
+- JavaScript Driver
+====
+
+Starting with *Neo4j 4.0*, the reactive processing of queries is supported.
 This can be achieved through reactive sessions.
 Reactive sessions allow for dynamic management of the data that is being exchanged between the driver and the server.
 
@@ -497,19 +583,23 @@ See <<driver-session-configuration>> for more details.
 === Auto-commit transactions
 
 An auto-commit transaction is a basic but limited form of transaction.
-Such a transaction consists of only one Cypher query and is not automatically replayed on failure.
+Such a transaction consists of only one Cypher Query and is not automatically replayed on failure.
 Therefore any error scenarios will need to be handled by the client application itself.
 
-Auto-commit transactions are intended to be used for simple use cases such as when learning Cypher or writing one-off scripts.
+Auto-commit transactions are intended to be used for simple use cases such as when learning *Cypher* or writing one-off scripts.
 It is not recommended to use auto-commit transactions in production environments.
 
 [NOTE]
-The only way to execute `PERIODIC COMMIT` Cypher queries is to auto-commit the transaction.
+====
+The only way to execute `PERIODIC COMMIT` Cypher Queries is to auto-commit the transaction.
+
 Unlike other kinds of Cypher query, `PERIODIC COMMIT` queries do not participate in the causal chain.
+
 Please refer to the <<cypher-manual#query-using-periodic-commit-hint, Cypher Manual -> `PERIODIC COMMIT` query hint>>.
+====
 
 [.tabbed-example]
-.Auto-commit transactions
+.Reactive auto-commit transactions
 ========
 [.include-with-dotnet]
 ======
@@ -553,7 +643,7 @@ Result processing begins when records are pulled from this flow.
 Only one subscriber may pull data from a given flow.
 
 [.tabbed-example]
-.Consuming results
+.Reactive consuming results
 ========
 [.include-with-dotnet]
 ======
@@ -607,22 +697,26 @@ This section details the configuration options available when constructing a ses
 The mechanism which ensures causal consistency between transactions within a session.
 Bookmarks are implicitly passed between transactions within a single session to meet the causal consistency requirements.
 There may be scenarios where you might want to use the bookmark from one session in a different new session.
-Default: None (Sessions will initially be created without a bookmark)
++
+*Default:* None (Sessions will initially be created without a bookmark)
 
 `DefaultAccessMode`::
 A fallback for the access mode setting when transaction functions are not used.
 Typically, access mode is set per transaction by calling the appropriate transaction function method.
 In other cases, this setting is inherited. Note that transaction functions will ignore/override this setting.
-Default: Write
++
+*Default:* Write
 
 `Database`::
 The database with which the session will interact.
 When you are working with a database which is not the default (i.e. the `system` database or another database in Neo4j 4.0 Enterprise Edition), you can explicitly configure the database which the driver is executing transactions against.
 See <<operations-manual#manage-databases-default, Operations Manual -> The default database>> for more information on databases.
-Default: the default database as configured on the server.
++
+*Default:* the default database as configured on the server.
 
 `Fetch Size`::
 The number of records to fetch in each batch from the server.
 Neo4j 4.0 introduces the ability to pull records in batches, allowing the client application to take control of data population and apply back pressure to the server.
 This `FetchSize` applies to <<driver-simple-sessions, simple sessions>> and <<driver-asynchronous-sessions, async-sessions>> whereas reactive sessions can be controlled directly using the request method of the subscription.
-Default: 1000 records
++
+*Default:* 1000 records
