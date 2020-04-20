@@ -78,7 +78,8 @@ With https://en.wikipedia.org/wiki/Reactive_programming[reactive capabilities], 
 To execute a Cypher Query, the *_query text_* is required along with an optional set of *_named parameters_*.
 The text can contain *_parameter placeholders_* that are substituted with the corresponding values at runtime.
 While it is possible to run non-parameterized Cypher Queries, *_good programming practice is to use parameters in Cypher Queries whenever possible_*.
-This allows for the caching of queries within the Cypher Engine, which is beneficial for performance. Parameter values should adhere to <<driver-cypher-values>>.
+This allows for the caching of queries within the Cypher Engine, which is beneficial for performance.
+Parameter values should adhere to <<cypher-manual#cypher-values>>.
 
 A result summary is also generally available.
 This contains additional information relating to the query execution and the result content.
