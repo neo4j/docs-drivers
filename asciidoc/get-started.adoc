@@ -29,9 +29,10 @@ The following languages and frameworks are officially supported by Neo4j:
 [NOTE]
 --
 The 4.0 release of the Python and Go drivers are a work in progress. There is currently no release date available.
-The Python Driver is in alpha release stage with support for Python 3.5, 3.6, 3.7, 3.8.
 
-See the 1.7 Driver documentation: {docs-base-uri}/driver-manual/1.7 for these drivers.
+The 4.0 Python Driver is in alpha release stage with support for Python 3.5, 3.6, 3.7, 3.8, and this manual includes examples for using this alpha version.
+
+For more information on the 1.7 Driver documentation, including the 1.7 Go Driver, see {docs-base-uri}/driver-manual/1.7.
 --
 
 The driver API is intended to be topologically agnostic.
@@ -288,45 +289,50 @@ To find a list of all available releases, visit https://pypi.org/simple/neo4j/
 To install the latest stable version of the Python Driver:
 [source, shell, subs="attributes, specialcharacters"]
 ----
-pip install neo4j-driver
+pip install neo4j
 ----
 
 It is also an option to install a certain version of the driver.
 
-Get the latest version, including alphas:
-[source, shell, subs="attributes, specialcharacters"]
-----
-pip install neo4j-driver>=4.0.0a
-----
-
-Get the latest version, including betas:
-[source, shell, subs="attributes, specialcharacters"]
-----
-pip install neo4j-driver>=4.0.0b
-----
-
-Get the latest version, including release candidates:
-[source, shell, subs="attributes, specialcharacters"]
-----
-pip install neo4j-driver>=4.0.0rc
-----
+.Installation with Python
 ========
-
 The following is the syntax for installing a certain version of the Python Driver:
 [source, shell, subs="attributes, specialcharacters"]
 ----
-pip install neo4j-driver==$PYTHON_DRIVER_VERSION
+pip install neo4j==$PYTHON_DRIVER_VERSION
 ----
 
 In the following example we are installing Python Driver version {python-driver-version}.
 [source, shell, subs="attributes, specialcharacters"]
 ----
-pip install neo4j-driver=={python-driver-version}
+pip install neo4j=={python-driver-version}
+----
+========
+
+.Installation with Python, get Python Driver prereleases
+========
+In the following example we get the latest version, including alphas:
+[source, shell, subs="attributes, specialcharacters"]
+----
+pip install neo4j>=4.0.0a
 ----
 
+In the following example we get the latest  version, including betas:
+[source, shell, subs="attributes, specialcharacters"]
+----
+pip install neo4j>=4.0.0b
+----
+
+In the following example we get the latest version, including release candidates:
+[source, shell, subs="attributes, specialcharacters"]
+----
+pip install neo4j>=4.0.0rc
+----
 ========
 
 The release notes for the Python Driver are available https://github.com/neo4j/neo4j-python-driver/releases[here]
+
+*NOTE:* The pypi project name have changed from *neo4j-driver* to *neo4j*, the old project will coexist with the new.
 
 ======
 
@@ -434,7 +440,7 @@ For a comprehensive listing of all driver functionality, refer to the *API docum
 
 [.include-with-python]
 ======
-{api-docs-base-uri}/python-driver/{python-driver-apidoc-version}/
+{api-docs-base-uri}/python-driver/{python-driver-apidoc-version}-preview/
 ======
 
 ====
