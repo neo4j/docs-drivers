@@ -36,7 +36,7 @@ In languages where <<term-thread-safety, thread safety>> is an issue, the Driver
 --
 Applications will typically construct a Driver Object on startup and destroy it on exit.
 
-*_Destroying a Driver Object will immediately shut down any connections previously opened via that Driver Object_*, by closing the associated connection pool.
+Destroying a Driver Object will immediately shut down any connections previously opened via that Driver Object, by closing the associated connection pool.
 
 This will have the consequence of rolling back any open transactions, and closing any unconsumed results.
 --
@@ -44,7 +44,7 @@ This will have the consequence of rolling back any open transactions, and closin
 To construct a driver instance, a <<driver-connection-uris, connection URI>> and <<driver-authentication, authentication information>> must be supplied.
 
 Additional configuration details can be supplied if required.
-*_The configuration details are immutable for the lifetime of the Driver Object._*
+The configuration details are immutable for the lifetime of the Driver Object.
 Therefore, if multiple configurations are required (such as when working with multiple database users) then multiple Driver Objects must be used.
 
 
@@ -111,13 +111,13 @@ include::{python-examples}/test_driver_lifecycle_example.py[tags=driver-lifecycl
 [[driver-connection-uris]]
 == Connection URIs
 
-A connection URI *_identifies a graph database and how to connect to it_*.
+A connection URI identifies a graph database and how to connect to it.
 
 The *_encryption_* and *_trust_* settings provide detail to how that connection should be secured.
 
 [CAUTION]
 ====
-*There are significant changes to security settings between Neo4j 3.x and Neo4j 4.x !*
+*There are significant changes to security settings between Neo4j 3.x and Neo4j 4.x*
 
 Please consider the information in this section before upgrading from a previous version.
 
@@ -276,8 +276,7 @@ For details on how to configure *_multi-data center routing policies_* for a Cau
 [NOTE]
 .Exposing a single instance deployment on a remote host using the `neo4j` URI scheme
 ====
-If you are using a *_single instance_* of *Neo4j*, deployed on a remote machine whilst using the `neo4j` URI scheme,
-*_you will need to complete additional configuration of the server_*.
+If you are using a *_single instance_* of *Neo4j*, deployed on a remote machine whilst using the `neo4j` URI scheme, *_you will need to complete additional configuration of the server_*.
 
 To make the server aware of its deployment environment, you need to configure
 <<operations-manual#config_dbms.default_advertised_address,`default_advertised_address`>>
