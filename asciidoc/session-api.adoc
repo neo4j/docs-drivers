@@ -200,11 +200,11 @@ include::{java-examples}/AutocommitTransactionExample.java[tags=autocommit-trans
 ======
 [source, python]
 ----
-include::{python-examples}/test_autocommit_transaction_example[tags=autocommit-transaction]
+include::{python-examples}/test_autocommit_transaction_example.py[tags=autocommit-transaction]
 ----
 [source, python]
 ----
-include::{python-examples}/test_autocommit_transaction_example[tags=autocommit-transaction-import]
+include::{python-examples}/test_autocommit_transaction_example.py[tags=autocommit-transaction-import]
 ----
 ======
 
@@ -240,7 +240,7 @@ include::{java-examples}/ResultConsumeExample.java[tags=result-consume]
 ======
 [source, python]
 ----
-include::{python-examples}/test_result_consume_example[tags=result-consume]
+include::{python-examples}/test_result_consume_example.py[tags=result-consume]
 ----
 ======
 
@@ -292,7 +292,7 @@ include::{java-examples}/ResultRetainExample.java[tags=result-retain]
 ======
 [source, python]
 ----
-include::{python-examples}/test_result_retain_example[tags=result-retain]
+include::{python-examples}/test_result_retain_example.py[tags=result-retain]
 ----
 ======
 

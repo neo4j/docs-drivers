@@ -263,7 +263,7 @@ include::{javascript-examples}/examples.test.js[tags=read-write-transaction]
 ======
 [source, python]
 ----
-include::{python-examples}/read_write_transaction_example.py[tags=read-write-transaction]
+include::{python-examples}/test_read_write_transaction_example.py[tags=read-write-transaction]
 ----
 ======
 
