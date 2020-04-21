@@ -9,10 +9,10 @@ font:
       normal: OpenSans-Light.ttf
       italic: OpenSans-LightItalic.ttf
     Inconsolata:
-      normal: Inconsolata-Regular.ttf
-      bold: Inconsolata-Bold.ttf
-      italic: Inconsolata-Regular.ttf
-      bold_italic: Inconsolata-Bold.ttf
+      normal: static/Inconsolata-Regular.ttf
+      bold: static/Inconsolata-Bold.ttf
+      italic: static/Inconsolata-Regular.ttf
+      bold_italic: static/Inconsolata-Bold.ttf
     Lora:
       normal: Lora-Regular.ttf
       bold: Lora-Bold.ttf
