@@ -2,9 +2,9 @@
 [[driver-colophon]]
 = Colophon
 
-(C) 2015 Neo Technology
+(C) 2020 Neo Technology
 
-License: Creative Commons 3.0
+License: Creative Commons 4.0
 
 .You are free to
 
@@ -32,5 +32,5 @@ No warranties are given.
 The license may not give you all of the permissions necessary for your intended use.
 For example, other rights such as publicity, privacy, or moral rights may limit how you use the material.
 
-See http://creativecommons.org/licenses/by-sa/3.0/ for further details.
-The full license text is available at http://creativecommons.org/licenses/by-sa/3.0/legalcode.
+See http://creativecommons.org/licenses/by-sa/4.0/ for further details.
+The full license text is available at http://creativecommons.org/licenses/by-sa/4.0/legalcode.

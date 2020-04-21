@@ -21,7 +21,7 @@ ifndef::python-root[:python-root: {project-root}/build/driver-sources/python-dri
 :go-examples: {go-root}/neo4j/test-integration
 :java-examples: {java-root}/examples/src/main/java/org/neo4j/docs/driver
 :javascript-examples: {javascript-root}/test
-:python-examples: {python-root}/test/examples
+:python-examples: {python-root}/tests/integration/examples
 :api-docs-base-uri: https://neo4j.com/docs/api
 
 

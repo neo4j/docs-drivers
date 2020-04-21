@@ -30,7 +30,9 @@ The following languages and frameworks are officially supported by Neo4j:
 --
 The 4.0 release of the Python and Go drivers are a work in progress. There is currently no release date available.
 
-See the 1.7 Driver documentation: {docs-base-uri}/driver-manual/1.7 for these drivers.
+The 4.0 Python Driver is in alpha release stage with support for Python 3.5, 3.6, 3.7, 3.8, and this manual includes examples for using this alpha version.
+
+For more information on the 1.7 Driver documentation, including the 1.7 Go Driver, see {docs-base-uri}/driver-manual/1.7.
 --
 
 The driver API is intended to be topologically agnostic.
@@ -44,17 +46,17 @@ See also the <<http-api#http-api, HTTP API documentation>>.
 [[driver-get-started-installation]]
 == Driver versions and installation
 
-Starting with Neo4j 4.0, the versioning scheme for the database, driver and protocol have all been aligned.
+Starting with *Neo4j 4.0*, *_the versioning scheme for the database, driver and protocol have all been aligned_*.
 This simplifies general compatibility concerns.
 
 That said, cross-version compatibility is still available, and minimum support for current and previous versions between both server and driver is guaranteed.
-More specifically, this means that Neo4j 4.0 is guaranteed to be compatible with both 4.0 and 1.7 drivers, and the 4.0 drivers are guaranteed to be compatible with both Neo4j 4.0 and Neo4j 3.5.
-In cases where at least one peer is below version 4.0, communication will occur in fallback mode, limiting functionality to that available in the lowest-versioned component.
+More specifically, this means that *Neo4j 4.0* is guaranteed to be compatible with both *4.0 Drivers* and *1.7 Drivers*, and the *4.0 Drivers* are guaranteed to be compatible with both *Neo4j 4.0* and *Neo4j 3.5*.
+In cases where at least one peer is below version 4.0, communication will occur in *_fallback mode, limiting functionality to that available in the lowest-versioned component_*.
 
-Wherever possible, it is recommended to use the latest driver release available.
+Wherever possible, it is recommended to use the latest stable driver release available.
 This will provide the greatest degree of stability and will ensure that the full set of server functionality is available.
-The drivers, when used with Neo4j Enterprise Edition, come with full cluster routing support.
-The drivers make no explicit distinction between Enterprise Edition and Community Edition however, and simply operate with the functionality made available by Neo4j itself.
+The drivers, when used with *Neo4j Enterprise Edition*, come with full cluster routing support.
+The drivers make no explicit distinction between *Enterprise Edition* and *Community Edition* however, and simply operate with the functionality made available by *Neo4j* itself.
 
 To install a driver or to find out more about which driver versions are available, use the relevant language distribution system, described below.
 
@@ -277,41 +279,62 @@ The release notes for this driver are available https://github.com/neo4j/neo4j-j
 
 ======
 
-// [.include-with-python]
-// ======
-//
-// To find out the latest version of the driver, visit https://pypi.org/project/neo4j/.
-//
-// To install the latest version of the driver:
-//
-// [source, shell, subs="attributes, specialcharacters"]
-// ----
-// pip install neo4j-driver
-// ----
-//
-// It is also an option to install a certain version of the driver.
-//
-// ========
-//
-// The following is the syntax for installing a certain version of the driver.
-//
-// [source, shell, subs="attributes, specialcharacters"]
-// ----
-// pip install neo4j-driver==$PYTHON_DRIVER_VERSION
-// ----
-//
-// In the following example we are installing driver version {python-driver-version}.
-//
-// [source, shell, subs="attributes, specialcharacters"]
-// ----
-// pip install neo4j-driver=={python-driver-version}
-// ----
-//
-// ========
-//
-// The release notes for this driver are available https://github.com/neo4j/neo4j-python-driver/releases[here].
-//
-// ======
+[.include-with-python]
+======
+
+To find out the latest stable version of the Python Driver, visit https://pypi.org/project/neo4j/
+
+To find a list of all available releases, visit https://pypi.org/simple/neo4j/
+
+To install the latest stable version of the Python Driver:
+[source, shell, subs="attributes, specialcharacters"]
+----
+pip install neo4j
+----
+
+It is also an option to install a certain version of the driver.
+
+.Installation with Python
+========
+The following is the syntax for installing a certain version of the Python Driver:
+[source, shell, subs="attributes, specialcharacters"]
+----
+pip install neo4j==$PYTHON_DRIVER_VERSION
+----
+
+In the following example we are installing Python Driver version {python-driver-version}.
+[source, shell, subs="attributes, specialcharacters"]
+----
+pip install neo4j=={python-driver-version}
+----
+========
+
+.Installation with Python, get Python Driver prereleases
+========
+In the following example we get the latest version, including alphas:
+[source, shell, subs="attributes, specialcharacters"]
+----
+pip install neo4j>=4.0.0a
+----
+
+In the following example we get the latest  version, including betas:
+[source, shell, subs="attributes, specialcharacters"]
+----
+pip install neo4j>=4.0.0b
+----
+
+In the following example we get the latest version, including release candidates:
+[source, shell, subs="attributes, specialcharacters"]
+----
+pip install neo4j>=4.0.0rc
+----
+========
+
+The release notes for the Python Driver are available https://github.com/neo4j/neo4j-python-driver/releases[here]
+
+*NOTE:* The pypi project name have changed from *neo4j-driver* to *neo4j*, the old project will coexist with the new.
+
+======
 
 ====
 
@@ -319,7 +342,7 @@ The release notes for this driver are available https://github.com/neo4j/neo4j-j
 [[driver-get-started-hello-world-example]]
 == A "Hello World" example
 
-The example below shows the minimal configuration necessary to interact with Neo4j through a driver.
+The example below shows the minimal configuration necessary to interact with *Neo4j* through a driver.
 
 [.tabbed-example]
 .Hello World
@@ -371,20 +394,25 @@ include::{javascript-examples}/examples.test.js[tags=hello-world]
 // ----
 ======
 
-//[.include-with-python]
-//======
-//[source, python]
-//----
-//include::{python-examples}/hello_world_example.py[tags=hello-world]
-//----
-//======
+[.include-with-python]
+======
+[source, python]
+----
+include::{python-examples}/test_hello_world_example.py[tags=hello-world]
+----
+[source, python]
+----
+include::{python-examples}/test_hello_world_example.py[tags=hello-world-import]
+----
+======
+
 ====
 
 
 [[driver-api-docs]]
 == Driver API docs
 
-For a comprehensive listing of all driver functionality, refer to the API documentation for the specific language driver.
+For a comprehensive listing of all driver functionality, refer to the *API documentation* for the specific driver language.
 
 [.tabbed-example]
 .API docs
@@ -410,9 +438,9 @@ For a comprehensive listing of all driver functionality, refer to the API docume
 {api-docs-base-uri}/javascript-driver/{javascript-driver-apidoc-version}/
 ======
 
-// [.include-with-python]
-// ======
-// {api-docs-base-uri}/python-driver/{python-driver-apidoc-version}/
-// ======
+[.include-with-python]
+======
+{api-docs-base-uri}/python-driver/{python-driver-apidoc-version}-preview/
+======
 
 ====

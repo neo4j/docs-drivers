@@ -8,19 +8,22 @@ This section describes how to create units of work and provide a logical context
 
 == Overview
 
-The Neo4j drivers expose a Cypher channel over which database work can be carried out (see the <<cypher-manual#cypher-manual, Cypher Manual>> for more information on the Cypher query language).
-Work itself is organized into sessions, transactions and queries as follows:
+The Neo4j Drivers expose a Cypher Channel over which database work can be carried out (see the <<cypher-manual#cypher-manual, Cypher Manual>> for more information
+on the Cypher Query Language).
+
+Work itself is organized into *_sessions_*, *_transactions_* and *_queries_*, as follows:
 
 image::sessions-queries-transactions.png[title="Sessions, queries and transactions", role="middle"]
 
-Sessions are always bound to a single transaction context, which is typically an individual database.
+Sessions are always bound to *_a single transaction context_*, which is typically an individual database.
+
 Using the bookmark mechanism, sessions also provide a guarantee of correct transaction sequencing, even when transactions occur over multiple cluster members.
-This effect is known as <<term-causal-chaining, _causal chaining_>>.
+This effect is known as <<term-causal-chaining, *_causal chaining_*>>.
 
 [[driver-sessions]]
 == Sessions
 
-Sessions are lightweight containers for causally chained sequences of transactions (see <<operations-manual#causal-consistency-explained, Operations Manual -> Causal consistency>>).
+Sessions are *_lightweight containers for causally chained sequences of transactions_* (see <<operations-manual#causal-consistency-explained, Operations Manual -> Causal consistency>>).
 They essentially provide context for storing transaction sequencing information in the form of bookmarks.
 
 When a transaction begins, the session in which it is contained acquires a connection from the driver connection pool.
@@ -28,16 +31,17 @@ On commit (or rollback) of the transaction, the session releases that connection
 This means that it is only when a session is carrying out work that it occupies a connection resource.
 When idle, no such resource is in use.
 
-Due to the sequencing guaranteed by a session, sessions may only host one transaction at a time. For parallel execution, multiple sessions should be used.
-In languages where <<term-thread-safety, thread safety>> is an issue, sessions should not be considered thread-safe.
+Due to the sequencing guaranteed by a session, sessions may only host *_one transaction at a time_*. For parallel execution, multiple sessions should be used.
+In languages where <<term-thread-safety, thread safety>> is an issue, *_sessions should not be considered thread-safe_*.
 
 Closing a session forces any open transaction to be rolled back, and its associated connection to consequently be released back into the pool.
 
-Sessions are bound to a single transactional context, specified on construction. Neo4j exposes each database inside its own context, thereby prohibiting cross-database transactions (or sessions) by design.
-Similarly, sessions bound to different databases may not be causally chained by propagating bookmarks between them.
+Sessions are bound to a single transactional context, specified on construction. *Neo4j* exposes each database inside its own context, thereby prohibiting cross-database transactions (or sessions) by design.
+Similarly, *_sessions bound to different databases may not be causally chained by propagating bookmarks between them_*.
 
 Individual language drivers provide several session classes, each oriented around a particular programming style.
-Each class provides a similar set of functionality but offers client applications a choice based on how the application is structured and what frameworks are in use, if any.
+Each session class provides a similar set of functionality but offers client applications a choice based on how the application is structured and what frameworks are in use, if any.
+
 The session classes are described in <<driver-session-api>>.
 For more details, please see the <<driver-api-docs, API documentation>> for your language.
 
@@ -45,21 +49,22 @@ For more details, please see the <<driver-api-docs, API documentation>> for your
 [[driver-transactions]]
 == Transactions
 
-Transactions are atomic units of work containing one or more Cypher queries.
+Transactions are *_atomic units of work_* containing one or more *_Cypher Queries_*.
 Transactions may contain read or write work, and will generally be routed to an appropriate server for execution, where they will be carried out in their entirety.
 In case of a transaction failure, the transaction needs to be retried from the beginning.
-This is the responsibility of the <<term-transaction-manager, transaction manager>>.
+This is the responsibility of the <<term-transaction-manager, *_transaction manager_*>>.
 
-The Neo4j drivers provide transaction management via the <<term-transaction-function, transaction function>> mechanism.
+The Neo4j Drivers provide *_transaction management_* via the <<term-transaction-function, *_transaction function_*>> mechanism.
 This mechanism is exposed through methods on the Session object which accept a function object that can be played multiple times against different servers until it either succeeds or a timeout is reached.
 This approach is recommended for most client applications.
 
-A convenient short-form alternative is the <<term-auto-commit, auto-commit>> transaction mechanism.
+A convenient *_short-form alternative_* is the <<term-auto-commit, *_auto-commit_*>> transaction mechanism.
 This provides a limited form of transaction management for single-query transactions, as a trade-off for a slightly smaller code overhead.
-This form of transaction is useful for quick scripts and environments where high availability guarantees are not required.
-It is also the required form of transaction for running <<cypher-manual#query-using-periodic-commit-hint, `PERIODIC COMMIT`>> queries, which are the only type of Cypher query to manage their own transactions.
+This form of transaction is useful for *_quick scripts and environments where high availability guarantees are not required_*.
+It is also the required form of transaction for running <<cypher-manual#query-using-periodic-commit-hint, `PERIODIC COMMIT`>> queries,
+which are the only type of Cypher Query to manage their own transactions.
 
-A lower-level unmanaged transaction API is also available for advanced use cases.
+A lower-level *_unmanaged transaction API_* is also available for advanced use cases.
 This is useful when an alternative transaction management layer is applied by the client, in which error handling and retries need to be managed in a custom way.
 To learn more about how to use unmanaged transactions, see <<driver-api-docs, API documentation>> for the relevant language.
 
@@ -67,13 +72,14 @@ To learn more about how to use unmanaged transactions, see <<driver-api-docs, AP
 == Queries and results
 
 Queries consist of a request to the server to execute a Cypher statement, followed by a response back to the client with the result.
-Results are transmitted as a stream of records, along with header and footer metadata, and can be incrementally consumed by a client application.
+Results are transmitted as a *_stream of records_*, along with header and footer metadata, and can be incrementally consumed by a client application.
 With https://en.wikipedia.org/wiki/Reactive_programming[reactive capabilities], the semantics of the record stream can be enhanced by allowing a Cypher result to be paused or cancelled part-way through.
 
-To execute a Cypher query, the query text is required along with an optional set of named parameters.
-The text can contain parameter placeholders that are substituted with the corresponding values at runtime.
-While it is possible to run non-parameterized Cypher, good programming practice is to use parameters in Cypher queries whenever possible.
-This allows for the caching of queries within the Cypher engine, which is beneficial for performance. Parameter values should adhere to <<driver-cypher-values>>.
+To execute a Cypher Query, the *_query text_* is required along with an optional set of *_named parameters_*.
+The text can contain *_parameter placeholders_* that are substituted with the corresponding values at runtime.
+While it is possible to run non-parameterized Cypher Queries, *_good programming practice is to use parameters in Cypher Queries whenever possible_*.
+This allows for the caching of queries within the Cypher Engine, which is beneficial for performance.
+Parameter values should adhere to <<cypher-manual#cypher-values>>.
 
 A result summary is also generally available.
 This contains additional information relating to the query execution and the result content.
@@ -84,7 +90,7 @@ See <<cypher-manual#how-do-i-profile-a-query, Cypher Manual -> Profiling a query
 [[driver-causal-chaining]]
 == Causal chaining and bookmarks
 
-When working with a Causal Cluster, transactions can be chained, via a session, to ensure causal consistency.
+When working with a *_Causal Cluster_*, transactions can be chained, via a session, to ensure *_causal consistency_*.
 This means that for any two transactions, it is guaranteed that the second transaction will begin only after the first has been successfully committed.
 This is true even if the transactions are carried out on different physical cluster members.
 For more information on Causal Clusters, please refer to <<operations-manual#clustering, Operations Manual -> Clustering>>.
@@ -156,20 +162,25 @@ include::{javascript-examples}/examples.test.js[tags=pass-bookmarks]
 
 ======
 
-// [.include-with-python]
-// ======
-// [source, python]
-// ----
-// include::{python-examples}/test_pass_bookmarks_example.py[tags=pass-bookmarks]
-// ----
-// ======
+[.include-with-python]
+======
+[source, python]
+----
+include::{python-examples}/test_pass_bookmarks_example.py[tags=pass-bookmarks]
+----
+[source, python]
+----
+include::{python-examples}/test_pass_bookmarks_example.py[tags=pass-bookmarks-import]
+----
+======
+
 ====
 
 
 [[driver-access-modes-transaction]]
 == Routing transactions using access modes
 
-Transactions can be executed in either read or write mode; this is known as the <<term-access-mode, access mode>>.
+Transactions can be executed in either *_read_* or *_write_* mode; this is known as the <<term-access-mode, *_access mode_*>>.
 In a Causal Cluster, each transaction will be routed to an appropriate server based on the mode.
 When using a single instance, all transactions will be passed to that one server.
 
@@ -177,15 +188,15 @@ Routing Cypher by identifying reads and writes can improve the utilization of av
 Since read servers are typically more plentiful than write servers, it is beneficial to direct read traffic to read servers instead of the write server.
 Doing so helps in keeping write servers available for write transactions.
 
-Access mode is generally specified by the method used to call the transaction function.
+*_Access mode is generally specified by the method used to call the transaction function._*
 Session classes provide a method for calling reads and another for writes.
 
-As a fallback for auto-commit and unmanaged transactions, a default access mode can also be provided at session level.
+As a fallback for *_auto-commit_* and *_unmanaged transactions_*, a *_default access mode_* can also be provided *_at session level_*.
 This is only used in cases when the access mode cannot otherwise be specified.
-In case a transaction function is used within that session, the default access mode will be overridden.
+*_In case a transaction function is used within that session, the default access mode will be overridden_*.
 
 [NOTE]
-The driver does not parse Cypher and therefore cannot automatically determine whether a transaction is intended to carry out read or write operations.
+The driver does not parse *Cypher* and therefore cannot automatically determine whether a transaction is intended to carry out read or write operations.
 As a result, a write transaction tagged as a read will still be sent to a read server, but will fail on execution.
 
 [.tabbed-example]
@@ -204,6 +215,7 @@ include::{dotnet-examples}/Examples.cs[tags=read-write-transaction]
 // ----
 // include::{dotnet-examples}/Examples.cs[tags=read-write-transaction-import]
 // ----
+
 ======
 
 // [.include-with-go]
@@ -216,6 +228,7 @@ include::{dotnet-examples}/Examples.cs[tags=read-write-transaction]
 
 [.include-with-java]
 ======
+
 .Read write transaction
 [source, java]
 ----
@@ -231,6 +244,7 @@ include::{java-examples}/ReadWriteTransactionExample.java[tags=read-write-transa
 
 [.include-with-javascript]
 ======
+
 .Read write transaction
 [source, javascript]
 ----
@@ -245,28 +259,31 @@ include::{javascript-examples}/examples.test.js[tags=read-write-transaction]
 
 ======
 
-// [.include-with-python]
-// ======
-// [source, python]
-// ----
-// include::{python-examples}/read_write_transaction_example.py[tags=read-write-transaction]
-// ----
-// ======
+[.include-with-python]
+======
+[source, python]
+----
+include::{python-examples}/test_read_write_transaction_example.py[tags=read-write-transaction]
+----
+======
+
 ====
 
 [[driver-databases]]
 == Databases and execution context
 
-Neo4j offers the ability to work with multiple databases within the same DBMS.
-For a single instance, this is limited to one user database, plus the `system` database.
-From a driver API perspective, a database can be selected on session construction, and is used as an execution context for the transactions within that session.
+*Neo4j* offers the ability to work with *_multiple databases_* within the same DBMS.
+
+For a *_single instance_*, this is limited to *_one user database_*, plus the `system` database.
+
+From a driver API perspective, *_a database can be selected on session construction_*, and is used as an execution context for the transactions within that session.
 It is not currently possible to execute a transaction across multiple databases.
 
-In a multi-database environment, the server tags one database as default.
+In a multi-database environment, *_the server tags one database as default_*.
 This is selected whenever a session is created without naming a particular database as default.
 In an environment with a single database, that database is always the default.
 
-For more information about managing multiple databases within the same DBMS, refer to <<cypher-manual#neo4j-databases-graphs, Cypher Manual -> Neo4j databases and graphs>> which has a full breakdown of the Neo4j data storage hierarchy.
+For more information about managing multiple databases within the same DBMS, refer to <<cypher-manual#neo4j-databases-graphs, Cypher Manual -> Neo4j databases and graphs>> which has a full breakdown of the *Neo4j* data storage hierarchy.
 
 === The `system` database
 
@@ -286,7 +303,7 @@ If you don't specify a name, the default database is used.
 The database name must not be `null`, nor an empty string.
 
 [NOTE]
-The selection of database is only possible when the driver is connected against Neo4j Enterprise Edition.
+*_The selection of database is only possible when the driver is connected against Neo4j Enterprise Edition_*.
 Changing to any other database than the default database in Neo4j Community Edition will lead to a runtime error.
 
 Please note that the database that is requested must exist.
@@ -320,10 +337,23 @@ include::{java-examples}/DatabaseSelectionExample.java[tags=database-selection-i
 
 [.include-with-javascript]
 ======
-.Read write transaction
+.Database selection on session creation
 [source, javascript]
 ----
 include::{javascript-examples}/examples.test.js[tags=database-selection]
+----
+======
+
+[.include-with-python]
+======
+[source, python]
+.Database selection on session creation
+----
+include::{python-examples}/test_database_selection_example.py[tags=database-selection]
+----
+[source, python]
+----
+include::{python-examples}/test_database_selection_example.py[tags=database-selection-import]
 ----
 ======
 
@@ -334,11 +364,13 @@ include::{javascript-examples}/examples.test.js[tags=database-selection]
 
 
 
-Drivers translate between application language types and the Cypher type system.
-To pass parameters and process results, it is important to know the basics of how Cypher works with types and to understand how the Cypher types are mapped in the driver.
+Drivers translate between *_application language types_* and the *_Cypher Types_*.
+
+To pass parameters and process results, it is important to know the basics of how Cypher works with types and to understand
+how the Cypher Types are mapped in the driver.
 
 The table below shows the available data types.
-All can be potentially found in results although not all can be used as parameters.
+All types can be potentially found in the result, although not all types can be used as parameters.
 
 ====
 [options="header", cols=",,"]
@@ -373,7 +405,7 @@ For information on how to work with null in Cypher, please refer to <<cypher-man
    Equivalent functionality is available by simply passing either the ID for pass-by-reference, or an extracted map of properties for pass-by-value.
 ====
 
-The Neo4j drivers map Cypher types to and from native language types as depicted in the table below.
+The Neo4j Drivers map Cypher Types to and from native language types as depicted in the table below.
 Custom types (those not available in the language or standard library) are highlighted in *bold*.
 
 [.tabbed-example]
@@ -383,7 +415,7 @@ Custom types (those not available in the language or standard library) are highl
 ======
 [options="header", cols=","]
 |===
-| Neo4j type        | .NET type
+| Neo4j Cypher Type        | .NET Type
 | `null` | `null`
 | `List` | `IList<object>`
 | `Map` | `IDictionary<string, object>`
@@ -440,7 +472,7 @@ Inbound conversion is carried out using http://cldr.unicode.org/development/deve
 ======
 [options="header", cols="m,"]
 |===
-| Neo4j type        | Java type
+| Neo4j Cypher Type        | Java Type
 | null | `null`
 | List | `List<Object>`
 | Map | `Map<String, Object>`
@@ -468,7 +500,7 @@ Inbound conversion is carried out using http://cldr.unicode.org/development/deve
 ======
 [options="header", cols="m,"]
 |===
-| Neo4j type        | JavaScript type
+| Neo4j Cypher Type        | JavaScript Type
 | null | `null`
 | List | `Array`
 | Map | `Object`
@@ -489,52 +521,48 @@ Inbound conversion is carried out using http://cldr.unicode.org/development/deve
 | Path | *`Path`*
 |===
 
-+*+ JavaScript has no native integer type so a custom type is provided. For convenience, this can be disabled through configuration so that the native Number type is used instead. Note that this can lead to a loss of precision.
++*+ JavaScript has *_no native integer type_* so a custom type is provided. For convenience, this can be disabled through configuration so that the *_native Number type_* is used instead. Note that this can lead to a loss of precision.
 ======
 
-// [.include-with-python]
-// ======
-// [options="header", cols="m,,"]
-// |===
-// | Neo4j type        | [deprecated]#Python 2 type# | Python 3 type
-// | null | `None` | `None`
-// | List | `list` | `list`
-// | Map | `dict` | `dict`
-// | Boolean | `bool` | `bool`
-// | Integer | `int / long`* | `int`
-// | Float | `float` | `float`
-// | String | `unicode`** | `str`
-// | ByteArray | `bytearray` | `bytearray`
-// | Date | *`neotime.Date`* | *`neotime.Date`*
-// | Time | *`neotime.Time`*† | *`neotime.Time`*†
-// | LocalTime | *`neotime.Time`*†† | *`neotime.Time`*††
-// | DateTime | *`neotime.DateTime`*† | *`neotime.DateTime`*†
-// | LocalDateTime | *`neotime.DateTime`*†† | *`neotime.DateTime`*††
-// | Duration | *`neotime.Duration`**** | *`neotime.Duration`****
-// | Point | *`Point`* | *`Point`*
-// | Node | *`Node`* | *`Node`*
-// | Relationship | *`Relationship`* | *`Relationship`*
-// | Path | *`Path`* | *`Path`*
-// |===
-//
-// +*+ While Cypher uses 64-bit signed integers, `int` can only hold integers up to `sys.maxint` in Python 2; `long` is used for values above this.
-//
-// +**+ In Python 2, a `str` passed as a parameter will always be implicitly converted to `unicode` via UTF-8.
-//
-// +***+ A `timedelta` passed as a parameter will always be implicitly converted to `neotime.Duration`.
-//
-// † Where tzinfo is not None.
-//
-// †† Where tzinfo is None.
-// ======
+[.include-with-python]
+======
+[options="header", cols="m,"]
+|===
+| Neo4j Type | Python 3 Type
+| null | `None`
+| List | `list`
+| Map | `dict`
+| Boolean | `bool`
+| Integer | `int`
+| Float | `float`
+| String | `str`
+| ByteArray | `bytearray`
+| Date | *`neo4j.time.Date`*
+| Time | *`neo4j.time.Time`†*
+| LocalTime | *`neo4j.time.Time`††*
+| DateTime | *`neo4j.time.DateTime`†*
+| LocalDateTime | *`neo4j.time.DateTime`††*
+| Duration | *`neo4j.time.Duration`**
+| Point | *`neo4j.spatial.Point`*
+| Node | *`neo4j.graph.Node`*
+| Relationship | *`neo4j.graph.Relationship`*
+| Path | *`neo4j.graph.Path`*
+|===
+
++*+ A `datetime.timedelta` object passed as a parameter will always be implicitly converted to `neo4j.time.Duration`
+
+† Where `tzinfo` *_is not_* `None`
+
+†† Where `tzinfo` *_is_* `None`
+======
 ====
 
 
 [[driver-exceptions-errors]]
 == Exceptions and error handling
 
-When executing Cypher or carrying out other operations with the driver, certain exceptions and error cases may arise.
-Server-generated exceptions are each associated with a <<status-codes#status-codes, status code>> that describes the nature of the problem and a message that provides more detail.
+When executing *Cypher* or carrying out other operations with the driver, certain exceptions and error cases may arise.
+*_Server-generated exceptions_* are each associated with a <<status-codes#status-codes, *_status code_*>> that describes the nature of the problem and a message that provides more detail.
 
 The classifications are listed in the table below.
 
@@ -554,7 +582,8 @@ The application should retry the operation.
 
 === Service unavailable
 
-A _Service Unavailable_ exception will be signalled when the driver is no longer able to establish communication with the server, even after retries.
+A *_Service Unavailable_* exception will be signalled when the driver is no longer able to establish communication with the server, even after retries.
+
 Encountering this condition usually indicates a fundamental networking or database problem.
 
 While certain mitigations can be made by the driver to avoid this issue, there will always be cases when this is impossible.
