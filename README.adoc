@@ -26,5 +26,5 @@ Fill in the necessary values.
 
 Source the common _devenv_: `source devenv`.
 
-Build stuff by running `./gralew <task>`, for example `./gradlew build`.
+Build stuff by running `./gradlew <task>`, for example `./gradlew build`.
 Run `./gradlew tasks --all` to see all available tasks.
