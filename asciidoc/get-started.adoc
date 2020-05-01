@@ -48,7 +48,7 @@ The 1.x series drivers have been built for Neo4j 3.x.
 [NOTE]
 Drivers 1.7 do not support multiple databases and Neo4j Fabric, features introduced in Neo4j 4.0.
 To be able to run multiple databases online concurrently and to do distributed queries over them, you must upgrade to Drivers 4.0.
-For information, see https://neo4j.com/docs/migration-guide/4.0/upgrade-driver/[Migrate to 4.0, Chapter 6. Upgrade Neo4j drivers^].
+For information, see https://neo4j.com/docs/migration-guide/4.0/upgrade-driver/[Migrate to 4.0 -> Chapter 6. Upgrade Neo4j drivers^].
 
 It is recommended to always use the latest driver release available.
 This will ensure that all server functionality is made available to client applications.
