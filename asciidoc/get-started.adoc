@@ -32,7 +32,7 @@ The following languages and frameworks are officially supported by Neo4j:
 
 The driver API is intended to be topologically agnostic.
 This means that the underlying database topology — single instance, Causal Cluster, etc. — can be altered without requiring a corresponding alteration to application code.
-In the general case, only the <<driver-connection-uris, connection URI>> needs to be modified when changes are made to the topology. 
+In the general case, only the <<driver-connection-uris, connection URI>> needs to be modified when changes are made to the topology.
 
 NOTE: The official drivers do not support HTTP communication.
 If you need an HTTP driver, choose one of the community drivers.
@@ -44,6 +44,11 @@ See also the <<http-api#http-api, HTTP API documentation>>.
 The driver _major.minor_ version number describes the feature set available within that driver.
 Across languages, drivers are generally released at similar times, although patches are driver-dependent.
 The 1.x series drivers have been built for Neo4j 3.x.
+
+[NOTE]
+Drivers 1.7 do not support multiple databases and Neo4j Fabric, features introduced in Neo4j 4.0.
+To be able to run multiple databases online concurrently and to do distributed queries over them, you must upgrade to Drivers 4.0.
+For information, see <<migration-guide#upgrade-driver, 4.0 Migration Guide -> Chapter 6. Upgrade Neo4j drivers>>.
 
 It is recommended to always use the latest driver release available.
 This will ensure that all server functionality is made available to client applications.
@@ -119,7 +124,7 @@ dep ensure github.com/neo4j/neo4j-go-driver
 ----
 
 You can also choose to install a certain version of the driver.
-Below is the syntax for using a certain minor version of the driver. 
+Below is the syntax for using a certain minor version of the driver.
 Visit https://golang.github.io/dep/docs/Gopkg.toml.html#version-rules for a detailed description of version rules that can be used.
 
 [source, shell, subs="attributes, specialcharacters"]
@@ -355,4 +360,3 @@ https://godoc.org/github.com/neo4j/neo4j-go-driver/neo4j
 {api-docs-base-uri}/python-driver/{python-driver-apidoc-version}/
 ======
 ====
-
