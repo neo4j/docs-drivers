@@ -51,7 +51,7 @@ To be able to run multiple databases online concurrently and to do distributed q
 For information, see <<migration-guide#upgrade-driver, 4.0 Migration Guide -> Chapter 6. Upgrade Neo4j drivers>>.
 
 [NOTE]
-The Go 1.8 driver do support multiple databases.
+The Go 1.8 driver does support multiple databases.
 
 It is recommended to always use the latest driver release available.
 This will ensure that all server functionality is made available to client applications.
@@ -101,7 +101,8 @@ You can review the release notes for this driver https://github.com/neo4j/neo4j-
 
 To find out the latest version of the driver, visit https://github.com/neo4j/neo4j-go-driver/releases.
 
-Instructions below is for installing the 1.8 driver. Please see installation instructions at https://github.com/neo4j/neo4j-go-driver/tree/1.7/ if 1.7 version is needed.
+The instructions below are for installing the 1.8 driver.
+Please see installation instructions at https://github.com/neo4j/neo4j-go-driver/tree/1.7/ if 1.7 version is needed.
 
 ========
 
