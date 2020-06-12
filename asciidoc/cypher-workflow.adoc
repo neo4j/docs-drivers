@@ -274,23 +274,47 @@ include::{python-examples}/test_read_write_transaction_example.py[tags=read-writ
 
 *Neo4j* offers the ability to work with *_multiple databases_* within the same DBMS.
 
-For a *_single instance_*, this is limited to *_one user database_*, plus the `system` database.
+For *Neo4j Community Edition* this is limited to *_one user database_*, plus the `system` database.
 
-From a driver API perspective, *_a database can be selected on session construction_*, and is used as an execution context for the transactions within that session.
+The execution context and session scope depend on the version of *Neo4j* that the driver connects to.
+
+- For *Neo4j 4.1*, from a driver API perspective, *_sessions have a DBMS scope_*, and the default database for a session can be selected on session construction. The default database is used as a target for queries that don't explicitly specify a database with a `USE` clause. See <<cypher-manual#query-use, Cypher Manual -> USE>> for details about the `USE` clause.
+- For *Neo4j 4.0*, *_a database can be selected on session construction_*, and is used as an execution context for the transactions within that session. 
+
 It is not currently possible to execute a transaction across multiple databases.
 
 In a multi-database environment, *_the server tags one database as default_*.
 This is selected whenever a session is created without naming a particular database as default.
 In an environment with a single database, that database is always the default.
 
-For more information about managing multiple databases within the same DBMS, refer to <<cypher-manual#neo4j-databases-graphs, Cypher Manual -> Neo4j databases and graphs>> which has a full breakdown of the *Neo4j* data storage hierarchy.
+For more information about managing multiple databases within the same DBMS, see <<cypher-manual#neo4j-databases-graphs, Cypher Manual -> Neo4j databases and graphs>>, which contains a full breakdown of the *Neo4j* data storage hierarchy.
 
-=== The `system` database
+The following example illustrates how to work with databases:
 
-Some administrative operations must be carried out against the `system` database.
+[source]
+----
+var session = driver.session(SessionConfig.forDatabase( "foo" ))
+
+// lists nodes from database foo
+session.run("MATCH (n) RETURN n").list()
+
+// lists nodes from database bar 
+session.run("USE bar MATCH (n) RETURN n").list()
+
+// creates an index in foo
+session.run("CREATE INDEX foo_idx FOR (n:Person) ON n.id").consume()
+
+// creates an index in bar
+session.run("USE bar CREATE INDEX bar_idx FOR (n:Person) ON n.id").consume()
+
+// targets System database
+session.run("SHOW USERS")
+----
+
+[NOTE]
+If you are connecting to *Neo4j 4.0*, some administrative operations must be carried out against the `system` database.
 To do this, construct a session targeting the database called `system` and execute Cypher as usual.
-Please see <<cypher-manual#administration-databases-introduction, Cypher Manual -> Databases>> for more information.
-
+For more information, see <<cypher-manual#administration-databases-introduction, Cypher Manual -> Databases>>.
 
 [role=enterprise-edition]
 [[database-selection]]
@@ -308,6 +332,33 @@ Changing to any other database than the default database in Neo4j Community Edit
 
 Please note that the database that is requested must exist.
 
+The following example illustrates the concept of DBMS transactions, and shows how queries to multiple databases can be issued in one driver transaction. It is annotated with comments describing how each operation impacts database transactions.
+
+[source]
+----
+var session = driver.session(SessionConfig.forDatabase( "foo" ))
+
+// a DBMS-level transaction is started
+var transaction = session.begin()
+
+// a transaction on database "foo" is started automatically with the first query targeting foo
+transaction.run("MATCH (n) RETURN n").list()
+
+// a transaction on database "bar" is started
+transaction.run("USE bar MATCH (n) RETURN n").list()
+
+// executes in the transaction on database "foo"
+transaction.run("RETURN 1").consume()
+
+// executes in the transaction on database "bar"
+transaction.run("USE bar RETURN 1").consume()
+
+// commits the DBMS-level transaction which commits the transactions on databases "foo" and 
+// "bar"
+transaction.commit()
+----
+
+For more information about transactions, see <<cypher-manual#transactions, Cypher Manual -> Transactions>>.
 [.tabbed-example]
 .Database selection on session creation
 ====
