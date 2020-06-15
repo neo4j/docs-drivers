@@ -24,7 +24,7 @@ The following languages and frameworks are officially supported by Neo4j:
 | .NET               | https://github.com/dotnet/standard/blob/master/docs/versions/netstandard2.0.md[.NET Standard 2.0]
 | Java               | Java 8+ (latest patch releases).
 | JavaScript         | All LTS versions of Node.JS, specifically the 4.x and 6.x series runtimes (https://github.com/nodejs/LTS).
-| Python             | CPython 3.5 and above.
+| Python             | CPython 3.5 and above. Note that Python 2 support has been deprecated and was discontinued in the 4.x series drivers.
 |===
 
 [NOTE]
