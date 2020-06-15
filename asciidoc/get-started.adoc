@@ -24,15 +24,14 @@ The following languages and frameworks are officially supported by Neo4j:
 | .NET               | https://github.com/dotnet/standard/blob/master/docs/versions/netstandard2.0.md[.NET Standard 2.0]
 | Java               | Java 8+ (latest patch releases).
 | JavaScript         | All LTS versions of Node.JS, specifically the 4.x and 6.x series runtimes (https://github.com/nodejs/LTS).
+| Python             | CPython 3.5 and above.
 |===
 
 [NOTE]
 --
-The 4.0 release of the Python and Go drivers are a work in progress. There is currently no release date available.
+The 4.0 release of the Go driver is a work in progress. There is currently no release date available.
 
-The 4.0 Python Driver is in alpha release stage with support for Python 3.5, 3.6, 3.7, 3.8, and this manual includes examples for using this alpha version.
-
-For more information on the 1.7 Driver documentation, including the 1.7 Go Driver, see {docs-base-uri}/driver-manual/1.7.
+For more information on the 1.7 Driver documentation, including the 1.7 and 1.8 Go Driver, see {docs-base-uri}/driver-manual/1.7.
 --
 
 The driver API is intended to be topologically agnostic.
@@ -445,7 +444,7 @@ For a comprehensive listing of all driver functionality, refer to the *API docum
 
 [.include-with-python]
 ======
-{api-docs-base-uri}/python-driver/{python-driver-apidoc-version}-preview/
+{api-docs-base-uri}/python-driver/{python-driver-apidoc-version}/
 ======
 
 ====
