@@ -274,7 +274,7 @@ include::{python-examples}/test_read_write_transaction_example.py[tags=read-writ
 
 *Neo4j* offers the ability to work with *_multiple databases_* within the same DBMS.
 
-For a *_single instance_*, this is limited to *_one user database_*, plus the `system` database.
+For *_Community Edition_*, this is limited to *_one user database_*, plus the `system` database.
 
 From a driver API perspective, *_a database can be selected on session construction_*, and is used as an execution context for the transactions within that session.
 It is not currently possible to execute a transaction across multiple databases.
