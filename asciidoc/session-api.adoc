@@ -42,7 +42,6 @@ Available in:
 
 - *.NET Driver*
 - *Java Driver*
-- *Python Driver*
 ====
 
 Simple sessions provide a "classic" *_blocking style_* API for Cypher execution.
@@ -78,14 +77,14 @@ try (Session session = driver.session(...)) {
 ----
 ======
 
-[.include-with-python]
-======
-[source, python]
-----
-with driver.session(...) as session:
-    // transactions go here
-----
-======
+// [.include-with-python]
+// ======
+// [source, python]
+// ----
+// with driver.session(...) as session:
+//     // transactions go here
+// ----
+// ======
 
 ====
 
@@ -115,7 +114,8 @@ To that end, transaction functions can return values but these should be derived
 ====
 *_Transaction functions are the recommended form for containing transactional units of work_*.
 
-*_When a transaction fails, the driver retry logic is invoked_*. For several failure cases, the transaction can be immediately retried against a different server.
+*_When a transaction fails, the driver retry logic is invoked_*.
+For several failure cases, the transaction can be immediately retried against a different server.
 These cases include connection issues, server role changes (e.g. leadership elections) and transient errors.
 Retry logic can be configured when creating a session.
 ====
@@ -139,17 +139,17 @@ include::{java-examples}/TransactionFunctionExample.java[tags=transaction-functi
 ----
 ======
 
-[.include-with-python]
-======
-[source, python]
-----
-include::{python-examples}/test_transaction_function_example.py[tags=transaction-function]
-----
-[source, python]
-----
-include::{python-examples}/test_transaction_function_example.py[tags=transaction-function-import]
-----
-======
+// [.include-with-python]
+// ======
+// [source, python]
+// ----
+// include::{python-examples}/test_transaction_function_example.py[tags=transaction-function]
+// ----
+// [source, python]
+// ----
+// include::{python-examples}/test_transaction_function_example.py[tags=transaction-function-import]
+// ----
+// ======
 
 ====
 
@@ -196,17 +196,17 @@ include::{java-examples}/AutocommitTransactionExample.java[tags=autocommit-trans
 ----
 ======
 
-[.include-with-python]
-======
-[source, python]
-----
-include::{python-examples}/test_autocommit_transaction_example.py[tags=autocommit-transaction]
-----
-[source, python]
-----
-include::{python-examples}/test_autocommit_transaction_example.py[tags=autocommit-transaction-import]
-----
-======
+// [.include-with-python]
+// ======
+// [source, python]
+// ----
+// include::{python-examples}/test_autocommit_transaction_example.py[tags=autocommit-transaction]
+// ----
+// [source, python]
+// ----
+// include::{python-examples}/test_autocommit_transaction_example.py[tags=autocommit-transaction-import]
+// ----
+// ======
 
 ====
 
@@ -236,13 +236,13 @@ include::{java-examples}/ResultConsumeExample.java[tags=result-consume]
 ----
 ======
 
-[.include-with-python]
-======
-[source, python]
-----
-include::{python-examples}/test_result_consume_example.py[tags=result-consume]
-----
-======
+// [.include-with-python]
+// ======
+// [source, python]
+// ----
+// include::{python-examples}/test_result_consume_example.py[tags=result-consume]
+// ----
+// ======
 
 ====
 
@@ -288,13 +288,13 @@ include::{java-examples}/ResultRetainExample.java[tags=result-retain]
 ----
 ======
 
-[.include-with-python]
-======
-[source, python]
-----
-include::{python-examples}/test_result_retain_example.py[tags=result-retain]
-----
-======
+// [.include-with-python]
+// ======
+// [source, python]
+// ----
+// include::{python-examples}/test_result_retain_example.py[tags=result-retain]
+// ----
+// ======
 
 ====
 
@@ -547,7 +547,8 @@ Any query results obtained within a transaction function should be consumed with
 To that end, transaction functions can return values but these should be derived values rather than raw results.
 
 [NOTE]
-When a transaction fails, the driver retry logic is invoked. For several failure cases, the transaction can be immediately retried against a different server.
+When a transaction fails, the driver retry logic is invoked.
+For several failure cases, the transaction can be immediately retried against a different server.
 These cases include connection issues, server role changes (e.g. leadership elections) and transient errors.
 Retry logic can be configured when creating a session.
 
