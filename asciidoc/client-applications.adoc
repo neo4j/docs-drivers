@@ -94,17 +94,17 @@ include::{javascript-examples}/examples.test.js[tags=driver-lifecycle]
 // ----
 ======
 
-// [.include-with-python]
-// ======
-// [source, python]
-// ----
-// include::{python-examples}/test_driver_lifecycle_example.py[tags=driver-lifecycle]
-// ----
-// [source, python]
-// ----
-// include::{python-examples}/test_driver_lifecycle_example.py[tags=driver-lifecycle-import]
-// ----
-// ======
+[.include-with-python]
+======
+[source, python]
+----
+include::{python-examples}/test_driver_lifecycle_example.py[tags=driver-lifecycle]
+----
+[source, python]
+----
+include::{python-examples}/test_driver_lifecycle_example.py[tags=driver-lifecycle-import]
+----
+======
 ====
 
 
@@ -222,17 +222,17 @@ include::{javascript-examples}/examples.test.js[tags=config-custom-resolver]
 ----
 ======
 
-// [.include-with-python]
-// ======
-// [source, python]
-// ----
-// include::{python-examples}/test_custom_resolver_example.py[tags=custom-resolver]
-// ----
-// [source, python]
-// ----
-// include::{python-examples}/test_custom_resolver_example.py[tags=custom-resolver-import]
-// ----
-// ======
+[.include-with-python]
+======
+[source, python]
+----
+include::{python-examples}/test_custom_resolver_example.py[tags=custom-resolver]
+----
+[source, python]
+----
+include::{python-examples}/test_custom_resolver_example.py[tags=custom-resolver-import]
+----
+======
 
 ====
 
@@ -753,121 +753,121 @@ To connect to a service without routing, you can replace `neo4j` with `bolt`.
 
 ======
 
-// [.include-with-python]
-// ======
-// The table below illustrates examples of how to connect to a service with routing:
-//
-// [options="header", cols="a,a,a,a"]
-// |===
-// |Product
-// |Security
-// |Code snippet
-// |Comments
-//
-// |Neo4j Aura
-// |Secured with full certificate
-// |
-// [source, python]
-// ----
-// GraphDatabase.driver("neo4j+s://graph.example.com:7687", auth)
-// ----
-//
-// For Python Driver versions before 4.0.0 you need this snippet instead:
-// [source, python]
-// ----
-// GraphDatabase.driver("neo4j://graph.example.com:7687", auth,
-//     "encrypted"=True, "trust"=TRUST_SYSTEM_CA_SIGNED_CERTIFICATES)
-// ----
-// | This is the default (and only option) for Neo4j Aura
-//
-// |Neo4j 4.x
-// |Unsecured
-// |
-// [source, python]
-// ----
-// GraphDatabase.driver("neo4j://graph.example.com:7687", auth)
-// ----
-// |This is the default for Neo4j 4.x series
-//
-// |Neo4j 4.x
-// |Secured with full certificate
-// |
-// [source, python]
-// ----
-// GraphDatabase.driver("neo4j+s://graph.example.com:7687", auth)
-// ----
-//
-// For Python Driver versions before 4.0.0 you need this snippet instead:
-// [source, python]
-// ----
-// GraphDatabase.driver("neo4j://graph.example.com:7687", auth,
-//     "encrypted"=True, "trust"=TRUST_SYSTEM_CA_SIGNED_CERTIFICATES)
-// ----
-// |
-//
-// |Neo4j 4.x
-// |Secured with self-signed certificate
-// |
-// [source, python]
-// ----
-// neo4j.driver("neo4j+ssc://graph.example.com:7687", auth)
-// ----
-//
-// For Python Driver versions before 4.0.0 you need this snippet instead:
-// [source, python]
-// ----
-// GraphDatabase.driver("neo4j://graph.example.com:7687", auth,
-//     "encrypted"=True, "trust"=TRUST_ALL_CERTIFICATES)
-// ----
-// |
-//
-// |Neo4j 3.x
-// |Secured with full certificate
-// |
-// [source, python]
-// ----
-// neo4j.driver("neo4j+s://graph.example.com:7687", auth)
-// ----
-//
-// For Python Driver versions before 4.0.0 you need this snippet instead:
-// [source, python]
-// ----
-// GraphDatabase.driver("neo4j://graph.example.com:7687", auth,
-//     "encrypted"=True, "trust"=TRUST_SYSTEM_CA_SIGNED_CERTIFICATES)
-// ----
-// |
-//
-// |Neo4j 3.x
-// |Secured with self-signed certificate
-// |
-// [source, python]
-// ----
-// neo4j.driver("neo4j+ssc://graph.example.com:7687", auth)
-// ----
-//
-// For Python Driver versions before 4.0.0 you need this snippet instead:
-// [source, python]
-// ----
-// GraphDatabase.driver("neo4j://graph.example.com:7687", auth,
-//     "encrypted"=True, "trust"=TRUST_ALL_CERTIFICATES)
-// ----
-// |This is the default for Neo4j 3.x series
-//
-// |Neo4j 3.x
-// |Unsecured
-// |
-// [source, python]
-// ----
-// neo4j.driver("neo4j://graph.example.com:7687", auth)
-// ----
-// |
-//
-// |===
-//
-// [NOTE]
-// To connect to a service without routing, you can replace `neo4j` with `bolt`.
-//
-// ======
+[.include-with-python]
+======
+The table below illustrates examples of how to connect to a service with routing:
+
+[options="header", cols="a,a,a,a"]
+|===
+|Product
+|Security
+|Code snippet
+|Comments
+
+|Neo4j Aura
+|Secured with full certificate
+|
+[source, python]
+----
+GraphDatabase.driver("neo4j+s://graph.example.com:7687", auth)
+----
+
+For Python Driver versions before 4.0.0 you need this snippet instead:
+[source, python]
+----
+GraphDatabase.driver("neo4j://graph.example.com:7687", auth,
+    "encrypted"=True, "trust"=TRUST_SYSTEM_CA_SIGNED_CERTIFICATES)
+----
+| This is the default (and only option) for Neo4j Aura
+
+|Neo4j 4.x
+|Unsecured
+|
+[source, python]
+----
+GraphDatabase.driver("neo4j://graph.example.com:7687", auth)
+----
+|This is the default for Neo4j 4.x series
+
+|Neo4j 4.x
+|Secured with full certificate
+|
+[source, python]
+----
+GraphDatabase.driver("neo4j+s://graph.example.com:7687", auth)
+----
+
+For Python Driver versions before 4.0.0 you need this snippet instead:
+[source, python]
+----
+GraphDatabase.driver("neo4j://graph.example.com:7687", auth,
+    "encrypted"=True, "trust"=TRUST_SYSTEM_CA_SIGNED_CERTIFICATES)
+----
+|
+
+|Neo4j 4.x
+|Secured with self-signed certificate
+|
+[source, python]
+----
+neo4j.driver("neo4j+ssc://graph.example.com:7687", auth)
+----
+
+For Python Driver versions before 4.0.0 you need this snippet instead:
+[source, python]
+----
+GraphDatabase.driver("neo4j://graph.example.com:7687", auth,
+    "encrypted"=True, "trust"=TRUST_ALL_CERTIFICATES)
+----
+|
+
+|Neo4j 3.x
+|Secured with full certificate
+|
+[source, python]
+----
+neo4j.driver("neo4j+s://graph.example.com:7687", auth)
+----
+
+For Python Driver versions before 4.0.0 you need this snippet instead:
+[source, python]
+----
+GraphDatabase.driver("neo4j://graph.example.com:7687", auth,
+    "encrypted"=True, "trust"=TRUST_SYSTEM_CA_SIGNED_CERTIFICATES)
+----
+|
+
+|Neo4j 3.x
+|Secured with self-signed certificate
+|
+[source, python]
+----
+neo4j.driver("neo4j+ssc://graph.example.com:7687", auth)
+----
+
+For Python Driver versions before 4.0.0 you need this snippet instead:
+[source, python]
+----
+GraphDatabase.driver("neo4j://graph.example.com:7687", auth,
+    "encrypted"=True, "trust"=TRUST_ALL_CERTIFICATES)
+----
+|This is the default for Neo4j 3.x series
+
+|Neo4j 3.x
+|Unsecured
+|
+[source, python]
+----
+neo4j.driver("neo4j://graph.example.com:7687", auth)
+----
+|
+
+|===
+
+[NOTE]
+To connect to a service without routing, you can replace `neo4j` with `bolt`.
+
+======
 
 ====
 
@@ -930,17 +930,17 @@ include::{javascript-examples}/examples.test.js[tags=basic-auth]
 // ----
 ======
 
-// [.include-with-python]
-// ======
-// [source, python]
-// ----
-// include::{python-examples}/test_basic_auth_example.py[tags=basic-auth]
-// ----
-// [source, python]
-// ----
-// include::{python-examples}/test_basic_auth_example.py[tags=basic-auth-import]
-// ----
-// ======
+[.include-with-python]
+======
+[source, python]
+----
+include::{python-examples}/test_basic_auth_example.py[tags=basic-auth]
+----
+[source, python]
+----
+include::{python-examples}/test_basic_auth_example.py[tags=basic-auth-import]
+----
+======
 
 ====
 
@@ -1001,17 +1001,17 @@ include::{javascript-examples}/examples.test.js[tags=kerberos-auth]
 // ----
 ======
 
-// [.include-with-python]
-// ======
-// [source, python]
-// ----
-// include::{python-examples}/test_kerberos_auth_example.py[tags=kerberos-auth]
-// ----
-// [source, python]
-// ----
-// include::{python-examples}/test_kerberos_auth_example.py[tags=kerberos-auth-import]
-// ----
-// ======
+[.include-with-python]
+======
+[source, python]
+----
+include::{python-examples}/test_kerberos_auth_example.py[tags=kerberos-auth]
+----
+[source, python]
+----
+include::{python-examples}/test_kerberos_auth_example.py[tags=kerberos-auth-import]
+----
+======
 
 ====
 
@@ -1070,17 +1070,17 @@ include::{javascript-examples}/examples.test.js[tags=custom-auth]
 // ----
 ======
 
-// [.include-with-python]
-// ======
-// [source, python]
-// ----
-// include::{python-examples}/test_custom_auth_example.py[tags=custom-auth]
-// ----
-// [source, python]
-// ----
-// include::{python-examples}/test_custom_auth_example.py[tags=custom-auth-import]
-// ----
-// ======
+[.include-with-python]
+======
+[source, python]
+----
+include::{python-examples}/test_custom_auth_example.py[tags=custom-auth]
+----
+[source, python]
+----
+include::{python-examples}/test_custom_auth_example.py[tags=custom-auth-import]
+----
+======
 
 ====
 
@@ -1145,17 +1145,17 @@ include::{javascript-examples}/examples.test.js[tags=config-connection-pool]
 // ----
 ======
 
-// [.include-with-python]
-// ======
-// [source, python]
-// ----
-// include::{python-examples}/test_config_connection_pool_example.py[tags=config-connection-pool]
-// ----
-// [source, python]
-// ----
-// include::{python-examples}/test_config_connection_pool_example.py[tags=config-connection-pool-import]
-// ----
-// ======
+[.include-with-python]
+======
+[source, python]
+----
+include::{python-examples}/test_config_connection_pool_example.py[tags=config-connection-pool]
+----
+[source, python]
+----
+include::{python-examples}/test_config_connection_pool_example.py[tags=config-connection-pool-import]
+----
+======
 
 ====
 
@@ -1216,17 +1216,17 @@ include::{javascript-examples}/examples.test.js[tags=config-connection-timeout]
 // ----
 ======
 
-// [.include-with-python]
-// ======
-// [source, python]
-// ----
-// include::{python-examples}/test_config_connection_timeout_example.py[tags=config-connection-timeout]
-// ----
-// [source, python]
-// ----
-// include::{python-examples}/test_config_connection_timeout_example.py[tags=config-connection-timeout-import]
-// ----
-// ======
+[.include-with-python]
+======
+[source, python]
+----
+include::{python-examples}/test_config_connection_timeout_example.py[tags=config-connection-timeout]
+----
+[source, python]
+----
+include::{python-examples}/test_config_connection_timeout_example.py[tags=config-connection-timeout-import]
+----
+======
 
 ====
 
@@ -1283,17 +1283,17 @@ include::{javascript-examples}/examples.test.js[tags=config-unencrypted]
 // ----
 ======
 
-// [.include-with-python]
-// ======
-// [source, python]
-// ----
-// include::{python-examples}/test_config_unencrypted_example.py[tags=config-unencrypted]
-// ----
-// [source, python]
-// ----
-// include::{python-examples}/test_config_unencrypted_example.py[tags=config-unencrypted-import]
-// ----
-// ======
+[.include-with-python]
+======
+[source, python]
+----
+include::{python-examples}/test_config_unencrypted_example.py[tags=config-unencrypted]
+----
+[source, python]
+----
+include::{python-examples}/test_config_unencrypted_example.py[tags=config-unencrypted-import]
+----
+======
 
 ====
 
@@ -1380,17 +1380,17 @@ include::{javascript-examples}/examples.test.js[tags=config-max-retry-time]
 // ----
 ======
 
-// [.include-with-python]
-// ======
-// [source, python]
-// ----
-// include::{python-examples}/test_config_max_retry_time_example.py[tags=config-max-retry-time]
-// ----
-// [source, python]
-// ----
-// include::{python-examples}/test_config_max_retry_time_example.py[tags=config-max-retry-time-import]
-// ----
-// ======
+[.include-with-python]
+======
+[source, python]
+----
+include::{python-examples}/test_config_max_retry_time_example.py[tags=config-max-retry-time]
+----
+[source, python]
+----
+include::{python-examples}/test_config_max_retry_time_example.py[tags=config-max-retry-time-import]
+----
+======
 
 ====
 
@@ -1451,17 +1451,17 @@ include::{javascript-examples}/examples.test.js[tags=config-trust]
 // ----
 ======
 
-// [.include-with-python]
-// ======
-// [source, python]
-// ----
-// include::{python-examples}/test_config_trust_example.py[tags=config-trust]
-// ----
-// [source, python]
-// ----
-// include::{python-examples}/test_config_trust_example.py[tags=config-trust-import]
-// ----
-// ======
+[.include-with-python]
+======
+[source, python]
+----
+include::{python-examples}/test_config_trust_example.py[tags=config-trust]
+----
+[source, python]
+----
+include::{python-examples}/test_config_trust_example.py[tags=config-trust-import]
+----
+======
 
 ====
 
@@ -1498,10 +1498,10 @@ IDriver driver = GraphDatabase.Driver(..., o => o.WithLogger(logger));
 | [source, javascript]
 const loggingConfig = {logging: neo4j.logging.console('debug')};
 const driver = neo4j.driver(..., loggingConfig);
-// | Python
-// | [source, python]
-// from logging import getLogger, StreamHandler, DEBUG
-// handler = StreamHandler()
-// handler.setLevel(DEBUG)
-// getLogger("neo4j").addHandler(handler)
+| Python
+| [source, python]
+from logging import getLogger, StreamHandler, DEBUG
+handler = StreamHandler()
+handler.setLevel(DEBUG)
+getLogger("neo4j").addHandler(handler)
 |===

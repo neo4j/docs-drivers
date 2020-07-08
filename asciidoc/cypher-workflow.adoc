@@ -162,17 +162,17 @@ include::{javascript-examples}/examples.test.js[tags=pass-bookmarks]
 
 ======
 
-// [.include-with-python]
-// ======
-// [source, python]
-// ----
-// include::{python-examples}/test_pass_bookmarks_example.py[tags=pass-bookmarks]
-// ----
-// [source, python]
-// ----
-// include::{python-examples}/test_pass_bookmarks_example.py[tags=pass-bookmarks-import]
-// ----
-// ======
+[.include-with-python]
+======
+[source, python]
+----
+include::{python-examples}/test_pass_bookmarks_example.py[tags=pass-bookmarks]
+----
+[source, python]
+----
+include::{python-examples}/test_pass_bookmarks_example.py[tags=pass-bookmarks-import]
+----
+======
 
 ====
 
@@ -259,13 +259,13 @@ include::{javascript-examples}/examples.test.js[tags=read-write-transaction]
 
 ======
 
-// [.include-with-python]
-// ======
-// [source, python]
-// ----
-// include::{python-examples}/test_read_write_transaction_example.py[tags=read-write-transaction]
-// ----
-// ======
+[.include-with-python]
+======
+[source, python]
+----
+include::{python-examples}/test_read_write_transaction_example.py[tags=read-write-transaction]
+----
+======
 
 ====
 
@@ -382,18 +382,18 @@ include::{javascript-examples}/examples.test.js[tags=database-selection]
 ----
 ======
 
-// [.include-with-python]
-// ======
-// [source, python]
-// .Database selection on session creation
-// ----
-// include::{python-examples}/test_database_selection_example.py[tags=database-selection]
-// ----
-// [source, python]
-// ----
-// include::{python-examples}/test_database_selection_example.py[tags=database-selection-import]
-// ----
-// ======
+[.include-with-python]
+======
+[source, python]
+.Database selection on session creation
+----
+include::{python-examples}/test_database_selection_example.py[tags=database-selection]
+----
+[source, python]
+----
+include::{python-examples}/test_database_selection_example.py[tags=database-selection-import]
+----
+======
 
 ====
 
@@ -562,37 +562,37 @@ Inbound conversion is carried out using http://cldr.unicode.org/development/deve
 +*+ JavaScript has *_no native integer type_* so a custom type is provided. For convenience, this can be disabled through configuration so that the *_native Number type_* is used instead. Note that this can lead to a loss of precision.
 ======
 
-// [.include-with-python]
-// ======
-// [options="header", cols="m,"]
-// |===
-// | Neo4j Type | Python 3 Type
-// | null | `None`
-// | List | `list`
-// | Map | `dict`
-// | Boolean | `bool`
-// | Integer | `int`
-// | Float | `float`
-// | String | `str`
-// | ByteArray | `bytearray`
-// | Date | *`neo4j.time.Date`*
-// | Time | *`neo4j.time.Time`†*
-// | LocalTime | *`neo4j.time.Time`††*
-// | DateTime | *`neo4j.time.DateTime`†*
-// | LocalDateTime | *`neo4j.time.DateTime`††*
-// | Duration | *`neo4j.time.Duration`**
-// | Point | *`neo4j.spatial.Point`*
-// | Node | *`neo4j.graph.Node`*
-// | Relationship | *`neo4j.graph.Relationship`*
-// | Path | *`neo4j.graph.Path`*
-// |===
-//
-// +*+ A `datetime.timedelta` object passed as a parameter will always be implicitly converted to `neo4j.time.Duration`
-//
-// † Where `tzinfo` *_is not_* `None`
-//
-// †† Where `tzinfo` *_is_* `None`
-// ======
+[.include-with-python]
+======
+[options="header", cols="m,"]
+|===
+| Neo4j Type | Python 3 Type
+| null | `None`
+| List | `list`
+| Map | `dict`
+| Boolean | `bool`
+| Integer | `int`
+| Float | `float`
+| String | `str`
+| ByteArray | `bytearray`
+| Date | *`neo4j.time.Date`*
+| Time | *`neo4j.time.Time`†*
+| LocalTime | *`neo4j.time.Time`††*
+| DateTime | *`neo4j.time.DateTime`†*
+| LocalDateTime | *`neo4j.time.DateTime`††*
+| Duration | *`neo4j.time.Duration`**
+| Point | *`neo4j.spatial.Point`*
+| Node | *`neo4j.graph.Node`*
+| Relationship | *`neo4j.graph.Relationship`*
+| Path | *`neo4j.graph.Path`*
+|===
+
++*+ A `datetime.timedelta` object passed as a parameter will always be implicitly converted to `neo4j.time.Duration`
+
+† Where `tzinfo` *_is not_* `None`
+
+†† Where `tzinfo` *_is_* `None`
+======
 ====
 
 
