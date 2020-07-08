@@ -40,9 +40,9 @@ This section describes simple sessions, transactions executed within a simple se
 ====
 Available in:
 
-- *.NET Driver*
-- *Java Driver*
-- *Python Driver*
+- .NET Driver
+- Java Driver
+- Python Driver
 ====
 
 Simple sessions provide a "classic" *_blocking style_* API for Cypher execution.

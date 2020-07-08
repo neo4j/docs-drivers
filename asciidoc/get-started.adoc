@@ -13,7 +13,7 @@ Neo4j provides official drivers for a number of popular programming languages.
 These drivers are supported by Neo4j.
 
 Community drivers also exist for many languages, but vary greatly in terms of feature sets, maturity, and support.
-To find out more about community drivers, visit https://neo4j.com/developer/language-guides/.
+To find more about community drivers, visit https://neo4j.com/developer/language-guides/.
 
 The following languages and frameworks are officially supported by Neo4j:
 
@@ -29,7 +29,7 @@ The following languages and frameworks are officially supported by Neo4j:
 
 [NOTE]
 --
-The 4.1 Go driver are a work in progress.
+The 4.1 Go driver is a work in progress.
 There is currently no release date available.
 
 The latest Go Driver is 1.8.
@@ -76,7 +76,7 @@ To install a driver or to find out more about which driver versions are availabl
 ======
 
 The .NET driver is distributed via the NuGet Gallery.
-To find out the latest version of the driver, visit https://www.nuget.org/packages/Neo4j.Driver/.
+To find the latest version of the driver, visit https://www.nuget.org/packages/Neo4j.Driver/.
 
 *Dependencies*
 
@@ -124,7 +124,7 @@ The release notes for this driver are available https://github.com/neo4j/neo4j-d
 // [.include-with-go]
 // ======
 //
-// To find out the latest version of the driver, visit https://github.com/neo4j/neo4j-go-driver/releases.
+// To find the latest version of the driver, visit https://github.com/neo4j/neo4j-go-driver/releases.
 //
 // In order to get go driver running, you need to install our C connector, seabolt, on your build and production environments.
 // Follow instructions at https://github.com/neo4j-drivers/seabolt for installing seabolt through one of our binary packages or by building from scratch.
@@ -170,7 +170,7 @@ The release notes for this driver are available https://github.com/neo4j/neo4j-d
 ======
 
 To use the Java driver, it is recommended employing a dependency manager, such as Maven or Gradle.
-To find out the latest version of the driver, visit the https://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22org.neo4j.driver%22%20AND%20a%3A%22neo4j-java-driver%22[Maven Central Repository].
+To find the latest version of the driver, visit the https://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22org.neo4j.driver%22%20AND%20a%3A%22neo4j-java-driver%22[Maven Central Repository].
 
 *Dependencies*
 
@@ -239,7 +239,7 @@ The release notes for this driver are available https://github.com/neo4j/neo4j-j
 ======
 
 To use the JavaScript driver, it is recommended employing `npm`.
-To find out the latest version of the driver, use:
+To find the latest version of the driver, use:
 
 [source, shell, subs="attributes, specialcharacters"]
 ----
@@ -289,7 +289,7 @@ The release notes for this driver are available https://github.com/neo4j/neo4j-j
 [.include-with-python]
 ======
 
-To find out the latest stable version of the Python Driver, visit https://pypi.org/project/neo4j/
+To find the latest stable version of the Python Driver, visit https://pypi.org/project/neo4j/
 
 To find a list of all available releases, visit https://pypi.org/simple/neo4j/
 
