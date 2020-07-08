@@ -24,19 +24,16 @@ The following languages and frameworks are officially supported by Neo4j:
 | .NET               | https://github.com/dotnet/standard/blob/master/docs/versions/netstandard2.0.md[.NET Standard 2.0]
 | Java               | Java 8+ (latest patch releases).
 | JavaScript         | All LTS versions of Node.JS, specifically the 4.x and 6.x series runtimes (https://github.com/nodejs/LTS).
-// | Python             | CPython 3.5 and above.
+| Python             | CPython 3.5 and above.
 |===
 
 [NOTE]
 --
-The 4.1 Go and Python drivers are a work in progress. 
+The 4.1 Go driver are a work in progress.
 There is currently no release date available.
 
 The latest Go Driver is 1.8.
 For information on the 1.8 Go Driver, see {docs-base-uri}/driver-manual/1.7.
-
-The latest Python Driver is 4.0.
-For information on the 4.0 Python Driver, see {docs-base-uri}/driver-manual/4.0.
 --
 
 The driver API is intended to be topologically agnostic.
@@ -87,7 +84,7 @@ To find out the latest version of the driver, visit https://www.nuget.org/packag
 * System.Net.NameResolution (^4.3.0)
 * System.Net.Security (^4.3.2)
 * System.Net.Sockets (^4.3.0)
-* System.Runtime.InteropServices.RuntimeInformation (^ 4.3.0)
+* System.Runtime.InteropServices.RuntimeInformation (^4.3.0)
 * System.Runtime.Serialization.Primitives (^4.3.0)
 * System.Threading.Thread (^4.3.0)
 * System.ValueTuple (^4.5.0)
@@ -165,7 +162,7 @@ The release notes for this driver are available https://github.com/neo4j/neo4j-d
 //
 // ========
 //
-// The release notes for this driver are available https://github.com/neo4j/neo4j-go-driver/releases[here].
+// The release notes for this driver are available https://github.com/neo4j/neo4j-go-driver/wiki[here].
 //
 // ======
 
@@ -234,7 +231,7 @@ compile 'org.neo4j.driver:neo4j-java-driver:{java-driver-version}'
 ----
 ========
 
-The release notes for this driver are available https://github.com/neo4j/neo4j-java-driver/releases[here].
+The release notes for this driver are available https://github.com/neo4j/neo4j-java-driver/wiki[here].
 
 ======
 
@@ -285,66 +282,52 @@ npm install neo4j-driver@{javascript-driver-version}
 ----
 ========
 
-The release notes for this driver are available https://github.com/neo4j/neo4j-javascript-driver/releases[here].
+The release notes for this driver are available https://github.com/neo4j/neo4j-javascript-driver/wiki[here].
 
 ======
 
-// [.include-with-python]
-// ======
-//
-// To find out the latest stable version of the Python Driver, visit https://pypi.org/project/neo4j/
-//
-// To find a list of all available releases, visit https://pypi.org/simple/neo4j/
-//
-// To install the latest stable version of the Python Driver:
-// [source, shell, subs="attributes, specialcharacters"]
-// ----
-// pip install neo4j
-// ----
-//
-// It is also an option to install a certain version of the driver.
-//
-// .Installation with Python
-// ========
-// The following is the syntax for installing a certain version of the Python Driver:
-// [source, shell, subs="attributes, specialcharacters"]
-// ----
-// pip install neo4j==$PYTHON_DRIVER_VERSION
-// ----
-//
-// In the following example we are installing Python Driver version {python-driver-version}.
-// [source, shell, subs="attributes, specialcharacters"]
-// ----
-// pip install neo4j=={python-driver-version}
-// ----
-// ========
-//
-// .Installation with Python, get Python Driver prereleases
-// ========
-// In the following example we get the latest version, including alphas:
-// [source, shell, subs="attributes, specialcharacters"]
-// ----
-// pip install neo4j>=4.0.0a
-// ----
-//
-// In the following example we get the latest  version, including betas:
-// [source, shell, subs="attributes, specialcharacters"]
-// ----
-// pip install neo4j>=4.0.0b
-// ----
-//
-// In the following example we get the latest version, including release candidates:
-// [source, shell, subs="attributes, specialcharacters"]
-// ----
-// pip install neo4j>=4.0.0rc
-// ----
-// ========
-//
-// The release notes for the Python Driver are available https://github.com/neo4j/neo4j-python-driver/releases[here]
-//
-// *NOTE:* The pypi project name have changed from *neo4j-driver* to *neo4j*, the old project will coexist with the new.
-//
-// ======
+[.include-with-python]
+======
+
+To find out the latest stable version of the Python Driver, visit https://pypi.org/project/neo4j/
+
+To find a list of all available releases, visit https://pypi.org/simple/neo4j/
+
+To install the latest stable version of the Python Driver:
+[source, shell, subs="attributes, specialcharacters"]
+----
+pip install neo4j
+----
+
+It is also an option to install a certain version of the driver.
+
+.Installation with Python
+========
+The following is the syntax for installing a certain version of the Python Driver:
+[source, shell, subs="attributes, specialcharacters"]
+----
+pip install neo4j==$PYTHON_DRIVER_VERSION
+----
+
+In the following example we are installing Python Driver version {python-driver-version}.
+[source, shell, subs="attributes, specialcharacters"]
+----
+pip install neo4j=={python-driver-version}
+----
+========
+
+.Installation with Python, get Python Driver prerelease
+========
+In the following example we get the latest prerelease version:
+[source, shell, subs="attributes, specialcharacters"]
+----
+pip install neo4 --pre
+----
+========
+
+The release notes for the Python Driver are available https://github.com/neo4j/neo4j-python-driver/wiki[here]
+
+======
 
 ====
 
@@ -398,23 +381,23 @@ include::{java-examples}/HelloWorldExample.java[tags=hello-world-import]
 include::{javascript-examples}/examples.test.js[tags=hello-world]
 ----
 
-[source, javascript]
-----
-include::{javascript-examples}/examples.test.js[tags=hello-world-import]
-----
+//[source, javascript]
+//----
+//include::{javascript-examples}/examples.test.js[tags=hello-world-import]
+//----
 ======
 
-// [.include-with-python]
-// ======
-// [source, python]
-// ----
-// include::{python-examples}/test_hello_world_example.py[tags=hello-world]
-// ----
-// [source, python]
-// ----
-// include::{python-examples}/test_hello_world_example.py[tags=hello-world-import]
-// ----
-// ======
+[.include-with-python]
+======
+[source, python]
+----
+include::{python-examples}/test_driver_introduction_example.py[tags=driver-introduction-example]
+----
+[source, python]
+----
+include::{python-examples}/test_driver_introduction_example.py[tags=driver-introduction-example-import]
+----
+======
 
 ====
 
@@ -448,9 +431,9 @@ For a comprehensive listing of all driver functionality, refer to the *API docum
 {api-docs-base-uri}/javascript-driver/{javascript-driver-apidoc-version}/
 ======
 
-// [.include-with-python]
-// ======
-// {api-docs-base-uri}/python-driver/{python-driver-apidoc-version}/
-// ======
+[.include-with-python]
+======
+{api-docs-base-uri}/python-driver/{python-driver-apidoc-version}/
+======
 
 ====

@@ -42,6 +42,7 @@ Available in:
 
 - *.NET Driver*
 - *Java Driver*
+- *Python Driver*
 ====
 
 Simple sessions provide a "classic" *_blocking style_* API for Cypher execution.
@@ -77,14 +78,14 @@ try (Session session = driver.session(...)) {
 ----
 ======
 
-// [.include-with-python]
-// ======
-// [source, python]
-// ----
-// with driver.session(...) as session:
-//     // transactions go here
-// ----
-// ======
+[.include-with-python]
+======
+[source, python]
+----
+with driver.session(...) as session:
+    // transactions go here
+----
+======
 
 ====
 
@@ -139,17 +140,17 @@ include::{java-examples}/TransactionFunctionExample.java[tags=transaction-functi
 ----
 ======
 
-// [.include-with-python]
-// ======
-// [source, python]
-// ----
-// include::{python-examples}/test_transaction_function_example.py[tags=transaction-function]
-// ----
-// [source, python]
-// ----
-// include::{python-examples}/test_transaction_function_example.py[tags=transaction-function-import]
-// ----
-// ======
+[.include-with-python]
+======
+[source, python]
+----
+include::{python-examples}/test_transaction_function_example.py[tags=transaction-function]
+----
+[source, python]
+----
+include::{python-examples}/test_transaction_function_example.py[tags=transaction-function-import]
+----
+======
 
 ====
 
@@ -196,17 +197,17 @@ include::{java-examples}/AutocommitTransactionExample.java[tags=autocommit-trans
 ----
 ======
 
-// [.include-with-python]
-// ======
-// [source, python]
-// ----
-// include::{python-examples}/test_autocommit_transaction_example.py[tags=autocommit-transaction]
-// ----
-// [source, python]
-// ----
-// include::{python-examples}/test_autocommit_transaction_example.py[tags=autocommit-transaction-import]
-// ----
-// ======
+[.include-with-python]
+======
+[source, python]
+----
+include::{python-examples}/test_autocommit_transaction_example.py[tags=autocommit-transaction]
+----
+[source, python]
+----
+include::{python-examples}/test_autocommit_transaction_example.py[tags=autocommit-transaction-import]
+----
+======
 
 ====
 
@@ -236,13 +237,13 @@ include::{java-examples}/ResultConsumeExample.java[tags=result-consume]
 ----
 ======
 
-// [.include-with-python]
-// ======
-// [source, python]
-// ----
-// include::{python-examples}/test_result_consume_example.py[tags=result-consume]
-// ----
-// ======
+[.include-with-python]
+======
+[source, python]
+----
+include::{python-examples}/test_result_consume_example.py[tags=result-consume]
+----
+======
 
 ====
 
@@ -288,13 +289,13 @@ include::{java-examples}/ResultRetainExample.java[tags=result-retain]
 ----
 ======
 
-// [.include-with-python]
-// ======
-// [source, python]
-// ----
-// include::{python-examples}/test_result_retain_example.py[tags=result-retain]
-// ----
-// ======
+[.include-with-python]
+======
+[source, python]
+----
+include::{python-examples}/test_result_retain_example.py[tags=result-retain]
+----
+======
 
 ====
 
