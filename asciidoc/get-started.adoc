@@ -207,7 +207,7 @@ In the following example, driver version {java-driver-version} is added.
     <dependency>
         <groupId>org.neo4j.driver</groupId>
         <artifactId>neo4j-java-driver</artifactId>
-        <version>4.0.0</version>
+        <version>{java-driver-version}</version>
     </dependency>
 </dependencies>
 ----
