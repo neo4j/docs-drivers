@@ -355,7 +355,7 @@ The example below shows the minimal configuration necessary to interact with *Ne
 ======
 [source, csharp]
 ----
-include::{dotnet-examples}/Examples.cs[tags=hello-world]
+include::{dotnet-examples}/ExamplesAsync.cs[tags=hello-world]
 ----
 
 // [source, csharp]
