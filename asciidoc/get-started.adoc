@@ -106,7 +106,7 @@ It is also an option to install a certain version of the driver.
 PM> Install-Package Neo4j.Driver -Version $DOTNET_DRIVER_VERSION
 ----
 
-The .Net Driver, by default, uses asynchronous methods.
+The .Net driver uses asynchronous methods by default.
 If you want to use blocking calls, then there is a set of extensions that are contained in the `Neo4j.Driver.Simple` NuGet package.
 This can be found at https://www.nuget.org/packages/Neo4j.Driver.Simple/.
 The initial examples make use of these extensions.
