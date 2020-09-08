@@ -27,13 +27,6 @@ The following languages and frameworks are officially supported by Neo4j:
 | Python             | CPython 3.5 and above. Note that Python 2 support has been deprecated and was discontinued in the 4.x series drivers.
 |===
 
-[NOTE]
---
-The 4.0 release of the Go driver is a work in progress. There is currently no release date available.
-
-For more information on the 1.7 Driver documentation, including the 1.7 and 1.8 Go Driver, see {docs-base-uri}/driver-manual/1.7.
---
-
 The driver API is intended to be topologically agnostic.
 This means that the underlying database topology — single instance, Causal Cluster, etc. — can be altered without requiring a corresponding alteration to application code.
 In the general case, only the <<driver-connection-uris, connection URI>> needs to be modified when changes are made to the topology.
