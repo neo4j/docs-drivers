@@ -36,7 +36,7 @@ endif::[]
 
 [abstract]
 --
-This is the driver manual for Neo4j official drivers version {driver-version}, authored by the Neo4j Team.
+This is the driver manual for Neo4j official drivers version {driver-version}, and the Go driver version 1.8, authored by the Neo4j Team.
 --
 
 This manual covers the following areas:
