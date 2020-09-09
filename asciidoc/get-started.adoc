@@ -32,8 +32,8 @@ The following languages and frameworks are officially supported by Neo4j:
 The 4.0 Go driver is a work in progress.
 There is currently no release date available.
 
-The latest Go Driver is 1.8.
-For information on the 1.8 Go Driver, see {docs-base-uri}/driver-manual/1.7.
+The latest Go driver is 1.8.
+For information on the 1.8 Go driver, see {docs-base-uri}/driver-manual/1.7.
 ====
 
 The driver API is intended to be topologically agnostic.
