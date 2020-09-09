@@ -33,7 +33,7 @@ The 4.0 Go driver is a work in progress.
 There is currently no release date available.
 
 The latest Go driver is 1.8.
-For information on the 1.8 Go driver, see {docs-base-uri}/driver-manual/1.7.
+For information on the 1.8 Go driver, see {docs-base-uri}/driver-manual/1.7 (this manual includes the 1.8 Go driver examples).
 ====
 
 The driver API is intended to be topologically agnostic.
