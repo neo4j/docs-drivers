@@ -68,6 +68,7 @@ A lower-level *_unmanaged transaction API_* is also available for advanced use c
 This is useful when an alternative transaction management layer is applied by the client, in which error handling and retries need to be managed in a custom way.
 To learn more about how to use unmanaged transactions, see <<driver-api-docs, API documentation>> for the relevant language.
 
+
 [[driver-queries-results]]
 == Queries and results
 
@@ -133,16 +134,16 @@ include::{dotnet-examples}/Examples.cs[tags=pass-bookmarks]
 
 [.include-with-java]
 ======
-.Pass bookmarks
-[source, java]
-----
-include::{java-examples}/PassBookmarkExample.java[tags=pass-bookmarks]
-----
-
 .Import bookmarks
 [source, java]
 ----
 include::{java-examples}/PassBookmarkExample.java[tags=pass-bookmarks-import]
+----
+
+.Pass bookmarks
+[source, java]
+----
+include::{java-examples}/PassBookmarkExample.java[tags=pass-bookmarks]
 ----
 ======
 
@@ -166,11 +167,12 @@ include::{javascript-examples}/examples.test.js[tags=pass-bookmarks]
 ======
 [source, python]
 ----
-include::{python-examples}/test_pass_bookmarks_example.py[tags=pass-bookmarks]
+include::{python-examples}/test_pass_bookmarks_example.py[tags=pass-bookmarks-import]
 ----
+
 [source, python]
 ----
-include::{python-examples}/test_pass_bookmarks_example.py[tags=pass-bookmarks-import]
+include::{python-examples}/test_pass_bookmarks_example.py[tags=pass-bookmarks]
 ----
 ======
 
@@ -228,17 +230,16 @@ include::{dotnet-examples}/Examples.cs[tags=read-write-transaction]
 
 [.include-with-java]
 ======
+.Import read write transaction
+[source, java]
+----
+include::{java-examples}/ReadWriteTransactionExample.java[tags=read-write-transaction-import]
+----
 
 .Read write transaction
 [source, java]
 ----
 include::{java-examples}/ReadWriteTransactionExample.java[tags=read-write-transaction]
-----
-
-.Import read write transaction
-[source, java]
-----
-include::{java-examples}/ReadWriteTransactionExample.java[tags=read-write-transaction-import]
 ----
 ======
 
@@ -322,16 +323,16 @@ include::{dotnet-examples}/Examples.cs[tags=database-selection]
 
 [.include-with-java]
 ======
-.Database selection on session creation
-[source, java]
-----
-include::{java-examples}/DatabaseSelectionExample.java[tags=database-selection]
-----
-
 .Import database selection on session creation
 [source, java]
 ----
 include::{java-examples}/DatabaseSelectionExample.java[tags=database-selection-import]
+----
+
+.Database selection on session creation
+[source, java]
+----
+include::{java-examples}/DatabaseSelectionExample.java[tags=database-selection]
 ----
 ======
 
@@ -347,13 +348,14 @@ include::{javascript-examples}/examples.test.js[tags=database-selection]
 [.include-with-python]
 ======
 [source, python]
-.Database selection on session creation
-----
-include::{python-examples}/test_database_selection_example.py[tags=database-selection]
-----
-[source, python]
 ----
 include::{python-examples}/test_database_selection_example.py[tags=database-selection-import]
+----
+
+.Database selection on session creation
+[source, python]
+----
+include::{python-examples}/test_database_selection_example.py[tags=database-selection]
 ----
 ======
 

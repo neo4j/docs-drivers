@@ -383,13 +383,14 @@ include::{dotnet-examples}/Examples.cs[tags=hello-world]
 ======
 [source, java]
 ----
-include::{java-examples}/HelloWorldExample.java[tags=hello-world]
+include::{java-examples}/HelloWorldExample.java[tags=hello-world-import]
 ----
 
 [source, java]
 ----
-include::{java-examples}/HelloWorldExample.java[tags=hello-world-import]
+include::{java-examples}/HelloWorldExample.java[tags=hello-world]
 ----
+
 ======
 
 [.include-with-javascript]
@@ -409,12 +410,14 @@ include::{javascript-examples}/examples.test.js[tags=hello-world]
 ======
 [source, python]
 ----
-include::{python-examples}/test_hello_world_example.py[tags=hello-world]
-----
-[source, python]
-----
 include::{python-examples}/test_hello_world_example.py[tags=hello-world-import]
 ----
+
+[source, python]
+----
+include::{python-examples}/test_hello_world_example.py[tags=hello-world]
+----
+
 ======
 
 ====

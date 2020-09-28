@@ -93,6 +93,7 @@ with driver.session(...) as session:
 This is carried out by supplying configuration inside the session constructor.
 See <<Session configuration>> for more details.
 
+
 [[driver-simple-transaction-fn]]
 === Transaction functions
 
@@ -143,11 +144,12 @@ include::{java-examples}/TransactionFunctionExample.java[tags=transaction-functi
 ======
 [source, python]
 ----
-include::{python-examples}/test_transaction_function_example.py[tags=transaction-function]
+include::{python-examples}/test_transaction_function_example.py[tags=transaction-function-import]
 ----
+
 [source, python]
 ----
-include::{python-examples}/test_transaction_function_example.py[tags=transaction-function-import]
+include::{python-examples}/test_transaction_function_example.py[tags=transaction-function]
 ----
 ======
 
@@ -200,11 +202,12 @@ include::{java-examples}/AutocommitTransactionExample.java[tags=autocommit-trans
 ======
 [source, python]
 ----
-include::{python-examples}/test_autocommit_transaction_example.py[tags=autocommit-transaction]
+include::{python-examples}/test_autocommit_transaction_example.py[tags=autocommit-transaction-import]
 ----
+
 [source, python]
 ----
-include::{python-examples}/test_autocommit_transaction_example.py[tags=autocommit-transaction-import]
+include::{python-examples}/test_autocommit_transaction_example.py[tags=autocommit-transaction]
 ----
 ======
 
@@ -319,6 +322,7 @@ Available in:
 Asynchronous sessions provide an API wherein function calls typically return available objects such as futures.
 This allows client applications to work within asynchronous frameworks and take advantage of cooperative multitasking.
 
+
 [[driver-async-lifecycle]]
 === Lifecycle
 
@@ -327,6 +331,7 @@ A session then exists until it is closed, which is typically set to occur after 
 
 Sessions can be configured in a number of different ways. This is carried out by supplying configuration inside the session constructor.
 See <<Session configuration>> for more details.
+
 
 [[driver-async-transaction-fn]]
 === Transaction functions
@@ -386,6 +391,7 @@ include::{javascript-examples}/examples.test.js[tags=async-transaction-function]
 ======
 ========
 
+
 [[driver-async-autocommit-transactions]]
 === Auto-commit transactions
 
@@ -444,6 +450,7 @@ include::{javascript-examples}/examples.test.js[tags=async-autocommit-transactio
 ======
 ========
 
+
 [[driver-async-result-consume]]
 === Consuming results
 
@@ -483,6 +490,7 @@ include::{javascript-examples}/examples.test.js[tags=async-result-consume]
 ----
 ======
 ========
+
 
 [[driver-rx-sessions]]
 == Reactive Sessions
@@ -524,11 +532,13 @@ Reactive sessions will typically be used in a client application that is already
 Refer to <<driver-get-started>> for more information on recommended dependencies.
 --
 
+
 [[driver-rx-lifecycle]]
 === Lifecycle
 
 Session lifetime begins with session construction.
 A session then exists until it is closed, which is typically set to occur after its contained query results have been consumed.
+
 
 [[driver-rx-transaction-fn]]
 === Transaction functions
@@ -590,6 +600,7 @@ Sessions can be configured in a number of different ways.
 This is carried out by supplying configuration inside the session constructor.
 See <<driver-session-configuration>> for more details.
 
+
 [[driver-rx-autocommit-transactions]]
 === Auto-commit transactions
 
@@ -648,6 +659,7 @@ include::{javascript-examples}/examples.test.js[tags=rx-autocommit-transaction]
 ======
 ========
 
+
 [[driver-rx-result-consume]]
 === Consuming results
 
@@ -691,6 +703,7 @@ include::{javascript-examples}/examples.test.js[tags=rx-result-consume]
 ----
 ======
 ========
+
 
 [[driver-rx-cancellation]]
 === Cancellation
