@@ -68,15 +68,15 @@ include::{dotnet-examples}/Examples.cs[tags=driver-lifecycle]
 
 [.include-with-java]
 ======
-[source, java]
-----
-include::{java-examples}/DriverLifecycleExample.java[tags=driver-lifecycle]
-----
-
 .Import driver lifecycle
 [source, java]
 ----
 include::{java-examples}/DriverLifecycleExample.java[tags=driver-lifecycle-import]
+----
+
+[source, java]
+----
+include::{java-examples}/DriverLifecycleExample.java[tags=driver-lifecycle]
 ----
 ======
 
@@ -98,11 +98,12 @@ include::{javascript-examples}/examples.test.js[tags=driver-lifecycle]
 ======
 [source, python]
 ----
-include::{python-examples}/test_driver_lifecycle_example.py[tags=driver-lifecycle]
+include::{python-examples}/test_driver_lifecycle_example.py[tags=driver-lifecycle-import]
 ----
+
 [source, python]
 ----
-include::{python-examples}/test_driver_lifecycle_example.py[tags=driver-lifecycle-import]
+include::{python-examples}/test_driver_lifecycle_example.py[tags=driver-lifecycle]
 ----
 ======
 ====
@@ -226,11 +227,12 @@ include::{javascript-examples}/examples.test.js[tags=config-custom-resolver]
 ======
 [source, python]
 ----
-include::{python-examples}/test_custom_resolver_example.py[tags=custom-resolver]
+include::{python-examples}/test_custom_resolver_example.py[tags=custom-resolver-import]
 ----
+
 [source, python]
 ----
-include::{python-examples}/test_custom_resolver_example.py[tags=custom-resolver-import]
+include::{python-examples}/test_custom_resolver_example.py[tags=custom-resolver]
 ----
 ======
 
@@ -904,15 +906,15 @@ include::{dotnet-examples}/Examples.cs[tags=basic-auth]
 
 [.include-with-java]
 ======
-[source, java]
-----
-include::{java-examples}/BasicAuthExample.java[tags=basic-auth]
-----
-
 .Import basic authentication
 [source, java]
 ----
 include::{java-examples}/BasicAuthExample.java[tags=basic-auth-import]
+----
+
+[source, java]
+----
+include::{java-examples}/BasicAuthExample.java[tags=basic-auth]
 ----
 ======
 
@@ -934,11 +936,12 @@ include::{javascript-examples}/examples.test.js[tags=basic-auth]
 ======
 [source, python]
 ----
-include::{python-examples}/test_basic_auth_example.py[tags=basic-auth]
+include::{python-examples}/test_basic_auth_example.py[tags=basic-auth-import]
 ----
+
 [source, python]
 ----
-include::{python-examples}/test_basic_auth_example.py[tags=basic-auth-import]
+include::{python-examples}/test_basic_auth_example.py[tags=basic-auth]
 ----
 ======
 
@@ -975,15 +978,15 @@ include::{dotnet-examples}/Examples.cs[tags=kerberos-auth]
 
 [.include-with-java]
 ======
-[source, java]
-----
-include::{java-examples}/KerberosAuthExample.java[tags=kerberos-auth]
-----
-
 .Import Kerberos authentication
 [source, java]
 ----
 include::{java-examples}/KerberosAuthExample.java[tags=kerberos-auth-import]
+----
+
+[source, java]
+----
+include::{java-examples}/KerberosAuthExample.java[tags=kerberos-auth]
 ----
 ======
 
@@ -1005,11 +1008,12 @@ include::{javascript-examples}/examples.test.js[tags=kerberos-auth]
 ======
 [source, python]
 ----
-include::{python-examples}/test_kerberos_auth_example.py[tags=kerberos-auth]
+include::{python-examples}/test_kerberos_auth_example.py[tags=kerberos-auth-import]
 ----
+
 [source, python]
 ----
-include::{python-examples}/test_kerberos_auth_example.py[tags=kerberos-auth-import]
+include::{python-examples}/test_kerberos_auth_example.py[tags=kerberos-auth]
 ----
 ======
 
@@ -1045,15 +1049,15 @@ include::{dotnet-examples}/Examples.cs[tags=custom-auth]
 
 [.include-with-java]
 ======
-[source, java]
-----
-include::{java-examples}/CustomAuthExample.java[tags=custom-auth]
-----
-
 .Import custom authentication
 [source, java]
 ----
 include::{java-examples}/CustomAuthExample.java[tags=custom-auth-import]
+----
+
+[source, java]
+----
+include::{java-examples}/CustomAuthExample.java[tags=custom-auth]
 ----
 ======
 
@@ -1074,11 +1078,12 @@ include::{javascript-examples}/examples.test.js[tags=custom-auth]
 ======
 [source, python]
 ----
-include::{python-examples}/test_custom_auth_example.py[tags=custom-auth]
+include::{python-examples}/test_custom_auth_example.py[tags=custom-auth-import]
 ----
+
 [source, python]
 ----
-include::{python-examples}/test_custom_auth_example.py[tags=custom-auth-import]
+include::{python-examples}/test_custom_auth_example.py[tags=custom-auth]
 ----
 ======
 
@@ -1119,15 +1124,15 @@ include::{dotnet-examples}/Examples.cs[tags=config-connection-pool]
 
 [.include-with-java]
 ======
-[source, java]
-----
-include::{java-examples}/ConfigConnectionPoolExample.java[tags=config-connection-pool]
-----
-
 .Import connection pool configuration
 [source, java]
 ----
 include::{java-examples}/ConfigConnectionPoolExample.java[tags=config-connection-pool-import]
+----
+
+[source, java]
+----
+include::{java-examples}/ConfigConnectionPoolExample.java[tags=config-connection-pool]
 ----
 ======
 
@@ -1149,11 +1154,12 @@ include::{javascript-examples}/examples.test.js[tags=config-connection-pool]
 ======
 [source, python]
 ----
-include::{python-examples}/test_config_connection_pool_example.py[tags=config-connection-pool]
+include::{python-examples}/test_config_connection_pool_example.py[tags=config-connection-pool-import]
 ----
+
 [source, python]
 ----
-include::{python-examples}/test_config_connection_pool_example.py[tags=config-connection-pool-import]
+include::{python-examples}/test_config_connection_pool_example.py[tags=config-connection-pool]
 ----
 ======
 
@@ -1192,14 +1198,15 @@ include::{dotnet-examples}/Examples.cs[tags=config-connection-timeout]
 
 [.include-with-java]
 ======
-[source, java]
-----
-include::{java-examples}/ConfigConnectionTimeoutExample.java[tags=config-connection-timeout]
-----
 .Import connection timeout configuration
 [source, java]
 ----
 include::{java-examples}/ConfigConnectionTimeoutExample.java[tags=config-connection-timeout-import]
+----
+
+[source, java]
+----
+include::{java-examples}/ConfigConnectionTimeoutExample.java[tags=config-connection-timeout]
 ----
 ======
 
@@ -1220,11 +1227,12 @@ include::{javascript-examples}/examples.test.js[tags=config-connection-timeout]
 ======
 [source, python]
 ----
-include::{python-examples}/test_config_connection_timeout_example.py[tags=config-connection-timeout]
+include::{python-examples}/test_config_connection_timeout_example.py[tags=config-connection-timeout-import]
 ----
+
 [source, python]
 ----
-include::{python-examples}/test_config_connection_timeout_example.py[tags=config-connection-timeout-import]
+include::{python-examples}/test_config_connection_timeout_example.py[tags=config-connection-timeout]
 ----
 ======
 
@@ -1259,14 +1267,15 @@ include::{dotnet-examples}/Examples.cs[tags=config-unencrypted]
 
 [.include-with-java]
 ======
-[source, java]
-----
-include::{java-examples}/ConfigUnencryptedExample.java[tags=config-unencrypted]
-----
 .Import unencrypted configuration
 [source, java]
 ----
 include::{java-examples}/ConfigUnencryptedExample.java[tags=config-unencrypted-import]
+----
+
+[source, java]
+----
+include::{java-examples}/ConfigUnencryptedExample.java[tags=config-unencrypted]
 ----
 ======
 
@@ -1287,11 +1296,12 @@ include::{javascript-examples}/examples.test.js[tags=config-unencrypted]
 ======
 [source, python]
 ----
-include::{python-examples}/test_config_unencrypted_example.py[tags=config-unencrypted]
+include::{python-examples}/test_config_unencrypted_example.py[tags=config-unencrypted-import]
 ----
+
 [source, python]
 ----
-include::{python-examples}/test_config_unencrypted_example.py[tags=config-unencrypted-import]
+include::{python-examples}/test_config_unencrypted_example.py[tags=config-unencrypted]
 ----
 ======
 
@@ -1356,14 +1366,15 @@ include::{dotnet-examples}/Examples.cs[tags=config-max-retry-time]
 
 [.include-with-java]
 ======
-[source, java]
-----
-include::{java-examples}/ConfigMaxRetryTimeExample.java[tags=config-max-retry-time]
-----
 .Import maximum retry time configuration
 [source, java]
 ----
 include::{java-examples}/ConfigMaxRetryTimeExample.java[tags=config-max-retry-time-import]
+----
+
+[source, java]
+----
+include::{java-examples}/ConfigMaxRetryTimeExample.java[tags=config-max-retry-time]
 ----
 ======
 
@@ -1384,11 +1395,12 @@ include::{javascript-examples}/examples.test.js[tags=config-max-retry-time]
 ======
 [source, python]
 ----
-include::{python-examples}/test_config_max_retry_time_example.py[tags=config-max-retry-time]
+include::{python-examples}/test_config_max_retry_time_example.py[tags=config-max-retry-time-import]
 ----
+
 [source, python]
 ----
-include::{python-examples}/test_config_max_retry_time_example.py[tags=config-max-retry-time-import]
+include::{python-examples}/test_config_max_retry_time_example.py[tags=config-max-retry-time]
 ----
 ======
 
@@ -1427,14 +1439,15 @@ include::{dotnet-examples}/Examples.cs[tags=config-trust]
 
 [.include-with-java]
 ======
-[source, java]
-----
-include::{java-examples}/ConfigTrustExample.java[tags=config-trust]
-----
 .Import trusted certificate configuration
 [source, java]
 ----
 include::{java-examples}/ConfigTrustExample.java[tags=config-trust-import]
+----
+
+[source, java]
+----
+include::{java-examples}/ConfigTrustExample.java[tags=config-trust]
 ----
 ======
 
@@ -1455,11 +1468,12 @@ include::{javascript-examples}/examples.test.js[tags=config-trust]
 ======
 [source, python]
 ----
-include::{python-examples}/test_config_trust_example.py[tags=config-trust]
+include::{python-examples}/test_config_trust_example.py[tags=config-trust-import]
 ----
+
 [source, python]
 ----
-include::{python-examples}/test_config_trust_example.py[tags=config-trust-import]
+include::{python-examples}/test_config_trust_example.py[tags=config-trust]
 ----
 ======
 
