@@ -6,6 +6,7 @@
 This section gives an overview of the official Neo4j drivers and how to connect to a Neo4j database with a "Hello World" example.
 --
 
+
 [[driver-get-started-about]]
 == About the official drivers
 
@@ -43,6 +44,7 @@ In the general case, only the <<driver-connection-uris, connection URI>> needs t
 NOTE: The official drivers do not support HTTP communication.
 If you need an HTTP driver, choose one of the community drivers.
 See also the <<http-api#http-api, HTTP API documentation>>.
+
 
 [[driver-get-started-installation]]
 == Driver versions and installation
@@ -370,12 +372,12 @@ include::{dotnet-examples}/Examples.cs[tags=hello-world]
 ======
 [source, java]
 ----
-include::{java-examples}/HelloWorldExample.java[tags=hello-world]
+include::{java-examples}/HelloWorldExample.java[tags=hello-world-import]
 ----
 
 [source, java]
 ----
-include::{java-examples}/HelloWorldExample.java[tags=hello-world-import]
+include::{java-examples}/HelloWorldExample.java[tags=hello-world]
 ----
 ======
 
@@ -396,11 +398,12 @@ include::{javascript-examples}/examples.test.js[tags=hello-world]
 ======
 [source, python]
 ----
-include::{python-examples}/test_driver_introduction_example.py[tags=driver-introduction-example]
+include::{python-examples}/test_driver_introduction_example.py[tags=driver-introduction-example-import]
 ----
+
 [source, python]
 ----
-include::{python-examples}/test_driver_introduction_example.py[tags=driver-introduction-example-import]
+include::{python-examples}/test_driver_introduction_example.py[tags=driver-introduction-example]
 ----
 ======
 

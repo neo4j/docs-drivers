@@ -48,6 +48,7 @@ Available in:
 Simple sessions provide a "classic" *_blocking style_* API for Cypher execution.
 In general, simple sessions provide the easiest programming style to work with since API calls are executed in a strictly sequential fashion.
 
+
 [[driver-simple-lifecycle]]
 === Lifecycle
 
@@ -92,6 +93,7 @@ with driver.session(...) as session:
 *_Sessions can be configured in a number of different ways_*.
 This is carried out by supplying configuration inside the session constructor.
 See <<Session configuration>> for more details.
+
 
 [[driver-simple-transaction-fn]]
 === Transaction functions
@@ -144,15 +146,17 @@ include::{java-examples}/TransactionFunctionExample.java[tags=transaction-functi
 ======
 [source, python]
 ----
-include::{python-examples}/test_transaction_function_example.py[tags=transaction-function]
+include::{python-examples}/test_transaction_function_example.py[tags=transaction-function-import]
 ----
+
 [source, python]
 ----
-include::{python-examples}/test_transaction_function_example.py[tags=transaction-function-import]
+include::{python-examples}/test_transaction_function_example.py[tags=transaction-function]
 ----
 ======
 
 ====
+
 
 [[driver-simple-autocommit-transactions]]
 === Auto-commit transactions
@@ -201,15 +205,17 @@ include::{java-examples}/AutocommitTransactionExample.java[tags=autocommit-trans
 ======
 [source, python]
 ----
-include::{python-examples}/test_autocommit_transaction_example.py[tags=autocommit-transaction]
+include::{python-examples}/test_autocommit_transaction_example.py[tags=autocommit-transaction-import]
 ----
+
 [source, python]
 ----
-include::{python-examples}/test_autocommit_transaction_example.py[tags=autocommit-transaction-import]
+include::{python-examples}/test_autocommit_transaction_example.py[tags=autocommit-transaction]
 ----
 ======
 
 ====
+
 
 [[driver-simple-result-consume]]
 === Consuming results
@@ -320,6 +326,7 @@ Available in:
 Asynchronous sessions provide an API wherein function calls typically return available objects such as futures.
 This allows client applications to work within asynchronous frameworks and take advantage of cooperative multitasking.
 
+
 [[driver-async-lifecycle]]
 === Lifecycle
 
@@ -357,10 +364,9 @@ Retry logic can be configured when creating a session.
 [.tabbed-example]
 .Asynchronous transaction functions
 ========
+
 [.include-with-dotnet]
 ======
-
-
 .Transaction function
 [source, csharp]
 ----
@@ -385,7 +391,9 @@ include::{java-examples}/AsyncTransactionFunctionExample.java[tags=async-transac
 include::{javascript-examples}/examples.test.js[tags=async-transaction-function]
 ----
 ======
+
 ========
+
 
 [[driver-async-autocommit-transactions]]
 === Auto-commit transactions
@@ -413,9 +421,9 @@ Please refer to the <<cypher-manual#query-using-periodic-commit-hint, Cypher Man
 [.tabbed-example]
 .Asynchronous auto-commit transactions
 ========
+
 [.include-with-dotnet]
 ======
-
 .Auto-commit transaction
 [source, csharp]
 ----
@@ -425,7 +433,6 @@ include::{dotnet-examples}/ExamplesAsync.cs[tags=async-autocommit-transaction]
 
 [.include-with-java]
 ======
-
 .Auto-commit transaction
 [source, java]
 ----
@@ -433,17 +440,17 @@ include::{java-examples}/AsyncAutocommitTransactionExample.java[tags=async-autoc
 ----
 ======
 
-
 [.include-with-javascript]
 ======
-
 .Auto-commit transaction
 [source, javascript]
 ----
 include::{javascript-examples}/examples.test.js[tags=async-autocommit-transaction]
 ----
 ======
+
 ========
+
 
 [[driver-async-result-consume]]
 === Consuming results
@@ -453,9 +460,9 @@ The asynchronous session API provides language-idiomatic methods to aid integrat
 [.tabbed-example]
 .Asynchronous consuming results
 ========
+
 [.include-with-dotnet]
 ======
-
 .Consuming results
 [source, csharp]
 ----
@@ -465,7 +472,6 @@ include::{dotnet-examples}/ExamplesAsync.cs[tags=async-result-consume]
 
 [.include-with-java]
 ======
-
 .Consuming results
 [source, java]
 ----
@@ -473,17 +479,17 @@ include::{java-examples}/AsyncResultConsumeExample.java[tags=async-result-consum
 ----
 ======
 
-
 [.include-with-javascript]
 ======
-
 .Consuming results
 [source, javascript]
 ----
 include::{javascript-examples}/examples.test.js[tags=async-result-consume]
 ----
 ======
+
 ========
+
 
 [[driver-rx-sessions]]
 == Reactive Sessions
@@ -525,11 +531,13 @@ Reactive sessions will typically be used in a client application that is already
 Refer to <<driver-get-started>> for more information on recommended dependencies.
 --
 
+
 [[driver-rx-lifecycle]]
 === Lifecycle
 
 Session lifetime begins with session construction.
 A session then exists until it is closed, which is typically set to occur after its contained query results have been consumed.
+
 
 [[driver-rx-transaction-fn]]
 === Transaction functions
@@ -556,9 +564,9 @@ Retry logic can be configured when creating a session.
 [.tabbed-example]
 .Reactive transaction functions
 ========
+
 [.include-with-dotnet]
 ======
-
 .Reactive transaction function
 [source, csharp]
 ----
@@ -568,7 +576,6 @@ include::{dotnet-examples}/ExamplesRx.cs[tags=rx-transaction-function]
 
 [.include-with-java]
 ======
-
 .Reactive transaction function
 [source, java]
 ----
@@ -576,21 +583,21 @@ include::{java-examples}/RxTransactionFunctionExample.java[tags=rx-transaction-f
 ----
 ======
 
-
 [.include-with-javascript]
 ======
-
 .Reactive transaction function
 [source, javascript]
 ----
 include::{javascript-examples}/examples.test.js[tags=rx-transaction-function]
 ----
 ======
+
 ========
 
 Sessions can be configured in a number of different ways.
 This is carried out by supplying configuration inside the session constructor.
 See <<driver-session-configuration>> for more details.
+
 
 [[driver-rx-autocommit-transactions]]
 === Auto-commit transactions
@@ -618,9 +625,9 @@ Please refer to the <<cypher-manual#query-using-periodic-commit-hint, Cypher Man
 [.tabbed-example]
 .Reactive auto-commit transactions
 ========
+
 [.include-with-dotnet]
 ======
-
 .Auto-commit transactions
 [source, csharp]
 ----
@@ -630,7 +637,6 @@ include::{dotnet-examples}/ExamplesRx.cs[tags=rx-autocommit-transaction]
 
 [.include-with-java]
 ======
-
 .Auto-commit transactions
 [source, java]
 ----
@@ -638,17 +644,17 @@ include::{java-examples}/RxAutocommitTransactionExample.java[tags=rx-autocommit-
 ----
 ======
 
-
 [.include-with-javascript]
 ======
-
 .Auto-commit transactions
 [source, javascript]
 ----
 include::{javascript-examples}/examples.test.js[tags=rx-autocommit-transaction]
 ----
 ======
+
 ========
+
 
 [[driver-rx-result-consume]]
 === Consuming results
@@ -662,9 +668,9 @@ Only one subscriber may pull data from a given flow.
 [.tabbed-example]
 .Reactive consuming results
 ========
+
 [.include-with-dotnet]
 ======
-
 .Consuming results
 [source, csharp]
 ----
@@ -674,7 +680,6 @@ include::{dotnet-examples}/ExamplesRx.cs[tags=rx-result-consume]
 
 [.include-with-java]
 ======
-
 .Consuming results
 [source, java]
 ----
@@ -682,17 +687,17 @@ include::{java-examples}/RxResultConsumeExample.java[tags=rx-result-consume]
 ----
 ======
 
-
 [.include-with-javascript]
 ======
-
 .Consuming results
 [source, javascript]
 ----
 include::{javascript-examples}/examples.test.js[tags=rx-result-consume]
 ----
 ======
+
 ========
+
 
 [[driver-rx-cancellation]]
 === Cancellation
