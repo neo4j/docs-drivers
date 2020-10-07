@@ -1,27 +1,19 @@
 [[drivers]]
 ifndef::backend-pdf[]
-= The Neo4j Drivers Manual v{driver-version}
+= The Neo4j JavaScript Driver Manual v{driver-version}
 endif::[]
 ifdef::backend-pdf[]
-= The Neo4j Drivers Manual v{driver-version} {for-lang}
+= The Neo4j JavaScript Driver Manual v{driver-version}
 endif::[]
 :project-version:
-:manual-title: Neo4j Driver Manual {project-version}
+:manual-title: Neo4j JavaScript Driver Manual {project-version}
 :source-indent: 0
 :icons: font
 :iconfont-cdn: https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.0.0/css/font-awesome.min.css
 // :example-caption!:
 // :table-caption!:
-ifndef::dotnet-root[:dotnet-root: {project-root}/build/driver-sources/dotnet-driver]
-ifndef::go-root[:go-root: {project-root}/build/driver-sources/go-driver]
-ifndef::java-root[:java-root: {project-root}/build/driver-sources/java-driver]
 ifndef::javascript-root[:javascript-root: {project-root}/build/driver-sources/javascript-driver]
-ifndef::python-root[:python-root: {project-root}/build/driver-sources/python-driver]
-:dotnet-examples: {dotnet-root}/Neo4j.Driver/Neo4j.Driver.Tests.Integration
-:go-examples: {go-root}/neo4j/test-integration
-:java-examples: {java-root}/examples/src/main/java/org/neo4j/docs/driver
 :javascript-examples: {javascript-root}/test
-:python-examples: {python-root}/tests/integration/examples
 :api-docs-base-uri: https://neo4j.com/docs/api
 
 
@@ -36,12 +28,12 @@ endif::[]
 
 [abstract]
 --
-This is the driver manual for Neo4j official drivers version {driver-version}, authored by the Neo4j Team.
+This is the manual for Neo4j JavaScript Driver version {driver-version}, authored by the Neo4j Team.
 --
 
 This manual covers the following areas:
 
-* <<driver-get-started>> -- An overview of the official Neo4j drivers and how to connect to a Neo4j database.
+* <<driver-get-started>> -- An overview of the official Neo4j JavaScript Driver and how to connect to a Neo4j database.
 * <<driver-client-applications>> -- How to manage database connections within an application.
 * <<driver-cypher-workflow>> -- How to create units of work and provide a logical context for that work.
 * <<driver-session-api>> -- How the types and values used by Cypher map to native language types.
@@ -49,7 +41,7 @@ This manual covers the following areas:
 
 _Who should read this?_
 
-This manual is written for the developer of a Neo4j client application.
+This manual is written for JavaScript developers building a Neo4j client application.
 
 include::get-started.adoc[leveloffset=+1]
 
