@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="895px" height="331px" viewBox="0 0 895 331" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 48.2 (47327) - http://www.bohemiancoding.com/sketch -->
+    <title>driver-passing-bookmarks</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Artboard" transform="translate(-19517.000000, -16390.000000)"></g>
+        <g id="driver-passing-bookmarks">
+            <rect id="Rectangle" fill="#DDF4F9" x="10" y="200" width="371" height="110"></rect>
+            <rect id="Rectangle-Copy-2" fill="#BCE9F4" x="25" y="215" width="80" height="80"></rect>
+            <rect id="Rectangle-Copy-3" fill="#BCE9F4" x="286" y="215" width="80" height="80"></rect>
+            <rect id="Rectangle-Copy" fill="#E8F5E9" x="10" y="41" width="371" height="110"></rect>
+            <rect id="Rectangle-Copy-6" fill="#FDEAE1" x="513" y="125" width="371" height="110"></rect>
+            <text id="Transaction-B1" font-family="OpenSans-Regular, Open Sans" font-size="12" font-weight="normal" fill="#333333">
+                <tspan x="31.1328125" y="253">Transaction</tspan>
+                <tspan x="54.6230469" y="270"> B1</tspan>
+            </text>
+            <text id="Transaction-B2" font-family="OpenSans-Regular, Open Sans" font-size="12" font-weight="normal" fill="#333333">
+                <tspan x="294.132812" y="253">Transaction</tspan>
+                <tspan x="319.181641" y="270">B2</tspan>
+            </text>
+            <text id="Session-B" font-family="OpenSans-Regular, Open Sans" font-size="12" font-weight="normal" fill="#333333">
+                <tspan x="157" y="190">Session B</tspan>
+            </text>
+            <text id="Last-bookmark-from-S" font-family="OpenSans-Regular, Open Sans" font-size="12" font-weight="normal" fill="#333333">
+                <tspan x="414" y="68">Last bookmark</tspan>
+                <tspan x="414" y="85">from Session A</tspan>
+            </text>
+            <text id="Last-bookmark-from-S" font-family="OpenSans-Regular, Open Sans" font-size="12" font-weight="normal" fill="#333333">
+                <tspan x="414" y="279">Last bookmark</tspan>
+                <tspan x="414" y="296">from Session B</tspan>
+            </text>
+            <g id="bookmark-3-copy-3" transform="translate(386.000000, 60.000000)">
+                <g id="Group" stroke-linecap="round" stroke-linejoin="round" transform="translate(5.000000, 0.000000)" stroke="#000000">
+                    <polygon id="Shape" points="13.5 23.5 7 17 0.5 23.5 0.5 0.5 13.5 0.5"></polygon>
+                    <g id="path-1-link" transform="translate(3.500000, 0.500000)">
+                        <path d="M0,0 L0,20" id="path-1"></path>
+                    </g>
+                    <g id="path-1-link" transform="translate(10.500000, 0.500000)">
+                        <path d="M0,0 L0,20" id="path-1"></path>
+                    </g>
+                </g>
+                <polygon id="Shape" points="0 0 24 0 24 24 0 24"></polygon>
+            </g>
+            <g id="bookmark-3-copy-4" transform="translate(385.000000, 271.000000)">
+                <g id="Group" stroke-linecap="round" stroke-linejoin="round" transform="translate(5.000000, 0.000000)" stroke="#000000">
+                    <polygon id="Shape" points="13.5 23.5 7 17 0.5 23.5 0.5 0.5 13.5 0.5"></polygon>
+                    <g id="path-1-link" transform="translate(3.500000, 0.500000)">
+                        <path d="M0,0 L0,20" id="path-1"></path>
+                    </g>
+                    <g id="path-1-link" transform="translate(10.500000, 0.500000)">
+                        <path d="M0,0 L0,20" id="path-1"></path>
+                    </g>
+                </g>
+                <polygon id="Shape" points="0 0 24 0 24 24 0 24"></polygon>
+            </g>
+            <g id="bookmark-3-copy" transform="translate(113.000000, 226.000000)">
+                <g id="Group" stroke-linecap="round" stroke-linejoin="round" transform="translate(5.000000, 0.000000)" stroke="#000000">
+                    <polygon id="Shape" points="13.5 23.5 7 17 0.5 23.5 0.5 0.5 13.5 0.5"></polygon>
+                    <g id="path-1-link" transform="translate(3.500000, 0.500000)">
+                        <path d="M0,0 L0,20" id="path-1"></path>
+                    </g>
+                    <g id="path-1-link" transform="translate(10.500000, 0.500000)">
+                        <path d="M0,0 L0,20" id="path-1"></path>
+                    </g>
+                </g>
+                <polygon id="Shape" points="0 0 24 0 24 24 0 24"></polygon>
+            </g>
+            <path d="M612,182 L786,182" id="Path-2-Copy" stroke="#979797" stroke-width="2"></path>
+            <rect id="Rectangle-Copy-4" fill="#D1EBD4" x="286" y="56" width="80" height="80"></rect>
+            <rect id="Rectangle-Copy-7" fill="#FCD5C2" x="789" y="140" width="80" height="80"></rect>
+            <rect id="Rectangle-Copy-5" fill="#D1EBD4" x="25" y="56" width="80" height="80"></rect>
+            <rect id="Rectangle-Copy-8" fill="#FCD5C2" x="528" y="140" width="80" height="80"></rect>
+            <text id="Session-A" font-family="OpenSans-Regular, Open Sans" font-size="12" font-weight="normal" fill="#333333">
+                <tspan x="157" y="29">Session A</tspan>
+            </text>
+            <text id="Session-C" font-family="OpenSans-Regular, Open Sans" font-size="12" font-weight="normal" fill="#333333">
+                <tspan x="670" y="112">Session C</tspan>
+            </text>
+            <text id="Transaction-A1" font-family="OpenSans-Regular, Open Sans" font-size="12" font-weight="normal" fill="#333333">
+                <tspan x="32.6328125" y="92">Transaction </tspan>
+                <tspan x="57.7724609" y="109">A1</tspan>
+            </text>
+            <text id="Transaction-C1" font-family="OpenSans-Regular, Open Sans" font-size="12" font-weight="normal" fill="#333333">
+                <tspan x="535.632812" y="176">Transaction </tspan>
+                <tspan x="560.78418" y="193">C1</tspan>
+            </text>
+            <text id="Transaction-A2" font-family="OpenSans-Regular, Open Sans" font-size="12" font-weight="normal" fill="#333333">
+                <tspan x="293.632812" y="92">Transaction </tspan>
+                <tspan x="318.772461" y="109">A2</tspan>
+            </text>
+            <text id="Transaction-C2" font-family="OpenSans-Regular, Open Sans" font-size="12" font-weight="normal" fill="#333333">
+                <tspan x="796.632812" y="174">Transaction </tspan>
+                <tspan x="821.78418" y="191">C2</tspan>
+            </text>
+            <polygon id="Shape" stroke="#000000" stroke-linecap="round" stroke-linejoin="round" points="127.5 86.5 121 80 114.5 86.5 114.5 63.5 127.5 63.5"></polygon>
+            <g id="path-1-link" stroke-linecap="round" stroke-linejoin="round" transform="translate(117.500000, 63.500000)" stroke="#000000">
+                <path d="M0,0 L0,20" id="path-1"></path>
+            </g>
+            <g id="path-1-link" stroke-linecap="round" stroke-linejoin="round" transform="translate(124.500000, 63.500000)" stroke="#000000">
+                <path d="M0,0 L0,20" id="path-1"></path>
+            </g>
+            <g id="Group" stroke-linecap="round" stroke-linejoin="round" transform="translate(618.000000, 149.000000)" stroke="#000000">
+                <polygon id="Shape" points="13.5 23.5 7 17 0.5 23.5 0.5 0.5 13.5 0.5"></polygon>
+                <g id="path-1-link" transform="translate(3.500000, 0.500000)">
+                    <path d="M0,0 L0,20" id="path-1"></path>
+                </g>
+                <g id="path-1-link" transform="translate(10.500000, 0.500000)">
+                    <path d="M0,0 L0,20" id="path-1"></path>
+                </g>
+            </g>
+            <polygon id="Shape" points="613 149 637 149 637 173 613 173"></polygon>
+            <circle id="Oval" fill="#979797" cx="381" cy="96" r="4"></circle>
+            <circle id="Oval-Copy-2" fill="#979797" cx="381" cy="258" r="4"></circle>
+            <circle id="Oval-Copy" fill="#979797" cx="609" cy="182" r="4"></circle>
+            <polygon id="Rectangle-2" fill="#979797" transform="translate(506.232117, 182.021960) rotate(-45.000000) translate(-506.232117, -182.021960) " points="508.110797 177.314854 510.939224 186.729067 501.52501 183.90064"></polygon>
+            <polygon id="Rectangle-2-Copy" fill="#979797" transform="translate(782.320811, 182.023697) rotate(-45.000000) translate(-782.320811, -182.023697) " points="784.199491 177.31659 787.027918 186.730804 777.613705 183.902377"></polygon>
+            <path d="M108,259 L282,259" id="Path-2" stroke="#979797" stroke-width="2"></path>
+            <circle id="Oval" fill="#979797" cx="105" cy="259" r="4"></circle>
+            <polygon id="Rectangle-2" fill="#979797" transform="translate(279.233374, 259.015163) rotate(-45.000000) translate(-279.233374, -259.015163) " points="281.112053 254.308056 283.94048 263.72227 274.526267 260.893842"></polygon>
+            <path d="M108,97 L282,97" id="Path-2" stroke="#979797" stroke-width="2"></path>
+            <circle id="Oval" fill="#979797" cx="105" cy="97" r="4"></circle>
+            <polygon id="Rectangle-2" fill="#979797" transform="translate(279.349126, 97.013395) rotate(-45.000000) translate(-279.349126, -97.013395) " points="281.227805 92.3062884 281.665951 93.7646252 284.056233 101.720502 274.642019 98.8920748"></polygon>
+            <path d="M381,96 L462.988629,96 C465.750053,96 467.988629,98.2385763 467.988629,101 L467.988629,177 C467.988629,179.761424 470.227205,182 472.988629,182 L507.511538,182" id="Path-3" stroke="#979797" stroke-width="2"></path>
+            <path d="M381,258 L462.988629,258 C465.750053,258 467.988629,255.761424 467.988629,253 L467.988629,187 C467.988629,184.238576 470.227205,182 472.988629,182 L508,182" id="Path-4" stroke="#979797" stroke-width="2"></path>
+            <rect id="Rectangle-27" stroke="#979797" x="5.5" y="5.5" width="884" height="320"></rect>
+            <g id="Group-2" transform="translate(109.000000, 57.000000)">
+                <polygon id="Shape" points="0 7 24 7 24 31 0 31"></polygon>
+                <text id="Bookmark-automatical" font-family="OpenSans-Regular, Open Sans" font-size="12" font-weight="normal" fill="#333333">
+                    <tspan x="24" y="13">Bookmark automatically</tspan>
+                    <tspan x="24" y="30">passed within session</tspan>
+                </text>
+            </g>
+            <text id="Bookmark-automatical" font-family="OpenSans-Regular, Open Sans" font-size="12" font-weight="normal" fill="#333333">
+                <tspan x="137" y="233">Bookmark automatically</tspan>
+                <tspan x="137" y="250">passed within session</tspan>
+            </text>
+            <text id="Bookmark-automatical" font-family="OpenSans-Regular, Open Sans" font-size="12" font-weight="normal" fill="#333333">
+                <tspan x="638" y="156">Bookmark automatically</tspan>
+                <tspan x="638" y="173">passed within session</tspan>
+            </text>
+        </g>
+    </g>
+</svg>

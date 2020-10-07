@@ -1,0 +1,54 @@
+[[drivers]]
+ifndef::backend-pdf[]
+= The Neo4j Java Driver Manual v{driver-version}
+endif::[]
+ifdef::backend-pdf[]
+= The Neo4j Java Driver Manual v{driver-version}
+endif::[]
+:project-version:
+:manual-title: Neo4j Java Driver Manual {project-version}
+:source-indent: 0
+:icons: font
+:iconfont-cdn: https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.0.0/css/font-awesome.min.css
+// :example-caption!:
+// :table-caption!:
+ifndef::java-root[:java-root: {project-root}/build/driver-sources/java-driver]
+:java-examples: {java-root}/examples/src/main/java/org/neo4j/docs/driver
+:api-docs-base-uri: https://neo4j.com/docs/api
+
+
+ifndef::backend-pdf[]
+License: link:{common-license-page-uri}[Creative Commons 4.0]
+endif::[]
+ifdef::backend-pdf[]
+Copyright (C) {copyright}
+
+License: <<license, Creative Commons 4.0>>
+endif::[]
+
+[abstract]
+--
+This is the manual for Neo4j Java Driver version {driver-version}, authored by the Neo4j Team.
+--
+
+This manual covers the following areas:
+
+* <<driver-get-started>> -- An overview of the official Neo4j Java Driver and how to connect to a Neo4j database.
+* <<driver-client-applications>> -- How to manage database connections within an application.
+* <<driver-cypher-workflow>> -- How to create units of work and provide a logical context for that work.
+* <<driver-session-api>> -- How the types and values used by Cypher map to native language types.
+* <<driver-terminology>> -- Terminology for drivers.
+
+_Who should read this?_
+
+This manual is written for Java developers building a Neo4j client application.
+
+include::get-started.adoc[leveloffset=+1]
+
+include::client-applications.adoc[leveloffset=+1]
+
+include::cypher-workflow.adoc[leveloffset=+1]
+
+include::session-api.adoc[leveloffset=+1]
+
+include::terminology.adoc[leveloffset=+1]
