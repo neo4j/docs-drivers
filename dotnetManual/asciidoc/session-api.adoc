@@ -6,27 +6,6 @@
 This section details the Session API that are made available by the driver, with each Session class oriented towards a different form of programming.
 --
 
-This chapter describes the following:
-
-* <<driver-simple-sessions, Simple sessions>>
-** <<driver-simple-lifecycle, Lifecycle>>
-** <<driver-simple-transaction-fn, Transaction functions>>
-** <<driver-simple-autocommit-transactions, Auto-commit transactions>>
-** <<driver-simple-result-consume, Consuming results>>
-** <<driver-simple-result-retain, Retaining results>>
-* <<driver-async-sessions, Asynchronous sessions>>
-** <<driver-async-transaction-fn, Transaction functions>>
-** <<driver-async-autocommit-transactions, Auto-commit transaction>>
-** <<driver-async-result-consume, Consuming results>>
-* <<driver-rx-sessions, Reactive sessions>>
-** <<driver-rx-lifecycle, Lifecycle>>
-** <<driver-rx-transaction-fn, Transaction functions>>
-** <<driver-rx-autocommit-transactions, Auto-commit transactions>>
-** <<driver-rx-result-consume, Consuming results>>
-** <<driver-rx-cancellation, Cancellation>>
-* <<driver-session-configuration, Configuration>>
-
-
 
 [[driver-simple-sessions]]
 == Simple sessions
@@ -35,15 +14,6 @@ This chapter describes the following:
 --
 This section describes simple sessions, transactions executed within a simple session and the results thereof.
 --
-
-[NOTE]
-====
-Available in:
-
-- .NET Driver
-- Java Driver
-- Python Driver
-====
 
 Simple sessions provide a "classic" *_blocking style_* API for Cypher execution.
 In general, simple sessions provide the easiest programming style to work with since API calls are executed in a strictly sequential fashion.
@@ -55,40 +25,13 @@ In general, simple sessions provide the easiest programming style to work with s
 The session lifetime extends from session construction to session closure.
 In languages that support them, simple sessions are usually scoped within a context block; this ensures that they are properly closed and that any underlying connections are released and not leaked.
 
-
-[.tabbed-example]
 .Session construction and closure
-====
-[.include-with-dotnet]
-======
 [source, csharp ]
 ----
 using (var session = driver.Session(...)) {
     // transactions go here
   }
 ----
-======
-
-[.include-with-java]
-======
-[source, java]
-----
-try (Session session = driver.session(...)) {
-    // transactions go here
-}
-----
-======
-
-[.include-with-python]
-======
-[source, python]
-----
-with driver.session(...) as session:
-    // transactions go here
-----
-======
-
-====
 
 *_Sessions can be configured in a number of different ways_*.
 This is carried out by supplying configuration inside the session constructor.
@@ -123,39 +66,12 @@ These cases include connection issues, server role changes (e.g. leadership elec
 Retry logic can be configured when creating a session.
 ====
 
-[.tabbed-example]
 .Transaction function
-====
-[.include-with-dotnet]
-======
 [source, csharp]
 ----
 include::{dotnet-examples}/Examples.cs[tags=transaction-function]
 ----
-======
 
-[.include-with-java]
-======
-[source, java]
-----
-include::{java-examples}/TransactionFunctionExample.java[tags=transaction-function]
-----
-======
-
-[.include-with-python]
-======
-[source, python]
-----
-include::{python-examples}/test_transaction_function_example.py[tags=transaction-function-import]
-----
-
-[source, python]
-----
-include::{python-examples}/test_transaction_function_example.py[tags=transaction-function]
-----
-======
-
-====
 
 
 [[driver-simple-autocommit-transactions]]
@@ -181,40 +97,11 @@ Therefore, the only way to execute `PERIODIC COMMIT` from a driver is to use aut
 Please refer to the <<cypher-manual#query-using-periodic-commit-hint, Cypher Manual -> `PERIODIC COMMIT` query hint>>.
 ====
 
-[.tabbed-example]
 .Simple auto-commit transactions
-====
-
-[.include-with-dotnet]
-======
 [source, csharp]
 ----
 include::{dotnet-examples}/Examples.cs[tags=autocommit-transaction]
 ----
-======
-
-[.include-with-java]
-======
-[source, java]
-----
-include::{java-examples}/AutocommitTransactionExample.java[tags=autocommit-transaction]
-----
-======
-
-[.include-with-python]
-======
-[source, python]
-----
-include::{python-examples}/test_autocommit_transaction_example.py[tags=autocommit-transaction-import]
-----
-
-[source, python]
-----
-include::{python-examples}/test_autocommit_transaction_example.py[tags=autocommit-transaction]
-----
-======
-
-====
 
 
 [[driver-simple-result-consume]]
@@ -223,35 +110,11 @@ include::{python-examples}/test_autocommit_transaction_example.py[tags=autocommi
 Query results are typically consumed as a stream of records.
 The drivers provide a language-idiomatic way to iterate through that stream.
 
-[.tabbed-example]
 .Consuming results
-====
-
-[.include-with-dotnet]
-======
 [source, csharp]
 ----
 include::{dotnet-examples}/Examples.cs[tags=result-consume]
 ----
-======
-
-[.include-with-java]
-======
-[source, java]
-----
-include::{java-examples}/ResultConsumeExample.java[tags=result-consume]
-----
-======
-
-[.include-with-python]
-======
-[source, python]
-----
-include::{python-examples}/test_result_consume_example.py[tags=result-consume]
-----
-======
-
-====
 
 
 [[driver-simple-result-retain]]
@@ -275,35 +138,11 @@ Client applications can choose to take control of more advanced query patterns b
 Such explicit retention may also be useful when a result needs to be saved for future processing.
 The drivers offer support for this process, as per the example below:
 
-[.tabbed-example]
 .Retain results for further processing
-====
-
-[.include-with-dotnet]
-======
 [source, csharp]
 ----
 include::{dotnet-examples}/Examples.cs[tags=result-retain]
 ----
-======
-
-[.include-with-java]
-======
-[source, java]
-----
-include::{java-examples}/ResultRetainExample.java[tags=result-retain]
-----
-======
-
-[.include-with-python]
-======
-[source, python]
-----
-include::{python-examples}/test_result_retain_example.py[tags=result-retain]
-----
-======
-
-====
 
 
 [[driver-async-sessions]]
@@ -313,15 +152,6 @@ include::{python-examples}/test_result_retain_example.py[tags=result-retain]
 --
 This section describes asynchronous sessions, transactions executed within an asynchronous session and the results thereof.
 --
-
-[NOTE]
-====
-Available in:
-
-- .NET Driver
-- Java Driver
-- JavaScript Driver
-====
 
 Asynchronous sessions provide an API wherein function calls typically return available objects such as futures.
 This allows client applications to work within asynchronous frameworks and take advantage of cooperative multitasking.
@@ -335,6 +165,7 @@ A session then exists until it is closed, which is typically set to occur after 
 
 Sessions can be configured in a number of different ways. This is carried out by supplying configuration inside the session constructor.
 See <<Session configuration>> for more details.
+
 
 [[driver-async-transaction-fn]]
 === Transaction functions
@@ -361,38 +192,11 @@ These cases include connection issues, server role changes (e.g. leadership elec
 Retry logic can be configured when creating a session.
 ====
 
-[.tabbed-example]
 .Asynchronous transaction functions
-========
-
-[.include-with-dotnet]
-======
-.Transaction function
 [source, csharp]
 ----
 include::{dotnet-examples}/ExamplesAsync.cs[tags=async-transaction-function]
 ----
-======
-
-[.include-with-java]
-======
-.Transaction function
-[source, java]
-----
-include::{java-examples}/AsyncTransactionFunctionExample.java[tags=async-transaction-function]
-----
-======
-
-[.include-with-javascript]
-======
-.Transaction function
-[source, javascript]
-----
-include::{javascript-examples}/examples.test.js[tags=async-transaction-function]
-----
-======
-
-========
 
 
 [[driver-async-autocommit-transactions]]
@@ -418,38 +222,12 @@ Therefore, the only way to execute them from a driver is to use auto-commit tran
 Please refer to the <<cypher-manual#query-using-periodic-commit-hint, Cypher Manual -> `PERIODIC COMMIT` query hint>>.
 ====
 
-[.tabbed-example]
 .Asynchronous auto-commit transactions
-========
-
-[.include-with-dotnet]
-======
 .Auto-commit transaction
 [source, csharp]
 ----
 include::{dotnet-examples}/ExamplesAsync.cs[tags=async-autocommit-transaction]
 ----
-======
-
-[.include-with-java]
-======
-.Auto-commit transaction
-[source, java]
-----
-include::{java-examples}/AsyncAutocommitTransactionExample.java[tags=async-autocommit-transaction]
-----
-======
-
-[.include-with-javascript]
-======
-.Auto-commit transaction
-[source, javascript]
-----
-include::{javascript-examples}/examples.test.js[tags=async-autocommit-transaction]
-----
-======
-
-========
 
 
 [[driver-async-result-consume]]
@@ -457,38 +235,11 @@ include::{javascript-examples}/examples.test.js[tags=async-autocommit-transactio
 
 The asynchronous session API provides language-idiomatic methods to aid integration with asynchronous applications and frameworks.
 
-[.tabbed-example]
 .Asynchronous consuming results
-========
-
-[.include-with-dotnet]
-======
-.Consuming results
 [source, csharp]
 ----
 include::{dotnet-examples}/ExamplesAsync.cs[tags=async-result-consume]
 ----
-======
-
-[.include-with-java]
-======
-.Consuming results
-[source, java]
-----
-include::{java-examples}/AsyncResultConsumeExample.java[tags=async-result-consume]
-----
-======
-
-[.include-with-javascript]
-======
-.Consuming results
-[source, javascript]
-----
-include::{javascript-examples}/examples.test.js[tags=async-result-consume]
-----
-======
-
-========
 
 
 [[driver-rx-sessions]]
@@ -498,15 +249,6 @@ include::{javascript-examples}/examples.test.js[tags=async-result-consume]
 --
 This section describes reactive sessions, transactions executed within a reactive session and the results thereof.
 --
-
-[NOTE]
-====
-Available in:
-
-- .NET Driver
-- Java Driver
-- JavaScript Driver
-====
 
 Starting with *Neo4j 4.0*, the reactive processing of queries is supported.
 This can be achieved through reactive sessions.
@@ -561,38 +303,11 @@ For several failure cases, the transaction can be immediately retried against a 
 These cases include connection issues, server role changes (e.g. leadership elections) and transient errors.
 Retry logic can be configured when creating a session.
 
-[.tabbed-example]
 .Reactive transaction functions
-========
-
-[.include-with-dotnet]
-======
-.Reactive transaction function
 [source, csharp]
 ----
 include::{dotnet-examples}/ExamplesRx.cs[tags=rx-transaction-function]
 ----
-======
-
-[.include-with-java]
-======
-.Reactive transaction function
-[source, java]
-----
-include::{java-examples}/RxTransactionFunctionExample.java[tags=rx-transaction-function]
-----
-======
-
-[.include-with-javascript]
-======
-.Reactive transaction function
-[source, javascript]
-----
-include::{javascript-examples}/examples.test.js[tags=rx-transaction-function]
-----
-======
-
-========
 
 Sessions can be configured in a number of different ways.
 This is carried out by supplying configuration inside the session constructor.
@@ -622,38 +337,11 @@ Unlike other kinds of Cypher query, `PERIODIC COMMIT` queries do not participate
 Please refer to the <<cypher-manual#query-using-periodic-commit-hint, Cypher Manual -> `PERIODIC COMMIT` query hint>>.
 ====
 
-[.tabbed-example]
 .Reactive auto-commit transactions
-========
-
-[.include-with-dotnet]
-======
-.Auto-commit transactions
 [source, csharp]
 ----
 include::{dotnet-examples}/ExamplesRx.cs[tags=rx-autocommit-transaction]
 ----
-======
-
-[.include-with-java]
-======
-.Auto-commit transactions
-[source, java]
-----
-include::{java-examples}/RxAutocommitTransactionExample.java[tags=rx-autocommit-transaction]
-----
-======
-
-[.include-with-javascript]
-======
-.Auto-commit transactions
-[source, javascript]
-----
-include::{javascript-examples}/examples.test.js[tags=rx-autocommit-transaction]
-----
-======
-
-========
 
 
 [[driver-rx-result-consume]]
@@ -665,38 +353,11 @@ Each transaction corresponds to a data flow which supplies the data from the ser
 Result processing begins when records are pulled from this flow.
 Only one subscriber may pull data from a given flow.
 
-[.tabbed-example]
 .Reactive consuming results
-========
-
-[.include-with-dotnet]
-======
-.Consuming results
 [source, csharp]
 ----
 include::{dotnet-examples}/ExamplesRx.cs[tags=rx-result-consume]
 ----
-======
-
-[.include-with-java]
-======
-.Consuming results
-[source, java]
-----
-include::{java-examples}/RxResultConsumeExample.java[tags=rx-result-consume]
-----
-======
-
-[.include-with-javascript]
-======
-.Consuming results
-[source, javascript]
-----
-include::{javascript-examples}/examples.test.js[tags=rx-result-consume]
-----
-======
-
-========
 
 
 [[driver-rx-cancellation]]

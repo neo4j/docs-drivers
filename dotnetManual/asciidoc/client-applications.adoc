@@ -6,22 +6,6 @@
 This section describes how to manage database connections within an application.
 --
 
-This section contains the following:
-
-* <<driver-driver-object,The Driver object>>
-* <<driver-connection-uris,Connection URIs>>
-** <<initial-address-resolution,Initial address resolution>>
-** <<driver-routing-table,Routing table>>
-** <<driver-routing-context,Routing context>>
-** <<driver-configuration-examples,Examples>>
-* <<driver-authentication,Authentication>>
-** <<driver-authentication-basic,Basic authentication>>
-** <<driver-authentication-kerberos,Kerberos authentication>>
-** <<driver-authentication-custom,Custom authentication>>
-* <<driver-configuration,Configuration>>
-* <<driver-logging,Logging>>
-
-
 [[driver-driver-object]]
 == The Driver Object
 
@@ -48,11 +32,8 @@ The configuration details are immutable for the lifetime of the Driver Object.
 Therefore, if multiple configurations are required (such as when working with multiple database users) then multiple Driver Objects must be used.
 
 
-[.tabbed-example]
+
 .The driver lifecycle
-====
-[.include-with-dotnet]
-======
 [source, csharp]
 ----
 include::{dotnet-examples}/Examples.cs[tags=driver-lifecycle]
@@ -63,50 +44,6 @@ include::{dotnet-examples}/Examples.cs[tags=driver-lifecycle]
 // ----
 // include::{dotnet-examples}/Examples.cs[tags=driver-lifecycle-import]
 // ----
-======
-
-
-[.include-with-java]
-======
-.Import driver lifecycle
-[source, java]
-----
-include::{java-examples}/DriverLifecycleExample.java[tags=driver-lifecycle-import]
-----
-
-[source, java]
-----
-include::{java-examples}/DriverLifecycleExample.java[tags=driver-lifecycle]
-----
-======
-
-[.include-with-javascript]
-======
-[source, javascript]
-----
-include::{javascript-examples}/examples.test.js[tags=driver-lifecycle]
-----
-
-// .Import driver lifecycle
-// [source, javascript]
-// ----
-// include::{javascript-examples}/examples.test.js[tags=driver-lifecycle-import]
-// ----
-======
-
-[.include-with-python]
-======
-[source, python]
-----
-include::{python-examples}/test_driver_lifecycle_example.py[tags=driver-lifecycle-import]
-----
-
-[source, python]
-----
-include::{python-examples}/test_driver_lifecycle_example.py[tags=driver-lifecycle]
-----
-======
-====
 
 
 [[driver-connection-uris]]
@@ -196,47 +133,12 @@ image::resolver-function.png[title="Initial address resolution using resolver fu
 
 The example below shows how to expand a single address into multiple (hard-coded) output addresses:
 
-[.tabbed-example]
+
 .Custom Address Resolver
-====
-[.include-with-dotnet]
-======
 [source, csharp]
 ----
 include::{dotnet-examples}/Examples.cs[tags=config-custom-resolver]
 ----
-======
-
-[.include-with-java]
-======
-[source, java]
-----
-include::{java-examples}/ConfigCustomResolverExample.java[tags=config-custom-resolver]
-----
-======
-
-[.include-with-javascript]
-======
-[source, javascript]
-----
-include::{javascript-examples}/examples.test.js[tags=config-custom-resolver]
-----
-======
-
-[.include-with-python]
-======
-[source, python]
-----
-include::{python-examples}/test_custom_resolver_example.py[tags=custom-resolver-import]
-----
-
-[source, python]
-----
-include::{python-examples}/test_custom_resolver_example.py[tags=custom-resolver]
-----
-======
-
-====
 
 
 [[driver-routing-table]]
@@ -353,11 +255,7 @@ This latter variant is designed specifically for use with self-signed certificat
 The table below provides example code snippets for different deployment configurations.
 Each snippet expects an `auth` variable to have been previously defined, containing the authentication details for that connection.
 
-[.tabbed-example]
 .Connecting to a service
-====
-[.include-with-dotnet]
-======
 The table below illustrates examples of how to connect to a service with routing:
 
 [options="header", cols="a,a,a,a"]
@@ -619,259 +517,6 @@ GraphDatabase.driver("neo4j://graph.example.com:7687", auth)
 
 [NOTE]
 To connect to a service without routing, you can replace `neo4j` with `bolt`.
-
-======
-
-[.include-with-javascript]
-======
-The table below illustrates examples of how to connect to a service with routing:
-
-[options="header", cols="a,a,a,a"]
-|===
-|Product
-|Security
-|Code snippet
-|Comments
-
-|Neo4j Aura
-|Secured with full certificate
-|
-[source, javascript]
-----
-neo4j.driver("neo4j+s://graph.example.com:7687", auth)
-----
-
-If you do not have at least the JavaScript Driver 4.0.2 patch installed, you will need this snippet instead:
-
-[source, javascript]
-----
-const uri = 'neo4j://graph.example.com:7687'
-const driver = neo4j.driver(uri, auth, {
-  encrypted: 'ENCRYPTION_ON'
-})
-----
-| This is the default (and only option) for Neo4j Aura
-
-|Neo4j 4.x
-|Unsecured
-|
-[source, javascript]
-----
-neo4j.driver("neo4j://graph.example.com:7687", auth)
-----
-|This is the default for Neo4j 4.x series
-
-|Neo4j 4.x
-|Secured with full certificate
-|
-[source, javascript]
-----
-neo4j.driver("neo4j+s://graph.example.com:7687", auth)
-----
-
-If you do not have at least the JavaScript Driver 4.0.2 patch installed, you will need this snippet instead:
-
-[source, javascript]
-----
-const uri = 'neo4j://graph.example.com:7687'
-const driver = neo4j.driver(uri, auth, {
-  encrypted: 'ENCRYPTION_ON'
-})
-----
-|
-
-|Neo4j 4.x
-|Secured with self-signed certificate
-|
-[source, javascript]
-----
-neo4j.driver("neo4j+ssc://graph.example.com:7687", auth)
-----
-
-If you do not have at least the JavaScript Driver 4.0.2 patch installed, you will need this snippet instead:
-
-[source, javascript]
-----
-const uri = 'neo4j://graph.example.com:7687'
-const driver = neo4j.driver(uri, auth, {
-  encrypted: 'ENCRYPTION_ON',
-  trust: 'TRUST_ALL_CERTIFICATES'
-})
-----
-|
-
-|Neo4j 3.x
-|Secured with full certificate
-|
-[source, javascript]
-----
-neo4j.driver("neo4j+s://graph.example.com:7687", auth)
-----
-
-If you do not have at least the JavaScript Driver 4.0.2 patch installed, you will need this snippet instead:
-
-[source, javascript]
-----
-const uri = 'neo4j://graph.example.com:7687'
-const driver = neo4j.driver(uri, auth, {
-  encrypted: 'ENCRYPTION_ON'
-})
-----
-|
-
-|Neo4j 3.x
-|Secured with self-signed certificate
-|
-[source, javascript]
-----
-neo4j.driver("neo4j+ssc://graph.example.com:7687", auth)
-----
-
-If you do not have at least the JavaScript Driver 4.0.2 patch installed, you will need this snippet instead:
-
-[source, javascript]
-----
-const uri = 'neo4j://graph.example.com:7687'
-const driver = neo4j.driver(uri, auth, {
-  encrypted: 'ENCRYPTION_ON',
-  trust: 'TRUST_ALL_CERTIFICATES'
-})
-----
-|This is the default for Neo4j 3.x series
-
-|Neo4j 3.x
-|Unsecured
-|
-[source, javascript]
-----
-neo4j.driver("neo4j://graph.example.com:7687", auth)
-----
-|
-
-|===
-
-[NOTE]
-To connect to a service without routing, you can replace `neo4j` with `bolt`.
-
-======
-
-[.include-with-python]
-======
-The table below illustrates examples of how to connect to a service with routing:
-
-[options="header", cols="a,a,a,a"]
-|===
-|Product
-|Security
-|Code snippet
-|Comments
-
-|Neo4j Aura
-|Secured with full certificate
-|
-[source, python]
-----
-GraphDatabase.driver("neo4j+s://graph.example.com:7687", auth)
-----
-
-For Python Driver versions before 4.0.0 you need this snippet instead:
-[source, python]
-----
-GraphDatabase.driver("neo4j://graph.example.com:7687", auth,
-    "encrypted"=True, "trust"=TRUST_SYSTEM_CA_SIGNED_CERTIFICATES)
-----
-| This is the default (and only option) for Neo4j Aura
-
-|Neo4j 4.x
-|Unsecured
-|
-[source, python]
-----
-GraphDatabase.driver("neo4j://graph.example.com:7687", auth)
-----
-|This is the default for Neo4j 4.x series
-
-|Neo4j 4.x
-|Secured with full certificate
-|
-[source, python]
-----
-GraphDatabase.driver("neo4j+s://graph.example.com:7687", auth)
-----
-
-For Python Driver versions before 4.0.0 you need this snippet instead:
-[source, python]
-----
-GraphDatabase.driver("neo4j://graph.example.com:7687", auth,
-    "encrypted"=True, "trust"=TRUST_SYSTEM_CA_SIGNED_CERTIFICATES)
-----
-|
-
-|Neo4j 4.x
-|Secured with self-signed certificate
-|
-[source, python]
-----
-neo4j.driver("neo4j+ssc://graph.example.com:7687", auth)
-----
-
-For Python Driver versions before 4.0.0 you need this snippet instead:
-[source, python]
-----
-GraphDatabase.driver("neo4j://graph.example.com:7687", auth,
-    "encrypted"=True, "trust"=TRUST_ALL_CERTIFICATES)
-----
-|
-
-|Neo4j 3.x
-|Secured with full certificate
-|
-[source, python]
-----
-neo4j.driver("neo4j+s://graph.example.com:7687", auth)
-----
-
-For Python Driver versions before 4.0.0 you need this snippet instead:
-[source, python]
-----
-GraphDatabase.driver("neo4j://graph.example.com:7687", auth,
-    "encrypted"=True, "trust"=TRUST_SYSTEM_CA_SIGNED_CERTIFICATES)
-----
-|
-
-|Neo4j 3.x
-|Secured with self-signed certificate
-|
-[source, python]
-----
-neo4j.driver("neo4j+ssc://graph.example.com:7687", auth)
-----
-
-For Python Driver versions before 4.0.0 you need this snippet instead:
-[source, python]
-----
-GraphDatabase.driver("neo4j://graph.example.com:7687", auth,
-    "encrypted"=True, "trust"=TRUST_ALL_CERTIFICATES)
-----
-|This is the default for Neo4j 3.x series
-
-|Neo4j 3.x
-|Unsecured
-|
-[source, python]
-----
-neo4j.driver("neo4j://graph.example.com:7687", auth)
-----
-|
-
-|===
-
-[NOTE]
-To connect to a service without routing, you can replace `neo4j` with `bolt`.
-
-======
-
-====
 
 
 [[driver-authentication]]
@@ -887,11 +532,7 @@ Authentication details are provided as an auth token which contains the user nam
 The basic authentication scheme is backed by a password file stored within the server and requires applications to provide a user name and password.
 For this, use the basic auth helper:
 
-[.tabbed-example]
 .Basic authentication
-====
-[.include-with-dotnet]
-======
 [source, csharp]
 ----
 include::{dotnet-examples}/Examples.cs[tags=basic-auth]
@@ -902,50 +543,6 @@ include::{dotnet-examples}/Examples.cs[tags=basic-auth]
 // ----
 // include::{dotnet-examples}/Examples.cs[tags=basic-auth-import]
 // ----
-======
-
-[.include-with-java]
-======
-.Import basic authentication
-[source, java]
-----
-include::{java-examples}/BasicAuthExample.java[tags=basic-auth-import]
-----
-
-[source, java]
-----
-include::{java-examples}/BasicAuthExample.java[tags=basic-auth]
-----
-======
-
-[.include-with-javascript]
-======
-[source, javascript]
-----
-include::{javascript-examples}/examples.test.js[tags=basic-auth]
-----
-
-// .Import basic authentication
-// [source, javascript]
-// ----
-// include::{javascript-examples}/examples.test.js[tags=basic-auth-import]
-// ----
-======
-
-[.include-with-python]
-======
-[source, python]
-----
-include::{python-examples}/test_basic_auth_example.py[tags=basic-auth-import]
-----
-
-[source, python]
-----
-include::{python-examples}/test_basic_auth_example.py[tags=basic-auth]
-----
-======
-
-====
 
 [NOTE]
 --
@@ -959,11 +556,7 @@ The basic authentication scheme can also be used to authenticate against an LDAP
 The Kerberos authentication scheme provides a simple way to create a Kerberos authentication token with a base64 encoded server authentication ticket.
 The best way to create a Kerberos authentication token is shown below:
 
-[.tabbed-example]
 .Kerberos authentication
-====
-[.include-with-dotnet]
-======
 [source, csharp]
 ----
 include::{dotnet-examples}/Examples.cs[tags=kerberos-auth]
@@ -974,50 +567,6 @@ include::{dotnet-examples}/Examples.cs[tags=kerberos-auth]
 // ----
 // include::{dotnet-examples}/Examples.cs[tags=kerberos-auth-import]
 // ----
-======
-
-[.include-with-java]
-======
-.Import Kerberos authentication
-[source, java]
-----
-include::{java-examples}/KerberosAuthExample.java[tags=kerberos-auth-import]
-----
-
-[source, java]
-----
-include::{java-examples}/KerberosAuthExample.java[tags=kerberos-auth]
-----
-======
-
-[.include-with-javascript]
-======
-[source, javascript]
-----
-include::{javascript-examples}/examples.test.js[tags=kerberos-auth]
-----
-
-// .Import Kerberos authentication
-// [source, javascript]
-// ----
-// include::{javascript-examples}/examples.test.js[tags=kerberos-auth-import]
-// ----
-======
-
-[.include-with-python]
-======
-[source, python]
-----
-include::{python-examples}/test_kerberos_auth_example.py[tags=kerberos-auth-import]
-----
-
-[source, python]
-----
-include::{python-examples}/test_kerberos_auth_example.py[tags=kerberos-auth]
-----
-======
-
-====
 
 [NOTE]
 --
@@ -1030,11 +579,7 @@ The Kerberos authentication token can only be understood by the server if the se
 
 For advanced deployments, where a custom security provider has been built, the custom authentication helper can be used.
 
-[.tabbed-example]
 .Custom authentication
-====
-[.include-with-dotnet]
-======
 [source, csharp]
 ----
 include::{dotnet-examples}/Examples.cs[tags=custom-auth]
@@ -1045,49 +590,6 @@ include::{dotnet-examples}/Examples.cs[tags=custom-auth]
 // ----
 // include::{dotnet-examples}/Examples.cs[tags=custom-auth-import]
 // ----
-======
-
-[.include-with-java]
-======
-.Import custom authentication
-[source, java]
-----
-include::{java-examples}/CustomAuthExample.java[tags=custom-auth-import]
-----
-
-[source, java]
-----
-include::{java-examples}/CustomAuthExample.java[tags=custom-auth]
-----
-======
-
-[.include-with-javascript]
-======
-[source, javascript]
-----
-include::{javascript-examples}/examples.test.js[tags=custom-auth]
-----
-// .Import custom authentication
-// [source, javascript]
-// ----
-// include::{javascript-examples}/examples.test.js[tags=custom-auth-import]
-// ----
-======
-
-[.include-with-python]
-======
-[source, python]
-----
-include::{python-examples}/test_custom_auth_example.py[tags=custom-auth-import]
-----
-
-[source, python]
-----
-include::{python-examples}/test_custom_auth_example.py[tags=custom-auth]
-----
-======
-
-====
 
 
 [[driver-configuration]]
@@ -1105,11 +607,7 @@ Finding an optimal value may require an element of experimentation, taking into 
 +
 *Default:* 60 seconds
 
-[.tabbed-example]
 .Configure connection pool
-====
-[.include-with-dotnet]
-======
 [source, csharp]
 ----
 include::{dotnet-examples}/Examples.cs[tags=config-connection-pool]
@@ -1119,51 +617,6 @@ include::{dotnet-examples}/Examples.cs[tags=config-connection-pool]
 // ----
 // include::{dotnet-examples}/Examples.cs[tags=config-connection-pool-import]
 // ----
-======
-
-
-[.include-with-java]
-======
-.Import connection pool configuration
-[source, java]
-----
-include::{java-examples}/ConfigConnectionPoolExample.java[tags=config-connection-pool-import]
-----
-
-[source, java]
-----
-include::{java-examples}/ConfigConnectionPoolExample.java[tags=config-connection-pool]
-----
-======
-
-[.include-with-javascript]
-======
-[source, javascript]
-----
-include::{javascript-examples}/examples.test.js[tags=config-connection-pool]
-----
-
-// .Import connection pool configuration
-// [source, javascript]
-// ----
-// include::{javascript-examples}/examples.test.js[tags=config-connection-pool-import]
-// ----
-======
-
-[.include-with-python]
-======
-[source, python]
-----
-include::{python-examples}/test_config_connection_pool_example.py[tags=config-connection-pool-import]
-----
-
-[source, python]
-----
-include::{python-examples}/test_config_connection_pool_example.py[tags=config-connection-pool]
-----
-======
-
-====
 
 `ConnectionTimeout`::
 
@@ -1178,11 +631,7 @@ For lower latency environments and quicker feedback on potential network issues 
 *Default:* 30 seconds
 
 
-[.tabbed-example]
 .Configure connection timeout
-====
-[.include-with-dotnet]
-======
 [source, csharp]
 ----
 include::{dotnet-examples}/Examples.cs[tags=config-connection-timeout]
@@ -1193,50 +642,6 @@ include::{dotnet-examples}/Examples.cs[tags=config-connection-timeout]
 // ----
 // include::{dotnet-examples}/Examples.cs[tags=config-connection-timeout-import]
 // ----
-======
-
-
-[.include-with-java]
-======
-.Import connection timeout configuration
-[source, java]
-----
-include::{java-examples}/ConfigConnectionTimeoutExample.java[tags=config-connection-timeout-import]
-----
-
-[source, java]
-----
-include::{java-examples}/ConfigConnectionTimeoutExample.java[tags=config-connection-timeout]
-----
-======
-
-[.include-with-javascript]
-======
-[source, javascript]
-----
-include::{javascript-examples}/examples.test.js[tags=config-connection-timeout]
-----
-// .Import connection timeout configuration
-// [source, javascript]
-// ----
-// include::{javascript-examples}/examples.test.js[tags=config-connection-timeout-import]
-// ----
-======
-
-[.include-with-python]
-======
-[source, python]
-----
-include::{python-examples}/test_config_connection_timeout_example.py[tags=config-connection-timeout-import]
-----
-
-[source, python]
-----
-include::{python-examples}/test_config_connection_timeout_example.py[tags=config-connection-timeout]
-----
-======
-
-====
 
 `CustomResolver`::
 
@@ -1248,11 +653,7 @@ Specify whether to use an encrypted connection between the driver and server.
 +
 *Default:* None
 
-[.tabbed-example]
 .Unencrypted configuration
-====
-[.include-with-dotnet]
-======
 [source, csharp]
 ----
 include::{dotnet-examples}/Examples.cs[tags=config-unencrypted]
@@ -1262,50 +663,6 @@ include::{dotnet-examples}/Examples.cs[tags=config-unencrypted]
 // ----
 // include::{dotnet-examples}/Examples.cs[tags=config-unencrypted-import]
 // ----
-======
-
-
-[.include-with-java]
-======
-.Import unencrypted configuration
-[source, java]
-----
-include::{java-examples}/ConfigUnencryptedExample.java[tags=config-unencrypted-import]
-----
-
-[source, java]
-----
-include::{java-examples}/ConfigUnencryptedExample.java[tags=config-unencrypted]
-----
-======
-
-[.include-with-javascript]
-======
-[source, javascript]
-----
-include::{javascript-examples}/examples.test.js[tags=config-unencrypted]
-----
-// .Import unencrypted configuration
-// [source, javascript]
-// ----
-// include::{javascript-examples}/examples.test.js[tags=config-unencrypted-import]
-// ----
-======
-
-[.include-with-python]
-======
-[source, python]
-----
-include::{python-examples}/test_config_unencrypted_example.py[tags=config-unencrypted-import]
-----
-
-[source, python]
-----
-include::{python-examples}/test_config_unencrypted_example.py[tags=config-unencrypted]
-----
-======
-
-====
 
 `MaxConnectionLifetime`::
 
@@ -1345,11 +702,7 @@ Failing transactions faster may highlight the reasons behind the transient error
 +
 *Default:* 30 seconds
 
-[.tabbed-example]
 .Configure maximum retry time
-====
-[.include-with-dotnet]
-======
 [source, csharp]
 ----
 include::{dotnet-examples}/Examples.cs[tags=config-max-retry-time]
@@ -1361,50 +714,6 @@ include::{dotnet-examples}/Examples.cs[tags=config-max-retry-time]
 // ----
 // include::{dotnet-examples}/Examples.cs[tags=config-max-retry-time-import]
 // ----
-======
-
-
-[.include-with-java]
-======
-.Import maximum retry time configuration
-[source, java]
-----
-include::{java-examples}/ConfigMaxRetryTimeExample.java[tags=config-max-retry-time-import]
-----
-
-[source, java]
-----
-include::{java-examples}/ConfigMaxRetryTimeExample.java[tags=config-max-retry-time]
-----
-======
-
-[.include-with-javascript]
-======
-[source, javascript]
-----
-include::{javascript-examples}/examples.test.js[tags=config-max-retry-time]
-----
-// .Import maximum retry time configuration
-// [source, javascript]
-// ----
-// include::{javascript-examples}/examples.test.js[tags=config-max-retry-time-import]
-// ----
-======
-
-[.include-with-python]
-======
-[source, python]
-----
-include::{python-examples}/test_config_max_retry_time_example.py[tags=config-max-retry-time-import]
-----
-
-[source, python]
-----
-include::{python-examples}/test_config_max_retry_time_example.py[tags=config-max-retry-time]
-----
-======
-
-====
 
 `TrustStrategy`::
 
@@ -1420,64 +729,7 @@ There are three choices as to which strategy to use:
 +
 *Default:* `TRUST_SYSTEM_CA_SIGNED_CERTIFICATES` (Note - only when encryption is enabled)
 
-[.tabbed-example]
 .Configure trusted certificates
-====
-[.include-with-dotnet]
-======
-[source, csharp]
-----
-include::{dotnet-examples}/Examples.cs[tags=config-trust]
-----
-// .Import trusted certificate configuration
-// [source, csharp]
-// ----
-// include::{dotnet-examples}/Examples.cs[tags=config-trust-import]
-// ----
-======
-
-
-[.include-with-java]
-======
-.Import trusted certificate configuration
-[source, java]
-----
-include::{java-examples}/ConfigTrustExample.java[tags=config-trust-import]
-----
-
-[source, java]
-----
-include::{java-examples}/ConfigTrustExample.java[tags=config-trust]
-----
-======
-
-[.include-with-javascript]
-======
-[source, javascript]
-----
-include::{javascript-examples}/examples.test.js[tags=config-trust]
-----
-// .Import trusted certificate configuration
-// [source, javascript]
-// ----
-// include::{javascript-examples}/examples.test.js[tags=config-trust-import]
-// ----
-======
-
-[.include-with-python]
-======
-[source, python]
-----
-include::{python-examples}/test_config_trust_example.py[tags=config-trust-import]
-----
-
-[source, python]
-----
-include::{python-examples}/test_config_trust_example.py[tags=config-trust]
-----
-======
-
-====
 
 `KeepAlive`::
 
@@ -1497,25 +749,10 @@ This is currently only configurable in the .NET Driver
 All official *Neo4j Drivers* log information to standard logging channels.
 This can typically be accessed in an ecosystem-specific way.
 
-The code snippets below show how to redirect log messages to standard output.
+The code snippet below demonstrates how to redirect log messages to standard output:
 
-[cols="2,2a"]
-|===
-| .NET
-| [source, csharp]
+[source, csharp]
+----
 #Please note that you will have to provide your own console logger implementing the ILogger interface.
 IDriver driver = GraphDatabase.Driver(..., o => o.WithLogger(logger));
-| Java
-| [source, java]
- ConfigBuilder.withLogging(Logging.console(Level.DEBUG))
-| JavaScript
-| [source, javascript]
-const loggingConfig = {logging: neo4j.logging.console('debug')};
-const driver = neo4j.driver(..., loggingConfig);
-| Python
-| [source, python]
-from logging import getLogger, StreamHandler, DEBUG
-handler = StreamHandler()
-handler.setLevel(DEBUG)
-getLogger("neo4j").addHandler(handler)
-|===
+----
