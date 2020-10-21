@@ -641,7 +641,7 @@ This is currently only configurable in the .NET Driver
 All official *Neo4j Drivers* log information to standard logging channels.
 This can typically be accessed in an ecosystem-specific way.
 
-The code snippets below show how to redirect log messages to standard output:
+The code snippet below demonstrates how to redirect log messages to standard output:
 
 [source, javascript]
 ----
