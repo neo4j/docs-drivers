@@ -114,43 +114,8 @@ Note that it is only when chaining across sessions that an application will need
 
 image::driver-passing-bookmarks.svg[title="Passing bookmarks", role="middle"]
 
-[.tabbed-example]
 .Pass bookmarks
-====
-[.include-with-dotnet]
 ======
-.Pass bookmarks
-[source, csharp]
-----
-include::{dotnet-examples}/Examples.cs[tags=pass-bookmarks]
-----
-
-// .Import bookmarks
-// [source, csharp]
-// ----
-// include::{dotnet-examples}/Examples.cs[tags=pass-bookmarks-import]
-// ----
-======
-
-
-[.include-with-java]
-======
-.Import bookmarks
-[source, java]
-----
-include::{java-examples}/PassBookmarkExample.java[tags=pass-bookmarks-import]
-----
-
-.Pass bookmarks
-[source, java]
-----
-include::{java-examples}/PassBookmarkExample.java[tags=pass-bookmarks]
-----
-======
-
-[.include-with-javascript]
-======
-.Pass bookmarks
 [source, javascript]
 ----
 include::{javascript-examples}/examples.test.js[tags=pass-bookmarks]
@@ -163,21 +128,6 @@ include::{javascript-examples}/examples.test.js[tags=pass-bookmarks]
 // ----
 
 ======
-
-[.include-with-python]
-======
-[source, python]
-----
-include::{python-examples}/test_pass_bookmarks_example.py[tags=pass-bookmarks-import]
-----
-
-[source, python]
-----
-include::{python-examples}/test_pass_bookmarks_example.py[tags=pass-bookmarks]
-----
-======
-
-====
 
 
 [[driver-access-modes-transaction]]
@@ -202,52 +152,8 @@ This is only used in cases when the access mode cannot otherwise be specified.
 The driver does not parse *Cypher* and therefore cannot automatically determine whether a transaction is intended to carry out read or write operations.
 As a result, a write transaction tagged as a read will still be sent to a read server, but will fail on execution.
 
-[.tabbed-example]
 .Read-write transaction
-====
-[.include-with-dotnet]
 ======
-
-.Read write transaction
-[source, csharp]
-----
-include::{dotnet-examples}/Examples.cs[tags=read-write-transaction]
-----
-
-// .Import read write transactions
-// ----
-// include::{dotnet-examples}/Examples.cs[tags=read-write-transaction-import]
-// ----
-
-======
-
-// [.include-with-go]
-// ======
-// [source, go]
-// ----
-// include::{go-examples}/examples_test.go[tags=read-write-transaction]
-// ----
-// ======
-
-[.include-with-java]
-======
-.Import read write transaction
-[source, java]
-----
-include::{java-examples}/ReadWriteTransactionExample.java[tags=read-write-transaction-import]
-----
-
-.Read write transaction
-[source, java]
-----
-include::{java-examples}/ReadWriteTransactionExample.java[tags=read-write-transaction]
-----
-======
-
-[.include-with-javascript]
-======
-
-.Read write transaction
 [source, javascript]
 ----
 include::{javascript-examples}/examples.test.js[tags=read-write-transaction]
@@ -260,16 +166,6 @@ include::{javascript-examples}/examples.test.js[tags=read-write-transaction]
 // ----
 
 ======
-
-[.include-with-python]
-======
-[source, python]
-----
-include::{python-examples}/test_read_write_transaction_example.py[tags=read-write-transaction]
-----
-======
-
-====
 
 
 [[driver-databases]]
@@ -350,57 +246,11 @@ transaction.commit()
 
 Please note that the database that is requested must exist.
 
-[.tabbed-example]
-.Database selection on session creation
-====
-[.include-with-dotnet]
-======
-.Database selection on session creation
-[source, csharp]
-----
-include::{dotnet-examples}/Examples.cs[tags=database-selection]
-----
-======
-
-[.include-with-java]
-======
-.Import database selection on session creation
-[source, java]
-----
-include::{java-examples}/DatabaseSelectionExample.java[tags=database-selection-import]
-----
-
-.Database selection on session creation
-[source, java]
-----
-include::{java-examples}/DatabaseSelectionExample.java[tags=database-selection]
-----
-======
-
-[.include-with-javascript]
-======
 .Database selection on session creation
 [source, javascript]
 ----
 include::{javascript-examples}/examples.test.js[tags=database-selection]
 ----
-======
-
-[.include-with-python]
-======
-.Database selection on session creation
-[source, python]
-----
-include::{python-examples}/test_database_selection_example.py[tags=database-selection-import]
-----
-
-[source, python]
-----
-include::{python-examples}/test_database_selection_example.py[tags=database-selection]
-----
-======
-
-====
 
 
 [[driver-type-mapping]]
@@ -450,95 +300,7 @@ For information on how to work with null in Cypher, please refer to <<cypher-man
 The Neo4j Drivers map Cypher Types to and from native language types as depicted in the table below.
 Custom types (those not available in the language or standard library) are highlighted in *bold*.
 
-[.tabbed-example]
 .Map Neo4j types to native language types
-====
-[.include-with-dotnet]
-======
-[options="header", cols=","]
-|===
-| Neo4j Cypher Type        | .NET Type
-| `null` | `null`
-| `List` | `IList<object>`
-| `Map` | `IDictionary<string, object>`
-| `Boolean` | `bool`
-| `Integer` | `long`
-| `Float` | `double`
-| `String` | `string`
-| `ByteArray` | `byte[]`
-| `Date` | *`LocalDate`*
-| `Time` | *`OffsetTime`*
-| `LocalTime` | *`LocalTime`*
-| `DateTime`* | *`ZonedDateTime`*
-| `LocalDateTime` | *`LocalDateTime`*
-| `Duration` | *`Duration`*
-| `Point` | *`Point`*
-| `Node` | *`INode`*
-| `Relationship` | *`IRelationship`*
-| `Path` | *`IPath`*
-|===
-
-+*+ Time zone names adhere to the https://www.iana.org/time-zones[IANA system], rather than the https://docs.microsoft.com/en-us/windows-hardware/manufacture/desktop/default-time-zones[Windows system].
-Inbound conversion is carried out using http://cldr.unicode.org/development/development-process/design-proposals/extended-windows-olson-zid-mapping[Extended Windows-Olson zid mapping] as defined by Unicode CLDR.
-======
-
-// [.include-with-go]
-// ======
-// [options="header", cols="m,"]
-// |===
-// | Neo4j type        | Go type
-// | null | `nil`
-// | List | `[]interface{}`
-// | Map | `map[string]interface{}`
-// | Boolean | `bool`
-// | Integer | `int64`
-// | Float | `float64`
-// | String | `string`
-// | ByteArray | `[]byte`
-// | Date | *`neo4j.Date`*
-// | Time | *`neo4j.OffsetTime`*
-// | LocalTime | *`neo4j.LocalTime`*
-// | DateTime | *`time.Time`**
-// | LocalDateTime | *`neo4j.LocalDateTime`*
-// | Duration | *`neo4j.Duration`*
-// | Point | *`neo4j.Point`*
-// | Node | *`neo4j.Node`*
-// | Relationship | *`neo4j.Relationship`*
-// | Path | *`neo4j.Path`*
-// |===
-//
-// +*+ When a `time.Time` value is sent/received through the driver and its `Zone()` returns a name of `Offset`, the value is stored with its offset value rather than its zone name.
-// ======
-
-[.include-with-java]
-======
-[options="header", cols="m,"]
-|===
-| Neo4j Cypher Type        | Java Type
-| null | `null`
-| List | `List<Object>`
-| Map | `Map<String, Object>`
-| Boolean | `boolean`
-| Integer | `long`
-| Float | `double`
-| String | `String`
-| ByteArray | `byte[]`
-| Date | `LocalDate`
-| Time | `OffsetTime`
-| LocalTime | `LocalTime`
-| DateTime | `ZonedDateTime`
-| LocalDateTime | `LocalDateTime`
-| Duration | *`IsoDuration`**
-| Point | *`Point`*
-| Node | *`Node`*
-| Relationship | *`Relationship`*
-| Path | *`Path`*
-|===
-
-+*+ A `Duration` or `Period` passed as a parameter will always be implicitly converted to `IsoDuration`.
-======
-
-[.include-with-javascript]
 ======
 [options="header", cols="m,"]
 |===
@@ -565,39 +327,6 @@ Inbound conversion is carried out using http://cldr.unicode.org/development/deve
 
 +*+ JavaScript has *_no native integer type_* so a custom type is provided. For convenience, this can be disabled through configuration so that the *_native Number type_* is used instead. Note that this can lead to a loss of precision.
 ======
-
-[.include-with-python]
-======
-[options="header", cols="m,"]
-|===
-| Neo4j Type | Python 3 Type
-| null | `None`
-| List | `list`
-| Map | `dict`
-| Boolean | `bool`
-| Integer | `int`
-| Float | `float`
-| String | `str`
-| ByteArray | `bytearray`
-| Date | *`neo4j.time.Date`*
-| Time | *`neo4j.time.Time`†*
-| LocalTime | *`neo4j.time.Time`††*
-| DateTime | *`neo4j.time.DateTime`†*
-| LocalDateTime | *`neo4j.time.DateTime`††*
-| Duration | *`neo4j.time.Duration`**
-| Point | *`neo4j.spatial.Point`*
-| Node | *`neo4j.graph.Node`*
-| Relationship | *`neo4j.graph.Relationship`*
-| Path | *`neo4j.graph.Path`*
-|===
-
-+*+ A `datetime.timedelta` object passed as a parameter will always be implicitly converted to `neo4j.time.Duration`
-
-† Where `tzinfo` *_is not_* `None`
-
-†† Where `tzinfo` *_is_* `None`
-======
-====
 
 
 [[driver-exceptions-errors]]
