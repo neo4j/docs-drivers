@@ -1,5 +1,5 @@
 name: go-manual
-title: Neo4j Go Manual
+title: Neo4j Go Driver Manual
 version: '4.2-preview'
 prerelease: true
 start_page: ROOT:index.adoc

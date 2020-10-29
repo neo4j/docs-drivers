@@ -1,5 +1,5 @@
 name: python-manual
-title: Neo4j Python Manual
+title: Neo4j Python Driver Manual
 version: '4.2-preview'
 prerelease: true
 start_page: ROOT:index.adoc

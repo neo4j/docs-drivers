@@ -1,5 +1,5 @@
 name: java-manual
-title: Neo4j Java Manual
+title: Neo4j Java Driver Manual
 version: '4.2-preview'
 prerelease: true
 start_page: ROOT:index.adoc
