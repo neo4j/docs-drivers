@@ -10,6 +10,6 @@ asciidoc:
     neo4j-version: '4.2'
     neo4j-version-exact: '4.2.0'
     neo4j-buildnumber: '4.2'
-    driver-version: "4.1"
+    driver-version: "4.2"
     python-driver-version: "4.1.1"
     python-examples: "partial$driver-sources/python-driver/4.1.1/tests/integration/examples"
