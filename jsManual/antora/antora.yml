@@ -1,0 +1,15 @@
+name: javascript-manual
+title: Neo4j JavaScript Driver Manual
+version: '4.2-preview'
+prerelease: true
+start_page: ROOT:index.adoc
+nav:
+- modules/ROOT/content-nav.adoc
+asciidoc:
+  attributes:
+    neo4j-version: '4.2'
+    neo4j-version-exact: '4.2.0'
+    neo4j-buildnumber: '4.2'
+    driver-version: "4.1"
+    javascript-driver-version: "4.1.2"
+    javascript-examples: 'partial$driver-sources/javascript-driver/4.1.2/test'
