@@ -212,7 +212,7 @@ The database name must not be `null`, nor an empty string.
 *_The selection of database is only possible when the driver is connected against Neo4j Enterprise Edition_*.
 Changing to any other database than the default database in Neo4j Community Edition will lead to a runtime error.
 
-The following example illustrates the concept of DBMS <<cypher-manual#transactions, Cypher Manual -> Transactions>> and shows how queries to multiple databases can be issued in one driver transaction. It is annotated with comments describing how each operation impacts database transactions.
+The following example illustrates the concept of DBMS <<cypher-manual#dbms-transactions, Cypher Manual -> Transactions>> and shows how queries to multiple databases can be issued in one driver transaction. It is annotated with comments describing how each operation impacts database transactions.
 
 [source]
 ----

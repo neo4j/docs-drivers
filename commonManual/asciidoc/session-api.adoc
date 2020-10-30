@@ -92,7 +92,7 @@ with driver.session(...) as session:
 
 *_Sessions can be configured in a number of different ways_*.
 This is carried out by supplying configuration inside the session constructor.
-See <<Session configuration>> for more details.
+See <<driver-session-configuration>> for more details.
 
 
 [[driver-simple-transaction-fn]]
@@ -334,7 +334,7 @@ Session lifetime begins with session construction.
 A session then exists until it is closed, which is typically set to occur after its contained query results have been consumed.
 
 Sessions can be configured in a number of different ways. This is carried out by supplying configuration inside the session constructor.
-See <<Session configuration>> for more details.
+See <<driver-session-configuration>> for more details.
 
 [[driver-async-transaction-fn]]
 === Transaction functions
@@ -739,6 +739,6 @@ See <<operations-manual#manage-databases-default, Operations Manual -> The defau
 `Fetch Size`::
 The number of records to fetch in each batch from the server.
 Neo4j 4.0 introduces the ability to pull records in batches, allowing the client application to take control of data population and apply back pressure to the server.
-This `FetchSize` applies to <<driver-simple-sessions, simple sessions>> and <<driver-asynchronous-sessions, async-sessions>> whereas reactive sessions can be controlled directly using the request method of the subscription.
+This `FetchSize` applies to <<driver-simple-sessions, simple sessions>> and <<driver-async-sessions, async-sessions>> whereas reactive sessions can be controlled directly using the request method of the subscription.
 +
 *Default:* 1000 records

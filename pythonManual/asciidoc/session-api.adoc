@@ -34,7 +34,7 @@ with driver.session(...) as session:
 
 *_Sessions can be configured in a number of different ways_*.
 This is carried out by supplying configuration inside the session constructor.
-See <<Session configuration>> for more details.
+See <<driver-session-configuration>> for more details.
 
 
 [[driver-simple-transaction-fn]]
@@ -155,3 +155,40 @@ The drivers offer support for this process, as per the example below:
 ----
 include::{python-examples}/test_result_retain_example.py[tags=result-retain]
 ----
+
+[[driver-session-configuration]]
+== Session configuration
+
+[abstract]
+--
+This section details the configuration options available when constructing a session.
+--
+
+[.compact]
+`Bookmarks`::
+The mechanism which ensures causal consistency between transactions within a session.
+Bookmarks are implicitly passed between transactions within a single session to meet the causal consistency requirements.
+There may be scenarios where you might want to use the bookmark from one session in a different new session.
++
+*Default:* None (Sessions will initially be created without a bookmark)
+
+`DefaultAccessMode`::
+A fallback for the access mode setting when transaction functions are not used.
+Typically, access mode is set per transaction by calling the appropriate transaction function method.
+In other cases, this setting is inherited. Note that transaction functions will ignore/override this setting.
++
+*Default:* Write
+
+`Database`::
+The database with which the session will interact.
+When you are working with a database which is not the default (i.e. the `system` database or another database in Neo4j 4.0 Enterprise Edition), you can explicitly configure the database which the driver is executing transactions against.
+See <<operations-manual#manage-databases-default, Operations Manual -> The default database>> for more information on databases.
++
+*Default:* the default database as configured on the server.
+
+`Fetch Size`::
+The number of records to fetch in each batch from the server.
+Neo4j 4.0 introduces the ability to pull records in batches, allowing the client application to take control of data population and apply back pressure to the server.
+This `FetchSize` applies to <<driver-simple-sessions, simple sessions>> and <<driver-async-sessions, async-sessions>> whereas reactive sessions can be controlled directly using the request method of the subscription.
++
+*Default:* 1000 records

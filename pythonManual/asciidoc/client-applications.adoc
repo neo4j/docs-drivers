@@ -35,7 +35,6 @@ Therefore, if multiple configurations are required (such as when working with mu
 
 .The driver lifecycle
 [source, python]
-======
 ----
 include::{python-examples}/test_driver_lifecycle_example.py[tags=driver-lifecycle-import]
 ----
@@ -44,7 +43,6 @@ include::{python-examples}/test_driver_lifecycle_example.py[tags=driver-lifecycl
 ----
 include::{python-examples}/test_driver_lifecycle_example.py[tags=driver-lifecycle]
 ----
-======
 
 
 [[driver-connection-uris]]

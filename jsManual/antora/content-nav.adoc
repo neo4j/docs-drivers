@@ -3,7 +3,6 @@
 * xref:client-applications/index.adoc[]
 * xref:cypher-workflow/index.adoc[]
 * xref:session-api/index.adoc[]
-** xref:session-api/simple/index.adoc[Simple Sessions]
 ** xref:session-api/asynchronous/index.adoc[Asynchronous Sessions]
 ** xref:session-api/reactive/index.adoc[Reactive Sessions]
 ** xref:session-api/configuration/index.adoc[Session Configuration]
