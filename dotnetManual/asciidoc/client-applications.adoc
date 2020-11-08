@@ -1,4 +1,4 @@
-[[driver-client-applications]]
+[[dotnet-driver-client-applications]]
 = Client applications
 
 [abstract]
@@ -6,7 +6,7 @@
 This section describes how to manage database connections within an application.
 --
 
-[[driver-driver-object]]
+[[dotnet-driver-driver-object]]
 == The Driver Object
 
 Neo4j client applications require a *_Driver Object_* which, from a data access perspective, forms the backbone of the application.
@@ -46,7 +46,7 @@ include::{dotnet-examples}/Examples.cs[tags=driver-lifecycle]
 // ----
 
 
-[[driver-connection-uris]]
+[[dotnet-driver-connection-uris]]
 == Connection URIs
 
 A connection URI identifies a graph database and how to connect to it.
@@ -91,7 +91,7 @@ For more information, see <<driver-configuration-examples>> below.
 |===
 
 
-[[initial-address-resolution]]
+[[dotnet-initial-address-resolution]]
 === Initial address resolution
 
 The address provided in a `neo4j://` URI is used for initial and fallback communication only.
@@ -104,7 +104,7 @@ Several options are available for providing this initial logical-to-physical hos
 These include *_regular DNS_*, *_custom middleware_* such as a load balancer, and the Driver Object *_resolver function_*, all of which are described in the following sections.
 
 
-[[dns-resolution]]
+[[dotnet-dns-resolution]]
 ==== DNS resolution
 
 DNS resolution is the default, and always-available option.
@@ -113,7 +113,7 @@ As it is possible to configure DNS to resolve a single host name down to multipl
 image::dns-resolution.png[title="Initial address resolution over DNS", role="middle"]
 
 
-[[custom-middleware]]
+[[dotnet-custom-middleware]]
 ==== Custom middleware
 
 Middleware, such as a load balancer, can be used to group the core servers under a single public address.
@@ -121,7 +121,7 @@ Middleware, such as a load balancer, can be used to group the core servers under
 image::custom-middleware.png[title="Initial address resolution using custom middleware"]
 
 
-[[driver-resolver-function]]
+[[dotnet-driver-resolver-function]]
 ==== Resolver function
 
 Neo4j Drivers also present an address resolution intercept hook called the *_resolver function_*.
@@ -141,7 +141,7 @@ include::{dotnet-examples}/Examples.cs[tags=config-custom-resolver]
 ----
 
 
-[[driver-routing-table]]
+[[dotnet-driver-routing-table]]
 === Routing table
 
 The routing table acts like the glue between the driver connectivity layer and the database surface.
@@ -150,7 +150,7 @@ This table contains a list of server addresses, grouped as *_readers_* and *_wri
 The driver does not expose any API to work directly with the routing table, but it can sometimes be useful to explore when troubleshooting a system.
 
 
-[[driver-routing-context]]
+[[dotnet-driver-routing-context]]
 === Routing context
 
 A routing context can be included as the query part of a `neo4j://` URI.
@@ -188,7 +188,7 @@ with your deployment machine's host name, as visible from the client machine.
 ====
 
 
-[[driver-configuration-examples]]
+[[dotnet-driver-configuration-examples]]
 === Examples
 
 *_Connection URIs_* are typically formed according to the following pattern:
@@ -380,153 +380,15 @@ GraphDatabase.Driver("neo4j://graph.example.com:7687", auth);
 [NOTE]
 To connect to a service without routing, you can replace `neo4j` with `bolt`.
 
-======
 
-[.include-with-java]
-======
-The table below illustrates examples of how to connect to a service with routing:
-
-[options="header", cols="a,a,a,a"]
-|===
-|Product
-|Security
-|Code snippet
-|Comments
-
-|Neo4j Aura
-|Secured with full certificate
-|
-[source, java]
-----
-GraphDatabase.driver("neo4j+s://graph.example.com:7687", auth)
-----
-
-If you do not have at least the Java Driver 4.0.1 patch installed, you will need this snippet instead:
-
-[source, java]
-----
-String uri = "neo4j://graph.example.com:7687";
-Config config = Config.builder()
-                     .withEncryption()
-                     .build();
-Driver driver = GraphDatabase.driver(uri, auth, config);
-----
-| This is the default (and only option) for Neo4j Aura
-
-|Neo4j 4.x
-|Unsecured
-|
-[source, java]
-----
-GraphDatabase.driver("neo4j://graph.example.com:7687", auth)
-----
-|This is the default for Neo4j 4.x series
-
-|Neo4j 4.x
-|Secured with full certificate
-|
-[source, java]
-----
-GraphDatabase.driver("neo4j+s://graph.example.com:7687", auth)
-----
-
-If you do not have at least the Java Driver 4.0.1 patch installed, you will need this snippet instead:
-
-[source, java]
-----
-String uri = "neo4j://graph.example.com:7687";
-Config config = Config.builder()
-                     .withEncryption()
-                     .build();
-Driver driver = GraphDatabase.driver(uri, auth, config);
-----
-|
-
-|Neo4j 4.x
-|Secured with self-signed certificate
-|
-[source, java]
-----
-GraphDatabase.driver("neo4j+ssc://graph.example.com:7687", auth)
-----
-
-If you do not have at least the Java Driver 4.0.1 patch installed, you will need this snippet instead:
-
-[source, java]
-----
-String uri = "neo4j://graph.example.com:7687";
-Config config = Config.builder()
-                    .withEncryption()
-                    .withTrustStrategy( trustAllCertificates() )
-                    .build();
-Driver driver = GraphDatabase.driver(uri, auth, config);
-----
-|
-
-|Neo4j 3.x
-|Secured with full certificate
-|
-[source, java]
-----
-GraphDatabase.driver("neo4j+s://graph.example.com:7687", auth)
-----
-
-If you do not have at least the Java Driver 4.0.1 patch installed, you will need this snippet instead:
-
-[source, java]
-----
-String uri = "neo4j://graph.example.com:7687";
-Config config = Config.builder()
-                     .withEncryption()
-                     .build();
-Driver driver = GraphDatabase.driver(uri, auth, config);
-----
-|
-
-|Neo4j 3.x
-|Secured with self-signed certificate
-|
-[source, java]
-----
-GraphDatabase.driver("neo4j+ssc://graph.example.com:7687", auth)
-----
-
-If you do not have at least the Java Driver 4.0.1 patch installed, you will need this snippet instead:
-
-[source, java]
-----
-String uri = "neo4j://graph.example.com:7687";
-Config config = Config.builder()
-                    .withEncryption()
-                    .withTrustStrategy( trustAllCertificates() )
-                    .build();
-Driver driver = GraphDatabase.driver(uri, auth, config);
-----
-|This is the default for Neo4j 3.x series
-
-|Neo4j 3.x
-|Unsecured
-|
-[source, java]
-----
-GraphDatabase.driver("neo4j://graph.example.com:7687", auth)
-----
-|
-
-|===
-
-[NOTE]
-To connect to a service without routing, you can replace `neo4j` with `bolt`.
-
-
-[[driver-authentication]]
+[[dotnet-driver-authentication]]
 == Authentication
 
 Authentication details are provided as an auth token which contains the user names, passwords or other credentials required to access the database.
 *Neo4j* supports multiple authentication standards but uses *_basic authentication_* by default.
 
 
-[[driver-authentication-basic]]
+[[dotnet-driver-authentication-basic]]
 === Basic authentication
 
 The basic authentication scheme is backed by a password file stored within the server and requires applications to provide a user name and password.
@@ -550,7 +412,7 @@ The basic authentication scheme can also be used to authenticate against an LDAP
 --
 
 
-[[driver-authentication-kerberos]]
+[[dotnet-driver-authentication-kerberos]]
 === Kerberos authentication
 
 The Kerberos authentication scheme provides a simple way to create a Kerberos authentication token with a base64 encoded server authentication ticket.
@@ -574,7 +436,7 @@ The Kerberos authentication token can only be understood by the server if the se
 --
 
 
-[[driver-authentication-custom]]
+[[dotnet-driver-authentication-custom]]
 === Custom authentication
 
 For advanced deployments, where a custom security provider has been built, the custom authentication helper can be used.
@@ -592,7 +454,7 @@ include::{dotnet-examples}/Examples.cs[tags=custom-auth]
 // ----
 
 
-[[driver-configuration]]
+[[dotnet-driver-configuration]]
 == Configuration
 
 `ConnectionAcquisitionTimeout`::
@@ -743,7 +605,7 @@ This is currently only configurable in the .NET Driver
 ====
 
 
-[[driver-logging]]
+[[dotnet-driver-logging]]
 == Logging
 
 All official *Neo4j Drivers* log information to standard logging channels.
