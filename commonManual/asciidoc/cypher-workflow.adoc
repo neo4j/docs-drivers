@@ -1,12 +1,19 @@
 [[driver-cypher-workflow]]
 = Cypher workflow
 
+# tag::abstract[]
+
 [abstract]
 --
 This section describes how to create units of work and provide a logical context for that work.
 --
 
+# end::abstract[]
+
+
 == Overview
+
+# tag::overview[]
 
 The Neo4j Drivers expose a Cypher Channel over which database work can be carried out (see the <<cypher-manual#cypher-manual, Cypher Manual>> for more information
 on the Cypher Query Language).
@@ -20,9 +27,13 @@ Sessions are always bound to *_a single transaction context_*, which is typicall
 Using the bookmark mechanism, sessions also provide a guarantee of correct transaction sequencing, even when transactions occur over multiple cluster members.
 This effect is known as <<term-causal-chaining, *_causal chaining_*>>.
 
+# end::overview[]
+
 
 [[driver-sessions]]
 == Sessions
+
+# tag::sessions[]
 
 Sessions are *_lightweight containers for causally chained sequences of transactions_* (see <<operations-manual#causal-consistency-explained, Operations Manual -> Causal consistency>>).
 They essentially provide context for storing transaction sequencing information in the form of bookmarks.
@@ -43,12 +54,16 @@ Similarly, *_sessions bound to different databases may not be causally chained b
 Individual language drivers provide several session classes, each oriented around a particular programming style.
 Each session class provides a similar set of functionality but offers client applications a choice based on how the application is structured and what frameworks are in use, if any.
 
+# end::sessions[]
+
 The session classes are described in <<driver-session-api>>.
 For more details, please see the <<driver-api-docs, API documentation>> for your language.
 
 
 [[driver-transactions]]
 == Transactions
+
+# tag::transactions[]
 
 Transactions are *_atomic units of work_* containing one or more *_Cypher Queries_*.
 Transactions may contain read or write work, and will generally be routed to an appropriate server for execution, where they will be carried out in their entirety.
@@ -67,30 +82,39 @@ which are the only type of Cypher Query to manage their own transactions.
 
 A lower-level *_unmanaged transaction API_* is also available for advanced use cases.
 This is useful when an alternative transaction management layer is applied by the client, in which error handling and retries need to be managed in a custom way.
+
+# end::transactions[]
+
 To learn more about how to use unmanaged transactions, see <<driver-api-docs, API documentation>> for the relevant language.
 
 
 [[driver-queries-results]]
 == Queries and results
 
+# tag::queries-results[]
+
 Queries consist of a request to the server to execute a Cypher statement, followed by a response back to the client with the result.
 Results are transmitted as a *_stream of records_*, along with header and footer metadata, and can be incrementally consumed by a client application.
-With https://en.wikipedia.org/wiki/Reactive_programming[reactive capabilities], the semantics of the record stream can be enhanced by allowing a Cypher result to be paused or cancelled part-way through.
+With reactive capabilities, the semantics of the record stream can be enhanced by allowing a Cypher result to be paused or cancelled part-way through.
 
 To execute a Cypher Query, the *_query text_* is required along with an optional set of *_named parameters_*.
 The text can contain *_parameter placeholders_* that are substituted with the corresponding values at runtime.
 While it is possible to run non-parameterized Cypher Queries, *_good programming practice is to use parameters in Cypher Queries whenever possible_*.
 This allows for the caching of queries within the Cypher Engine, which is beneficial for performance.
-Parameter values should adhere to <<cypher-manual#cypher-values>>.
+Parameter values should adhere to <<cypher-manual#cypher-values, Cypher values>>.
 
 A result summary is also generally available.
 This contains additional information relating to the query execution and the result content.
 For an `EXPLAIN` or `PROFILE` query, this is where the query plan is returned.
 See <<cypher-manual#how-do-i-profile-a-query, Cypher Manual -> Profiling a query>> for more information on these queries.
 
+# end::queries-results[]
+
 
 [[driver-causal-chaining]]
 == Causal chaining and bookmarks
+
+# tag::causal-chaining[]
 
 When working with a *_Causal Cluster_*, transactions can be chained, via a session, to ensure *_causal consistency_*.
 This means that for any two transactions, it is guaranteed that the second transaction will begin only after the first has been successfully committed.
@@ -113,6 +137,8 @@ Multiple bookmarks can also be combined if a transaction has more than one logic
 Note that it is only when chaining across sessions that an application will need to work with bookmarks directly.
 
 image::driver-passing-bookmarks.svg[title="Passing bookmarks", role="middle"]
+
+# end::causal-chaining[]
 
 [.tabbed-example]
 .Pass bookmarks
@@ -183,6 +209,8 @@ include::{python-examples}/test_pass_bookmarks_example.py[tags=pass-bookmarks]
 [[driver-access-modes-transaction]]
 == Routing transactions using access modes
 
+# tag::access-modes-transaction[]
+
 Transactions can be executed in either *_read_* or *_write_* mode; this is known as the <<term-access-mode, *_access mode_*>>.
 In a Causal Cluster, each transaction will be routed to an appropriate server based on the mode.
 When using a single instance, all transactions will be passed to that one server.
@@ -201,6 +229,8 @@ This is only used in cases when the access mode cannot otherwise be specified.
 [NOTE]
 The driver does not parse *Cypher* and therefore cannot automatically determine whether a transaction is intended to carry out read or write operations.
 As a result, a write transaction tagged as a read will still be sent to a read server, but will fail on execution.
+
+# end::access-modes-transaction[]
 
 [.tabbed-example]
 .Read-write transaction
@@ -275,6 +305,8 @@ include::{python-examples}/test_read_write_transaction_example.py[tags=read-writ
 [[driver-databases]]
 == Databases and execution context
 
+# tag::databases[]
+
 *Neo4j* offers the ability to work with *_multiple databases_* within the same DBMS.
 
 For *_Community Edition_*, this is limited to *_one user database_*, plus the `system` database.
@@ -308,12 +340,16 @@ session.run("USE bar CREATE INDEX bar_idx FOR (n:Person) ON n.id").consume()
 session.run("SHOW USERS")
 ----
 
+# end::databases[]
+
 
 [role=enterprise-edition]
 [[database-selection]]
 === Database selection
 
 The database selection on the client side happens on the <<driver-session-api, session API>>.
+
+# tag::database-selection[]
 
 You pass the name of the database to the driver during session creation.
 If you don't specify a name, the default database is used.
@@ -349,6 +385,8 @@ transaction.commit()
 ----
 
 Please note that the database that is requested must exist.
+
+# end::database-selection[]
 
 [.tabbed-example]
 .Database selection on session creation
@@ -406,6 +444,8 @@ include::{python-examples}/test_database_selection_example.py[tags=database-sele
 [[driver-type-mapping]]
 == Type mapping
 
+# tag::type-mapping[]
+
 Drivers translate between *_application language types_* and the *_Cypher Types_*.
 
 To pass parameters and process results, it is important to know the basics of how Cypher works with types and to understand
@@ -446,6 +486,8 @@ For information on how to work with null in Cypher, please refer to <<cypher-man
    Graph structures may not be used as parameters because it depends on application context whether such a parameter would be passed by reference or by value, and Cypher provides no mechanism to denote this.
    Equivalent functionality is available by simply passing either the ID for pass-by-reference, or an extracted map of properties for pass-by-value.
 ====
+
+# end::type-mapping[]
 
 The Neo4j Drivers map Cypher Types to and from native language types as depicted in the table below.
 Custom types (those not available in the language or standard library) are highlighted in *bold*.
@@ -603,6 +645,8 @@ Inbound conversion is carried out using http://cldr.unicode.org/development/deve
 [[driver-exceptions-errors]]
 == Exceptions and error handling
 
+# tag::exceptions-errors[]
+
 When executing *Cypher* or carrying out other operations with the driver, certain exceptions and error cases may arise.
 *_Server-generated exceptions_* are each associated with a <<status-codes#status-codes, *_status code_*>> that describes the nature of the problem and a message that provides more detail.
 
@@ -637,3 +681,5 @@ Transient errors are those which are generated by the server and marked as safe 
 Examples of such errors are deadlocks and memory issues.
 
 When using transaction functions, the driver will usually be able to automatically retry when a transient failure occurs.
+
+# end::exceptions-errors[]

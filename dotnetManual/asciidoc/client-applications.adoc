@@ -1,10 +1,7 @@
 [[dotnet-driver-client-applications]]
 = Client applications
 
-[abstract]
---
-This section describes how to manage database connections within an application.
---
+include::{common-content}/client-applications.adoc[tag=abstract]
 
 
 [[dotnet-driver-driver-object]]
@@ -348,7 +345,7 @@ include::{dotnet-examples}/Examples.cs[tags=custom-auth]
 == Configuration
 
 include::{common-content}/client-applications.adoc[tag=configuration-ConnectionAcquisitionTimeout]
-
++
 .Configure connection pool
 [source, csharp]
 ----
@@ -361,7 +358,7 @@ include::{dotnet-examples}/Examples.cs[tags=config-connection-pool]
 // ----
 
 include::{common-content}/client-applications.adoc[tag=configuration-ConnectionTimeout]
-
++
 .Configure connection timeout
 [source, csharp]
 ----
@@ -374,10 +371,12 @@ include::{dotnet-examples}/Examples.cs[tags=config-connection-timeout]
 // include::{dotnet-examples}/Examples.cs[tags=config-connection-timeout-import]
 // ----
 
-include::{common-content}/client-applications.adoc[tag=configuration-CustomResolver]
+`CustomResolver`::
+
+Specify a custom server address resolver used by the routing driver to resolve the initial address used to create the driver. See <<dotnet-driver-resolver-function>> for more details.
 
 include::{common-content}/client-applications.adoc[tag=configuration-Encryption]
-
++
 .Unencrypted configuration
 [source, csharp]
 ----
@@ -394,7 +393,7 @@ include::{common-content}/client-applications.adoc[tag=configuration-MaxConnecti
 include::{common-content}/client-applications.adoc[tag=configuration-MaxConnectionPoolSize]
 
 include::{common-content}/client-applications.adoc[tag=configuration-MaxTransactionRetryTime]
-
++
 .Configure maximum retry time
 [source, csharp]
 ----
@@ -409,7 +408,7 @@ include::{dotnet-examples}/Examples.cs[tags=config-max-retry-time]
 // ----
 
 include::{common-content}/client-applications.adoc[tag=configuration-TrustStrategy]
-
++
 .Configure trusted certificates
 [source, csharp]
 ----

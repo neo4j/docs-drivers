@@ -1,10 +1,14 @@
 [[driver-client-applications]]
 = Client applications
 
+# tag::abstract[]
+
 [abstract]
 --
 This section describes how to manage database connections within an application.
 --
+
+# end::abstract[]
 
 
 [[driver-driver-object]]
