@@ -1,14 +1,19 @@
 [[driver-get-started]]
 = Get started
 
+# tag::abstract[]
+
 [abstract]
 --
 This section gives an overview of the official Neo4j drivers and how to connect to a Neo4j database with a "Hello World" example.
 --
 
+# end::abstract[]
 
 [[driver-get-started-about]]
 == About the official drivers
+
+# tag::about[]
 
 Neo4j provides official drivers for a number of popular programming languages.
 These drivers are supported by Neo4j.
@@ -45,9 +50,12 @@ NOTE: The official drivers do not support HTTP communication.
 If you need an HTTP driver, choose one of the community drivers.
 See also the <<http-api#http-api, HTTP API documentation>>.
 
+# end::about[]
 
 [[driver-get-started-installation]]
 == Driver versions and installation
+
+# tag::versions[]
 
 Starting with *Neo4j 4.0*, *_the versioning scheme for the database, driver and protocol have all been aligned_*.
 This simplifies general compatibility concerns.
@@ -66,6 +74,8 @@ Wherever possible, it is recommended to use the latest stable driver release ava
 This will provide the greatest degree of stability and will ensure that the full set of server functionality is available.
 The drivers, when used with *Neo4j Enterprise Edition*, come with full cluster routing support.
 The drivers make no explicit distinction between *Enterprise Edition* and *Community Edition* however, and simply operate with the functionality made available by *Neo4j* itself.
+
+# end::versions[]
 
 To install a driver or to find out more about which driver versions are available, use the relevant language distribution system, described below.
 
