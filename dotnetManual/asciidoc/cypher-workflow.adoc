@@ -1,4 +1,4 @@
-[[driver-cypher-workflow]]
+[[dotnet-driver-cypher-workflow]]
 = Cypher workflow
 
 [abstract]
@@ -21,7 +21,7 @@ Using the bookmark mechanism, sessions also provide a guarantee of correct trans
 This effect is known as <<term-causal-chaining, *_causal chaining_*>>.
 
 
-[[driver-sessions]]
+[[dotnet-driver-sessions]]
 == Sessions
 
 Sessions are *_lightweight containers for causally chained sequences of transactions_* (see <<operations-manual#causal-consistency-explained, Operations Manual -> Causal consistency>>).
@@ -43,11 +43,11 @@ Similarly, *_sessions bound to different databases may not be causally chained b
 Individual language drivers provide several session classes, each oriented around a particular programming style.
 Each session class provides a similar set of functionality but offers client applications a choice based on how the application is structured and what frameworks are in use, if any.
 
-The session classes are described in <<driver-session-api>>.
-For more details, please see the <<driver-api-docs, API documentation>> for your language.
+The session classes are described in <<dotnet-driver-session-api>>.
+For more details, please see the <<dotnet-driver-api-docs, API documentation>> for your language.
 
 
-[[driver-transactions]]
+[[dotnet-driver-transactions]]
 == Transactions
 
 Transactions are *_atomic units of work_* containing one or more *_Cypher Queries_*.
@@ -67,10 +67,10 @@ which are the only type of Cypher Query to manage their own transactions.
 
 A lower-level *_unmanaged transaction API_* is also available for advanced use cases.
 This is useful when an alternative transaction management layer is applied by the client, in which error handling and retries need to be managed in a custom way.
-To learn more about how to use unmanaged transactions, see <<driver-api-docs, API documentation>> for the relevant language.
+To learn more about how to use unmanaged transactions, see <<dotnet-driver-api-docs, API documentation>> for the relevant language.
 
 
-[[driver-queries-results]]
+[[dotnet-driver-queries-results]]
 == Queries and results
 
 Queries consist of a request to the server to execute a Cypher statement, followed by a response back to the client with the result.
@@ -89,7 +89,7 @@ For an `EXPLAIN` or `PROFILE` query, this is where the query plan is returned.
 See <<cypher-manual#how-do-i-profile-a-query, Cypher Manual -> Profiling a query>> for more information on these queries.
 
 
-[[driver-causal-chaining]]
+[[dotnet-driver-causal-chaining]]
 == Causal chaining and bookmarks
 
 When working with a *_Causal Cluster_*, transactions can be chained, via a session, to ensure *_causal consistency_*.
@@ -127,7 +127,7 @@ include::{dotnet-examples}/Examples.cs[tags=pass-bookmarks]
 // ----
 
 
-[[driver-access-modes-transaction]]
+[[dotnet-driver-access-modes-transaction]]
 == Routing transactions using access modes
 
 Transactions can be executed in either *_read_* or *_write_* mode; this is known as the <<term-access-mode, *_access mode_*>>.
@@ -161,7 +161,7 @@ include::{dotnet-examples}/Examples.cs[tags=read-write-transaction]
 // ----
 
 
-[[driver-databases]]
+[[dotnet-driver-databases]]
 == Databases and execution context
 
 *Neo4j* offers the ability to work with *_multiple databases_* within the same DBMS.
@@ -199,10 +199,10 @@ session.run("SHOW USERS")
 
 
 [role=enterprise-edition]
-[[database-selection]]
+[[dotnet-database-selection]]
 === Database selection
 
-The database selection on the client side happens on the <<driver-session-api, session API>>.
+The database selection on the client side happens on the <<dotnet-driver-session-api, session API>>.
 
 You pass the name of the database to the driver during session creation.
 If you don't specify a name, the default database is used.
@@ -246,7 +246,7 @@ include::{dotnet-examples}/Examples.cs[tags=database-selection]
 ----
 
 
-[[driver-type-mapping]]
+[[dotnet-driver-type-mapping]]
 == Type mapping
 
 Drivers translate between *_application language types_* and the *_Cypher Types_*.
@@ -322,7 +322,7 @@ Custom types (those not available in the language or standard library) are highl
 Inbound conversion is carried out using http://cldr.unicode.org/development/development-process/design-proposals/extended-windows-olson-zid-mapping[Extended Windows-Olson zid mapping] as defined by Unicode CLDR.
 
 
-[[driver-exceptions-errors]]
+[[dotnet-driver-exceptions-errors]]
 == Exceptions and error handling
 
 When executing *Cypher* or carrying out other operations with the driver, certain exceptions and error cases may arise.

@@ -6,24 +6,11 @@
 This section describes how to manage database connections within an application.
 --
 
-This section contains the following:
-
-* <<driver-driver-object,The Driver object>>
-* <<driver-connection-uris,Connection URIs>>
-** <<initial-address-resolution,Initial address resolution>>
-** <<driver-routing-table,Routing table>>
-** <<driver-routing-context,Routing context>>
-** <<driver-configuration-examples,Examples>>
-* <<driver-authentication,Authentication>>
-** <<driver-authentication-basic,Basic authentication>>
-** <<driver-authentication-kerberos,Kerberos authentication>>
-** <<driver-authentication-custom,Custom authentication>>
-* <<driver-configuration,Configuration>>
-* <<driver-logging,Logging>>
-
 
 [[driver-driver-object]]
 == The Driver Object
+
+# tag::object[]
 
 Neo4j client applications require a *_Driver Object_* which, from a data access perspective, forms the backbone of the application.
 It is through this object that all Neo4j interaction is carried out, and it should therefore be made available to all parts of the application that require data access.
@@ -40,6 +27,8 @@ Destroying a Driver Object will immediately shut down any connections previously
 
 This will have the consequence of rolling back any open transactions, and closing any unconsumed results.
 --
+
+# end::object[]
 
 To construct a driver instance, a <<driver-connection-uris, connection URI>> and <<driver-authentication, authentication information>> must be supplied.
 
@@ -112,6 +101,8 @@ include::{python-examples}/test_driver_lifecycle_example.py[tags=driver-lifecycl
 [[driver-connection-uris]]
 == Connection URIs
 
+# tag::uris[]
+
 A connection URI identifies a graph database and how to connect to it.
 
 The *_encryption_* and *_trust_* settings provide detail to how that connection should be secured.
@@ -132,6 +123,8 @@ This is a change from previous versions, which switched on encryption by default
 When a full certificate is installed, and encryption is enabled on the driver, full certificate checks are carried out (refer to <<operations-manual#ssl-framework, Operations Manual -> SSL framework >>).
 Full certificates provide better overall security than self-signed certificates as they include a complete chain of trust back to a root certificate authority.
 
+# end::uris[]
+
 [NOTE]
 ====
 https://neo4j.com/aura/[*Neo4j Aura*] is a *_secure hosted service_* backed by full certificates signed by a root certificate authority.
@@ -140,6 +133,8 @@ To connect to *Neo4j Aura*, driver users must *_enable encryption_* and the comp
 
 For more information, see <<driver-configuration-examples>> below.
 ====
+
+# tag::default-security-changes[]
 
 .Changes in default security settings between 3.x and 4.x
 [options="header"]
@@ -153,9 +148,13 @@ For more information, see <<driver-configuration-examples>> below.
 | Certificate hostname check  | on  | off
 |===
 
+# end::default-security-changes[]
+
 
 [[initial-address-resolution]]
 === Initial address resolution
+
+# tag::initial-address-resolution[]
 
 The address provided in a `neo4j://` URI is used for initial and fallback communication only.
 
@@ -166,26 +165,38 @@ The initial address is once again reused to bootstrap the system.
 Several options are available for providing this initial logical-to-physical host resolution.
 These include *_regular DNS_*, *_custom middleware_* such as a load balancer, and the Driver Object *_resolver function_*, all of which are described in the following sections.
 
+# end::initial-address-resolution[]
+
 
 [[dns-resolution]]
 ==== DNS resolution
+
+# tag::dns-resolution[]
 
 DNS resolution is the default, and always-available option.
 As it is possible to configure DNS to resolve a single host name down to multiple IP addresses, this can be used to expose all core server IP addresses under a single host name.
 
 image::dns-resolution.png[title="Initial address resolution over DNS", role="middle"]
 
+# end::dns-resolution[]
+
 
 [[custom-middleware]]
 ==== Custom middleware
+
+# tag::custom-middleware[]
 
 Middleware, such as a load balancer, can be used to group the core servers under a single public address.
 
 image::custom-middleware.png[title="Initial address resolution using custom middleware"]
 
+# end::custom-middleware[]
+
 
 [[driver-resolver-function]]
 ==== Resolver function
+
+# tag::resolver-function[]
 
 Neo4j Drivers also present an address resolution intercept hook called the *_resolver function_*.
 
@@ -195,6 +206,8 @@ The function may hard code the output addresses or may draw them from another co
 image::resolver-function.png[title="Initial address resolution using resolver function"]
 
 The example below shows how to expand a single address into multiple (hard-coded) output addresses:
+
+# end::resolver-function[]
 
 [.tabbed-example]
 .Custom Address Resolver
@@ -242,14 +255,20 @@ include::{python-examples}/test_custom_resolver_example.py[tags=custom-resolver]
 [[driver-routing-table]]
 === Routing table
 
+# tag::routing-table[]
+
 The routing table acts like the glue between the driver connectivity layer and the database surface.
 This table contains a list of server addresses, grouped as *_readers_* and *_writers_*, and is refreshed automatically by the driver as required.
 
 The driver does not expose any API to work directly with the routing table, but it can sometimes be useful to explore when troubleshooting a system.
 
+# end::routing-table[]
+
 
 [[driver-routing-context]]
 === Routing context
+
+# tag::routing-context[]
 
 A routing context can be included as the query part of a `neo4j://` URI.
 
@@ -285,9 +304,13 @@ To make the server aware of its deployment environment, you need to configure
 with your deployment machine's host name, as visible from the client machine.
 ====
 
+# end::routing-context[]
+
 
 [[driver-configuration-examples]]
 === Examples
+
+# tag::examples-pt1[]
 
 *_Connection URIs_* are typically formed according to the following pattern:
 
@@ -299,8 +322,12 @@ neo4j://<HOST>:<PORT>[?<ROUTING_CONTEXT>]
 This targets a routed *Neo4j* service that may be fulfilled by either a cluster or a single instance.
 The `HOST` and `PORT` values contain a logical hostname and port number targeting the entry point to the *Neo4j* service (e.g. `neo4j://graph.example.com:7687`).
 
+# end::examples-pt1[]
+
 In a clustered environment, the URI address will resolve to one of more of the core members; for standalone installations, this will simply point to that server address.
 The `ROUTING_CONTEXT` option allows for customization of the routing table and is discussed in more detail in <<driver-routing-context>>.
+
+# tag::examples-pt2[]
 
 An alternative URI form, using the `bolt` URI scheme (e.g. `bolt://graph.example.com:7687`), can be used when a *_single point-to-point connection is required_*.
 This variant is useful for the subset client applications (such as admin tooling) that need to be aware of individual servers, as opposed to those which require a highly available database service.
@@ -352,6 +379,8 @@ This latter variant is designed specifically for use with self-signed certificat
 
 The table below provides example code snippets for different deployment configurations.
 Each snippet expects an `auth` variable to have been previously defined, containing the authentication details for that connection.
+
+# end::examples-pt2[]
 
 [.tabbed-example]
 .Connecting to a service
@@ -877,15 +906,23 @@ To connect to a service without routing, you can replace `neo4j` with `bolt`.
 [[driver-authentication]]
 == Authentication
 
+# tag::authentication[]
+
 Authentication details are provided as an auth token which contains the user names, passwords or other credentials required to access the database.
 *Neo4j* supports multiple authentication standards but uses *_basic authentication_* by default.
+
+# end::authentication[]
 
 
 [[driver-authentication-basic]]
 === Basic authentication
 
+# tag::authentication-basic[]
+
 The basic authentication scheme is backed by a password file stored within the server and requires applications to provide a user name and password.
 For this, use the basic auth helper:
+
+# end::authentication-basic[]
 
 [.tabbed-example]
 .Basic authentication
@@ -947,17 +984,25 @@ include::{python-examples}/test_basic_auth_example.py[tags=basic-auth]
 
 ====
 
+# tag::authentication-basic-note[]
+
 [NOTE]
 --
 The basic authentication scheme can also be used to authenticate against an LDAP server.
 --
 
+# end::authentication-basic-note[]
+
 
 [[driver-authentication-kerberos]]
 === Kerberos authentication
 
+# tag::authentication-kerberos[]
+
 The Kerberos authentication scheme provides a simple way to create a Kerberos authentication token with a base64 encoded server authentication ticket.
 The best way to create a Kerberos authentication token is shown below:
+
+# end::authentication-kerberos[]
 
 [.tabbed-example]
 .Kerberos authentication
@@ -1019,10 +1064,14 @@ include::{python-examples}/test_kerberos_auth_example.py[tags=kerberos-auth]
 
 ====
 
+# tag::authentication-kerberos-note[]
+
 [NOTE]
 --
 The Kerberos authentication token can only be understood by the server if the server has the link:{kerberos-add-on-base-uri}[Kerberos Add-on] installed.
 --
+
+# end::authentication-kerberos-note[]
 
 
 [[driver-authentication-custom]]

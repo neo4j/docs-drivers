@@ -2,6 +2,8 @@
 [[driver-terminology]]
 = Driver terminology
 
+# tag::terminology[]
+
 [abstract]
 --
 This section lists the relevant terminology related to Neo4j drivers.
@@ -79,3 +81,5 @@ The method of grouping a number of queries together which, when run in a session
 
 [[term-transaction-manager]]transaction manager::
 The component/code responsible for deciding what to do if a transaction fails, i.e to retry, give up or do something else.
+
+# end::terminology[]

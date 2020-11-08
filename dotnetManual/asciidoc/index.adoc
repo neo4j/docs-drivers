@@ -1,4 +1,4 @@
-[[drivers]]
+[[dotnet-drivers]]
 ifndef::backend-pdf[]
 = The Neo4j .NET Driver Manual v{driver-version}
 endif::[]
