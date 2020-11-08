@@ -10,7 +10,7 @@ This section describes how to manage database connections within an application.
 [[driver-driver-object]]
 == The Driver Object
 
-# tag::object[]
+# tag::object-pt1[]
 
 Neo4j client applications require a *_Driver Object_* which, from a data access perspective, forms the backbone of the application.
 It is through this object that all Neo4j interaction is carried out, and it should therefore be made available to all parts of the application that require data access.
@@ -28,14 +28,17 @@ Destroying a Driver Object will immediately shut down any connections previously
 This will have the consequence of rolling back any open transactions, and closing any unconsumed results.
 --
 
-# end::object[]
+# end::object-pt1[]
 
 To construct a driver instance, a <<driver-connection-uris, connection URI>> and <<driver-authentication, authentication information>> must be supplied.
+
+# tag::object-pt2[]
 
 Additional configuration details can be supplied if required.
 The configuration details are immutable for the lifetime of the Driver Object.
 Therefore, if multiple configurations are required (such as when working with multiple database users) then multiple Driver Objects must be used.
 
+# end::object-pt2[]
 
 [.tabbed-example]
 .The driver lifecycle
@@ -1077,7 +1080,11 @@ The Kerberos authentication token can only be understood by the server if the se
 [[driver-authentication-custom]]
 === Custom authentication
 
+# tag::authentication-custom[]
+
 For advanced deployments, where a custom security provider has been built, the custom authentication helper can be used.
+
+# end::authentication-custom[]
 
 [.tabbed-example]
 .Custom authentication
@@ -1142,6 +1149,8 @@ include::{python-examples}/test_custom_auth_example.py[tags=custom-auth]
 [[driver-configuration]]
 == Configuration
 
+# tag::configuration-ConnectionAcquisitionTimeout[]
+
 `ConnectionAcquisitionTimeout`::
 
 The maximum amount of time a session will wait when requesting a connection from the connection pool.
@@ -1153,6 +1162,8 @@ Setting a higher value will result in these transactions being queued, increasin
 Finding an optimal value may require an element of experimentation, taking into consideration the expected levels of parallelism within your application as well as the `MaxConnectionPoolSize`.
 +
 *Default:* 60 seconds
+
+# end::configuration-ConnectionAcquisitionTimeout[]
 
 [.tabbed-example]
 .Configure connection pool
@@ -1214,6 +1225,8 @@ include::{python-examples}/test_config_connection_pool_example.py[tags=config-co
 
 ====
 
+# tag::configuration-ConnectionTimeout[]
+
 `ConnectionTimeout`::
 
 The maximum amount of time to wait for a TCP connection to be established.
@@ -1226,6 +1239,7 @@ For lower latency environments and quicker feedback on potential network issues 
 +
 *Default:* 30 seconds
 
+# end::configuration-ConnectionTimeout[]
 
 [.tabbed-example]
 .Configure connection timeout
@@ -1287,15 +1301,23 @@ include::{python-examples}/test_config_connection_timeout_example.py[tags=config
 
 ====
 
+# tag::configuration-CustomResolver[]
+
 `CustomResolver`::
 
 Specify a custom server address resolver used by the routing driver to resolve the initial address used to create the driver. See <<driver-resolver-function>> for more details.
+
+# end::configuration-CustomResolver[]
+
+# tag::configuration-Encryption[]
 
 `Encryption`::
 
 Specify whether to use an encrypted connection between the driver and server.
 +
 *Default:* None
+
+# end::configuration-Encryption[]
 
 [.tabbed-example]
 .Unencrypted configuration
@@ -1356,6 +1378,8 @@ include::{python-examples}/test_config_unencrypted_example.py[tags=config-unencr
 
 ====
 
+# tag::configuration-MaxConnectionLifetime[]
+
 `MaxConnectionLifetime`::
 
 The maximum duration the driver will keep a connection for before being removed from the pool.
@@ -1371,6 +1395,10 @@ Negative values result in lifetime not being checked.
 +
 *Default:* 1 hour (3600 seconds)
 
+# end::configuration-MaxConnectionLifetime[]
+
+# tag::configuration-MaxConnectionPoolSize[]
+
 `MaxConnectionPoolSize`::
 
 The maximum total number of connections allowed, per host (i.e. cluster nodes), to be managed by the connection pool.
@@ -1383,6 +1411,10 @@ This configuration option allows you to manage the memory and I/O resources bein
 +
 *Default:* 100 connections (except .NET Driver with 500 connections)
 
+# end::configuration-MaxConnectionPoolSize[]
+
+# tag::configuration-MaxTransactionRetryTime[]
+
 `MaxTransactionRetryTime`::
 
 The maximum amount of time that a managed transaction will retry for before failing. Queries that are executed within a managed transaction gain the benefit of being retried when a transient error occurs.
@@ -1393,6 +1425,8 @@ Configure lower in low latency environments and where your workload mainly consi
 Failing transactions faster may highlight the reasons behind the transient errors making it easier to fix underlying issues.
 +
 *Default:* 30 seconds
+
+# end::configuration-MaxTransactionRetryTime[]
 
 [.tabbed-example]
 .Configure maximum retry time
@@ -1455,6 +1489,8 @@ include::{python-examples}/test_config_max_retry_time_example.py[tags=config-max
 
 ====
 
+# tag::configuration-TrustStrategy[]
+
 `TrustStrategy`::
 
 Specify how to determine the authenticity of encryption certificates provided by the Neo4j instance that you are connecting to.
@@ -1468,6 +1504,8 @@ There are three choices as to which strategy to use:
 
 +
 *Default:* `TRUST_SYSTEM_CA_SIGNED_CERTIFICATES` (Note - only when encryption is enabled)
+
+# end::configuration-TrustStrategy[]
 
 [.tabbed-example]
 .Configure trusted certificates
@@ -1528,11 +1566,15 @@ include::{python-examples}/test_config_trust_example.py[tags=config-trust]
 
 ====
 
+# tag::configuration-KeepAlive[]
+
 `KeepAlive`::
 
 Specify whether TCP keep-alive should be enabled. To ensure that the connection between the driver and server is still operational, the TCP layer can periodically send messages to check the connection.
 +
 *Default:* True
+
+# end::configuration-KeepAlive[]
 
 [NOTE]
 ====
@@ -1543,10 +1585,15 @@ This is currently only configurable in the .NET Driver
 [[driver-logging]]
 == Logging
 
+# tag::logging[]
+
 All official *Neo4j Drivers* log information to standard logging channels.
 This can typically be accessed in an ecosystem-specific way.
 
-The code snippets below show how to redirect log messages to standard output.
+The code snippet below demonstrates how to redirect log messages to standard output:
+
+# end::logging[]
+
 
 [cols="2,2a"]
 |===
