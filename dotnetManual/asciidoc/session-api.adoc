@@ -1,4 +1,4 @@
-[[driver-session-api]]
+[[dotnet-driver-session-api]]
 = The session API
 
 [abstract]
@@ -6,7 +6,7 @@
 This section details the Session API that are made available by the driver, with each Session class oriented towards a different form of programming.
 --
 
-[[driver-simple-sessions]]
+[[dotnet-driver-simple-sessions]]
 == Simple sessions
 
 [abstract]
@@ -18,7 +18,7 @@ Simple sessions provide a "classic" *_blocking style_* API for Cypher execution.
 In general, simple sessions provide the easiest programming style to work with since API calls are executed in a strictly sequential fashion.
 
 
-[[driver-simple-lifecycle]]
+[[dotnet-driver-simple-lifecycle]]
 === Lifecycle
 
 The session lifetime extends from session construction to session closure.
@@ -34,10 +34,10 @@ using (var session = driver.Session(...)) {
 
 *_Sessions can be configured in a number of different ways_*.
 This is carried out by supplying configuration inside the session constructor.
-See <<driver-session-configuration>> for more details.
+See <<dotnet-driver-session-configuration>> for more details.
 
 
-[[driver-simple-transaction-fn]]
+[[dotnet-driver-simple-transaction-fn]]
 === Transaction functions
 
 Transaction functions are used for containing transactional units of work.
@@ -70,10 +70,9 @@ Retry logic can be configured when creating a session.
 ----
 include::{dotnet-examples}/Examples.cs[tags=transaction-function]
 ----
+-
 
-
-
-[[driver-simple-autocommit-transactions]]
+[[dotnet-driver-simple-autocommit-transactions]]
 === Auto-commit transactions
 
 An *_auto-commit transaction_* is a *_basic but limited form of transaction_*.
@@ -103,7 +102,7 @@ include::{dotnet-examples}/Examples.cs[tags=autocommit-transaction]
 ----
 
 
-[[driver-simple-result-consume]]
+[[dotnet-driver-simple-result-consume]]
 === Consuming results
 
 Query results are typically consumed as a stream of records.
@@ -116,7 +115,7 @@ include::{dotnet-examples}/Examples.cs[tags=result-consume]
 ----
 
 
-[[driver-simple-result-retain]]
+[[dotnet-driver-simple-result-retain]]
 === Retaining results
 
 Within a session, *_only one result stream can be active at any one time_*.
@@ -144,7 +143,7 @@ include::{dotnet-examples}/Examples.cs[tags=result-retain]
 ----
 
 
-[[driver-async-sessions]]
+[[dotnet-driver-async-sessions]]
 == Asynchronous sessions
 
 [abstract]
@@ -156,17 +155,17 @@ Asynchronous sessions provide an API wherein function calls typically return ava
 This allows client applications to work within asynchronous frameworks and take advantage of cooperative multitasking.
 
 
-[[driver-async-lifecycle]]
+[[dotnet-driver-async-lifecycle]]
 === Lifecycle
 
 Session lifetime begins with session construction.
 A session then exists until it is closed, which is typically set to occur after its contained query results have been consumed.
 
 Sessions can be configured in a number of different ways. This is carried out by supplying configuration inside the session constructor.
-See <<driver-session-configuration>> for more details.
+See <<dotnet-driver-session-configuration>> for more details.
 
 
-[[driver-async-transaction-fn]]
+[[dotnet-driver-async-transaction-fn]]
 === Transaction functions
 
 Transaction functions are *_the recommended form for containing transactional units of work_*.
@@ -198,7 +197,7 @@ include::{dotnet-examples}/ExamplesAsync.cs[tags=async-transaction-function]
 ----
 
 
-[[driver-async-autocommit-transactions]]
+[[dotnet-driver-async-autocommit-transactions]]
 === Auto-commit transactions
 
 An auto-commit transaction is a basic but limited form of transaction.
@@ -229,7 +228,7 @@ include::{dotnet-examples}/ExamplesAsync.cs[tags=async-autocommit-transaction]
 ----
 
 
-[[driver-async-result-consume]]
+[[dotnet-driver-async-result-consume]]
 === Consuming results
 
 The asynchronous session API provides language-idiomatic methods to aid integration with asynchronous applications and frameworks.
@@ -241,7 +240,7 @@ include::{dotnet-examples}/ExamplesAsync.cs[tags=async-result-consume]
 ----
 
 
-[[driver-rx-sessions]]
+[[dotnet-driver-rx-sessions]]
 == Reactive Sessions
 
 [abstract]
@@ -269,18 +268,18 @@ For more information about reactive stream, please see the following:
 --
 Reactive sessions will typically be used in a client application that is already oriented towards the reactive style; it is expected that a reactive dependency or framework is in place.
 
-Refer to <<driver-get-started>> for more information on recommended dependencies.
+Refer to <<dotnet-driver-get-started>> for more information on recommended dependencies.
 --
 
 
-[[driver-rx-lifecycle]]
+[[dotnet-driver-rx-lifecycle]]
 === Lifecycle
 
 Session lifetime begins with session construction.
 A session then exists until it is closed, which is typically set to occur after its contained query results have been consumed.
 
 
-[[driver-rx-transaction-fn]]
+[[dotnet-driver-rx-transaction-fn]]
 === Transaction functions
 
 This form of transaction requires minimal boilerplate code and allows for a clear separation of database queries and application logic.
@@ -310,10 +309,10 @@ include::{dotnet-examples}/ExamplesRx.cs[tags=rx-transaction-function]
 
 Sessions can be configured in a number of different ways.
 This is carried out by supplying configuration inside the session constructor.
-See <<driver-session-configuration>> for more details.
+See <<dotnet-driver-session-configuration>> for more details.
 
 
-[[driver-rx-autocommit-transactions]]
+[[dotnet-driver-rx-autocommit-transactions]]
 === Auto-commit transactions
 
 An auto-commit transaction is a basic but limited form of transaction.
@@ -343,7 +342,7 @@ include::{dotnet-examples}/ExamplesRx.cs[tags=rx-autocommit-transaction]
 ----
 
 
-[[driver-rx-result-consume]]
+[[dotnet-driver-rx-result-consume]]
 === Consuming results
 
 To consume data from a query in a reactive session, a subscriber is required to handle the results that are being returned by the publisher.
@@ -359,14 +358,14 @@ include::{dotnet-examples}/ExamplesRx.cs[tags=rx-result-consume]
 ----
 
 
-[[driver-rx-cancellation]]
+[[dotnet-driver-rx-cancellation]]
 === Cancellation
 
 As per the reactive stream specification, a reactive data flow can be cancelled part way through.
 This prematurely commits or rolls back the transaction and stops the query engine from producing any more records.
 
 
-[[driver-session-configuration]]
+[[dotnet-driver-session-configuration]]
 == Session configuration
 
 [abstract]
@@ -399,6 +398,6 @@ See <<operations-manual#manage-databases-default, Operations Manual -> The defau
 `Fetch Size`::
 The number of records to fetch in each batch from the server.
 Neo4j 4.0 introduces the ability to pull records in batches, allowing the client application to take control of data population and apply back pressure to the server.
-This `FetchSize` applies to <<driver-simple-sessions, simple sessions>> and <<driver-async-sessions, async-sessions>> whereas reactive sessions can be controlled directly using the request method of the subscription.
+This `FetchSize` applies to <<dotnet-driver-simple-sessions, simple sessions>> and <<dotnet-driver-async-sessions, async-sessions>> whereas reactive sessions can be controlled directly using the request method of the subscription.
 +
 *Default:* 1000 records
