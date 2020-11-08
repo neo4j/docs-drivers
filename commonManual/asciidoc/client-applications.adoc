@@ -392,16 +392,11 @@ Each snippet expects an `auth` variable to have been previously defined, contain
 ======
 The table below illustrates examples of how to connect to a service with routing:
 
-[options="header", cols="a,a,a,a"]
+[cols="a,a"]
 |===
-|Product
-|Security
-|Code snippet
-|Comments
-
-|Neo4j Aura
-|Secured with full certificate
-|
+|Product |Neo4j Aura
+|Security |Secured with full certificate
+|Code snippet |
 [source, csharp]
 ----
 GraphDatabase.Driver("neo4j+s://graph.example.com:7687", auth)
@@ -415,7 +410,7 @@ String uri = "neo4j://graph.example.com:7687";
 IDriver driver = GraphDatabase.Driver(uri, auth,
            o => o.WithEncryptionLevel(EncryptionLevel.Encrypted));
 ----
-| This is the default (and only option) for Neo4j Aura
+|Comments | This is the default (and only option) for Neo4j Aura
 
 |Neo4j 4.x
 |Unsecured

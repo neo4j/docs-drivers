@@ -100,17 +100,18 @@ The `ROUTING_CONTEXT` option allows for customization of the routing table and i
 include::{common-content}/client-applications.adoc[tag=examples-pt2]
 
 .Connecting to a service
-The table below illustrates examples of how to connect to a service with routing:
+The tables below illustrate examples of how to connect to a service with routing:
 
-[options="header", cols="a,a,a,a"]
+.Neo4j Aura, secured with full certificate
+[cols="<15h,<85a"]
 |===
-|Product
-|Security
-|Code snippet
-|Comments
+| Product
+| Neo4j Aura
 
-|Neo4j Aura
-|Secured with full certificate
+| Security
+| Secured with full certificate
+
+| Code snippet
 |
 [source, csharp]
 ----
@@ -125,19 +126,40 @@ String uri = "neo4j://graph.example.com:7687";
 IDriver driver = GraphDatabase.Driver(uri, auth,
            o => o.WithEncryptionLevel(EncryptionLevel.Encrypted));
 ----
-| This is the default (and only option) for Neo4j Aura
 
-|Neo4j 4.x
-|Unsecured
+| Comments
+| This is the default (and only option) for Neo4j Aura.
+|===
+
+.Neo4j 4.x, unsecured
+[cols="<15h,<85a"]
+|===
+| Product
+| Neo4j 4.x
+
+| Security
+| Unsecured
+
+| Code snippet
 |
 [source, csharp]
 ----
 GraphDatabase.Driver("neo4j://graph.example.com:7687", auth);
 ----
-|This is the default for Neo4j 4.x series
+| Comments
+| This is the default for Neo4j 4.x series
+|===
 
-|Neo4j 4.x
-|Secured with full certificate
+.Neo4j 4.x, secured with full certificate
+[cols="<15h,<85a"]
+|===
+| Product
+| Neo4j 4.x
+
+| Security
+| Secured with full certificate
+
+| Code snippet
 |
 [source, csharp]
 ----
@@ -152,10 +174,18 @@ String uri = "neo4j://graph.example.com:7687";
 IDriver driver = GraphDatabase.Driver(uri, auth,
            o => o.WithEncryptionLevel(EncryptionLevel.Encrypted));
 ----
-|
+|===
 
-|Neo4j 4.x
-|Secured with self-signed certificate
+.Neo4j 4.x, secured with self-signed certificate
+[cols="<15h,<85a"]
+|===
+| Product
+| Neo4j 4.x
+
+| Security
+| Secured with self-signed certificate
+
+| Code snippet
 |
 [source, csharp]
 ----
@@ -171,10 +201,18 @@ IDriver driver = GraphDatabase.Driver(uri, auth,
            o => o.WithEncryptionLevel(EncryptionLevel.Encrypted)
                  .WithTrustManager(TrustManager.CreateInsecure()));
 ----
-|
+|===
 
-|Neo4j 3.x
-|Secured with full certificate
+.Neo4j 3.x, secured with full certificate
+[cols="<15h,<85a"]
+|===
+| Product
+| Neo4j 3.x
+
+| Security
+| Secured with full certificate
+
+| Code snippet
 |
 [source, csharp]
 ----
@@ -189,10 +227,18 @@ String uri = "neo4j://graph.example.com:7687";
 IDriver driver = GraphDatabase.Driver(uri, auth,
            o => o.WithEncryptionLevel(EncryptionLevel.Encrypted));
 ----
-|
+|===
 
-|Neo4j 3.x
-|Secured with self-signed certificate
+.Neo4j 3.x, secured with self-signed certificate
+[cols="<15h,<85a"]
+|===
+| Product
+| Neo4j 3.x
+
+| Security
+| Secured with self-signed certificate
+
+| Code snippet
 |
 [source, csharp]
 ----
@@ -208,17 +254,26 @@ IDriver driver = GraphDatabase.Driver(uri, auth,
            o => o.WithEncryptionLevel(EncryptionLevel.Encrypted)
                  .WithTrustManager(TrustManager.CreateInsecure()));
 ----
-|This is the default for Neo4j 3.x series
 
-|Neo4j 3.x
-|Unsecured
+| Comments
+| This is the default for Neo4j 3.x series
+|===
+
+.Neo4j 3.x, unsecured
+[cols="<15h,<85a"]
+|===
+| Product
+| Neo4j 3.x
+
+| Security
+| Unsecured
+
+| Code snippet
 |
 [source, csharp]
 ----
 GraphDatabase.Driver("neo4j://graph.example.com:7687", auth);
 ----
-|
-
 |===
 
 [NOTE]
