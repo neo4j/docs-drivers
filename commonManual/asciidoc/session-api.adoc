@@ -1,60 +1,36 @@
 [[driver-session-api]]
 = The session API
 
+# tag::abstract[]
+
 [abstract]
 --
 This section details the Session API that are made available by the driver, with each Session class oriented towards a different form of programming.
 --
 
-This chapter describes the following:
-
-* <<driver-simple-sessions, Simple sessions>>
-** <<driver-simple-lifecycle, Lifecycle>>
-** <<driver-simple-transaction-fn, Transaction functions>>
-** <<driver-simple-autocommit-transactions, Auto-commit transactions>>
-** <<driver-simple-result-consume, Consuming results>>
-** <<driver-simple-result-retain, Retaining results>>
-* <<driver-async-sessions, Asynchronous sessions>>
-** <<driver-async-transaction-fn, Transaction functions>>
-** <<driver-async-autocommit-transactions, Auto-commit transaction>>
-** <<driver-async-result-consume, Consuming results>>
-* <<driver-rx-sessions, Reactive sessions>>
-** <<driver-rx-lifecycle, Lifecycle>>
-** <<driver-rx-transaction-fn, Transaction functions>>
-** <<driver-rx-autocommit-transactions, Auto-commit transactions>>
-** <<driver-rx-result-consume, Consuming results>>
-** <<driver-rx-cancellation, Cancellation>>
-* <<driver-session-configuration, Configuration>>
-
+# end::abstract[]
 
 
 [[driver-simple-sessions]]
 == Simple sessions
 
-[abstract]
---
-This section describes simple sessions, transactions executed within a simple session and the results thereof.
---
-
-[NOTE]
-====
-Available in:
-
-- .NET Driver
-- Java Driver
-- Python Driver
-====
+# tag::simple-sessions[]
 
 Simple sessions provide a "classic" *_blocking style_* API for Cypher execution.
 In general, simple sessions provide the easiest programming style to work with since API calls are executed in a strictly sequential fashion.
+
+# end::simple-sessions[]
 
 
 [[driver-simple-lifecycle]]
 === Lifecycle
 
+# tag::simple-lifecycle[]
+
 The session lifetime extends from session construction to session closure.
 In languages that support them, simple sessions are usually scoped within a context block; this ensures that they are properly closed and that any underlying connections are released and not leaked.
 
+# end::simple-lifecycle[]
 
 [.tabbed-example]
 .Session construction and closure
@@ -98,6 +74,8 @@ See <<driver-session-configuration>> for more details.
 [[driver-simple-transaction-fn]]
 === Transaction functions
 
+# tag::simple-transaction-fn[]
+
 Transaction functions are used for containing transactional units of work.
 This form of transaction requires minimal boilerplate code and allows for a clear separation of database queries and application logic.
 
@@ -122,6 +100,8 @@ For several failure cases, the transaction can be immediately retried against a 
 These cases include connection issues, server role changes (e.g. leadership elections) and transient errors.
 Retry logic can be configured when creating a session.
 ====
+
+# end::simple-transaction-fn[]
 
 [.tabbed-example]
 .Transaction function
@@ -161,6 +141,8 @@ include::{python-examples}/test_transaction_function_example.py[tags=transaction
 [[driver-simple-autocommit-transactions]]
 === Auto-commit transactions
 
+# tag::simple-autocommit-transactions[]
+
 An *_auto-commit transaction_* is a *_basic but limited form of transaction_*.
 Such a transaction consists of only one Cypher query and is not automatically replayed on failure.
 Therefore any error scenarios must be handled by the client application itself.
@@ -180,6 +162,8 @@ Therefore, the only way to execute `PERIODIC COMMIT` from a driver is to use aut
 
 Please refer to the <<cypher-manual#query-using-periodic-commit-hint, Cypher Manual -> `PERIODIC COMMIT` query hint>>.
 ====
+
+# end::simple-autocommit-transactions[]
 
 [.tabbed-example]
 .Simple auto-commit transactions
@@ -220,8 +204,12 @@ include::{python-examples}/test_autocommit_transaction_example.py[tags=autocommi
 [[driver-simple-result-consume]]
 === Consuming results
 
+# tag::simple-result-consume[]
+
 Query results are typically consumed as a stream of records.
-The drivers provide a language-idiomatic way to iterate through that stream.
+The drivers provide a way to iterate through that stream.
+
+# end::simple-result-consume[]
 
 [.tabbed-example]
 .Consuming results
@@ -257,6 +245,8 @@ include::{python-examples}/test_result_consume_example.py[tags=result-consume]
 [[driver-simple-result-retain]]
 === Retaining results
 
+# tag::simple-result-retain[]
+
 Within a session, *_only one result stream can be active at any one time_*.
 Therefore, if the result of one query is not fully consumed before another query is executed, the remainder of the first result will be automatically buffered within the result object.
 
@@ -274,6 +264,8 @@ For this reason, *_it is recommended to consume results in order wherever possib
 Client applications can choose to take control of more advanced query patterns by explicitly retaining results.
 Such explicit retention may also be useful when a result needs to be saved for future processing.
 The drivers offer support for this process, as per the example below:
+
+# end::simple-result-retain[]
 
 [.tabbed-example]
 .Retain results for further processing
@@ -309,35 +301,33 @@ include::{python-examples}/test_result_retain_example.py[tags=result-retain]
 [[driver-async-sessions]]
 == Asynchronous sessions
 
-[abstract]
---
-This section describes asynchronous sessions, transactions executed within an asynchronous session and the results thereof.
---
-
-[NOTE]
-====
-Available in:
-
-- .NET Driver
-- Java Driver
-- JavaScript Driver
-====
+# tag::async-sessions[]
 
 Asynchronous sessions provide an API wherein function calls typically return available objects such as futures.
 This allows client applications to work within asynchronous frameworks and take advantage of cooperative multitasking.
+
+# end::async-sessions[]
 
 
 [[driver-async-lifecycle]]
 === Lifecycle
 
+# tag::async-lifecycle[]
+
 Session lifetime begins with session construction.
 A session then exists until it is closed, which is typically set to occur after its contained query results have been consumed.
 
 Sessions can be configured in a number of different ways. This is carried out by supplying configuration inside the session constructor.
+
+# end::async-lifecycle[]
+
 See <<driver-session-configuration>> for more details.
+
 
 [[driver-async-transaction-fn]]
 === Transaction functions
+
+# tag::async-transaction-fn[]
 
 Transaction functions are *_the recommended form for containing transactional units of work_*.
 This form of transaction requires minimal boilerplate code and allows for a clear separation of database queries and application logic.
@@ -360,6 +350,8 @@ When a transaction fails, the driver retry logic is invoked. For several failure
 These cases include connection issues, server role changes (e.g. leadership elections) and transient errors.
 Retry logic can be configured when creating a session.
 ====
+
+# end::async-transaction-fn[]
 
 [.tabbed-example]
 .Asynchronous transaction functions
@@ -398,6 +390,8 @@ include::{javascript-examples}/examples.test.js[tags=async-transaction-function]
 [[driver-async-autocommit-transactions]]
 === Auto-commit transactions
 
+# tag::async-autocommit-transactions[]
+
 An auto-commit transaction is a basic but limited form of transaction.
 Such a transaction consists of only one Cypher query and is not automatically replayed on failure.
 Therefore any error scenarios must be handled by the client application itself.
@@ -417,6 +411,8 @@ Therefore, the only way to execute them from a driver is to use auto-commit tran
 
 Please refer to the <<cypher-manual#query-using-periodic-commit-hint, Cypher Manual -> `PERIODIC COMMIT` query hint>>.
 ====
+
+# end::async-autocommit-transactions[]
 
 [.tabbed-example]
 .Asynchronous auto-commit transactions
@@ -455,7 +451,11 @@ include::{javascript-examples}/examples.test.js[tags=async-autocommit-transactio
 [[driver-async-result-consume]]
 === Consuming results
 
+# tag::async-result-consume[]
+
 The asynchronous session API provides language-idiomatic methods to aid integration with asynchronous applications and frameworks.
+
+# end::async-result-consume[]
 
 [.tabbed-example]
 .Asynchronous consuming results
@@ -494,19 +494,7 @@ include::{javascript-examples}/examples.test.js[tags=async-result-consume]
 [[driver-rx-sessions]]
 == Reactive Sessions
 
-[abstract]
---
-This section describes reactive sessions, transactions executed within a reactive session and the results thereof.
---
-
-[NOTE]
-====
-Available in:
-
-- .NET Driver
-- Java Driver
-- JavaScript Driver
-====
+# tag::rx-sessions[]
 
 Starting with *Neo4j 4.0*, the reactive processing of queries is supported.
 This can be achieved through reactive sessions.
@@ -523,6 +511,7 @@ For more information about reactive stream, please see the following:
 *  https://projectreactor.io/docs/core/release/reference/[Project Reactor reference documentation]
 *  http://introtorx.com/[Introduction to Reactive Extensions to .NET]
 
+# end::rx-sessions[]
 
 [NOTE]
 --
@@ -535,12 +524,18 @@ Refer to <<driver-get-started>> for more information on recommended dependencies
 [[driver-rx-lifecycle]]
 === Lifecycle
 
+# tag::rx-lifecycle[]
+
 Session lifetime begins with session construction.
 A session then exists until it is closed, which is typically set to occur after its contained query results have been consumed.
+
+# end::rx-lifecycle[]
 
 
 [[driver-rx-transaction-fn]]
 === Transaction functions
+
+# tag::rx-transaction-fn[]
 
 This form of transaction requires minimal boilerplate code and allows for a clear separation of database queries and application logic.
 Transaction functions are also desirable since they encapsulate retry logic and allow for the greatest degree of flexibility when swapping out a single instance of server for a cluster.
@@ -560,6 +555,8 @@ When a transaction fails, the driver retry logic is invoked.
 For several failure cases, the transaction can be immediately retried against a different server.
 These cases include connection issues, server role changes (e.g. leadership elections) and transient errors.
 Retry logic can be configured when creating a session.
+
+# end::rx-transaction-fn[]
 
 [.tabbed-example]
 .Reactive transaction functions
@@ -602,6 +599,8 @@ See <<driver-session-configuration>> for more details.
 [[driver-rx-autocommit-transactions]]
 === Auto-commit transactions
 
+# tag::rx-autocommit-transactions[]
+
 An auto-commit transaction is a basic but limited form of transaction.
 Such a transaction consists of only one Cypher Query and is not automatically replayed on failure.
 Therefore any error scenarios will need to be handled by the client application itself.
@@ -621,6 +620,8 @@ Unlike other kinds of Cypher query, `PERIODIC COMMIT` queries do not participate
 
 Please refer to the <<cypher-manual#query-using-periodic-commit-hint, Cypher Manual -> `PERIODIC COMMIT` query hint>>.
 ====
+
+# end::rx-autocommit-transactions[]
 
 [.tabbed-example]
 .Reactive auto-commit transactions
@@ -659,11 +660,15 @@ include::{javascript-examples}/examples.test.js[tags=rx-autocommit-transaction]
 [[driver-rx-result-consume]]
 === Consuming results
 
+# tag::rx-result-consume[]
+
 To consume data from a query in a reactive session, a subscriber is required to handle the results that are being returned by the publisher.
 
 Each transaction corresponds to a data flow which supplies the data from the server.
 Result processing begins when records are pulled from this flow.
 Only one subscriber may pull data from a given flow.
+
+# end::rx-result-consume[]
 
 [.tabbed-example]
 .Reactive consuming results
@@ -702,17 +707,18 @@ include::{javascript-examples}/examples.test.js[tags=rx-result-consume]
 [[driver-rx-cancellation]]
 === Cancellation
 
+# tag::rx-cancellation[]
+
 As per the reactive stream specification, a reactive data flow can be cancelled part way through.
 This prematurely commits or rolls back the transaction and stops the query engine from producing any more records.
+
+# end::rx-cancellation[]
 
 
 [[driver-session-configuration]]
 == Session configuration
 
-[abstract]
---
-This section details the configuration options available when constructing a session.
---
+# tag::Bookmarks[]
 
 [.compact]
 `Bookmarks`::
@@ -722,6 +728,10 @@ There may be scenarios where you might want to use the bookmark from one session
 +
 *Default:* None (Sessions will initially be created without a bookmark)
 
+# end::Bookmarks[]
+
+# tag::DefaultAccessMode[]
+
 `DefaultAccessMode`::
 A fallback for the access mode setting when transaction functions are not used.
 Typically, access mode is set per transaction by calling the appropriate transaction function method.
@@ -729,12 +739,18 @@ In other cases, this setting is inherited. Note that transaction functions will 
 +
 *Default:* Write
 
+# end::DefaultAccessMode[]
+
+# tag::Database[]
+
 `Database`::
 The database with which the session will interact.
 When you are working with a database which is not the default (i.e. the `system` database or another database in Neo4j 4.0 Enterprise Edition), you can explicitly configure the database which the driver is executing transactions against.
 See <<operations-manual#manage-databases-default, Operations Manual -> The default database>> for more information on databases.
 +
 *Default:* the default database as configured on the server.
+
+# end::Database[]
 
 `Fetch Size`::
 The number of records to fetch in each batch from the server.
