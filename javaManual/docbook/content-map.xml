@@ -2,23 +2,23 @@
 
 <d:toc xmlns:d="http://docbook.org/ns/docbook" xmlns="http://www.w3.org/1999/xhtml" role="chunk-toc">
   <d:tocentry linkend="driver-manual"><?dbhtml filename="index.html"?>
-    <d:tocentry linkend="driver-get-started"><?dbhtml filename="get-started/index.html"?>
+    <d:tocentry linkend="java-driver-get-started"><?dbhtml filename="get-started/index.html"?>
     </d:tocentry>
-    <d:tocentry linkend="driver-client-applications"><?dbhtml filename="client-applications/index.html"?>
+    <d:tocentry linkend="java-driver-client-applications"><?dbhtml filename="client-applications/index.html"?>
     </d:tocentry>
-    <d:tocentry linkend="driver-cypher-workflow"><?dbhtml filename="cypher-workflow/index.html"?>
+    <d:tocentry linkend="java-driver-cypher-workflow"><?dbhtml filename="cypher-workflow/index.html"?>
     </d:tocentry>
-    <d:tocentry linkend="driver-session-api"><?dbhtml filename="session-api/index.html"?>
-      <d:tocentry linkend="driver-simple-sessions"><?dbhtml filename="session-api/simple/index.html"?>
+    <d:tocentry linkend="java-driver-session-api"><?dbhtml filename="session-api/index.html"?>
+      <d:tocentry linkend="java-driver-simple-sessions"><?dbhtml filename="session-api/simple/index.html"?>
       </d:tocentry>
-      <d:tocentry linkend="driver-async-sessions"><?dbhtml filename="session-api/asynchronous/index.html"?>
+      <d:tocentry linkend="java-driver-async-sessions"><?dbhtml filename="session-api/asynchronous/index.html"?>
       </d:tocentry>
-      <d:tocentry linkend="driver-rx-sessions"><?dbhtml filename="session-api/reactive/index.html"?>
+      <d:tocentry linkend="java-driver-rx-sessions"><?dbhtml filename="session-api/reactive/index.html"?>
       </d:tocentry>
-      <d:tocentry linkend="driver-session-configuration"><?dbhtml filename="session-api/configuration/index.html"?>
+      <d:tocentry linkend="java-driver-session-configuration"><?dbhtml filename="session-api/configuration/index.html"?>
       </d:tocentry>
     </d:tocentry>
-    <d:tocentry linkend="driver-terminology"><?dbhtml filename="terminology/index.html"?>
+    <d:tocentry linkend="java-driver-terminology"><?dbhtml filename="terminology/index.html"?>
     </d:tocentry>
   </d:tocentry>
 </d:toc>
