@@ -1,36 +1,17 @@
-[[driver-client-applications]]
+[[java-driver-client-applications]]
 = Client applications
 
-[abstract]
---
-This section describes how to manage database connections within an application.
---
+include::{common-content}/client-applications.adoc[tag=abstract]
 
 
 [[driver-driver-object]]
 == The Driver Object
 
-Neo4j client applications require a *_Driver Object_* which, from a data access perspective, forms the backbone of the application.
-It is through this object that all Neo4j interaction is carried out, and it should therefore be made available to all parts of the application that require data access.
-
-In languages where <<term-thread-safety, thread safety>> is an issue, the Driver Object can be considered *_thread-safe_*.
-
-
-[TIP]
-.A note on lifecycle
---
-Applications will typically construct a Driver Object on startup and destroy it on exit.
-
-Destroying a Driver Object will immediately shut down any connections previously opened via that Driver Object, by closing the associated connection pool.
-
-This will have the consequence of rolling back any open transactions, and closing any unconsumed results.
---
+include::{common-content}/client-applications.adoc[tag=object-pt1]
 
 To construct a driver instance, a <<driver-connection-uris, connection URI>> and <<driver-authentication, authentication information>> must be supplied.
 
-Additional configuration details can be supplied if required.
-The configuration details are immutable for the lifetime of the Driver Object.
-Therefore, if multiple configurations are required (such as when working with multiple database users) then multiple Driver Objects must be used.
+include::{common-content}/client-applications.adoc[tag=object-pt2]
 
 
 .The driver lifecycle
@@ -47,7 +28,7 @@ include::{java-examples}/DriverLifecycleExample.java[tags=driver-lifecycle]
 ======
 
 
-[[driver-connection-uris]]
+[[java-driver-connection-uris]]
 == Connection URIs
 
 A connection URI identifies a graph database and how to connect to it.
@@ -92,7 +73,7 @@ For more information, see <<driver-configuration-examples>> below.
 |===
 
 
-[[initial-address-resolution]]
+[[java-initial-address-resolution]]
 === Initial address resolution
 
 The address provided in a `neo4j://` URI is used for initial and fallback communication only.
@@ -105,7 +86,7 @@ Several options are available for providing this initial logical-to-physical hos
 These include *_regular DNS_*, *_custom middleware_* such as a load balancer, and the Driver Object *_resolver function_*, all of which are described in the following sections.
 
 
-[[dns-resolution]]
+[[java-dns-resolution]]
 ==== DNS resolution
 
 DNS resolution is the default, and always-available option.
@@ -114,7 +95,7 @@ As it is possible to configure DNS to resolve a single host name down to multipl
 image::dns-resolution.png[title="Initial address resolution over DNS", role="middle"]
 
 
-[[custom-middleware]]
+[[java-custom-middleware]]
 ==== Custom middleware
 
 Middleware, such as a load balancer, can be used to group the core servers under a single public address.
@@ -122,7 +103,7 @@ Middleware, such as a load balancer, can be used to group the core servers under
 image::custom-middleware.png[title="Initial address resolution using custom middleware"]
 
 
-[[driver-resolver-function]]
+[[java-driver-resolver-function]]
 ==== Resolver function
 
 Neo4j Drivers also present an address resolution intercept hook called the *_resolver function_*.
@@ -143,7 +124,7 @@ include::{java-examples}/ConfigCustomResolverExample.java[tags=config-custom-res
 ======
 
 
-[[driver-routing-table]]
+[[java-driver-routing-table]]
 === Routing table
 
 The routing table acts like the glue between the driver connectivity layer and the database surface.
@@ -152,7 +133,7 @@ This table contains a list of server addresses, grouped as *_readers_* and *_wri
 The driver does not expose any API to work directly with the routing table, but it can sometimes be useful to explore when troubleshooting a system.
 
 
-[[driver-routing-context]]
+[[java-driver-routing-context]]
 === Routing context
 
 A routing context can be included as the query part of a `neo4j://` URI.
@@ -190,7 +171,7 @@ with your deployment machine's host name, as visible from the client machine.
 ====
 
 
-[[driver-configuration-examples]]
+[[java-driver-configuration-examples]]
 === Examples
 
 *_Connection URIs_* are typically formed according to the following pattern:
@@ -396,14 +377,14 @@ To connect to a service without routing, you can replace `neo4j` with `bolt`.
 ======
 
 
-[[driver-authentication]]
+[[java-driver-authentication]]
 == Authentication
 
 Authentication details are provided as an auth token which contains the user names, passwords or other credentials required to access the database.
 *Neo4j* supports multiple authentication standards but uses *_basic authentication_* by default.
 
 
-[[driver-authentication-basic]]
+[[java-driver-authentication-basic]]
 === Basic authentication
 
 The basic authentication scheme is backed by a password file stored within the server and requires applications to provide a user name and password.
@@ -429,7 +410,7 @@ The basic authentication scheme can also be used to authenticate against an LDAP
 --
 
 
-[[driver-authentication-kerberos]]
+[[java-driver-authentication-kerberos]]
 === Kerberos authentication
 
 The Kerberos authentication scheme provides a simple way to create a Kerberos authentication token with a base64 encoded server authentication ticket.
@@ -454,7 +435,7 @@ The Kerberos authentication token can only be understood by the server if the se
 --
 
 
-[[driver-authentication-custom]]
+[[java-driver-authentication-custom]]
 === Custom authentication
 
 For advanced deployments, where a custom security provider has been built, the custom authentication helper can be used.
@@ -473,7 +454,7 @@ include::{java-examples}/CustomAuthExample.java[tags=custom-auth]
 ======
 
 
-[[driver-configuration]]
+[[java-driver-configuration]]
 == Configuration
 
 `ConnectionAcquisitionTimeout`::
@@ -628,7 +609,7 @@ include::{java-examples}/ConfigTrustExample.java[tags=config-trust]
 ======
 
 
-[[driver-logging]]
+[[java-driver-logging]]
 == Logging
 
 All official *Neo4j Drivers* log information to standard logging channels.
