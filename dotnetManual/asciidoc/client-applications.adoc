@@ -143,6 +143,7 @@ IDriver driver = GraphDatabase.Driver(uri, auth,
 ----
 GraphDatabase.Driver("neo4j://graph.example.com:7687", auth);
 ----
+
 | Comments
 | This is the default for Neo4j 4.x series
 |===
