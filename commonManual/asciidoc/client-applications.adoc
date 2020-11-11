@@ -120,7 +120,7 @@ The *_encryption_* and *_trust_* settings provide detail to how that connection 
 
 Please consider the information in this section before upgrading from a previous version.
 
-The https://neo4j.com/docs/migration-guide/4.0/[Migration Guide] is also a good source of information about changes in functionality.
+The https://neo4j.com/docs/migration-guide/current/[Migration Guide] is also a good source of information about changes in functionality.
 ====
 
 Starting with *Neo4j 4.0*, client-server communication uses only *_unencrypted local connections by default_*.

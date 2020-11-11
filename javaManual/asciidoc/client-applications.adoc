@@ -31,25 +31,8 @@ include::{java-examples}/DriverLifecycleExample.java[tags=driver-lifecycle]
 [[java-driver-connection-uris]]
 == Connection URIs
 
-A connection URI identifies a graph database and how to connect to it.
+include::{common-content}/client-applications.adoc[tag=uris]
 
-The *_encryption_* and *_trust_* settings provide detail to how that connection should be secured.
-
-[CAUTION]
-====
-*There are significant changes to security settings between Neo4j 3.x and Neo4j 4.x*
-
-Please consider the information in this section before upgrading from a previous version.
-
-The https://neo4j.com/docs/migration-guide/4.0/[Migration Guide] is also a good source of information about changes in functionality.
-====
-
-Starting with *Neo4j 4.0*, client-server communication uses only *_unencrypted local connections by default_*.
-
-This is a change from previous versions, which switched on encryption by default, but generated a self-signed certificate out of the box.
-
-When a full certificate is installed, and encryption is enabled on the driver, full certificate checks are carried out (refer to <<operations-manual#ssl-framework, Operations Manual -> SSL framework >>).
-Full certificates provide better overall security than self-signed certificates as they include a complete chain of trust back to a root certificate authority.
 
 [NOTE]
 ====
@@ -57,63 +40,34 @@ https://neo4j.com/aura/[*Neo4j Aura*] is a *_secure hosted service_* backed by f
 
 To connect to *Neo4j Aura*, driver users must *_enable encryption_* and the complete set of certificate checks (the latter of which are enabled by default).
 
-For more information, see <<driver-configuration-examples>> below.
+For more information, see <<java-driver-configuration-examples>> below.
 ====
 
-.Changes in default security settings between 3.x and 4.x
-[options="header"]
-|===
-| Setting | Neo4j 4.x | Neo4j 3.x (Drivers 1.x)
-| Bundled certificate | none | auto-generated, self-signed
-| Driver encryption   | off  | on
-| Bolt interface      | localhost |localhost
-| Certificate expiry check  | on  |on
-| Certificate CA check  | on  | off
-| Certificate hostname check  | on  | off
-|===
+include::{common-content}/client-applications.adoc[tag=default-security-changes]
 
 
 [[java-initial-address-resolution]]
 === Initial address resolution
 
-The address provided in a `neo4j://` URI is used for initial and fallback communication only.
-
-This communication occurs *_to bootstrap the routing table_*, through which all subsequent communication is carried out.
-Fallback occurs when the driver is unable to contact any of the addresses held in the routing table.
-The initial address is once again reused to bootstrap the system.
-
-Several options are available for providing this initial logical-to-physical host resolution.
-These include *_regular DNS_*, *_custom middleware_* such as a load balancer, and the Driver Object *_resolver function_*, all of which are described in the following sections.
+include::{common-content}/client-applications.adoc[tag=initial-address-resolution]
 
 
 [[java-dns-resolution]]
 ==== DNS resolution
 
-DNS resolution is the default, and always-available option.
-As it is possible to configure DNS to resolve a single host name down to multiple IP addresses, this can be used to expose all core server IP addresses under a single host name.
-
-image::dns-resolution.png[title="Initial address resolution over DNS", role="middle"]
+include::{common-content}/client-applications.adoc[tag=dns-resolution]
 
 
 [[java-custom-middleware]]
 ==== Custom middleware
 
-Middleware, such as a load balancer, can be used to group the core servers under a single public address.
-
-image::custom-middleware.png[title="Initial address resolution using custom middleware"]
+include::{common-content}/client-applications.adoc[tag=custom-middleware]
 
 
 [[java-driver-resolver-function]]
 ==== Resolver function
 
-Neo4j Drivers also present an address resolution intercept hook called the *_resolver function_*.
-
-This takes the form of a callback function that accepts a single input address and returns multiple output addresses.
-The function may hard code the output addresses or may draw them from another configuration source, as required.
-
-image::resolver-function.png[title="Initial address resolution using resolver function"]
-
-The example below shows how to expand a single address into multiple (hard-coded) output addresses:
+include::{common-content}/client-applications.adoc[tag=resolver-function]
 
 .Custom Address Resolver
 ======
@@ -127,130 +81,38 @@ include::{java-examples}/ConfigCustomResolverExample.java[tags=config-custom-res
 [[java-driver-routing-table]]
 === Routing table
 
-The routing table acts like the glue between the driver connectivity layer and the database surface.
-This table contains a list of server addresses, grouped as *_readers_* and *_writers_*, and is refreshed automatically by the driver as required.
-
-The driver does not expose any API to work directly with the routing table, but it can sometimes be useful to explore when troubleshooting a system.
+include::{common-content}/client-applications.adoc[tag=routing-table]
 
 
 [[java-driver-routing-context]]
 === Routing context
 
-A routing context can be included as the query part of a `neo4j://` URI.
-
-Routing contexts are defined by means of *_server policies_* and allow customization of the contents of the routing table.
-
-.Configure a routing driver with routing context
-====
-This example will assume that *Neo4j* has been configured for server policies as described in <<operations-manual#multi-dc-load-balancing, Neo4j Operations Manual -> Load balancing for multi-data center systems>>.
-In particular, a server policy called `europe` has been defined.
-Additionally, we have a server `neo01.graph.example.com` to which we wish to direct the driver.
-
-This URI will use the server policy `europe`:
-
-`neo4j://neo01.graph.example.com?policy=europe`
-====
-
-[NOTE]
-.Server-side configuration to enable routing drivers with routing context
-====
-A prerequisite for using a routing driver with routing context is that the *Neo4j* database is operated on a <<operations-manual#clustering, Causal Cluster>> with the <<operations-manual#multi-dc, Multi-data center licensing option>> enabled.
-Additionally, the routing contexts must be defined within the cluster as *_routing policies_*.
-
-For details on how to configure *_multi-data center routing policies_* for a Causal Cluster, please refer to <<operations-manual#multi-dc-load-balancing, Operations Manual -> Causal Clustering>>.
-====
-
-[NOTE]
-.Exposing a single instance deployment on a remote host using the `neo4j` URI scheme
-====
-If you are using a *_single instance_* of *Neo4j*, deployed on a remote machine whilst using the `neo4j` URI scheme, *_you will need to complete additional configuration of the server_*.
-
-To make the server aware of its deployment environment, you need to configure
-<<operations-manual#config_dbms.default_advertised_address,`default_advertised_address`>>
-with your deployment machine's host name, as visible from the client machine.
-====
+include::{common-content}/client-applications.adoc[tag=routing-context]
 
 
 [[java-driver-configuration-examples]]
 === Examples
 
-*_Connection URIs_* are typically formed according to the following pattern:
-
-[source, shell]
-----
-neo4j://<HOST>:<PORT>[?<ROUTING_CONTEXT>]
-----
-
-This targets a routed *Neo4j* service that may be fulfilled by either a cluster or a single instance.
-The `HOST` and `PORT` values contain a logical hostname and port number targeting the entry point to the *Neo4j* service (e.g. `neo4j://graph.example.com:7687`).
+include::{common-content}/client-applications.adoc[tag=examples-pt1]
 
 In a clustered environment, the URI address will resolve to one of more of the core members; for standalone installations, this will simply point to that server address.
-The `ROUTING_CONTEXT` option allows for customization of the routing table and is discussed in more detail in <<driver-routing-context>>.
+The `ROUTING_CONTEXT` option allows for customization of the routing table and is discussed in more detail in <<java-driver-routing-context>>.
 
-An alternative URI form, using the `bolt` URI scheme (e.g. `bolt://graph.example.com:7687`), can be used when a *_single point-to-point connection is required_*.
-This variant is useful for the subset client applications (such as admin tooling) that need to be aware of individual servers, as opposed to those which require a highly available database service.
-
-[source, shell]
-----
-bolt://<HOST>:<PORT>
-----
-
-Each of the `neo4j` and `bolt` URI schemes permit variants that contain extra encryption and trust information.
-The `+s` variants enable encryption with a full certificate check, and the `+ssc` variants enable encryption, but with no certificate check.
-This latter variant is designed specifically for use with self-signed certificates.
-
-.Available URI schemes
-[options="header", cols="m,a,a"]
-|===
-|URI scheme
-|Routing
-|Description
-
-|neo4j
-|Yes
-|Unsecured
-
-|neo4j+s
-|Yes
-|Secured with full certificate
-
-|neo4j+ssc
-|Yes
-|Secured with self-signed certificate
-
-|bolt
-|No
-|Unsecured
-
-|bolt+s
-|No
-|Secured with full certificate
-
-|bolt+ssc
-|No
-|Secured with self-signed certificate
-
-|===
-
-[NOTE]
-*Neo4j 3.x* did not provide a routing table in single instance mode and therefore you should use a `bolt://` URI if targeting an older, non-clustered server.
-
-The table below provides example code snippets for different deployment configurations.
-Each snippet expects an `auth` variable to have been previously defined, containing the authentication details for that connection.
+include::{common-content}/client-applications.adoc[tag=examples-pt2]
 
 .Connecting to a service
-======
-The table below illustrates examples of how to connect to a service with routing:
+The tables below illustrate examples of how to connect to a service with routing:
 
-[options="header", cols="a,a,a,a"]
+.Neo4j Aura, secured with full certificate
+[cols="<15h,<85a"]
 |===
-|Product
-|Security
-|Code snippet
-|Comments
+| Product
+| Neo4j Aura
 
-|Neo4j Aura
-|Secured with full certificate
+| Security
+| Secured with full certificate
+
+| Code snippet
 |
 [source, java]
 ----
@@ -267,19 +129,42 @@ Config config = Config.builder()
                      .build();
 Driver driver = GraphDatabase.driver(uri, auth, config);
 ----
+
+| Comments
 | This is the default (and only option) for Neo4j Aura
 
-|Neo4j 4.x
-|Unsecured
+|===
+
+.Neo4j 4.x, unsecured
+[cols="<15h,<85a"]
+|===
+| Product
+| Neo4j 4.x
+
+| Security
+| Unsecured
+
+| Code snippet
 |
 [source, java]
 ----
 GraphDatabase.driver("neo4j://graph.example.com:7687", auth)
 ----
-|This is the default for Neo4j 4.x series
 
-|Neo4j 4.x
-|Secured with full certificate
+| Comments
+| This is the default for Neo4j 4.x series
+|===
+
+.Neo4j 4.x, secured with full certificate
+[cols="<15h,<85a"]
+|===
+| Product
+| Neo4j 4.x
+
+| Security
+| Secured with full certificate
+
+| Code snippet
 |
 [source, java]
 ----
@@ -296,10 +181,18 @@ Config config = Config.builder()
                      .build();
 Driver driver = GraphDatabase.driver(uri, auth, config);
 ----
-|
+|===
 
-|Neo4j 4.x
-|Secured with self-signed certificate
+.Neo4j 4.x, secured with self-signed certificate
+[cols="<15h,<85a"]
+|===
+| Product
+| Neo4j 4.x
+
+| Security
+| Secured with self-signed certificate
+
+| Code snippet
 |
 [source, java]
 ----
@@ -317,10 +210,18 @@ Config config = Config.builder()
                     .build();
 Driver driver = GraphDatabase.driver(uri, auth, config);
 ----
-|
+|===
 
-|Neo4j 3.x
-|Secured with full certificate
+.Neo4j 3.x, secured with full certificate
+[cols="<15h,<85a"]
+|===
+| Product
+| Neo4j 3.x
+
+| Security
+| Secured with full certificate
+
+| Code snippet
 |
 [source, java]
 ----
@@ -337,10 +238,18 @@ Config config = Config.builder()
                      .build();
 Driver driver = GraphDatabase.driver(uri, auth, config);
 ----
-|
+|===
 
-|Neo4j 3.x
-|Secured with self-signed certificate
+.Neo4j 3.x, secured with self-signed certificate
+[cols="<15h,<85a"]
+|===
+| Product
+| Neo4j 3.x
+
+| Security
+| Secured with self-signed certificate
+
+| Code snippet
 |
 [source, java]
 ----
@@ -358,41 +267,45 @@ Config config = Config.builder()
                     .build();
 Driver driver = GraphDatabase.driver(uri, auth, config);
 ----
-|This is the default for Neo4j 3.x series
 
-|Neo4j 3.x
-|Unsecured
+| Comments
+| This is the default for Neo4j 3.x series
+|===
+
+.Neo4j 3.x, unsecured
+[cols="<15h,<85a"]
+|===
+| Product
+| Neo4j 3.x
+
+| Security
+| Unsecured
+
+| Code snippet
 |
 [source, java]
 ----
 GraphDatabase.driver("neo4j://graph.example.com:7687", auth)
 ----
-|
-
 |===
 
 [NOTE]
 To connect to a service without routing, you can replace `neo4j` with `bolt`.
 
-======
-
 
 [[java-driver-authentication]]
 == Authentication
 
-Authentication details are provided as an auth token which contains the user names, passwords or other credentials required to access the database.
-*Neo4j* supports multiple authentication standards but uses *_basic authentication_* by default.
+include::{common-content}/client-applications.adoc[tag=authentication]
 
 
 [[java-driver-authentication-basic]]
 === Basic authentication
 
-The basic authentication scheme is backed by a password file stored within the server and requires applications to provide a user name and password.
-For this, use the basic auth helper:
+include::{common-content}/client-applications.adoc[tag=authentication-basic]
 
 .Basic authentication
 ======
-.Import basic authentication
 [source, java]
 ----
 include::{java-examples}/BasicAuthExample.java[tags=basic-auth-import]
@@ -404,17 +317,13 @@ include::{java-examples}/BasicAuthExample.java[tags=basic-auth]
 ----
 ======
 
-[NOTE]
---
-The basic authentication scheme can also be used to authenticate against an LDAP server.
---
+include::{common-content}/client-applications.adoc[tag=authentication-basic-note]
 
 
 [[java-driver-authentication-kerberos]]
 === Kerberos authentication
 
-The Kerberos authentication scheme provides a simple way to create a Kerberos authentication token with a base64 encoded server authentication ticket.
-The best way to create a Kerberos authentication token is shown below:
+include::{common-content}/client-applications.adoc[tag=authentication-kerberos]
 
 .Kerberos authentication
 ======
@@ -429,16 +338,13 @@ include::{java-examples}/KerberosAuthExample.java[tags=kerberos-auth]
 ----
 ======
 
-[NOTE]
---
-The Kerberos authentication token can only be understood by the server if the server has the link:{kerberos-add-on-base-uri}[Kerberos Add-on] installed.
---
+include::{common-content}/client-applications.adoc[tag=authentication-kerberos-note]
 
 
 [[java-driver-authentication-custom]]
 === Custom authentication
 
-For advanced deployments, where a custom security provider has been built, the custom authentication helper can be used.
+include::{common-content}/client-applications.adoc[tag=authentication-custom]
 
 .Custom authentication
 ======
@@ -457,18 +363,8 @@ include::{java-examples}/CustomAuthExample.java[tags=custom-auth]
 [[java-driver-configuration]]
 == Configuration
 
-`ConnectionAcquisitionTimeout`::
-
-The maximum amount of time a session will wait when requesting a connection from the connection pool.
-For connection pools where all connections are currently being used and the `MaxConnectionPoolSize` limit has been reached, a session will wait this duration for a connection to be made available.
-Since the process of acquiring a connection may involve creating a new connection, *_ensure that the value of this configuration is higher than the configured_* `ConnectionTimeout`.
+include::{common-content}/client-applications.adoc[tag=configuration-ConnectionAcquisitionTimeout]
 +
-Setting a low value will allow for transactions to *_fail fast_* when all connections in the pool have been acquired by other transactions.
-Setting a higher value will result in these transactions being queued, increasing the chances of eventually acquiring a connection at the cost of longer time to receive feedback on failure.
-Finding an optimal value may require an element of experimentation, taking into consideration the expected levels of parallelism within your application as well as the `MaxConnectionPoolSize`.
-+
-*Default:* 60 seconds
-
 .Configure connection pool
 ======
 [source, java]
@@ -482,18 +378,8 @@ include::{java-examples}/ConfigConnectionPoolExample.java[tags=config-connection
 ----
 ======
 
-`ConnectionTimeout`::
-
-The maximum amount of time to wait for a TCP connection to be established.
-Connections are only created when a session requires one unless there is an available connection in the connection pool.
-The driver maintains a pool of open connections which can be loaned to a session when one is available.
-If a connection is not available, then an attempt to create a new connection (provided the `MaxConnectionPoolSize` limit has not been reached) is made with this configuration option, providing the maximum amount of time to wait for the connection to be established.
+include::{common-content}/client-applications.adoc[tag=configuration-ConnectionTimeout]
 +
-In environments with high latency and high occurrences of connection timeouts it is recommended to configure a higher value.
-For lower latency environments and quicker feedback on potential network issues configure with a lower value.
-+
-*Default:* 30 seconds
-
 .Configure connection timeout
 ======
 [source, java]
@@ -509,14 +395,10 @@ include::{java-examples}/ConfigConnectionTimeoutExample.java[tags=config-connect
 
 `CustomResolver`::
 
-Specify a custom server address resolver used by the routing driver to resolve the initial address used to create the driver. See <<driver-resolver-function>> for more details.
+Specify a custom server address resolver used by the routing driver to resolve the initial address used to create the driver. See <<java-driver-resolver-function>> for more details.
 
-`Encryption`::
-
-Specify whether to use an encrypted connection between the driver and server.
+include::{common-content}/client-applications.adoc[tag=configuration-Encryption]
 +
-*Default:* None
-
 .Unencrypted configuration
 ======
 [source, java]
@@ -530,44 +412,11 @@ include::{java-examples}/ConfigUnencryptedExample.java[tags=config-unencrypted]
 ----
 ======
 
-`MaxConnectionLifetime`::
+include::{common-content}/client-applications.adoc[tag=configuration-MaxConnectionLifetime]
 
-The maximum duration the driver will keep a connection for before being removed from the pool.
-Note that while the driver will respect this value, it is possible that the network environment will close connections inside this lifetime.
-This is beyond the control of the driver.
-The check on the connection’s lifetime happens when a session requires a connection.
-If the available connection’s lifetime is over this limit it is closed and a new connection is created, added to the pool and returned to the requesting session.
-Changing this configuration value would be useful in environments where users don’t have full control over the network environment and wish to proactively ensure all connections are ready.
-+
-Setting this option to a low value will cause a high connection churn rate, and can result in a performance drop.
-It is recommended to pick a value smaller than the maximum lifetime exposed by the surrounding system infrastructure (such as operating system, router, load balancer, proxy and firewall).
-Negative values result in lifetime not being checked.
-+
-*Default:* 1 hour (3600 seconds)
+include::{common-content}/client-applications.adoc[tag=configuration-MaxConnectionPoolSize]
 
-`MaxConnectionPoolSize`::
-
-The maximum total number of connections allowed, per host (i.e. cluster nodes), to be managed by the connection pool.
-In other words, for a direct driver using the `bolt://` scheme, this sets the maximum number of connections towards a single database server.
-For a driver connected to a cluster using the `neo4j://` scheme, this sets the maximum amount of connections per cluster member.
-If a session or transaction tries to acquire a connection at a time when the pool size is at its full capacity, it must wait until a free connection is available in the pool or the request to acquire a new connection times out.
-The connection acquiring timeout is configured via `ConnectionAcquisitionTimeout`.
-+
-This configuration option allows you to manage the memory and I/O resources being used by the driver and tuning this option is dependent on these factors, in addition to number of cluster members.
-+
-*Default:* 100 connections (except .NET Driver with 500 connections)
-
-`MaxTransactionRetryTime`::
-
-The maximum amount of time that a managed transaction will retry for before failing. Queries that are executed within a managed transaction gain the benefit of being retried when a transient error occurs.
-When this happens the transaction is retired multiple times up to the `MaxTransactionRetryTime`.
-+
-Configure this option higher in high latency environments or if you are executing many large transactions which could limit the number of times that they are retired and therefore their chance to succeed.
-Configure lower in low latency environments and where your workload mainly consists of many smaller transactions.
-Failing transactions faster may highlight the reasons behind the transient errors making it easier to fix underlying issues.
-+
-*Default:* 30 seconds
-
+include::{common-content}/client-applications.adoc[tag=configuration-MaxTransactionRetryTime]
 .Configure maximum retry time
 ======
 [source, java]
@@ -581,20 +430,8 @@ include::{java-examples}/ConfigMaxRetryTimeExample.java[tags=config-max-retry-ti
 ----
 ======
 
-`TrustStrategy`::
-
-Specify how to determine the authenticity of encryption certificates provided by the Neo4j instance that you are connecting to.
-There are three choices as to which strategy to use:
-
-* `TRUST_SYSTEM_CA_SIGNED_CERTIFICATES` - Accept any certificate that can be verified against a custom CA.
-
-* `TRUST_CUSTOM_CA_SIGNED_CERTIFICATES` - Accept any certificate that can be verified against the system store.
-
-* `TRUST_ALL_CERTIFICATES` - Accept any certificate provided by the server, regardless of CA chain. *We do not recommend using this setting for production environments.*
-
+include::{common-content}/client-applications.adoc[tag=configuration-TrustStrategy]
 +
-*Default:* `TRUST_SYSTEM_CA_SIGNED_CERTIFICATES` (Note - only when encryption is enabled)
-
 .Configure trusted certificates
 ======
 [source, java]
@@ -612,10 +449,7 @@ include::{java-examples}/ConfigTrustExample.java[tags=config-trust]
 [[java-driver-logging]]
 == Logging
 
-All official *Neo4j Drivers* log information to standard logging channels.
-This can typically be accessed in an ecosystem-specific way.
-
-The code snippet below demonstrates how to redirect log messages to standard output:
+include::{common-content}/client-applications.adoc[tag=logging]
 
 [source, java]
 ----
