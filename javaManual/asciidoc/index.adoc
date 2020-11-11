@@ -33,11 +33,11 @@ This is the manual for Neo4j Java Driver version {driver-version}, authored by t
 
 This manual covers the following areas:
 
-* <<driver-get-started>> -- An overview of the official Neo4j Java Driver and how to connect to a Neo4j database.
-* <<driver-client-applications>> -- How to manage database connections within an application.
-* <<driver-cypher-workflow>> -- How to create units of work and provide a logical context for that work.
-* <<driver-session-api>> -- How the types and values used by Cypher map to native language types.
-* <<driver-terminology>> -- Terminology for drivers.
+* <<java-driver-get-started>> -- An overview of the official Neo4j Java Driver and how to connect to a Neo4j database.
+* <<java-driver-client-applications>> -- How to manage database connections within an application.
+* <<java-driver-cypher-workflow>> -- How to create units of work and provide a logical context for that work.
+* <<java-driver-session-api>> -- How the types and values used by Cypher map to native language types.
+* <<java-driver-terminology>> -- Terminology for drivers.
 
 _Who should read this?_
 
