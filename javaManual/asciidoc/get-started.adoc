@@ -1,73 +1,21 @@
-[[driver-get-started]]
+[[java-driver-get-started]]
 = Get started
 
 [abstract]
 --
-This section gives an overview of the official Neo4j drivers and how to connect to a Neo4j database with a "Hello World" example.
+This section gives an overview of the official Neo4j Java Driver and how to connect to a Neo4j database with a "Hello World" example.
 --
 
-
-[[driver-get-started-about]]
+[[java-driver-get-started-about]]
 == About the official drivers
 
-Neo4j provides official drivers for a number of popular programming languages.
-These drivers are supported by Neo4j.
-
-Community drivers also exist for many languages, but vary greatly in terms of feature sets, maturity, and support.
-To find more about community drivers, visit https://neo4j.com/developer/language-guides/.
-
-The following languages and frameworks are officially supported by Neo4j:
-
-.Supported languages and frameworks for the 4.x driver series
-[options="header"]
-|===
-| Language/framework | Versions supported
-| .NET               | https://github.com/dotnet/standard/blob/master/docs/versions/netstandard2.0.md[.NET Standard 2.0]
-| Java               | Java 8+ (latest patch releases).
-| JavaScript         | All LTS versions of Node.JS, specifically the 4.x and 6.x series runtimes (https://github.com/nodejs/LTS).
-| Python             | CPython 3.5 and above.
-|===
-
-[NOTE]
---
-The 4.1 Go driver is a work in progress.
-There is currently no release date available.
-
-The latest Go Driver is 1.8.
-For information on the 1.8 Go Driver, see {docs-base-uri}/driver-manual/1.7.
---
-
-The driver API is intended to be topologically agnostic.
-This means that the underlying database topology — single instance, Causal Cluster, etc. — can be altered without requiring a corresponding alteration to application code.
-In the general case, only the <<driver-connection-uris, connection URI>> needs to be modified when changes are made to the topology.
-
-NOTE: The official drivers do not support HTTP communication.
-If you need an HTTP driver, choose one of the community drivers.
-See also the <<http-api#http-api, HTTP API documentation>>.
+include::{common-content}/get-started.adoc[tag=about]
 
 
-[[driver-get-started-installation]]
+[[java-driver-get-started-installation]]
 == Driver versions and installation
 
-Starting with *Neo4j 4.0*, *_the versioning scheme for the database, driver and protocol have all been aligned_*.
-This simplifies general compatibility concerns.
-
-Cross-version compatibility is still available, and minimum support for current and previous versions between both server and driver is guaranteed.
-More specifically, this means that *Neo4j 4.0* is guaranteed to be compatible with both *4.0 Drivers* and *1.7 Drivers*, and the *4.0 Drivers* are guaranteed to be compatible with both *Neo4j 4.0* and *Neo4j 3.5*.
-In cases where at least one peer is below version 4.0, communication will occur in *_fallback mode, limiting functionality to that available in the lowest-versioned component_*.
-
-[NOTE]
-Drivers 1.7 do not support multiple databases and Neo4j Fabric, features introduced in Neo4j 4.0.
-To be able to run multiple databases online concurrently and to do distributed queries over them, you must upgrade Drivers from 1.7 to 4.0.
-For information, see https://neo4j.com/docs/migration-guide/4.0/upgrade-driver/[4.0 Migration Guide -> Chapter 6. Upgrade Neo4j drivers].
-
-
-Wherever possible, it is recommended to use the latest stable driver release available.
-This will provide the greatest degree of stability and will ensure that the full set of server functionality is available.
-The drivers, when used with *Neo4j Enterprise Edition*, come with full cluster routing support.
-The drivers make no explicit distinction between *Enterprise Edition* and *Community Edition* however, and simply operate with the functionality made available by *Neo4j* itself.
-
-To install a driver or to find out more about which driver versions are available, use the relevant language distribution system, described below.
+include::{common-content}/get-started.adoc[tag=versions]
 
 
 .Acquire the driver
@@ -140,7 +88,7 @@ The release notes for this driver are available https://github.com/neo4j/neo4j-j
 ======
 
 
-[[driver-get-started-hello-world-example]]
+[[java-driver-get-started-hello-world-example]]
 == A "Hello World" example
 
 The example below shows the minimal configuration necessary to interact with *Neo4j* through a driver.
@@ -159,7 +107,7 @@ include::{java-examples}/HelloWorldExample.java[tags=hello-world]
 ======
 
 
-[[driver-api-docs]]
+[[java-driver-api-docs]]
 == Driver API docs
 
 For a comprehensive listing of all driver functionality, refer to the *API documentation*: {api-docs-base-uri}/java-driver/{java-driver-apidoc-version}/
