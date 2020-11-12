@@ -487,10 +487,10 @@ For information on how to work with null in Cypher, please refer to <<cypher-man
    Equivalent functionality is available by simply passing either the ID for pass-by-reference, or an extracted map of properties for pass-by-value.
 ====
 
-# end::type-mapping[]
-
 The Neo4j Drivers map Cypher Types to and from native language types as depicted in the table below.
 Custom types (those not available in the language or standard library) are highlighted in *bold*.
+
+# end::type-mapping[]
 
 [.tabbed-example]
 .Map Neo4j types to native language types

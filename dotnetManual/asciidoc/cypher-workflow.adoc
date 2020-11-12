@@ -79,7 +79,6 @@ include::{common-content}/cypher-workflow.adoc[tag=databases]
 
 include::{common-content}/cypher-workflow.adoc[tag=database-selection]
 
-
 .Database selection on session creation
 [source, csharp]
 ----
@@ -92,10 +91,7 @@ include::{dotnet-examples}/Examples.cs[tags=database-selection]
 
 include::{common-content}/cypher-workflow.adoc[tag=type-mapping]
 
-The Neo4j Drivers map Cypher Types to and from native language types as depicted in the table below.
-Custom types (those not available in the language or standard library) are highlighted in *bold*.
-
-.Map Neo4j types to native language types
+.Map Neo4j types to .NET types
 [options="header", cols=","]
 |===
 | Neo4j Cypher Type        | .NET Type

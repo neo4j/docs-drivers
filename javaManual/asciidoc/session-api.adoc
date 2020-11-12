@@ -1,4 +1,4 @@
-[[driver-session-api]]
+[[java-driver-session-api]]
 = The session API
 
 [abstract]
@@ -7,7 +7,7 @@ This section details the Session API that are made available by the driver, with
 --
 
 
-[[driver-simple-sessions]]
+[[java-driver-simple-sessions]]
 == Simple sessions
 
 [abstract]
@@ -19,7 +19,7 @@ Simple sessions provide a "classic" *_blocking style_* API for Cypher execution.
 In general, simple sessions provide the easiest programming style to work with since API calls are executed in a strictly sequential fashion.
 
 
-[[driver-simple-lifecycle]]
+[[java-driver-simple-lifecycle]]
 === Lifecycle
 
 The session lifetime extends from session construction to session closure.
@@ -41,7 +41,7 @@ This is carried out by supplying configuration inside the session constructor.
 See <<driver-session-configuration>> for more details.
 
 
-[[driver-simple-transaction-fn]]
+[[java-driver-simple-transaction-fn]]
 === Transaction functions
 
 Transaction functions are used for containing transactional units of work.
@@ -78,7 +78,7 @@ include::{java-examples}/TransactionFunctionExample.java[tags=transaction-functi
 ======
 
 
-[[driver-simple-autocommit-transactions]]
+[[java-driver-simple-autocommit-transactions]]
 === Auto-commit transactions
 
 An *_auto-commit transaction_* is a *_basic but limited form of transaction_*.
@@ -110,7 +110,7 @@ include::{java-examples}/AutocommitTransactionExample.java[tags=autocommit-trans
 ======
 
 
-[[driver-simple-result-consume]]
+[[java-driver-simple-result-consume]]
 === Consuming results
 
 Query results are typically consumed as a stream of records.
@@ -125,7 +125,7 @@ include::{java-examples}/ResultConsumeExample.java[tags=result-consume]
 ======
 
 
-[[driver-simple-result-retain]]
+[[java-driver-simple-result-retain]]
 === Retaining results
 
 Within a session, *_only one result stream can be active at any one time_*.
@@ -155,7 +155,7 @@ include::{java-examples}/ResultRetainExample.java[tags=result-retain]
 ======
 
 
-[[driver-async-sessions]]
+[[java-driver-async-sessions]]
 == Asynchronous sessions
 
 [abstract]
@@ -177,7 +177,7 @@ Sessions can be configured in a number of different ways. This is carried out by
 See <<driver-session-configuration>> for more details.
 
 
-[[driver-async-transaction-fn]]
+[[java-driver-async-transaction-fn]]
 === Transaction functions
 
 Transaction functions are *_the recommended form for containing transactional units of work_*.
@@ -212,7 +212,7 @@ include::{java-examples}/AsyncTransactionFunctionExample.java[tags=async-transac
 ======
 
 
-[[driver-async-autocommit-transactions]]
+[[java-driver-async-autocommit-transactions]]
 === Auto-commit transactions
 
 An auto-commit transaction is a basic but limited form of transaction.
@@ -245,7 +245,7 @@ include::{java-examples}/AsyncAutocommitTransactionExample.java[tags=async-autoc
 ======
 
 
-[[driver-async-result-consume]]
+[[java-driver-async-result-consume]]
 === Consuming results
 
 The asynchronous session API provides language-idiomatic methods to aid integration with asynchronous applications and frameworks.
@@ -260,7 +260,7 @@ include::{java-examples}/AsyncResultConsumeExample.java[tags=async-result-consum
 ======
 
 
-[[driver-rx-sessions]]
+[[java-driver-rx-sessions]]
 == Reactive Sessions
 
 [abstract]
@@ -293,14 +293,14 @@ Refer to <<driver-get-started>> for more information on recommended dependencies
 --
 
 
-[[driver-rx-lifecycle]]
+[[java-driver-rx-lifecycle]]
 === Lifecycle
 
 Session lifetime begins with session construction.
 A session then exists until it is closed, which is typically set to occur after its contained query results have been consumed.
 
 
-[[driver-rx-transaction-fn]]
+[[java-driver-rx-transaction-fn]]
 === Transaction functions
 
 This form of transaction requires minimal boilerplate code and allows for a clear separation of database queries and application logic.
@@ -335,7 +335,7 @@ This is carried out by supplying configuration inside the session constructor.
 See <<driver-session-configuration>> for more details.
 
 
-[[driver-rx-autocommit-transactions]]
+[[java-driver-rx-autocommit-transactions]]
 === Auto-commit transactions
 
 An auto-commit transaction is a basic but limited form of transaction.
@@ -367,7 +367,7 @@ include::{java-examples}/RxAutocommitTransactionExample.java[tags=rx-autocommit-
 ======
 
 
-[[driver-rx-result-consume]]
+[[java-driver-rx-result-consume]]
 === Consuming results
 
 To consume data from a query in a reactive session, a subscriber is required to handle the results that are being returned by the publisher.
@@ -385,14 +385,14 @@ include::{java-examples}/RxResultConsumeExample.java[tags=rx-result-consume]
 ======
 
 
-[[driver-rx-cancellation]]
+[[java-driver-rx-cancellation]]
 === Cancellation
 
 As per the reactive stream specification, a reactive data flow can be cancelled part way through.
 This prematurely commits or rolls back the transaction and stops the query engine from producing any more records.
 
 
-[[driver-session-configuration]]
+[[java-driver-session-configuration]]
 == Session configuration
 
 [abstract]
