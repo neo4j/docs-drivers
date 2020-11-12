@@ -1495,9 +1495,9 @@ include::{python-examples}/test_config_max_retry_time_example.py[tags=config-max
 Specify how to determine the authenticity of encryption certificates provided by the Neo4j instance that you are connecting to.
 There are three choices as to which strategy to use:
 
-* `TRUST_SYSTEM_CA_SIGNED_CERTIFICATES` - Accept any certificate that can be verified against a custom CA.
+* `TRUST_SYSTEM_CA_SIGNED_CERTIFICATES` - Accept any certificate that can be verified against the system store.
 
-* `TRUST_CUSTOM_CA_SIGNED_CERTIFICATES` - Accept any certificate that can be verified against the system store.
+* `TRUST_CUSTOM_CA_SIGNED_CERTIFICATES` - Accept any certificate that can be verified against a custom CA.
 
 * `TRUST_ALL_CERTIFICATES` - Accept any certificate provided by the server, regardless of CA chain. *We do not recommend using this setting for production environments.*
 

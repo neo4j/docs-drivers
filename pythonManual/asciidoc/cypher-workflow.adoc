@@ -15,7 +15,7 @@ include::{common-content}/cypher-workflow.adoc[tag=overview]
 include::{common-content}/cypher-workflow.adoc[tag=sessions]
 
 The session classes are described in <<python-driver-session-api>>.
-For more details, please see the <<python-driver-api-docs, API documentation>> for your language.
+For more details, please see the <<python-driver-api-docs, API documentation>>.
 
 
 [[python-driver-transactions]]
