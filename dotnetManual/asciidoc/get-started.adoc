@@ -6,6 +6,7 @@
 This section gives an overview of the official Neo4j .NET Driver and how to connect to a Neo4j database with a "Hello World" example.
 --
 
+
 [[dotnet-driver-get-started-about]]
 == About the official drivers
 
