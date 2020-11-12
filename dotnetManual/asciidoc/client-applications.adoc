@@ -31,7 +31,6 @@ include::{dotnet-examples}/Examples.cs[tags=driver-lifecycle]
 
 include::{common-content}/client-applications.adoc[tag=uris]
 
-
 [NOTE]
 ====
 https://neo4j.com/aura/[*Neo4j Aura*] is a *_secure hosted service_* backed by full certificates signed by a root certificate authority.
@@ -374,7 +373,8 @@ include::{dotnet-examples}/Examples.cs[tags=config-connection-timeout]
 
 `CustomResolver`::
 
-Specify a custom server address resolver used by the routing driver to resolve the initial address used to create the driver. See <<dotnet-driver-resolver-function>> for more details.
+Specify a custom server address resolver used by the routing driver to resolve the initial address used to create the driver.
+See <<dotnet-driver-resolver-function>> for more details.
 
 include::{common-content}/client-applications.adoc[tag=configuration-Encryption]
 +
