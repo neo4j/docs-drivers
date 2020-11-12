@@ -1,430 +1,197 @@
 [[java-driver-session-api]]
 = The session API
 
-[abstract]
---
-This section details the Session API that are made available by the driver, with each Session class oriented towards a different form of programming.
---
+include::{common-content}/session-api.adoc[tag=abstract]
 
 
 [[java-driver-simple-sessions]]
 == Simple sessions
 
-[abstract]
---
-This section describes simple sessions, transactions executed within a simple session and the results thereof.
---
-
-Simple sessions provide a "classic" *_blocking style_* API for Cypher execution.
-In general, simple sessions provide the easiest programming style to work with since API calls are executed in a strictly sequential fashion.
+include::{common-content}/session-api.adoc[tag=simple-sessions]
 
 
 [[java-driver-simple-lifecycle]]
 === Lifecycle
 
-The session lifetime extends from session construction to session closure.
-In languages that support them, simple sessions are usually scoped within a context block; this ensures that they are properly closed and that any underlying connections are released and not leaked.
+include::{common-content}/session-api.adoc[tag=simple-lifecycle]
 
-
-.Session construction and closure
-======
 [source, java]
 ----
 try (Session session = driver.session(...)) {
     // transactions go here
 }
 ----
-======
 
 *_Sessions can be configured in a number of different ways_*.
 This is carried out by supplying configuration inside the session constructor.
-See <<driver-session-configuration>> for more details.
+See <<java-driver-session-configuration>> for more details.
 
 
 [[java-driver-simple-transaction-fn]]
 === Transaction functions
 
-Transaction functions are used for containing transactional units of work.
-This form of transaction requires minimal boilerplate code and allows for a clear separation of database queries and application logic.
+include::{common-content}/session-api.adoc[tag=simple-transaction-fn]
 
-Transaction functions are also desirable since they encapsulate retry logic and allow for the greatest degree of flexibility when swapping out a single instance of server for a cluster.
-
-Transaction functions can be called as either read or write operations.
-This choice will route the transaction to an appropriate server within a clustered environment.
-If you are operating in a single instance environment, this routing has no impact. It does give you flexibility if you choose to adopt a clustered environment later on.
-
-Before writing a transaction function *_it is important to ensure that it is designed to be idempotent_*.
-This is because a function may be executed multiple times if initial runs fail.
-
-Any query results obtained within a transaction function should be consumed within that function, as connection-bound resources cannot be managed correctly when out of scope.
-To that end, transaction functions can return values but these should be derived values rather than raw results.
-
-[NOTE]
-====
-*_Transaction functions are the recommended form for containing transactional units of work_*.
-
-*_When a transaction fails, the driver retry logic is invoked_*.
-For several failure cases, the transaction can be immediately retried against a different server.
-These cases include connection issues, server role changes (e.g. leadership elections) and transient errors.
-Retry logic can be configured when creating a session.
-====
-
-.Transaction function
-======
 [source, java]
 ----
 include::{java-examples}/TransactionFunctionExample.java[tags=transaction-function]
 ----
-======
 
 
 [[java-driver-simple-autocommit-transactions]]
 === Auto-commit transactions
 
-An *_auto-commit transaction_* is a *_basic but limited form of transaction_*.
-Such a transaction consists of only one Cypher query and is not automatically replayed on failure.
-Therefore any error scenarios must be handled by the client application itself.
+include::{common-content}/session-api.adoc[tag=simple-autocommit-transactions]
 
-Auto-commit transactions are *_intended to be used for simple use cases_* such as when learning *Cypher* or writing one-off scripts.
-
-[WARNING]
-====
-It is not recommended to use auto-commit transactions in production environments.
-====
-
-[NOTE]
-====
-Unlike other kinds of Cypher Query, `PERIODIC COMMIT` queries do not participate in the causal chain.
-
-Therefore, the only way to execute `PERIODIC COMMIT` from a driver is to use auto-commit transactions.
-
-Please refer to the <<cypher-manual#query-using-periodic-commit-hint, Cypher Manual -> `PERIODIC COMMIT` query hint>>.
-====
-
-.Simple auto-commit transactions
-======
 [source, java]
 ----
 include::{java-examples}/AutocommitTransactionExample.java[tags=autocommit-transaction]
 ----
-======
 
 
 [[java-driver-simple-result-consume]]
 === Consuming results
 
-Query results are typically consumed as a stream of records.
-The drivers provide a language-idiomatic way to iterate through that stream.
+include::{common-content}/session-api.adoc[tag=simple-result-consume]
 
-.Consuming results
-======
 [source, java]
 ----
 include::{java-examples}/ResultConsumeExample.java[tags=result-consume]
 ----
-======
 
 
 [[java-driver-simple-result-retain]]
 === Retaining results
 
-Within a session, *_only one result stream can be active at any one time_*.
-Therefore, if the result of one query is not fully consumed before another query is executed, the remainder of the first result will be automatically buffered within the result object.
+include::{common-content}/session-api.adoc[tag=simple-result-retain]
 
-image::driver-result-buffer.svg[title="Result buffer", role="middle"]
-
-This buffer provides a staging point for results, and divides result handling into *_fetching_* (moving from the network to the buffer) and *_consuming_* (moving from the buffer to the application).
-
-[NOTE]
-====
-For large results, the result buffer may require a significant amount of memory.
-
-For this reason, *_it is recommended to consume results in order wherever possible_*.
-====
-
-Client applications can choose to take control of more advanced query patterns by explicitly retaining results.
-Such explicit retention may also be useful when a result needs to be saved for future processing.
-The drivers offer support for this process, as per the example below:
-
-.Retain results for further processing
-======
 [source, java]
 ----
 include::{java-examples}/ResultRetainExample.java[tags=result-retain]
 ----
-======
 
 
 [[java-driver-async-sessions]]
 == Asynchronous sessions
 
-[abstract]
---
-This section describes asynchronous sessions, transactions executed within an asynchronous session and the results thereof.
---
-
-Asynchronous sessions provide an API wherein function calls typically return available objects such as futures.
-This allows client applications to work within asynchronous frameworks and take advantage of cooperative multitasking.
+include::{common-content}/session-api.adoc[tag=async-sessions]
 
 
 [[driver-async-lifecycle]]
 === Lifecycle
 
-Session lifetime begins with session construction.
-A session then exists until it is closed, which is typically set to occur after its contained query results have been consumed.
+include::{common-content}/session-api.adoc[tag=async-lifecycle]
 
-Sessions can be configured in a number of different ways. This is carried out by supplying configuration inside the session constructor.
-See <<driver-session-configuration>> for more details.
+See <<java-driver-session-configuration>> for more details.
 
 
 [[java-driver-async-transaction-fn]]
 === Transaction functions
 
-Transaction functions are *_the recommended form for containing transactional units of work_*.
-This form of transaction requires minimal boilerplate code and allows for a clear separation of database queries and application logic.
-Transaction functions are also desirable since they encapsulate retry logic and allow for the greatest degree of flexibility when swapping out a single instance of server for a cluster.
+include::{common-content}/session-api.adoc[tag=async-transaction-fn]
 
-Functions can be called as either read or write operations.
-This choice will route the transaction to an appropriate server within a clustered environment.
-If you are in a single instance environment, this routing has no impact but it does give you the flexibility should you choose to later adopt a clustered environment.
-
-Before writing a transaction function it is important to ensure that any side-effects carried out by a transaction function should be designed to be idempotent.
-This is because a function may be executed multiple times if initial runs fail.
-
-Any query results obtained within a transaction function should be consumed within that function, as connection-bound resources cannot be managed correctly when out of scope.
-To that end, transaction functions can return values but these should be derived values rather than raw results.
-
-[NOTE]
-====
-When a transaction fails, the driver retry logic is invoked. For several failure cases, the transaction can be immediately retried against a different server.
-
-These cases include connection issues, server role changes (e.g. leadership elections) and transient errors.
-Retry logic can be configured when creating a session.
-====
-
-.Asynchronous transaction functions
-======
-.Transaction function
 [source, java]
 ----
 include::{java-examples}/AsyncTransactionFunctionExample.java[tags=async-transaction-function]
 ----
-======
 
 
 [[java-driver-async-autocommit-transactions]]
 === Auto-commit transactions
 
-An auto-commit transaction is a basic but limited form of transaction.
-Such a transaction consists of only one Cypher query and is not automatically replayed on failure.
-Therefore any error scenarios must be handled by the client application itself.
+include::{common-content}/session-api.adoc[tag=async-autocommit-transactions]
 
-Auto-commit transactions are intended to be used for simple use cases such as when learning Cypher or writing one-off scripts.
-
-[WARNING]
-====
-It is not recommended to use auto-commit transactions in production environments.
-====
-
-[NOTE]
-====
-Unlike other kinds of Cypher Query, `PERIODIC COMMIT` queries do not participate in the causal chain.
-
-Therefore, the only way to execute them from a driver is to use auto-commit transactions.
-
-Please refer to the <<cypher-manual#query-using-periodic-commit-hint, Cypher Manual -> `PERIODIC COMMIT` query hint>>.
-====
-
-.Asynchronous auto-commit transactions
-======
-.Auto-commit transaction
 [source, java]
 ----
 include::{java-examples}/AsyncAutocommitTransactionExample.java[tags=async-autocommit-transaction]
 ----
-======
 
 
 [[java-driver-async-result-consume]]
 === Consuming results
 
-The asynchronous session API provides language-idiomatic methods to aid integration with asynchronous applications and frameworks.
+include::{common-content}/session-api.adoc[tag=async-result-consume]
 
-.Asynchronous consuming results
-======
-.Consuming results
 [source, java]
 ----
 include::{java-examples}/AsyncResultConsumeExample.java[tags=async-result-consume]
 ----
-======
 
 
 [[java-driver-rx-sessions]]
 == Reactive Sessions
 
-[abstract]
---
-This section describes reactive sessions, transactions executed within a reactive session and the results thereof.
---
-
-
-Starting with *Neo4j 4.0*, the reactive processing of queries is supported.
-This can be achieved through reactive sessions.
-Reactive sessions allow for dynamic management of the data that is being exchanged between the driver and the server.
-
-Typical of reactive programming, consumers control the rate at which they consume records from queries and the driver in turn manages the rate at which records are requested from the server.
-Flow control is supported throughout the entire Neo4j stack, meaning that the query engine responds correctly to the flow control signals.
-This results in far more efficient resource handling and ensures that the receiving side is not forced to buffer arbitrary amounts of data.
-
-For more information about reactive stream, please see the following:
-
-*  https://www.reactivemanifesto.org/[The Reactive Manifesto]
-*  https://www.reactive-streams.org[Reactive Streams for JVM and JavaScript]
-*  https://projectreactor.io/docs/core/release/reference/[Project Reactor reference documentation]
-*  http://introtorx.com/[Introduction to Reactive Extensions to .NET]
-
+include::{common-content}/session-api.adoc[tag=rx-sessions]
 
 [NOTE]
---
+====
 Reactive sessions will typically be used in a client application that is already oriented towards the reactive style; it is expected that a reactive dependency or framework is in place.
 
-Refer to <<driver-get-started>> for more information on recommended dependencies.
---
+Refer to <<java-driver-get-started>> for more information on recommended dependencies.
+====
 
 
 [[java-driver-rx-lifecycle]]
 === Lifecycle
 
-Session lifetime begins with session construction.
-A session then exists until it is closed, which is typically set to occur after its contained query results have been consumed.
+include::{common-content}/session-api.adoc[tag=rx-lifecycle]
 
 
 [[java-driver-rx-transaction-fn]]
 === Transaction functions
 
-This form of transaction requires minimal boilerplate code and allows for a clear separation of database queries and application logic.
-Transaction functions are also desirable since they encapsulate retry logic and allow for the greatest degree of flexibility when swapping out a single instance of server for a cluster.
+include::{common-content}/session-api.adoc[tag=rx-transaction-fn]
 
-Functions can be called as either read or write operations.
-This choice will route the transaction to an appropriate server within a clustered environment.
-If you are in a single instance environment, this routing has no impact but it does give you the flexibility should you choose to later adopt a clustered environment.
-
-Before writing a transaction function it is important to ensure that any side-effects carried out by a transaction function should be designed to be idempotent.
-This is because a function may be executed multiple times if initial runs fail.
-
-Any query results obtained within a transaction function should be consumed within that function, as connection-bound resources cannot be managed correctly when out of scope.
-To that end, transaction functions can return values but these should be derived values rather than raw results.
-
-[NOTE]
-When a transaction fails, the driver retry logic is invoked.
-For several failure cases, the transaction can be immediately retried against a different server.
-These cases include connection issues, server role changes (e.g. leadership elections) and transient errors.
-Retry logic can be configured when creating a session.
-
-.Reactive transaction functions
-======
 [source, java]
 ----
 include::{java-examples}/RxTransactionFunctionExample.java[tags=rx-transaction-function]
 ----
-======
 
 Sessions can be configured in a number of different ways.
 This is carried out by supplying configuration inside the session constructor.
-See <<driver-session-configuration>> for more details.
+See <<java-driver-session-configuration>> for more details.
 
 
 [[java-driver-rx-autocommit-transactions]]
 === Auto-commit transactions
 
-An auto-commit transaction is a basic but limited form of transaction.
-Such a transaction consists of only one Cypher Query and is not automatically replayed on failure.
-Therefore any error scenarios will need to be handled by the client application itself.
+include::{common-content}/session-api.adoc[tag=rx-autocommit-transactions]
 
-Auto-commit transactions are intended to be used for simple use cases such as when learning *Cypher* or writing one-off scripts.
-
-[WARNING]
-====
-It is not recommended to use auto-commit transactions in production environments.
-====
-
-[NOTE]
-====
-The only way to execute `PERIODIC COMMIT` Cypher Queries is to auto-commit the transaction.
-
-Unlike other kinds of Cypher query, `PERIODIC COMMIT` queries do not participate in the causal chain.
-
-Please refer to the <<cypher-manual#query-using-periodic-commit-hint, Cypher Manual -> `PERIODIC COMMIT` query hint>>.
-====
-
-.Reactive auto-commit transactions
-======
 [source, java]
 ----
 include::{java-examples}/RxAutocommitTransactionExample.java[tags=rx-autocommit-transaction]
 ----
-======
 
 
 [[java-driver-rx-result-consume]]
 === Consuming results
 
-To consume data from a query in a reactive session, a subscriber is required to handle the results that are being returned by the publisher.
+include::{common-content}/session-api.adoc[tag=rx-result-consume]
 
-Each transaction corresponds to a data flow which supplies the data from the server.
-Result processing begins when records are pulled from this flow.
-Only one subscriber may pull data from a given flow.
-
-.Reactive consuming results
-======
 [source, java]
 ----
 include::{java-examples}/RxResultConsumeExample.java[tags=rx-result-consume]
 ----
-======
 
 
 [[java-driver-rx-cancellation]]
 === Cancellation
 
-As per the reactive stream specification, a reactive data flow can be cancelled part way through.
-This prematurely commits or rolls back the transaction and stops the query engine from producing any more records.
+include::{common-content}/session-api.adoc[tag=rx-cancellation]
 
 
 [[java-driver-session-configuration]]
 == Session configuration
 
-[abstract]
---
-This section details the configuration options available when constructing a session.
---
+include::{common-content}/session-api.adoc[tag=Bookmarks]
 
-[.compact]
-`Bookmarks`::
-The mechanism which ensures causal consistency between transactions within a session.
-Bookmarks are implicitly passed between transactions within a single session to meet the causal consistency requirements.
-There may be scenarios where you might want to use the bookmark from one session in a different new session.
-+
-*Default:* None (Sessions will initially be created without a bookmark)
+include::{common-content}/session-api.adoc[tag=DefaultAccessMode]
 
-`DefaultAccessMode`::
-A fallback for the access mode setting when transaction functions are not used.
-Typically, access mode is set per transaction by calling the appropriate transaction function method.
-In other cases, this setting is inherited. Note that transaction functions will ignore/override this setting.
-+
-*Default:* Write
-
-`Database`::
-The database with which the session will interact.
-When you are working with a database which is not the default (i.e. the `system` database or another database in Neo4j 4.0 Enterprise Edition), you can explicitly configure the database which the driver is executing transactions against.
-See <<operations-manual#manage-databases-default, Operations Manual -> The default database>> for more information on databases.
-+
-*Default:* the default database as configured on the server.
+include::{common-content}/session-api.adoc[tag=Database]
 
 `Fetch Size`::
 The number of records to fetch in each batch from the server.
 Neo4j 4.0 introduces the ability to pull records in batches, allowing the client application to take control of data population and apply back pressure to the server.
-This `FetchSize` applies to <<driver-simple-sessions, simple sessions>> and <<driver-async-sessions, async-sessions>> whereas reactive sessions can be controlled directly using the request method of the subscription.
+This `FetchSize` applies to <<java-driver-simple-sessions, simple sessions>> and <<java-driver-async-sessions, async-sessions>> whereas reactive sessions can be controlled directly using the request method of the subscription.
 +
 *Default:* 1000 records

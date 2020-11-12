@@ -112,7 +112,6 @@ include::{dotnet-examples}/ExamplesAsync.cs[tags=async-autocommit-transaction]
 
 include::{common-content}/session-api.adoc[tag=async-result-consume]
 
-.Asynchronous consuming results
 [source, csharp]
 ----
 include::{dotnet-examples}/ExamplesAsync.cs[tags=async-result-consume]
