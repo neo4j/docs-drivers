@@ -131,6 +131,13 @@ include::{dotnet-examples}/Examples.cs[tags=pass-bookmarks]
 // ----
 ======
 
+[.include-with-go]
+======
+[source, go]
+----
+include::{go-examples}/examples_test.go[tags=pass-bookmarks]
+----
+======
 
 [.include-with-java]
 ======
@@ -220,13 +227,13 @@ include::{dotnet-examples}/Examples.cs[tags=read-write-transaction]
 
 ======
 
-// [.include-with-go]
-// ======
-// [source, go]
-// ----
-// include::{go-examples}/examples_test.go[tags=read-write-transaction]
-// ----
-// ======
+[.include-with-go]
+======
+[source, go]
+----
+include::{go-examples}/examples_test.go[tags=read-write-transaction]
+----
+======
 
 [.include-with-java]
 ======
@@ -318,6 +325,14 @@ Please note that the database that is requested must exist.
 [source, csharp]
 ----
 include::{dotnet-examples}/Examples.cs[tags=database-selection]
+----
+======
+
+[.include-with-go]
+======
+[source, go]
+----
+include::{go-examples}/examples_test.go[tags=database-selection]
 ----
 ======
 
@@ -442,33 +457,33 @@ Custom types (those not available in the language or standard library) are highl
 Inbound conversion is carried out using http://cldr.unicode.org/development/development-process/design-proposals/extended-windows-olson-zid-mapping[Extended Windows-Olson zid mapping] as defined by Unicode CLDR.
 ======
 
-// [.include-with-go]
-// ======
-// [options="header", cols="m,"]
-// |===
-// | Neo4j type        | Go type
-// | null | `nil`
-// | List | `[]interface{}`
-// | Map | `map[string]interface{}`
-// | Boolean | `bool`
-// | Integer | `int64`
-// | Float | `float64`
-// | String | `string`
-// | ByteArray | `[]byte`
-// | Date | *`neo4j.Date`*
-// | Time | *`neo4j.OffsetTime`*
-// | LocalTime | *`neo4j.LocalTime`*
-// | DateTime | *`time.Time`**
-// | LocalDateTime | *`neo4j.LocalDateTime`*
-// | Duration | *`neo4j.Duration`*
-// | Point | *`neo4j.Point`*
-// | Node | *`neo4j.Node`*
-// | Relationship | *`neo4j.Relationship`*
-// | Path | *`neo4j.Path`*
-// |===
-//
-// +*+ When a `time.Time` value is sent/received through the driver and its `Zone()` returns a name of `Offset`, the value is stored with its offset value rather than its zone name.
-// ======
+[.include-with-go]
+======
+[options="header", cols="m,"]
+|===
+| Neo4j type        | Go type
+| null | `nil`
+| List | `[]interface{}`
+| Map | `map[string]interface{}`
+| Boolean | `bool`
+| Integer | `int64`
+| Float | `float64`
+| String | `string`
+| ByteArray | `[]byte`
+| Date | *`neo4j.Date`*
+| Time | *`neo4j.OffsetTime`*
+| LocalTime | *`neo4j.LocalTime`*
+| DateTime | *`time.Time`**
+| LocalDateTime | *`neo4j.LocalDateTime`*
+| Duration | *`neo4j.Duration`*
+| Point | *`neo4j.Point`*
+| Node | *`neo4j.Node`*
+| Relationship | *`neo4j.Relationship`*
+| Path | *`neo4j.Path`*
+|===
+
++*+ When a `time.Time` value is sent/received through the driver and its `Zone()` returns a name of `Offset`, the value is stored with its offset value rather than its zone name.
+======
 
 [.include-with-java]
 ======
