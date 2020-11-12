@@ -1,31 +1,20 @@
 [[python-driver-session-api]]
 = The session API
 
-[abstract]
---
-This section details the Session API that are made available by the driver, with each Session class oriented towards a different form of programming.
---
+include::{common-content}/session-api.adoc[tag=abstract]
 
 
 [[python-driver-simple-sessions]]
 == Simple sessions
 
-[abstract]
---
-This section describes simple sessions, transactions executed within a simple session and the results thereof.
---
-
-Simple sessions provide a "classic" *_blocking style_* API for Cypher execution.
-In general, simple sessions provide the easiest programming style to work with since API calls are executed in a strictly sequential fashion.
+include::{common-content}/session-api.adoc[tag=simple-sessions]
 
 
 [[python-driver-simple-lifecycle]]
 === Lifecycle
 
-The session lifetime extends from session construction to session closure.
-In languages that support them, simple sessions are usually scoped within a context block; this ensures that they are properly closed and that any underlying connections are released and not leaked.
+include::{common-content}/session-api.adoc[tag=simple-lifecycle]
 
-.Session construction and closure
 [source, python]
 ----
 with driver.session(...) as session:
@@ -34,36 +23,13 @@ with driver.session(...) as session:
 
 *_Sessions can be configured in a number of different ways_*.
 This is carried out by supplying configuration inside the session constructor.
-See <<driver-session-configuration>> for more details.
+See <<python-driver-session-configuration>> for more details.
 
 
 [[python-driver-simple-transaction-fn]]
 === Transaction functions
 
-Transaction functions are used for containing transactional units of work.
-This form of transaction requires minimal boilerplate code and allows for a clear separation of database queries and application logic.
-
-Transaction functions are also desirable since they encapsulate retry logic and allow for the greatest degree of flexibility when swapping out a single instance of server for a cluster.
-
-Transaction functions can be called as either read or write operations.
-This choice will route the transaction to an appropriate server within a clustered environment.
-If you are operating in a single instance environment, this routing has no impact. It does give you flexibility if you choose to adopt a clustered environment later on.
-
-Before writing a transaction function *_it is important to ensure that it is designed to be idempotent_*.
-This is because a function may be executed multiple times if initial runs fail.
-
-Any query results obtained within a transaction function should be consumed within that function, as connection-bound resources cannot be managed correctly when out of scope.
-To that end, transaction functions can return values but these should be derived values rather than raw results.
-
-[NOTE]
-====
-*_Transaction functions are the recommended form for containing transactional units of work_*.
-
-*_When a transaction fails, the driver retry logic is invoked_*.
-For several failure cases, the transaction can be immediately retried against a different server.
-These cases include connection issues, server role changes (e.g. leadership elections) and transient errors.
-Retry logic can be configured when creating a session.
-====
+include::{common-content}/session-api.adoc[tag=simple-transaction-fn]
 
 .Transaction function
 ======
@@ -82,25 +48,7 @@ include::{python-examples}/test_transaction_function_example.py[tags=transaction
 [[python-driver-simple-autocommit-transactions]]
 === Auto-commit transactions
 
-An *_auto-commit transaction_* is a *_basic but limited form of transaction_*.
-Such a transaction consists of only one Cypher query and is not automatically replayed on failure.
-Therefore any error scenarios must be handled by the client application itself.
-
-Auto-commit transactions are *_intended to be used for simple use cases_* such as when learning *Cypher* or writing one-off scripts.
-
-[WARNING]
-====
-It is not recommended to use auto-commit transactions in production environments.
-====
-
-[NOTE]
-====
-Unlike other kinds of Cypher Query, `PERIODIC COMMIT` queries do not participate in the causal chain.
-
-Therefore, the only way to execute `PERIODIC COMMIT` from a driver is to use auto-commit transactions.
-
-Please refer to the <<cypher-manual#query-using-periodic-commit-hint, Cypher Manual -> `PERIODIC COMMIT` query hint>>.
-====
+include::{common-content}/session-api.adoc[tag=simple-autocommit-transactions]
 
 .Simple auto-commit transactions
 ======
@@ -119,8 +67,7 @@ include::{python-examples}/test_autocommit_transaction_example.py[tags=autocommi
 [[python-driver-simple-result-consume]]
 === Consuming results
 
-Query results are typically consumed as a stream of records.
-The drivers provide a language-idiomatic way to iterate through that stream.
+include::{common-content}/session-api.adoc[tag=simple-result-consume]
 
 .Consuming results
 [source, python]
@@ -132,63 +79,26 @@ include::{python-examples}/test_result_consume_example.py[tags=result-consume]
 [[python-driver-simple-result-retain]]
 === Retaining results
 
-Within a session, *_only one result stream can be active at any one time_*.
-Therefore, if the result of one query is not fully consumed before another query is executed, the remainder of the first result will be automatically buffered within the result object.
+include::{common-content}/session-api.adoc[tag=simple-result-retain]
 
-image::driver-result-buffer.svg[title="Result buffer", role="middle"]
-
-This buffer provides a staging point for results, and divides result handling into *_fetching_* (moving from the network to the buffer) and *_consuming_* (moving from the buffer to the application).
-
-[NOTE]
-====
-For large results, the result buffer may require a significant amount of memory.
-
-For this reason, *_it is recommended to consume results in order wherever possible_*.
-====
-
-Client applications can choose to take control of more advanced query patterns by explicitly retaining results.
-Such explicit retention may also be useful when a result needs to be saved for future processing.
-The drivers offer support for this process, as per the example below:
-
-.Retain results for further processing
 [source, python]
 ----
 include::{python-examples}/test_result_retain_example.py[tags=result-retain]
 ----
 
+
 [[python-driver-session-configuration]]
 == Session configuration
 
-[abstract]
---
-This section details the configuration options available when constructing a session.
---
+include::{common-content}/session-api.adoc[tag=Bookmarks]
 
-[.compact]
-`Bookmarks`::
-The mechanism which ensures causal consistency between transactions within a session.
-Bookmarks are implicitly passed between transactions within a single session to meet the causal consistency requirements.
-There may be scenarios where you might want to use the bookmark from one session in a different new session.
-+
-*Default:* None (Sessions will initially be created without a bookmark)
+include::{common-content}/session-api.adoc[tag=DefaultAccessMode]
 
-`DefaultAccessMode`::
-A fallback for the access mode setting when transaction functions are not used.
-Typically, access mode is set per transaction by calling the appropriate transaction function method.
-In other cases, this setting is inherited. Note that transaction functions will ignore/override this setting.
-+
-*Default:* Write
-
-`Database`::
-The database with which the session will interact.
-When you are working with a database which is not the default (i.e. the `system` database or another database in Neo4j 4.0 Enterprise Edition), you can explicitly configure the database which the driver is executing transactions against.
-See <<operations-manual#manage-databases-default, Operations Manual -> The default database>> for more information on databases.
-+
-*Default:* the default database as configured on the server.
+include::{common-content}/session-api.adoc[tag=Database]
 
 `Fetch Size`::
 The number of records to fetch in each batch from the server.
 Neo4j 4.0 introduces the ability to pull records in batches, allowing the client application to take control of data population and apply back pressure to the server.
-This `FetchSize` applies to <<driver-simple-sessions, simple sessions>> and <<driver-async-sessions, async-sessions>> whereas reactive sessions can be controlled directly using the request method of the subscription.
+This `FetchSize` applies to <<python-driver-simple-sessions, simple sessions>> and <<python-driver-async-sessions, async-sessions>> whereas reactive sessions can be controlled directly using the request method of the subscription.
 +
 *Default:* 1000 records
