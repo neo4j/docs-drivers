@@ -1,118 +1,41 @@
-[[driver-cypher-workflow]]
+[[java-driver-cypher-workflow]]
 = Cypher workflow
 
-[abstract]
---
-This section describes how to create units of work and provide a logical context for that work.
---
+include::{common-content}/cypher-workflow.adoc[tag=abstract]
 
 == Overview
 
-The Neo4j Drivers expose a Cypher Channel over which database work can be carried out (see the <<cypher-manual#cypher-manual, Cypher Manual>> for more information
-on the Cypher Query Language).
-
-Work itself is organized into *_sessions_*, *_transactions_* and *_queries_*, as follows:
-
-image::sessions-queries-transactions.png[title="Sessions, queries and transactions", role="middle"]
-
-Sessions are always bound to *_a single transaction context_*, which is typically an individual database.
-
-Using the bookmark mechanism, sessions also provide a guarantee of correct transaction sequencing, even when transactions occur over multiple cluster members.
-This effect is known as <<term-causal-chaining, *_causal chaining_*>>.
+include::{common-content}/cypher-workflow.adoc[tag=overview]
 
 
-[[driver-sessions]]
+[[java-driver-sessions]]
 == Sessions
 
-Sessions are *_lightweight containers for causally chained sequences of transactions_* (see <<operations-manual#causal-consistency-explained, Operations Manual -> Causal consistency>>).
-They essentially provide context for storing transaction sequencing information in the form of bookmarks.
+include::{common-content}/cypher-workflow.adoc[tag=sessions]
 
-When a transaction begins, the session in which it is contained acquires a connection from the driver connection pool.
-On commit (or rollback) of the transaction, the session releases that connection again.
-This means that it is only when a session is carrying out work that it occupies a connection resource.
-When idle, no such resource is in use.
-
-Due to the sequencing guaranteed by a session, sessions may only host *_one transaction at a time_*. For parallel execution, multiple sessions should be used.
-In languages where <<term-thread-safety, thread safety>> is an issue, *_sessions should not be considered thread-safe_*.
-
-Closing a session forces any open transaction to be rolled back, and its associated connection to consequently be released back into the pool.
-
-Sessions are bound to a single transactional context, specified on construction. *Neo4j* exposes each database inside its own context, thereby prohibiting cross-database transactions (or sessions) by design.
-Similarly, *_sessions bound to different databases may not be causally chained by propagating bookmarks between them_*.
-
-Individual language drivers provide several session classes, each oriented around a particular programming style.
-Each session class provides a similar set of functionality but offers client applications a choice based on how the application is structured and what frameworks are in use, if any.
-
-The session classes are described in <<driver-session-api>>.
-For more details, please see the <<driver-api-docs, API documentation>> for your language.
+The session classes are described in <<java-driver-session-api>>.
+For more details, please see the <<java-driver-api-docs, API documentation>> for your language.
 
 
-[[driver-transactions]]
+[[java-driver-transactions]]
 == Transactions
 
-Transactions are *_atomic units of work_* containing one or more *_Cypher Queries_*.
-Transactions may contain read or write work, and will generally be routed to an appropriate server for execution, where they will be carried out in their entirety.
-In case of a transaction failure, the transaction needs to be retried from the beginning.
-This is the responsibility of the <<term-transaction-manager, *_transaction manager_*>>.
+include::{common-content}/cypher-workflow.adoc[tag=transactions]
 
-The Neo4j Drivers provide *_transaction management_* via the <<term-transaction-function, *_transaction function_*>> mechanism.
-This mechanism is exposed through methods on the Session object which accept a function object that can be played multiple times against different servers until it either succeeds or a timeout is reached.
-This approach is recommended for most client applications.
-
-A convenient *_short-form alternative_* is the <<term-auto-commit, *_auto-commit_*>> transaction mechanism.
-This provides a limited form of transaction management for single-query transactions, as a trade-off for a slightly smaller code overhead.
-This form of transaction is useful for *_quick scripts and environments where high availability guarantees are not required_*.
-It is also the required form of transaction for running <<cypher-manual#query-using-periodic-commit-hint, `PERIODIC COMMIT`>> queries,
-which are the only type of Cypher Query to manage their own transactions.
-
-A lower-level *_unmanaged transaction API_* is also available for advanced use cases.
-This is useful when an alternative transaction management layer is applied by the client, in which error handling and retries need to be managed in a custom way.
-To learn more about how to use unmanaged transactions, see <<driver-api-docs, API documentation>> for the relevant language.
+To learn more about how to use unmanaged transactions, see <<java-driver-api-docs, API documentation>> for the relevant language.
 
 
-[[driver-queries-results]]
+[[java-driver-queries-results]]
 == Queries and results
 
-Queries consist of a request to the server to execute a Cypher statement, followed by a response back to the client with the result.
-Results are transmitted as a *_stream of records_*, along with header and footer metadata, and can be incrementally consumed by a client application.
-With https://en.wikipedia.org/wiki/Reactive_programming[reactive capabilities], the semantics of the record stream can be enhanced by allowing a Cypher result to be paused or cancelled part-way through.
-
-To execute a Cypher Query, the *_query text_* is required along with an optional set of *_named parameters_*.
-The text can contain *_parameter placeholders_* that are substituted with the corresponding values at runtime.
-While it is possible to run non-parameterized Cypher Queries, *_good programming practice is to use parameters in Cypher Queries whenever possible_*.
-This allows for the caching of queries within the Cypher Engine, which is beneficial for performance.
-Parameter values should adhere to <<cypher-manual#cypher-values>>.
-
-A result summary is also generally available.
-This contains additional information relating to the query execution and the result content.
-For an `EXPLAIN` or `PROFILE` query, this is where the query plan is returned.
-See <<cypher-manual#how-do-i-profile-a-query, Cypher Manual -> Profiling a query>> for more information on these queries.
+include::{common-content}/cypher-workflow.adoc[tag=queries-results]
 
 
-[[driver-causal-chaining]]
+[[java-driver-causal-chaining]]
 == Causal chaining and bookmarks
 
-When working with a *_Causal Cluster_*, transactions can be chained, via a session, to ensure *_causal consistency_*.
-This means that for any two transactions, it is guaranteed that the second transaction will begin only after the first has been successfully committed.
-This is true even if the transactions are carried out on different physical cluster members.
-For more information on Causal Clusters, please refer to <<operations-manual#clustering, Operations Manual -> Clustering>>.
+include::{common-content}/cypher-workflow.adoc[tag=causal-chaining]
 
-Internally, causal chaining is carried out by passing bookmarks between transactions.
-Each bookmark records one or more points in transactional history for a particular database, and can be used to inform cluster members to carry out units of work in a particular sequence.
-On receipt of a bookmark, the server will block until it has caught up with the relevant transactional point in time.
-
-An initial bookmark is sent from client to server on beginning a new transaction, and a final bookmark is returned on successful completion.
-Note that this applies to both read and write transactions.
-
-Bookmark propagation is carried out automatically within sessions and does not require any explicit signal or setting from the application.
-To opt out of this mechanism, for unrelated units of work, applications can use multiple sessions.
-This avoids the small latency overhead of the causal chain.
-
-Bookmarks can be passed between sessions by extracting the last bookmark from a session and passing this into the construction of another.
-Multiple bookmarks can also be combined if a transaction has more than one logical predecessor.
-Note that it is only when chaining across sessions that an application will need to work with bookmarks directly.
-
-image::driver-passing-bookmarks.svg[title="Passing bookmarks", role="middle"]
 
 .Pass bookmarks
 ======
@@ -128,27 +51,10 @@ include::{java-examples}/PassBookmarkExample.java[tags=pass-bookmarks]
 ======
 
 
-[[driver-access-modes-transaction]]
+[[java-driver-access-modes-transaction]]
 == Routing transactions using access modes
 
-Transactions can be executed in either *_read_* or *_write_* mode; this is known as the <<term-access-mode, *_access mode_*>>.
-In a Causal Cluster, each transaction will be routed to an appropriate server based on the mode.
-When using a single instance, all transactions will be passed to that one server.
-
-Routing Cypher by identifying reads and writes can improve the utilization of available cluster resources.
-Since read servers are typically more plentiful than write servers, it is beneficial to direct read traffic to read servers instead of the write server.
-Doing so helps in keeping write servers available for write transactions.
-
-*_Access mode is generally specified by the method used to call the transaction function._*
-Session classes provide a method for calling reads and another for writes.
-
-As a fallback for *_auto-commit_* and *_unmanaged transactions_*, a *_default access mode_* can also be provided *_at session level_*.
-This is only used in cases when the access mode cannot otherwise be specified.
-*_In case a transaction function is used within that session, the default access mode will be overridden_*.
-
-[NOTE]
-The driver does not parse *Cypher* and therefore cannot automatically determine whether a transaction is intended to carry out read or write operations.
-As a result, a write transaction tagged as a read will still be sent to a read server, but will fail on execution.
+include::{common-content}/cypher-workflow.adoc[tag=access-modes-transaction]
 
 .Read-write transaction
 ======
@@ -166,92 +72,29 @@ include::{java-examples}/ReadWriteTransactionExample.java[tags=read-write-transa
 ======
 
 
-[[driver-databases]]
+[[java-driver-databases]]
 == Databases and execution context
 
-*Neo4j* offers the ability to work with *_multiple databases_* within the same DBMS.
-
-For *_Community Edition_*, this is limited to *_one user database_*, plus the `system` database.
-
-From a driver API perspective, sessions have a DBMS scope, and the default database for a session can be selected on session construction. The default database is used as a target for queries that don't explicitly specify a database with a `USE` clause. See <<cypher-manual#query-use, Cypher Manual -> USE>> for details about the `USE` clause.
-
-In a multi-database environment, *_the server tags one database as default_*.
-This is selected whenever a session is created without naming a particular database as default.
-In an environment with a single database, that database is always the default.
-
-For more information about managing multiple databases within the same DBMS, refer to <<cypher-manual#neo4j-databases-graphs, Cypher Manual -> Neo4j databases and graphs>>, which has a full breakdown of the *Neo4j* data storage hierarchy.
-
-The following example illustrates how to work with databases:
-
-[source]
-----
-var session = driver.session(SessionConfig.forDatabase( "foo" ))
-// lists nodes from database foo
-session.run("MATCH (n) RETURN n").list()
-
-// lists nodes from database bar
-session.run("USE bar MATCH (n) RETURN n").list()
-
-// creates an index in foo
-session.run("CREATE INDEX foo_idx FOR (n:Person) ON n.id").consume()
-
-// creates an index in bar
-session.run("USE bar CREATE INDEX bar_idx FOR (n:Person) ON n.id").consume()
-
-// targets System database
-session.run("SHOW USERS")
-----
+include::{common-content}/cypher-workflow.adoc[tag=databases]
 
 
 [role=enterprise-edition]
-[[database-selection]]
+[[java-database-selection]]
 === Database selection
 
-The database selection on the client side happens on the <<driver-session-api, session API>>.
-
-You pass the name of the database to the driver during session creation.
-If you don't specify a name, the default database is used.
-The database name must not be `null`, nor an empty string.
-
-[NOTE]
-*_The selection of database is only possible when the driver is connected against Neo4j Enterprise Edition_*.
-Changing to any other database than the default database in Neo4j Community Edition will lead to a runtime error.
-
-The following example illustrates the concept of DBMS <<cypher-manual#dbms-transactions, Cypher Manual -> Transactions>> and shows how queries to multiple databases can be issued in one driver transaction. It is annotated with comments describing how each operation impacts database transactions.
-
-[source]
-----
-var session = driver.session(SessionConfig.forDatabase( "foo" ))
-// a DBMS-level transaction is started
-var transaction = session.begin()
-
-// a transaction on database "foo" is started automatically with the first query targeting foo
-transaction.run("MATCH (n) RETURN n").list()
-
-// a transaction on database "bar" is started
-transaction.run("USE bar MATCH (n) RETURN n").list()
-
-// executes in the transaction on database "foo"
-transaction.run("RETURN 1").consume()
-
-// executes in the transaction on database "bar"
-transaction.run("USE bar RETURN 1").consume()
-
-// commits the DBMS-level transaction which commits the transactions on databases "foo" and
-// "bar"
-transaction.commit()
-----
-
-Please note that the database that is requested must exist.
+include::{common-content}/cypher-workflow.adoc[tag=database-selection]
 
 .Database selection on session creation
-.Import database selection on session creation
+======
+Import database selection on session creation:
+
 [source, java]
 ----
 include::{java-examples}/DatabaseSelectionExample.java[tags=database-selection-import]
 ----
 
-.Database selection on session creation
+Database selection on session creation:
+
 [source, java]
 ----
 include::{java-examples}/DatabaseSelectionExample.java[tags=database-selection]
@@ -260,54 +103,12 @@ include::{java-examples}/DatabaseSelectionExample.java[tags=database-selection]
 
 
 
-[[driver-type-mapping]]
+[[java-driver-type-mapping]]
 == Type mapping
 
-Drivers translate between *_application language types_* and the *_Cypher Types_*.
+include::{common-content}/cypher-workflow.adoc[tag=type-mapping]
 
-To pass parameters and process results, it is important to know the basics of how Cypher works with types and to understand
-how the Cypher Types are mapped in the driver.
-
-The table below shows the available data types.
-All types can be potentially found in the result, although not all types can be used as parameters.
-
-====
-[options="header", cols=",,"]
-|===
-| Cypher Type | Parameter | Result
-| `null`* | ✔ | ✔
-| `List`  | ✔ | ✔
-| `Map`   | ✔ | ✔
-| `Boolean` | ✔ | ✔
-| `Integer` | ✔ | ✔
-| `Float` | ✔ | ✔
-| `String` | ✔ | ✔
-| `ByteArray` | ✔ | ✔
-| `Date` | ✔ | ✔
-| `Time` | ✔ | ✔
-| `LocalTime` | ✔ | ✔
-| `DateTime` | ✔ | ✔
-| `LocalDateTime` | ✔ | ✔
-| `Duration` | ✔ | ✔
-| `Point` | ✔ | ✔
-| `Node`** | | ✔
-| `Relationship`** | | ✔
-| `Path`** | | ✔
-|===
-
-+*+ The null marker is not a type but a placeholder for absence of value.
-For information on how to work with null in Cypher, please refer to <<cypher-manual#cypher-working-with-null, Cypher Manual -> Working with `null`>>.
-
-+**+ Nodes, relationships and paths are passed in results as snapshots of the original graph entities.
-   While the original entity IDs are included in these snapshots, no permanent link is retained back to the underlying server-side entities, which may be deleted or otherwise altered independently of the client copies.
-   Graph structures may not be used as parameters because it depends on application context whether such a parameter would be passed by reference or by value, and Cypher provides no mechanism to denote this.
-   Equivalent functionality is available by simply passing either the ID for pass-by-reference, or an extracted map of properties for pass-by-value.
-====
-
-The Neo4j Drivers map Cypher Types to and from native language types as depicted in the table below.
-Custom types (those not available in the language or standard library) are highlighted in *bold*.
-
-.Map Neo4j types to native language types
+.Map Neo4j types to Java types
 ======
 [options="header", cols="m,"]
 |===
@@ -336,40 +137,7 @@ Custom types (those not available in the language or standard library) are highl
 ======
 
 
-[[driver-exceptions-errors]]
+[[java-driver-exceptions-errors]]
 == Exceptions and error handling
 
-When executing *Cypher* or carrying out other operations with the driver, certain exceptions and error cases may arise.
-*_Server-generated exceptions_* are each associated with a <<status-codes#status-codes, *_status code_*>> that describes the nature of the problem and a message that provides more detail.
-
-The classifications are listed in the table below.
-
-.Server status code classifications
-[options="header"]
-|===
-| Classification 	| Description
-|ClientError            | The client application has caused an error.
-The application should amend and retry the operation.
-
-|DatabaseError          | The server has caused an error.
-Retrying the operation will generally be unsuccessful.
-
-|TransientError         | A temporary error has occurred.
-The application should retry the operation.
-|===
-
-=== Service unavailable
-
-A *_Service Unavailable_* exception will be signalled when the driver is no longer able to establish communication with the server, even after retries.
-
-Encountering this condition usually indicates a fundamental networking or database problem.
-
-While certain mitigations can be made by the driver to avoid this issue, there will always be cases when this is impossible.
-As such, it is highly recommended to ensure client applications contain a code path that can be followed when the client is no longer able to communicate with the server.
-
-=== Transient errors
-
-Transient errors are those which are generated by the server and marked as safe to retry without alteration to the original request.
-Examples of such errors are deadlocks and memory issues.
-
-When using transaction functions, the driver will usually be able to automatically retry when a transient failure occurs.
+include::{common-content}/cypher-workflow.adoc[tag=exceptions-errors]
