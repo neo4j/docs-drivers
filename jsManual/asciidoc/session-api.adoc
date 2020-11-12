@@ -1,4 +1,4 @@
-[[driver-session-api]]
+[[js-driver-session-api]]
 = The session API
 
 [abstract]
@@ -9,7 +9,7 @@ This section details the Session API that are made available by the driver, with
 The JavaScript Driver supports asynchronous and reactive sessions.
 
 
-[[driver-async-sessions]]
+[[js-driver-async-sessions]]
 == Asynchronous sessions
 
 [abstract]
@@ -21,7 +21,7 @@ Asynchronous sessions provide an API wherein function calls typically return ava
 This allows client applications to work within asynchronous frameworks and take advantage of cooperative multitasking.
 
 
-[[driver-async-lifecycle]]
+[[js-driver-async-lifecycle]]
 === Lifecycle
 
 Session lifetime begins with session construction.
@@ -31,7 +31,7 @@ Sessions can be configured in a number of different ways. This is carried out by
 See <<driver-session-configuration>> for more details.
 
 
-[[driver-async-transaction-fn]]
+[[js-driver-async-transaction-fn]]
 === Transaction functions
 
 Transaction functions are *_the recommended form for containing transactional units of work_*.
@@ -64,7 +64,7 @@ include::{javascript-examples}/examples.test.js[tags=async-transaction-function]
 
 
 
-[[driver-async-autocommit-transactions]]
+[[js-driver-async-autocommit-transactions]]
 === Auto-commit transactions
 
 An auto-commit transaction is a basic but limited form of transaction.
@@ -94,7 +94,7 @@ include::{javascript-examples}/examples.test.js[tags=async-autocommit-transactio
 ----
 
 
-[[driver-async-result-consume]]
+[[js-driver-async-result-consume]]
 === Consuming results
 
 The asynchronous session API provides language-idiomatic methods to aid integration with asynchronous applications and frameworks.
@@ -106,7 +106,7 @@ include::{javascript-examples}/examples.test.js[tags=async-result-consume]
 ----
 
 
-[[driver-rx-sessions]]
+[[js-driver-rx-sessions]]
 == Reactive Sessions
 
 [abstract]
@@ -138,14 +138,14 @@ Refer to <<driver-get-started>> for more information on recommended dependencies
 --
 
 
-[[driver-rx-lifecycle]]
+[[js-driver-rx-lifecycle]]
 === Lifecycle
 
 Session lifetime begins with session construction.
 A session then exists until it is closed, which is typically set to occur after its contained query results have been consumed.
 
 
-[[driver-rx-transaction-fn]]
+[[js-driver-rx-transaction-fn]]
 === Transaction functions
 
 This form of transaction requires minimal boilerplate code and allows for a clear separation of database queries and application logic.
@@ -178,7 +178,7 @@ This is carried out by supplying configuration inside the session constructor.
 See <<driver-session-configuration>> for more details.
 
 
-[[driver-rx-autocommit-transactions]]
+[[js-driver-rx-autocommit-transactions]]
 === Auto-commit transactions
 
 An auto-commit transaction is a basic but limited form of transaction.
@@ -208,7 +208,7 @@ include::{javascript-examples}/examples.test.js[tags=rx-autocommit-transaction]
 ----
 
 
-[[driver-rx-result-consume]]
+[[js-driver-rx-result-consume]]
 === Consuming results
 
 To consume data from a query in a reactive session, a subscriber is required to handle the results that are being returned by the publisher.
@@ -224,14 +224,14 @@ include::{javascript-examples}/examples.test.js[tags=rx-result-consume]
 ----
 
 
-[[driver-rx-cancellation]]
+[[js-driver-rx-cancellation]]
 === Cancellation
 
 As per the reactive stream specification, a reactive data flow can be cancelled part way through.
 This prematurely commits or rolls back the transaction and stops the query engine from producing any more records.
 
 
-[[driver-session-configuration]]
+[[js-driver-session-configuration]]
 == Session configuration
 
 [abstract]
