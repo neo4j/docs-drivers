@@ -1,4 +1,4 @@
-[[driver-get-started]]
+[[python-driver-get-started]]
 = Get started
 
 [abstract]
@@ -7,7 +7,7 @@ This section gives an overview of the official Neo4j drivers and how to connect 
 --
 
 
-[[driver-get-started-about]]
+[[python-driver-get-started-about]]
 == About the official drivers
 
 Neo4j provides official drivers for a number of popular programming languages.
@@ -46,7 +46,7 @@ If you need an HTTP driver, choose one of the community drivers.
 See also the <<http-api#http-api, HTTP API documentation>>.
 
 
-[[driver-get-started-installation]]
+[[python-driver-get-started-installation]]
 == Driver versions and installation
 
 Starting with *Neo4j 4.0*, *_the versioning scheme for the database, driver and protocol have all been aligned_*.
@@ -114,7 +114,7 @@ The release notes for the Python Driver are available https://github.com/neo4j/n
 ======
 
 
-[[driver-get-started-hello-world-example]]
+[[python-driver-get-started-hello-world-example]]
 == A "Hello World" example
 
 The example below shows the minimal configuration necessary to interact with *Neo4j* through a driver.
@@ -133,7 +133,7 @@ include::{python-examples}/test_driver_introduction_example.py[tags=driver-intro
 ======
 
 
-[[driver-api-docs]]
+[[python-driver-api-docs]]
 == Driver API docs
 
 For a comprehensive listing of all driver functionality, refer to the *API documentation*: {api-docs-base-uri}/python-driver/{python-driver-apidoc-version}/
