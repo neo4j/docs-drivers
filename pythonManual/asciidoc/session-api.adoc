@@ -1,4 +1,4 @@
-[[driver-session-api]]
+[[python-driver-session-api]]
 = The session API
 
 [abstract]
@@ -7,7 +7,7 @@ This section details the Session API that are made available by the driver, with
 --
 
 
-[[driver-simple-sessions]]
+[[python-driver-simple-sessions]]
 == Simple sessions
 
 [abstract]
@@ -19,7 +19,7 @@ Simple sessions provide a "classic" *_blocking style_* API for Cypher execution.
 In general, simple sessions provide the easiest programming style to work with since API calls are executed in a strictly sequential fashion.
 
 
-[[driver-simple-lifecycle]]
+[[python-driver-simple-lifecycle]]
 === Lifecycle
 
 The session lifetime extends from session construction to session closure.
@@ -37,7 +37,7 @@ This is carried out by supplying configuration inside the session constructor.
 See <<driver-session-configuration>> for more details.
 
 
-[[driver-simple-transaction-fn]]
+[[python-driver-simple-transaction-fn]]
 === Transaction functions
 
 Transaction functions are used for containing transactional units of work.
@@ -79,7 +79,7 @@ include::{python-examples}/test_transaction_function_example.py[tags=transaction
 ======
 
 
-[[driver-simple-autocommit-transactions]]
+[[python-driver-simple-autocommit-transactions]]
 === Auto-commit transactions
 
 An *_auto-commit transaction_* is a *_basic but limited form of transaction_*.
@@ -116,7 +116,7 @@ include::{python-examples}/test_autocommit_transaction_example.py[tags=autocommi
 ======
 
 
-[[driver-simple-result-consume]]
+[[python-driver-simple-result-consume]]
 === Consuming results
 
 Query results are typically consumed as a stream of records.
@@ -129,7 +129,7 @@ include::{python-examples}/test_result_consume_example.py[tags=result-consume]
 ----
 
 
-[[driver-simple-result-retain]]
+[[python-driver-simple-result-retain]]
 === Retaining results
 
 Within a session, *_only one result stream can be active at any one time_*.
@@ -156,7 +156,7 @@ The drivers offer support for this process, as per the example below:
 include::{python-examples}/test_result_retain_example.py[tags=result-retain]
 ----
 
-[[driver-session-configuration]]
+[[python-driver-session-configuration]]
 == Session configuration
 
 [abstract]
