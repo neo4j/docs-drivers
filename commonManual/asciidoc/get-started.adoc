@@ -36,13 +36,22 @@ The following languages and frameworks are officially supported by Neo4j:
 
 The driver API is intended to be topologically agnostic.
 This means that the underlying database topology — single instance, Causal Cluster, etc. — can be altered without requiring a corresponding alteration to application code.
-In the general case, only the <<driver-connection-uris, connection URI>> needs to be modified when changes are made to the topology.
-
-NOTE: The official drivers do not support HTTP communication.
-If you need an HTTP driver, choose one of the community drivers.
-See also the <<http-api#http-api, HTTP API documentation>>.
 
 # end::about[]
+
+In the general case, only the <<driver-connection-uris, connection URI>> needs to be modified when changes are made to the topology.
+
+# tag::about-note[]
+
+[NOTE]
+====
+The official drivers do not support HTTP communication.
+If you need an HTTP driver, choose one of the community drivers.
+
+See also the <<http-api#http-api, HTTP API documentation>>.
+====
+
+# end::about-note[]
 
 [[driver-get-started-installation]]
 == Driver versions and installation

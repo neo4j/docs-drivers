@@ -12,6 +12,10 @@ This section gives an overview of the official Neo4j Python Driver and how to co
 
 include::{common-content}/get-started.adoc[tag=about]
 
+In the general case, only the <<python-driver-connection-uris, connection URI>> needs to be modified when changes are made to the topology.
+
+include::{common-content}/get-started.adoc[tag=about-note]
+
 
 [[python-driver-get-started-installation]]
 == Driver versions and installation
