@@ -41,6 +41,7 @@ This section describes simple sessions, transactions executed within a simple se
 Available in:
 
 - *.NET Driver*
+- *Go Driver*
 - *Java Driver*
 - *Python Driver*
 ====
@@ -65,6 +66,16 @@ In languages that support them, simple sessions are usually scoped within a cont
 using (var session = driver.Session(...)) {
     // transactions go here
   }
+----
+======
+
+[.include-with-go]
+======
+[source, go ]
+----
+session := driver.NewSession(...)
+defer session.Close()
+// transactions go here
 ----
 ======
 
@@ -132,6 +143,14 @@ include::{dotnet-examples}/Examples.cs[tags=transaction-function]
 ----
 ======
 
+[.include-with-go]
+======
+[source, go]
+----
+include::{go-examples}/examples_test.go[tags=transaction-function]
+----
+======
+
 [.include-with-java]
 ======
 [source, java]
@@ -190,6 +209,14 @@ include::{dotnet-examples}/Examples.cs[tags=autocommit-transaction]
 ----
 ======
 
+[.include-with-go]
+======
+[source, go]
+----
+include::{go-examples}/examples_test.go[tags=autocommit-transaction]
+----
+======
+
 [.include-with-java]
 ======
 [source, java]
@@ -228,6 +255,14 @@ The drivers provide a language-idiomatic way to iterate through that stream.
 [source, csharp]
 ----
 include::{dotnet-examples}/Examples.cs[tags=result-consume]
+----
+======
+
+[.include-with-go]
+======
+[source, go]
+----
+include::{go-examples}/examples_test.go[tags=result-consume]
 ----
 ======
 
@@ -280,6 +315,14 @@ The drivers offer support for this process, as per the example below:
 [source, csharp]
 ----
 include::{dotnet-examples}/Examples.cs[tags=result-retain]
+----
+======
+
+[.include-with-go]
+======
+[source, go]
+----
+include::{go-examples}/examples_test.go[tags=result-retain]
 ----
 ======
 

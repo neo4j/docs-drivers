@@ -65,6 +65,13 @@ include::{dotnet-examples}/Examples.cs[tags=driver-lifecycle]
 // ----
 ======
 
+[.include-with-go]
+======
+[source, go]
+----
+include::{go-examples}/examples_test.go[tags=driver-lifecycle]
+----
+======
 
 [.include-with-java]
 ======
@@ -206,6 +213,14 @@ The example below shows how to expand a single address into multiple (hard-coded
 [source, csharp]
 ----
 include::{dotnet-examples}/Examples.cs[tags=config-custom-resolver]
+----
+======
+
+[.include-with-go]
+======
+[source, go]
+----
+include::{go-examples}/examples_test.go[tags=config-custom-resolver]
 ----
 ======
 
@@ -477,6 +492,88 @@ IDriver driver = GraphDatabase.Driver(uri, auth,
 [source, csharp]
 ----
 GraphDatabase.Driver("neo4j://graph.example.com:7687", auth);
+----
+|
+
+|===
+
+[NOTE]
+To connect to a service without routing, you can replace `neo4j` with `bolt`.
+
+======
+
+[.include-with-go]
+======
+The table below illustrates examples of how to connect to a service with routing:
+
+[options="header", cols="a,a,a,a"]
+|===
+|Product
+|Security
+|Code snippet
+|Comments
+
+|Neo4j Aura
+|Secured with full certificate
+|
+[source, go]
+----
+neo4j.NewDriver("neo4j+s://graph.example.com:7687", auth)
+----
+
+| This is the default (and only option) for Neo4j Aura
+
+|Neo4j 4.x
+|Unsecured
+|
+[source, go]
+----
+neo4j.NewDriver("neo4j://graph.example.com:7687", auth);
+----
+|This is the default for Neo4j 4.x series
+
+|Neo4j 4.x
+|Secured with full certificate
+|
+[source, go]
+----
+neo4j.NewDriver("neo4j+s://graph.example.com:7687", auth)
+----
+|
+
+|Neo4j 4.x
+|Secured with self-signed certificate
+|
+[source, go]
+----
+neo4j.NewDriver("neo4j+ssc://graph.example.com:7687", auth)
+----
+|
+
+|Neo4j 3.x
+|Secured with full certificate
+|
+[source, go]
+----
+neo4j.NewDriver("neo4j+s://graph.example.com:7687", auth)
+----
+|
+
+|Neo4j 3.x
+|Secured with self-signed certificate
+|
+[source, go]
+----
+neo4j.NewDriver("neo4j+ssc://graph.example.com:7687", auth)
+----
+|This is the default for Neo4j 3.x series
+
+|Neo4j 3.x
+|Unsecured
+|
+[source, go]
+----
+neo4j.NewDriver("neo4j://graph.example.com:7687", auth);
 ----
 |
 
@@ -907,6 +1004,14 @@ include::{dotnet-examples}/Examples.cs[tags=basic-auth]
 // ----
 ======
 
+[.include-with-go]
+======
+[source, go]
+----
+include::{go-examples}/examples_test.go[tags=basic-auth]
+----
+======
+
 [.include-with-java]
 ======
 .Import basic authentication
@@ -979,6 +1084,14 @@ include::{dotnet-examples}/Examples.cs[tags=kerberos-auth]
 // ----
 ======
 
+[.include-with-go]
+======
+[source, go]
+----
+include::{go-examples}/examples_test.go[tags=kerberos-auth]
+----
+======
+
 [.include-with-java]
 ======
 .Import Kerberos authentication
@@ -1048,6 +1161,14 @@ include::{dotnet-examples}/Examples.cs[tags=custom-auth]
 // ----
 // include::{dotnet-examples}/Examples.cs[tags=custom-auth-import]
 // ----
+======
+
+[.include-with-go]
+======
+[source, go]
+----
+include::{go-examples}/examples_test.go[tags=custom-auth]
+----
 ======
 
 [.include-with-java]
@@ -1124,6 +1245,13 @@ include::{dotnet-examples}/Examples.cs[tags=config-connection-pool]
 // ----
 ======
 
+[.include-with-go]
+======
+[source, go]
+----
+include::{go-examples}/examples_test.go[tags=config-connection-pool]
+----
+======
 
 [.include-with-java]
 ======
@@ -1196,6 +1324,13 @@ include::{dotnet-examples}/Examples.cs[tags=config-connection-timeout]
 // ----
 ======
 
+[.include-with-go]
+======
+[source, go]
+----
+include::{go-examples}/examples_test.go[tags=config-connection-timeout]
+----
+======
 
 [.include-with-java]
 ======
@@ -1265,6 +1400,10 @@ include::{dotnet-examples}/Examples.cs[tags=config-unencrypted]
 // ----
 ======
 
+[.include-with-go]
+======
+Not applicable
+======
 
 [.include-with-java]
 ======
@@ -1364,6 +1503,13 @@ include::{dotnet-examples}/Examples.cs[tags=config-max-retry-time]
 // ----
 ======
 
+[.include-with-go]
+======
+[source, go]
+----
+include::{go-examples}/examples_test.go[tags=config-max-retry-time]
+----
+======
 
 [.include-with-java]
 ======
@@ -1412,9 +1558,9 @@ include::{python-examples}/test_config_max_retry_time_example.py[tags=config-max
 Specify how to determine the authenticity of encryption certificates provided by the Neo4j instance that you are connecting to.
 There are three choices as to which strategy to use:
 
-* `TRUST_SYSTEM_CA_SIGNED_CERTIFICATES` - Accept any certificate that can be verified against a custom CA.
+* `TRUST_SYSTEM_CA_SIGNED_CERTIFICATES` - Accept any certificate that can be verified against system store.
 
-* `TRUST_CUSTOM_CA_SIGNED_CERTIFICATES` - Accept any certificate that can be verified against the system store.
+* `TRUST_CUSTOM_CA_SIGNED_CERTIFICATES` - Accept any certificate that can be verified against the a custom CA.
 
 * `TRUST_ALL_CERTIFICATES` - Accept any certificate provided by the server, regardless of CA chain. *We do not recommend using this setting for production environments.*
 
@@ -1435,6 +1581,11 @@ include::{dotnet-examples}/Examples.cs[tags=config-trust]
 // ----
 // include::{dotnet-examples}/Examples.cs[tags=config-trust-import]
 // ----
+======
+
+[.include-with-go]
+======
+Not applicable. Go driver uses URI to determine trust strategy. RootCAs can be used to configure custom CAs.
 ======
 
 [.include-with-java]
@@ -1508,6 +1659,9 @@ The code snippets below show how to redirect log messages to standard output.
 | [source, csharp]
 #Please note that you will have to provide your own console logger implementing the ILogger interface.
 IDriver driver = GraphDatabase.Driver(..., o => o.WithLogger(logger));
+| Go
+| [source, go]
+driver, err := neo4j.NewDriver(..., func(c *neo4j.Config) { c.Log = neo4j.ConsoleLogger(neo4j.DEBUG) })
 | Java
 | [source, java]
  ConfigBuilder.withLogging(Logging.console(Level.DEBUG))
