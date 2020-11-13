@@ -24,15 +24,29 @@ To find more about community drivers, visit https://neo4j.com/developer/language
 The following languages and frameworks are officially supported by Neo4j:
 
 .Supported languages and frameworks for the 4.x driver series
-[options="header"]
+[options="header", cols="<25s,<75a"]
 |===
-| Language/framework | Versions supported
-| .NET               | https://github.com/dotnet/standard/blob/master/docs/versions/netstandard2.0.md[.NET Standard 2.0]
-| Go                 | Go 1.10
-| Java               | Java 8+ (latest patch releases).
-| JavaScript         | All LTS versions of Node.JS, specifically the 4.x and 6.x series runtimes (https://github.com/nodejs/LTS).
-| Python             | CPython 3.5 and above.
+| Language/framework
+| Versions supported
+
+| .NET
+| https://github.com/dotnet/standard/blob/master/docs/versions/netstandard2.0.md[.NET Standard 2.0]
+
+| Go <<table-note, ^[1]^>>
+| Go 1.10
+
+| Java
+| Java 8+ (latest patch releases).
+
+| JavaScript
+| All LTS versions of Node.JS, specifically the 4.x and 6.x series runtimes (https://github.com/nodejs/LTS).
+
+| Python
+| Python 3.5 and above.
 |===
+
+[[table-note]]
+^[1]^_[.small]#The 4.2 Go Driver is not yet available.#_
 
 The driver API is intended to be topologically agnostic.
 This means that the underlying database topology — single instance, Causal Cluster, etc. — can be altered without requiring a corresponding alteration to application code.

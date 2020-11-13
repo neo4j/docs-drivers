@@ -104,7 +104,7 @@ include::{common-content}/client-applications.adoc[tag=examples-pt2]
 The tables below illustrate examples of how to connect to a service with routing:
 
 .Neo4j Aura, secured with full certificate
-[cols="<15h,<85a"]
+[cols="<15s,<85a"]
 |===
 | Product
 | Neo4j Aura
@@ -136,7 +136,7 @@ Driver driver = GraphDatabase.driver(uri, auth, config);
 |===
 
 .Neo4j 4.x, unsecured
-[cols="<15h,<85a"]
+[cols="<15s,<85a"]
 |===
 | Product
 | Neo4j 4.x
@@ -156,7 +156,7 @@ GraphDatabase.driver("neo4j://graph.example.com:7687", auth)
 |===
 
 .Neo4j 4.x, secured with full certificate
-[cols="<15h,<85a"]
+[cols="<15s,<85a"]
 |===
 | Product
 | Neo4j 4.x
@@ -184,7 +184,7 @@ Driver driver = GraphDatabase.driver(uri, auth, config);
 |===
 
 .Neo4j 4.x, secured with self-signed certificate
-[cols="<15h,<85a"]
+[cols="<15s,<85a"]
 |===
 | Product
 | Neo4j 4.x
@@ -213,7 +213,7 @@ Driver driver = GraphDatabase.driver(uri, auth, config);
 |===
 
 .Neo4j 3.x, secured with full certificate
-[cols="<15h,<85a"]
+[cols="<15s,<85a"]
 |===
 | Product
 | Neo4j 3.x
@@ -241,7 +241,7 @@ Driver driver = GraphDatabase.driver(uri, auth, config);
 |===
 
 .Neo4j 3.x, secured with self-signed certificate
-[cols="<15h,<85a"]
+[cols="<15s,<85a"]
 |===
 | Product
 | Neo4j 3.x
@@ -273,7 +273,7 @@ Driver driver = GraphDatabase.driver(uri, auth, config);
 |===
 
 .Neo4j 3.x, unsecured
-[cols="<15h,<85a"]
+[cols="<15s,<85a"]
 |===
 | Product
 | Neo4j 3.x
