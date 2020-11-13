@@ -1509,7 +1509,7 @@ include::{dotnet-examples}/Examples.cs[tags=config-max-retry-time]
 ======
 [source, go]
 ----
-include::{go-examples}/examples_test.go[tags=max-retry-time]
+include::{go-examples}/examples_test.go[tags=config-max-retry-time]
 ----
 ======
 
