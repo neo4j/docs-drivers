@@ -8,7 +8,7 @@ This section gives an overview of the official Neo4j Python Driver and how to co
 
 
 [[python-driver-get-started-about]]
-== About the official drivers
+== About the official Python driver
 
 include::{common-content}/get-started.adoc[tag=about]
 
