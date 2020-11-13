@@ -1225,7 +1225,7 @@ Setting a higher value will result in these transactions being queued, increasin
 Finding an optimal value may require an element of experimentation, taking into consideration the expected levels of parallelism within your application as well as the `MaxConnectionPoolSize`.
 +
 *Default:* 60 seconds
-
++
 [.tabbed-example]
 .Configure connection pool
 ====
@@ -1290,7 +1290,6 @@ include::{python-examples}/test_config_connection_pool_example.py[tags=config-co
 include::{python-examples}/test_config_connection_pool_example.py[tags=config-connection-pool]
 ----
 ======
-
 ====
 
 `ConnectionTimeout`::
@@ -1304,8 +1303,7 @@ In environments with high latency and high occurrences of connection timeouts it
 For lower latency environments and quicker feedback on potential network issues configure with a lower value.
 +
 *Default:* 30 seconds
-
-
++
 [.tabbed-example]
 .Configure connection timeout
 ====
@@ -1382,7 +1380,7 @@ Specify a custom server address resolver used by the routing driver to resolve t
 Specify whether to use an encrypted connection between the driver and server.
 +
 *Default:* None
-
++
 [.tabbed-example]
 .Unencrypted configuration
 ====
@@ -1483,7 +1481,7 @@ Configure lower in low latency environments and where your workload mainly consi
 Failing transactions faster may highlight the reasons behind the transient errors making it easier to fix underlying issues.
 +
 *Default:* 30 seconds
-
++
 [.tabbed-example]
 .Configure maximum retry time
 ====
@@ -1565,7 +1563,7 @@ There are three choices as to which strategy to use:
 
 +
 *Default:* `TRUST_SYSTEM_CA_SIGNED_CERTIFICATES` (Note - only when encryption is enabled)
-
++
 [.tabbed-example]
 .Configure trusted certificates
 ====
