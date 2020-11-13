@@ -330,6 +330,7 @@ include::{dotnet-examples}/Examples.cs[tags=database-selection]
 
 [.include-with-go]
 ======
+.Database selection on session creation
 [source, go]
 ----
 include::{go-examples}/examples_test.go[tags=database-selection]
