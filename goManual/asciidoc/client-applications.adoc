@@ -14,12 +14,12 @@ To construct a driver instance, a <<go-driver-connection-uris, connection URI>> 
 include::{common-content}/client-applications.adoc[tag=object-pt2]
 
 .The driver lifecycle
-====
+======
 [source, go]
 ----
 include::{go-examples}/examples_test.go[tags=driver-lifecycle]
 ----
-====
+======
 
 
 [[go-driver-connection-uris]]
@@ -63,10 +63,12 @@ include::{common-content}/client-applications.adoc[tag=custom-middleware]
 include::{common-content}/client-applications.adoc[tag=resolver-function]
 
 .Custom Address Resolver
+======
 [source, go]
 ----
 include::{go-examples}/examples_test.go[tags=config-custom-resolver]
 ----
+======
 
 
 [[go-driver-routing-table]]
@@ -238,10 +240,12 @@ include::{common-content}/client-applications.adoc[tag=authentication]
 include::{common-content}/client-applications.adoc[tag=authentication-basic]
 
 .Basic authentication
+======
 [source, go]
 ----
 include::{go-examples}/examples_test.go[tags=basic-auth]
 ----
+======
 
 include::{common-content}/client-applications.adoc[tag=authentication-basic-note]
 
@@ -252,10 +256,12 @@ include::{common-content}/client-applications.adoc[tag=authentication-basic-note
 include::{common-content}/client-applications.adoc[tag=authentication-kerberos]
 
 .Import Kerberos authentication
+======
 [source, go]
 ----
 include::{go-examples}/examples_test.go[tags=kerberos-auth]
 ----
+======
 
 include::{common-content}/client-applications.adoc[tag=authentication-kerberos-note]
 
@@ -266,10 +272,12 @@ include::{common-content}/client-applications.adoc[tag=authentication-kerberos-n
 include::{common-content}/client-applications.adoc[tag=authentication-custom]
 
 .Custom authentication
+======
 [source, go]
 ----
 include::{go-examples}/examples_test.go[tags=custom-auth]
 ----
+======
 
 
 [[go-driver-configuration]]
@@ -278,18 +286,22 @@ include::{go-examples}/examples_test.go[tags=custom-auth]
 include::{common-content}/client-applications.adoc[tag=configuration-ConnectionAcquisitionTimeout]
 +
 .Configure connection pool
+======
 [source, go]
 ----
 include::{go-examples}/examples_test.go[tags=config-connection-pool]
 ----
+======
 
 include::{common-content}/client-applications.adoc[tag=configuration-ConnectionTimeout]
 +
 .Configure connection timeout
+======
 [source, go]
 ----
 include::{go-examples}/examples_test.go[tags=config-connection-timeout]
 ----
+======
 
 `CustomResolver`::
 
@@ -304,10 +316,12 @@ include::{common-content}/client-applications.adoc[tag=configuration-MaxConnecti
 include::{common-content}/client-applications.adoc[tag=configuration-MaxTransactionRetryTime]
 +
 .Configure maximum retry time
+======
 [source, go]
 ----
 include::{go-examples}/examples_test.go[tags=max-retry-time]
 ----
+======
 
 include::{common-content}/client-applications.adoc[tag=configuration-TrustStrategy]
 +

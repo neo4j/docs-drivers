@@ -69,10 +69,12 @@ The release notes for this driver are available https://github.com/neo4j/neo4j-g
 The example below shows the minimal configuration necessary to interact with *Neo4j* through the Go driver.
 
 .Hello World
+======
 [source, go]
 ----
 include::{go-examples}/examples_test.go[tags=hello-world]
 ----
+======
 
 
 [[driver-api-docs]]

@@ -119,11 +119,6 @@ include::{common-content}/session-api.adoc[tag=rx-cancellation]
 [[js-driver-session-configuration]]
 == Session configuration
 
-[abstract]
---
-This section details the configuration options available when constructing a session.
---
-
 include::{common-content}/session-api.adoc[tag=Bookmarks]
 
 include::{common-content}/session-api.adoc[tag=DefaultAccessMode]
