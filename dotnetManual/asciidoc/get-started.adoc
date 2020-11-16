@@ -8,7 +8,7 @@ This section gives an overview of the official Neo4j .NET Driver and how to conn
 
 
 [[dotnet-driver-get-started-about]]
-== About the official drivers
+== About the official .NET driver
 
 include::{common-content}/get-started.adoc[tag=about]
 
