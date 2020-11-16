@@ -56,15 +56,16 @@ include::{java-examples}/PassBookmarkExample.java[tags=pass-bookmarks]
 
 include::{common-content}/cypher-workflow.adoc[tag=access-modes-transaction]
 
-.Read-write transaction
+.Import read-write transaction
 ======
-.Import read write transaction
 [source, java]
 ----
 include::{java-examples}/ReadWriteTransactionExample.java[tags=read-write-transaction-import]
 ----
+======
 
-.Read write transaction
+.Read-write transaction
+======
 [source, java]
 ----
 include::{java-examples}/ReadWriteTransactionExample.java[tags=read-write-transaction]

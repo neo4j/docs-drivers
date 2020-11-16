@@ -81,6 +81,7 @@ The release notes for this driver are available https://github.com/neo4j/neo4j-d
 The example below shows the minimal configuration necessary to interact with *Neo4j* through the .NET driver:
 
 .Hello World
+======
 [source, csharp]
 ----
 include::{dotnet-examples}/Examples.cs[tags=hello-world]
@@ -90,6 +91,7 @@ include::{dotnet-examples}/Examples.cs[tags=hello-world]
 // ----
 // include::{dotnet-examples}/Examples.cs[tags=hello-world-import]
 // ----
+======
 
 
 [[dotnet-driver-api-docs]]
