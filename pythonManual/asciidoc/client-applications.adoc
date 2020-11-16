@@ -14,6 +14,7 @@ To construct a driver instance, a <<python-driver-connection-uris, connection UR
 include::{common-content}/client-applications.adoc[tag=object-pt2]
 
 .The driver lifecycle
+====
 [source, python]
 ----
 include::{python-examples}/test_driver_lifecycle_example.py[tags=driver-lifecycle-import]
@@ -23,7 +24,7 @@ include::{python-examples}/test_driver_lifecycle_example.py[tags=driver-lifecycl
 ----
 include::{python-examples}/test_driver_lifecycle_example.py[tags=driver-lifecycle]
 ----
-
+====
 
 [[python-driver-connection-uris]]
 == Connection URIs
