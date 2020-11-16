@@ -7,7 +7,7 @@ This section gives an overview of the official Neo4j Java Driver and how to conn
 --
 
 [[java-driver-get-started-about]]
-== About the official drivers
+== About the official Java driver 
 
 include::{common-content}/get-started.adoc[tag=about]
 
