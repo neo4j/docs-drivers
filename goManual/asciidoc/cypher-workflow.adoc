@@ -79,7 +79,7 @@ include::{go-examples}/examples_test.go[tags=database-selection]
 include::{common-content}/cypher-workflow.adoc[tag=type-mapping]
 
 .Map Neo4j types to Go types
-[options="header", cols="m,"]
+[options="header", cols="<40m,<60a"]
 |===
 | Neo4j type        | Go type
 | null | `nil`

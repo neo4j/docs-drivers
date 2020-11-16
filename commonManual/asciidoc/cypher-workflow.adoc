@@ -653,7 +653,7 @@ When executing *Cypher* or carrying out other operations with the driver, certai
 The classifications are listed in the table below.
 
 .Server status code classifications
-[options="header"]
+[options="header", cols="<25m,<75a"]
 |===
 | Classification 	| Description
 |ClientError            | The client application has caused an error.

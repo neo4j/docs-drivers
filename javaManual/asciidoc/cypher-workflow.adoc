@@ -110,7 +110,7 @@ include::{common-content}/cypher-workflow.adoc[tag=type-mapping]
 
 .Map Neo4j types to Java types
 ======
-[options="header", cols="m,"]
+[options="header", cols="<40m,<60a"]
 |===
 | Neo4j Cypher Type        | Java Type
 | null | `null`
