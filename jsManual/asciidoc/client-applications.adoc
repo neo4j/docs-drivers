@@ -14,7 +14,7 @@ To construct a driver instance, a <<js-driver-connection-uris, connection URI>> 
 include::{common-content}/client-applications.adoc[tag=object-pt2]
 
 .The driver lifecycle
-======
+====
 [source, javascript]
 ----
 include::{javascript-examples}/examples.test.js[tags=driver-lifecycle]
@@ -25,7 +25,7 @@ include::{javascript-examples}/examples.test.js[tags=driver-lifecycle]
 // ----
 // include::{javascript-examples}/examples.test.js[tags=driver-lifecycle-import]
 // ----
-======
+====
 
 
 [[js-driver-connection-uris]]

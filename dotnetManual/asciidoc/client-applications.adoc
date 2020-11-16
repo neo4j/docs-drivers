@@ -14,6 +14,7 @@ To construct a driver instance, a <<dotnet-driver-connection-uris, connection UR
 include::{common-content}/client-applications.adoc[tag=object-pt2]
 
 .The driver lifecycle
+====
 [source, csharp]
 ----
 include::{dotnet-examples}/Examples.cs[tags=driver-lifecycle]
@@ -24,6 +25,7 @@ include::{dotnet-examples}/Examples.cs[tags=driver-lifecycle]
 // ----
 // include::{dotnet-examples}/Examples.cs[tags=driver-lifecycle-import]
 // ----
+====
 
 
 [[dotnet-driver-connection-uris]]

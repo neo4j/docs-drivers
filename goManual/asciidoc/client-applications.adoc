@@ -14,10 +14,12 @@ To construct a driver instance, a <<go-driver-connection-uris, connection URI>> 
 include::{common-content}/client-applications.adoc[tag=object-pt2]
 
 .The driver lifecycle
+====
 [source, go]
 ----
 include::{go-examples}/examples_test.go[tags=driver-lifecycle]
 ----
+====
 
 
 [[go-driver-connection-uris]]
