@@ -417,6 +417,7 @@ include::{common-content}/client-applications.adoc[tag=configuration-MaxConnecti
 include::{common-content}/client-applications.adoc[tag=configuration-MaxConnectionPoolSize]
 
 include::{common-content}/client-applications.adoc[tag=configuration-MaxTransactionRetryTime]
++
 .Configure maximum retry time
 ======
 [source, java]

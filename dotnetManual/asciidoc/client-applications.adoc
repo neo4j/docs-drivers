@@ -69,10 +69,12 @@ include::{common-content}/client-applications.adoc[tag=custom-middleware]
 include::{common-content}/client-applications.adoc[tag=resolver-function]
 
 .Custom Address Resolver
+======
 [source, csharp]
 ----
 include::{dotnet-examples}/Examples.cs[tags=config-custom-resolver]
 ----
+======
 
 
 [[dotnet-driver-routing-table]]
@@ -291,6 +293,7 @@ include::{common-content}/client-applications.adoc[tag=authentication]
 include::{common-content}/client-applications.adoc[tag=authentication-basic]
 
 .Basic authentication
+======
 [source, csharp]
 ----
 include::{dotnet-examples}/Examples.cs[tags=basic-auth]
@@ -301,6 +304,7 @@ include::{dotnet-examples}/Examples.cs[tags=basic-auth]
 // ----
 // include::{dotnet-examples}/Examples.cs[tags=basic-auth-import]
 // ----
+======
 
 include::{common-content}/client-applications.adoc[tag=authentication-basic-note]
 
@@ -311,6 +315,7 @@ include::{common-content}/client-applications.adoc[tag=authentication-basic-note
 include::{common-content}/client-applications.adoc[tag=authentication-kerberos]
 
 .Kerberos authentication
+======
 [source, csharp]
 ----
 include::{dotnet-examples}/Examples.cs[tags=kerberos-auth]
@@ -321,6 +326,7 @@ include::{dotnet-examples}/Examples.cs[tags=kerberos-auth]
 // ----
 // include::{dotnet-examples}/Examples.cs[tags=kerberos-auth-import]
 // ----
+======
 
 include::{common-content}/client-applications.adoc[tag=authentication-kerberos-note]
 
@@ -331,6 +337,7 @@ include::{common-content}/client-applications.adoc[tag=authentication-kerberos-n
 include::{common-content}/client-applications.adoc[tag=authentication-custom]
 
 .Custom authentication
+======
 [source, csharp]
 ----
 include::{dotnet-examples}/Examples.cs[tags=custom-auth]
@@ -341,6 +348,7 @@ include::{dotnet-examples}/Examples.cs[tags=custom-auth]
 // ----
 // include::{dotnet-examples}/Examples.cs[tags=custom-auth-import]
 // ----
+======
 
 
 [[dotnet-driver-configuration]]
@@ -349,6 +357,7 @@ include::{dotnet-examples}/Examples.cs[tags=custom-auth]
 include::{common-content}/client-applications.adoc[tag=configuration-ConnectionAcquisitionTimeout]
 +
 .Configure connection pool
+======
 [source, csharp]
 ----
 include::{dotnet-examples}/Examples.cs[tags=config-connection-pool]
@@ -358,10 +367,12 @@ include::{dotnet-examples}/Examples.cs[tags=config-connection-pool]
 // ----
 // include::{dotnet-examples}/Examples.cs[tags=config-connection-pool-import]
 // ----
+======
 
 include::{common-content}/client-applications.adoc[tag=configuration-ConnectionTimeout]
 +
 .Configure connection timeout
+======
 [source, csharp]
 ----
 include::{dotnet-examples}/Examples.cs[tags=config-connection-timeout]
@@ -372,6 +383,7 @@ include::{dotnet-examples}/Examples.cs[tags=config-connection-timeout]
 // ----
 // include::{dotnet-examples}/Examples.cs[tags=config-connection-timeout-import]
 // ----
+======
 
 `CustomResolver`::
 
@@ -381,6 +393,7 @@ See <<dotnet-driver-resolver-function>> for more details.
 include::{common-content}/client-applications.adoc[tag=configuration-Encryption]
 +
 .Unencrypted configuration
+======
 [source, csharp]
 ----
 include::{dotnet-examples}/Examples.cs[tags=config-unencrypted]
@@ -390,6 +403,7 @@ include::{dotnet-examples}/Examples.cs[tags=config-unencrypted]
 // ----
 // include::{dotnet-examples}/Examples.cs[tags=config-unencrypted-import]
 // ----
+======
 
 include::{common-content}/client-applications.adoc[tag=configuration-MaxConnectionLifetime]
 
@@ -398,6 +412,7 @@ include::{common-content}/client-applications.adoc[tag=configuration-MaxConnecti
 include::{common-content}/client-applications.adoc[tag=configuration-MaxTransactionRetryTime]
 +
 .Configure maximum retry time
+======
 [source, csharp]
 ----
 include::{dotnet-examples}/Examples.cs[tags=config-max-retry-time]
@@ -409,10 +424,12 @@ include::{dotnet-examples}/Examples.cs[tags=config-max-retry-time]
 // ----
 // include::{dotnet-examples}/Examples.cs[tags=config-max-retry-time-import]
 // ----
+======
 
 include::{common-content}/client-applications.adoc[tag=configuration-TrustStrategy]
 +
 .Configure trusted certificates
+======
 [source, csharp]
 ----
 include::{dotnet-examples}/Examples.cs[tags=config-trust]
@@ -422,6 +439,7 @@ include::{dotnet-examples}/Examples.cs[tags=config-trust]
 // ----
 // include::{dotnet-examples}/Examples.cs[tags=config-trust-import]
 // ----
+======
 
 include::{common-content}/client-applications.adoc[tag=configuration-KeepAlive]
 
