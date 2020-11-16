@@ -92,7 +92,7 @@ include::{dotnet-examples}/Examples.cs[tags=database-selection]
 include::{common-content}/cypher-workflow.adoc[tag=type-mapping]
 
 .Map Neo4j types to .NET types
-[options="header", cols=","]
+[options="header", cols="<40m,<60a"]
 |===
 | Neo4j Cypher Type        | .NET Type
 | `null` | `null`

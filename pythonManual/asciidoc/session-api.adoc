@@ -70,10 +70,12 @@ include::{python-examples}/test_autocommit_transaction_example.py[tags=autocommi
 include::{common-content}/session-api.adoc[tag=simple-result-consume]
 
 .Consuming results
+======
 [source, python]
 ----
 include::{python-examples}/test_result_consume_example.py[tags=result-consume]
 ----
+======
 
 
 [[python-driver-simple-result-retain]]
