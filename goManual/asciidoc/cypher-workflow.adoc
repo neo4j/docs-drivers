@@ -38,10 +38,12 @@ include::{common-content}/cypher-workflow.adoc[tag=queries-results]
 include::{common-content}/cypher-workflow.adoc[tag=causal-chaining]
 
 .Pass bookmarks
+======
 [source, go]
 ----
 include::{go-examples}/examples_test.go[tags=pass-bookmarks]
 ----
+======
 
 
 [[go-driver-access-modes-transaction]]
@@ -50,10 +52,12 @@ include::{go-examples}/examples_test.go[tags=pass-bookmarks]
 include::{common-content}/cypher-workflow.adoc[tag=access-modes-transaction]
 
 .Read-write transaction
+======
 [source, go]
 ----
 include::{go-examples}/examples_test.go[tags=read-write-transaction]
 ----
+======
 
 
 [[go-driver-databases]]
@@ -67,10 +71,12 @@ include::{go-examples}/examples_test.go[tags=read-write-transaction]
 include::{common-content}/cypher-workflow.adoc[tag=database-selection]
 
 .Database selection on session creation
+======
 [source, go]
 ----
 include::{go-examples}/examples_test.go[tags=database-selection]
 ----
+======
 
 
 [[go-driver-type-mapping]]

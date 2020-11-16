@@ -70,10 +70,12 @@ include::{common-content}/client-applications.adoc[tag=resolver-function]
 
 
 .Custom Address Resolver
+======
 [source, javascript]
 ----
 include::{javascript-examples}/examples.test.js[tags=config-custom-resolver]
 ----
+======
 
 
 [[js-driver-routing-table]]

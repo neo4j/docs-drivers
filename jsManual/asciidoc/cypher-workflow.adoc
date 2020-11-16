@@ -37,6 +37,7 @@ include::{common-content}/cypher-workflow.adoc[tag=queries-results]
 include::{common-content}/cypher-workflow.adoc[tag=causal-chaining]
 
 .Pass bookmarks
+======
 [source, javascript]
 ----
 include::{javascript-examples}/examples.test.js[tags=pass-bookmarks]
@@ -47,6 +48,7 @@ include::{javascript-examples}/examples.test.js[tags=pass-bookmarks]
 // ----
 // include::{javascript-examples}/examples.test.js[tags=pass-bookmarks-import]
 // ----
+======
 
 
 [[js-driver-access-modes-transaction]]
@@ -55,6 +57,7 @@ include::{javascript-examples}/examples.test.js[tags=pass-bookmarks]
 include::{common-content}/cypher-workflow.adoc[tag=access-modes-transaction]
 
 .Read-write transaction
+======
 [source, javascript]
 ----
 include::{javascript-examples}/examples.test.js[tags=read-write-transaction]
@@ -65,6 +68,7 @@ include::{javascript-examples}/examples.test.js[tags=read-write-transaction]
 // ----
 // include::{javascript-examples}/examples.test.js[tags=read-write-transaction-import]
 // ----
+======
 
 
 [[js-driver-databases]]
@@ -81,10 +85,12 @@ include::{common-content}/cypher-workflow.adoc[tag=database-selection]
 
 
 .Database selection on session creation
+======
 [source, javascript]
 ----
 include::{javascript-examples}/examples.test.js[tags=database-selection]
 ----
+======
 
 
 [[js-driver-type-mapping]]
