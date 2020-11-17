@@ -1,7 +1,6 @@
 name: java-manual
 title: Neo4j Java Driver Manual
-version: '4.2-preview'
-prerelease: true
+version: '4.2'
 start_page: ROOT:index.adoc
 nav:
 - modules/ROOT/content-nav.adoc
@@ -11,5 +10,5 @@ asciidoc:
     neo4j-version-exact: '4.2.0'
     neo4j-buildnumber: '4.2'
     driver-version: "4.2"
-    java-driver-version: "4.1.1"
-    java-examples: 'partial$driver-sources/java-driver/4.1.1/examples/src/main/java/org/neo4j/docs/driver'
+    java-driver-version: "4.2.0"
+    java-examples: 'partial$driver-sources/java-driver/4.2.0/examples/src/main/java/org/neo4j/docs/driver'
