@@ -1,7 +1,6 @@
 name: python-manual
 title: Neo4j Python Driver Manual
-version: '4.2-preview'
-prerelease: true
+version: '4.2'
 start_page: ROOT:index.adoc
 nav:
 - modules/ROOT/content-nav.adoc
@@ -11,5 +10,5 @@ asciidoc:
     neo4j-version-exact: '4.2.0'
     neo4j-buildnumber: '4.2'
     driver-version: "4.2"
-    python-driver-version: "4.1.1"
-    python-examples: "partial$driver-sources/python-driver/4.1.1/tests/integration/examples"
+    python-driver-version: "4.2.0"
+    python-examples: "partial$driver-sources/python-driver/4.2.0/tests/integration/examples"
