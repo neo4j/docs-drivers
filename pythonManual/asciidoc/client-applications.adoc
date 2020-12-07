@@ -396,7 +396,6 @@ include::{common-content}/client-applications.adoc[tag=configuration-MaxConnecti
 
 include::{common-content}/client-applications.adoc[tag=configuration-MaxConnectionPoolSize]
 +
-+
 *Default:* 100 connections
 
 include::{common-content}/client-applications.adoc[tag=configuration-MaxTransactionRetryTime]
