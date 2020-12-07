@@ -1407,8 +1407,6 @@ If a session or transaction tries to acquire a connection at a time when the poo
 The connection acquiring timeout is configured via `ConnectionAcquisitionTimeout`.
 +
 This configuration option allows you to manage the memory and I/O resources being used by the driver and tuning this option is dependent on these factors, in addition to number of cluster members.
-+
-*Default:* 100 connections (except .NET Driver with 500 connections)
 
 # end::configuration-MaxConnectionPoolSize[]
 
