@@ -408,6 +408,9 @@ include::{dotnet-examples}/Examples.cs[tags=config-unencrypted]
 include::{common-content}/client-applications.adoc[tag=configuration-MaxConnectionLifetime]
 
 include::{common-content}/client-applications.adoc[tag=configuration-MaxConnectionPoolSize]
++
+*Default:* 500 connections
+
 
 include::{common-content}/client-applications.adoc[tag=configuration-MaxTransactionRetryTime]
 +
