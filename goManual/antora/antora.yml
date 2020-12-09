@@ -1,7 +1,6 @@
 name: go-manual
 title: Neo4j Go Driver Manual
-version: '4.2-preview'
-prerelease: true
+version: '4.2'
 start_page: ROOT:index.adoc
 nav:
 - modules/ROOT/content-nav.adoc
@@ -11,5 +10,5 @@ asciidoc:
     neo4j-version-exact: '4.2.0'
     neo4j-buildnumber: '4.2'
     driver-version: "4.2"
-    go-driver-version: "4.1"
-    go-examples: 'partial$driver-sources/go-driver/4.1/neo4j/test-integration'
+    go-driver-version: "4.2"
+    go-examples: 'partial$driver-sources/go-driver/4.2/neo4j/test-integration'

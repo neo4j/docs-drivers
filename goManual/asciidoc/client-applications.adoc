@@ -319,7 +319,7 @@ include::{common-content}/client-applications.adoc[tag=configuration-MaxTransact
 ======
 [source, go]
 ----
-include::{go-examples}/examples_test.go[tags=max-retry-time]
+include::{go-examples}/examples_test.go[tags=config-max-retry-time]
 ----
 ======
 
