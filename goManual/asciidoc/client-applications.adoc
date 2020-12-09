@@ -323,21 +323,21 @@ include::{go-examples}/examples_test.go[tags=config-max-retry-time]
 ----
 ======
 
-include::{common-content}/client-applications.adoc[tag=configuration-TrustStrategy]
+`TrustStrategy`::
 +
 This is not applicable for the Go driver, as it uses a URI to determine trust strategy.
 RootCAs can be used to configure custom CAs.
 
-`KeepAlive`::
-
-Specify whether TCP keep-alive should be enabled. To ensure that the connection between the driver and server is still operational, the TCP layer can periodically send messages to check the connection.
-+
-*Default:* True
-
-[NOTE]
-====
-This is currently only configurable in the .NET Driver
-====
+// `KeepAlive`::
+//
+// Specify whether TCP keep-alive should be enabled. To ensure that the connection between the driver and server is still operational, the TCP layer can periodically send messages to check the connection.
+// +
+// *Default:* True
+//
+// [NOTE]
+// ====
+// This is currently only configurable in the .NET Driver
+// ====
 
 
 [[driver-logging]]

@@ -45,9 +45,6 @@ The following languages and frameworks are officially supported by Neo4j:
 | Python 3.5 and above.
 |===
 
-[[table-note]]
-^[1]^_[.small]#The 4.2 Go Driver is not yet available.#_
-
 The driver API is intended to be topologically agnostic.
 This means that the underlying database topology — single instance, Causal Cluster, etc. — can be altered without requiring a corresponding alteration to application code.
 
