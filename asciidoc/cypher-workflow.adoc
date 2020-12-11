@@ -85,7 +85,7 @@ Parameter values should adhere to <<cypher-manual#cypher-values>>.
 A result summary is also generally available.
 This contains additional information relating to the query execution and the result content.
 For an `EXPLAIN` or `PROFILE` query, this is where the query plan is returned.
-See <<cypher-manual#how-do-i-profile-a-query, Cypher Manual -> Profiling a query>> for more information on these queries.
+See xref:cypher-manual:ROOT:query-tuning/how-do-i-profile-a-query/index.adoc#how-do-i-profile-a-query[Cypher Manual -> Profiling a query] for more information on these queries.
 
 
 [[driver-causal-chaining]]
