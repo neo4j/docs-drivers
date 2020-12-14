@@ -5,7 +5,7 @@
 
 [abstract]
 --
-This section details the Session API that are made available by the driver, with each Session class oriented towards a different form of programming.
+This section details the Session API that is made available by the driver.
 --
 
 # end::abstract[]

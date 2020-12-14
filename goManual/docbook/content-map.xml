@@ -9,14 +9,6 @@
     <d:tocentry linkend="go-driver-cypher-workflow"><?dbhtml filename="cypher-workflow/index.html"?>
     </d:tocentry>
     <d:tocentry linkend="go-driver-session-api"><?dbhtml filename="session-api/index.html"?>
-      <d:tocentry linkend="go-driver-simple-sessions"><?dbhtml filename="session-api/simple/index.html"?>
-      </d:tocentry>
-      <d:tocentry linkend="go-driver-async-sessions"><?dbhtml filename="session-api/asynchronous/index.html"?>
-      </d:tocentry>
-      <d:tocentry linkend="go-driver-rx-sessions"><?dbhtml filename="session-api/reactive/index.html"?>
-      </d:tocentry>
-      <d:tocentry linkend="go-driver-session-configuration"><?dbhtml filename="session-api/configuration/index.html"?>
-      </d:tocentry>
     </d:tocentry>
     <d:tocentry linkend="go-driver-terminology"><?dbhtml filename="terminology/index.html"?>
     </d:tocentry>

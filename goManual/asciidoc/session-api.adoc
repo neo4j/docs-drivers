@@ -3,15 +3,12 @@
 
 include::{common-content}/session-api.adoc[tag=abstract]
 
-
-[[go-driver-simple-sessions]]
-== Simple sessions
-
-include::{common-content}/session-api.adoc[tag=simple-sessions]
+Sessions provide a "classic" *_blocking style_* API for Cypher execution.
+In general, sessions provide the easiest programming style to work with since API calls are executed in a strictly sequential fashion.
 
 
 [[go-driver-simple-lifecycle]]
-=== Lifecycle
+== Lifecycle
 
 include::{common-content}/session-api.adoc[tag=simple-lifecycle]
 
@@ -28,7 +25,7 @@ See <<go-driver-session-configuration>> for more details.
 
 
 [[go-driver-simple-transaction-fn]]
-=== Transaction functions
+== Transaction functions
 
 include::{common-content}/session-api.adoc[tag=simple-transaction-fn]
 
@@ -39,7 +36,7 @@ include::{go-examples}/examples_test.go[tags=transaction-function]
 
 
 [[go-driver-simple-autocommit-transactions]]
-=== Auto-commit transactions
+== Auto-commit transactions
 
 include::{common-content}/session-api.adoc[tag=simple-autocommit-transactions]
 
@@ -50,7 +47,7 @@ include::{go-examples}/examples_test.go[tags=autocommit-transaction]
 
 
 [[go-driver-simple-result-consume]]
-=== Consuming results
+== Consuming results
 
 include::{common-content}/session-api.adoc[tag=simple-result-consume]
 
@@ -61,7 +58,7 @@ include::{go-examples}/examples_test.go[tags=result-consume]
 
 
 [[go-driver-simple-result-retain]]
-=== Retaining results
+== Retaining results
 
 include::{common-content}/session-api.adoc[tag=simple-result-retain]
 
