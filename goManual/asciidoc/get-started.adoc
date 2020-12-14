@@ -27,36 +27,12 @@ include::{common-content}/get-started.adoc[tag=versions]
 
 To find the latest version of the driver, visit https://github.com/neo4j/neo4j-go-driver/releases.
 
-========
-
 To install the latest version of the driver using `go get`:
 
 [source, shell, subs="attributes, specialcharacters"]
 ----
-go get github.com/neo4j/neo4j-go-driver
+go get github.com/neo4j/neo4j-go-driver/v4
 ----
-
-========
-
-========
-
-To install the latest version of the driver using `dep`:
-
-[source, shell, subs="attributes, specialcharacters"]
-----
-dep ensure github.com/neo4j/neo4j-go-driver
-----
-
-It is also an option to install a certain version of the driver.
-Below is the syntax for using a certain minor version of the driver.
-Visit https://golang.github.io/dep/docs/Gopkg.toml.html#version-rules for a detailed description of version rules that can be used.
-
-[source, shell, subs="attributes, specialcharacters"]
-----
-dep ensure github.com/neo4j/neo4j-go-driver@1.7.x
-----
-
-========
 
 The release notes for this driver are available https://github.com/neo4j/neo4j-go-driver/wiki[here].
 
