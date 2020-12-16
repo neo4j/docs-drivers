@@ -6,9 +6,6 @@ include::{common-content}/session-api.adoc[tag=abstract]
 Sessions provide a "classic" *_blocking style_* API for Cypher execution.
 In general, sessions provide the easiest programming style to work with since API calls are executed in a strictly sequential fashion.
 
-include::{common-content}/session-api.adoc[tag=simple-sessions]
-
-
 [[go-driver-simple-lifecycle]]
 == Lifecycle
 
