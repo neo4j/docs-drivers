@@ -32,7 +32,7 @@ The following languages and frameworks are officially supported by Neo4j:
 | .NET
 | https://github.com/dotnet/standard/blob/master/docs/versions/netstandard2.0.md[.NET Standard 2.0]
 
-| Go <<table-note, ^[1]^>>
+| Go 
 | Go 1.10
 
 | Java
