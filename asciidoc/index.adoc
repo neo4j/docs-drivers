@@ -1,4 +1,4 @@
-[[drivers]]
+[[driver-manual]]
 ifndef::backend-pdf[]
 = The Neo4j Drivers Manual v{driver-version}
 endif::[]
