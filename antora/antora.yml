@@ -12,7 +12,7 @@ asciidoc:
     dotnet-examples: 'partial$driver-sources/dotnet-driver/1.7.2/Neo4j.Driver/Neo4j.Driver.IntegrationTests'
     go-examples: 'partial$driver-sources/go-driver/v1.8.0/neo4j/test-integration'
     java-examples: 'partial$driver-sources/java-driver/1.7.5/examples/src/main/java/org/neo4j/docs/driver'
-    javascript-examples: 'partial$driver-sources/javascript-driver/1.7.7/test/v1'
+    javascript-examples: 'partial$driver-sources/javascript-driver/1.7.8/test/v1'
     python-examples: 'partial$driver-sources/python-driver/1.7.6/test/examples'
     driver-version: "1.7"
     dotnet-driver-version: "1.7.2"
