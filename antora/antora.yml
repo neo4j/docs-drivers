@@ -18,5 +18,5 @@ asciidoc:
     dotnet-driver-version: "1.7.2"
     go-driver-version: "v1.8.0"
     java-driver-version: "1.7.5"
-    javascript-driver-version: "1.7.7"
+    javascript-driver-version: "1.7.8"
     python-driver-version: "1.7.6"
