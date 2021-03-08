@@ -7,7 +7,7 @@ nav:
 asciidoc:
   attributes:
     neo4j-version: '4.2'
-    neo4j-version-exact: '4.2.0'
+    neo4j-version-exact: '4.2.3'
     neo4j-buildnumber: '4.2'
     driver-version: "4.2"
     dotnet-driver-version: "4.2.0"
