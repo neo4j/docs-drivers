@@ -8,5 +8,5 @@ asciidoc:
   attributes:
     neo4j-version: '4.2'
     driver-version: "4.2"
-    java-driver-version: "4.2.4"
-    java-examples: 'partial$driver-sources/java-driver/4.2.4/examples/src/main/java/org/neo4j/docs/driver'
+    java-driver-version: "4.2.5"
+    java-examples: 'partial$driver-sources/java-driver/4.2.5/examples/src/main/java/org/neo4j/docs/driver'
