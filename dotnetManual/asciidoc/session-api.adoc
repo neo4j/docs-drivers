@@ -106,6 +106,14 @@ include::{common-content}/session-api.adoc[tag=async-autocommit-transactions]
 include::{dotnet-examples}/ExamplesAsync.cs[tags=async-autocommit-transaction]
 ----
 
+=== Combining Transactions
+
+include::{common-content}/session-api.adoc[tag=async-multiple-tx]
+
+[source, csharp]
+----
+include::{dotnet-examples}/ExamplesAsync.cs[tags=async-multiple-tx]
+----
 
 [[dotnet-driver-async-result-consume]]
 === Consuming results

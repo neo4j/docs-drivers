@@ -106,6 +106,14 @@ include::{common-content}/session-api.adoc[tag=async-autocommit-transactions]
 include::{java-examples}/AsyncAutocommitTransactionExample.java[tags=async-autocommit-transaction]
 ----
 
+=== Combining Transactions
+
+include::{common-content}/session-api.adoc[tag=async-multiple-tx]
+
+[source, java]
+----
+include::{java-examples}/AsyncRunMultipleTransactionExample.java[tags=async-multiple-tx]
+----
 
 [[java-driver-async-result-consume]]
 === Consuming results
