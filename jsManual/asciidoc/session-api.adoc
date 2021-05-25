@@ -41,6 +41,14 @@ include::{common-content}/session-api.adoc[tag=async-autocommit-transactions]
 include::{javascript-examples}/examples.test.js[tags=async-autocommit-transaction]
 ----
 
+=== Combining Transactions
+
+include::{common-content}/session-api.adoc[tag=async-multiple-tx]
+
+[source, javascript]
+----
+include::{javascript-examples}/examples.test.js[tags=async-multiple-tx]
+----
 
 [[js-driver-async-result-consume]]
 === Consuming results
