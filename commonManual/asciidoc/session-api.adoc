@@ -487,6 +487,15 @@ include::{javascript-examples}/examples.test.js[tags=async-result-consume]
 ----
 ======
 
+[[driver-async-multiple-transactions]]
+=== Combining Transactions
+
+# tag::async-multiple-tx[]
+
+The driver provides a language idiomatic way to combine multiple transactions within a single asynchronous session.
+
+# end::async-multiple-tx[]
+
 ========
 
 
