@@ -1,14 +1,14 @@
 name: javascript-manual
 title: Neo4j JavaScript Driver Manual
-version: '4.2'
+version: '4.3'
 start_page: ROOT:index.adoc
 nav:
 - modules/ROOT/content-nav.adoc
 asciidoc:
   attributes:
-    neo4j-version: '4.2'
-    neo4j-version-exact: '4.2.3'
-    neo4j-buildnumber: '4.2'
-    driver-version: "4.2"
-    javascript-driver-version: "4.2.3"
-    javascript-examples: 'partial$driver-sources/javascript-driver/4.2.3/test'
+    neo4j-version: '4.3'
+    neo4j-version-exact: '4.3.0'
+    neo4j-buildnumber: '4.3'
+    driver-version: "4.3"
+    javascript-driver-version: "4.3.0"
+    javascript-examples: 'partial$driver-sources/javascript-driver/4.3.0/test'
