@@ -766,3 +766,32 @@ Neo4j 4.0 introduces the ability to pull records in batches, allowing the client
 This `FetchSize` applies to <<driver-simple-sessions, simple sessions>> and <<driver-async-sessions, async-sessions>> whereas reactive sessions can be controlled directly using the request method of the subscription.
 +
 *Default:* 1000 records
+
+# tag::TransactionConfiguration[]
+
+[[driver-transaction-configuration]]
+== Transaction configuration
+
+Additional configuration can be provided to transaction which are executed.
+
+=== Transaction Timeout
+
+A timeout value can be provided and transactions which take longer than this value to execute on the server will be terminated.
+This value will override the value set by `+dbms.transaction.timeout+`. If no value is provided, the default is taken by the server setting
+(see <<operations-manual#transaction-management, Operations Manual -> Transaction Management>>).
+
+Note: Using with Neo4j 4.1 and earlier it is possible for the driver to override any value set with `+dbms.transaction.timeout+`.
+In 4.2 and later, `+dbms.transaction.timeout+` also acts as a maximum which the driver cannot override. For example, with
+a server setting of `+dbms.transaction.timeout=10s+` the driver can specify a shorter timeout (e.g. 5 seconds) but not a value
+greater than 10 seconds. If a greater value is supplied the transaction will still timeout after 10 seconds.
+
+*Default:* Configured on server with `+dbms.transaction.timeout+`.
+
+=== Metadata
+
+Transactions can be tagged with metadata which will be attached to the executing transaction and visible in various output when listing
+transactions and queries as well as appearing in the query log.
+
+*Default:* None.
+
+# end::TransactionConfiguration[]
