@@ -195,3 +195,7 @@ Neo4j 4.0 introduces the ability to pull records in batches, allowing the client
 This `FetchSize` applies to <<dotnet-driver-simple-sessions, simple sessions>> and <<dotnet-driver-async-sessions, async-sessions>> whereas reactive sessions can be controlled directly using the request method of the subscription.
 +
 *Default:* 1000 records
+
+[[dotnet-driver-transaction-configuration]]
+
+include::{common-content}/session-api.adoc[tag=TransactionConfiguration]
