@@ -107,3 +107,17 @@ Neo4j 4.0 introduces the ability to pull records in batches, allowing the client
 [[python-driver-transaction-configuration]]
 
 include::{common-content}/session-api.adoc[tag=TransactionConfiguration]
+
+include::{common-content}/session-api.adoc[tag=TransactionTimeout]
+
+[source, python]
+----
+include::{python-examples}/test_transaction-timeout-config_example.py[tags=transaction-timeout-config]
+----
+
+include::{common-content}/session-api.adoc[tag=TransactionMetadata]
+
+[source, python]
+----
+include::{python-examples}/test_transaction-metadata-config_example.py[tags=transaction-metadata-config]
+----
