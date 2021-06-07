@@ -774,6 +774,10 @@ This `FetchSize` applies to <<driver-simple-sessions, simple sessions>> and <<dr
 
 Additional configuration can be provided to transaction which are executed.
 
+# end::TransactionConfiguration[]
+
+# tag::TransactionTimeout[]
+
 === Transaction Timeout
 
 A timeout value can be provided and transactions which take longer than this value to execute on the server will be terminated.
@@ -787,6 +791,10 @@ greater than 10 seconds. If a greater value is supplied the transaction will sti
 
 *Default:* Configured on server with `+dbms.transaction.timeout+`.
 
+# end::TransactionTimeout[]
+
+# tag::TransactionMetadata[]
+
 === Metadata
 
 Transactions can be tagged with metadata which will be attached to the executing transaction and visible in various output when listing
@@ -794,4 +802,4 @@ transactions and queries as well as appearing in the query log.
 
 *Default:* None.
 
-# end::TransactionConfiguration[]
+# end::TransactionMetadata[]
