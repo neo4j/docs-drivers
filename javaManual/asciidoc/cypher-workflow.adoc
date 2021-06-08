@@ -137,6 +137,24 @@ include::{common-content}/cypher-workflow.adoc[tag=type-mapping]
 +*+ A `Duration` or `Period` passed as a parameter will always be implicitly converted to `IsoDuration`.
 ======
 
+[[java-driver-reading-values]]
+=== Reading Values
+The `Value` interfaces describes methods to inferring and coercing the type of the values returned by Neo4j. The type inference methods start with `is` followed
+by the name of the type and the types coercion methods start with `as`. The coercion methods, except `asObject()` and `asString()`, throws `Uncoercible`
+exception if the value is null. In manner to avoid this kind exceptions, the `isNull()` or `asTypeName(TypeName defaultValue)` can be used depending on the
+need.
+
+[source, java]
+----
+include::{java-examples}/ReadingValuesExample.java[tags=java-driver-reading-values-non-null]
+----
+
+[source, java]
+----
+include::{java-examples}/ReadingValuesExample.java[tags=java-driver-reading-values-null]
+----
+
+See https://neo4j.com/docs/api/java-driver/4.2/org/neo4j/driver/Value.html for further details.
 
 [[java-driver-exceptions-errors]]
 == Exceptions and error handling
