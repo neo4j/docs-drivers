@@ -1,6 +1,7 @@
 name: go-manual
 title: Neo4j Go Driver Manual
-version: '4.3'
+version: '4.3-preview'
+prerelease: true
 start_page: ROOT:index.adoc
 nav:
 - modules/ROOT/content-nav.adoc
