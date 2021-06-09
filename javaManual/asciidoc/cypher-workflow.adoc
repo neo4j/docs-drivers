@@ -141,7 +141,7 @@ include::{common-content}/cypher-workflow.adoc[tag=type-mapping]
 === Reading Values
 The `Value` interfaces describes methods to inferring and coercing the type of the values returned by Neo4j. The type inference methods start with `is` followed
 by the name of the type and the types coercion methods start with `as`. The coercion methods, except `asObject()` and `asString()`, throws `Uncoercible`
-exception if the value is null. In manner to avoid this kind exceptions, the `isNull()` or `asTypeName(TypeName defaultValue)` can be used depending on the
+exception if the value is null. To avoid this kind exception, the `isNull()` or `asTypeName(TypeName defaultValue)` can be used depending on the
 need.
 
 [source, java]
