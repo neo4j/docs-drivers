@@ -19,12 +19,5 @@ The examples for each of the driver languages are generated out of each driver's
 
 == Usage
 
-First, set up your environment.
+The drivers manuals are built using the build tooling in the https://github.com/neo-technology/neo4j-manual-modeling-antora/[neo4j-manual-modeling-antora] repo. Information on how to build drivers manuals locally can be found in the wiki of that repository.
 
-If this is your first time, make a copy of _devenv.local.template_ called _devenv.local_.
-Fill in the necessary values.
-
-Source the common _devenv_: `source devenv`.
-
-Build stuff by running `./gradlew <task>`, for example `./gradlew build`.
-Run `./gradlew tasks --all` to see all available tasks.
