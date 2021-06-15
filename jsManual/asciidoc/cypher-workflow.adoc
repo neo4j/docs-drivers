@@ -178,7 +178,8 @@ include::{javascript-examples}/examples.test.js[tags=temporal-types-localtime]
 
 [[js-driver-temporal-types-duration]]
 ==== Duration
-Represents an ISO 8601 duration. Contains both date-based values (years, months, days) and time-based values (seconds, nanoseconds).
+Represents an ISO 8601 duration. 
+Contains both date-based values (years, months, days) and time-based values (seconds, nanoseconds).
 
 [source, javascript]
 ----
