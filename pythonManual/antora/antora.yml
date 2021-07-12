@@ -7,8 +7,7 @@ nav:
 asciidoc:
   attributes:
     neo4j-version: '4.3'
-    neo4j-version-exact: '4.3.1'
     neo4j-buildnumber: '4.3'
     driver-version: "4.3"
-    python-driver-version: "4.3.1"
-    python-examples: "partial$driver-sources/python-driver/4.3.1/tests/integration/examples"
+    python-driver-version: "4.3.2"
+    python-examples: "partial$driver-sources/python-driver/4.3.2/tests/integration/examples"
