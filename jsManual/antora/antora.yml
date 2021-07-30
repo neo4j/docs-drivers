@@ -10,5 +10,5 @@ asciidoc:
     neo4j-version-exact: '4.3.0'
     neo4j-buildnumber: '4.3'
     driver-version: "4.3"
-    javascript-driver-version: "4.3.1"
-    javascript-examples: 'partial$driver-sources/javascript-driver/4.3.1/test'
+    javascript-driver-version: "4.3.2"
+    javascript-examples: 'partial$driver-sources/javascript-driver/4.3.2/test'
