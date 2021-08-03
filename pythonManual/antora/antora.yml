@@ -11,4 +11,4 @@ asciidoc:
     neo4j-buildnumber: '4.2'
     driver-version: "4.2"
     python-driver-version: "4.2.1"
-    python-examples: "partial$driver-sources/python-driver/4.2.1/tests/integration/examples"
+    python-examples: "partial$driver-sources/python-driver/tests/integration/examples"
