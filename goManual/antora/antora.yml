@@ -11,4 +11,4 @@ asciidoc:
     neo4j-buildnumber: '4.3'
     driver-version: "4.3"
     go-driver-version: "4.3"
-    go-examples: 'partial$driver-sources/go-driver/4.3/neo4j/test-integration'
+    go-examples: 'partial$driver-sources/go-driver/neo4j/test-integration'
