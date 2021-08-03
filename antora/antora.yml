@@ -9,11 +9,11 @@ asciidoc:
     neo4j-version: '4.1'
     neo4j-version-exact: '4.1.1'
     neo4j-buildnumber: '4.1'
-    dotnet-examples: 'partial$driver-sources/dotnet-driver/4.1.1/Neo4j.Driver/Neo4j.Driver.Tests.Integration'
-    go-examples: 'partial$driver-sources/go-driver/4.0/neo4j/test-integration'
-    java-examples: 'partial$driver-sources/java-driver/4.1.4/examples/src/main/java/org/neo4j/docs/driver'
-    javascript-examples: 'partial$driver-sources/javascript-driver/4.1.2/test'
-    python-examples: 'partial$driver-sources/python-driver/4.1.3/tests/integration/examples'
+    dotnet-examples: 'partial$driver-sources/dotnet-driver/Neo4j.Driver/Neo4j.Driver.Tests.Integration'
+    go-examples: 'partial$driver-sources/go-driver/neo4j/test-integration'
+    java-examples: 'partial$driver-sources/java-driver/examples/src/main/java/org/neo4j/docs/driver'
+    javascript-examples: 'partial$driver-sources/javascript-driver/test'
+    python-examples: 'partial$driver-sources/python-driver/tests/integration/examples'
     driver-version: "4.1"
     dotnet-driver-version: "4.1.1"
     go-driver-version: "4.1"
