@@ -435,6 +435,8 @@ include::{python-examples}/test_driver_introduction_example.py[tags=driver-intro
 [[driver-api-docs]]
 == Driver API docs
 
+:driver-version: 4.3
+
 For a comprehensive listing of all driver functionality, refer to the *API documentation* for the specific driver language.
 
 [.tabbed-example]
@@ -442,7 +444,7 @@ For a comprehensive listing of all driver functionality, refer to the *API docum
 ====
 [.include-with-dotnet]
 ======
-{api-docs-base-uri}/dotnet-driver/{dotnet-driver-apidoc-version}/
+{api-docs-base-uri}/dotnet-driver/{driver-version}/
 ======
 
 // [.include-with-go]
@@ -453,17 +455,17 @@ For a comprehensive listing of all driver functionality, refer to the *API docum
 
 [.include-with-java]
 ======
-{api-docs-base-uri}/java-driver/{java-driver-apidoc-version}/
+{api-docs-base-uri}/java-driver/{driver-version}/
 ======
 
 [.include-with-javascript]
 ======
-{api-docs-base-uri}/javascript-driver/{javascript-driver-apidoc-version}/
+{api-docs-base-uri}/javascript-driver/{driver-version}/
 ======
 
 [.include-with-python]
 ======
-{api-docs-base-uri}/python-driver/{python-driver-apidoc-version}/
+{api-docs-base-uri}/python-driver/{driver-version}
 ======
 
 ====
