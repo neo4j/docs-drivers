@@ -11,4 +11,4 @@ asciidoc:
     neo4j-buildnumber: '4.3'
     driver-version: "4.3"
     dotnet-driver-version: "4.3.1"
-    dotnet-examples: 'partial$driver-sources/dotnet-driver/4.3.1/Neo4j.Driver/Neo4j.Driver.Tests.Integration'
+    dotnet-examples: 'partial$driver-sources/dotnet-driver/Neo4j.Driver/Neo4j.Driver.Tests.Integration'
