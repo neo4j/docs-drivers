@@ -113,4 +113,4 @@ include::{java-examples}/HelloWorldExample.java[tags=hello-world]
 [[java-driver-api-docs]]
 == Driver API docs
 
-For a comprehensive listing of all driver functionality, refer to the *API documentation*: {api-docs-base-uri}/java-driver/{java-driver-apidoc-version}/
+For a comprehensive listing of all driver functionality, refer to the *API documentation*: {api-docs-base-uri}/java-driver/{driver-version}/
