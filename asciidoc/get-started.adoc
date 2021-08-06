@@ -379,7 +379,6 @@ include::{python-examples}/test_driver_introduction_example.py[tags=driver-intro
 [[driver-api-docs]]
 == Driver API docs
 
-:driver-version: 4.2
 
 For a comprehensive listing of all driver functionality, refer to the *API documentation* for the specific driver language.
 
