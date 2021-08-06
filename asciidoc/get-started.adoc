@@ -392,6 +392,7 @@ include::{python-examples}/test_hello_world_example.py[tags=hello-world]
 [[driver-api-docs]]
 == Driver API docs
 
+
 For a comprehensive listing of all driver functionality, refer to the *API documentation* for the specific driver language.
 
 [.tabbed-example]
@@ -399,7 +400,7 @@ For a comprehensive listing of all driver functionality, refer to the *API docum
 ====
 [.include-with-dotnet]
 ======
-{api-docs-base-uri}/dotnet-driver/{dotnet-driver-apidoc-version}/
+{api-docs-base-uri}/dotnet-driver/{driver-version}/
 ======
 
 [.include-with-go]
@@ -410,17 +411,17 @@ https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v4
 
 [.include-with-java]
 ======
-{api-docs-base-uri}/java-driver/{java-driver-apidoc-version}/
+{api-docs-base-uri}/java-driver/{driver-version}/
 ======
 
 [.include-with-javascript]
 ======
-{api-docs-base-uri}/javascript-driver/{javascript-driver-apidoc-version}/
+{api-docs-base-uri}/javascript-driver/{driver-version}/
 ======
 
 [.include-with-python]
 ======
-{api-docs-base-uri}/python-driver/{python-driver-apidoc-version}/
+{api-docs-base-uri}/python-driver/{driver-version}/
 ======
 
 ====
