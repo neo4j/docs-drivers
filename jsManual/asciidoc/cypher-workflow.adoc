@@ -129,19 +129,24 @@ include::{common-content}/cypher-workflow.adoc[tag=type-mapping]
 
 [[js-driver-temporal-types]]
 === Temporal Types
-This section list some basic usage of the temporal types provided by the driver.
+
+This section lists some basic usage of the temporal types provided by the JavaScript Driver.
+
 
 [[js-driver-temporal-types-datetime]]
 ==== DateTime
-Represents an instant capturing the date, the time and the timezone identifier.
+
+Represents an instant capturing the date, the time, and the timezone identifier.
 
 [source, javascript]
 ----
 include::{javascript-examples}/examples.test.js[tags=temporal-types-datetime]
 ----
 
+
 [[js-driver-temporal-types-date]]
 ==== Date
+
 Represents an instant capturing the date, but not the time, nor the timezone.
 
 [source, javascript]
@@ -149,8 +154,10 @@ Represents an instant capturing the date, but not the time, nor the timezone.
 include::{javascript-examples}/examples.test.js[tags=temporal-types-date]
 ----
 
+
 [[js-driver-temporal-types-time]]
 ==== Time
+
 Represents an instant capturing the time of day, and the timezone offset in seconds, but not the date.
 
 [source, javascript]
@@ -158,8 +165,10 @@ Represents an instant capturing the time of day, and the timezone offset in seco
 include::{javascript-examples}/examples.test.js[tags=temporal-types-time]
 ----
 
+
 [[js-driver-temporal-types-localdatetime]]
 ==== LocalDateTime
+
 Represents an instant capturing the date and the time, but not the timezone.
 
 [source, javascript]
@@ -167,8 +176,10 @@ Represents an instant capturing the date and the time, but not the timezone.
 include::{javascript-examples}/examples.test.js[tags=temporal-types-localdatetime]
 ----
 
+
 [[js-driver-temporal-types-localtime]]
 ==== LocalTime
+
 Represents an instant capturing the time of day, but not the date, nor the timezone.
 
 [source, javascript]
@@ -176,15 +187,18 @@ Represents an instant capturing the time of day, but not the date, nor the timez
 include::{javascript-examples}/examples.test.js[tags=temporal-types-localtime]
 ----
 
+
 [[js-driver-temporal-types-duration]]
 ==== Duration
-Represents an ISO 8601 duration. 
+
+Represents an ISO 8601 duration.
 Contains both date-based values (years, months, days) and time-based values (seconds, nanoseconds).
 
 [source, javascript]
 ----
 include::{javascript-examples}/examples.test.js[tags=temporal-types-duration]
 ----
+
 
 [[js-driver-exceptions-errors]]
 == Exceptions and error handling
