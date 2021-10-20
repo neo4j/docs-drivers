@@ -134,7 +134,7 @@ This section lists some basic usage of the temporal types provided by the JavaSc
 
 
 [[js-driver-temporal-types-datetime]]
-==== DateTime
+==== `dateTime`
 
 Represents an instant capturing the date, the time, and the timezone identifier.
 
@@ -145,7 +145,7 @@ include::{javascript-examples}/examples.test.js[tags=temporal-types-datetime]
 
 
 [[js-driver-temporal-types-date]]
-==== Date
+==== `date`
 
 Represents an instant capturing the date, but not the time, nor the timezone.
 
@@ -156,7 +156,7 @@ include::{javascript-examples}/examples.test.js[tags=temporal-types-date]
 
 
 [[js-driver-temporal-types-time]]
-==== Time
+==== `time`
 
 Represents an instant capturing the time of day, and the timezone offset in seconds, but not the date.
 
@@ -167,7 +167,7 @@ include::{javascript-examples}/examples.test.js[tags=temporal-types-time]
 
 
 [[js-driver-temporal-types-localdatetime]]
-==== LocalDateTime
+==== `localDateTime`
 
 Represents an instant capturing the date and the time, but not the timezone.
 
@@ -178,7 +178,7 @@ include::{javascript-examples}/examples.test.js[tags=temporal-types-localdatetim
 
 
 [[js-driver-temporal-types-localtime]]
-==== LocalTime
+==== `localTime`
 
 Represents an instant capturing the time of day, but not the date, nor the timezone.
 
@@ -189,7 +189,7 @@ include::{javascript-examples}/examples.test.js[tags=temporal-types-localtime]
 
 
 [[js-driver-temporal-types-duration]]
-==== Duration
+==== `duration`
 
 Represents an ISO 8601 duration.
 Contains both date-based values (years, months, days) and time-based values (seconds, nanoseconds).
