@@ -1,14 +1,15 @@
 name: dotnet-manual
 title: Neo4j .NET Driver Manual
-version: '4.3'
+version: 4.4
+prerelease: -preview
 start_page: ROOT:index.adoc
 nav:
 - modules/ROOT/content-nav.adoc
 asciidoc:
   attributes:
-    neo4j-version: '4.3'
-    neo4j-version-exact: '4.3.0'
-    neo4j-buildnumber: '4.3'
-    driver-version: "4.3"
-    dotnet-driver-version: "4.3.1"
+    neo4j-version: '4.4'
+    neo4j-version-exact: '4.4.0'
+    neo4j-buildnumber: '4.4'
+    driver-version: "4.4"
+    dotnet-driver-version: "4.4.0"
     dotnet-examples: 'partial$driver-sources/dotnet-driver/Neo4j.Driver/Neo4j.Driver.Tests.Integration'
