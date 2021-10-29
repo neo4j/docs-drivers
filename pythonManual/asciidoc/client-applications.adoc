@@ -491,8 +491,11 @@ include::{common-content}/client-applications.adoc[tag=logging]
 
 [source, python]
 ----
-from logging import getLogger, StreamHandler, DEBUG
-handler = StreamHandler()
-handler.setLevel(DEBUG)
-getLogger("neo4j").addHandler(handler)
+import logging
+import sys
+
+handler = logging.StreamHandler(sys.stdout)
+handler.setLevel(logging.DEBUG)
+logging.getLogger("neo4j").addHandler(handler)
+logging.getLogger("neo4j").setLevel(logging.DEBUG)
 ----
