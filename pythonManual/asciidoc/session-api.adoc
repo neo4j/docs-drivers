@@ -112,12 +112,12 @@ include::{common-content}/session-api.adoc[tag=TransactionTimeout]
 
 [source, python]
 ----
-include::{python-examples}/test_transaction-timeout-config_example.py[tags=transaction-timeout-config]
+include::{python-examples}/test_transaction_timeout_config_example.py[tags=transaction-timeout-config]
 ----
 
 include::{common-content}/session-api.adoc[tag=TransactionMetadata]
 
 [source, python]
 ----
-include::{python-examples}/test_transaction-metadata-config_example.py[tags=transaction-metadata-config]
+include::{python-examples}/test_transaction_metadata_config_example.py[tags=transaction-metadata-config]
 ----
