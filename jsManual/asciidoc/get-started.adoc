@@ -96,4 +96,4 @@ include::{javascript-examples}/examples.test.js[tags=hello-world]
 [[js-driver-api-docs]]
 == Driver API docs
 
-For a comprehensive listing of all driver functionality, refer to the *API documentation*: {api-docs-base-uri}/javascript-driver/{javascript-driver-apidoc-version}/
+For a comprehensive listing of all driver functionality, refer to the *API documentation*: {api-docs-base-uri}/javascript-driver/{driver-version}/
