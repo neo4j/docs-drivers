@@ -13,7 +13,7 @@ endif::[]
 // :example-caption!:
 // :table-caption!:
 ifndef::javascript-root[:javascript-root: {project-root}/build/driver-sources/javascript-driver]
-:javascript-examples: {javascript-root}/test
+:javascript-examples: {javascript-root}/packages/neo4j-driver/test
 :api-docs-base-uri: https://neo4j.com/docs/api
 
 

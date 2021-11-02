@@ -12,4 +12,4 @@ asciidoc:
     neo4j-buildnumber: '4.4'
     driver-version: "4.4"
     javascript-driver-version: "4.4.0"
-    javascript-examples: 'partial$driver-sources/javascript-driver/test'
+    javascript-examples: 'partial$driver-sources/javascript-driver/packages/neo4j-driver/test'
