@@ -232,6 +232,44 @@ include::{python-examples}/test_temporal_types_example.py[tags=temporal-types-du
 ----
 
 
+[[python-driver-geospatial-types]]
+=== Geospatial Types
+
+This section lists some basic usage of the geospatial types provided by the Python Driver.
+
+
+[[python-driver-geospatial-types-cartesian]]
+==== `CartesianPoint`
+
+Represents 2 or 3 dimensional point in Cartesian space.
+
+[source, python]
+----
+include::{python-examples}/test_temporal_types_example.py[tags=temporal-types-cartesian-import]
+----
+
+[source, python]
+----
+include::{python-examples}/test_temporal_types_example.py[tags=temporal-types-cartesian]
+----
+
+
+[[python-driver-geospatial-types-wgs84]]
+==== `WGS84Point`
+
+Represents an instant capturing the wgs84, but not the time, nor the timezone.
+
+[source, python]
+----
+include::{python-examples}/test_temporal_types_example.py[tags=temporal-types-wgs84-import]
+----
+
+[source, python]
+----
+include::{python-examples}/test_temporal_types_example.py[tags=temporal-types-wgs84]
+----
+
+
 [[python-driver-exceptions-errors]]
 == Exceptions and error handling
 
