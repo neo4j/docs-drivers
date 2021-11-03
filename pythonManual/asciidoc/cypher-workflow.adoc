@@ -129,6 +129,147 @@ include::{common-content}/cypher-workflow.adoc[tag=type-mapping]
 ======
 
 
+[[python-driver-temporal-types]]
+=== Temporal Types
+
+This section lists some basic usage of the temporal types provided by the Python Driver.
+
+
+[[python-driver-temporal-types-datetime]]
+==== `DateTime`
+
+Represents an instant capturing the date, the time, and the timezone identifier.
+
+[source, python]
+----
+include::{python-examples}/test_temporal_types_example.py[tags=temporal-types-datetime-import]
+----
+
+[source, python]
+----
+include::{python-examples}/test_temporal_types_example.py[tags=temporal-types-datetime]
+----
+
+
+[[python-driver-temporal-types-date]]
+==== `Date`
+
+Represents an instant capturing the date, but not the time, nor the timezone.
+
+[source, python]
+----
+include::{python-examples}/test_temporal_types_example.py[tags=temporal-types-date-import]
+----
+
+[source, python]
+----
+include::{python-examples}/test_temporal_types_example.py[tags=temporal-types-date]
+----
+
+
+[[python-driver-temporal-types-time]]
+==== `Time`
+
+Represents an instant capturing the time of day, and the timezone offset in seconds, but not the date.
+
+[source, python]
+----
+include::{python-examples}/test_temporal_types_example.py[tags=temporal-types-time-import]
+----
+
+[source, python]
+----
+include::{python-examples}/test_temporal_types_example.py[tags=temporal-types-time]
+----
+
+
+[[python-driver-temporal-types-local-datetime]]
+==== `Local DateTime`
+
+Represents an instant capturing the date and the time, but not the timezone.
+
+[source, python]
+----
+include::{python-examples}/test_temporal_types_example.py[tags=temporal-types-local-datetime-import]
+----
+
+[source, python]
+----
+include::{python-examples}/test_temporal_types_example.py[tags=temporal-types-local-datetime]
+----
+
+
+[[python-driver-temporal-types-local-time]]
+==== `Local Time`
+
+Represents an instant capturing the time of day, but not the date, nor the timezone.
+
+[source, python]
+----
+include::{python-examples}/test_temporal_types_example.py[tags=temporal-types-local-time-import]
+----
+
+[source, python]
+----
+include::{python-examples}/test_temporal_types_example.py[tags=temporal-types-local-time]
+----
+
+
+[[python-driver-temporal-types-duration]]
+==== `Duration`
+
+Represents an ISO 8601 duration.
+Contains both date-based values (years, months, days) and time-based values (seconds, nanoseconds).
+
+[source, python]
+----
+include::{python-examples}/test_temporal_types_example.py[tags=temporal-types-duration-import]
+----
+
+[source, python]
+----
+include::{python-examples}/test_temporal_types_example.py[tags=temporal-types-duration]
+----
+
+
+[[python-driver-geospatial-types]]
+=== Geospatial Types
+
+This section lists some basic usage of the geospatial types provided by the Python Driver.
+
+
+[[python-driver-geospatial-types-cartesian]]
+==== `CartesianPoint`
+
+Represents 2 or 3 dimensional point in Cartesian space.
+
+[source, python]
+----
+include::{python-examples}/test_temporal_types_example.py[tags=temporal-types-cartesian-import]
+----
+
+[source, python]
+----
+include::{python-examples}/test_temporal_types_example.py[tags=temporal-types-cartesian]
+----
+
+
+[[python-driver-geospatial-types-wgs84]]
+==== `WGS84Point`
+
+Represents an instant capturing the wgs84, but not the time, nor the timezone.
+
+[source, python]
+----
+include::{python-examples}/test_temporal_types_example.py[tags=temporal-types-wgs84-import]
+----
+
+[source, python]
+----
+include::{python-examples}/test_temporal_types_example.py[tags=temporal-types-wgs84]
+----
+
+
 [[python-driver-exceptions-errors]]
 == Exceptions and error handling
 
