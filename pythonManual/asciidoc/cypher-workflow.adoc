@@ -245,12 +245,12 @@ Represents 2 or 3 dimensional point in Cartesian space.
 
 [source, python]
 ----
-include::{python-examples}/test_geospatial_types_example.py[tags=temporal-types-cartesian-import]
+include::{python-examples}/test_geospatial_types_example.py[tags=geospatial-types-cartesian-import]
 ----
 
 [source, python]
 ----
-include::{python-examples}/test_geospatial_types_example.py[tags=temporal-types-cartesian]
+include::{python-examples}/test_geospatial_types_example.py[tags=geospatial-types-cartesian]
 ----
 
 
@@ -261,12 +261,12 @@ Represents an instant capturing the wgs84, but not the time, nor the timezone.
 
 [source, python]
 ----
-include::{python-examples}/test_geospatial_types_example.py[tags=temporal-types-wgs84-import]
+include::{python-examples}/test_geospatial_types_example.py[tags=geospatial-types-wgs84-import]
 ----
 
 [source, python]
 ----
-include::{python-examples}/test_geospatial_types_example.py[tags=temporal-types-wgs84]
+include::{python-examples}/test_geospatial_types_example.py[tags=geospatial-types-wgs84]
 ----
 
 
