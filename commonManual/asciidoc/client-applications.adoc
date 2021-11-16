@@ -1075,6 +1075,85 @@ The Kerberos authentication token can only be understood by the server if the se
 
 # end::authentication-kerberos-note[]
 
+[role=enterprise-edition]
+[[driver-authentication-bearer]]
+=== Bearer authentication
+
+# tag::authentication-sso[]
+
+The bearer scheme allows you to create a bearer authentication token
+using a base64 encoded bearer authentication token provided by an Identity Provider.
+This scheme is used in conjunction with Neo4j's Single Sign-On feature.
+
+[NOTE]
+--
+The bearer scheme requires configuring Single Sign-On on the server.
+Please see the operations manual on how to configure it: <<https://development.neo4j.dev/docs/operations-manual/current/authentication-authorization/sso-integration/>>. Once configured, clients can discover Neo4j's configuration through the Discovery API.
+--
+
+The best way to create a bearer authentication token is shown below:
+
+# end::authentication-bearer[]
+
+[.tabbed-example]
+.Bearer authentication
+====
+// dotnet example will be available later
+//[.include-with-dotnet]
+//======
+//[source, csharp]
+//----
+//include::{dotnet-examples}/Examples.cs[tags=bearer-auth]
+//----
+//
+//======
+
+[.include-with-java]
+======
+.Import Bearer authentication
+[source, java]
+----
+include::{java-examples}/BearerAuthExample.java[tags=bearer-auth-import]
+----
+
+[source, java]
+----
+include::{java-examples}/BearerAuthExample.java[tags=bearer-auth]
+----
+======
+
+[.include-with-javascript]
+======
+[source, javascript]
+----
+include::{javascript-examples}/examples.test.js[tags=bearer-auth]
+----
+
+======
+
+[.include-with-python]
+======
+[source, python]
+----
+include::{python-examples}/test_bearer_auth_example.py[tags=bearer-auth-import]
+----
+
+[source, python]
+----
+include::{python-examples}/test_bearer_auth_example.py[tags=bearer-auth]
+----
+======
+
+[.include-with-go]
+======
+[source, go]
+----
+include::{go-examples}/examples_test.go[tags=bearer-auth]
+----
+======
+
+====
+
 
 [[driver-authentication-custom]]
 === Custom authentication
