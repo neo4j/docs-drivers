@@ -1081,14 +1081,14 @@ The Kerberos authentication token can only be understood by the server if the se
 
 # tag::authentication-sso[]
 
-The bearer scheme allows you to create a bearer authentication token
-using a base64 encoded bearer authentication token provided by an Identity Provider.
+The bearer scheme allows you to create a bearer authentication token using a base64 encoded bearer authentication token provided by an Identity Provider.
 This scheme is used in conjunction with Neo4j's Single Sign-On feature.
 
 [NOTE]
 --
 The bearer scheme requires configuring Single Sign-On on the server.
-Please see the operations manual on how to configure it: <<https://development.neo4j.dev/docs/operations-manual/current/authentication-authorization/sso-integration/>>. Once configured, clients can discover Neo4j's configuration through the Discovery API.
+See the Operations Manual for information on how to configure it xref:4.4@operations-manual:ROOT:authentication-authorization/sso-integration/index.adoc[Operations Manual -> Integration with Single Sign-On services^].
+Once configured, clients can discover Neo4j's configuration through the Discovery API.
 --
 
 The best way to create a bearer authentication token is shown below:
