@@ -783,3 +783,13 @@ Neo4j 4.0 introduces the ability to pull records in batches, allowing the client
 This `FetchSize` applies to <<driver-simple-sessions, simple sessions>> and <<driver-async-sessions, async-sessions>> whereas reactive sessions can be controlled directly using the request method of the subscription.
 +
 *Default:* 1000 records
+
+# tag::ImpersonatedUser[]
+
+`ImpersonatedUser`::
+Users can run transactions against the database as different users if they have been granted explicit permission for doing it. When impersonating an user, the query is run as the complete security context of the impersonated user and not the authenticated user (e.g. home database, permissions etc).
+See <<operations-manual#mange-databases-home, Operations Manual -> Per-user home databases>> for more information on default database per user.
++
+*Default:* None (Sessions will be create with the logged user)
+
+# end::ImpersonatedUser[]
