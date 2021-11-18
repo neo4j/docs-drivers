@@ -265,6 +265,18 @@ include::{go-examples}/examples_test.go[tags=kerberos-auth]
 
 include::{common-content}/client-applications.adoc[tag=authentication-kerberos-note]
 
+[[go-driver-authentication-bearer]]
+=== Bearer authentication
+
+include::{common-content}/client-applications.adoc[tag=authentication-bearer]
+
+.Import bearer authentication
+======
+[source, go]
+----
+include::{go-examples}/examples_test.go[tags=bearer-auth]
+----
+======
 
 [[go-driver-authentication-custom]]
 === Custom authentication
