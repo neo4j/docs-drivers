@@ -754,6 +754,11 @@ In other cases, this setting is inherited. Note that transaction functions will 
 `Database`::
 The database with which the session will interact.
 When you are working with a database which is not the default (i.e. the `system` database or another database in Neo4j 4.0 Enterprise Edition), you can explicitly configure the database which the driver is executing transactions against.
++
+[WARNING]
+====
+Resolution of databases aliases occurs at connection creation time, which is not under the control of the session. It is therefore not recommended altering database aliases while there are live sessions. The per user home-database is resolved at session creation and when first impersonating a user. Therefore, the creation of a new session is necessary to reflect a changed home database.
+====
 See <<operations-manual#manage-databases-default, Operations Manual -> The default database>> for more information on databases.
 +
 *Default:* the default database as configured on the server.
@@ -770,7 +775,8 @@ This `FetchSize` applies to <<driver-simple-sessions, simple sessions>> and <<dr
 # tag::ImpersonatedUser[]
 
 `ImpersonatedUser`::
-Users can run transactions against the database as different users if they have been granted explicit permission for doing it. When impersonating an user, the query is run as the complete security context of the impersonated user and not the authenticated user (e.g. home database, permissions etc).
+Users can run transactions against the database as different users if they have been granted explicit permission for doing so. When impersonating a user, the query is run within the complete security context of the impersonated user and not the authenticated user (i.e., home database, permissions, etc.).
++
 See <<operations-manual#mange-databases-home, Operations Manual -> Per-user home databases>> for more information on default database per user.
 +
 *Default:* None (Sessions will be create with the logged user)
