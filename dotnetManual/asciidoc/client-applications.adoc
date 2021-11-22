@@ -330,6 +330,18 @@ include::{dotnet-examples}/Examples.cs[tags=kerberos-auth]
 
 include::{common-content}/client-applications.adoc[tag=authentication-kerberos-note]
 
+[[go-driver-authentication-bearer]]
+=== Bearer authentication
+
+include::{common-content}/client-applications.adoc[tag=authentication-bearer]
+
+.Import bearer authentication
+======
+[source, csharp]
+----
+include::{dotnet-examples}/examples_test.cs[tags=bearer-auth]
+----
+======
 
 [[dotnet-driver-authentication-custom]]
 === Custom authentication
