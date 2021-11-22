@@ -339,7 +339,7 @@ include::{common-content}/client-applications.adoc[tag=authentication-bearer]
 ======
 [source, csharp]
 ----
-include::{dotnet-examples}/examples_test.cs[tags=bearer-auth]
+include::{dotnet-examples}/Examples.cs[tags=bearer-auth]
 ----
 ======
 
