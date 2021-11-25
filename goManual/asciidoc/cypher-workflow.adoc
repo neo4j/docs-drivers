@@ -110,6 +110,55 @@ include::{common-content}/cypher-workflow.adoc[tag=type-mapping]
 
 +*+ When a `time.Time` value is sent/received through the driver and its `Zone()` returns a name of `Offset`, the value is stored with its offset value rather than its zone name.
 
+[[go-driver-geospartial-types]]
+=== Geospatial Types
+This section lists some basic usage of the geospatial types provided by the Go Driver.
+
+[[go-driver-geospatial-types-point2d]]
+==== `Point2D`
+
+Represents a two-dimensional in Cartesian space or in the WGS84 space. The field `SpatialRefId` indicates the type of the coordinate.
+
+The following table defines the list of possibles values for `SpatialRefId` and its meaning.
+
+======
+[options="header", cols="<20m,<80a"]
+|===
+| SpatialRefId        | Description
+| `7203` | 2D point in the cartesian space.
+| `4326` | 2D point in the WGS84 space.
+|===
+======
+
+Examples of two-dimensions points instantiation and reading:
+
+[source, golang]
+----
+include::{go-examples}/examples_test.go[tags=geospatial-types-point2d]
+----
+
+[[go-driver-geospatial-types-point3d]]
+==== `Point3D`
+
+Represents a three-dimensional point in Cartesian space or in the WGS84 space. The field `SpatialRefId` indicates the type of the coordinate.
+
+The following table defines the list of possibles values for `SpatialRefId` and its meaning.
+
+======
+[options="header", cols="<20m,<80a"]
+|===
+| SpatialRefId  | Description
+| `9157` | 3D point in the cartesian space.
+| `4979` | 3D point in the WGS84 space.
+|===
+======
+
+Examples of three-dimensions points instantiation and reading:
+
+[source, golang]
+----
+include::{go-examples}/examples_test.go[tags=geospatial-types-point2d]
+----
 
 [[go-driver-exceptions-errors]]
 == Exceptions and error handling
