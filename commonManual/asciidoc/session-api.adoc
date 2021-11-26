@@ -143,13 +143,14 @@ include::{python-examples}/test_transaction_function_example.py[tags=transaction
 # tag::simple-autocommit-transactions[]
 
 An auto-commit transaction is a basic but limited form of transaction.
-Such a transaction consists of only one Cypher Query and is not automatically retried on failure.
+Such a transaction consists of only one Cypher query and is not automatically retried on failure.
 Therefore, any error scenarios will need to be handled by the client application itself.
 
-Auto-commit transactions serve two purposes:
+Auto-commit transactions serve the following purposes:
 
-* simple use cases such as when learning *Cypher* or writing one-off scripts.
-* operations such as batched data load operations, where the driver cannot be aware of the committed state and therefore cannot safely request a retry. The operator will have to perform a 'retry' or 'undo' under these circumstances.
+* simple use cases such as when learning Cypher or writing one-off scripts.
+* operations such as batched data load operations, where the driver cannot be aware of the committed state and therefore cannot safely request a retry.
+The operator will have to perform a `retry` or `undo` under these circumstances.
 
 [WARNING]
 ====
@@ -158,12 +159,13 @@ The driver does not retry auto-commit queries on failure since it is unaware of 
 
 [NOTE]
 ====
-Unlike other kinds of Cypher Query, `PERIODIC COMMIT` and `CALL {} IN TRANSACTIONS` queries do not participate in the causal chain.
-
+Unlike other kinds of Cypher query, `PERIODIC COMMIT` and `CALL {} IN TRANSACTIONS` queries do not participate in the causal chain.
 Therefore, the only way to execute these queries from a driver is to use auto-commit transactions.
 
-Please refer to the <<cypher-manual#query-using-periodic-commit-hint, Cypher Manual -> `PERIODIC COMMIT` query hint>> and
-<<cypher-manual#subquery-call-in-transactions, Cypher Manual -> `CALL {} IN TRANSACTIONS`>> for more details.
+Please refer to the following for more details:
+
+* <<cypher-manual#query-using-periodic-commit-hint, Cypher Manual -> `PERIODIC COMMIT` query hint>>
+* <<cypher-manual#subquery-call-in-transactions, Cypher Manual -> `CALL {} IN TRANSACTIONS`>>
 ====
 
 # end::simple-autocommit-transactions[]
@@ -396,13 +398,14 @@ include::{javascript-examples}/examples.test.js[tags=async-transaction-function]
 # tag::async-autocommit-transactions[]
 
 An auto-commit transaction is a basic but limited form of transaction.
-Such a transaction consists of only one Cypher Query and is not automatically retried on failure.
+Such a transaction consists of only one Cypher query and is not automatically retried on failure.
 Therefore, any error scenarios will need to be handled by the client application itself.
 
 Auto-commit transactions serve two purposes:
 
-* simple use cases such as when learning *Cypher* or writing one-off scripts.
-* operations such as batched data load operations, where the driver cannot be aware of the committed state and therefore cannot safely request a retry. The operator will have to perform a 'retry' or 'undo' under these circumstances.
+* simple use cases such as when learning Cypher or writing one-off scripts.
+* operations such as batched data load operations, where the driver cannot be aware of the committed state and therefore cannot safely request a retry.
+The operator will have to perform a `retry` or `undo` under these circumstances.
 
 [WARNING]
 ====
@@ -412,11 +415,12 @@ The driver does not retry auto-commit queries on failure since it is unaware of 
 [NOTE]
 ====
 Unlike other kinds of Cypher Query, `PERIODIC COMMIT` and `CALL {} IN TRANSACTIONS` queries do not participate in the causal chain.
-
 Therefore, the only way to execute these queries from a driver is to use auto-commit transactions.
 
-Please refer to the <<cypher-manual#query-using-periodic-commit-hint, Cypher Manual -> `PERIODIC COMMIT` query hint>> and
-<<cypher-manual#subquery-call-in-transactions, Cypher Manual -> `CALL {} IN TRANSACTIONS`>> for more details.
+Please refer to the following for more details:
+
+* <<cypher-manual#query-using-periodic-commit-hint, Cypher Manual -> `PERIODIC COMMIT` query hint>>
+* <<cypher-manual#subquery-call-in-transactions, Cypher Manual -> `CALL {} IN TRANSACTIONS`>>
 ====
 
 # end::async-autocommit-transactions[]
@@ -618,13 +622,13 @@ See <<driver-session-configuration>> for more details.
 # tag::rx-autocommit-transactions[]
 
 An auto-commit transaction is a basic but limited form of transaction.
-Such a transaction consists of only one Cypher Query and is not automatically retried on failure.
+Such a transaction consists of only one Cypher query and is not automatically retried on failure.
 Therefore, any error scenarios will need to be handled by the client application itself.
 
 Auto-commit transactions serve two purposes:
 
-* simple use cases such as when learning *Cypher* or writing one-off scripts.
-* operations such as batched data load operations, where the driver cannot be aware of the committed state and therefore cannot safely request a retry. The operator will have to perform a 'retry' or 'undo' under these circumstances.
+* simple use cases such as when learning Cypher or writing one-off scripts.
+* operations such as batched data load operations, where the driver cannot be aware of the committed state and therefore cannot safely request a retry. The operator will have to perform a `retry` or `undo` under these circumstances.
 
 [WARNING]
 ====
@@ -634,11 +638,12 @@ The driver does not retry auto-commit queries on failure since it is unaware of 
 [NOTE]
 ====
 Unlike other kinds of Cypher Query, `PERIODIC COMMIT` and `CALL {} IN TRANSACTIONS` queries do not participate in the causal chain.
-
 Therefore, the only way to execute these queries from a driver is to use auto-commit transactions.
 
-Please refer to the <<cypher-manual#query-using-periodic-commit-hint, Cypher Manual -> `PERIODIC COMMIT` query hint>> and
-<<cypher-manual#subquery-call-in-transactions, Cypher Manual -> `CALL {} IN TRANSACTIONS`>> for more details.
+Please refer to the following for more details:
+
+* <<cypher-manual#query-using-periodic-commit-hint, Cypher Manual -> `PERIODIC COMMIT` query hint>>
+* <<cypher-manual#subquery-call-in-transactions, Cypher Manual -> `CALL {} IN TRANSACTIONS`>>
 ====
 
 # end::rx-autocommit-transactions[]
