@@ -117,9 +117,10 @@ This section lists some basic usage of the geospatial types provided by the Go D
 [[go-driver-geospatial-types-point2d]]
 ==== `Point2D`
 
-Represents a two-dimensional in Cartesian space or in the WGS84 space. The field `SpatialRefId` indicates the type of the coordinate.
+Represents a two-dimensional in Cartesian space or in the WGS84 space. 
+The field `SpatialRefId` indicates the type of the coordinate.
 
-The following table defines the list of possibles values for `SpatialRefId` and its meaning.
+The following table lists the possible values for `SpatialRefId`:
 
 ======
 [options="header", cols="<20m,<80a"]
@@ -140,9 +141,10 @@ include::{go-examples}/examples_test.go[tags=geospatial-types-point2d]
 [[go-driver-geospatial-types-point3d]]
 ==== `Point3D`
 
-Represents a three-dimensional point in Cartesian space or in the WGS84 space. The field `SpatialRefId` indicates the type of the coordinate.
+Represents a three-dimensional point in Cartesian space or in the WGS84 space. 
+The field `SpatialRefId` indicates the type of the coordinate.
 
-The following table defines the list of possibles values for `SpatialRefId` and its meaning.
+The following table lists the possible values for `SpatialRefId`:
 
 ======
 [options="header", cols="<20m,<80a"]
