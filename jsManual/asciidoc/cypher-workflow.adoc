@@ -208,9 +208,10 @@ This section lists some basic usage of the geospatial types provided by the Java
 [[js-driver-geospatial-types-cartesian]]
 ==== `Point`
 
-Represents 2 or 3 dimensional point in Cartesian space or in the WGS84 space. The field `srid` indicates the type of the coordinate.
+Represents 2 or 3 dimensional point in Cartesian space or in the WGS84 space. 
+The field `SRID` indicates the type of the coordinate.
 
-The following table defines the list of possibles values for `srid` and its meaning.
+The following table lists the possible values for `SRID`:
 
 ======
 [options="header", cols="<20m,<80a"]
