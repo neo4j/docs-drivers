@@ -103,3 +103,21 @@ The number of records to fetch in each batch from the server.
 Neo4j 4.0 introduces the ability to pull records in batches, allowing the client application to take control of data population and apply back pressure to the server.
 +
 *Default:* 1000 records
+
+[[python-driver-transaction-configuration]]
+
+include::{common-content}/session-api.adoc[tag=TransactionConfiguration]
+
+include::{common-content}/session-api.adoc[tag=TransactionTimeout]
+
+[source, python]
+----
+include::{python-examples}/test_transaction_timeout_config_example.py[tags=transaction-timeout-config]
+----
+
+include::{common-content}/session-api.adoc[tag=TransactionMetadata]
+
+[source, python]
+----
+include::{python-examples}/test_transaction_metadata_config_example.py[tags=transaction-metadata-config]
+----
