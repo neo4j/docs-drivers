@@ -139,3 +139,21 @@ Neo4j 4.0 introduces the ability to pull records in batches, allowing the client
 This `FetchSize` applies to <<js-driver-async-sessions, async-sessions>> whereas <<js-driver-rx-sessions, reactive sessions>> can be controlled directly using the request method of the subscription.
 +
 *Default:* 1000 records
+
+[[js-driver-transaction-configuration]]
+
+include::{common-content}/session-api.adoc[tag=TransactionConfiguration]
+
+include::{common-content}/session-api.adoc[tag=TransactionTimeout]
+
+[source, javascript]
+----
+include::{javascript-examples}/examples.test.js[tags=transaction-timeout-config]
+----
+
+include::{common-content}/session-api.adoc[tag=TransactionMetadata]
+
+[source, javascript]
+----
+include::{javascript-examples}/examples.test.js[tags=transaction-metadata-config]
+----
