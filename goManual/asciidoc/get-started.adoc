@@ -56,4 +56,4 @@ include::{go-examples}/examples_test.go[tags=hello-world]
 [[go-driver-api-docs]]
 == Driver API docs
 
-For a comprehensive listing of all driver functionality, refer to the *API documentation*: https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v4
+For a comprehensive listing of all driver functionality, please see the https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v4[Go API reference documentation].
