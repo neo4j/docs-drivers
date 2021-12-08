@@ -35,7 +35,7 @@ This effect is known as <<term-causal-chaining, *_causal chaining_*>>.
 
 # tag::sessions[]
 
-Sessions are *_lightweight containers for causally chained sequences of transactions_* (see <<operations-manual#consistency-explained, Operations Manual -> Causal consistency>>).
+Sessions are *_lightweight containers for causally chained sequences of transactions_* (see <<operations-manual#causal-consistency-explained, Operations Manual -> Causal consistency>>).
 They essentially provide context for storing transaction sequencing information in the form of bookmarks.
 
 When a transaction begins, the session in which it is contained acquires a connection from the driver connection pool.
