@@ -205,3 +205,22 @@ This `FetchSize` applies to <<dotnet-driver-simple-sessions, simple sessions>> a
 *Default:* 1000 records
 
 include::{common-content}/session-api.adoc[tag=ImpersonatedUser]
+
+
+[[dotnet-driver-transaction-configuration]]
+
+include::{common-content}/session-api.adoc[tag=TransactionConfiguration]
+
+include::{common-content}/session-api.adoc[tag=TransactionTimeout]
+
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=transaction-timeout-config]
+----
+
+include::{common-content}/session-api.adoc[tag=TransactionMetadata]
+
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=transaction-metadata-config]
+----
