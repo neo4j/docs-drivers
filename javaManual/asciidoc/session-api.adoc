@@ -205,3 +205,22 @@ This `FetchSize` applies to <<java-driver-simple-sessions, simple sessions>> and
 *Default:* 1000 records
 
 include::{common-content}/session-api.adoc[tag=ImpersonatedUser]
+
+
+[[java-driver-transaction-configuration]]
+
+include::{common-content}/session-api.adoc[tag=TransactionConfiguration]
+
+include::{common-content}/session-api.adoc[tag=TransactionTimeout]
+
+[source, java]
+----
+include::{java-examples}/TransactionTimeoutConfigExample.java[tags=transaction-timeout-config]
+----
+
+include::{common-content}/session-api.adoc[tag=TransactionMetadata]
+
+[source, java]
+----
+include::{java-examples}/TransactionMetadataConfigExample.java[tags=transaction-metadata-config]
+----

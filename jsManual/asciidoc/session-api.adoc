@@ -141,3 +141,22 @@ This `FetchSize` applies to <<js-driver-async-sessions, async-sessions>> whereas
 *Default:* 1000 records
 
 include::{common-content}/session-api.adoc[tag=ImpersonatedUser]
+
+
+[[js-driver-transaction-configuration]]
+
+include::{common-content}/session-api.adoc[tag=TransactionConfiguration]
+
+include::{common-content}/session-api.adoc[tag=TransactionTimeout]
+
+[source, javascript]
+----
+include::{javascript-examples}/examples.test.js[tags=transaction-timeout-config]
+----
+
+include::{common-content}/session-api.adoc[tag=TransactionMetadata]
+
+[source, javascript]
+----
+include::{javascript-examples}/examples.test.js[tags=transaction-metadata-config]
+----
