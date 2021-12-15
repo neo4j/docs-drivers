@@ -1095,66 +1095,6 @@ The best way to create a bearer authentication token is shown below:
 
 # end::authentication-bearer[]
 
-[.tabbed-example]
-.Bearer authentication
-====
-// dotnet example will be available later
-//[.include-with-dotnet]
-//======
-//[source, csharp]
-//----
-//include::{dotnet-examples}/Examples.cs[tags=bearer-auth]
-//----
-//
-//======
-
-[.include-with-java]
-======
-.Import Bearer authentication
-[source, java]
-----
-include::{java-examples}/BearerAuthExample.java[tags=bearer-auth-import]
-----
-
-[source, java]
-----
-include::{java-examples}/BearerAuthExample.java[tags=bearer-auth]
-----
-======
-
-[.include-with-javascript]
-======
-[source, javascript]
-----
-include::{javascript-examples}/examples.test.js[tags=bearer-auth]
-----
-
-======
-
-[.include-with-python]
-======
-[source, python]
-----
-include::{python-examples}/test_bearer_auth_example.py[tags=bearer-auth-import]
-----
-
-[source, python]
-----
-include::{python-examples}/test_bearer_auth_example.py[tags=bearer-auth]
-----
-======
-
-[.include-with-go]
-======
-[source, go]
-----
-include::{go-examples}/examples_test.go[tags=bearer-auth]
-----
-======
-
-====
-
-
 [[driver-authentication-custom]]
 === Custom authentication
 
