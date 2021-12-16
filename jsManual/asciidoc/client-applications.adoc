@@ -333,6 +333,19 @@ include::{javascript-examples}/examples.test.js[tags=kerberos-auth]
 
 include::{common-content}/client-applications.adoc[tag=authentication-kerberos-note]
 
+[[js-driver-authentication-bearer]]
+=== Bearer authentication
+
+include::{common-content}/client-applications.adoc[tag=authentication-bearer]
+
+.Import bearer authentication
+======
+[source, javascript]
+----
+include::{javascript-examples}/examples.test.js[tags=bearer-auth]
+----
+
+======
 
 [[js-driver-authentication-custom]]
 === Custom authentication

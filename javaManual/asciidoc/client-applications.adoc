@@ -340,6 +340,23 @@ include::{java-examples}/KerberosAuthExample.java[tags=kerberos-auth]
 
 include::{common-content}/client-applications.adoc[tag=authentication-kerberos-note]
 
+[[java-driver-authentication-bearer]]
+=== Bearer authentication
+
+include::{common-content}/client-applications.adoc[tag=authentication-bearer]
+
+.Import bearer authentication
+======
+[source, java]
+----
+include::{java-examples}/BearerAuthExample.java[tags=bearer-auth-import]
+----
+
+[source, java]
+----
+include::{java-examples}/BearerAuthExample.java[tags=bearer-auth]
+----
+======
 
 [[java-driver-authentication-custom]]
 === Custom authentication

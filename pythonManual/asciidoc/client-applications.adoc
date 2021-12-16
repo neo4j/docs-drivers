@@ -319,6 +319,23 @@ include::{python-examples}/test_kerberos_auth_example.py[tags=kerberos-auth]
 
 include::{common-content}/client-applications.adoc[tag=authentication-kerberos-note]
 
+[[python-driver-authentication-bearer]]
+=== Bearer authentication
+
+include::{common-content}/client-applications.adoc[tag=authentication-bearer]
+
+.Import bearer authentication
+======
+[source, python]
+----
+include::{python-examples}/test_bearer_auth_example.py[tags=bearer-auth-import]
+----
+
+[source, python]
+----
+include::{python-examples}/test_bearer_auth_example.py[tags=bearer-auth]
+----
+======
 
 [[python-driver-authentication-custom]]
 === Custom authentication
