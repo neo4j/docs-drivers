@@ -32,7 +32,7 @@ The following languages and frameworks are officially supported by Neo4j:
 | .NET
 | https://github.com/dotnet/standard/blob/master/docs/versions/netstandard2.0.md[.NET Standard 2.0]
 
-| Go 
+| Go
 | Go 1.10
 
 | Java
@@ -79,7 +79,7 @@ In cases where at least one peer is below version 4.0, communication will occur 
 [NOTE]
 Drivers 1.7 do not support multiple databases and Neo4j Fabric, features introduced in Neo4j 4.0.
 To be able to run multiple databases online concurrently and to do distributed queries over them, you must upgrade Drivers from 1.7 to 4.0.
-For information, see https://neo4j.com/docs/migration-guide/4.0/upgrade-driver/[4.0 Migration Guide -> Chapter 6. Upgrade Neo4j drivers].
+For information, see link:https://neo4j.com/docs/migration-guide/4.0/upgrade-driver/[4.0 Migration Guide -> Chapter 6. Upgrade Neo4j drivers].
 
 
 Wherever possible, it is recommended to use the latest stable driver release available.
