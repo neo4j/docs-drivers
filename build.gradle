@@ -161,7 +161,7 @@ ext {
         'kerberosAddOn' : '1.0',
     ]
 
-    copyrightYear = '2020'
+    copyrightYear = '2022'
     docsBaseUri = "https://neo4j.com/docs"
     crossReferenceBase = [ // We have no strategy for cross references yet; always link to current.
             'cypher-manual'     : "${docsBaseUri}/cypher-manual/current",
