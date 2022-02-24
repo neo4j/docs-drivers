@@ -2,7 +2,7 @@
 [[driver-colophon]]
 = Colophon
 
-(C) 2020 Neo Technology
+(C) 2022 Neo Technology
 
 License: Creative Commons 4.0
 
