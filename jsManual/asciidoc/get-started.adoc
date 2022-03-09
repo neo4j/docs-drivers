@@ -36,9 +36,8 @@ npm show neo4j-driver@* version
 
 * Babel/Runtime (^7.5.5)
 * RxJS (^6.5.2)
-* text-encoding-utf-8 (^1.0.2)
-* URI-js (^4.2.2)
-
+* buffer (^6.0.3)
+* string_decoder (^1.3.0)
 
 The JavaScript Reactive API is built and exposed via RxJs.
 A dependency of RxJs is automatically installed with the driver.
