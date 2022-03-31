@@ -159,12 +159,11 @@ The driver does not retry auto-commit queries on failure since it is unaware of 
 
 [NOTE]
 ====
-Unlike other kinds of Cypher query, `PERIODIC COMMIT` and `CALL {} IN TRANSACTIONS` queries do not participate in the causal chain.
+Unlike other kinds of Cypher query, `CALL {} IN TRANSACTIONS` queries do not participate in the causal chain.
 Therefore, the only way to execute these queries from a driver is to use auto-commit transactions.
 
 Please refer to the following for more details:
 
-* <<cypher-manual#query-using-periodic-commit-hint, Cypher Manual -> `PERIODIC COMMIT` query hint>>
 * <<cypher-manual#subquery-call-in-transactions, Cypher Manual -> `CALL {} IN TRANSACTIONS`>>
 ====
 
@@ -414,12 +413,11 @@ The driver does not retry auto-commit queries on failure since it is unaware of 
 
 [NOTE]
 ====
-Unlike other kinds of Cypher Query, `PERIODIC COMMIT` and `CALL {} IN TRANSACTIONS` queries do not participate in the causal chain.
+Unlike other kinds of Cypher Query, `CALL {} IN TRANSACTIONS` queries do not participate in the causal chain.
 Therefore, the only way to execute these queries from a driver is to use auto-commit transactions.
 
 Please refer to the following for more details:
 
-* <<cypher-manual#query-using-periodic-commit-hint, Cypher Manual -> `PERIODIC COMMIT` query hint>>
 * <<cypher-manual#subquery-call-in-transactions, Cypher Manual -> `CALL {} IN TRANSACTIONS`>>
 ====
 
@@ -637,12 +635,11 @@ The driver does not retry auto-commit queries on failure since it is unaware of 
 
 [NOTE]
 ====
-Unlike other kinds of Cypher Query, `PERIODIC COMMIT` and `CALL {} IN TRANSACTIONS` queries do not participate in the causal chain.
+Unlike other kinds of Cypher Query, `CALL {} IN TRANSACTIONS` queries do not participate in the causal chain.
 Therefore, the only way to execute these queries from a driver is to use auto-commit transactions.
 
 Please refer to the following for more details:
 
-* <<cypher-manual#query-using-periodic-commit-hint, Cypher Manual -> `PERIODIC COMMIT` query hint>>
 * <<cypher-manual#subquery-call-in-transactions, Cypher Manual -> `CALL {} IN TRANSACTIONS`>>
 ====
 
