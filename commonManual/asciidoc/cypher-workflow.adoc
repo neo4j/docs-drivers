@@ -77,8 +77,7 @@ This approach is recommended for most client applications.
 A convenient *_short-form alternative_* is the <<term-auto-commit, *_auto-commit_*>> transaction mechanism.
 This provides a limited form of transaction management for single-query transactions, as a trade-off for a slightly smaller code overhead.
 This form of transaction is useful for *_quick scripts and environments where high availability guarantees are not required_*.
-It is also the required form of transaction for running <<cypher-manual#query-using-periodic-commit-hint, `PERIODIC COMMIT`>> queries,
-which are the only type of Cypher Query to manage their own transactions.
+It is also the required form of transaction for running <<cypher-manual#subquery-call-in-transactions, Cypher Manual -> `CALL {} IN TRANSACTIONS`>> queries, which are the only type of Cypher Query to manage their own transactions.
 
 A lower-level *_unmanaged transaction API_* is also available for advanced use cases.
 This is useful when an alternative transaction management layer is applied by the client, in which error handling and retries need to be managed in a custom way.
