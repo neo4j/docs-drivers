@@ -33,7 +33,7 @@ The following languages and frameworks are officially supported by Neo4j:
 | https://github.com/dotnet/standard/blob/master/docs/versions/netstandard2.0.md[.NET Standard 2.0]
 
 | Go
-| All the Go versions officially supported (https://go.dev/doc/devel/release#policy)
+| All the Go versions officially supported, with 1.18 as a minimum (https://go.dev/doc/devel/release#policy)
 
 | Java
 | Java 8+ (latest patch releases).
