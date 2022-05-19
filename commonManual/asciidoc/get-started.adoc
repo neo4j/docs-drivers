@@ -33,7 +33,7 @@ The following languages and frameworks are officially supported by Neo4j:
 | https://github.com/dotnet/standard/blob/master/docs/versions/netstandard2.0.md[.NET Standard 2.0]
 
 | Go
-| Go 1.10
+| All the Go versions officially supported (https://go.dev/doc/devel/release#policy)
 
 | Java
 | Java 8+ (latest patch releases).
@@ -42,7 +42,7 @@ The following languages and frameworks are officially supported by Neo4j:
 | All LTS versions of Node.JS, specifically the 4.x and 6.x series runtimes (https://github.com/nodejs/LTS).
 
 | Python
-| Python 3.5 and above.
+| Python 3.6 and above.
 |===
 
 The driver API is intended to be topologically agnostic.

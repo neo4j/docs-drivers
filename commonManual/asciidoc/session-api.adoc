@@ -782,6 +782,8 @@ Therefore, the creation of a new session is necessary to reflect a changed home 
 +
 See <<operations-manual#manage-databases-default, Operations Manual -> The default database>> for more information on databases.
 +
+See below and <<cypher-manual#access-control-dbms-administration-impersonation, Cypher Manual -> The `DBMS IMPERSONATE` privileges>> for more information on impersonation.
++
 *Default:* the default database as configured on the server.
 
 # end::Database[]
