@@ -59,7 +59,7 @@ In the general case, only the <<driver-connection-uris, connection URI>> needs t
 The official drivers do not support HTTP communication.
 If you need an HTTP driver, choose one of the community drivers.
 
-See also the <<http-api#http-api, HTTP API documentation>>.
+See also the {http-api-base-uri}[HTTP API documentation].
 ====
 
 # end::about-note[]
