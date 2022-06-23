@@ -771,7 +771,18 @@ In other cases, this setting is inherited. Note that transaction functions will 
 `Database`::
 The database with which the session will interact.
 When you are working with a database which is not the default (i.e. the `system` database or another database in Neo4j 4.0 Enterprise Edition), you can explicitly configure the database which the driver is executing transactions against.
-+
+See an example:
+
+[source]
+----
+var session = driver.session({
+  database: 'foo',
+  defaultAccessMode: neo4j.session.WRITE
+})
+----
+
+For more examples, check link:https://neo4j.com/docs/api/javascript-driver/current/[JavaScript API Reference].
+
 [WARNING]
 ====
 The resolution of database aliases occurs at connection creation time, which is not under the control of the session.
