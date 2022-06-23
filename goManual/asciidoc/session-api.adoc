@@ -79,6 +79,7 @@ include::{common-content}/session-api.adoc[tag=Database]
 `Fetch Size`::
 The number of records to fetch in each batch from the server.
 Neo4j 4.0 introduces the ability to pull records in batches, allowing the client application to take control of data population and apply back pressure to the server.
+To see an example, check link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v4[Go API Reference].
 +
 *Default:* 1000 records
 
