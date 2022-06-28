@@ -197,6 +197,8 @@ include::{common-content}/session-api.adoc[tag=DefaultAccessMode]
 
 include::{common-content}/session-api.adoc[tag=Database]
 
+See more about <<java-database-selection>>.
+
 `Fetch Size`::
 The number of records to fetch in each batch from the server.
 Neo4j 4.0 introduces the ability to pull records in batches, allowing the client application to take control of data population and apply back pressure to the server.

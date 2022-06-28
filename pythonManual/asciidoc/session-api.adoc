@@ -98,19 +98,7 @@ include::{common-content}/session-api.adoc[tag=DefaultAccessMode]
 
 include::{common-content}/session-api.adoc[tag=Database]
 
-See examples of database configuration:
-
-[source, python]
-----
-include::{python-examples}/test_session_example.py[tags=session-config-database-import]
-----
-
-[source, python]
-----
-include::{python-examples}/test_session_example.py[tags=session-config-database]
-----
-
-For more examples, check link:https://neo4j.com/docs/api/python-driver/current/[Python API Reference].
+See more about <<python-database-selection>>.
 
 `Fetch Size`::
 The number of records to fetch in each batch from the server.
