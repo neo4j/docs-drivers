@@ -133,6 +133,15 @@ include::{common-content}/session-api.adoc[tag=DefaultAccessMode]
 
 include::{common-content}/session-api.adoc[tag=Database]
 
+See an example of database configuration:
+
+[source, javascript]
+----
+include::{javascript-examples}/examples.test.js[tags=session-config-database]
+----
+
+For more examples, check link:https://neo4j.com/docs/api/javascript-driver/current/[JavaScript API Reference].
+
 `Fetch Size`::
 The number of records to fetch in each batch from the server.
 Neo4j 4.0 introduces the ability to pull records in batches, allowing the client application to take control of data population and apply back pressure to the server.
