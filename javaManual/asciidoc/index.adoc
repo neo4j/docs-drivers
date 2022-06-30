@@ -43,6 +43,19 @@ _Who should read this?_
 
 This manual is written for Java developers building a Neo4j client application.
 
+[.discrete.ad]
+== link:https://graphacademy.neo4j.com/?ref=guides[Learn with GraphAcademy^]
+
+image::https://graphacademy.neo4j.com/courses/app-java/badge/[float=left]
+
+[.discrete]
+=== link:https://graphacademy.neo4j.com/courses/app-java/?ref=guides[Building Neo4j Applications with Java^]
+
+In this free course, follow a walk through the steps to integrate Neo4j into your Java projects.
+You will learn about the Neo4j Java Driver, how sessions and transactions work and how to query Neo4j from an existing application.
+
+link:https://graphacademy.neo4j.com/courses/app-java/?ref=guides[Learn more^,role=button]
+
 include::get-started.adoc[leveloffset=+1]
 
 include::client-applications.adoc[leveloffset=+1]
