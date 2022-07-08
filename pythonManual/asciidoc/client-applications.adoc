@@ -495,7 +495,7 @@ import sys
 from neo4j.debug import watch
 watch("neo4j", out=sys.stdout)
 ----
-For more control, you can configure the logger manaully:
+For more control, you can configure the logger manually:
 [source, python]
 ----
 import logging
