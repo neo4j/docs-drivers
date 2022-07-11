@@ -515,7 +515,7 @@ from neo4j.debug import watch
 watch("neo4j", out=sys.stdout)
 ----
 
-For more control, you can configure the logger manaully:
+For more control, you can configure the logger manually:
 
 [source, python]
 ----
@@ -526,7 +526,7 @@ import sys
 handler = logging.StreamHandler(sys.stdout)
 # configure the handler to your liking
 handler.setFormatter(logging.Formatter(
-    "%(threadName)s(%(thread)d) %(asctime)s  %(message)s"
+    "[%(levelname)-8s] %(threadName)s(%(thread)d) %(asctime)s  %(message)s"
 ))
 # add the handler to the driver's logger
 logging.getLogger("neo4j").addHandler(handler)
