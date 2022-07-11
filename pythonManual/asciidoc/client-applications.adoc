@@ -491,8 +491,24 @@ include::{common-content}/client-applications.adoc[tag=logging]
 
 [source, python]
 ----
-from logging import getLogger, StreamHandler, DEBUG
-handler = StreamHandler()
-handler.setLevel(DEBUG)
-getLogger("neo4j").addHandler(handler)
+import sys
+from neo4j.debug import watch
+watch("neo4j", out=sys.stdout)
+----
+For more control, you can configure the logger manually:
+[source, python]
+----
+import logging
+import sys
+# create a handler, e.g., to log to stdout
+handler = logging.StreamHandler(sys.stdout)
+# configure the handler to your liking
+handler.setFormatter(logging.Formatter(
+    "[%(levelname)-8s] %(threadName)s(%(thread)d) %(asctime)s  %(message)s"
+))
+# add the handler to the driver's logger
+logging.getLogger("neo4j").addHandler(handler)
+# make sure the logger logs on the desired log level
+logging.getLogger("neo4j").setLevel(logging.DEBUG)
+# from now on, DEBUG logging to stderr is enabled in the driver
 ----
