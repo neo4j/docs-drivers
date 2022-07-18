@@ -743,7 +743,7 @@ This prematurely commits or rolls back the transaction and stops the query engin
 # tag::Bookmarks[]
 
 [.compact]
-`Bookmarks`::
+Bookmarks::
 The mechanism which ensures causal consistency between transactions within a session.
 Bookmarks are implicitly passed between transactions within a single session to meet the causal consistency requirements.
 There may be scenarios where you might want to use the bookmark from one session in a different new session.
@@ -754,7 +754,7 @@ There may be scenarios where you might want to use the bookmark from one session
 
 # tag::DefaultAccessMode[]
 
-`DefaultAccessMode`::
+Default Access Mode::
 A fallback for the access mode setting when transaction functions are not used.
 Typically, access mode is set per transaction by calling the appropriate transaction function method.
 In other cases, this setting is inherited. Note that transaction functions will ignore/override this setting.
@@ -765,7 +765,7 @@ In other cases, this setting is inherited. Note that transaction functions will 
 
 # tag::Database[]
 
-`Database`::
+Database::
 The database with which the session will interact.
 When you are working with a database which is not the default (i.e. the `system` database or another database in Neo4j 4.0 Enterprise Edition), you can explicitly configure the database which the driver is executing transactions against.
 +
@@ -794,7 +794,7 @@ This `FetchSize` applies to <<driver-simple-sessions, simple sessions>> and <<dr
 
 # tag::ImpersonatedUser[]
 
-`ImpersonatedUser`::
+Impersonated User::
 Users can run transactions against the database as different users if they have been granted explicit permission for doing so.
 When impersonating a user, the query is run within the complete security context of the impersonated user and not the authenticated user (i.e., home database, permissions, etc.).
 +
