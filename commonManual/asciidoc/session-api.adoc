@@ -729,7 +729,7 @@ This prematurely commits or rolls back the transaction and stops the query engin
 # tag::Bookmarks[]
 
 [.compact]
-Bookmarks::
+`Bookmarks`::
 The mechanism which ensures causal consistency between transactions within a session.
 Bookmarks are implicitly passed between transactions within a single session to meet the causal consistency requirements.
 There may be scenarios where you might want to use the bookmark from one session in a different new session.
@@ -766,19 +766,6 @@ Neo4j 4.0 introduces the ability to pull records in batches, allowing the client
 This `FetchSize` applies to <<driver-simple-sessions, simple sessions>> and <<driver-async-sessions, async-sessions>> whereas reactive sessions can be controlled directly using the request method of the subscription.
 +
 *Default:* 1000 records
-
-# tag::ImpersonatedUser[]
-
-Impersonated User::
-Users can run transactions against the database as different users if they have been granted explicit permission for doing so.
-When impersonating a user, the query is run within the complete security context of the impersonated user and not the authenticated user (i.e., home database, permissions, etc.).
-+
-See <<operations-manual#manage-databases-home, Operations Manual -> Per-user home databases>> for more information on default database per-user.
-+
-*Default:* None (Sessions will be created with the logged user)
-
-# end::ImpersonatedUser[]
-
 
 # tag::TransactionConfiguration[]
 
