@@ -729,7 +729,7 @@ This prematurely commits or rolls back the transaction and stops the query engin
 # tag::Bookmarks[]
 
 [.compact]
-Bookmarks::
+`Bookmarks`::
 The mechanism which ensures causal consistency between transactions within a session.
 Bookmarks are implicitly passed between transactions within a single session to meet the causal consistency requirements.
 There may be scenarios where you might want to use the bookmark from one session in a different new session.
@@ -751,7 +751,7 @@ In other cases, this setting is inherited. Note that transaction functions will 
 
 # tag::Database[]
 
-`Database`::
+Database::
 The database with which the session will interact.
 When you are working with a database which is not the default (i.e. the `system` database or another database in Neo4j 4.0 Enterprise Edition), you can explicitly configure the database which the driver is executing transactions against.
 See <<operations-manual#manage-databases-default, Operations Manual -> The default database>> for more information on databases.
