@@ -729,7 +729,7 @@ This prematurely commits or rolls back the transaction and stops the query engin
 # tag::Bookmarks[]
 
 [.compact]
-`Bookmarks`::
+Bookmarks::
 The mechanism which ensures causal consistency between transactions within a session.
 Bookmarks are implicitly passed between transactions within a single session to meet the causal consistency requirements.
 There may be scenarios where you might want to use the bookmark from one session in a different new session.
@@ -740,7 +740,7 @@ There may be scenarios where you might want to use the bookmark from one session
 
 # tag::DefaultAccessMode[]
 
-`DefaultAccessMode`::
+Default Access Mode::
 A fallback for the access mode setting when transaction functions are not used.
 Typically, access mode is set per transaction by calling the appropriate transaction function method.
 In other cases, this setting is inherited. Note that transaction functions will ignore/override this setting.
