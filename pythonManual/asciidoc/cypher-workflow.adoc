@@ -274,9 +274,3 @@ include::{python-examples}/test_geospatial_types_example.py[tags=geospatial-type
 == Exceptions and error handling
 
 include::{common-content}/cypher-workflow.adoc[tag=exceptions-errors]
-
-
-[[python-driver-exceptions-errors]]
-== Exceptions and error handling
-
-include::{common-content}/cypher-workflow.adoc[tag=exceptions-errors]
