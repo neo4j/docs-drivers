@@ -142,7 +142,7 @@ include::{python-examples}/test_transaction_function_example.py[tags=transaction
 
 # tag::simple-autocommit-transactions[]
 
-An auto-commit transaction is a basic but limited form of transaction.
+An auto-commit transaction (also called implicit transaction) is a basic but limited form of transaction.
 Such a transaction consists of only one Cypher query and is not automatically retried on failure.
 Therefore, any error scenarios will need to be handled by the client application itself.
 
@@ -396,7 +396,7 @@ include::{javascript-examples}/examples.test.js[tags=async-transaction-function]
 
 # tag::async-autocommit-transactions[]
 
-An auto-commit transaction is a basic but limited form of transaction.
+An auto-commit transaction (also called implicit transaction) is a basic but limited form of transaction.
 Such a transaction consists of only one Cypher query and is not automatically retried on failure.
 Therefore, any error scenarios will need to be handled by the client application itself.
 
@@ -619,7 +619,7 @@ See <<driver-session-configuration>> for more details.
 
 # tag::rx-autocommit-transactions[]
 
-An auto-commit transaction is a basic but limited form of transaction.
+An auto-commit transaction (also called implicit transaction) is a basic but limited form of transaction.
 Such a transaction consists of only one Cypher query and is not automatically retried on failure.
 Therefore, any error scenarios will need to be handled by the client application itself.
 
