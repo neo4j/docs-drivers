@@ -1,0 +1,83 @@
+[[python-driver-simple-sessions]]
+= Simple sessions
+
+include::{common-partial}/session-api.adoc[tag=simple-sessions]
+
+
+[[python-driver-simple-lifecycle]]
+== Lifecycle
+
+include::{common-partial}/session-api.adoc[tag=simple-lifecycle]
+
+[source, python, indent=0]
+----
+with driver.session(...) as session:
+    // transactions go here
+----
+
+*_Sessions can be configured in a number of different ways_*.
+This is carried out by supplying configuration inside the session constructor.
+See xref::/session-api.adoc#python-driver-session-configuration[Session configuration] for more details.
+
+
+[[python-driver-simple-transaction-fn]]
+== Transaction functions
+
+include::{common-partial}/session-api.adoc[tag=simple-transaction-fn]
+
+.Transaction function
+======
+[source, python, indent=0]
+----
+include::{python-examples}/test_transaction_function_example.py[tags=transaction-function-import]
+----
+
+[source, python, indent=0]
+----
+include::{python-examples}/test_transaction_function_example.py[tags=transaction-function]
+----
+======
+
+
+[[python-driver-simple-autocommit-transactions]]
+== Auto-commit transactions
+
+include::{common-partial}/session-api.adoc[tag=simple-autocommit-transactions]
+
+.Simple auto-commit transactions
+======
+[source, python, indent=0]
+----
+include::{python-examples}/test_autocommit_transaction_example.py[tags=autocommit-transaction-import]
+----
+
+[source, python, indent=0]
+----
+include::{python-examples}/test_autocommit_transaction_example.py[tags=autocommit-transaction]
+----
+======
+
+
+[[python-driver-simple-result-consume]]
+== Consuming results
+
+include::{common-partial}/session-api.adoc[tag=simple-result-consume]
+
+.Consuming results
+======
+[source, python, indent=0]
+----
+include::{python-examples}/test_result_consume_example.py[tags=result-consume]
+----
+======
+
+
+[[python-driver-simple-result-retain]]
+== Retaining results
+
+include::{common-partial}/session-api.adoc[tag=simple-result-retain]
+
+[source, python, indent=0]
+----
+include::{python-examples}/test_result_retain_example.py[tags=result-retain]
+----
