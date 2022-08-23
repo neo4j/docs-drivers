@@ -1,0 +1,1230 @@
+[[driver-client-applications]]
+= Client applications
+:description: This section describes how to manage database connections within an application. 
+
+This section contains the following:
+
+* xref:client-applications.adoc#driver-driver-object[The driver object]
+* xref:client-applications.adoc#driver-connection-uris-encryption-trust[Connection URIs, encryption and trust]
+** xref:client-applications.adoc#driver-connection-uris[Connection URIs]
+** xref:client-applications.adoc#driver-configuration-encryption[Encryption]
+** xref:client-applications.adoc#driver-configuration-trust[Trust]
+** xref:client-applications.adoc#driver-configuration-examples[Examples]
+* xref:client-applications.adoc#driver-authentication[Authentication]
+** xref:client-applications.adoc#driver-authentication-basic[Basic authentication]
+** xref:client-applications.adoc#driver-authentication-kerberos[Kerberos authentication]
+** xref:client-applications.adoc#driver-authentication-custom[Custom authentication]
+* xref:client-applications.adoc#driver-configuration[Configuration]
+** xref:client-applications.adoc#driver-config-connection-pool-management[Connection pool management]
+** xref:client-applications.adoc#driver-configuration-connection-timeout[Connection timeout]
+** xref:client-applications.adoc#driver-configuration-max-retry-time[Max retry time]
+* xref:client-applications.adoc#driver-service-unavailable[Service unavailable]
+
+
+[[driver-driver-object]]
+== The driver object
+
+A Neo4j client application will require a driver instance in order to provide access to the database.
+This driver should be made available to all parts of the application that need to interact with Neo4j.
+In languages where xref:terminology.adoc#term-thread-safety[thread safety] is an issue, the driver can be considered thread-safe.
+
+[TIP]
+.A note on lifecycle
+--
+Applications will typically construct a driver instance on startup and destroy it on exit.
+Destroying a driver instance will immediately shut down any connections previously opened via that driver; for drivers that contain a connection pool, the entire pool will be shut down.
+--
+
+To construct a driver instance, a xref:client-applications.adoc#driver-connection-uris[connection URI] and xref:client-applications.adoc#driver-authentication[authentication information] must be supplied.
+Additional configuration details can be supplied if required.
+All of these details are immutable for the lifetime of the driver.
+Therefore, if multiple configurations are required (such as when working with multiple database users) then multiple driver instances must be used.
+
+An example of driver construction and destruction can be seen below:
+
+[.tabbed-example]
+.The driver lifecycle
+====
+[.include-with-dotnet]
+======
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=driver-lifecycle]
+----
+======
+
+[.include-with-go]
+======
+[source, go]
+----
+include::{go-examples}/examples_test.go[tags=driver-lifecycle]
+----
+======
+
+[.include-with-java]
+======
+[source, java]
+----
+include::{java-examples}/DriverLifecycleExample.java[tags=driver-lifecycle]
+----
+======
+
+[.include-with-javascript]
+======
+[source, javascript]
+----
+include::{javascript-examples}/examples.test.js[tags=driver-lifecycle]
+----
+======
+
+[.include-with-python]
+======
+[source, python]
+----
+include::{python-examples}/driver_lifecycle_example.py[tags=driver-lifecycle]
+----
+======
+====
+
+
+[[driver-connection-uris-encryption-trust]]
+== Connection URIs, encryption and trust
+
+A connection URI identifies a graph database and how to connect to it.
+The encryption and trust settings provide detail to how that connection should be secured.
+
+
+[[driver-connection-uris]]
+=== Connection URIs
+
+The official Neo4j drivers currently support the following URI schemes and driver object types:
+
+.Available URI schemes
+[options="header"]
+|===
+| URI Scheme     | Driver object type
+| bolt           | Direct driver
+| bolt+routing   | Routing driver
+|===
+
+==== Direct drivers (bolt)
+
+A direct driver is created via a `bolt` URI, for example: `bolt://localhost:7687`.
+This kind of driver is used to maintain connections to a single database server and is typically used when working with a single Neo4j instance or when targeting a specific member of a cluster.
+Note that a routing driver is generally preferable when working with a Causal Cluster.
+
+
+[[routing_drivers_bolt_routing]]
+==== Routing drivers (bolt+routing)
+
+A routing driver is created via a `bolt+routing` URI, for example: `bolt+routing://graph.example.com:7687`.
+The address in the URI must be that of a Core Server.
+This kind of driver uses the xref:terminology.adoc#term-bolt-routing-protocol[Bolt Routing Protocol] and works in tandem with the cluster to route transactions to available cluster members.
+
+==== Routing drivers with routing context
+
+Routing drivers with routing context are an available option when using drivers of version 1.3 or above together with a Neo4j Causal Cluster of version 3.2 or above.
+In such a setup, a routing driver can include a preferred routing context via the query part of the `bolt+routing` URI.
+
+In the standard Neo4j configuration, routing contexts are defined on the server side by means of _server policies_.
+Thus the driver communicates the routing context to the cluster in the form of a server policy.
+It then obtains refined routing information back from the cluster, based on the server policy.
+
+The address in the URI of a routing driver with routing context must be that of a Core Server.
+
+.Configure a routing driver with routing context
+====
+This example will assume that Neo4j has been configured for server policies as described in link:docs/operations-manual/3.5/clustering-advanced/multi-data-center/load-balancing/index.adoc[Neo4j Operations Manual -> Load balancing for multi-data center systems].
+In particular, a server policy called `europe` has been defined.
+Additionally, we have a server `neo01.graph.example.com` to which we wish to direct the driver.
+
+This URI will use the server policy `europe`:
+
+`bolt+routing://neo01.graph.example.com?policy=europe`
+====
+
+[NOTE]
+.Server-side configuration to enable Routing drivers with routing context
+====
+A prerequisite for using a Routing driver with routing context is that the Neo4j database is operated on a link:docs/operations-manual/3.5/clustering/index.adoc[Causal Cluster] with the link:docs/operations-manual/3.5/clustering-advanced/multi-data-center/index.adoc[Multi-data center licensing option] enabled.
+Additionally, the routing contexts must be defined within the cluster as routing _policies_.
+For details on how to configure multi-data center routing policies for a Causal Cluster, please refer to link:docs/operations-manual/3.5/clustering-advanced/multi-data-center/load-balancing/index.adoc[Operations Manual -> Causal Clustering].
+====
+
+
+==== Cluster bootstrap address resolution
+
+Drivers have the ability to intercept cluster bootstrap address resolution.
+This is generally performed by a routing driver on construction or after complete contact has been lost with a cluster.
+This hook can be useful to augment regular DNS resolution and can be used to initialize a routing driver with multiple server addresses.
+
+The intercept hook is provided as a driver configuration option and takes the form of a callback function that accepts a single input address and yields or returns multiple output addresses.
+This function may hard code the output addresses or may draw them from another configuration source, as required.
+Output addresses can contain host names or IP addresses and are forwarded to the connection pool as initial routers.
+
+image::resolution.svg[title="Cluster bootstrap address resolution", role="middle"]
+
+The example below shows how to expand a single address into multiple (hard coded) output addresses:
+
+[.tabbed-example]
+.Custom Address Resolver
+====
+[.include-with-dotnet]
+======
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=config-custom-resolver]
+----
+======
+
+[.include-with-go]
+======
+[source, go]
+----
+include::{go-examples}/examples_test.go[tags=config-custom-resolver]
+----
+======
+
+[.include-with-java]
+======
+[source, java]
+----
+include::{java-examples}/ConfigCustomResolverExample.java[tags=config-custom-resolver]
+----
+======
+
+[.include-with-javascript]
+======
+[source, javascript]
+----
+include::{javascript-examples}/examples.test.js[tags=config-custom-resolver]
+----
+======
+
+[.include-with-python]
+======
+[source, python]
+----
+include::{python-examples}/custom_resolver_example.py[tags=custom-resolver]
+----
+======
+====
+
+
+[[driver-configuration-encryption]]
+=== Encryption
+
+TLS encryption is enabled for all connections by default.
+This can be disabled through configuration as follows:
+
+[.tabbed-example]
+.Unencrypted
+====
+[.include-with-dotnet]
+======
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=config-unencrypted]
+----
+======
+
+[.include-with-go]
+======
+[source, go]
+----
+include::{go-examples}/examples_test.go[tags=config-unencrypted]
+----
+======
+
+[.include-with-java]
+======
+[source, java]
+----
+include::{java-examples}/ConfigUnencryptedExample.java[tags=config-unencrypted]
+----
+======
+
+[.include-with-javascript]
+======
+[source, javascript]
+----
+include::{javascript-examples}/examples.test.js[tags=config-unencrypted]
+----
+======
+
+[.include-with-python]
+======
+[source, python]
+----
+include::{python-examples}/config_unencrypted_example.py[tags=config-unencrypted]
+----
+======
+====
+
+The server can be modified to require encryption for all connections.
+Please see the link:docs/operations-manual/3.5/configuration/connectors/index.adoc[Operations Manual -> Configure Neo4j connectors] for more information.
+
+An attempt to connect to a server using an encryption setting not allowed by that server will result in a xref:client-applications.adoc#driver-service-unavailable[_Service unavailable_] status.
+
+
+[[driver-configuration-trust]]
+=== Trust
+
+During a TLS handshake, the server provides a certificate to the client application.
+The application can choose to accept or reject this certificate based on one of the following trust strategies:
+
+.Trust strategies
+[options="header"]
+|===
+| Trust strategy                        | Description
+| `TRUST_ALL_CERTIFICATES` (default)    | Accept any certificate provided by the server, regardless of CA chain.
+| `TRUST_CUSTOM_CA_SIGNED_CERTIFICATES` | Accept any certificate that can be verified against a custom CA.
+| `TRUST_SYSTEM_CA_SIGNED_CERTIFICATES` | Accept any certificate that can be verified against the system store.
+|===
+
+https://en.wikipedia.org/wiki/Server_Name_Indication[Server Name Indication (SNI)] is enabled by default, allowing proxy middleware to route encrypted Bolt connections to the correct backend server.
+
+[.tabbed-example]
+.Trust
+====
+[.include-with-dotnet]
+======
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=config-trust]
+----
+======
+
+[.include-with-go]
+======
+[source, go]
+----
+include::{go-examples}/examples_test.go[tags=config-trust]
+----
+======
+
+[.include-with-java]
+======
+[source, java]
+----
+include::{java-examples}/ConfigTrustExample.java[tags=config-trust]
+----
+======
+
+[.include-with-javascript]
+======
+[source, javascript]
+----
+include::{javascript-examples}/examples.test.js[tags=config-trust]
+----
+======
+
+[.include-with-python]
+======
+[source, python]
+----
+include::{python-examples}/config_trust_example.py[tags=config-trust]
+----
+======
+====
+
+
+[[driver-configuration-examples]]
+=== Examples
+
+The table below provides example code snippets for different deployment configurations.
+Each snippet expects an `auth` variable to have been previously defined, containing the authentication details for that connection.
+
+[.tabbed-example]
+.Connecting to a service
+====
+[.include-with-dotnet]
+======
+The table below illustrates examples of how to connect to a service with routing:
+
+[options="header", cols="a,a,a,a"]
+|===
+|Product
+|Security
+|Code snippet
+|Comments
+
+|Neo4j Aura
+|Secured with full certificate
+|
+[source, csharp]
+----
+String uri = "bolt+routing://graph.example.com:7687";
+IDriver driver = GraphDatabase.Driver(uri, auth,
+           new Config {TrustStrategy = TrustStrategy.TrustSystemCaSignedCertificates});
+----
+| This is the default (and only option) for Neo4j Aura
+
+|Neo4j 4.x
+|Unsecured
+|
+[source, csharp]
+----
+String uri = "bolt+routing://graph.example.com:7687";
+IDriver driver = GraphDatabase.Driver(uri, auth,
+                     new Config {EncryptionLevel = EncryptionLevel.None});
+----
+|This is the default for Neo4j 4.x series
+
+|Neo4j 4.x
+|Secured with full certificate
+|
+[source, csharp]
+----
+String uri = "bolt+routing://graph.example.com:7687";
+IDriver driver = GraphDatabase.Driver(uri, auth,
+           new Config {TrustStrategy = TrustStrategy.TrustSystemCaSignedCertificates});
+----
+|
+
+|Neo4j 4.x
+|Secured with self-signed certificate
+|
+[source, csharp]
+----
+GraphDatabase.Driver("bolt+routing://graph.example.com:7687", auth)
+----
+|
+
+|Neo4j 3.x
+|Secured with full certificate
+|
+[source, csharp]
+----
+String uri = "bolt+routing://graph.example.com:7687";
+IDriver driver = GraphDatabase.Driver(uri, auth,
+           new Config {TrustStrategy = TrustStrategy.TrustSystemCaSignedCertificates});
+----
+|
+
+|Neo4j 3.x
+|Secured with self-signed certificate
+|
+[source, csharp]
+----
+GraphDatabase.Driver("bolt+routing://graph.example.com:7687", auth)
+----
+|This is the default for Neo4j 3.x series
+
+|Neo4j 3.x
+|Unsecured
+|
+[source, csharp]
+----
+String uri = "bolt+routing://graph.example.com:7687";
+IDriver driver = GraphDatabase.Driver(uri, auth,
+                     new Config {EncryptionLevel = EncryptionLevel.None});
+----
+|
+|===
+
+[NOTE]
+To connect to a service without routing, you can replace `bolt+routing` with `bolt`.
+
+======
+
+[.include-with-go]
+======
+The table below illustrates examples of how to connect to a service with routing.
+
+[options="header", cols="a,a,a,a"]
+|===
+|Product
+|Security
+|Code snippet
+|Comments
+
+|Neo4j Aura
+|Secured with full certificate
+|
+[source, go]
+----
+uri := "bolt+routing://graph.example.com:7687"
+
+driver, err := neo4j.NewDriver(uri, auth, func(config *neo4j.Config) {
+        config.TrustStrategy = neo4j.TrustSystem(true)
+})
+----
+| This is the default (and only option) for Neo4j Aura
+
+|Neo4j 4.x
+|Unsecured
+|
+[source, go]
+----
+uri := "bolt+routing://graph.example.com:7687"
+
+driver, err := neo4j.NewDriver(uri, auth, func(config *neo4j.Config) {
+        config.Encrypted = false
+})
+----
+|This is the default for Neo4j 4.x series
+
+|Neo4j 4.x
+|Secured with full certificate
+|
+[source, go]
+----
+uri := "bolt+routing://graph.example.com:7687"
+
+driver, err := neo4j.NewDriver(uri, auth, func(config *neo4j.Config) {
+        config.TrustStrategy = neo4j.TrustSystem(true)
+})
+----
+|
+
+|Neo4j 4.x
+|Secured with self-signed certificate
+|
+[source, go]
+----
+driver, err := neo4j.NewDriver("bolt+routing://graph.example.com:7687", auth)
+----
+|
+
+|Neo4j 3.x
+|Secured with full certificate
+|
+[source, go]
+----
+uri := "bolt+routing://graph.example.com:7687"
+
+driver, err := neo4j.NewDriver(uri, auth, func(config *neo4j.Config) {
+        config.TrustStrategy = neo4j.TrustSystem(true)
+})
+----
+|
+
+|Neo4j 3.x
+|Secured with self-signed certificate
+|
+[source, go]
+----
+driver, err := neo4j.NewDriver("bolt+routing://graph.example.com:7687", auth)
+----
+|This is the default for Neo4j 3.x series
+
+|Neo4j 3.x
+|Unsecured
+|
+[source, go]
+----
+uri := "bolt+routing://graph.example.com:7687"
+
+driver, err := neo4j.NewDriver(uri, auth, func(config *neo4j.Config) {
+        config.Encrypted = false
+})
+----
+|
+
+|===
+
+[NOTE]
+To connect to a service without routing, you can replace `bolt+routing` with `bolt`.
+
+======
+
+[.include-with-java]
+======
+The table below illustrates examples of how to connect to a service with routing.
+
+[options="header", cols="a,a,a,a"]
+|===
+|Product
+|Security
+|Code snippet
+|Comments
+
+|Neo4j Aura
+|Secured with full certificate
+|
+[source, java]
+----
+String uri = "bolt+routing://graph.example.com:7687";
+Config config = Config.build()
+                      .withTrustStrategy( trustSystemCertificates() )
+                      .build();
+----
+| This is the default (and only option) for Neo4j Aura
+
+|Neo4j 4.x
+|Unsecured
+|
+[source, java]
+----
+String uri = "bolt+routing://graph.example.com:7687";
+Config config = Config.build()
+                      .withoutEncryption()
+                      .build();
+
+GraphDatabase.driver( uri, auth, config );
+----
+|This is the default for Neo4j 4.x series
+
+|Neo4j 4.x
+|Secured with full certificate
+|
+[source, java]
+----
+String uri = "bolt+routing://graph.example.com:7687";
+Config config = Config.build()
+                      .withTrustStrategy( trustSystemCertificates() )
+                      .build();
+----
+|
+
+|Neo4j 4.x
+|Secured with self-signed certificate
+|
+[source, java]
+----
+GraphDatabase.driver("bolt+routing://graph.example.com:7687", auth)
+----
+|
+
+|Neo4j 3.x
+|Secured with full certificate
+|
+[source, java]
+----
+String uri = "bolt+routing://graph.example.com:7687";
+Config config = Config.build()
+                      .withTrustStrategy( trustSystemCertificates() )
+                      .build();
+----
+|
+
+|Neo4j 3.x
+|Secured with self-signed certificate
+|
+[source, java]
+----
+GraphDatabase.driver("bolt+routing://graph.example.com:7687", auth)
+----
+|This is the default for Neo4j 3.x series
+
+|Neo4j 3.x
+|Unsecured
+|
+[source, java]
+----
+String uri = "bolt+routing://graph.example.com:7687";
+Config config = Config.build()
+                      .withoutEncryption()
+                      .build();
+
+GraphDatabase.driver( uri, auth, config );
+----
+|
+
+|===
+
+[NOTE]
+To connect to a service without routing, you can replace `bolt+routing` with `bolt`.
+
+======
+
+[.include-with-javascript]
+======
+The table below illustrates examples of how to connect to a service with routing.
+
+[options="header", cols="a,a,a,a"]
+|===
+|Product
+|Security
+|Code snippet
+|Comments
+
+|Neo4j Aura
+|Secured with full certificate
+|
+[source, javascript]
+----
+const uri = 'bolt+routing://graph.example.com:7687'
+const driver = neo4j.driver(uri,auth, {
+    trust: 'TRUST_SYSTEM_CA_SIGNED_CERTIFICATES'
+})
+----
+| This is the default (and only option) for Neo4j Aura
+
+|Neo4j 4.x
+|Unsecured
+|
+[source, javascript]
+----
+const uri = 'bolt+routing://graph.example.com:7687'
+const driver = neo4j.driver(uri, auth, {
+  encrypted: 'ENCRYPTION_OFF'
+})
+----
+|This is the default for Neo4j 4.x series
+
+|Neo4j 4.x
+|Secured with full certificate
+|
+[source, javascript]
+----
+const uri = 'bolt+routing://graph.example.com:7687'
+const driver = neo4j.driver(uri,auth, {
+    trust: 'TRUST_SYSTEM_CA_SIGNED_CERTIFICATES'
+})
+----
+|
+
+|Neo4j 4.x
+|Secured with self-signed certificate
+|
+[source, javascript]
+----
+neo4j.driver("bolt+routing://graph.example.com:7687", auth)
+----
+|
+
+|Neo4j 3.x
+|Secured with full certificate
+|
+[source, javascript]
+----
+const uri = 'bolt+routing://graph.example.com:7687'
+const driver = neo4j.driver(uri,auth, {
+    trust: 'TRUST_SYSTEM_CA_SIGNED_CERTIFICATES'
+})
+----
+|
+
+|Neo4j 3.x
+|Secured with self-signed certificate
+|
+[source, javascript]
+----
+neo4j.driver("bolt+routing://graph.example.com:7687", auth)
+----
+|This is the default for Neo4j 3.x series
+
+|Neo4j 3.x
+|Unsecured
+|
+[source, javascript]
+----
+const uri = 'bolt+routing://graph.example.com:7687'
+const driver = neo4j.driver(uri, auth, {
+  encrypted: 'ENCRYPTION_OFF'
+})
+----
+|
+
+|===
+
+[NOTE]
+To connect to a service without routing, you can replace `bolt+routing` with `bolt`.
+
+======
+
+[.include-with-python]
+======
+The table below illustrates examples of how to connect to a service with routing.
+
+[options="header", cols="a,a,a,a"]
+|===
+|Product
+|Security
+|Code snippet
+|Comments
+
+|Neo4j Aura
+|Secured with full certificate
+|
+[source, python]
+----
+uri = "bolt+routing://graph.example.com:7687"
+GraphDatabase.driver(uri, auth, trust=TRUST_SYSTEM_CA_SIGNED_CERTIFICATES)
+----
+| This is the default (and only option) for Neo4j Aura
+
+|Neo4j 4.x
+|Unsecured
+|
+[source, python]
+----
+uri = "bolt+routing://graph.example.com:7687"
+GraphDatabase.driver(uri, auth, encrypted=False)
+----
+|This is the default for Neo4j 4.x series
+
+|Neo4j 4.x
+|Secured with full certificate
+|
+[source, python]
+----
+uri = "bolt+routing://graph.example.com:7687"
+GraphDatabase.driver(uri, auth, trust=TRUST_SYSTEM_CA_SIGNED_CERTIFICATES)
+----
+|
+
+|Neo4j 4.x
+|Secured with self-signed certificate
+|
+[source, python]
+----
+GraphDatabase.driver("bolt+routing://graph.example.com:7687", auth)
+----
+|
+
+|Neo4j 3.x
+|Secured with full certificate
+|
+[source, python]
+----
+uri = "bolt+routing://graph.example.com:7687"
+GraphDatabase.driver(uri, auth, trust=TRUST_SYSTEM_CA_SIGNED_CERTIFICATES)
+----
+|
+
+|Neo4j 3.x
+|Secured with self-signed certificate
+|
+[source, python]
+----
+GraphDatabase.driver("bolt+routing://graph.example.com:7687", auth)
+----
+|This is the default for Neo4j 3.x series
+
+|Neo4j 3.x
+|Unsecured
+|
+[source, python]
+----
+uri = "bolt+routing://graph.example.com:7687"
+GraphDatabase.driver(uri, auth, encrypted=False)
+----
+|
+|===
+
+[NOTE]
+To connect to a service without routing, you can replace `bolt+routing` with `bolt`.
+
+======
+
+====
+
+
+[[driver-authentication]]
+== Authentication
+
+Authentication details are provided as an auth token which contains the user names, passwords or other credentials required to access the database.
+Neo4j supports multiple authentication standards but uses basic authentication by default.
+
+
+[[driver-authentication-basic]]
+=== Basic authentication
+
+The basic authentication scheme is backed by a password file stored within the server and requires applications to provide a user name and password.
+For this, use the basic auth helper:
+
+[.tabbed-example]
+.Basic authentication
+====
+[.include-with-dotnet]
+======
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=basic-auth]
+----
+======
+
+[.include-with-go]
+======
+[source, go]
+----
+include::{go-examples}/examples_test.go[tags=basic-auth]
+----
+======
+
+[.include-with-java]
+======
+[source, java]
+----
+include::{java-examples}/BasicAuthExample.java[tags=basic-auth]
+----
+======
+
+[.include-with-javascript]
+======
+[source, javascript]
+----
+include::{javascript-examples}/examples.test.js[tags=basic-auth]
+----
+======
+
+[.include-with-python]
+======
+[source, python]
+----
+include::{python-examples}/auth_example.py[tags=basic-auth]
+----
+======
+====
+
+[NOTE]
+--
+The basic authentication scheme can also be used to authenticate against an LDAP server.
+--
+
+
+[[driver-authentication-kerberos]]
+=== Kerberos authentication
+
+The Kerberos authentication scheme provides a simple way to create a Kerberos authentication token with a base64 encoded server authentication ticket.
+The best way to create a Kerberos authentication token is shown below:
+
+[.tabbed-example]
+.Kerberos authentication
+====
+[.include-with-dotnet]
+======
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=kerberos-auth]
+----
+======
+
+[.include-with-go]
+======
+[source, go]
+----
+include::{go-examples}/examples_test.go[tags=kerberos-auth]
+----
+======
+
+[.include-with-java]
+======
+[source, java]
+----
+include::{java-examples}/KerberosAuthExample.java[tags=kerberos-auth]
+----
+======
+
+[.include-with-javascript]
+======
+[source, javascript]
+----
+include::{javascript-examples}/examples.test.js[tags=kerberos-auth]
+----
+======
+
+[.include-with-python]
+======
+[source, python]
+----
+include::{python-examples}/kerberos_auth_example.py[tags=kerberos-auth]
+----
+======
+====
+
+[NOTE]
+--
+The Kerberos authentication token can only be understood by the server if the server has the link:{kerberos-add-on-base-uri}[Kerberos Add-on] installed.
+--
+
+
+[[driver-authentication-custom]]
+=== Custom authentication
+
+For advanced deployments, where a custom security provider has been built, the custom authentication helper can be used.
+
+[.tabbed-example]
+.Custom authentication
+====
+[.include-with-dotnet]
+======
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=custom-auth]
+----
+======
+
+[.include-with-go]
+======
+[source, go]
+----
+include::{go-examples}/examples_test.go[tags=custom-auth]
+----
+======
+
+[.include-with-java]
+======
+[source, java]
+----
+include::{java-examples}/CustomAuthExample.java[tags=custom-auth]
+----
+======
+
+[.include-with-javascript]
+======
+[source, javascript]
+----
+include::{javascript-examples}/examples.test.js[tags=custom-auth]
+----
+======
+
+[.include-with-python]
+======
+[source, python]
+----
+include::{python-examples}/custom_auth_example.py[tags=custom-auth]
+----
+======
+====
+
+
+[[driver-configuration]]
+== Configuration
+
+
+[[driver-config-connection-pool-management]]
+=== Connection pool management
+
+The driver maintains a pool of connections.
+The pooled connections are reused by sessions and transactions to avoid the overhead added by establishing new connections for every query.
+The connection pool always starts up empty.
+New connections are created on demand by sessions and transactions.
+When a session or a transaction is done with its execution, the connection will be returned to the pool to be reused.
+
+Application users can tune connection pool settings to configure the driver for different use cases based on client performance requirements and database resource consumption limits.
+
+Detailed descriptions of connection pool settings available via driver configuration are listed below:
+
+`MaxConnectionLifetime`::
+Pooled connections older than this threshold will be closed and removed from the pool.
+The actual removal happens during connection acquisition so that the new session returned is never backed by an old connection.
+Setting this option to a low value will cause a high connection churn, and can result in a performance drop.
+It is recommended to pick a value smaller than the maximum lifetime exposed by the surrounding system infrastructure (such as operating system, router, load balancer, proxy and firewall).
+Negative values result in lifetime not being checked.
++
+Default value: 1h.
+
+`MaxConnectionPoolSize`::
+This setting defines the maximum total number of connections allowed, per host, to be managed by the connection pool.
+In other words, for a direct driver, this sets the maximum number of connections towards a single database server.
+For a routing driver this sets the maximum amount of connections per cluster member.
+If a session or transaction tries to acquire a connection at a time when the pool size is at its full capacity, it must wait until a free connection is available in the pool or the request to acquire a new connection times out.
+The connection acquiring timeout is configured via `ConnectionAcquisitionTimeout`.
++
+Default value: This is different for different drivers, but is a number in the order of 100.
+
+`ConnectionAcquisitionTimeout`::
+This setting limits the amount of time a session or transaction can spend waiting for a free connection to appear in the pool before throwing an exception.
+The exception thrown in this case is `ClientException`.
+Timeout only applies when connection pool is at its max capacity.
++
+Default value: 1m.
+
+
+[.tabbed-example]
+.Connection pool management
+====
+[.include-with-dotnet]
+======
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=config-connection-pool]
+----
+======
+
+[.include-with-go]
+======
+[source, go]
+----
+include::{go-examples}/examples_test.go[tags=config-connection-pool]
+----
+======
+
+[.include-with-java]
+======
+[source, java]
+----
+include::{java-examples}/ConfigConnectionPoolExample.java[tags=config-connection-pool]
+----
+======
+
+[.include-with-javascript]
+======
+[source, javascript]
+----
+include::{javascript-examples}/examples.test.js[tags=config-connection-pool]
+----
+======
+
+[.include-with-python]
+======
+[source, python]
+----
+include::{python-examples}/config_connection_pool_example.py[tags=config-connection-pool]
+----
+======
+====
+
+
+[[driver-configuration-connection-timeout]]
+=== Connection timeout
+
+To configure the maximum time allowed to establish a connection, pass a duration value to the driver configuration.
+For example:
+
+[.tabbed-example]
+.Connection timeout
+====
+[.include-with-dotnet]
+======
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=config-connection-timeout]
+----
+======
+
+[.include-with-go]
+======
+[source, go]
+----
+include::{go-examples}/examples_test.go[tags=config-connection-timeout]
+----
+======
+
+[.include-with-java]
+======
+[source, java]
+----
+include::{java-examples}/ConfigConnectionTimeoutExample.java[tags=config-connection-timeout]
+----
+======
+
+[.include-with-javascript]
+======
+[source, javascript]
+----
+include::{javascript-examples}/examples.test.js[tags=config-connection-timeout]
+----
+======
+
+[.include-with-python]
+======
+[source, python]
+----
+include::{python-examples}/config_connection_timeout_example.py[tags=config-connection-timeout]
+----
+======
+====
+
+
+[[driver-configuration-max-retry-time]]
+=== Max retry time
+
+To configure retry behavior, supply a value for the maximum time in which to keep attempting retries of transaction functions.
+For example:
+
+[.tabbed-example]
+.Max retry time
+====
+[.include-with-dotnet]
+======
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=config-max-retry-time]
+----
+======
+
+[.include-with-go]
+======
+[source, go]
+----
+include::{go-examples}/examples_test.go[tags=config-max-retry-time]
+----
+======
+
+[.include-with-java]
+======
+[source, java]
+----
+include::{java-examples}/ConfigMaxRetryTimeExample.java[tags=config-max-retry-time]
+----
+======
+
+[.include-with-javascript]
+======
+[source, javascript]
+----
+include::{javascript-examples}/examples.test.js[tags=config-max-retry-time]
+----
+======
+
+[.include-with-python]
+======
+[source, python]
+----
+include::{python-examples}/config_max_retry_time_example.py[tags=config-max-retry-time]
+----
+======
+====
+
+Note that the time specified here does not take into account the running time of the unit of work itself, merely a limit after which retries will no longer be attempted.
+
+
+[[driver-service-unavailable]]
+== Service unavailable
+
+A Service unavailable status will be signalled when the driver is no longer able to establish communication with the server, even after retries.
+Encountering this condition usually indicates a fundamental networking or database problem.
+Applications should be designed to cater for this eventuality.
+
+[.tabbed-example]
+.Service unavailable
+====
+[.include-with-dotnet]
+======
+
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=service-unavailable]
+----
+======
+
+[.include-with-go]
+======
+[source, go]
+----
+include::{go-examples}/examples_test.go[tags=service-unavailable]
+----
+======
+
+[.include-with-java]
+======
+
+[source, java]
+----
+include::{java-examples}/ServiceUnavailableExample.java[tags=service-unavailable]
+----
+======
+
+[.include-with-javascript]
+======
+
+[source, javascript]
+----
+include::{javascript-examples}/examples.test.js[tags=service-unavailable]
+----
+======
+
+[.include-with-python]
+======
+
+[source, python]
+----
+include::{python-examples}/service_unavailable_example.py[tags=service-unavailable]
+----
+======
+====
