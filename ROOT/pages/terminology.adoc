@@ -1,11 +1,7 @@
 [appendix]
 [[driver-terminology]]
 = Driver terminology
-
-[abstract]
---
-This section lists the relevant terminology related to Neo4j drivers.
---
+:description: This section lists the relevant terminology related to Neo4j drivers. 
 
 [[term-access-mode]]access mode::
 The mode in which a transaction is executed, either read or write.
@@ -46,7 +42,7 @@ A globally accessible controller for all database access.
 
 [[term-driver-package]]driver (package)::
 A software library that provides access to Neo4j from a particular programming language.
-The Neo4j drivers implement the <<term-bolt, Bolt>> protocol.
+The Neo4j drivers implement the xref:terminology.adoc#term-bolt[Bolt] protocol.
 
 [[term-query-result]]query result::
 The stream of records that are returned on execution of a query.

@@ -1,40 +1,30 @@
 [[driver-session-api]]
 = The session API
-
-[abstract]
---
-This section details the Session API that are made available by the driver, with each Session class oriented towards a different form of programming.
---
+:description: This section details the Session API that are made available by the driver, with each Session class oriented towards a different form of programming.  This section describes simple sessions, transactions executed within a simple session and the results thereof.  This section describes asynchronous sessions, transactions executed within an asynchronous session and the results thereof.  This section describes reactive sessions, transactions executed within a reactive session and the results thereof.  This section details the configuration options available when constructing a session. 
 
 This chapter describes the following:
 
-* <<driver-simple-sessions, Simple sessions>>
-** <<driver-simple-lifecycle, Lifecycle>>
-** <<driver-simple-transaction-fn, Transaction functions>>
-** <<driver-simple-autocommit-transactions, Auto-commit transactions>>
-** <<driver-simple-result-consume, Consuming results>>
-** <<driver-simple-result-retain, Retaining results>>
-* <<driver-async-sessions, Asynchronous sessions>>
-** <<driver-async-transaction-fn, Transaction functions>>
-** <<driver-async-autocommit-transactions, Auto-commit transaction>>
-** <<driver-async-result-consume, Consuming results>>
-* <<driver-rx-sessions, Reactive sessions>>
-** <<driver-rx-lifecycle, Lifecycle>>
-** <<driver-rx-transaction-fn, Transaction functions>>
-** <<driver-rx-autocommit-transactions, Auto-commit transactions>>
-** <<driver-rx-result-consume, Consuming results>>
-** <<driver-rx-cancellation, Cancellation>>
-* <<driver-session-configuration, Configuration>>
-
+* xref:session-api.adoc#driver-simple-sessions[Simple sessions]
+** xref:session-api.adoc#driver-simple-lifecycle[Lifecycle]
+** xref:session-api.adoc#driver-simple-transaction-fn[Transaction functions]
+** xref:session-api.adoc#driver-simple-autocommit-transactions[Auto-commit transactions]
+** xref:session-api.adoc#driver-simple-result-consume[Consuming results]
+** xref:session-api.adoc#driver-simple-result-retain[Retaining results]
+* xref:session-api.adoc#driver-async-sessions[Asynchronous sessions]
+** xref:session-api.adoc#driver-async-transaction-fn[Transaction functions]
+** xref:session-api.adoc#driver-async-autocommit-transactions[Auto-commit transaction]
+** xref:session-api.adoc#driver-async-result-consume[Consuming results]
+* xref:session-api.adoc#driver-rx-sessions[Reactive sessions]
+** xref:session-api.adoc#driver-rx-lifecycle[Lifecycle]
+** xref:session-api.adoc#driver-rx-transaction-fn[Transaction functions]
+** xref:session-api.adoc#driver-rx-autocommit-transactions[Auto-commit transactions]
+** xref:session-api.adoc#driver-rx-result-consume[Consuming results]
+** xref:session-api.adoc#driver-rx-cancellation[Cancellation]
+* xref:session-api.adoc#driver-session-configuration[Configuration]
 
 
 [[driver-simple-sessions]]
 == Simple sessions
-
-[abstract]
---
-This section describes simple sessions, transactions executed within a simple session and the results thereof.
---
 
 [NOTE]
 ====
@@ -102,7 +92,7 @@ with driver.session(...) as session:
 
 *_Sessions can be configured in a number of different ways_*.
 This is carried out by supplying configuration inside the session constructor.
-See <<driver-session-configuration>> for more details.
+See xref:session-api.adoc#driver-session-configuration[Session configuration] for more details.
 
 
 [[driver-simple-transaction-fn]]
@@ -193,7 +183,7 @@ Unlike other kinds of Cypher Query, `PERIODIC COMMIT` queries do not participate
 
 Therefore, the only way to execute `PERIODIC COMMIT` from a driver is to use auto-commit transactions.
 
-Please refer to the <<cypher-manual#query-using-periodic-commit-hint, Cypher Manual -> `PERIODIC COMMIT` query hint>>.
+Please refer to the link:docs/cypher-manual/4.0/query-tuning/using/index.adoc#query-using-periodic-commit-hint[Cypher Manual -> `PERIODIC COMMIT` query hint].
 ====
 
 [.tabbed-example]
@@ -347,11 +337,6 @@ include::{python-examples}/test_result_retain_example.py[tags=result-retain]
 [[driver-async-sessions]]
 == Asynchronous sessions
 
-[abstract]
---
-This section describes asynchronous sessions, transactions executed within an asynchronous session and the results thereof.
---
-
 [NOTE]
 ====
 Available in:
@@ -372,7 +357,7 @@ Session lifetime begins with session construction.
 A session then exists until it is closed, which is typically set to occur after its contained query results have been consumed.
 
 Sessions can be configured in a number of different ways. This is carried out by supplying configuration inside the session constructor.
-See <<driver-session-configuration>> for more details.
+See xref:session-api.adoc#driver-session-configuration[Session configuration] for more details.
 
 
 [[driver-async-transaction-fn]]
@@ -454,7 +439,7 @@ Unlike other kinds of Cypher Query, `PERIODIC COMMIT` queries do not participate
 
 Therefore, the only way to execute them from a driver is to use auto-commit transactions.
 
-Please refer to the <<cypher-manual#query-using-periodic-commit-hint, Cypher Manual -> `PERIODIC COMMIT` query hint>>.
+Please refer to the link:docs/cypher-manual/4.0/query-tuning/using/index.adoc#query-using-periodic-commit-hint[Cypher Manual -> `PERIODIC COMMIT` query hint].
 ====
 
 [.tabbed-example]
@@ -537,11 +522,6 @@ include::{javascript-examples}/examples.test.js[tags=async-result-consume]
 [[driver-rx-sessions]]
 == Reactive Sessions
 
-[abstract]
---
-This section describes reactive sessions, transactions executed within a reactive session and the results thereof.
---
-
 [NOTE]
 ====
 Available in:
@@ -571,7 +551,7 @@ For more information about reactive stream, please see the following:
 --
 Reactive sessions will typically be used in a client application that is already oriented towards the reactive style; it is expected that a reactive dependency or framework is in place.
 
-Refer to <<driver-get-started>> for more information on recommended dependencies.
+Refer to xref:get-started.adoc[Get started] for more information on recommended dependencies.
 --
 
 
@@ -640,7 +620,7 @@ include::{javascript-examples}/examples.test.js[tags=rx-transaction-function]
 
 Sessions can be configured in a number of different ways.
 This is carried out by supplying configuration inside the session constructor.
-See <<driver-session-configuration>> for more details.
+See xref:session-api.adoc#driver-session-configuration[Session configuration] for more details.
 
 
 [[driver-rx-autocommit-transactions]]
@@ -663,7 +643,7 @@ The only way to execute `PERIODIC COMMIT` Cypher Queries is to auto-commit the t
 
 Unlike other kinds of Cypher query, `PERIODIC COMMIT` queries do not participate in the causal chain.
 
-Please refer to the <<cypher-manual#query-using-periodic-commit-hint, Cypher Manual -> `PERIODIC COMMIT` query hint>>.
+Please refer to the link:docs/cypher-manual/4.0/query-tuning/using/index.adoc#query-using-periodic-commit-hint[Cypher Manual -> `PERIODIC COMMIT` query hint].
 ====
 
 [.tabbed-example]
@@ -757,11 +737,6 @@ This prematurely commits or rolls back the transaction and stops the query engin
 [[driver-session-configuration]]
 == Session configuration
 
-[abstract]
---
-This section details the configuration options available when constructing a session.
---
-
 [.compact]
 `Bookmarks`::
 The mechanism which ensures causal consistency between transactions within a session.
@@ -780,13 +755,13 @@ In other cases, this setting is inherited. Note that transaction functions will 
 Database::
 The database with which the session will interact.
 When you are working with a database which is not the default (i.e. the `system` database or another database in Neo4j 4.0 Enterprise Edition), you can explicitly configure the database which the driver is executing transactions against.
-See <<operations-manual#manage-databases-default, Operations Manual -> The default database>> for more information on databases.
+See link:docs/operations-manual/4.0/manage-databases/introduction/index.adoc#manage-databases-default[Operations Manual -> The default database] for more information on databases.
 +
 *Default:* the default database as configured on the server.
 
 `Fetch Size`::
 The number of records to fetch in each batch from the server.
 Neo4j 4.0 introduces the ability to pull records in batches, allowing the client application to take control of data population and apply back pressure to the server.
-This `FetchSize` applies to <<driver-simple-sessions, simple sessions>> and <<driver-async-sessions, async-sessions>> whereas reactive sessions can be controlled directly using the request method of the subscription.
+This `FetchSize` applies to xref:session-api.adoc#driver-simple-sessions[simple sessions] and xref:session-api.adoc#driver-async-sessions[async-sessions] whereas reactive sessions can be controlled directly using the request method of the subscription.
 +
 *Default:* 1000 records

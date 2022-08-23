@@ -1,25 +1,21 @@
 [[driver-client-applications]]
 = Client applications
-
-[abstract]
---
-This section describes how to manage database connections within an application.
---
+:description: This section describes how to manage database connections within an application. 
 
 This section contains the following:
 
-* <<driver-driver-object,The Driver object>>
-* <<driver-connection-uris,Connection URIs>>
-** <<initial-address-resolution,Initial address resolution>>
-** <<driver-routing-table,Routing table>>
-** <<driver-routing-context,Routing context>>
-** <<driver-configuration-examples,Examples>>
-* <<driver-authentication,Authentication>>
-** <<driver-authentication-basic,Basic authentication>>
-** <<driver-authentication-kerberos,Kerberos authentication>>
-** <<driver-authentication-custom,Custom authentication>>
-* <<driver-configuration,Configuration>>
-* <<driver-logging,Logging>>
+* xref:client-applications.adoc#driver-driver-object[The Driver object]
+* xref:client-applications.adoc#driver-connection-uris[Connection URIs]
+** xref:client-applications.adoc#initial-address-resolution[Initial address resolution]
+** xref:client-applications.adoc#driver-routing-table[Routing table]
+** xref:client-applications.adoc#driver-routing-context[Routing context]
+** xref:client-applications.adoc#driver-configuration-examples[Examples]
+* xref:client-applications.adoc#driver-authentication[Authentication]
+** xref:client-applications.adoc#driver-authentication-basic[Basic authentication]
+** xref:client-applications.adoc#driver-authentication-kerberos[Kerberos authentication]
+** xref:client-applications.adoc#driver-authentication-custom[Custom authentication]
+* xref:client-applications.adoc#driver-configuration[Configuration]
+* xref:client-applications.adoc#driver-logging[Logging]
 
 
 [[driver-driver-object]]
@@ -28,7 +24,7 @@ This section contains the following:
 Neo4j client applications require a *_Driver Object_* which, from a data access perspective, forms the backbone of the application.
 It is through this object that all Neo4j interaction is carried out, and it should therefore be made available to all parts of the application that require data access.
 
-In languages where <<term-thread-safety, thread safety>> is an issue, the Driver Object can be considered *_thread-safe_*.
+In languages where xref:terminology.adoc#term-thread-safety[thread safety] is an issue, the Driver Object can be considered *_thread-safe_*.
 
 
 [TIP]
@@ -41,7 +37,7 @@ Destroying a Driver Object will immediately shut down any connections previously
 This will have the consequence of rolling back any open transactions, and closing any unconsumed results.
 --
 
-To construct a driver instance, a <<driver-connection-uris, connection URI>> and <<driver-authentication, authentication information>> must be supplied.
+To construct a driver instance, a xref:client-applications.adoc#driver-connection-uris[connection URI] and xref:client-applications.adoc#driver-authentication[authentication information] must be supplied.
 
 Additional configuration details can be supplied if required.
 The configuration details are immutable for the lifetime of the Driver Object.
@@ -138,7 +134,7 @@ Starting with *Neo4j 4.0*, client-server communication uses only *_unencrypted l
 
 This is a change from previous versions, which switched on encryption by default, but generated a self-signed certificate out of the box.
 
-When a full certificate is installed, and encryption is enabled on the driver, full certificate checks are carried out (refer to <<operations-manual#ssl-framework, Operations Manual -> SSL framework >>).
+When a full certificate is installed, and encryption is enabled on the driver, full certificate checks are carried out (refer to link:docs/operations-manual/4.0/security/ssl-framework/index.adoc[Operations Manual -> SSL framework]).
 Full certificates provide better overall security than self-signed certificates as they include a complete chain of trust back to a root certificate authority.
 
 [NOTE]
@@ -147,7 +143,7 @@ https://neo4j.com/aura/[*Neo4j Aura*] is a *_secure hosted service_* backed by f
 
 To connect to *Neo4j Aura*, driver users must *_enable encryption_* and the complete set of certificate checks (the latter of which are enabled by default).
 
-For more information, see <<driver-configuration-examples>>.
+For more information, see xref:client-applications.adoc#driver-configuration-examples[Examples].
 ====
 
 .Changes in default security settings between 3.x and 4.x
@@ -275,7 +271,7 @@ Routing contexts are defined by means of *_server policies_* and allow customiza
 
 .Configure a routing driver with routing context
 ====
-This example will assume that *Neo4j* has been configured for server policies as described in <<operations-manual#multi-dc-load-balancing, Neo4j Operations Manual -> Load balancing for multi-data center systems>>.
+This example will assume that *Neo4j* has been configured for server policies as described in link:docs/operations-manual/4.0/clustering-advanced/multi-data-center/load-balancing/index.adoc[Neo4j Operations Manual -> Load balancing for multi-data center systems].
 In particular, a server policy called `europe` has been defined.
 Additionally, we have a server `neo01.graph.example.com` to which we wish to direct the driver.
 
@@ -287,10 +283,10 @@ This URI will use the server policy `europe`:
 [NOTE]
 .Server-side configuration to enable routing drivers with routing context
 ====
-A prerequisite for using a routing driver with routing context is that the *Neo4j* database is operated on a <<operations-manual#clustering, Causal Cluster>> with the <<operations-manual#multi-dc, Multi-data center licensing option>> enabled.
+A prerequisite for using a routing driver with routing context is that the *Neo4j* database is operated on a link:docs/operations-manual/4.0/clustering/index.adoc[Causal Cluster] with the link:docs/operations-manual/4.0/clustering-advanced/multi-data-center/index.adoc[Multi-data center licensing option] enabled.
 Additionally, the routing contexts must be defined within the cluster as *_routing policies_*.
 
-For details on how to configure *_multi-data center routing policies_* for a Causal Cluster, please refer to <<operations-manual#multi-dc-load-balancing, Operations Manual -> Causal Clustering>>.
+For details on how to configure *_multi-data center routing policies_* for a Causal Cluster, please refer to link:docs/operations-manual/4.0/clustering-advanced/multi-data-center/load-balancing/index.adoc[Operations Manual -> Causal Clustering].
 ====
 
 [NOTE]
@@ -299,7 +295,7 @@ For details on how to configure *_multi-data center routing policies_* for a Cau
 If you are using a *_single instance_* of *Neo4j*, deployed on a remote machine whilst using the `neo4j` URI scheme, *_you will need to complete additional configuration of the server_*.
 
 To make the server aware of its deployment environment, you need to configure
-<<operations-manual#config_dbms.default_advertised_address,`default_advertised_address`>>
+link:docs/operations-manual/4.0/reference/configuration-settings/index.adoc#config_dbms.default_advertised_address[`default_advertised_address`]
 with your deployment machine's host name, as visible from the client machine.
 ====
 
@@ -318,7 +314,7 @@ This targets a routed *Neo4j* service that may be fulfilled by either a cluster 
 The `HOST` and `PORT` values contain a logical hostname and port number targeting the entry point to the *Neo4j* service (e.g. `neo4j://graph.example.com:7687`).
 
 In a clustered environment, the URI address will resolve to one of more of the core members; for standalone installations, this will simply point to that server address.
-The `ROUTING_CONTEXT` option allows for customization of the routing table and is discussed in more detail in <<driver-routing-context>>.
+The `ROUTING_CONTEXT` option allows for customization of the routing table and is discussed in more detail in xref:client-applications.adoc#driver-routing-context[Routing context].
 
 An alternative URI form, using the `bolt` URI scheme (e.g. `bolt://graph.example.com:7687`), can be used when a *_single point-to-point connection is required_*.
 This variant is useful for the subset client applications (such as admin tooling) that need to be aware of individual servers, as opposed to those which require a highly available database service.
@@ -1376,7 +1372,7 @@ include::{python-examples}/test_config_connection_timeout_example.py[tags=config
 
 `CustomResolver`::
 
-Specify a custom server address resolver used by the routing driver to resolve the initial address used to create the driver. See <<driver-resolver-function>> for more details.
+Specify a custom server address resolver used by the routing driver to resolve the initial address used to create the driver. See xref:client-applications.adoc#driver-resolver-function[Resolver function] for more details.
 
 `Encryption`::
 

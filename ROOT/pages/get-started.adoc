@@ -1,10 +1,6 @@
 [[driver-get-started]]
 = Get started
-
-[abstract]
---
-This section gives an overview of the official Neo4j drivers and how to connect to a Neo4j database with a "Hello World" example.
---
+:description: This section gives an overview of the official Neo4j drivers and how to connect to a Neo4j database with a "Hello World" example. 
 
 [[driver-get-started-about]]
 == About the official drivers
@@ -30,11 +26,11 @@ The following languages and frameworks are officially supported by Neo4j:
 
 The driver API is intended to be topologically agnostic.
 This means that the underlying database topology — single instance, Causal Cluster, etc. — can be altered without requiring a corresponding alteration to application code.
-In the general case, only the <<driver-connection-uris, connection URI>> needs to be modified when changes are made to the topology.
+In the general case, only the xref:client-applications.adoc#driver-connection-uris[connection URI] needs to be modified when changes are made to the topology.
 
 NOTE: The official drivers do not support HTTP communication.
 If you need an HTTP driver, choose one of the community drivers.
-See also the <<http-api#http-api, HTTP API documentation>>.
+See also the link:docs/http-api/4.0/index.adoc#http-api[HTTP API documentation].
 
 [[driver-get-started-installation]]
 == Driver versions and installation
