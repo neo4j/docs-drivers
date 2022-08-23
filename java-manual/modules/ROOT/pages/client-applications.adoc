@@ -1,0 +1,477 @@
+[[java-driver-client-applications]]
+= Client applications
+
+include::{common-partial}/client-applications.adoc[tag=abstract]
+
+
+[[driver-driver-object]]
+== The Driver Object
+
+include::{common-partial}/client-applications.adoc[tag=object-pt1]
+
+To construct a driver instance, a xref:client-applications.adoc#driver-connection-uris[connection URI] and xref:client-applications.adoc#driver-authentication[authentication information] must be supplied.
+
+include::{common-partial}/client-applications.adoc[tag=object-pt2]
+
+
+.The driver lifecycle
+====
+[source, java]
+----
+include::{java-examples}/DriverLifecycleExample.java[tags=driver-lifecycle-import]
+----
+
+[source, java]
+----
+include::{java-examples}/DriverLifecycleExample.java[tags=driver-lifecycle]
+----
+====
+
+
+[[java-driver-connection-uris]]
+== Connection URIs
+
+include::{common-partial}/client-applications.adoc[tag=uris]
+
+
+[NOTE]
+====
+https://neo4j.com/aura/[*Neo4j Aura*] is a *_secure hosted service_* backed by full certificates signed by a root certificate authority.
+
+To connect to *Neo4j Aura*, driver users must *_enable encryption_* and the complete set of certificate checks (the latter of which are enabled by default).
+
+For more information, see xref:client-applications.adoc#java-driver-configuration-examples[Examples] below.
+====
+
+include::{common-partial}/client-applications.adoc[tag=default-security-changes]
+
+
+[[java-initial-address-resolution]]
+=== Initial address resolution
+
+include::{common-partial}/client-applications.adoc[tag=initial-address-resolution]
+
+
+[[java-dns-resolution]]
+==== DNS resolution
+
+include::{common-partial}/client-applications.adoc[tag=dns-resolution]
+
+
+[[java-custom-middleware]]
+==== Custom middleware
+
+include::{common-partial}/client-applications.adoc[tag=custom-middleware]
+
+
+[[java-driver-resolver-function]]
+==== Resolver function
+
+include::{common-partial}/client-applications.adoc[tag=resolver-function]
+
+.Custom Address Resolver
+======
+[source, java]
+----
+include::{java-examples}/ConfigCustomResolverExample.java[tags=config-custom-resolver]
+----
+======
+
+
+[[java-driver-routing-table]]
+=== Routing table
+
+include::{common-partial}/client-applications.adoc[tag=routing-table]
+
+
+[[java-driver-routing-context]]
+=== Routing context
+
+include::{common-partial}/client-applications.adoc[tag=routing-context]
+
+
+[[java-driver-configuration-examples]]
+=== Examples
+
+include::{common-partial}/client-applications.adoc[tag=examples-pt1]
+
+In a clustered environment, the URI address will resolve to one of more of the core members; for standalone installations, this will simply point to that server address.
+The `ROUTING_CONTEXT` option allows for customization of the routing table and is discussed in more detail in xref:client-applications.adoc#java-driver-routing-context[Routing context].
+
+include::{common-partial}/client-applications.adoc[tag=examples-pt2]
+
+.Connecting to a service
+The tables below illustrate examples of how to connect to a service with routing:
+
+.Neo4j Aura, secured with full certificate
+[cols="<15s,<85a"]
+|===
+| Product
+| Neo4j Aura
+
+| Security
+| Secured with full certificate
+
+| Code snippet
+|
+[source, java]
+----
+GraphDatabase.driver("neo4j+s://graph.example.com:7687", auth)
+----
+
+If you do not have at least the Java Driver 4.0.1 patch installed, you will need this snippet instead:
+
+[source, java]
+----
+String uri = "neo4j://graph.example.com:7687";
+Config config = Config.builder()
+                     .withEncryption()
+                     .build();
+Driver driver = GraphDatabase.driver(uri, auth, config);
+----
+
+| Comments
+| This is the default (and only option) for Neo4j Aura
+
+|===
+
+.Neo4j 4.x, unsecured
+[cols="<15s,<85a"]
+|===
+| Product
+| Neo4j 4.x
+
+| Security
+| Unsecured
+
+| Code snippet
+|
+[source, java]
+----
+GraphDatabase.driver("neo4j://graph.example.com:7687", auth)
+----
+
+| Comments
+| This is the default for Neo4j 4.x series
+|===
+
+.Neo4j 4.x, secured with full certificate
+[cols="<15s,<85a"]
+|===
+| Product
+| Neo4j 4.x
+
+| Security
+| Secured with full certificate
+
+| Code snippet
+|
+[source, java]
+----
+GraphDatabase.driver("neo4j+s://graph.example.com:7687", auth)
+----
+
+If you do not have at least the Java Driver 4.0.1 patch installed, you will need this snippet instead:
+
+[source, java]
+----
+String uri = "neo4j://graph.example.com:7687";
+Config config = Config.builder()
+                     .withEncryption()
+                     .build();
+Driver driver = GraphDatabase.driver(uri, auth, config);
+----
+|===
+
+.Neo4j 4.x, secured with self-signed certificate
+[cols="<15s,<85a"]
+|===
+| Product
+| Neo4j 4.x
+
+| Security
+| Secured with self-signed certificate
+
+| Code snippet
+|
+[source, java]
+----
+GraphDatabase.driver("neo4j+ssc://graph.example.com:7687", auth)
+----
+
+If you do not have at least the Java Driver 4.0.1 patch installed, you will need this snippet instead:
+
+[source, java]
+----
+String uri = "neo4j://graph.example.com:7687";
+Config config = Config.builder()
+                    .withEncryption()
+                    .withTrustStrategy( trustAllCertificates() )
+                    .build();
+Driver driver = GraphDatabase.driver(uri, auth, config);
+----
+|===
+
+.Neo4j 3.x, secured with full certificate
+[cols="<15s,<85a"]
+|===
+| Product
+| Neo4j 3.x
+
+| Security
+| Secured with full certificate
+
+| Code snippet
+|
+[source, java]
+----
+GraphDatabase.driver("neo4j+s://graph.example.com:7687", auth)
+----
+
+If you do not have at least the Java Driver 4.0.1 patch installed, you will need this snippet instead:
+
+[source, java]
+----
+String uri = "neo4j://graph.example.com:7687";
+Config config = Config.builder()
+                     .withEncryption()
+                     .build();
+Driver driver = GraphDatabase.driver(uri, auth, config);
+----
+|===
+
+.Neo4j 3.x, secured with self-signed certificate
+[cols="<15s,<85a"]
+|===
+| Product
+| Neo4j 3.x
+
+| Security
+| Secured with self-signed certificate
+
+| Code snippet
+|
+[source, java]
+----
+GraphDatabase.driver("neo4j+ssc://graph.example.com:7687", auth)
+----
+
+If you do not have at least the Java Driver 4.0.1 patch installed, you will need this snippet instead:
+
+[source, java]
+----
+String uri = "neo4j://graph.example.com:7687";
+Config config = Config.builder()
+                    .withEncryption()
+                    .withTrustStrategy( trustAllCertificates() )
+                    .build();
+Driver driver = GraphDatabase.driver(uri, auth, config);
+----
+
+| Comments
+| This is the default for Neo4j 3.x series
+|===
+
+.Neo4j 3.x, unsecured
+[cols="<15s,<85a"]
+|===
+| Product
+| Neo4j 3.x
+
+| Security
+| Unsecured
+
+| Code snippet
+|
+[source, java]
+----
+GraphDatabase.driver("neo4j://graph.example.com:7687", auth)
+----
+|===
+
+[NOTE]
+To connect to a service without routing, you can replace `neo4j` with `bolt`.
+
+
+[[java-driver-authentication]]
+== Authentication
+
+include::{common-partial}/client-applications.adoc[tag=authentication]
+
+
+[[java-driver-authentication-basic]]
+=== Basic authentication
+
+include::{common-partial}/client-applications.adoc[tag=authentication-basic]
+
+.Basic authentication
+======
+[source, java]
+----
+include::{java-examples}/BasicAuthExample.java[tags=basic-auth-import]
+----
+
+[source, java]
+----
+include::{java-examples}/BasicAuthExample.java[tags=basic-auth]
+----
+======
+
+include::{common-partial}/client-applications.adoc[tag=authentication-basic-note]
+
+
+[[java-driver-authentication-kerberos]]
+=== Kerberos authentication
+
+include::{common-partial}/client-applications.adoc[tag=authentication-kerberos]
+
+.Kerberos authentication
+======
+[source, java]
+----
+include::{java-examples}/KerberosAuthExample.java[tags=kerberos-auth-import]
+----
+
+[source, java]
+----
+include::{java-examples}/KerberosAuthExample.java[tags=kerberos-auth]
+----
+======
+
+include::{common-partial}/client-applications.adoc[tag=authentication-kerberos-note]
+
+[[java-driver-authentication-bearer]]
+=== Bearer authentication
+
+include::{common-partial}/client-applications.adoc[tag=authentication-bearer]
+
+.Import bearer authentication
+======
+[source, java]
+----
+include::{java-examples}/BearerAuthExample.java[tags=bearer-auth-import]
+----
+
+[source, java]
+----
+include::{java-examples}/BearerAuthExample.java[tags=bearer-auth]
+----
+======
+
+[[java-driver-authentication-custom]]
+=== Custom authentication
+
+include::{common-partial}/client-applications.adoc[tag=authentication-custom]
+
+.Custom authentication
+======
+[source, java]
+----
+include::{java-examples}/CustomAuthExample.java[tags=custom-auth-import]
+----
+
+[source, java]
+----
+include::{java-examples}/CustomAuthExample.java[tags=custom-auth]
+----
+======
+
+
+[[java-driver-configuration]]
+== Configuration
+
+include::{common-partial}/client-applications.adoc[tag=configuration-ConnectionAcquisitionTimeout]
++
+.Configure connection pool
+======
+[source, java]
+----
+include::{java-examples}/ConfigConnectionPoolExample.java[tags=config-connection-pool-import]
+----
+
+[source, java]
+----
+include::{java-examples}/ConfigConnectionPoolExample.java[tags=config-connection-pool]
+----
+======
+
+include::{common-partial}/client-applications.adoc[tag=configuration-ConnectionTimeout]
++
+.Configure connection timeout
+======
+[source, java]
+----
+include::{java-examples}/ConfigConnectionTimeoutExample.java[tags=config-connection-timeout-import]
+----
+
+[source, java]
+----
+include::{java-examples}/ConfigConnectionTimeoutExample.java[tags=config-connection-timeout]
+----
+======
+
+`CustomResolver`::
+
+Specify a custom server address resolver used by the routing driver to resolve the initial address used to create the driver. See xref:client-applications.adoc#java-driver-resolver-function[Resolver function] for more details.
+
+include::{common-partial}/client-applications.adoc[tag=configuration-Encryption]
++
+.Unencrypted configuration
+======
+[source, java]
+----
+include::{java-examples}/ConfigUnencryptedExample.java[tags=config-unencrypted-import]
+----
+
+[source, java]
+----
+include::{java-examples}/ConfigUnencryptedExample.java[tags=config-unencrypted]
+----
+======
+
+include::{common-partial}/client-applications.adoc[tag=configuration-MaxConnectionLifetime]
+
+include::{common-partial}/client-applications.adoc[tag=configuration-MaxConnectionPoolSize]
++
+*Default:* 100 connections
+
+include::{common-partial}/client-applications.adoc[tag=configuration-MaxTransactionRetryTime]
++
+.Configure maximum retry time
+======
+[source, java]
+----
+include::{java-examples}/ConfigMaxRetryTimeExample.java[tags=config-max-retry-time-import]
+----
+
+[source, java]
+----
+include::{java-examples}/ConfigMaxRetryTimeExample.java[tags=config-max-retry-time]
+----
+======
+
+include::{common-partial}/client-applications.adoc[tag=configuration-TrustStrategy]
++
+.Configure trusted certificates
+======
+[source, java]
+----
+include::{java-examples}/ConfigTrustExample.java[tags=config-trust-import]
+----
+
+[source, java]
+----
+include::{java-examples}/ConfigTrustExample.java[tags=config-trust]
+----
+======
+
+
+[[java-driver-logging]]
+== Logging
+
+include::{common-partial}/client-applications.adoc[tag=logging]
+
+[source, java]
+----
+ConfigBuilder.withLogging(Logging.console(Level.DEBUG))
+----

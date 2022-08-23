@@ -1,5 +1,0 @@
-[appendix]
-[[dotnet-driver-terminology]]
-= Driver terminology
-
-include::{common-content}/terminology.adoc[tag=terminology]

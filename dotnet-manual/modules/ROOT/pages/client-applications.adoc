@@ -1,0 +1,471 @@
+[[dotnet-driver-client-applications]]
+= Client applications
+
+include::{common-partial}/client-applications.adoc[tag=abstract]
+
+
+[[dotnet-driver-driver-object]]
+== The Driver Object
+
+include::{common-partial}/client-applications.adoc[tag=object-pt1]
+
+To construct a driver instance, a xref:client-applications.adoc#dotnet-driver-connection-uris[connection URI] and xref:client-applications.adoc#dotnet-driver-authentication[authentication information] must be supplied.
+
+include::{common-partial}/client-applications.adoc[tag=object-pt2]
+
+.The driver lifecycle
+====
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=driver-lifecycle]
+----
+
+// .Import driver lifecycle
+// [source, csharp]
+// ----
+// include::{dotnet-examples}/Examples.cs[tags=driver-lifecycle-import]
+// ----
+====
+
+
+[[dotnet-driver-connection-uris]]
+== Connection URIs
+
+include::{common-partial}/client-applications.adoc[tag=uris]
+
+[NOTE]
+====
+https://neo4j.com/aura/[*Neo4j Aura*] is a *_secure hosted service_* backed by full certificates signed by a root certificate authority.
+
+To connect to *Neo4j Aura*, driver users must *_enable encryption_* and the complete set of certificate checks (the latter of which are enabled by default).
+
+For more information, see xref:client-applications.adoc#dotnet-driver-configuration-examples[Examples] below.
+====
+
+include::{common-partial}/client-applications.adoc[tag=default-security-changes]
+
+
+[[dotnet-initial-address-resolution]]
+=== Initial address resolution
+
+include::{common-partial}/client-applications.adoc[tag=initial-address-resolution]
+
+
+[[dotnet-dns-resolution]]
+==== DNS resolution
+
+include::{common-partial}/client-applications.adoc[tag=dns-resolution]
+
+
+[[dotnet-custom-middleware]]
+==== Custom middleware
+
+include::{common-partial}/client-applications.adoc[tag=custom-middleware]
+
+
+[[dotnet-driver-resolver-function]]
+==== Resolver function
+
+include::{common-partial}/client-applications.adoc[tag=resolver-function]
+
+.Custom Address Resolver
+======
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=config-custom-resolver]
+----
+======
+
+
+[[dotnet-driver-routing-table]]
+=== Routing table
+
+include::{common-partial}/client-applications.adoc[tag=routing-table]
+
+
+[[dotnet-driver-routing-context]]
+=== Routing context
+
+include::{common-partial}/client-applications.adoc[tag=routing-context]
+
+
+[[dotnet-driver-configuration-examples]]
+=== Examples
+
+include::{common-partial}/client-applications.adoc[tag=examples-pt1]
+
+In a clustered environment, the URI address will resolve to one of more of the core members; for standalone installations, this will simply point to that server address.
+The `ROUTING_CONTEXT` option allows for customization of the routing table and is discussed in more detail in xref:client-applications.adoc#dotnet-driver-routing-context[Routing context].
+
+include::{common-partial}/client-applications.adoc[tag=examples-pt2]
+
+.Connecting to a service
+The tables below illustrate examples of how to connect to a service with routing:
+
+.Neo4j Aura, secured with full certificate
+[cols="<15s,<85a"]
+|===
+| Product
+| Neo4j Aura
+
+| Security
+| Secured with full certificate
+
+| Code snippet
+|
+[source, csharp]
+----
+GraphDatabase.Driver("neo4j+s://graph.example.com:7687", auth)
+----
+
+If you do not have at least the .NET Driver 4.0.1 patch installed, you will need this snippet instead:
+
+[source, csharp]
+----
+String uri = "neo4j://graph.example.com:7687";
+IDriver driver = GraphDatabase.Driver(uri, auth,
+           o => o.WithEncryptionLevel(EncryptionLevel.Encrypted));
+----
+
+| Comments
+| This is the default (and only option) for Neo4j Aura.
+|===
+
+.Neo4j 4.x, unsecured
+[cols="<15s,<85a"]
+|===
+| Product
+| Neo4j 4.x
+
+| Security
+| Unsecured
+
+| Code snippet
+|
+[source, csharp]
+----
+GraphDatabase.Driver("neo4j://graph.example.com:7687", auth);
+----
+
+| Comments
+| This is the default for Neo4j 4.x series
+|===
+
+.Neo4j 4.x, secured with full certificate
+[cols="<15s,<85a"]
+|===
+| Product
+| Neo4j 4.x
+
+| Security
+| Secured with full certificate
+
+| Code snippet
+|
+[source, csharp]
+----
+GraphDatabase.Driver("neo4j+s://graph.example.com:7687", auth)
+----
+
+If you do not have at least the .NET Driver 4.0.1 patch installed, you will need this snippet instead:
+
+[source, csharp]
+----
+String uri = "neo4j://graph.example.com:7687";
+IDriver driver = GraphDatabase.Driver(uri, auth,
+           o => o.WithEncryptionLevel(EncryptionLevel.Encrypted));
+----
+|===
+
+.Neo4j 4.x, secured with self-signed certificate
+[cols="<15s,<85a"]
+|===
+| Product
+| Neo4j 4.x
+
+| Security
+| Secured with self-signed certificate
+
+| Code snippet
+|
+[source, csharp]
+----
+GraphDatabase.Driver("neo4j+ssc://graph.example.com:7687", auth)
+----
+
+If you do not have at least the .NET Driver 4.0.1 patch installed, you will need this snippet instead:
+
+[source, csharp]
+----
+String uri = "neo4j://graph.example.com:7687";
+IDriver driver = GraphDatabase.Driver(uri, auth,
+           o => o.WithEncryptionLevel(EncryptionLevel.Encrypted)
+                 .WithTrustManager(TrustManager.CreateInsecure()));
+----
+|===
+
+.Neo4j 3.x, secured with full certificate
+[cols="<15s,<85a"]
+|===
+| Product
+| Neo4j 3.x
+
+| Security
+| Secured with full certificate
+
+| Code snippet
+|
+[source, csharp]
+----
+GraphDatabase.Driver("neo4j+s://graph.example.com:7687", auth)
+----
+
+If you do not have at least the .NET Driver 4.0.1 patch installed, you will need this snippet instead:
+
+[source, csharp]
+----
+String uri = "neo4j://graph.example.com:7687";
+IDriver driver = GraphDatabase.Driver(uri, auth,
+           o => o.WithEncryptionLevel(EncryptionLevel.Encrypted));
+----
+|===
+
+.Neo4j 3.x, secured with self-signed certificate
+[cols="<15s,<85a"]
+|===
+| Product
+| Neo4j 3.x
+
+| Security
+| Secured with self-signed certificate
+
+| Code snippet
+|
+[source, csharp]
+----
+GraphDatabase.Driver("neo4j+ssc://graph.example.com:7687", auth)
+----
+
+If you do not have at least the .NET Driver 4.0.1 patch installed, you will need this snippet instead:
+
+[source, csharp]
+----
+String uri = "neo4j://graph.example.com:7687";
+IDriver driver = GraphDatabase.Driver(uri, auth,
+           o => o.WithEncryptionLevel(EncryptionLevel.Encrypted)
+                 .WithTrustManager(TrustManager.CreateInsecure()));
+----
+
+| Comments
+| This is the default for Neo4j 3.x series
+|===
+
+.Neo4j 3.x, unsecured
+[cols="<15s,<85a"]
+|===
+| Product
+| Neo4j 3.x
+
+| Security
+| Unsecured
+
+| Code snippet
+|
+[source, csharp]
+----
+GraphDatabase.Driver("neo4j://graph.example.com:7687", auth);
+----
+|===
+
+[NOTE]
+To connect to a service without routing, you can replace `neo4j` with `bolt`.
+
+
+[[dotnet-driver-authentication]]
+== Authentication
+
+include::{common-partial}/client-applications.adoc[tag=authentication]
+
+
+[[dotnet-driver-authentication-basic]]
+=== Basic authentication
+
+include::{common-partial}/client-applications.adoc[tag=authentication-basic]
+
+.Basic authentication
+======
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=basic-auth]
+----
+
+// .Import basic authentication
+// [source, csharp]
+// ----
+// include::{dotnet-examples}/Examples.cs[tags=basic-auth-import]
+// ----
+======
+
+include::{common-partial}/client-applications.adoc[tag=authentication-basic-note]
+
+
+[[dotnet-driver-authentication-kerberos]]
+=== Kerberos authentication
+
+include::{common-partial}/client-applications.adoc[tag=authentication-kerberos]
+
+.Kerberos authentication
+======
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=kerberos-auth]
+----
+
+// .Import Kerberos authentication
+// [source, csharp]
+// ----
+// include::{dotnet-examples}/Examples.cs[tags=kerberos-auth-import]
+// ----
+======
+
+include::{common-partial}/client-applications.adoc[tag=authentication-kerberos-note]
+
+[[go-driver-authentication-bearer]]
+=== Bearer authentication
+
+include::{common-partial}/client-applications.adoc[tag=authentication-bearer]
+
+.Import bearer authentication
+======
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=bearer-auth]
+----
+======
+
+[[dotnet-driver-authentication-custom]]
+=== Custom authentication
+
+include::{common-partial}/client-applications.adoc[tag=authentication-custom]
+
+.Custom authentication
+======
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=custom-auth]
+----
+
+// .Import custom authentication
+// [source, csharp]
+// ----
+// include::{dotnet-examples}/Examples.cs[tags=custom-auth-import]
+// ----
+======
+
+
+[[dotnet-driver-configuration]]
+== Configuration
+
+include::{common-partial}/client-applications.adoc[tag=configuration-ConnectionAcquisitionTimeout]
++
+.Configure connection pool
+======
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=config-connection-pool]
+----
+// .Import connection pool configuration
+// [source, csharp]
+// ----
+// include::{dotnet-examples}/Examples.cs[tags=config-connection-pool-import]
+// ----
+======
+
+include::{common-partial}/client-applications.adoc[tag=configuration-ConnectionTimeout]
++
+.Configure connection timeout
+======
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=config-connection-timeout]
+----
+
+// .Import connection timeout configuration
+// [source, csharp]
+// ----
+// include::{dotnet-examples}/Examples.cs[tags=config-connection-timeout-import]
+// ----
+======
+
+`CustomResolver`::
+
+Specify a custom server address resolver used by the routing driver to resolve the initial address used to create the driver.
+See xref:client-applications.adoc#dotnet-driver-resolver-function[Resolver function] for more details.
+
+include::{common-partial}/client-applications.adoc[tag=configuration-Encryption]
++
+.Unencrypted configuration
+======
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=config-unencrypted]
+----
+// .Import unencrypted configuration
+// [source, csharp]
+// ----
+// include::{dotnet-examples}/Examples.cs[tags=config-unencrypted-import]
+// ----
+======
+
+include::{common-partial}/client-applications.adoc[tag=configuration-MaxConnectionLifetime]
+
+include::{common-partial}/client-applications.adoc[tag=configuration-MaxConnectionPoolSize]
++
+*Default:* 500 connections
+
+
+include::{common-partial}/client-applications.adoc[tag=configuration-MaxTransactionRetryTime]
++
+.Configure maximum retry time
+======
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=config-max-retry-time]
+----
+// .Import maximum retry time configuration
+// [.include-with-dotnet]
+// ======
+// [source, csharp]
+// ----
+// include::{dotnet-examples}/Examples.cs[tags=config-max-retry-time-import]
+// ----
+======
+
+include::{common-partial}/client-applications.adoc[tag=configuration-TrustStrategy]
++
+.Configure trusted certificates
+======
+[source, csharp]
+----
+include::{dotnet-examples}/Examples.cs[tags=config-trust]
+----
+// .Import trusted certificate configuration
+// [source, csharp]
+// ----
+// include::{dotnet-examples}/Examples.cs[tags=config-trust-import]
+// ----
+======
+
+include::{common-partial}/client-applications.adoc[tag=configuration-KeepAlive]
+
+
+[[dotnet-driver-logging]]
+== Logging
+
+include::{common-partial}/client-applications.adoc[tag=logging]
+
+[source, csharp]
+----
+#Please note that you will have to provide your own console logger implementing the ILogger interface.
+IDriver driver = GraphDatabase.Driver(..., o => o.WithLogger(logger));
+----
