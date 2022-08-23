@@ -1,0 +1,50 @@
+{
+  "name": "driver-documentation",
+  "version": "4.1",
+  "description": "Neo4j Driver Documentation",
+  "main": "server.js",
+  "scripts": {
+    "clean": "rm -rf build && rm -rf */modules/api && rm -rf modules/ROOT/partials/driver-sources",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "npm run fetch && nodemon -e adoc --exec \"npm run build && npm run serve\"",
+    "deploy": "npm run worktrees:refresh && npm run fetch -- -p publish.yml && npm run publish",
+    "fetch:preview": "npm run fetch",
+    "fetch:publish": "npm run fetch -- -p publish.yml",
+    "serve": "node server.js",
+    "build": "antora --stacktrace preview.yml",
+    "publish": "antora --stacktrace publish.yml",
+    "lint": "node scripts/lint-links.js",
+    "worktrees:add": "git worktree add ./worktrees/4.3 4.3 && git worktree add ./worktrees/4.2 4.2 && git worktree add ./worktrees/4.1 4.1 && git worktree add ./worktrees/4.0 4.0 && git worktree add ./worktrees/1.7 1.7",
+    "worktrees:remove": "git worktree remove 4.3 && git worktree remove 4.2 && git worktree remove 4.1 && git worktree remove 4.0 && git worktree remove 1.7",
+    "worktrees:refresh": "npm run worktrees:remove && npm run worktrees:add",
+    "fetch": "node fetch.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/neo4j/driver-documentation.git"
+  },
+  "keywords": [],
+  "author": "Neo4j",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/neo4j/driver-documentation/issues"
+  },
+  "homepage": "https://github.com/neo4j/driver-documentation#readme",
+  "dependencies": {
+    "@antora/cli": "^3.0.1",
+    "@antora/site-generator-default": "^3.0.1",
+    "@neo4j-antora/antora-add-notes": "^0.1.6",
+    "@neo4j-antora/antora-modify-sitemaps": "^0.4.3",
+    "@neo4j-antora/antora-page-roles": "^0.3.1",
+    "@neo4j-antora/antora-table-footnotes": "^0.3.2",
+    "@neo4j-documentation/macros": "^1.0.2",
+    "@neo4j-documentation/remote-include": "^1.0.0",
+    "js-yaml": "^4.1.0",
+    "simple-git": "^2.40.0",
+    "yargs": "^17.5.1"
+  },
+  "devDependencies": {
+    "express": "^4.17.1",
+    "nodemon": "^2.0.15"
+  }
+}
