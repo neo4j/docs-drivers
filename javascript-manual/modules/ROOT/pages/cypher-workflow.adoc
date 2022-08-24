@@ -38,13 +38,13 @@ include::{common-partial}/cypher-workflow.adoc[tag=causal-chaining]
 
 .Pass bookmarks
 ======
-[source, javascript]
+[source, javascript, indent=0]
 ----
 include::{javascript-examples}/examples.test.js[tags=pass-bookmarks]
 ----
 
 // .Import bookmarks
-// [source, javascript]
+// [source, javascript, indent=0]
 // ----
 // include::{javascript-examples}/examples.test.js[tags=pass-bookmarks-import]
 // ----
@@ -58,13 +58,13 @@ include::{common-partial}/cypher-workflow.adoc[tag=access-modes-transaction]
 
 .Read-write transaction
 ======
-[source, javascript]
+[source, javascript, indent=0]
 ----
 include::{javascript-examples}/examples.test.js[tags=read-write-transaction]
 ----
 
 // .Import read write transaction
-// [source, javascript]
+// [source, javascript, indent=0]
 // ----
 // include::{javascript-examples}/examples.test.js[tags=read-write-transaction-import]
 // ----
@@ -86,7 +86,7 @@ include::{common-partial}/cypher-workflow.adoc[tag=database-selection]
 
 .Database selection on session creation
 ======
-[source, javascript]
+[source, javascript, indent=0]
 ----
 include::{javascript-examples}/examples.test.js[tags=database-selection]
 ----
@@ -138,7 +138,7 @@ This section lists some basic usage of the temporal types provided by the JavaSc
 
 Represents an instant capturing the date, the time, and the timezone identifier.
 
-[source, javascript]
+[source, javascript, indent=0]
 ----
 include::{javascript-examples}/examples.test.js[tags=temporal-types-datetime]
 ----
@@ -149,7 +149,7 @@ include::{javascript-examples}/examples.test.js[tags=temporal-types-datetime]
 
 Represents an instant capturing the date, but not the time, nor the timezone.
 
-[source, javascript]
+[source, javascript, indent=0]
 ----
 include::{javascript-examples}/examples.test.js[tags=temporal-types-date]
 ----
@@ -160,7 +160,7 @@ include::{javascript-examples}/examples.test.js[tags=temporal-types-date]
 
 Represents an instant capturing the time of day, and the timezone offset in seconds, but not the date.
 
-[source, javascript]
+[source, javascript, indent=0]
 ----
 include::{javascript-examples}/examples.test.js[tags=temporal-types-time]
 ----
@@ -171,7 +171,7 @@ include::{javascript-examples}/examples.test.js[tags=temporal-types-time]
 
 Represents an instant capturing the date and the time, but not the timezone.
 
-[source, javascript]
+[source, javascript, indent=0]
 ----
 include::{javascript-examples}/examples.test.js[tags=temporal-types-localdatetime]
 ----
@@ -182,7 +182,7 @@ include::{javascript-examples}/examples.test.js[tags=temporal-types-localdatetim
 
 Represents an instant capturing the time of day, but not the date, nor the timezone.
 
-[source, javascript]
+[source, javascript, indent=0]
 ----
 include::{javascript-examples}/examples.test.js[tags=temporal-types-localtime]
 ----
@@ -194,7 +194,7 @@ include::{javascript-examples}/examples.test.js[tags=temporal-types-localtime]
 Represents an ISO 8601 duration.
 Contains both date-based values (years, months, days) and time-based values (seconds, nanoseconds).
 
-[source, javascript]
+[source, javascript, indent=0]
 ----
 include::{javascript-examples}/examples.test.js[tags=temporal-types-duration]
 ----

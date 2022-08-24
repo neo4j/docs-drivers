@@ -39,12 +39,12 @@ include::{common-partial}/cypher-workflow.adoc[tag=causal-chaining]
 
 .Pass bookmarks
 ======
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/test_pass_bookmarks_example.py[tags=pass-bookmarks-import]
 ----
 
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/test_pass_bookmarks_example.py[tags=pass-bookmarks]
 ----
@@ -58,7 +58,7 @@ include::{common-partial}/cypher-workflow.adoc[tag=access-modes-transaction]
 
 .Read-write transaction
 ======
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/test_read_write_transaction_example.py[tags=read-write-transaction]
 ----
@@ -79,12 +79,12 @@ include::{common-partial}/cypher-workflow.adoc[tag=database-selection]
 
 .Database selection on session creation
 ======
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/test_database_selection_example.py[tags=database-selection-import]
 ----
 
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/test_database_selection_example.py[tags=database-selection]
 ----

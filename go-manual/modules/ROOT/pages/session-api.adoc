@@ -11,7 +11,7 @@ In general, sessions provide the easiest programming style to work with since AP
 
 include::{common-partial}/session-api.adoc[tag=simple-lifecycle]
 
-[source, go ]
+[source, go , indent=0]
 ----
 session := driver.NewSession(...)
 defer session.Close()
@@ -28,7 +28,7 @@ See xref:session-api.adoc#go-driver-session-configuration[Session configuration]
 
 include::{common-partial}/session-api.adoc[tag=simple-transaction-fn]
 
-[source, go]
+[source, go, indent=0]
 ----
 include::{go-examples}/examples_test.go[tags=transaction-function]
 ----
@@ -39,7 +39,7 @@ include::{go-examples}/examples_test.go[tags=transaction-function]
 
 include::{common-partial}/session-api.adoc[tag=simple-autocommit-transactions]
 
-[source, go]
+[source, go, indent=0]
 ----
 include::{go-examples}/examples_test.go[tags=autocommit-transaction]
 ----
@@ -50,7 +50,7 @@ include::{go-examples}/examples_test.go[tags=autocommit-transaction]
 
 include::{common-partial}/session-api.adoc[tag=simple-result-consume]
 
-[source, go]
+[source, go, indent=0]
 ----
 include::{go-examples}/examples_test.go[tags=result-consume]
 ----
@@ -61,7 +61,7 @@ include::{go-examples}/examples_test.go[tags=result-consume]
 
 include::{common-partial}/session-api.adoc[tag=simple-result-retain]
 
-[source, go]
+[source, go, indent=0]
 ----
 include::{go-examples}/examples_test.go[tags=result-retain]
 ----
@@ -88,14 +88,14 @@ include::{common-partial}/session-api.adoc[tag=TransactionConfiguration]
 
 include::{common-partial}/session-api.adoc[tag=TransactionTimeout]
 
-[source, go]
+[source, go, indent=0]
 ----
 include::{go-examples}/examples_test.go[tags=transaction-timeout-config]
 ----
 
 include::{common-partial}/session-api.adoc[tag=TransactionMetadata]
 
-[source, go]
+[source, go, indent=0]
 ----
 include::{go-examples}/examples_test.go[tags=transaction-metadata-config]
 ----

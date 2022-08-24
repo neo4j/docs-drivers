@@ -39,7 +39,7 @@ include::{common-partial}/cypher-workflow.adoc[tag=causal-chaining]
 
 .Pass bookmarks
 ======
-[source, go]
+[source, go, indent=0]
 ----
 include::{go-examples}/examples_test.go[tags=pass-bookmarks]
 ----
@@ -53,7 +53,7 @@ include::{common-partial}/cypher-workflow.adoc[tag=access-modes-transaction]
 
 .Read-write transaction
 ======
-[source, go]
+[source, go, indent=0]
 ----
 include::{go-examples}/examples_test.go[tags=read-write-transaction]
 ----
@@ -72,7 +72,7 @@ include::{common-partial}/cypher-workflow.adoc[tag=database-selection]
 
 .Database selection on session creation
 ======
-[source, go]
+[source, go, indent=0]
 ----
 include::{go-examples}/examples_test.go[tags=database-selection]
 ----

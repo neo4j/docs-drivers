@@ -39,7 +39,7 @@ Both implement the Reactive Streams API and provide an exhaustive set of operato
 When using Maven, add the following block to the _pom.xml_ file.
 The driver version can either be declared as a property (as in the first example) or as an explicit version number (as in the second).
 
-[source, xml, subs="attributes, specialcharacters"]
+[source, xml, subs="attributes, specialcharacters", indent=0]
 ----
 <dependencies>
     <dependency>
@@ -52,7 +52,7 @@ The driver version can either be declared as a property (as in the first example
 
 In the following example, driver version {java-driver-version} is added.
 
-[source, xml, subs="attributes, specialcharacters"]
+[source, xml, subs="attributes, specialcharacters", indent=0]
 ----
 <dependencies>
     <dependency>
@@ -69,14 +69,14 @@ In the following example, driver version {java-driver-version} is added.
 
 For Gradle, a compile line will be required. Again, this can use a property or an explicit version number.
 
-[source, groovy, subs="attributes, specialcharacters"]
+[source, groovy, subs="attributes, specialcharacters", indent=0]
 ----
 compile 'org.neo4j.driver:neo4j-java-driver:$JAVA_DRIVER_VERSION'
 ----
 
 In the following example, a driver version {java-driver-version} is added.
 
-[source, groovy, subs="attributes, specialcharacters"]
+[source, groovy, subs="attributes, specialcharacters", indent=0]
 ----
 compile 'org.neo4j.driver:neo4j-java-driver:{java-driver-version}'
 ----
@@ -94,12 +94,12 @@ The example below shows the minimal configuration necessary to interact with *Ne
 
 .Hello World
 ======
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/HelloWorldExample.java[tags=hello-world-import]
 ----
 
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/HelloWorldExample.java[tags=hello-world]
 ----
