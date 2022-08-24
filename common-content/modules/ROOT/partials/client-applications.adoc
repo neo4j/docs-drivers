@@ -19,7 +19,7 @@ This section describes how to manage database connections within an application.
 Neo4j client applications require a *_Driver Object_* which, from a data access perspective, forms the backbone of the application.
 It is through this object that all Neo4j interaction is carried out, and it should therefore be made available to all parts of the application that require data access.
 
-In languages where xref:terminology/index.adoc#term-thread-safety[thread safety] is an issue, the Driver Object can be considered *_thread-safe_*.
+In languages where xref:terminology.adoc#term-thread-safety[thread safety] is an issue, the Driver Object can be considered *_thread-safe_*.
 
 
 [TIP]
@@ -34,7 +34,7 @@ This will have the consequence of rolling back any open transactions, and closin
 
 # end::object-pt1[]
 
-To construct a driver instance, a xref:client-applications/index.adoc#driver-connection-uris[connection URI] and xref:client-applications/index.adoc#driver-authentication[authentication information] must be supplied.
+To construct a driver instance, a xref:client-applications.adoc#driver-connection-uris[connection URI] and xref:client-applications.adoc#driver-authentication[authentication information] must be supplied.
 
 # tag::object-pt2[]
 
@@ -138,7 +138,7 @@ https://neo4j.com/aura/[*Neo4j Aura*] is a *_secure hosted service_* backed by f
 
 To connect to *Neo4j Aura*, driver users must *_enable encryption_* and the complete set of certificate checks (the latter of which are enabled by default).
 
-For more information, see xref:client-applications/index.adoc#driver-configuration-examples[Examples] below.
+For more information, see xref:client-applications.adoc#driver-configuration-examples[Examples] below.
 ====
 
 # tag::default-security-changes[]
@@ -332,7 +332,7 @@ The `HOST` and `PORT` values contain a logical hostname and port number targetin
 # end::examples-pt1[]
 
 In a clustered environment, the URI address will resolve to one of more of the core members; for standalone installations, this will simply point to that server address.
-The `ROUTING_CONTEXT` option allows for customization of the routing table and is discussed in more detail in xref:client-applications/index.adoc#driver-routing-context[Routing context].
+The `ROUTING_CONTEXT` option allows for customization of the routing table and is discussed in more detail in xref:client-applications.adoc#driver-routing-context[Routing context].
 
 # tag::examples-pt2[]
 
@@ -1304,7 +1304,7 @@ include::{python-examples}/test_config_connection_timeout_example.py[tags=config
 
 `CustomResolver`::
 
-Specify a custom server address resolver used by the routing driver to resolve the initial address used to create the driver. See xref:client-applications/index.adoc#driver-resolver-function[Resolver function] for more details.
+Specify a custom server address resolver used by the routing driver to resolve the initial address used to create the driver. See xref:client-applications.adoc#driver-resolver-function[Resolver function] for more details.
 
 # end::configuration-CustomResolver[]
 

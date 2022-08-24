@@ -68,7 +68,7 @@ with driver.session(...) as session:
 
 *_Sessions can be configured in a number of different ways_*.
 This is carried out by supplying configuration inside the session constructor.
-See xref:session-api/configuration/index.adoc#driver-session-configuration[Session configuration] for more details.
+See xref:session-api.adoc#driver-session-configuration[Session configuration] for more details.
 
 
 [[driver-simple-transaction-fn]]
@@ -325,7 +325,7 @@ Sessions can be configured in a number of different ways. This is carried out by
 
 # end::async-lifecycle[]
 
-See xref:session-api/configuration/index.adoc#driver-session-configuration[Session configuration] for more details.
+See xref:session-api.adoc#driver-session-configuration[Session configuration] for more details.
 
 
 [[driver-async-transaction-fn]]
@@ -535,7 +535,7 @@ For more information about reactive stream, please see the following:
 --
 Reactive sessions will typically be used in a client application that is already oriented towards the reactive style; it is expected that a reactive dependency or framework is in place.
 
-Refer to xref:get-started/index.adoc#driver-get-started[Get started] for more information on recommended dependencies.
+Refer to xref:get-started.adoc#driver-get-started[Get started] for more information on recommended dependencies.
 --
 
 
@@ -611,7 +611,7 @@ include::{javascript-examples}/examples.test.js[tags=rx-transaction-function]
 
 Sessions can be configured in a number of different ways.
 This is carried out by supplying configuration inside the session constructor.
-See xref:session-api/configuration/index.adoc#driver-session-configuration[Session configuration] for more details.
+See xref:session-api.adoc#driver-session-configuration[Session configuration] for more details.
 
 
 [[driver-rx-autocommit-transactions]]
@@ -788,7 +788,7 @@ See below and link:docs/cypher-manual/5.0/access-control/dbms-administration.ado
 `Fetch Size`::
 The number of records to fetch in each batch from the server.
 Neo4j 4.0 introduces the ability to pull records in batches, allowing the client application to take control of data population and apply back pressure to the server.
-This `FetchSize` applies to xref:session-api/configuration/index.adoc#driver-simple-sessions[simple sessions] and xref:session-api/configuration/index.adoc#driver-async-sessions[async-sessions] whereas reactive sessions can be controlled directly using the request method of the subscription.
+This `FetchSize` applies to xref:session-api.adoc#driver-simple-sessions[simple sessions] and xref:session-api.adoc#driver-async-sessions[async-sessions] whereas reactive sessions can be controlled directly using the request method of the subscription.
 +
 *Default:* 1000 records
 

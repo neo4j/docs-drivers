@@ -30,11 +30,11 @@ endif::[]
 
 This manual covers the following areas:
 
-* xref:get-started/index.adoc[Get started] -- An overview of the official Neo4j .NET Driver and how to connect to a Neo4j database.
-* xref:client-applications/index.adoc[Client applications] -- How to manage database connections within an application.
-* xref:cypher-workflow/index.adoc[Cypher workflow] -- How to create units of work and provide a logical context for that work.
-* xref:session-api/index.adoc[The session API] -- How the types and values used by Cypher map to native language types.
-* xref:terminology/index.adoc[Driver terminology] -- Terminology for drivers.
+* xref:get-started.adoc[Get started] -- An overview of the official Neo4j .NET Driver and how to connect to a Neo4j database.
+* xref:client-applications.adoc[Client applications] -- How to manage database connections within an application.
+* xref:cypher-workflow.adoc[Cypher workflow] -- How to create units of work and provide a logical context for that work.
+* xref:session-api.adoc[The session API] -- How the types and values used by Cypher map to native language types.
+* xref:terminology.adoc[Driver terminology] -- Terminology for drivers.
 
 _Who should read this?_
 

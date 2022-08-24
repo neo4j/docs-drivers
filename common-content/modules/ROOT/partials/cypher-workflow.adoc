@@ -25,7 +25,7 @@ image::{common-image}/sessions-queries-transactions.png[title="Sessions, queries
 Sessions are always bound to *_a single transaction context_*, which is typically an individual database.
 
 Using the bookmark mechanism, sessions also provide a guarantee of correct transaction sequencing, even when transactions occur over multiple cluster members.
-This effect is known as xref:terminology/index.adoc#term-causal-chaining[*_causal chaining_*].
+This effect is known as xref:terminology.adoc#term-causal-chaining[*_causal chaining_*].
 
 # end::overview[]
 
@@ -44,7 +44,7 @@ This means that it is only when a session is carrying out work that it occupies 
 When idle, no such resource is in use.
 
 Due to the sequencing guaranteed by a session, sessions may only host *_one transaction at a time_*. For parallel execution, multiple sessions should be used.
-In languages where xref:terminology/index.adoc#term-thread-safety[thread safety] is an issue, *_sessions should not be considered thread-safe_*.
+In languages where xref:terminology.adoc#term-thread-safety[thread safety] is an issue, *_sessions should not be considered thread-safe_*.
 
 Closing a session forces any open transaction to be rolled back, and its associated connection to consequently be released back into the pool.
 
@@ -56,7 +56,7 @@ Each session class provides a similar set of functionality but offers client app
 
 # end::sessions[]
 
-The session classes are described in xref:session-api/configuration/index.adoc#driver-session-api[The session API].
+The session classes are described in xref:session-api.adoc#driver-session-api[The session API].
 For more details, please see the <<driver-api-docs, API documentation>> for your language.
 
 
@@ -68,13 +68,13 @@ For more details, please see the <<driver-api-docs, API documentation>> for your
 Transactions are *_atomic units of work_* containing one or more *_Cypher Queries_*.
 Transactions may contain read or write work, and will generally be routed to an appropriate server for execution, where they will be carried out in their entirety.
 In case of a transaction failure, the transaction needs to be retried from the beginning.
-This is the responsibility of the xref:terminology/index.adoc#term-transaction-manager[*_transaction manager_*].
+This is the responsibility of the xref:terminology.adoc#term-transaction-manager[*_transaction manager_*].
 
-The Neo4j Drivers provide *_transaction management_* via the xref:terminology/index.adoc#term-transaction-function[*_transaction function_*] mechanism.
+The Neo4j Drivers provide *_transaction management_* via the xref:terminology.adoc#term-transaction-function[*_transaction function_*] mechanism.
 This mechanism is exposed through methods on the Session object which accept a function object that can be played multiple times against different servers until it either succeeds or a timeout is reached.
 This approach is recommended for most client applications.
 
-A convenient *_short-form alternative_* is the xref:terminology/index.adoc#term-auto-commit[*_auto-commit_*] transaction mechanism.
+A convenient *_short-form alternative_* is the xref:terminology.adoc#term-auto-commit[*_auto-commit_*] transaction mechanism.
 This provides a limited form of transaction management for single-query transactions, as a trade-off for a slightly smaller code overhead.
 This form of transaction is useful for *_quick scripts and environments where high availability guarantees are not required_*.
 It is also the required form of transaction for running link:docs/cypher-manual/5.0/clauses/call-subquery/index.adoc#subquery-call-in-transactions[Cypher Manual -> `CALL {} IN TRANSACTIONS`] queries, which are the only type of Cypher Query to manage their own transactions.
@@ -210,7 +210,7 @@ include::{python-examples}/test_pass_bookmarks_example.py[tags=pass-bookmarks]
 
 # tag::access-modes-transaction[]
 
-Transactions can be executed in either *_read_* or *_write_* mode; this is known as the xref:terminology/index.adoc#term-access-mode[*_access mode_*].
+Transactions can be executed in either *_read_* or *_write_* mode; this is known as the xref:terminology.adoc#term-access-mode[*_access mode_*].
 In a Causal Cluster, each transaction will be routed to an appropriate server based on the mode.
 When using a single instance, all transactions will be passed to that one server.
 
@@ -346,7 +346,7 @@ session.run("SHOW USERS")
 [[database-selection]]
 === Database selection
 
-The database selection on the client side happens on the xref:session-api/configuration/index.adoc#driver-session-api[session API].
+The database selection on the client side happens on the xref:session-api.adoc#driver-session-api[session API].
 
 # tag::database-selection[]
 

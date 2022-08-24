@@ -41,11 +41,11 @@ This is the driver manual for Neo4j official drivers version {driver-version}, a
 
 This manual covers the following areas:
 
-* xref:get-started/index.adoc#driver-get-started[Get started] -- An overview of the official Neo4j drivers and how to connect to a Neo4j database.
-* xref:client-applications/index.adoc#driver-client-applications[Client applications] -- How to manage database connections within an application.
-* xref:cypher-workflow/index.adoc#driver-cypher-workflow[Cypher workflow] -- How to create units of work and provide a logical context for that work.
-* xref:session-api/configuration/index.adoc#driver-session-api[The session API] -- How the types and values used by Cypher map to native language types.
-* xref:terminology/index.adoc#driver-terminology[Driver terminology] -- Terminology for drivers.
+* xref:get-started.adoc#driver-get-started[Get started] -- An overview of the official Neo4j drivers and how to connect to a Neo4j database.
+* xref:client-applications.adoc#driver-client-applications[Client applications] -- How to manage database connections within an application.
+* xref:cypher-workflow.adoc#driver-cypher-workflow[Cypher workflow] -- How to create units of work and provide a logical context for that work.
+* xref:session-api.adoc#driver-session-api[The session API] -- How the types and values used by Cypher map to native language types.
+* xref:terminology.adoc#driver-terminology[Driver terminology] -- Terminology for drivers.
 
 _Who should read this?_
 

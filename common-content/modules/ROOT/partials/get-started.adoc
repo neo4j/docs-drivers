@@ -50,7 +50,7 @@ This means that the underlying database topology — single instance, Causal
 
 # end::about[]
 
-In the general case, only the xref:client-applications/index.adoc#driver-connection-uris[connection URI] needs to be modified when changes are made to the topology.
+In the general case, only the xref:client-applications.adoc#driver-connection-uris[connection URI] needs to be modified when changes are made to the topology.
 
 # tag::about-note[]
 
