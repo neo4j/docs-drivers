@@ -24,7 +24,7 @@ See xref:session-api.adoc#js-driver-session-configuration[Session configuration]
 
 include::{common-partial}/session-api.adoc[tag=async-transaction-fn]
 
-[source, javascript]
+[source, javascript, indent=0]
 ----
 include::{javascript-examples}/examples.test.js[tags=async-transaction-function]
 ----
@@ -35,7 +35,7 @@ include::{javascript-examples}/examples.test.js[tags=async-transaction-function]
 
 include::{common-partial}/session-api.adoc[tag=async-autocommit-transactions]
 
-[source, javascript]
+[source, javascript, indent=0]
 ----
 include::{javascript-examples}/examples.test.js[tags=async-autocommit-transaction]
 ----
@@ -44,7 +44,7 @@ include::{javascript-examples}/examples.test.js[tags=async-autocommit-transactio
 
 include::{common-partial}/session-api.adoc[tag=async-multiple-tx]
 
-[source, javascript]
+[source, javascript, indent=0]
 ----
 include::{javascript-examples}/examples.test.js[tags=async-multiple-tx]
 ----
@@ -54,7 +54,7 @@ include::{javascript-examples}/examples.test.js[tags=async-multiple-tx]
 
 include::{common-partial}/session-api.adoc[tag=async-result-consume]
 
-[source, javascript]
+[source, javascript, indent=0]
 ----
 include::{javascript-examples}/examples.test.js[tags=async-result-consume]
 ----
@@ -85,7 +85,7 @@ include::{common-partial}/session-api.adoc[tag=rx-lifecycle]
 
 include::{common-partial}/session-api.adoc[tag=rx-transaction-fn]
 
-[source, javascript]
+[source, javascript, indent=0]
 ----
 include::{javascript-examples}/examples.test.js[tags=rx-transaction-function]
 ----
@@ -100,7 +100,7 @@ See xref:session-api.adoc#js-driver-session-configuration[Session configuration]
 
 include::{common-partial}/session-api.adoc[tag=rx-autocommit-transactions]
 
-[source, javascript]
+[source, javascript, indent=0]
 ----
 include::{javascript-examples}/examples.test.js[tags=rx-autocommit-transaction]
 ----
@@ -111,7 +111,7 @@ include::{javascript-examples}/examples.test.js[tags=rx-autocommit-transaction]
 
 include::{common-partial}/session-api.adoc[tag=rx-result-consume]
 
-[source, javascript]
+[source, javascript, indent=0]
 ----
 include::{javascript-examples}/examples.test.js[tags=rx-result-consume]
 ----
@@ -145,14 +145,14 @@ include::{common-partial}/session-api.adoc[tag=TransactionConfiguration]
 
 include::{common-partial}/session-api.adoc[tag=TransactionTimeout]
 
-[source, javascript]
+[source, javascript, indent=0]
 ----
 include::{javascript-examples}/examples.test.js[tags=transaction-timeout-config]
 ----
 
 include::{common-partial}/session-api.adoc[tag=TransactionMetadata]
 
-[source, javascript]
+[source, javascript, indent=0]
 ----
 include::{javascript-examples}/examples.test.js[tags=transaction-metadata-config]
 ----

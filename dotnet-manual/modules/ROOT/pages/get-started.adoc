@@ -41,14 +41,14 @@ There is no extra dependency required use .NET reactive API.
 ========
 To install the latest version of the driver using NuGet in Visual Studio:
 
-[source, csharp, subs="attributes, specialcharacters"]
+[source, csharp, subs="attributes, specialcharacters", indent=0]
 ----
 PM> Install-Package Neo4j.Driver
 ----
 
 It is also an option to install a certain version of the driver.
 
-[source, csharp, subs="attributes, specialcharacters"]
+[source, csharp, subs="attributes, specialcharacters", indent=0]
 ----
 PM> Install-Package Neo4j.Driver -Version $DOTNET_DRIVER_VERSION
 ----
@@ -60,7 +60,7 @@ The initial examples make use of these extensions.
 
 In the following example we are installing driver version {dotnet-driver-version}.
 
-[source, csharp, subs="attributes, specialcharacters"]
+[source, csharp, subs="attributes, specialcharacters", indent=0]
 ----
 PM> Install-Package Neo4j.Driver -Version {dotnet-driver-version}
 ----
@@ -78,12 +78,12 @@ The example below shows the minimal configuration necessary to interact with *Ne
 
 .Hello World
 ======
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/Examples.cs[tags=hello-world]
 ----
 
-// [source, csharp]
+// [source, csharp, indent=0]
 // ----
 // include::{dotnet-examples}/Examples.cs[tags=hello-world-import]
 // ----

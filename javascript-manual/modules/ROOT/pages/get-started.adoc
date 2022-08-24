@@ -23,7 +23,7 @@ include::{common-partial}/get-started.adoc[tag=versions]
 To use the JavaScript driver, it is recommended employing `npm`.
 To find the latest version of the driver, use:
 
-[source, shell, subs="attributes, specialcharacters"]
+[source, shell, subs="attributes, specialcharacters", indent=0]
 ----
 npm show neo4j-driver@* version
 ----
@@ -44,21 +44,21 @@ A dependency of RxJs is automatically installed with the driver.
 
 To install the latest version of the driver:
 
-[source, shell, subs="attributes, specialcharacters"]
+[source, shell, subs="attributes, specialcharacters", indent=0]
 ----
 npm install neo4j-driver
 ----
 
 It is also an option to install a certain version of the driver.
 
-[source, shell, subs="attributes, specialcharacters"]
+[source, shell, subs="attributes, specialcharacters", indent=0]
 ----
 npm install neo4j-driver@$JAVASCRIPT-DRIVER-VERSION
 ----
 
 In the following example, driver version {javascript-driver-version} is installed.
 
-[source, shell, subs="attributes, specialcharacters"]
+[source, shell, subs="attributes, specialcharacters", indent=0]
 ----
 npm install neo4j-driver@{javascript-driver-version}
 ----
@@ -76,12 +76,12 @@ The example below shows the minimal configuration necessary to interact with *Ne
 
 .Hello World
 ======
-[source, javascript]
+[source, javascript, indent=0]
 ----
 include::{javascript-examples}/examples.test.js[tags=hello-world]
 ----
 
-//[source, javascript]
+//[source, javascript, indent=0]
 //----
 //include::{javascript-examples}/examples.test.js[tags=hello-world-import]
 //----

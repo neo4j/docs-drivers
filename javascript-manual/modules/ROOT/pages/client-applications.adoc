@@ -15,13 +15,13 @@ include::{common-partial}/client-applications.adoc[tag=object-pt2]
 
 .The driver lifecycle
 ====
-[source, javascript]
+[source, javascript, indent=0]
 ----
 include::{javascript-examples}/examples.test.js[tags=driver-lifecycle]
 ----
 
 // .Import driver lifecycle
-// [source, javascript]
+// [source, javascript, indent=0]
 // ----
 // include::{javascript-examples}/examples.test.js[tags=driver-lifecycle-import]
 // ----
@@ -71,7 +71,7 @@ include::{common-partial}/client-applications.adoc[tag=resolver-function]
 
 .Custom Address Resolver
 ======
-[source, javascript]
+[source, javascript, indent=0]
 ----
 include::{javascript-examples}/examples.test.js[tags=config-custom-resolver]
 ----
@@ -114,14 +114,14 @@ The tables below illustrate examples of how to connect to a service with routing
 
 | Code snippet
 |
-[source, javascript]
+[source, javascript, indent=0]
 ----
 neo4j.driver("neo4j+s://graph.example.com:7687", auth)
 ----
 
 If you do not have at least the JavaScript Driver 4.0.2 patch installed, you will need this snippet instead:
 
-[source, javascript]
+[source, javascript, indent=0]
 ----
 const uri = 'neo4j://graph.example.com:7687'
 const driver = neo4j.driver(uri, auth, {
@@ -143,7 +143,7 @@ const driver = neo4j.driver(uri, auth, {
 
 | Code snippet
 |
-[source, javascript]
+[source, javascript, indent=0]
 ----
 neo4j.driver("neo4j://graph.example.com:7687", auth)
 ----
@@ -162,14 +162,14 @@ neo4j.driver("neo4j://graph.example.com:7687", auth)
 
 | Code snippet
 |
-[source, javascript]
+[source, javascript, indent=0]
 ----
 neo4j.driver("neo4j+s://graph.example.com:7687", auth)
 ----
 
 If you do not have at least the JavaScript Driver 4.0.2 patch installed, you will need this snippet instead:
 
-[source, javascript]
+[source, javascript, indent=0]
 ----
 const uri = 'neo4j://graph.example.com:7687'
 const driver = neo4j.driver(uri, auth, {
@@ -189,14 +189,14 @@ const driver = neo4j.driver(uri, auth, {
 
 | Code snippet
 |
-[source, javascript]
+[source, javascript, indent=0]
 ----
 neo4j.driver("neo4j+ssc://graph.example.com:7687", auth)
 ----
 
 If you do not have at least the JavaScript Driver 4.0.2 patch installed, you will need this snippet instead:
 
-[source, javascript]
+[source, javascript, indent=0]
 ----
 const uri = 'neo4j://graph.example.com:7687'
 const driver = neo4j.driver(uri, auth, {
@@ -217,14 +217,14 @@ const driver = neo4j.driver(uri, auth, {
 
 | Code snippet
 |
-[source, javascript]
+[source, javascript, indent=0]
 ----
 neo4j.driver("neo4j+s://graph.example.com:7687", auth)
 ----
 
 If you do not have at least the JavaScript Driver 4.0.2 patch installed, you will need this snippet instead:
 
-[source, javascript]
+[source, javascript, indent=0]
 ----
 const uri = 'neo4j://graph.example.com:7687'
 const driver = neo4j.driver(uri, auth, {
@@ -244,14 +244,14 @@ const driver = neo4j.driver(uri, auth, {
 
 | Code snippet
 |
-[source, javascript]
+[source, javascript, indent=0]
 ----
 neo4j.driver("neo4j+ssc://graph.example.com:7687", auth)
 ----
 
 If you do not have at least the JavaScript Driver 4.0.2 patch installed, you will need this snippet instead:
 
-[source, javascript]
+[source, javascript, indent=0]
 ----
 const uri = 'neo4j://graph.example.com:7687'
 const driver = neo4j.driver(uri, auth, {
@@ -274,7 +274,7 @@ const driver = neo4j.driver(uri, auth, {
 
 | Code snippet
 |
-[source, javascript]
+[source, javascript, indent=0]
 ----
 neo4j.driver("neo4j://graph.example.com:7687", auth)
 ----
@@ -297,13 +297,13 @@ include::{common-partial}/client-applications.adoc[tag=authentication-basic]
 
 .Basic authentication
 ======
-[source, javascript]
+[source, javascript, indent=0]
 ----
 include::{javascript-examples}/examples.test.js[tags=basic-auth]
 ----
 
 // .Import basic authentication
-// [source, javascript]
+// [source, javascript, indent=0]
 // ----
 // include::{javascript-examples}/examples.test.js[tags=basic-auth-import]
 // ----
@@ -319,13 +319,13 @@ include::{common-partial}/client-applications.adoc[tag=authentication-kerberos]
 
 .Kerberos authentication
 ======
-[source, javascript]
+[source, javascript, indent=0]
 ----
 include::{javascript-examples}/examples.test.js[tags=kerberos-auth]
 ----
 
 // .Import Kerberos authentication
-// [source, javascript]
+// [source, javascript, indent=0]
 // ----
 // include::{javascript-examples}/examples.test.js[tags=kerberos-auth-import]
 // ----
@@ -341,12 +341,12 @@ include::{common-partial}/client-applications.adoc[tag=authentication-custom]
 
 .Custom authentication
 ======
-[source, javascript]
+[source, javascript, indent=0]
 ----
 include::{javascript-examples}/examples.test.js[tags=custom-auth]
 ----
 // .Import custom authentication
-// [source, javascript]
+// [source, javascript, indent=0]
 // ----
 // include::{javascript-examples}/examples.test.js[tags=custom-auth-import]
 // ----
@@ -360,13 +360,13 @@ include::{common-partial}/client-applications.adoc[tag=configuration-ConnectionA
 +
 .Configure connection pool
 ======
-[source, javascript]
+[source, javascript, indent=0]
 ----
 include::{javascript-examples}/examples.test.js[tags=config-connection-pool]
 ----
 
 // .Import connection pool configuration
-// [source, javascript]
+// [source, javascript, indent=0]
 // ----
 // include::{javascript-examples}/examples.test.js[tags=config-connection-pool-import]
 // ----
@@ -376,12 +376,12 @@ include::{common-partial}/client-applications.adoc[tag=configuration-ConnectionT
 +
 .Configure connection timeout
 ======
-[source, javascript]
+[source, javascript, indent=0]
 ----
 include::{javascript-examples}/examples.test.js[tags=config-connection-timeout]
 ----
 // .Import connection timeout configuration
-// [source, javascript]
+// [source, javascript, indent=0]
 // ----
 // include::{javascript-examples}/examples.test.js[tags=config-connection-timeout-import]
 // ----
@@ -395,12 +395,12 @@ include::{common-partial}/client-applications.adoc[tag=configuration-Encryption]
 +
 .Unencrypted configuration
 ======
-[source, javascript]
+[source, javascript, indent=0]
 ----
 include::{javascript-examples}/examples.test.js[tags=config-unencrypted]
 ----
 // .Import unencrypted configuration
-// [source, javascript]
+// [source, javascript, indent=0]
 // ----
 // include::{javascript-examples}/examples.test.js[tags=config-unencrypted-import]
 // ----
@@ -416,12 +416,12 @@ include::{common-partial}/client-applications.adoc[tag=configuration-MaxTransact
 +
 .Configure maximum retry time
 ======
-[source, javascript]
+[source, javascript, indent=0]
 ----
 include::{javascript-examples}/examples.test.js[tags=config-max-retry-time]
 ----
 // .Import maximum retry time configuration
-// [source, javascript]
+// [source, javascript, indent=0]
 // ----
 // include::{javascript-examples}/examples.test.js[tags=config-max-retry-time-import]
 // ----
@@ -431,12 +431,12 @@ include::{common-partial}/client-applications.adoc[tag=configuration-TrustStrate
 +
 .Configure trusted certificates
 ======
-[source, javascript]
+[source, javascript, indent=0]
 ----
 include::{javascript-examples}/examples.test.js[tags=config-trust]
 ----
 // .Import trusted certificate configuration
-// [source, javascript]
+// [source, javascript, indent=0]
 // ----
 // include::{javascript-examples}/examples.test.js[tags=config-trust-import]
 // ----
@@ -448,7 +448,7 @@ include::{javascript-examples}/examples.test.js[tags=config-trust]
 
 include::{common-partial}/client-applications.adoc[tag=logging]
 
-[source, javascript]
+[source, javascript, indent=0]
 ----
 const loggingConfig = {logging: neo4j.logging.console('debug')};
 const driver = neo4j.driver(..., loggingConfig);

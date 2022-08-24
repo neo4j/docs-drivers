@@ -26,7 +26,7 @@ To find a list of all available releases, visit https://pypi.org/simple/neo4j/
 
 To install the latest stable version of the Python Driver:
 
-[source, shell, subs="attributes, specialcharacters"]
+[source, shell, subs="attributes, specialcharacters", indent=0]
 ----
 pip install neo4j
 ----
@@ -36,13 +36,13 @@ It is also an option to install a certain version of the driver.
 .Installation with Python
 ========
 The following is the syntax for installing a certain version of the Python Driver:
-[source, shell, subs="attributes, specialcharacters"]
+[source, shell, subs="attributes, specialcharacters", indent=0]
 ----
 pip install neo4j==$PYTHON_DRIVER_VERSION
 ----
 
 In the following example we are installing Python Driver version {python-driver-version}.
-[source, shell, subs="attributes, specialcharacters"]
+[source, shell, subs="attributes, specialcharacters", indent=0]
 ----
 pip install neo4j=={python-driver-version}
 ----
@@ -51,7 +51,7 @@ pip install neo4j=={python-driver-version}
 .Installation with Python, get Python Driver prerelease
 ========
 In the following example we get the latest prerelease version:
-[source, shell, subs="attributes, specialcharacters"]
+[source, shell, subs="attributes, specialcharacters", indent=0]
 ----
 pip install neo4 --pre
 ----
@@ -69,12 +69,12 @@ The example below shows the minimal configuration necessary to interact with *Ne
 
 .Hello World
 ======
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/test_driver_introduction_example.py[tags=driver-introduction-example-import]
 ----
 
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/test_driver_introduction_example.py[tags=driver-introduction-example]
 ----

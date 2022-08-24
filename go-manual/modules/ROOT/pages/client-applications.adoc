@@ -15,7 +15,7 @@ include::{common-partial}/client-applications.adoc[tag=object-pt2]
 
 .The driver lifecycle
 ======
-[source, go]
+[source, go, indent=0]
 ----
 include::{go-examples}/examples_test.go[tags=driver-lifecycle]
 ----
@@ -64,7 +64,7 @@ include::{common-partial}/client-applications.adoc[tag=resolver-function]
 
 .Custom Address Resolver
 ======
-[source, go]
+[source, go, indent=0]
 ----
 include::{go-examples}/examples_test.go[tags=config-custom-resolver]
 ----
@@ -107,7 +107,7 @@ The tables below illustrate examples of how to connect to a service with routing
 
 | Code snippet
 |
-[source, go]
+[source, go, indent=0]
 ----
 neo4j.NewDriver("neo4j+s://graph.example.com:7687", auth)
 ----
@@ -127,7 +127,7 @@ neo4j.NewDriver("neo4j+s://graph.example.com:7687", auth)
 
 | Code snippet
 |
-[source, go]
+[source, go, indent=0]
 ----
 neo4j.NewDriver("neo4j://graph.example.com:7687", auth);
 ----
@@ -147,7 +147,7 @@ neo4j.NewDriver("neo4j://graph.example.com:7687", auth);
 
 | Code snippet
 |
-[source, go]
+[source, go, indent=0]
 ----
 neo4j.NewDriver("neo4j+s://graph.example.com:7687", auth)
 ----
@@ -164,7 +164,7 @@ neo4j.NewDriver("neo4j+s://graph.example.com:7687", auth)
 
 | Code snippet
 |
-[source, go]
+[source, go, indent=0]
 ----
 neo4j.NewDriver("neo4j+ssc://graph.example.com:7687", auth)
 ----
@@ -181,7 +181,7 @@ neo4j.NewDriver("neo4j+ssc://graph.example.com:7687", auth)
 
 | Code snippet
 |
-[source, go]
+[source, go, indent=0]
 ----
 neo4j.NewDriver("neo4j+s://graph.example.com:7687", auth)
 ----
@@ -198,7 +198,7 @@ neo4j.NewDriver("neo4j+s://graph.example.com:7687", auth)
 
 | Code snippet
 |
-[source, go]
+[source, go, indent=0]
 ----
 neo4j.NewDriver("neo4j+ssc://graph.example.com:7687", auth)
 ----
@@ -218,7 +218,7 @@ neo4j.NewDriver("neo4j+ssc://graph.example.com:7687", auth)
 
 | Code snippet
 |
-[source, go]
+[source, go, indent=0]
 ----
 neo4j.NewDriver("neo4j://graph.example.com:7687", auth);
 ----
@@ -241,7 +241,7 @@ include::{common-partial}/client-applications.adoc[tag=authentication-basic]
 
 .Basic authentication
 ======
-[source, go]
+[source, go, indent=0]
 ----
 include::{go-examples}/examples_test.go[tags=basic-auth]
 ----
@@ -257,7 +257,7 @@ include::{common-partial}/client-applications.adoc[tag=authentication-kerberos]
 
 .Import Kerberos authentication
 ======
-[source, go]
+[source, go, indent=0]
 ----
 include::{go-examples}/examples_test.go[tags=kerberos-auth]
 ----
@@ -273,7 +273,7 @@ include::{common-partial}/client-applications.adoc[tag=authentication-custom]
 
 .Custom authentication
 ======
-[source, go]
+[source, go, indent=0]
 ----
 include::{go-examples}/examples_test.go[tags=custom-auth]
 ----
@@ -287,7 +287,7 @@ include::{common-partial}/client-applications.adoc[tag=configuration-ConnectionA
 +
 .Configure connection pool
 ======
-[source, go]
+[source, go, indent=0]
 ----
 include::{go-examples}/examples_test.go[tags=config-connection-pool]
 ----
@@ -297,7 +297,7 @@ include::{common-partial}/client-applications.adoc[tag=configuration-ConnectionT
 +
 .Configure connection timeout
 ======
-[source, go]
+[source, go, indent=0]
 ----
 include::{go-examples}/examples_test.go[tags=config-connection-timeout]
 ----
@@ -319,7 +319,7 @@ include::{common-partial}/client-applications.adoc[tag=configuration-MaxTransact
 +
 .Configure maximum retry time
 ======
-[source, go]
+[source, go, indent=0]
 ----
 include::{go-examples}/examples_test.go[tags=config-max-retry-time]
 ----
@@ -347,7 +347,7 @@ RootCAs can be used to configure custom CAs.
 
 include::{common-partial}/client-applications.adoc[tag=logging]
 
-[source, go]
+[source, go, indent=0]
 ----
 driver, err := neo4j.NewDriver(..., func(c *neo4j.Config) { c.Log = neo4j.ConsoleLogger(neo4j.DEBUG) })
 ----
