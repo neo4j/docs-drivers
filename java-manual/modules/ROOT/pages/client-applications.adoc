@@ -16,12 +16,12 @@ include::{common-partial}/client-applications.adoc[tag=object-pt2]
 
 .The driver lifecycle
 ====
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/DriverLifecycleExample.java[tags=driver-lifecycle-import]
 ----
 
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/DriverLifecycleExample.java[tags=driver-lifecycle]
 ----
@@ -71,7 +71,7 @@ include::{common-partial}/client-applications.adoc[tag=resolver-function]
 
 .Custom Address Resolver
 ======
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/ConfigCustomResolverExample.java[tags=config-custom-resolver]
 ----
@@ -114,14 +114,14 @@ The tables below illustrate examples of how to connect to a service with routing
 
 | Code snippet
 |
-[source, java]
+[source, java, indent=0]
 ----
 GraphDatabase.driver("neo4j+s://graph.example.com:7687", auth)
 ----
 
 If you do not have at least the Java Driver 4.0.1 patch installed, you will need this snippet instead:
 
-[source, java]
+[source, java, indent=0]
 ----
 String uri = "neo4j://graph.example.com:7687";
 Config config = Config.builder()
@@ -146,7 +146,7 @@ Driver driver = GraphDatabase.driver(uri, auth, config);
 
 | Code snippet
 |
-[source, java]
+[source, java, indent=0]
 ----
 GraphDatabase.driver("neo4j://graph.example.com:7687", auth)
 ----
@@ -166,14 +166,14 @@ GraphDatabase.driver("neo4j://graph.example.com:7687", auth)
 
 | Code snippet
 |
-[source, java]
+[source, java, indent=0]
 ----
 GraphDatabase.driver("neo4j+s://graph.example.com:7687", auth)
 ----
 
 If you do not have at least the Java Driver 4.0.1 patch installed, you will need this snippet instead:
 
-[source, java]
+[source, java, indent=0]
 ----
 String uri = "neo4j://graph.example.com:7687";
 Config config = Config.builder()
@@ -194,14 +194,14 @@ Driver driver = GraphDatabase.driver(uri, auth, config);
 
 | Code snippet
 |
-[source, java]
+[source, java, indent=0]
 ----
 GraphDatabase.driver("neo4j+ssc://graph.example.com:7687", auth)
 ----
 
 If you do not have at least the Java Driver 4.0.1 patch installed, you will need this snippet instead:
 
-[source, java]
+[source, java, indent=0]
 ----
 String uri = "neo4j://graph.example.com:7687";
 Config config = Config.builder()
@@ -223,14 +223,14 @@ Driver driver = GraphDatabase.driver(uri, auth, config);
 
 | Code snippet
 |
-[source, java]
+[source, java, indent=0]
 ----
 GraphDatabase.driver("neo4j+s://graph.example.com:7687", auth)
 ----
 
 If you do not have at least the Java Driver 4.0.1 patch installed, you will need this snippet instead:
 
-[source, java]
+[source, java, indent=0]
 ----
 String uri = "neo4j://graph.example.com:7687";
 Config config = Config.builder()
@@ -251,14 +251,14 @@ Driver driver = GraphDatabase.driver(uri, auth, config);
 
 | Code snippet
 |
-[source, java]
+[source, java, indent=0]
 ----
 GraphDatabase.driver("neo4j+ssc://graph.example.com:7687", auth)
 ----
 
 If you do not have at least the Java Driver 4.0.1 patch installed, you will need this snippet instead:
 
-[source, java]
+[source, java, indent=0]
 ----
 String uri = "neo4j://graph.example.com:7687";
 Config config = Config.builder()
@@ -283,7 +283,7 @@ Driver driver = GraphDatabase.driver(uri, auth, config);
 
 | Code snippet
 |
-[source, java]
+[source, java, indent=0]
 ----
 GraphDatabase.driver("neo4j://graph.example.com:7687", auth)
 ----
@@ -306,12 +306,12 @@ include::{common-partial}/client-applications.adoc[tag=authentication-basic]
 
 .Basic authentication
 ======
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/BasicAuthExample.java[tags=basic-auth-import]
 ----
 
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/BasicAuthExample.java[tags=basic-auth]
 ----
@@ -327,12 +327,12 @@ include::{common-partial}/client-applications.adoc[tag=authentication-kerberos]
 
 .Kerberos authentication
 ======
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/KerberosAuthExample.java[tags=kerberos-auth-import]
 ----
 
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/KerberosAuthExample.java[tags=kerberos-auth]
 ----
@@ -347,12 +347,12 @@ include::{common-partial}/client-applications.adoc[tag=authentication-bearer]
 
 .Import bearer authentication
 ======
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/BearerAuthExample.java[tags=bearer-auth-import]
 ----
 
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/BearerAuthExample.java[tags=bearer-auth]
 ----
@@ -365,12 +365,12 @@ include::{common-partial}/client-applications.adoc[tag=authentication-custom]
 
 .Custom authentication
 ======
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/CustomAuthExample.java[tags=custom-auth-import]
 ----
 
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/CustomAuthExample.java[tags=custom-auth]
 ----
@@ -384,12 +384,12 @@ include::{common-partial}/client-applications.adoc[tag=configuration-ConnectionA
 +
 .Configure connection pool
 ======
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/ConfigConnectionPoolExample.java[tags=config-connection-pool-import]
 ----
 
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/ConfigConnectionPoolExample.java[tags=config-connection-pool]
 ----
@@ -399,12 +399,12 @@ include::{common-partial}/client-applications.adoc[tag=configuration-ConnectionT
 +
 .Configure connection timeout
 ======
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/ConfigConnectionTimeoutExample.java[tags=config-connection-timeout-import]
 ----
 
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/ConfigConnectionTimeoutExample.java[tags=config-connection-timeout]
 ----
@@ -418,12 +418,12 @@ include::{common-partial}/client-applications.adoc[tag=configuration-Encryption]
 +
 .Unencrypted configuration
 ======
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/ConfigUnencryptedExample.java[tags=config-unencrypted-import]
 ----
 
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/ConfigUnencryptedExample.java[tags=config-unencrypted]
 ----
@@ -439,12 +439,12 @@ include::{common-partial}/client-applications.adoc[tag=configuration-MaxTransact
 +
 .Configure maximum retry time
 ======
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/ConfigMaxRetryTimeExample.java[tags=config-max-retry-time-import]
 ----
 
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/ConfigMaxRetryTimeExample.java[tags=config-max-retry-time]
 ----
@@ -454,12 +454,12 @@ include::{common-partial}/client-applications.adoc[tag=configuration-TrustStrate
 +
 .Configure trusted certificates
 ======
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/ConfigTrustExample.java[tags=config-trust-import]
 ----
 
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/ConfigTrustExample.java[tags=config-trust]
 ----
@@ -471,7 +471,7 @@ include::{java-examples}/ConfigTrustExample.java[tags=config-trust]
 
 include::{common-partial}/client-applications.adoc[tag=logging]
 
-[source, java]
+[source, java, indent=0]
 ----
 ConfigBuilder.withLogging(Logging.console(Level.DEBUG))
 ----

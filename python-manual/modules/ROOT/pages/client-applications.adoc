@@ -15,12 +15,12 @@ include::{common-partial}/client-applications.adoc[tag=object-pt2]
 
 .The driver lifecycle
 ====
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/test_driver_lifecycle_example.py[tags=driver-lifecycle-import]
 ----
 
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/test_driver_lifecycle_example.py[tags=driver-lifecycle]
 ----
@@ -68,12 +68,12 @@ include::{common-partial}/client-applications.adoc[tag=resolver-function]
 
 .Custom Address Resolver
 ======
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/test_custom_resolver_example.py[tags=custom-resolver-import]
 ----
 
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/test_custom_resolver_example.py[tags=custom-resolver]
 ----
@@ -116,13 +116,13 @@ The tables below illustrate examples of how to connect to a service with routing
 
 | Code snippet
 |
-[source, python]
+[source, python, indent=0]
 ----
 GraphDatabase.driver("neo4j+s://graph.example.com:7687", auth)
 ----
 
 For Python Driver versions before 4.0.0 you need this snippet instead:
-[source, python]
+[source, python, indent=0]
 ----
 GraphDatabase.driver("neo4j://graph.example.com:7687", auth,
     "encrypted"=True, "trust"=TRUST_SYSTEM_CA_SIGNED_CERTIFICATES)
@@ -143,7 +143,7 @@ GraphDatabase.driver("neo4j://graph.example.com:7687", auth,
 
 | Code snippet
 |
-[source, python]
+[source, python, indent=0]
 ----
 GraphDatabase.driver("neo4j://graph.example.com:7687", auth)
 ----
@@ -163,13 +163,13 @@ GraphDatabase.driver("neo4j://graph.example.com:7687", auth)
 
 | Code snippet
 |
-[source, python]
+[source, python, indent=0]
 ----
 GraphDatabase.driver("neo4j+s://graph.example.com:7687", auth)
 ----
 
 For Python Driver versions before 4.0.0 you need this snippet instead:
-[source, python]
+[source, python, indent=0]
 ----
 GraphDatabase.driver("neo4j://graph.example.com:7687", auth,
     "encrypted"=True, "trust"=TRUST_SYSTEM_CA_SIGNED_CERTIFICATES)
@@ -187,13 +187,13 @@ GraphDatabase.driver("neo4j://graph.example.com:7687", auth,
 
 | Code snippet
 |
-[source, python]
+[source, python, indent=0]
 ----
 neo4j.driver("neo4j+ssc://graph.example.com:7687", auth)
 ----
 
 For Python Driver versions before 4.0.0 you need this snippet instead:
-[source, python]
+[source, python, indent=0]
 ----
 GraphDatabase.driver("neo4j://graph.example.com:7687", auth,
     "encrypted"=True, "trust"=TRUST_ALL_CERTIFICATES)
@@ -211,13 +211,13 @@ GraphDatabase.driver("neo4j://graph.example.com:7687", auth,
 
 | Code snippet
 |
-[source, python]
+[source, python, indent=0]
 ----
 neo4j.driver("neo4j+s://graph.example.com:7687", auth)
 ----
 
 For Python Driver versions before 4.0.0 you need this snippet instead:
-[source, python]
+[source, python, indent=0]
 ----
 GraphDatabase.driver("neo4j://graph.example.com:7687", auth,
     "encrypted"=True, "trust"=TRUST_SYSTEM_CA_SIGNED_CERTIFICATES)
@@ -235,13 +235,13 @@ GraphDatabase.driver("neo4j://graph.example.com:7687", auth,
 
 | Code snippet
 |
-[source, python]
+[source, python, indent=0]
 ----
 neo4j.driver("neo4j+ssc://graph.example.com:7687", auth)
 ----
 
 For Python Driver versions before 4.0.0 you need this snippet instead:
-[source, python]
+[source, python, indent=0]
 ----
 GraphDatabase.driver("neo4j://graph.example.com:7687", auth,
     "encrypted"=True, "trust"=TRUST_ALL_CERTIFICATES)
@@ -262,7 +262,7 @@ GraphDatabase.driver("neo4j://graph.example.com:7687", auth,
 
 | Code snippet
 |
-[source, python]
+[source, python, indent=0]
 ----
 neo4j.driver("neo4j://graph.example.com:7687", auth)
 ----
@@ -285,12 +285,12 @@ include::{common-partial}/client-applications.adoc[tag=authentication-basic]
 
 .Basic authentication
 ======
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/test_basic_auth_example.py[tags=basic-auth-import]
 ----
 
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/test_basic_auth_example.py[tags=basic-auth]
 ----
@@ -306,12 +306,12 @@ include::{common-partial}/client-applications.adoc[tag=authentication-kerberos]
 
 .Kerberos authentication
 ======
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/test_kerberos_auth_example.py[tags=kerberos-auth-import]
 ----
 
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/test_kerberos_auth_example.py[tags=kerberos-auth]
 ----
@@ -326,12 +326,12 @@ include::{common-partial}/client-applications.adoc[tag=authentication-bearer]
 
 .Import bearer authentication
 ======
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/test_bearer_auth_example.py[tags=bearer-auth-import]
 ----
 
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/test_bearer_auth_example.py[tags=bearer-auth]
 ----
@@ -344,12 +344,12 @@ include::{common-partial}/client-applications.adoc[tag=authentication-custom]
 
 .Custom authentication
 ======
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/test_custom_auth_example.py[tags=custom-auth-import]
 ----
 
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/test_custom_auth_example.py[tags=custom-auth]
 ----
@@ -376,12 +376,12 @@ Finding an optimal value may require an element of experimentation, taking into 
 +
 .Configure connection pool
 ======
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/test_config_connection_pool_example.py[tags=config-connection-pool-import]
 ----
 
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/test_config_connection_pool_example.py[tags=config-connection-pool]
 ----
@@ -404,12 +404,12 @@ For lower latency environments and quicker feedback on potential network issues 
 +
 .Configure connection timeout
 ======
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/test_config_connection_timeout_example.py[tags=config-connection-timeout-import]
 ----
 
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/test_config_connection_timeout_example.py[tags=config-connection-timeout]
 ----
@@ -424,12 +424,12 @@ include::{common-partial}/client-applications.adoc[tag=configuration-Encryption]
 +
 .Unencrypted configuration
 ======
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/test_config_unencrypted_example.py[tags=config-unencrypted-import]
 ----
 
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/test_config_unencrypted_example.py[tags=config-unencrypted]
 ----
@@ -474,12 +474,12 @@ Failing transactions faster may highlight the reasons behind the transient error
 +
 .Configure maximum retry time
 ======
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/test_config_max_retry_time_example.py[tags=config-max-retry-time-import]
 ----
 
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/test_config_max_retry_time_example.py[tags=config-max-retry-time]
 ----
@@ -489,12 +489,12 @@ include::{common-partial}/client-applications.adoc[tag=configuration-TrustStrate
 +
 .Configure trusted certificates
 ======
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/test_config_trust_example.py[tags=config-trust-import]
 ----
 
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/test_config_trust_example.py[tags=config-trust]
 ----
@@ -506,7 +506,7 @@ include::{python-examples}/test_config_trust_example.py[tags=config-trust]
 
 include::{common-partial}/client-applications.adoc[tag=logging]
 
-[source, python]
+[source, python, indent=0]
 ----
 import sys
 
@@ -517,7 +517,7 @@ watch("neo4j", out=sys.stdout)
 
 For more control, you can configure the logger manually:
 
-[source, python]
+[source, python, indent=0]
 ----
 import logging
 import sys

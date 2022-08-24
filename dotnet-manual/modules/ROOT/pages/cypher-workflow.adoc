@@ -39,13 +39,13 @@ include::{common-partial}/cypher-workflow.adoc[tag=causal-chaining]
 
 .Pass bookmarks
 ======
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/Examples.cs[tags=pass-bookmarks]
 ----
 
 // .Import bookmarks
-// [source, csharp]
+// [source, csharp, indent=0]
 // ----
 // include::{dotnet-examples}/Examples.cs[tags=pass-bookmarks-import]
 // ----
@@ -59,7 +59,7 @@ include::{common-partial}/cypher-workflow.adoc[tag=access-modes-transaction]
 
 .Read-write transaction
 ======
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/Examples.cs[tags=read-write-transaction]
 ----
@@ -85,7 +85,7 @@ include::{common-partial}/cypher-workflow.adoc[tag=database-selection]
 
 .Database selection on session creation
 ======
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/Examples.cs[tags=database-selection]
 ----

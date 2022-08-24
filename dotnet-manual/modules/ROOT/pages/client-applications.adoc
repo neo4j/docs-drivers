@@ -15,13 +15,13 @@ include::{common-partial}/client-applications.adoc[tag=object-pt2]
 
 .The driver lifecycle
 ====
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/Examples.cs[tags=driver-lifecycle]
 ----
 
 // .Import driver lifecycle
-// [source, csharp]
+// [source, csharp, indent=0]
 // ----
 // include::{dotnet-examples}/Examples.cs[tags=driver-lifecycle-import]
 // ----
@@ -70,7 +70,7 @@ include::{common-partial}/client-applications.adoc[tag=resolver-function]
 
 .Custom Address Resolver
 ======
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/Examples.cs[tags=config-custom-resolver]
 ----
@@ -113,14 +113,14 @@ The tables below illustrate examples of how to connect to a service with routing
 
 | Code snippet
 |
-[source, csharp]
+[source, csharp, indent=0]
 ----
 GraphDatabase.Driver("neo4j+s://graph.example.com:7687", auth)
 ----
 
 If you do not have at least the .NET Driver 4.0.1 patch installed, you will need this snippet instead:
 
-[source, csharp]
+[source, csharp, indent=0]
 ----
 String uri = "neo4j://graph.example.com:7687";
 IDriver driver = GraphDatabase.Driver(uri, auth,
@@ -142,7 +142,7 @@ IDriver driver = GraphDatabase.Driver(uri, auth,
 
 | Code snippet
 |
-[source, csharp]
+[source, csharp, indent=0]
 ----
 GraphDatabase.Driver("neo4j://graph.example.com:7687", auth);
 ----
@@ -162,14 +162,14 @@ GraphDatabase.Driver("neo4j://graph.example.com:7687", auth);
 
 | Code snippet
 |
-[source, csharp]
+[source, csharp, indent=0]
 ----
 GraphDatabase.Driver("neo4j+s://graph.example.com:7687", auth)
 ----
 
 If you do not have at least the .NET Driver 4.0.1 patch installed, you will need this snippet instead:
 
-[source, csharp]
+[source, csharp, indent=0]
 ----
 String uri = "neo4j://graph.example.com:7687";
 IDriver driver = GraphDatabase.Driver(uri, auth,
@@ -188,14 +188,14 @@ IDriver driver = GraphDatabase.Driver(uri, auth,
 
 | Code snippet
 |
-[source, csharp]
+[source, csharp, indent=0]
 ----
 GraphDatabase.Driver("neo4j+ssc://graph.example.com:7687", auth)
 ----
 
 If you do not have at least the .NET Driver 4.0.1 patch installed, you will need this snippet instead:
 
-[source, csharp]
+[source, csharp, indent=0]
 ----
 String uri = "neo4j://graph.example.com:7687";
 IDriver driver = GraphDatabase.Driver(uri, auth,
@@ -215,14 +215,14 @@ IDriver driver = GraphDatabase.Driver(uri, auth,
 
 | Code snippet
 |
-[source, csharp]
+[source, csharp, indent=0]
 ----
 GraphDatabase.Driver("neo4j+s://graph.example.com:7687", auth)
 ----
 
 If you do not have at least the .NET Driver 4.0.1 patch installed, you will need this snippet instead:
 
-[source, csharp]
+[source, csharp, indent=0]
 ----
 String uri = "neo4j://graph.example.com:7687";
 IDriver driver = GraphDatabase.Driver(uri, auth,
@@ -241,14 +241,14 @@ IDriver driver = GraphDatabase.Driver(uri, auth,
 
 | Code snippet
 |
-[source, csharp]
+[source, csharp, indent=0]
 ----
 GraphDatabase.Driver("neo4j+ssc://graph.example.com:7687", auth)
 ----
 
 If you do not have at least the .NET Driver 4.0.1 patch installed, you will need this snippet instead:
 
-[source, csharp]
+[source, csharp, indent=0]
 ----
 String uri = "neo4j://graph.example.com:7687";
 IDriver driver = GraphDatabase.Driver(uri, auth,
@@ -271,7 +271,7 @@ IDriver driver = GraphDatabase.Driver(uri, auth,
 
 | Code snippet
 |
-[source, csharp]
+[source, csharp, indent=0]
 ----
 GraphDatabase.Driver("neo4j://graph.example.com:7687", auth);
 ----
@@ -294,13 +294,13 @@ include::{common-partial}/client-applications.adoc[tag=authentication-basic]
 
 .Basic authentication
 ======
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/Examples.cs[tags=basic-auth]
 ----
 
 // .Import basic authentication
-// [source, csharp]
+// [source, csharp, indent=0]
 // ----
 // include::{dotnet-examples}/Examples.cs[tags=basic-auth-import]
 // ----
@@ -316,13 +316,13 @@ include::{common-partial}/client-applications.adoc[tag=authentication-kerberos]
 
 .Kerberos authentication
 ======
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/Examples.cs[tags=kerberos-auth]
 ----
 
 // .Import Kerberos authentication
-// [source, csharp]
+// [source, csharp, indent=0]
 // ----
 // include::{dotnet-examples}/Examples.cs[tags=kerberos-auth-import]
 // ----
@@ -337,7 +337,7 @@ include::{common-partial}/client-applications.adoc[tag=authentication-bearer]
 
 .Import bearer authentication
 ======
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/Examples.cs[tags=bearer-auth]
 ----
@@ -350,13 +350,13 @@ include::{common-partial}/client-applications.adoc[tag=authentication-custom]
 
 .Custom authentication
 ======
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/Examples.cs[tags=custom-auth]
 ----
 
 // .Import custom authentication
-// [source, csharp]
+// [source, csharp, indent=0]
 // ----
 // include::{dotnet-examples}/Examples.cs[tags=custom-auth-import]
 // ----
@@ -370,12 +370,12 @@ include::{common-partial}/client-applications.adoc[tag=configuration-ConnectionA
 +
 .Configure connection pool
 ======
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/Examples.cs[tags=config-connection-pool]
 ----
 // .Import connection pool configuration
-// [source, csharp]
+// [source, csharp, indent=0]
 // ----
 // include::{dotnet-examples}/Examples.cs[tags=config-connection-pool-import]
 // ----
@@ -385,13 +385,13 @@ include::{common-partial}/client-applications.adoc[tag=configuration-ConnectionT
 +
 .Configure connection timeout
 ======
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/Examples.cs[tags=config-connection-timeout]
 ----
 
 // .Import connection timeout configuration
-// [source, csharp]
+// [source, csharp, indent=0]
 // ----
 // include::{dotnet-examples}/Examples.cs[tags=config-connection-timeout-import]
 // ----
@@ -406,12 +406,12 @@ include::{common-partial}/client-applications.adoc[tag=configuration-Encryption]
 +
 .Unencrypted configuration
 ======
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/Examples.cs[tags=config-unencrypted]
 ----
 // .Import unencrypted configuration
-// [source, csharp]
+// [source, csharp, indent=0]
 // ----
 // include::{dotnet-examples}/Examples.cs[tags=config-unencrypted-import]
 // ----
@@ -428,14 +428,14 @@ include::{common-partial}/client-applications.adoc[tag=configuration-MaxTransact
 +
 .Configure maximum retry time
 ======
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/Examples.cs[tags=config-max-retry-time]
 ----
 // .Import maximum retry time configuration
 // [.include-with-dotnet]
 // ======
-// [source, csharp]
+// [source, csharp, indent=0]
 // ----
 // include::{dotnet-examples}/Examples.cs[tags=config-max-retry-time-import]
 // ----
@@ -445,12 +445,12 @@ include::{common-partial}/client-applications.adoc[tag=configuration-TrustStrate
 +
 .Configure trusted certificates
 ======
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/Examples.cs[tags=config-trust]
 ----
 // .Import trusted certificate configuration
-// [source, csharp]
+// [source, csharp, indent=0]
 // ----
 // include::{dotnet-examples}/Examples.cs[tags=config-trust-import]
 // ----
@@ -464,7 +464,7 @@ include::{common-partial}/client-applications.adoc[tag=configuration-KeepAlive]
 
 include::{common-partial}/client-applications.adoc[tag=logging]
 
-[source, csharp]
+[source, csharp, indent=0]
 ----
 #Please note that you will have to provide your own console logger implementing the ILogger interface.
 IDriver driver = GraphDatabase.Driver(..., o => o.WithLogger(logger));
