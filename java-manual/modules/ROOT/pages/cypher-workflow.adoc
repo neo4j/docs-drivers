@@ -39,12 +39,12 @@ include::{common-partial}/cypher-workflow.adoc[tag=causal-chaining]
 
 .Pass bookmarks
 ======
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/PassBookmarkExample.java[tags=pass-bookmarks-import]
 ----
 
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/PassBookmarkExample.java[tags=pass-bookmarks]
 ----
@@ -58,7 +58,7 @@ include::{common-partial}/cypher-workflow.adoc[tag=access-modes-transaction]
 
 .Import read-write transaction
 ======
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/ReadWriteTransactionExample.java[tags=read-write-transaction-import]
 ----
@@ -66,7 +66,7 @@ include::{java-examples}/ReadWriteTransactionExample.java[tags=read-write-transa
 
 .Read-write transaction
 ======
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/ReadWriteTransactionExample.java[tags=read-write-transaction]
 ----
@@ -89,14 +89,14 @@ include::{common-partial}/cypher-workflow.adoc[tag=database-selection]
 ======
 Import database selection on session creation:
 
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/DatabaseSelectionExample.java[tags=database-selection-import]
 ----
 
 Database selection on session creation:
 
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/DatabaseSelectionExample.java[tags=database-selection]
 ----
@@ -148,12 +148,12 @@ The coercion methods, except `asObject()` and `asString()`, throw a `Uncoercible
 To avoid this kind exception, the `isNull()` or `asTypeName(TypeName defaultValue)` can be used, depending on the
 need.
 
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/ReadingValuesExample.java[tags=java-driver-reading-values-non-null]
 ----
 
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/ReadingValuesExample.java[tags=java-driver-reading-values-null]
 ----

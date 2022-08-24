@@ -25,7 +25,7 @@ To find the latest version of the driver, visit https://github.com/neo4j/neo4j-g
 
 To install the latest version of the driver using `go get`:
 
-[source, shell, subs="attributes, specialcharacters"]
+[source, shell, subs="attributes, specialcharacters", indent=0]
 ----
 go get github.com/neo4j/neo4j-go-driver/v4
 ----
@@ -42,7 +42,7 @@ The example below shows the minimal configuration necessary to interact with *Ne
 
 .Hello World
 ======
-[source, go]
+[source, go, indent=0]
 ----
 include::{go-examples}/examples_test.go[tags=hello-world]
 ----

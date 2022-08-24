@@ -15,7 +15,7 @@ include::{common-partial}/session-api.adoc[tag=simple-sessions]
 
 include::{common-partial}/session-api.adoc[tag=simple-lifecycle]
 
-[source, csharp ]
+[source, csharp , indent=0]
 ----
 using (var session = driver.Session(...)) {
     // transactions go here
@@ -32,7 +32,7 @@ See xref:session-api.adoc#dotnet-driver-session-configuration[Session configurat
 
 include::{common-partial}/session-api.adoc[tag=simple-transaction-fn]
 
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/Examples.cs[tags=transaction-function]
 ----
@@ -43,7 +43,7 @@ include::{dotnet-examples}/Examples.cs[tags=transaction-function]
 
 include::{common-partial}/session-api.adoc[tag=simple-autocommit-transactions]
 
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/Examples.cs[tags=autocommit-transaction]
 ----
@@ -54,7 +54,7 @@ include::{dotnet-examples}/Examples.cs[tags=autocommit-transaction]
 
 include::{common-partial}/session-api.adoc[tag=simple-result-consume]
 
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/Examples.cs[tags=result-consume]
 ----
@@ -65,7 +65,7 @@ include::{dotnet-examples}/Examples.cs[tags=result-consume]
 
 include::{common-partial}/session-api.adoc[tag=simple-result-retain]
 
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/Examples.cs[tags=result-retain]
 ----
@@ -90,7 +90,7 @@ See xref:session-api.adoc#dotnet-driver-session-configuration[Session configurat
 
 include::{common-partial}/session-api.adoc[tag=async-transaction-fn]
 
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/ExamplesAsync.cs[tags=async-transaction-function]
 ----
@@ -101,7 +101,7 @@ include::{dotnet-examples}/ExamplesAsync.cs[tags=async-transaction-function]
 
 include::{common-partial}/session-api.adoc[tag=async-autocommit-transactions]
 
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/ExamplesAsync.cs[tags=async-autocommit-transaction]
 ----
@@ -110,7 +110,7 @@ include::{dotnet-examples}/ExamplesAsync.cs[tags=async-autocommit-transaction]
 
 include::{common-partial}/session-api.adoc[tag=async-multiple-tx]
 
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/ExamplesAsync.cs[tags=async-multiple-tx]
 ----
@@ -120,7 +120,7 @@ include::{dotnet-examples}/ExamplesAsync.cs[tags=async-multiple-tx]
 
 include::{common-partial}/session-api.adoc[tag=async-result-consume]
 
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/ExamplesAsync.cs[tags=async-result-consume]
 ----
@@ -150,7 +150,7 @@ include::{common-partial}/session-api.adoc[tag=rx-lifecycle]
 
 include::{common-partial}/session-api.adoc[tag=rx-transaction-fn]
 
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/ExamplesRx.cs[tags=rx-transaction-function]
 ----
@@ -165,7 +165,7 @@ See xref:session-api.adoc#dotnet-driver-session-configuration[Session configurat
 
 include::{common-partial}/session-api.adoc[tag=rx-autocommit-transactions]
 
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/ExamplesRx.cs[tags=rx-autocommit-transaction]
 ----
@@ -176,7 +176,7 @@ include::{dotnet-examples}/ExamplesRx.cs[tags=rx-autocommit-transaction]
 
 include::{common-partial}/session-api.adoc[tag=rx-result-consume]
 
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/ExamplesRx.cs[tags=rx-result-consume]
 ----
@@ -215,14 +215,14 @@ include::{common-partial}/session-api.adoc[tag=TransactionConfiguration]
 
 include::{common-partial}/session-api.adoc[tag=TransactionTimeout]
 
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/Examples.cs[tags=transaction-timeout-config]
 ----
 
 include::{common-partial}/session-api.adoc[tag=TransactionMetadata]
 
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/Examples.cs[tags=transaction-metadata-config]
 ----

@@ -15,7 +15,7 @@ include::{common-partial}/session-api.adoc[tag=simple-sessions]
 
 include::{common-partial}/session-api.adoc[tag=simple-lifecycle]
 
-[source, java]
+[source, java, indent=0]
 ----
 try (Session session = driver.session(...)) {
     // transactions go here
@@ -32,7 +32,7 @@ See xref:session-api.adoc#java-driver-session-configuration[Session configuratio
 
 include::{common-partial}/session-api.adoc[tag=simple-transaction-fn]
 
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/TransactionFunctionExample.java[tags=transaction-function]
 ----
@@ -43,7 +43,7 @@ include::{java-examples}/TransactionFunctionExample.java[tags=transaction-functi
 
 include::{common-partial}/session-api.adoc[tag=simple-autocommit-transactions]
 
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/AutocommitTransactionExample.java[tags=autocommit-transaction]
 ----
@@ -54,7 +54,7 @@ include::{java-examples}/AutocommitTransactionExample.java[tags=autocommit-trans
 
 include::{common-partial}/session-api.adoc[tag=simple-result-consume]
 
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/ResultConsumeExample.java[tags=result-consume]
 ----
@@ -65,7 +65,7 @@ include::{java-examples}/ResultConsumeExample.java[tags=result-consume]
 
 include::{common-partial}/session-api.adoc[tag=simple-result-retain]
 
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/ResultRetainExample.java[tags=result-retain]
 ----
@@ -90,7 +90,7 @@ See xref:session-api.adoc#java-driver-session-configuration[Session configuratio
 
 include::{common-partial}/session-api.adoc[tag=async-transaction-fn]
 
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/AsyncTransactionFunctionExample.java[tags=async-transaction-function]
 ----
@@ -101,7 +101,7 @@ include::{java-examples}/AsyncTransactionFunctionExample.java[tags=async-transac
 
 include::{common-partial}/session-api.adoc[tag=async-autocommit-transactions]
 
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/AsyncAutocommitTransactionExample.java[tags=async-autocommit-transaction]
 ----
@@ -110,7 +110,7 @@ include::{java-examples}/AsyncAutocommitTransactionExample.java[tags=async-autoc
 
 include::{common-partial}/session-api.adoc[tag=async-multiple-tx]
 
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/AsyncRunMultipleTransactionExample.java[tags=async-multiple-tx]
 ----
@@ -120,7 +120,7 @@ include::{java-examples}/AsyncRunMultipleTransactionExample.java[tags=async-mult
 
 include::{common-partial}/session-api.adoc[tag=async-result-consume]
 
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/AsyncResultConsumeExample.java[tags=async-result-consume]
 ----
@@ -150,7 +150,7 @@ include::{common-partial}/session-api.adoc[tag=rx-lifecycle]
 
 include::{common-partial}/session-api.adoc[tag=rx-transaction-fn]
 
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/RxTransactionFunctionExample.java[tags=rx-transaction-function]
 ----
@@ -165,7 +165,7 @@ See xref:session-api.adoc#java-driver-session-configuration[Session configuratio
 
 include::{common-partial}/session-api.adoc[tag=rx-autocommit-transactions]
 
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/RxAutocommitTransactionExample.java[tags=rx-autocommit-transaction]
 ----
@@ -176,7 +176,7 @@ include::{java-examples}/RxAutocommitTransactionExample.java[tags=rx-autocommit-
 
 include::{common-partial}/session-api.adoc[tag=rx-result-consume]
 
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/RxResultConsumeExample.java[tags=rx-result-consume]
 ----
@@ -215,14 +215,14 @@ include::{common-partial}/session-api.adoc[tag=TransactionConfiguration]
 
 include::{common-partial}/session-api.adoc[tag=TransactionTimeout]
 
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/TransactionTimeoutConfigExample.java[tags=transaction-timeout-config]
 ----
 
 include::{common-partial}/session-api.adoc[tag=TransactionMetadata]
 
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/TransactionMetadataConfigExample.java[tags=transaction-metadata-config]
 ----

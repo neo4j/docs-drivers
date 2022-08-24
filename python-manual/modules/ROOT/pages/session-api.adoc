@@ -15,7 +15,7 @@ include::{common-partial}/session-api.adoc[tag=simple-sessions]
 
 include::{common-partial}/session-api.adoc[tag=simple-lifecycle]
 
-[source, python]
+[source, python, indent=0]
 ----
 with driver.session(...) as session:
     // transactions go here
@@ -33,12 +33,12 @@ include::{common-partial}/session-api.adoc[tag=simple-transaction-fn]
 
 .Transaction function
 ======
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/test_transaction_function_example.py[tags=transaction-function-import]
 ----
 
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/test_transaction_function_example.py[tags=transaction-function]
 ----
@@ -52,12 +52,12 @@ include::{common-partial}/session-api.adoc[tag=simple-autocommit-transactions]
 
 .Simple auto-commit transactions
 ======
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/test_autocommit_transaction_example.py[tags=autocommit-transaction-import]
 ----
 
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/test_autocommit_transaction_example.py[tags=autocommit-transaction]
 ----
@@ -71,7 +71,7 @@ include::{common-partial}/session-api.adoc[tag=simple-result-consume]
 
 .Consuming results
 ======
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/test_result_consume_example.py[tags=result-consume]
 ----
@@ -83,7 +83,7 @@ include::{python-examples}/test_result_consume_example.py[tags=result-consume]
 
 include::{common-partial}/session-api.adoc[tag=simple-result-retain]
 
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/test_result_retain_example.py[tags=result-retain]
 ----
@@ -115,14 +115,14 @@ include::{common-partial}/session-api.adoc[tag=TransactionConfiguration]
 
 include::{common-partial}/session-api.adoc[tag=TransactionTimeout]
 
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/test_transaction_timeout_config_example.py[tags=transaction-timeout-config]
 ----
 
 include::{common-partial}/session-api.adoc[tag=TransactionMetadata]
 
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/test_transaction_metadata_config_example.py[tags=transaction-metadata-config]
 ----
