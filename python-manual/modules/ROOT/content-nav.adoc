@@ -3,6 +3,4 @@
 * xref:client-applications.adoc[]
 * xref:cypher-workflow.adoc[]
 * xref:session-api.adoc[]
-// ** xref:session-api/simple.adoc[Simple Sessions]
-// ** xref:session-api/configuration.adoc[Session Configuration]
 * xref:terminology.adoc[]

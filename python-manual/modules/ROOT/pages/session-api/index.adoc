@@ -1,4 +1,0 @@
-[[python-driver-session-api]]
-= The session API
-
-include::{common-partial}/session-api.adoc[tag=abstract]
