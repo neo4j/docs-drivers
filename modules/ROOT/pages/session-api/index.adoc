@@ -52,7 +52,7 @@ In languages that support them, simple sessions are usually scoped within a cont
 ====
 [.include-with-dotnet]
 ======
-[source, csharp ]
+[source, csharp , indent=0]
 ----
 using (var session = driver.Session(...)) {
     // transactions go here
@@ -62,7 +62,7 @@ using (var session = driver.Session(...)) {
 
 [.include-with-go]
 ======
-[source, go ]
+[source, go , indent=0]
 ----
 session := driver.NewSession(...)
 defer session.Close()
@@ -72,7 +72,7 @@ defer session.Close()
 
 [.include-with-java]
 ======
-[source, java]
+[source, java, indent=0]
 ----
 try (Session session = driver.session(...)) {
     // transactions go here
@@ -82,7 +82,7 @@ try (Session session = driver.session(...)) {
 
 [.include-with-python]
 ======
-[source, python]
+[source, python, indent=0]
 ----
 with driver.session(...) as session:
     // transactions go here
@@ -128,7 +128,7 @@ These cases include connection issues, server role changes (e.g. leadership elec
 ====
 [.include-with-dotnet]
 ======
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/Examples.cs[tags=transaction-function]
 ----
@@ -136,7 +136,7 @@ include::{dotnet-examples}/Examples.cs[tags=transaction-function]
 
 [.include-with-go]
 ======
-[source, go]
+[source, go, indent=0]
 ----
 include::{go-examples}/examples_test.go[tags=transaction-function]
 ----
@@ -144,7 +144,7 @@ include::{go-examples}/examples_test.go[tags=transaction-function]
 
 [.include-with-java]
 ======
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/TransactionFunctionExample.java[tags=transaction-function]
 ----
@@ -152,12 +152,12 @@ include::{java-examples}/TransactionFunctionExample.java[tags=transaction-functi
 
 [.include-with-python]
 ======
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/test_transaction_function_example.py[tags=transaction-function-import]
 ----
 
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/test_transaction_function_example.py[tags=transaction-function]
 ----
@@ -195,7 +195,7 @@ Please refer to the link:docs/cypher-manual/4.1/query-tuning/using/index.adoc#qu
 
 [.include-with-dotnet]
 ======
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/Examples.cs[tags=autocommit-transaction]
 ----
@@ -203,7 +203,7 @@ include::{dotnet-examples}/Examples.cs[tags=autocommit-transaction]
 
 [.include-with-go]
 ======
-[source, go]
+[source, go, indent=0]
 ----
 include::{go-examples}/examples_test.go[tags=autocommit-transaction]
 ----
@@ -211,7 +211,7 @@ include::{go-examples}/examples_test.go[tags=autocommit-transaction]
 
 [.include-with-java]
 ======
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/AutocommitTransactionExample.java[tags=autocommit-transaction]
 ----
@@ -219,12 +219,12 @@ include::{java-examples}/AutocommitTransactionExample.java[tags=autocommit-trans
 
 [.include-with-python]
 ======
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/test_autocommit_transaction_example.py[tags=autocommit-transaction-import]
 ----
 
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/test_autocommit_transaction_example.py[tags=autocommit-transaction]
 ----
@@ -245,7 +245,7 @@ The drivers provide a language-idiomatic way to iterate through that stream.
 
 [.include-with-dotnet]
 ======
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/Examples.cs[tags=result-consume]
 ----
@@ -253,7 +253,7 @@ include::{dotnet-examples}/Examples.cs[tags=result-consume]
 
 [.include-with-go]
 ======
-[source, go]
+[source, go, indent=0]
 ----
 include::{go-examples}/examples_test.go[tags=result-consume]
 ----
@@ -261,7 +261,7 @@ include::{go-examples}/examples_test.go[tags=result-consume]
 
 [.include-with-java]
 ======
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/ResultConsumeExample.java[tags=result-consume]
 ----
@@ -269,7 +269,7 @@ include::{java-examples}/ResultConsumeExample.java[tags=result-consume]
 
 [.include-with-python]
 ======
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/test_result_consume_example.py[tags=result-consume]
 ----
@@ -305,7 +305,7 @@ The drivers offer support for this process, as per the example below:
 
 [.include-with-dotnet]
 ======
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/Examples.cs[tags=result-retain]
 ----
@@ -313,7 +313,7 @@ include::{dotnet-examples}/Examples.cs[tags=result-retain]
 
 [.include-with-go]
 ======
-[source, go]
+[source, go, indent=0]
 ----
 include::{go-examples}/examples_test.go[tags=result-retain]
 ----
@@ -321,7 +321,7 @@ include::{go-examples}/examples_test.go[tags=result-retain]
 
 [.include-with-java]
 ======
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/ResultRetainExample.java[tags=result-retain]
 ----
@@ -329,7 +329,7 @@ include::{java-examples}/ResultRetainExample.java[tags=result-retain]
 
 [.include-with-python]
 ======
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/test_result_retain_example.py[tags=result-retain]
 ----
@@ -395,7 +395,7 @@ Retry logic can be configured when creating a session.
 [.include-with-dotnet]
 ======
 .Transaction function
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/ExamplesAsync.cs[tags=async-transaction-function]
 ----
@@ -404,7 +404,7 @@ include::{dotnet-examples}/ExamplesAsync.cs[tags=async-transaction-function]
 [.include-with-java]
 ======
 .Transaction function
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/AsyncTransactionFunctionExample.java[tags=async-transaction-function]
 ----
@@ -413,7 +413,7 @@ include::{java-examples}/AsyncTransactionFunctionExample.java[tags=async-transac
 [.include-with-javascript]
 ======
 .Transaction function
-[source, javascript]
+[source, javascript, indent=0]
 ----
 include::{javascript-examples}/examples.test.js[tags=async-transaction-function]
 ----
@@ -452,7 +452,7 @@ Please refer to the link:docs/cypher-manual/4.1/query-tuning/using/index.adoc#qu
 [.include-with-dotnet]
 ======
 .Auto-commit transaction
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/ExamplesAsync.cs[tags=async-autocommit-transaction]
 ----
@@ -461,7 +461,7 @@ include::{dotnet-examples}/ExamplesAsync.cs[tags=async-autocommit-transaction]
 [.include-with-java]
 ======
 .Auto-commit transaction
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/AsyncAutocommitTransactionExample.java[tags=async-autocommit-transaction]
 ----
@@ -470,7 +470,7 @@ include::{java-examples}/AsyncAutocommitTransactionExample.java[tags=async-autoc
 [.include-with-javascript]
 ======
 .Auto-commit transaction
-[source, javascript]
+[source, javascript, indent=0]
 ----
 include::{javascript-examples}/examples.test.js[tags=async-autocommit-transaction]
 ----
@@ -491,7 +491,7 @@ The asynchronous session API provides language-idiomatic methods to aid integrat
 [.include-with-dotnet]
 ======
 .Consuming results
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/ExamplesAsync.cs[tags=async-result-consume]
 ----
@@ -500,7 +500,7 @@ include::{dotnet-examples}/ExamplesAsync.cs[tags=async-result-consume]
 [.include-with-java]
 ======
 .Consuming results
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/AsyncResultConsumeExample.java[tags=async-result-consume]
 ----
@@ -509,7 +509,7 @@ include::{java-examples}/AsyncResultConsumeExample.java[tags=async-result-consum
 [.include-with-javascript]
 ======
 .Consuming results
-[source, javascript]
+[source, javascript, indent=0]
 ----
 include::{javascript-examples}/examples.test.js[tags=async-result-consume]
 ----
@@ -590,7 +590,7 @@ Retry logic can be configured when creating a session.
 [.include-with-dotnet]
 ======
 .Reactive transaction function
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/ExamplesRx.cs[tags=rx-transaction-function]
 ----
@@ -599,7 +599,7 @@ include::{dotnet-examples}/ExamplesRx.cs[tags=rx-transaction-function]
 [.include-with-java]
 ======
 .Reactive transaction function
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/RxTransactionFunctionExample.java[tags=rx-transaction-function]
 ----
@@ -608,7 +608,7 @@ include::{java-examples}/RxTransactionFunctionExample.java[tags=rx-transaction-f
 [.include-with-javascript]
 ======
 .Reactive transaction function
-[source, javascript]
+[source, javascript, indent=0]
 ----
 include::{javascript-examples}/examples.test.js[tags=rx-transaction-function]
 ----
@@ -651,7 +651,7 @@ Please refer to the link:docs/cypher-manual/4.1/query-tuning/using/index.adoc#qu
 [.include-with-dotnet]
 ======
 .Auto-commit transactions
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/ExamplesRx.cs[tags=rx-autocommit-transaction]
 ----
@@ -660,7 +660,7 @@ include::{dotnet-examples}/ExamplesRx.cs[tags=rx-autocommit-transaction]
 [.include-with-java]
 ======
 .Auto-commit transactions
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/RxAutocommitTransactionExample.java[tags=rx-autocommit-transaction]
 ----
@@ -669,7 +669,7 @@ include::{java-examples}/RxAutocommitTransactionExample.java[tags=rx-autocommit-
 [.include-with-javascript]
 ======
 .Auto-commit transactions
-[source, javascript]
+[source, javascript, indent=0]
 ----
 include::{javascript-examples}/examples.test.js[tags=rx-autocommit-transaction]
 ----
@@ -694,7 +694,7 @@ Only one subscriber may pull data from a given flow.
 [.include-with-dotnet]
 ======
 .Consuming results
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/ExamplesRx.cs[tags=rx-result-consume]
 ----
@@ -703,7 +703,7 @@ include::{dotnet-examples}/ExamplesRx.cs[tags=rx-result-consume]
 [.include-with-java]
 ======
 .Consuming results
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/RxResultConsumeExample.java[tags=rx-result-consume]
 ----
@@ -712,7 +712,7 @@ include::{java-examples}/RxResultConsumeExample.java[tags=rx-result-consume]
 [.include-with-javascript]
 ======
 .Consuming results
-[source, javascript]
+[source, javascript, indent=0]
 ----
 include::{javascript-examples}/examples.test.js[tags=rx-result-consume]
 ----

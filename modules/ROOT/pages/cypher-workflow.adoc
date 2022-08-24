@@ -116,13 +116,13 @@ image::driver-passing-bookmarks.svg[title="Passing bookmarks", role="middle"]
 [.include-with-dotnet]
 ======
 .Pass bookmarks
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/Examples.cs[tags=pass-bookmarks]
 ----
 
 // .Import bookmarks
-// [source, csharp]
+// [source, csharp, indent=0]
 // ----
 // include::{dotnet-examples}/Examples.cs[tags=pass-bookmarks-import]
 // ----
@@ -130,7 +130,7 @@ include::{dotnet-examples}/Examples.cs[tags=pass-bookmarks]
 
 [.include-with-go]
 ======
-[source, go]
+[source, go, indent=0]
 ----
 include::{go-examples}/examples_test.go[tags=pass-bookmarks]
 ----
@@ -139,13 +139,13 @@ include::{go-examples}/examples_test.go[tags=pass-bookmarks]
 [.include-with-java]
 ======
 .Import bookmarks
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/PassBookmarkExample.java[tags=pass-bookmarks-import]
 ----
 
 .Pass bookmarks
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/PassBookmarkExample.java[tags=pass-bookmarks]
 ----
@@ -154,13 +154,13 @@ include::{java-examples}/PassBookmarkExample.java[tags=pass-bookmarks]
 [.include-with-javascript]
 ======
 .Pass bookmarks
-[source, javascript]
+[source, javascript, indent=0]
 ----
 include::{javascript-examples}/examples.test.js[tags=pass-bookmarks]
 ----
 
 // .Import bookmarks
-// [source, javascript]
+// [source, javascript, indent=0]
 // ----
 // include::{javascript-examples}/examples.test.js[tags=pass-bookmarks-import]
 // ----
@@ -169,12 +169,12 @@ include::{javascript-examples}/examples.test.js[tags=pass-bookmarks]
 
 [.include-with-python]
 ======
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/test_pass_bookmarks_example.py[tags=pass-bookmarks-import]
 ----
 
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/test_pass_bookmarks_example.py[tags=pass-bookmarks]
 ----
@@ -212,7 +212,7 @@ As a result, a write transaction tagged as a read will still be sent to a read s
 ======
 
 .Read write transaction
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/Examples.cs[tags=read-write-transaction]
 ----
@@ -226,7 +226,7 @@ include::{dotnet-examples}/Examples.cs[tags=read-write-transaction]
 
 [.include-with-go]
 ======
-[source, go]
+[source, go, indent=0]
 ----
 include::{go-examples}/examples_test.go[tags=read-write-transaction]
 ----
@@ -235,13 +235,13 @@ include::{go-examples}/examples_test.go[tags=read-write-transaction]
 [.include-with-java]
 ======
 .Import read write transaction
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/ReadWriteTransactionExample.java[tags=read-write-transaction-import]
 ----
 
 .Read write transaction
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/ReadWriteTransactionExample.java[tags=read-write-transaction]
 ----
@@ -251,13 +251,13 @@ include::{java-examples}/ReadWriteTransactionExample.java[tags=read-write-transa
 ======
 
 .Read write transaction
-[source, javascript]
+[source, javascript, indent=0]
 ----
 include::{javascript-examples}/examples.test.js[tags=read-write-transaction]
 ----
 
 // .Import read write transaction
-// [source, javascript]
+// [source, javascript, indent=0]
 // ----
 // include::{javascript-examples}/examples.test.js[tags=read-write-transaction-import]
 // ----
@@ -266,7 +266,7 @@ include::{javascript-examples}/examples.test.js[tags=read-write-transaction]
 
 [.include-with-python]
 ======
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/test_read_write_transaction_example.py[tags=read-write-transaction]
 ----
@@ -292,7 +292,7 @@ For more information about managing multiple databases within the same DBMS, ref
 
 The following example illustrates how to work with databases:
 
-[source]
+[source, indent=0]
 ----
 var session = driver.session(SessionConfig.forDatabase( "foo" ))
 // lists nodes from database foo
@@ -328,7 +328,7 @@ Changing to any other database than the default database in Neo4j Community Edit
 
 The following example illustrates the concept of DBMS link:docs/cypher-manual/4.1/introduction/transactions/index.adoc[Cypher Manual -> Transactions] and shows how queries to multiple databases can be issued in one driver transaction. It is annotated with comments describing how each operation impacts database transactions.
 
-[source]
+[source, indent=0]
 ----
 var session = driver.session(SessionConfig.forDatabase( "foo" ))
 // a DBMS-level transaction is started
@@ -359,7 +359,7 @@ Please note that the database that is requested must exist.
 [.include-with-dotnet]
 ======
 .Database selection on session creation
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/Examples.cs[tags=database-selection]
 ----
@@ -368,7 +368,7 @@ include::{dotnet-examples}/Examples.cs[tags=database-selection]
 [.include-with-go]
 ======
 .Database selection on session creation
-[source, go]
+[source, go, indent=0]
 ----
 include::{go-examples}/examples_test.go[tags=database-selection]
 ----
@@ -377,13 +377,13 @@ include::{go-examples}/examples_test.go[tags=database-selection]
 [.include-with-java]
 ======
 .Import database selection on session creation
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/DatabaseSelectionExample.java[tags=database-selection-import]
 ----
 
 .Database selection on session creation
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/DatabaseSelectionExample.java[tags=database-selection]
 ----
@@ -392,7 +392,7 @@ include::{java-examples}/DatabaseSelectionExample.java[tags=database-selection]
 [.include-with-javascript]
 ======
 .Database selection on session creation
-[source, javascript]
+[source, javascript, indent=0]
 ----
 include::{javascript-examples}/examples.test.js[tags=database-selection]
 ----
@@ -401,12 +401,12 @@ include::{javascript-examples}/examples.test.js[tags=database-selection]
 [.include-with-python]
 ======
 .Database selection on session creation
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/test_database_selection_example.py[tags=database-selection-import]
 ----
 
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/test_database_selection_example.py[tags=database-selection]
 ----
