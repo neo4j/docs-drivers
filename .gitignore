@@ -36,6 +36,6 @@ target/
 # docs project
 .env
 node_modules/
-modules/api/examples/
+*/modules/api/examples/
 modules/ROOT/partials/driver-sources/
 worktrees/
