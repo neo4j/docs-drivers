@@ -12,10 +12,6 @@ endif::[]
 :source-indent: 0
 :icons: font
 :iconfont-cdn: https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.0.0/css/font-awesome.min.css
-// :example-caption!:
-// :table-caption!:
-ifndef::dotnet-root[:dotnet-root: {project-root}/build/driver-sources/dotnet-driver]
-:dotnet-examples: {dotnet-root}/Neo4j.Driver/Neo4j.Driver.Tests.Integration
 :api-docs-base-uri: https://neo4j.com/docs/api
 
 

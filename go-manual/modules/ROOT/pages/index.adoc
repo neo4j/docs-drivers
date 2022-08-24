@@ -12,11 +12,6 @@ endif::[]
 :source-indent: 0
 :icons: font
 :iconfont-cdn: https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.0.0/css/font-awesome.min.css
-// :example-caption!:
-// :table-caption!:
-ifndef::go-root[:go-root: {project-root}/build/driver-sources/go-driver]
-:go-examples: {go-root}/neo4j/test-integration
-:api-docs-base-uri: https://neo4j.com/docs/api
 
 
 ifndef::backend-pdf[]
