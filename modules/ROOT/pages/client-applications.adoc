@@ -47,7 +47,7 @@ An example of driver construction and destruction can be seen below:
 ====
 [.include-with-dotnet]
 ======
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/Examples.cs[tags=driver-lifecycle]
 ----
@@ -55,7 +55,7 @@ include::{dotnet-examples}/Examples.cs[tags=driver-lifecycle]
 
 [.include-with-go]
 ======
-[source, go]
+[source, go, indent=0]
 ----
 include::{go-examples}/examples_test.go[tags=driver-lifecycle]
 ----
@@ -63,7 +63,7 @@ include::{go-examples}/examples_test.go[tags=driver-lifecycle]
 
 [.include-with-java]
 ======
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/DriverLifecycleExample.java[tags=driver-lifecycle]
 ----
@@ -71,7 +71,7 @@ include::{java-examples}/DriverLifecycleExample.java[tags=driver-lifecycle]
 
 [.include-with-javascript]
 ======
-[source, javascript]
+[source, javascript, indent=0]
 ----
 include::{javascript-examples}/examples.test.js[tags=driver-lifecycle]
 ----
@@ -79,7 +79,7 @@ include::{javascript-examples}/examples.test.js[tags=driver-lifecycle]
 
 [.include-with-python]
 ======
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/driver_lifecycle_example.py[tags=driver-lifecycle]
 ----
@@ -171,7 +171,7 @@ The example below shows how to expand a single address into multiple (hard coded
 ====
 [.include-with-dotnet]
 ======
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/Examples.cs[tags=config-custom-resolver]
 ----
@@ -179,7 +179,7 @@ include::{dotnet-examples}/Examples.cs[tags=config-custom-resolver]
 
 [.include-with-go]
 ======
-[source, go]
+[source, go, indent=0]
 ----
 include::{go-examples}/examples_test.go[tags=config-custom-resolver]
 ----
@@ -187,7 +187,7 @@ include::{go-examples}/examples_test.go[tags=config-custom-resolver]
 
 [.include-with-java]
 ======
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/ConfigCustomResolverExample.java[tags=config-custom-resolver]
 ----
@@ -195,7 +195,7 @@ include::{java-examples}/ConfigCustomResolverExample.java[tags=config-custom-res
 
 [.include-with-javascript]
 ======
-[source, javascript]
+[source, javascript, indent=0]
 ----
 include::{javascript-examples}/examples.test.js[tags=config-custom-resolver]
 ----
@@ -203,7 +203,7 @@ include::{javascript-examples}/examples.test.js[tags=config-custom-resolver]
 
 [.include-with-python]
 ======
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/custom_resolver_example.py[tags=custom-resolver]
 ----
@@ -222,7 +222,7 @@ This can be disabled through configuration as follows:
 ====
 [.include-with-dotnet]
 ======
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/Examples.cs[tags=config-unencrypted]
 ----
@@ -230,7 +230,7 @@ include::{dotnet-examples}/Examples.cs[tags=config-unencrypted]
 
 [.include-with-go]
 ======
-[source, go]
+[source, go, indent=0]
 ----
 include::{go-examples}/examples_test.go[tags=config-unencrypted]
 ----
@@ -238,7 +238,7 @@ include::{go-examples}/examples_test.go[tags=config-unencrypted]
 
 [.include-with-java]
 ======
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/ConfigUnencryptedExample.java[tags=config-unencrypted]
 ----
@@ -246,7 +246,7 @@ include::{java-examples}/ConfigUnencryptedExample.java[tags=config-unencrypted]
 
 [.include-with-javascript]
 ======
-[source, javascript]
+[source, javascript, indent=0]
 ----
 include::{javascript-examples}/examples.test.js[tags=config-unencrypted]
 ----
@@ -254,7 +254,7 @@ include::{javascript-examples}/examples.test.js[tags=config-unencrypted]
 
 [.include-with-python]
 ======
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/config_unencrypted_example.py[tags=config-unencrypted]
 ----
@@ -289,7 +289,7 @@ https://en.wikipedia.org/wiki/Server_Name_Indication[Server Name Indication (SNI
 ====
 [.include-with-dotnet]
 ======
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/Examples.cs[tags=config-trust]
 ----
@@ -297,7 +297,7 @@ include::{dotnet-examples}/Examples.cs[tags=config-trust]
 
 [.include-with-go]
 ======
-[source, go]
+[source, go, indent=0]
 ----
 include::{go-examples}/examples_test.go[tags=config-trust]
 ----
@@ -305,7 +305,7 @@ include::{go-examples}/examples_test.go[tags=config-trust]
 
 [.include-with-java]
 ======
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/ConfigTrustExample.java[tags=config-trust]
 ----
@@ -313,7 +313,7 @@ include::{java-examples}/ConfigTrustExample.java[tags=config-trust]
 
 [.include-with-javascript]
 ======
-[source, javascript]
+[source, javascript, indent=0]
 ----
 include::{javascript-examples}/examples.test.js[tags=config-trust]
 ----
@@ -321,7 +321,7 @@ include::{javascript-examples}/examples.test.js[tags=config-trust]
 
 [.include-with-python]
 ======
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/config_trust_example.py[tags=config-trust]
 ----
@@ -352,7 +352,7 @@ The table below illustrates examples of how to connect to a service with routing
 |Neo4j Aura
 |Secured with full certificate
 |
-[source, csharp]
+[source, csharp, indent=0]
 ----
 String uri = "bolt+routing://graph.example.com:7687";
 IDriver driver = GraphDatabase.Driver(uri, auth,
@@ -363,7 +363,7 @@ IDriver driver = GraphDatabase.Driver(uri, auth,
 |Neo4j 4.x
 |Unsecured
 |
-[source, csharp]
+[source, csharp, indent=0]
 ----
 String uri = "bolt+routing://graph.example.com:7687";
 IDriver driver = GraphDatabase.Driver(uri, auth,
@@ -374,7 +374,7 @@ IDriver driver = GraphDatabase.Driver(uri, auth,
 |Neo4j 4.x
 |Secured with full certificate
 |
-[source, csharp]
+[source, csharp, indent=0]
 ----
 String uri = "bolt+routing://graph.example.com:7687";
 IDriver driver = GraphDatabase.Driver(uri, auth,
@@ -385,7 +385,7 @@ IDriver driver = GraphDatabase.Driver(uri, auth,
 |Neo4j 4.x
 |Secured with self-signed certificate
 |
-[source, csharp]
+[source, csharp, indent=0]
 ----
 GraphDatabase.Driver("bolt+routing://graph.example.com:7687", auth)
 ----
@@ -394,7 +394,7 @@ GraphDatabase.Driver("bolt+routing://graph.example.com:7687", auth)
 |Neo4j 3.x
 |Secured with full certificate
 |
-[source, csharp]
+[source, csharp, indent=0]
 ----
 String uri = "bolt+routing://graph.example.com:7687";
 IDriver driver = GraphDatabase.Driver(uri, auth,
@@ -405,7 +405,7 @@ IDriver driver = GraphDatabase.Driver(uri, auth,
 |Neo4j 3.x
 |Secured with self-signed certificate
 |
-[source, csharp]
+[source, csharp, indent=0]
 ----
 GraphDatabase.Driver("bolt+routing://graph.example.com:7687", auth)
 ----
@@ -414,7 +414,7 @@ GraphDatabase.Driver("bolt+routing://graph.example.com:7687", auth)
 |Neo4j 3.x
 |Unsecured
 |
-[source, csharp]
+[source, csharp, indent=0]
 ----
 String uri = "bolt+routing://graph.example.com:7687";
 IDriver driver = GraphDatabase.Driver(uri, auth,
@@ -442,7 +442,7 @@ The table below illustrates examples of how to connect to a service with routing
 |Neo4j Aura
 |Secured with full certificate
 |
-[source, go]
+[source, go, indent=0]
 ----
 uri := "bolt+routing://graph.example.com:7687"
 
@@ -455,7 +455,7 @@ driver, err := neo4j.NewDriver(uri, auth, func(config *neo4j.Config) {
 |Neo4j 4.x
 |Unsecured
 |
-[source, go]
+[source, go, indent=0]
 ----
 uri := "bolt+routing://graph.example.com:7687"
 
@@ -468,7 +468,7 @@ driver, err := neo4j.NewDriver(uri, auth, func(config *neo4j.Config) {
 |Neo4j 4.x
 |Secured with full certificate
 |
-[source, go]
+[source, go, indent=0]
 ----
 uri := "bolt+routing://graph.example.com:7687"
 
@@ -481,7 +481,7 @@ driver, err := neo4j.NewDriver(uri, auth, func(config *neo4j.Config) {
 |Neo4j 4.x
 |Secured with self-signed certificate
 |
-[source, go]
+[source, go, indent=0]
 ----
 driver, err := neo4j.NewDriver("bolt+routing://graph.example.com:7687", auth)
 ----
@@ -490,7 +490,7 @@ driver, err := neo4j.NewDriver("bolt+routing://graph.example.com:7687", auth)
 |Neo4j 3.x
 |Secured with full certificate
 |
-[source, go]
+[source, go, indent=0]
 ----
 uri := "bolt+routing://graph.example.com:7687"
 
@@ -503,7 +503,7 @@ driver, err := neo4j.NewDriver(uri, auth, func(config *neo4j.Config) {
 |Neo4j 3.x
 |Secured with self-signed certificate
 |
-[source, go]
+[source, go, indent=0]
 ----
 driver, err := neo4j.NewDriver("bolt+routing://graph.example.com:7687", auth)
 ----
@@ -512,7 +512,7 @@ driver, err := neo4j.NewDriver("bolt+routing://graph.example.com:7687", auth)
 |Neo4j 3.x
 |Unsecured
 |
-[source, go]
+[source, go, indent=0]
 ----
 uri := "bolt+routing://graph.example.com:7687"
 
@@ -543,7 +543,7 @@ The table below illustrates examples of how to connect to a service with routing
 |Neo4j Aura
 |Secured with full certificate
 |
-[source, java]
+[source, java, indent=0]
 ----
 String uri = "bolt+routing://graph.example.com:7687";
 Config config = Config.build()
@@ -555,7 +555,7 @@ Config config = Config.build()
 |Neo4j 4.x
 |Unsecured
 |
-[source, java]
+[source, java, indent=0]
 ----
 String uri = "bolt+routing://graph.example.com:7687";
 Config config = Config.build()
@@ -569,7 +569,7 @@ GraphDatabase.driver( uri, auth, config );
 |Neo4j 4.x
 |Secured with full certificate
 |
-[source, java]
+[source, java, indent=0]
 ----
 String uri = "bolt+routing://graph.example.com:7687";
 Config config = Config.build()
@@ -581,7 +581,7 @@ Config config = Config.build()
 |Neo4j 4.x
 |Secured with self-signed certificate
 |
-[source, java]
+[source, java, indent=0]
 ----
 GraphDatabase.driver("bolt+routing://graph.example.com:7687", auth)
 ----
@@ -590,7 +590,7 @@ GraphDatabase.driver("bolt+routing://graph.example.com:7687", auth)
 |Neo4j 3.x
 |Secured with full certificate
 |
-[source, java]
+[source, java, indent=0]
 ----
 String uri = "bolt+routing://graph.example.com:7687";
 Config config = Config.build()
@@ -602,7 +602,7 @@ Config config = Config.build()
 |Neo4j 3.x
 |Secured with self-signed certificate
 |
-[source, java]
+[source, java, indent=0]
 ----
 GraphDatabase.driver("bolt+routing://graph.example.com:7687", auth)
 ----
@@ -611,7 +611,7 @@ GraphDatabase.driver("bolt+routing://graph.example.com:7687", auth)
 |Neo4j 3.x
 |Unsecured
 |
-[source, java]
+[source, java, indent=0]
 ----
 String uri = "bolt+routing://graph.example.com:7687";
 Config config = Config.build()
@@ -643,7 +643,7 @@ The table below illustrates examples of how to connect to a service with routing
 |Neo4j Aura
 |Secured with full certificate
 |
-[source, javascript]
+[source, javascript, indent=0]
 ----
 const uri = 'bolt+routing://graph.example.com:7687'
 const driver = neo4j.driver(uri,auth, {
@@ -655,7 +655,7 @@ const driver = neo4j.driver(uri,auth, {
 |Neo4j 4.x
 |Unsecured
 |
-[source, javascript]
+[source, javascript, indent=0]
 ----
 const uri = 'bolt+routing://graph.example.com:7687'
 const driver = neo4j.driver(uri, auth, {
@@ -667,7 +667,7 @@ const driver = neo4j.driver(uri, auth, {
 |Neo4j 4.x
 |Secured with full certificate
 |
-[source, javascript]
+[source, javascript, indent=0]
 ----
 const uri = 'bolt+routing://graph.example.com:7687'
 const driver = neo4j.driver(uri,auth, {
@@ -679,7 +679,7 @@ const driver = neo4j.driver(uri,auth, {
 |Neo4j 4.x
 |Secured with self-signed certificate
 |
-[source, javascript]
+[source, javascript, indent=0]
 ----
 neo4j.driver("bolt+routing://graph.example.com:7687", auth)
 ----
@@ -688,7 +688,7 @@ neo4j.driver("bolt+routing://graph.example.com:7687", auth)
 |Neo4j 3.x
 |Secured with full certificate
 |
-[source, javascript]
+[source, javascript, indent=0]
 ----
 const uri = 'bolt+routing://graph.example.com:7687'
 const driver = neo4j.driver(uri,auth, {
@@ -700,7 +700,7 @@ const driver = neo4j.driver(uri,auth, {
 |Neo4j 3.x
 |Secured with self-signed certificate
 |
-[source, javascript]
+[source, javascript, indent=0]
 ----
 neo4j.driver("bolt+routing://graph.example.com:7687", auth)
 ----
@@ -709,7 +709,7 @@ neo4j.driver("bolt+routing://graph.example.com:7687", auth)
 |Neo4j 3.x
 |Unsecured
 |
-[source, javascript]
+[source, javascript, indent=0]
 ----
 const uri = 'bolt+routing://graph.example.com:7687'
 const driver = neo4j.driver(uri, auth, {
@@ -739,7 +739,7 @@ The table below illustrates examples of how to connect to a service with routing
 |Neo4j Aura
 |Secured with full certificate
 |
-[source, python]
+[source, python, indent=0]
 ----
 uri = "bolt+routing://graph.example.com:7687"
 GraphDatabase.driver(uri, auth, trust=TRUST_SYSTEM_CA_SIGNED_CERTIFICATES)
@@ -749,7 +749,7 @@ GraphDatabase.driver(uri, auth, trust=TRUST_SYSTEM_CA_SIGNED_CERTIFICATES)
 |Neo4j 4.x
 |Unsecured
 |
-[source, python]
+[source, python, indent=0]
 ----
 uri = "bolt+routing://graph.example.com:7687"
 GraphDatabase.driver(uri, auth, encrypted=False)
@@ -759,7 +759,7 @@ GraphDatabase.driver(uri, auth, encrypted=False)
 |Neo4j 4.x
 |Secured with full certificate
 |
-[source, python]
+[source, python, indent=0]
 ----
 uri = "bolt+routing://graph.example.com:7687"
 GraphDatabase.driver(uri, auth, trust=TRUST_SYSTEM_CA_SIGNED_CERTIFICATES)
@@ -769,7 +769,7 @@ GraphDatabase.driver(uri, auth, trust=TRUST_SYSTEM_CA_SIGNED_CERTIFICATES)
 |Neo4j 4.x
 |Secured with self-signed certificate
 |
-[source, python]
+[source, python, indent=0]
 ----
 GraphDatabase.driver("bolt+routing://graph.example.com:7687", auth)
 ----
@@ -778,7 +778,7 @@ GraphDatabase.driver("bolt+routing://graph.example.com:7687", auth)
 |Neo4j 3.x
 |Secured with full certificate
 |
-[source, python]
+[source, python, indent=0]
 ----
 uri = "bolt+routing://graph.example.com:7687"
 GraphDatabase.driver(uri, auth, trust=TRUST_SYSTEM_CA_SIGNED_CERTIFICATES)
@@ -788,7 +788,7 @@ GraphDatabase.driver(uri, auth, trust=TRUST_SYSTEM_CA_SIGNED_CERTIFICATES)
 |Neo4j 3.x
 |Secured with self-signed certificate
 |
-[source, python]
+[source, python, indent=0]
 ----
 GraphDatabase.driver("bolt+routing://graph.example.com:7687", auth)
 ----
@@ -797,7 +797,7 @@ GraphDatabase.driver("bolt+routing://graph.example.com:7687", auth)
 |Neo4j 3.x
 |Unsecured
 |
-[source, python]
+[source, python, indent=0]
 ----
 uri = "bolt+routing://graph.example.com:7687"
 GraphDatabase.driver(uri, auth, encrypted=False)
@@ -831,7 +831,7 @@ For this, use the basic auth helper:
 ====
 [.include-with-dotnet]
 ======
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/Examples.cs[tags=basic-auth]
 ----
@@ -839,7 +839,7 @@ include::{dotnet-examples}/Examples.cs[tags=basic-auth]
 
 [.include-with-go]
 ======
-[source, go]
+[source, go, indent=0]
 ----
 include::{go-examples}/examples_test.go[tags=basic-auth]
 ----
@@ -847,7 +847,7 @@ include::{go-examples}/examples_test.go[tags=basic-auth]
 
 [.include-with-java]
 ======
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/BasicAuthExample.java[tags=basic-auth]
 ----
@@ -855,7 +855,7 @@ include::{java-examples}/BasicAuthExample.java[tags=basic-auth]
 
 [.include-with-javascript]
 ======
-[source, javascript]
+[source, javascript, indent=0]
 ----
 include::{javascript-examples}/examples.test.js[tags=basic-auth]
 ----
@@ -863,7 +863,7 @@ include::{javascript-examples}/examples.test.js[tags=basic-auth]
 
 [.include-with-python]
 ======
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/auth_example.py[tags=basic-auth]
 ----
@@ -887,7 +887,7 @@ The best way to create a Kerberos authentication token is shown below:
 ====
 [.include-with-dotnet]
 ======
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/Examples.cs[tags=kerberos-auth]
 ----
@@ -895,7 +895,7 @@ include::{dotnet-examples}/Examples.cs[tags=kerberos-auth]
 
 [.include-with-go]
 ======
-[source, go]
+[source, go, indent=0]
 ----
 include::{go-examples}/examples_test.go[tags=kerberos-auth]
 ----
@@ -903,7 +903,7 @@ include::{go-examples}/examples_test.go[tags=kerberos-auth]
 
 [.include-with-java]
 ======
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/KerberosAuthExample.java[tags=kerberos-auth]
 ----
@@ -911,7 +911,7 @@ include::{java-examples}/KerberosAuthExample.java[tags=kerberos-auth]
 
 [.include-with-javascript]
 ======
-[source, javascript]
+[source, javascript, indent=0]
 ----
 include::{javascript-examples}/examples.test.js[tags=kerberos-auth]
 ----
@@ -919,7 +919,7 @@ include::{javascript-examples}/examples.test.js[tags=kerberos-auth]
 
 [.include-with-python]
 ======
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/kerberos_auth_example.py[tags=kerberos-auth]
 ----
@@ -942,7 +942,7 @@ For advanced deployments, where a custom security provider has been built, the c
 ====
 [.include-with-dotnet]
 ======
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/Examples.cs[tags=custom-auth]
 ----
@@ -950,7 +950,7 @@ include::{dotnet-examples}/Examples.cs[tags=custom-auth]
 
 [.include-with-go]
 ======
-[source, go]
+[source, go, indent=0]
 ----
 include::{go-examples}/examples_test.go[tags=custom-auth]
 ----
@@ -958,7 +958,7 @@ include::{go-examples}/examples_test.go[tags=custom-auth]
 
 [.include-with-java]
 ======
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/CustomAuthExample.java[tags=custom-auth]
 ----
@@ -966,7 +966,7 @@ include::{java-examples}/CustomAuthExample.java[tags=custom-auth]
 
 [.include-with-javascript]
 ======
-[source, javascript]
+[source, javascript, indent=0]
 ----
 include::{javascript-examples}/examples.test.js[tags=custom-auth]
 ----
@@ -974,7 +974,7 @@ include::{javascript-examples}/examples.test.js[tags=custom-auth]
 
 [.include-with-python]
 ======
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/custom_auth_example.py[tags=custom-auth]
 ----
@@ -1030,7 +1030,7 @@ Default value: 1m.
 ====
 [.include-with-dotnet]
 ======
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/Examples.cs[tags=config-connection-pool]
 ----
@@ -1038,7 +1038,7 @@ include::{dotnet-examples}/Examples.cs[tags=config-connection-pool]
 
 [.include-with-go]
 ======
-[source, go]
+[source, go, indent=0]
 ----
 include::{go-examples}/examples_test.go[tags=config-connection-pool]
 ----
@@ -1046,7 +1046,7 @@ include::{go-examples}/examples_test.go[tags=config-connection-pool]
 
 [.include-with-java]
 ======
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/ConfigConnectionPoolExample.java[tags=config-connection-pool]
 ----
@@ -1054,7 +1054,7 @@ include::{java-examples}/ConfigConnectionPoolExample.java[tags=config-connection
 
 [.include-with-javascript]
 ======
-[source, javascript]
+[source, javascript, indent=0]
 ----
 include::{javascript-examples}/examples.test.js[tags=config-connection-pool]
 ----
@@ -1062,7 +1062,7 @@ include::{javascript-examples}/examples.test.js[tags=config-connection-pool]
 
 [.include-with-python]
 ======
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/config_connection_pool_example.py[tags=config-connection-pool]
 ----
@@ -1081,7 +1081,7 @@ For example:
 ====
 [.include-with-dotnet]
 ======
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/Examples.cs[tags=config-connection-timeout]
 ----
@@ -1089,7 +1089,7 @@ include::{dotnet-examples}/Examples.cs[tags=config-connection-timeout]
 
 [.include-with-go]
 ======
-[source, go]
+[source, go, indent=0]
 ----
 include::{go-examples}/examples_test.go[tags=config-connection-timeout]
 ----
@@ -1097,7 +1097,7 @@ include::{go-examples}/examples_test.go[tags=config-connection-timeout]
 
 [.include-with-java]
 ======
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/ConfigConnectionTimeoutExample.java[tags=config-connection-timeout]
 ----
@@ -1105,7 +1105,7 @@ include::{java-examples}/ConfigConnectionTimeoutExample.java[tags=config-connect
 
 [.include-with-javascript]
 ======
-[source, javascript]
+[source, javascript, indent=0]
 ----
 include::{javascript-examples}/examples.test.js[tags=config-connection-timeout]
 ----
@@ -1113,7 +1113,7 @@ include::{javascript-examples}/examples.test.js[tags=config-connection-timeout]
 
 [.include-with-python]
 ======
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/config_connection_timeout_example.py[tags=config-connection-timeout]
 ----
@@ -1132,7 +1132,7 @@ For example:
 ====
 [.include-with-dotnet]
 ======
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/Examples.cs[tags=config-max-retry-time]
 ----
@@ -1140,7 +1140,7 @@ include::{dotnet-examples}/Examples.cs[tags=config-max-retry-time]
 
 [.include-with-go]
 ======
-[source, go]
+[source, go, indent=0]
 ----
 include::{go-examples}/examples_test.go[tags=config-max-retry-time]
 ----
@@ -1148,7 +1148,7 @@ include::{go-examples}/examples_test.go[tags=config-max-retry-time]
 
 [.include-with-java]
 ======
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/ConfigMaxRetryTimeExample.java[tags=config-max-retry-time]
 ----
@@ -1156,7 +1156,7 @@ include::{java-examples}/ConfigMaxRetryTimeExample.java[tags=config-max-retry-ti
 
 [.include-with-javascript]
 ======
-[source, javascript]
+[source, javascript, indent=0]
 ----
 include::{javascript-examples}/examples.test.js[tags=config-max-retry-time]
 ----
@@ -1164,7 +1164,7 @@ include::{javascript-examples}/examples.test.js[tags=config-max-retry-time]
 
 [.include-with-python]
 ======
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/config_max_retry_time_example.py[tags=config-max-retry-time]
 ----
@@ -1187,7 +1187,7 @@ Applications should be designed to cater for this eventuality.
 [.include-with-dotnet]
 ======
 
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/Examples.cs[tags=service-unavailable]
 ----
@@ -1195,7 +1195,7 @@ include::{dotnet-examples}/Examples.cs[tags=service-unavailable]
 
 [.include-with-go]
 ======
-[source, go]
+[source, go, indent=0]
 ----
 include::{go-examples}/examples_test.go[tags=service-unavailable]
 ----
@@ -1204,7 +1204,7 @@ include::{go-examples}/examples_test.go[tags=service-unavailable]
 [.include-with-java]
 ======
 
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/ServiceUnavailableExample.java[tags=service-unavailable]
 ----
@@ -1213,7 +1213,7 @@ include::{java-examples}/ServiceUnavailableExample.java[tags=service-unavailable
 [.include-with-javascript]
 ======
 
-[source, javascript]
+[source, javascript, indent=0]
 ----
 include::{javascript-examples}/examples.test.js[tags=service-unavailable]
 ----
@@ -1222,7 +1222,7 @@ include::{javascript-examples}/examples.test.js[tags=service-unavailable]
 [.include-with-python]
 ======
 
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/service_unavailable_example.py[tags=service-unavailable]
 ----

@@ -242,7 +242,7 @@ Drivers provide a language-idiomatic way to iterate through a result stream.
 ====
 [.include-with-dotnet]
 ======
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/Examples.cs[tags=result-consume]
 ----
@@ -250,7 +250,7 @@ include::{dotnet-examples}/Examples.cs[tags=result-consume]
 
 [.include-with-go]
 ======
-[source, go]
+[source, go, indent=0]
 ----
 include::{go-examples}/examples_test.go[tags=result-consume]
 ----
@@ -258,7 +258,7 @@ include::{go-examples}/examples_test.go[tags=result-consume]
 
 [.include-with-java]
 ======
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/ResultConsumeExample.java[tags=result-consume]
 ----
@@ -266,7 +266,7 @@ include::{java-examples}/ResultConsumeExample.java[tags=result-consume]
 
 [.include-with-javascript]
 ======
-[source, javascript]
+[source, javascript, indent=0]
 ----
 include::{javascript-examples}/examples.test.js[tags=result-consume]
 ----
@@ -274,7 +274,7 @@ include::{javascript-examples}/examples.test.js[tags=result-consume]
 
 [.include-with-python]
 ======
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/result_consume_example.py[tags=result-consume]
 ----
@@ -297,35 +297,35 @@ The saved results can also be used directly to run a new statement.
 ====
 [.include-with-dotnet]
 ======
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/Examples.cs[tags=result-retain]
 ----
 ======
 [.include-with-go]
 ======
-[source, go]
+[source, go, indent=0]
 ----
 include::{go-examples}/examples_test.go[tags=result-retain]
 ----
 ======
 [.include-with-java]
 ======
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/ResultRetainExample.java[tags=result-retain]
 ----
 ======
 [.include-with-javascript]
 ======
-[source, javascript]
+[source, javascript, indent=0]
 ----
 include::{javascript-examples}/examples.test.js[tags=result-retain]
 ----
 ======
 [.include-with-python]
 ======
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/result_retain_example.py[tags=result-retain]
 ----

@@ -19,7 +19,7 @@ This ensures that they are properly closed and that any underlying connections a
 [.include-with-dotnet]
 ======
 
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/Examples.cs[tags=session]
 ----
@@ -28,7 +28,7 @@ include::{dotnet-examples}/Examples.cs[tags=session]
 [.include-with-go]
 ======
 
-[source, go]
+[source, go, indent=0]
 ----
 include::{go-examples}/examples_test.go[tags=session]
 ----
@@ -37,7 +37,7 @@ include::{go-examples}/examples_test.go[tags=session]
 [.include-with-java]
 ======
 
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/SessionExample.java[tags=session]
 ----
@@ -46,7 +46,7 @@ include::{java-examples}/SessionExample.java[tags=session]
 [.include-with-javascript]
 ======
 
-[source, javascript]
+[source, javascript, indent=0]
 ----
 include::{javascript-examples}/examples.test.js[tags=session]
 ----
@@ -55,7 +55,7 @@ include::{javascript-examples}/examples.test.js[tags=session]
 [.include-with-python]
 ======
 
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/session_example.py[tags=session]
 ----
@@ -98,7 +98,7 @@ An auto-commit transaction is invoked using the `session.run` method:
 [.include-with-dotnet]
 ======
 
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/Examples.cs[tags=autocommit-transaction]
 ----
@@ -107,7 +107,7 @@ include::{dotnet-examples}/Examples.cs[tags=autocommit-transaction]
 [.include-with-go]
 ======
 
-[source, go]
+[source, go, indent=0]
 ----
 include::{go-examples}/examples_test.go[tags=autocommit-transaction]
 ----
@@ -116,7 +116,7 @@ include::{go-examples}/examples_test.go[tags=autocommit-transaction]
 [.include-with-java]
 ======
 
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/AutocommitTransactionExample.java[tags=autocommit-transaction]
 ----
@@ -125,7 +125,7 @@ include::{java-examples}/AutocommitTransactionExample.java[tags=autocommit-trans
 [.include-with-javascript]
 ======
 
-[source, javascript]
+[source, javascript, indent=0]
 ----
 include::{javascript-examples}/examples.test.js[tags=autocommit-transaction]
 ----
@@ -134,7 +134,7 @@ include::{javascript-examples}/examples.test.js[tags=autocommit-transaction]
 [.include-with-python]
 ======
 
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/autocommit_transaction_example.py[tags=autocommit-transaction]
 ----
@@ -161,7 +161,7 @@ This form requires minimal boilerplate code and allows for a clear separation of
 ====
 [.include-with-dotnet]
 ======
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/Examples.cs[tags=transaction-function]
 ----
@@ -169,7 +169,7 @@ include::{dotnet-examples}/Examples.cs[tags=transaction-function]
 
 [.include-with-go]
 ======
-[source, go]
+[source, go, indent=0]
 ----
 include::{go-examples}/examples_test.go[tags=transaction-function]
 ----
@@ -177,7 +177,7 @@ include::{go-examples}/examples_test.go[tags=transaction-function]
 
 [.include-with-java]
 ======
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/TransactionFunctionExample.java[tags=transaction-function]
 ----
@@ -185,7 +185,7 @@ include::{java-examples}/TransactionFunctionExample.java[tags=transaction-functi
 
 [.include-with-javascript]
 ======
-[source, javascript]
+[source, javascript, indent=0]
 ----
 include::{javascript-examples}/examples.test.js[tags=transaction-function]
 ----
@@ -193,7 +193,7 @@ include::{javascript-examples}/examples.test.js[tags=transaction-function]
 
 [.include-with-python]
 ======
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/transaction_function_example.py[tags=transaction-function]
 ----
@@ -287,7 +287,7 @@ First consider the code:
 
 [.include-with-dotnet]
 ======
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/Examples.cs[tags=pass-bookmarks]
 ----
@@ -295,7 +295,7 @@ include::{dotnet-examples}/Examples.cs[tags=pass-bookmarks]
 
 [.include-with-go]
 ======
-[source, go]
+[source, go, indent=0]
 ----
 include::{go-examples}/examples_test.go[tags=pass-bookmarks]
 ----
@@ -303,7 +303,7 @@ include::{go-examples}/examples_test.go[tags=pass-bookmarks]
 
 [.include-with-java]
 ======
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/PassBookmarkExample.java[tags=pass-bookmarks]
 ----
@@ -311,7 +311,7 @@ include::{java-examples}/PassBookmarkExample.java[tags=pass-bookmarks]
 
 [.include-with-javascript]
 ======
-[source, javascript]
+[source, javascript, indent=0]
 ----
 include::{javascript-examples}/examples.test.js[tags=pass-bookmarks]
 ----
@@ -321,7 +321,7 @@ include::{javascript-examples}/examples.test.js[tags=pass-bookmarks]
 ======
 
 
-[source, python]
+[source, python, indent=0]
 ----
 
 include::{python-examples}/pass_bookmarks_example.py[tags=pass-bookmarks]
@@ -374,7 +374,7 @@ As a result of this, a `write` transaction tagged for `read` will be sent to a r
 ====
 [.include-with-dotnet]
 ======
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/Examples.cs[tags=read-write-transaction]
 ----
@@ -382,7 +382,7 @@ include::{dotnet-examples}/Examples.cs[tags=read-write-transaction]
 
 [.include-with-go]
 ======
-[source, go]
+[source, go, indent=0]
 ----
 include::{go-examples}/examples_test.go[tags=read-write-transaction]
 ----
@@ -390,7 +390,7 @@ include::{go-examples}/examples_test.go[tags=read-write-transaction]
 
 [.include-with-java]
 ======
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/ReadWriteTransactionExample.java[tags=read-write-transaction]
 ----
@@ -398,7 +398,7 @@ include::{java-examples}/ReadWriteTransactionExample.java[tags=read-write-transa
 
 [.include-with-javascript]
 ======
-[source, javascript]
+[source, javascript, indent=0]
 ----
 include::{javascript-examples}/examples.test.js[tags=read-write-transaction]
 ----
@@ -406,7 +406,7 @@ include::{javascript-examples}/examples.test.js[tags=read-write-transaction]
 
 [.include-with-python]
 ======
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/read_write_transaction_example.py[tags=read-write-transaction]
 ----
@@ -432,19 +432,19 @@ Asynchronous methods are named as their synchronous counterparts but with an add
 ======
 
 .Auto-commit transactions
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/ExamplesAsync.cs[tags=async-autocommit-transaction]
 ----
 
 .Transaction functions
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/ExamplesAsync.cs[tags=async-transaction-function]
 ----
 
 .Explicit transactions
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/ExamplesAsync.cs[tags=async-explicit-transaction]
 ----
@@ -462,19 +462,19 @@ Thus it is optional to put *tx.CommitAsync* or *tx.RollbackAsync* in a _finally_
 ======
 
 .Auto-commit transactions
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/AsyncAutocommitTransactionExample.java[tags=async-autocommit-transaction]
 ----
 
 .Transaction functions
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/AsyncTransactionFunctionExample.java[tags=async-transaction-function]
 ----
 
 .Explicit transactions
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/AsyncExplicitTransactionExample.java[tags=async-explicit-transaction]
 ----
