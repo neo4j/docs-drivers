@@ -779,11 +779,11 @@ It is therefore not recommended to alter database aliases while there are live s
 The per-user home database is resolved at session creation and when first impersonating a user.
 Therefore, the creation of a new session is necessary to reflect a changed home database.
 ====
-+
+
 See link:/docs/operations-manual/4.4/manage-databases/introduction#manage-databases-default[Operations Manual -> The default database] for more information on databases.
-+
+
 See below and link:/docs/cypher-manual/4.4/access-control/dbms-administration#access-control-dbms-administration-impersonation[Cypher Manual -> The `DBMS IMPERSONATE` privileges] for more information on impersonation.
-+
+
 *Default:* the default database as configured on the server.
 
 # end::Database[]
@@ -819,7 +819,7 @@ Additional configuration can be provided to transaction which are executed.
 
 # tag::TransactionTimeout[]
 
-=== Transaction Timeout
+=== Transaction timeout
 
 A timeout value can be provided and transactions which take longer than this value to execute on the server will be terminated.
 This value will override the value set by `+dbms.transaction.timeout+`. If no value is provided, the default is taken by the server setting
