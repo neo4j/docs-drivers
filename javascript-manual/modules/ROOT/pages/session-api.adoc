@@ -61,7 +61,7 @@ include::{javascript-examples}/examples.test.js[tags=async-result-consume]
 
 
 [[js-driver-rx-sessions]]
-== Reactive Sessions
+== Reactive sessions
 
 include::{common-partial}/session-api.adoc[tag=rx-sessions]
 

@@ -159,7 +159,7 @@ The driver does not retry auto-commit queries on failure since it is unaware of 
 
 [NOTE]
 ====
-Unlike other kinds of Cypher query, `PERIODIC COMMIT` and `CALL {} IN TRANSACTIONS` queries do not participate in the causal chain.
+Unlike other kinds of Cypher query, `CALL {} IN TRANSACTIONS` queries do not participate in the causal chain.
 Therefore, the only way to execute these queries from a driver is to use auto-commit transactions.
 
 Please refer to the following for more details:
@@ -414,7 +414,7 @@ The driver does not retry auto-commit queries on failure since it is unaware of 
 
 [NOTE]
 ====
-Unlike other kinds of Cypher Query, `PERIODIC COMMIT` and `CALL {} IN TRANSACTIONS` queries do not participate in the causal chain.
+Unlike other kinds of Cypher Query, `CALL {} IN TRANSACTIONS` queries do not participate in the causal chain.
 Therefore, the only way to execute these queries from a driver is to use auto-commit transactions.
 
 Please refer to the following for more details:
@@ -637,7 +637,7 @@ The driver does not retry auto-commit queries on failure since it is unaware of 
 
 [NOTE]
 ====
-Unlike other kinds of Cypher Query, `PERIODIC COMMIT` and `CALL {} IN TRANSACTIONS` queries do not participate in the causal chain.
+Unlike other kinds of Cypher Query, `CALL {} IN TRANSACTIONS` queries do not participate in the causal chain.
 Therefore, the only way to execute these queries from a driver is to use auto-commit transactions.
 
 Please refer to the following for more details:
@@ -770,8 +770,8 @@ In other cases, this setting is inherited. Note that transaction functions will 
 
 Database::
 The database with which the session will interact.
-When working with a database which is not the default (i.e. the `system` database or another database in Neo4j 4.0 Enterprise Edition), you can explicitly configure the database which the driver is executing transactions against.
-
+When you are working with a database which is not the default (i.e. the `system` database or another database in Neo4j 4.0 Enterprise Edition), you can explicitly configure the database which the driver is executing transactions against.
++
 [WARNING]
 ====
 The resolution of database aliases occurs at connection creation time, which is not under the control of the session.
@@ -819,7 +819,7 @@ Additional configuration can be provided to transaction which are executed.
 
 # tag::TransactionTimeout[]
 
-=== Transaction Timeout
+=== Transaction timeout
 
 A timeout value can be provided and transactions which take longer than this value to execute on the server will be terminated.
 This value will override the value set by `+dbms.transaction.timeout+`. If no value is provided, the default is taken by the server setting

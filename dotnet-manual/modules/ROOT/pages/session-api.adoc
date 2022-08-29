@@ -127,7 +127,7 @@ include::{dotnet-examples}/ExamplesAsync.cs[tags=async-result-consume]
 
 
 [[dotnet-driver-rx-sessions]]
-== Reactive Sessions
+== Reactive sessions
 
 include::{common-partial}/session-api.adoc[tag=rx-sessions]
 
