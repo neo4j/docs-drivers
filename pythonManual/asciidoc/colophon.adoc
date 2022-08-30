@@ -1,5 +1,0 @@
-[colophon]
-[[python-driver-colophon]]
-= Colophon
-
-include::{common-content}/colophon.adoc[tag=colophon]
