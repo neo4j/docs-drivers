@@ -1,10 +1,6 @@
 [[driver-get-started]]
 = Get started
-
-[abstract]
---
-This section gives an overview of the official Neo4j drivers and how to connect to a Neo4j database with a "Hello World" example.
---
+:description: This section gives an overview of the official Neo4j drivers and how to connect to a Neo4j database with a "Hello World" example. 
 
 [[driver-get-started-about]]
 == About the official drivers
@@ -30,11 +26,11 @@ The following languages and frameworks are officially supported by Neo4j:
 
 The driver API is intended to be topologically agnostic.
 This means that the underlying database topology — single instance, Causal Cluster, etc. — can be altered without requiring a corresponding alteration to application code.
-In the general case, only the <<driver-connection-uris, connection URI>> needs to be modified when changes are made to the topology.
+In the general case, only the xref:client-applications.adoc#driver-connection-uris[connection URI] needs to be modified when changes are made to the topology.
 
 NOTE: The official drivers do not support HTTP communication.
 If you need an HTTP driver, choose one of the community drivers.
-See also the <<http-api#http-api, HTTP API documentation>>.
+See also the link:/docs/http-api/4.0#http-api[HTTP API documentation].
 
 [[driver-get-started-installation]]
 == Driver versions and installation
@@ -88,14 +84,14 @@ There is no extra dependency required use .NET reactive API.
 ========
 To install the latest version of the driver using NuGet in Visual Studio:
 
-[source, csharp, subs="attributes, specialcharacters"]
+[source, csharp, subs="attributes, specialcharacters", indent=0]
 ----
 PM> Install-Package Neo4j.Driver
 ----
 
 It is also an option to install a certain version of the driver.
 
-[source, csharp, subs="attributes, specialcharacters"]
+[source, csharp, subs="attributes, specialcharacters", indent=0]
 ----
 PM> Install-Package Neo4j.Driver -Version $DOTNET_DRIVER_VERSION
 ----
@@ -107,7 +103,7 @@ The initial examples make use of these extensions.
 
 In the following example we are installing driver version {dotnet-driver-version}.
 
-[source, csharp, subs="attributes, specialcharacters"]
+[source, csharp, subs="attributes, specialcharacters", indent=0]
 ----
 PM> Install-Package Neo4j.Driver -Version {dotnet-driver-version}
 ----
@@ -126,7 +122,7 @@ To find out the latest version of the driver, visit https://github.com/neo4j/neo
 
 To install the latest version of the driver using `go get`:
 
-[source, shell, subs="attributes, specialcharacters"]
+[source, shell, subs="attributes, specialcharacters", indent=0]
 ----
 go get github.com/neo4j/neo4j-go-driver/v4@<latest tag>
 ----
@@ -158,7 +154,7 @@ Both implement the Reactive Streams API and provide an exhaustive set of operato
 When using Maven, add the following block to the _pom.xml_ file.
 The driver version can either be declared as a property (as in the first example) or as an explicit version number (as in the second).
 
-[source, xml, subs="attributes, specialcharacters"]
+[source, xml, subs="attributes, specialcharacters", indent=0]
 ----
 <dependencies>
     <dependency>
@@ -171,7 +167,7 @@ The driver version can either be declared as a property (as in the first example
 
 In the following example, driver version {java-driver-version} is added.
 
-[source, xml, subs="attributes, specialcharacters"]
+[source, xml, subs="attributes, specialcharacters", indent=0]
 ----
 <dependencies>
     <dependency>
@@ -188,14 +184,14 @@ In the following example, driver version {java-driver-version} is added.
 
 For Gradle, a compile line will be required. Again, this can use a property or an explicit version number.
 
-[source, groovy, subs="attributes, specialcharacters"]
+[source, groovy, subs="attributes, specialcharacters", indent=0]
 ----
 compile 'org.neo4j.driver:neo4j-java-driver:$JAVA_DRIVER_VERSION'
 ----
 
 In the following example, a driver version {java-driver-version} is added.
 
-[source, groovy, subs="attributes, specialcharacters"]
+[source, groovy, subs="attributes, specialcharacters", indent=0]
 ----
 compile 'org.neo4j.driver:neo4j-java-driver:{java-driver-version}'
 ----
@@ -211,7 +207,7 @@ The release notes for this driver are available https://github.com/neo4j/neo4j-j
 To use the JavaScript driver, it is recommended employing `npm`.
 To find out the latest version of the driver, use:
 
-[source, shell, subs="attributes, specialcharacters"]
+[source, shell, subs="attributes, specialcharacters", indent=0]
 ----
 npm show neo4j-driver@* version
 ----
@@ -232,21 +228,21 @@ A dependency of RxJs is automatically installed with the driver.
 
 To install the latest version of the driver:
 
-[source, shell, subs="attributes, specialcharacters"]
+[source, shell, subs="attributes, specialcharacters", indent=0]
 ----
 npm install neo4j-driver
 ----
 
 It is also an option to install a certain version of the driver.
 
-[source, shell, subs="attributes, specialcharacters"]
+[source, shell, subs="attributes, specialcharacters", indent=0]
 ----
 npm install neo4j-driver@$JAVASCRIPT-DRIVER-VERSION
 ----
 
 In the following example, driver version {javascript-driver-version} is installed.
 
-[source, shell, subs="attributes, specialcharacters"]
+[source, shell, subs="attributes, specialcharacters", indent=0]
 ----
 npm install neo4j-driver@{javascript-driver-version}
 ----
@@ -264,7 +260,7 @@ To find out the latest stable version of the Python Driver, visit https://pypi.o
 To find a list of all available releases, visit https://pypi.org/simple/neo4j/
 
 To install the latest stable version of the Python Driver:
-[source, shell, subs="attributes, specialcharacters"]
+[source, shell, subs="attributes, specialcharacters", indent=0]
 ----
 pip install neo4j
 ----
@@ -274,13 +270,13 @@ It is also an option to install a certain version of the driver.
 .Installation with Python
 ========
 The following is the syntax for installing a certain version of the Python Driver:
-[source, shell, subs="attributes, specialcharacters"]
+[source, shell, subs="attributes, specialcharacters", indent=0]
 ----
 pip install neo4j==$PYTHON_DRIVER_VERSION
 ----
 
 In the following example we are installing Python Driver version {python-driver-version}.
-[source, shell, subs="attributes, specialcharacters"]
+[source, shell, subs="attributes, specialcharacters", indent=0]
 ----
 pip install neo4j=={python-driver-version}
 ----
@@ -289,19 +285,19 @@ pip install neo4j=={python-driver-version}
 .Installation with Python, get Python Driver prereleases
 ========
 In the following example we get the latest version, including alphas:
-[source, shell, subs="attributes, specialcharacters"]
+[source, shell, subs="attributes, specialcharacters", indent=0]
 ----
 pip install neo4j>=4.0.0a
 ----
 
 In the following example we get the latest  version, including betas:
-[source, shell, subs="attributes, specialcharacters"]
+[source, shell, subs="attributes, specialcharacters", indent=0]
 ----
 pip install neo4j>=4.0.0b
 ----
 
 In the following example we get the latest version, including release candidates:
-[source, shell, subs="attributes, specialcharacters"]
+[source, shell, subs="attributes, specialcharacters", indent=0]
 ----
 pip install neo4j>=4.0.0rc
 ----
@@ -326,12 +322,12 @@ The example below shows the minimal configuration necessary to interact with *Ne
 ====
 [.include-with-dotnet]
 ======
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/Examples.cs[tags=hello-world]
 ----
 
-// [source, csharp]
+// [source, csharp, indent=0]
 // ----
 // include::{dotnet-examples}/Examples.cs[tags=hello-world-import]
 // ----
@@ -339,7 +335,7 @@ include::{dotnet-examples}/Examples.cs[tags=hello-world]
 
 [.include-with-go]
 ======
-[source, go]
+[source, go, indent=0]
 ----
 include::{go-examples}/examples_test.go[tags=hello-world]
 ----
@@ -347,12 +343,12 @@ include::{go-examples}/examples_test.go[tags=hello-world]
 
 [.include-with-java]
 ======
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/HelloWorldExample.java[tags=hello-world-import]
 ----
 
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/HelloWorldExample.java[tags=hello-world]
 ----
@@ -361,12 +357,12 @@ include::{java-examples}/HelloWorldExample.java[tags=hello-world]
 
 [.include-with-javascript]
 ======
-[source, javascript]
+[source, javascript, indent=0]
 ----
 include::{javascript-examples}/examples.test.js[tags=hello-world]
 ----
 
-// [source, javascript]
+// [source, javascript, indent=0]
 // ----
 // include::{javascript-examples}/examples.test.js[tags=hello-world-import]
 // ----
@@ -374,12 +370,12 @@ include::{javascript-examples}/examples.test.js[tags=hello-world]
 
 [.include-with-python]
 ======
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/test_hello_world_example.py[tags=hello-world-import]
 ----
 
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/test_hello_world_example.py[tags=hello-world]
 ----

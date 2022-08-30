@@ -1,40 +1,30 @@
 [[driver-session-api]]
 = The session API
-
-[abstract]
---
-This section details the Session API that are made available by the driver, with each Session class oriented towards a different form of programming.
---
+:description: This section details the Session API that are made available by the driver, with each Session class oriented towards a different form of programming.  This section describes simple sessions, transactions executed within a simple session and the results thereof.  This section describes asynchronous sessions, transactions executed within an asynchronous session and the results thereof.  This section describes reactive sessions, transactions executed within a reactive session and the results thereof.  This section details the configuration options available when constructing a session. 
 
 This chapter describes the following:
 
-* <<driver-simple-sessions, Simple sessions>>
-** <<driver-simple-lifecycle, Lifecycle>>
-** <<driver-simple-transaction-fn, Transaction functions>>
-** <<driver-simple-autocommit-transactions, Auto-commit transactions>>
-** <<driver-simple-result-consume, Consuming results>>
-** <<driver-simple-result-retain, Retaining results>>
-* <<driver-async-sessions, Asynchronous sessions>>
-** <<driver-async-transaction-fn, Transaction functions>>
-** <<driver-async-autocommit-transactions, Auto-commit transaction>>
-** <<driver-async-result-consume, Consuming results>>
-* <<driver-rx-sessions, Reactive sessions>>
-** <<driver-rx-lifecycle, Lifecycle>>
-** <<driver-rx-transaction-fn, Transaction functions>>
-** <<driver-rx-autocommit-transactions, Auto-commit transactions>>
-** <<driver-rx-result-consume, Consuming results>>
-** <<driver-rx-cancellation, Cancellation>>
-* <<driver-session-configuration, Configuration>>
-
+* xref:session-api.adoc#driver-simple-sessions[Simple sessions]
+** xref:session-api.adoc#driver-simple-lifecycle[Lifecycle]
+** xref:session-api.adoc#driver-simple-transaction-fn[Transaction functions]
+** xref:session-api.adoc#driver-simple-autocommit-transactions[Auto-commit transactions]
+** xref:session-api.adoc#driver-simple-result-consume[Consuming results]
+** xref:session-api.adoc#driver-simple-result-retain[Retaining results]
+* xref:session-api.adoc#driver-async-sessions[Asynchronous sessions]
+** xref:session-api.adoc#driver-async-transaction-fn[Transaction functions]
+** xref:session-api.adoc#driver-async-autocommit-transactions[Auto-commit transaction]
+** xref:session-api.adoc#driver-async-result-consume[Consuming results]
+* xref:session-api.adoc#driver-rx-sessions[Reactive sessions]
+** xref:session-api.adoc#driver-rx-lifecycle[Lifecycle]
+** xref:session-api.adoc#driver-rx-transaction-fn[Transaction functions]
+** xref:session-api.adoc#driver-rx-autocommit-transactions[Auto-commit transactions]
+** xref:session-api.adoc#driver-rx-result-consume[Consuming results]
+** xref:session-api.adoc#driver-rx-cancellation[Cancellation]
+* xref:session-api.adoc#driver-session-configuration[Configuration]
 
 
 [[driver-simple-sessions]]
 == Simple sessions
-
-[abstract]
---
-This section describes simple sessions, transactions executed within a simple session and the results thereof.
---
 
 [NOTE]
 ====
@@ -61,7 +51,7 @@ In languages that support them, simple sessions are usually scoped within a cont
 ====
 [.include-with-dotnet]
 ======
-[source, csharp ]
+[source, csharp , indent=0]
 ----
 using (var session = driver.Session(...)) {
     // transactions go here
@@ -71,7 +61,7 @@ using (var session = driver.Session(...)) {
 
 [.include-with-go]
 ======
-[source, go ]
+[source, go , indent=0]
 ----
 session := driver.NewSession(...)
 defer session.Close()
@@ -81,7 +71,7 @@ defer session.Close()
 
 [.include-with-java]
 ======
-[source, java]
+[source, java, indent=0]
 ----
 try (Session session = driver.session(...)) {
     // transactions go here
@@ -91,7 +81,7 @@ try (Session session = driver.session(...)) {
 
 [.include-with-python]
 ======
-[source, python]
+[source, python, indent=0]
 ----
 with driver.session(...) as session:
     // transactions go here
@@ -102,7 +92,7 @@ with driver.session(...) as session:
 
 *_Sessions can be configured in a number of different ways_*.
 This is carried out by supplying configuration inside the session constructor.
-See <<driver-session-configuration>> for more details.
+See xref:session-api.adoc#driver-session-configuration[Session configuration] for more details.
 
 
 [[driver-simple-transaction-fn]]
@@ -136,7 +126,7 @@ These cases include connection issues, server role changes (e.g. leadership elec
 ====
 [.include-with-dotnet]
 ======
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/Examples.cs[tags=transaction-function]
 ----
@@ -144,7 +134,7 @@ include::{dotnet-examples}/Examples.cs[tags=transaction-function]
 
 [.include-with-go]
 ======
-[source, go]
+[source, go, indent=0]
 ----
 include::{go-examples}/examples_test.go[tags=transaction-function]
 ----
@@ -152,7 +142,7 @@ include::{go-examples}/examples_test.go[tags=transaction-function]
 
 [.include-with-java]
 ======
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/TransactionFunctionExample.java[tags=transaction-function]
 ----
@@ -160,12 +150,12 @@ include::{java-examples}/TransactionFunctionExample.java[tags=transaction-functi
 
 [.include-with-python]
 ======
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/test_transaction_function_example.py[tags=transaction-function-import]
 ----
 
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/test_transaction_function_example.py[tags=transaction-function]
 ----
@@ -193,7 +183,7 @@ Unlike other kinds of Cypher Query, `PERIODIC COMMIT` queries do not participate
 
 Therefore, the only way to execute `PERIODIC COMMIT` from a driver is to use auto-commit transactions.
 
-Please refer to the <<cypher-manual#query-using-periodic-commit-hint, Cypher Manual -> `PERIODIC COMMIT` query hint>>.
+Please refer to the link:/docs/cypher-manual/4.0/query-tuning/using#query-using-periodic-commit-hint[Cypher Manual -> `PERIODIC COMMIT` query hint].
 ====
 
 [.tabbed-example]
@@ -202,7 +192,7 @@ Please refer to the <<cypher-manual#query-using-periodic-commit-hint, Cypher Man
 
 [.include-with-dotnet]
 ======
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/Examples.cs[tags=autocommit-transaction]
 ----
@@ -210,7 +200,7 @@ include::{dotnet-examples}/Examples.cs[tags=autocommit-transaction]
 
 [.include-with-go]
 ======
-[source, go]
+[source, go, indent=0]
 ----
 include::{go-examples}/examples_test.go[tags=autocommit-transaction]
 ----
@@ -218,7 +208,7 @@ include::{go-examples}/examples_test.go[tags=autocommit-transaction]
 
 [.include-with-java]
 ======
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/AutocommitTransactionExample.java[tags=autocommit-transaction]
 ----
@@ -226,12 +216,12 @@ include::{java-examples}/AutocommitTransactionExample.java[tags=autocommit-trans
 
 [.include-with-python]
 ======
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/test_autocommit_transaction_example.py[tags=autocommit-transaction-import]
 ----
 
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/test_autocommit_transaction_example.py[tags=autocommit-transaction]
 ----
@@ -251,7 +241,7 @@ The drivers provide a language-idiomatic way to iterate through that stream.
 
 [.include-with-dotnet]
 ======
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/Examples.cs[tags=result-consume]
 ----
@@ -259,7 +249,7 @@ include::{dotnet-examples}/Examples.cs[tags=result-consume]
 
 [.include-with-go]
 ======
-[source, go]
+[source, go, indent=0]
 ----
 include::{go-examples}/examples_test.go[tags=result-consume]
 ----
@@ -267,7 +257,7 @@ include::{go-examples}/examples_test.go[tags=result-consume]
 
 [.include-with-java]
 ======
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/ResultConsumeExample.java[tags=result-consume]
 ----
@@ -275,7 +265,7 @@ include::{java-examples}/ResultConsumeExample.java[tags=result-consume]
 
 [.include-with-python]
 ======
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/test_result_consume_example.py[tags=result-consume]
 ----
@@ -311,7 +301,7 @@ The drivers offer support for this process, as per the example below:
 
 [.include-with-dotnet]
 ======
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/Examples.cs[tags=result-retain]
 ----
@@ -319,7 +309,7 @@ include::{dotnet-examples}/Examples.cs[tags=result-retain]
 
 [.include-with-go]
 ======
-[source, go]
+[source, go, indent=0]
 ----
 include::{go-examples}/examples_test.go[tags=result-retain]
 ----
@@ -327,7 +317,7 @@ include::{go-examples}/examples_test.go[tags=result-retain]
 
 [.include-with-java]
 ======
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/ResultRetainExample.java[tags=result-retain]
 ----
@@ -335,7 +325,7 @@ include::{java-examples}/ResultRetainExample.java[tags=result-retain]
 
 [.include-with-python]
 ======
-[source, python]
+[source, python, indent=0]
 ----
 include::{python-examples}/test_result_retain_example.py[tags=result-retain]
 ----
@@ -346,11 +336,6 @@ include::{python-examples}/test_result_retain_example.py[tags=result-retain]
 
 [[driver-async-sessions]]
 == Asynchronous sessions
-
-[abstract]
---
-This section describes asynchronous sessions, transactions executed within an asynchronous session and the results thereof.
---
 
 [NOTE]
 ====
@@ -372,7 +357,7 @@ Session lifetime begins with session construction.
 A session then exists until it is closed, which is typically set to occur after its contained query results have been consumed.
 
 Sessions can be configured in a number of different ways. This is carried out by supplying configuration inside the session constructor.
-See <<driver-session-configuration>> for more details.
+See xref:session-api.adoc#driver-session-configuration[Session configuration] for more details.
 
 
 [[driver-async-transaction-fn]]
@@ -408,7 +393,7 @@ Retry logic can be configured when creating a session.
 
 
 .Transaction function
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/ExamplesAsync.cs[tags=async-transaction-function]
 ----
@@ -417,7 +402,7 @@ include::{dotnet-examples}/ExamplesAsync.cs[tags=async-transaction-function]
 [.include-with-java]
 ======
 .Transaction function
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/AsyncTransactionFunctionExample.java[tags=async-transaction-function]
 ----
@@ -426,7 +411,7 @@ include::{java-examples}/AsyncTransactionFunctionExample.java[tags=async-transac
 [.include-with-javascript]
 ======
 .Transaction function
-[source, javascript]
+[source, javascript, indent=0]
 ----
 include::{javascript-examples}/examples.test.js[tags=async-transaction-function]
 ----
@@ -454,7 +439,7 @@ Unlike other kinds of Cypher Query, `PERIODIC COMMIT` queries do not participate
 
 Therefore, the only way to execute them from a driver is to use auto-commit transactions.
 
-Please refer to the <<cypher-manual#query-using-periodic-commit-hint, Cypher Manual -> `PERIODIC COMMIT` query hint>>.
+Please refer to the link:/docs/cypher-manual/4.0/query-tuning/using#query-using-periodic-commit-hint[Cypher Manual -> `PERIODIC COMMIT` query hint].
 ====
 
 [.tabbed-example]
@@ -464,7 +449,7 @@ Please refer to the <<cypher-manual#query-using-periodic-commit-hint, Cypher Man
 ======
 
 .Auto-commit transaction
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/ExamplesAsync.cs[tags=async-autocommit-transaction]
 ----
@@ -474,7 +459,7 @@ include::{dotnet-examples}/ExamplesAsync.cs[tags=async-autocommit-transaction]
 ======
 
 .Auto-commit transaction
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/AsyncAutocommitTransactionExample.java[tags=async-autocommit-transaction]
 ----
@@ -485,7 +470,7 @@ include::{java-examples}/AsyncAutocommitTransactionExample.java[tags=async-autoc
 ======
 
 .Auto-commit transaction
-[source, javascript]
+[source, javascript, indent=0]
 ----
 include::{javascript-examples}/examples.test.js[tags=async-autocommit-transaction]
 ----
@@ -505,7 +490,7 @@ The asynchronous session API provides language-idiomatic methods to aid integrat
 ======
 
 .Consuming results
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/ExamplesAsync.cs[tags=async-result-consume]
 ----
@@ -515,7 +500,7 @@ include::{dotnet-examples}/ExamplesAsync.cs[tags=async-result-consume]
 ======
 
 .Consuming results
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/AsyncResultConsumeExample.java[tags=async-result-consume]
 ----
@@ -526,7 +511,7 @@ include::{java-examples}/AsyncResultConsumeExample.java[tags=async-result-consum
 ======
 
 .Consuming results
-[source, javascript]
+[source, javascript, indent=0]
 ----
 include::{javascript-examples}/examples.test.js[tags=async-result-consume]
 ----
@@ -536,11 +521,6 @@ include::{javascript-examples}/examples.test.js[tags=async-result-consume]
 
 [[driver-rx-sessions]]
 == Reactive Sessions
-
-[abstract]
---
-This section describes reactive sessions, transactions executed within a reactive session and the results thereof.
---
 
 [NOTE]
 ====
@@ -571,7 +551,7 @@ For more information about reactive stream, please see the following:
 --
 Reactive sessions will typically be used in a client application that is already oriented towards the reactive style; it is expected that a reactive dependency or framework is in place.
 
-Refer to <<driver-get-started>> for more information on recommended dependencies.
+Refer to xref:get-started.adoc[Get started] for more information on recommended dependencies.
 --
 
 
@@ -610,7 +590,7 @@ Retry logic can be configured when creating a session.
 ======
 
 .Reactive transaction function
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/ExamplesRx.cs[tags=rx-transaction-function]
 ----
@@ -620,7 +600,7 @@ include::{dotnet-examples}/ExamplesRx.cs[tags=rx-transaction-function]
 ======
 
 .Reactive transaction function
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/RxTransactionFunctionExample.java[tags=rx-transaction-function]
 ----
@@ -631,7 +611,7 @@ include::{java-examples}/RxTransactionFunctionExample.java[tags=rx-transaction-f
 ======
 
 .Reactive transaction function
-[source, javascript]
+[source, javascript, indent=0]
 ----
 include::{javascript-examples}/examples.test.js[tags=rx-transaction-function]
 ----
@@ -640,7 +620,7 @@ include::{javascript-examples}/examples.test.js[tags=rx-transaction-function]
 
 Sessions can be configured in a number of different ways.
 This is carried out by supplying configuration inside the session constructor.
-See <<driver-session-configuration>> for more details.
+See xref:session-api.adoc#driver-session-configuration[Session configuration] for more details.
 
 
 [[driver-rx-autocommit-transactions]]
@@ -663,7 +643,7 @@ The only way to execute `PERIODIC COMMIT` Cypher Queries is to auto-commit the t
 
 Unlike other kinds of Cypher query, `PERIODIC COMMIT` queries do not participate in the causal chain.
 
-Please refer to the <<cypher-manual#query-using-periodic-commit-hint, Cypher Manual -> `PERIODIC COMMIT` query hint>>.
+Please refer to the link:/docs/cypher-manual/4.0/query-tuning/using#query-using-periodic-commit-hint[Cypher Manual -> `PERIODIC COMMIT` query hint].
 ====
 
 [.tabbed-example]
@@ -673,7 +653,7 @@ Please refer to the <<cypher-manual#query-using-periodic-commit-hint, Cypher Man
 ======
 
 .Auto-commit transactions
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/ExamplesRx.cs[tags=rx-autocommit-transaction]
 ----
@@ -683,7 +663,7 @@ include::{dotnet-examples}/ExamplesRx.cs[tags=rx-autocommit-transaction]
 ======
 
 .Auto-commit transactions
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/RxAutocommitTransactionExample.java[tags=rx-autocommit-transaction]
 ----
@@ -694,7 +674,7 @@ include::{java-examples}/RxAutocommitTransactionExample.java[tags=rx-autocommit-
 ======
 
 .Auto-commit transactions
-[source, javascript]
+[source, javascript, indent=0]
 ----
 include::{javascript-examples}/examples.test.js[tags=rx-autocommit-transaction]
 ----
@@ -718,7 +698,7 @@ Only one subscriber may pull data from a given flow.
 ======
 
 .Consuming results
-[source, csharp]
+[source, csharp, indent=0]
 ----
 include::{dotnet-examples}/ExamplesRx.cs[tags=rx-result-consume]
 ----
@@ -728,7 +708,7 @@ include::{dotnet-examples}/ExamplesRx.cs[tags=rx-result-consume]
 ======
 
 .Consuming results
-[source, java]
+[source, java, indent=0]
 ----
 include::{java-examples}/RxResultConsumeExample.java[tags=rx-result-consume]
 ----
@@ -739,7 +719,7 @@ include::{java-examples}/RxResultConsumeExample.java[tags=rx-result-consume]
 ======
 
 .Consuming results
-[source, javascript]
+[source, javascript, indent=0]
 ----
 include::{javascript-examples}/examples.test.js[tags=rx-result-consume]
 ----
@@ -756,11 +736,6 @@ This prematurely commits or rolls back the transaction and stops the query engin
 
 [[driver-session-configuration]]
 == Session configuration
-
-[abstract]
---
-This section details the configuration options available when constructing a session.
---
 
 [.compact]
 `Bookmarks`::
@@ -780,13 +755,13 @@ In other cases, this setting is inherited. Note that transaction functions will 
 Database::
 The database with which the session will interact.
 When you are working with a database which is not the default (i.e. the `system` database or another database in Neo4j 4.0 Enterprise Edition), you can explicitly configure the database which the driver is executing transactions against.
-See <<operations-manual#manage-databases-default, Operations Manual -> The default database>> for more information on databases.
+See link:/docs/operations-manual/4.0/manage-databases/introduction#manage-databases-default[Operations Manual -> The default database] for more information on databases.
 +
 *Default:* the default database as configured on the server.
 
 `Fetch Size`::
 The number of records to fetch in each batch from the server.
 Neo4j 4.0 introduces the ability to pull records in batches, allowing the client application to take control of data population and apply back pressure to the server.
-This `FetchSize` applies to <<driver-simple-sessions, simple sessions>> and <<driver-async-sessions, async-sessions>> whereas reactive sessions can be controlled directly using the request method of the subscription.
+This `FetchSize` applies to xref:session-api.adoc#driver-simple-sessions[simple sessions] and xref:session-api.adoc#driver-async-sessions[async-sessions] whereas reactive sessions can be controlled directly using the request method of the subscription.
 +
 *Default:* 1000 records

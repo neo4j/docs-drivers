@@ -7,7 +7,7 @@ nav:
 asciidoc:
   attributes:
     neo4j-version: '4.0'
-    neo4j-version-exact: '4.0.8'
+    neo4j-version-exact: '4.0.1'
     neo4j-buildnumber: '4.0'
     dotnet-examples: 'partial$driver-sources/dotnet-driver/Neo4j.Driver/Neo4j.Driver.Tests.Integration'
     go-examples: 'partial$driver-sources/go-driver/neo4j/test-integration'
@@ -15,8 +15,14 @@ asciidoc:
     javascript-examples: 'partial$driver-sources/javascript-driver/test'
     python-examples: 'partial$driver-sources/python-driver/tests/integration/examples'
     driver-version: "4.0"
-    dotnet-driver-version: "4.0.3"
+    dotnet-driver-version: "4.0.1"
     go-driver-version: "4.0"
-    java-driver-version: "4.0.3"
-    javascript-driver-version: "4.0.3"
-    python-driver-version: "4.0.3"
+    java-driver-version: "4.0.4"
+    javascript-driver-version: "4.0.2"
+    python-driver-version: "4.0"
+    dotnet-driver-apidoc-version: "4.0"
+    go-driver-apidoc-version: "4.0"
+    java-driver-apidoc-version: "4.0"
+    javascript-driver-apidoc-version: "4.0"
+    python-driver-apidoc-version: "4.0"
+    upgrade-current-uri: "https://neo4j.com/docs/upgrade-migration-guide/current"
