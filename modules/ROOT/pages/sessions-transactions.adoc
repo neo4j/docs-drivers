@@ -147,7 +147,7 @@ This means that multiple transactions cannot share network packets, thereby exhi
 Auto-commit transactions are intended to be used for simple use cases such as when learning Cypher or writing one-off scripts.
 It is not recommended to use auto-commit transactions in production environments or when performance or resilience are a primary concern.
 
-However, Auto-commit transactions are the only way to execute `link:docs/cypher-manual/3.5/query-tuning/using/index.adoc#query-using-periodic-commit-hint[USING PERIODIC COMMIT]` Cypher statements.
+However, Auto-commit transactions are the only way to execute `link:/docs/cypher-manual/3.5/query-tuning/using#query-using-periodic-commit-hint[USING PERIODIC COMMIT]` Cypher statements.
 
 
 [[driver-transactions-transaction-functions]]
@@ -220,12 +220,12 @@ While this form is useful for a handful of use cases, it is recommended to use t
 Both auto-commit and explicit transactions can be assigned _metadata_, and a _timeout_.
 
 Metadata is a map of arbitrary values that will be attached to the executing transaction.
-It will be visible in the output of the procedures `link:docs/operations-manual/3.5/monitoring/query-management/index.adoc#query-management-list-queries[dbms.listQueries]` and `link:docs/operations-manual/3.5/monitoring/transaction-management/index.adoc#transaction-management-list-transactions[dbms.listTransactions]`.
-It will also get logged to the `link:docs/operations-manual/3.5/monitoring/logging/query-logging/index.adoc[query.log]`.
+It will be visible in the output of the procedures `link:/docs/operations-manual/3.5/monitoring/query-management#query-management-list-queries[dbms.listQueries]` and `link:/docs/operations-manual/3.5/monitoring/transaction-management#transaction-management-list-transactions[dbms.listTransactions]`.
+It will also get logged to the `link:/docs/operations-manual/3.5/monitoring/logging/query-logging[query.log]`.
 
 A timeout will cause the related transaction to be terminated by the database if its execution time is longer than the provided value.
 This functionality allows to limit query/transaction execution time.
-A specified timeout overrides the default timeout defined by the configuration setting `link:docs/operations-manual/3.5/reference/configuration-settings/index.adoc#config_dbms.transaction.timeout[config_dbms.transaction.timeout]`.
+A specified timeout overrides the default timeout defined by the configuration setting `link:/docs/operations-manual/3.5/reference/configuration-settings#config_dbms.transaction.timeout[config_dbms.transaction.timeout]`.
 
 For usage patterns, please refer to the xref:get-started.adoc#driver-api-docs[API documentation] for your specific language.
 
@@ -233,7 +233,7 @@ For usage patterns, please refer to the xref:get-started.adoc#driver-api-docs[AP
 === Cypher errors
 
 When executing Cypher, it is possible for an exception to be thrown by the Cypher engine.
-Each such exception is associated with a link:docs/status-codes/3.5/index.adoc#status-codes[status code] that describes the nature of the error and a message that provides more detail.
+Each such exception is associated with a link:/docs/status-codes/3.5#status-codes[status code] that describes the nature of the error and a message that provides more detail.
 
 The error classifications are listed in the table below.
 

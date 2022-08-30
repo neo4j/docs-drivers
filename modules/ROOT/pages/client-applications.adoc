@@ -134,7 +134,7 @@ The address in the URI of a routing driver with routing context must be that of 
 
 .Configure a routing driver with routing context
 ====
-This example will assume that Neo4j has been configured for server policies as described in link:docs/operations-manual/3.5/clustering-advanced/multi-data-center/load-balancing/index.adoc[Neo4j Operations Manual -> Load balancing for multi-data center systems].
+This example will assume that Neo4j has been configured for server policies as described in link:/docs/operations-manual/3.5/clustering-advanced/multi-data-center/load-balancing[Neo4j Operations Manual -> Load balancing for multi-data center systems].
 In particular, a server policy called `europe` has been defined.
 Additionally, we have a server `neo01.graph.example.com` to which we wish to direct the driver.
 
@@ -146,9 +146,9 @@ This URI will use the server policy `europe`:
 [NOTE]
 .Server-side configuration to enable Routing drivers with routing context
 ====
-A prerequisite for using a Routing driver with routing context is that the Neo4j database is operated on a link:docs/operations-manual/3.5/clustering/index.adoc[Causal Cluster] with the link:docs/operations-manual/3.5/clustering-advanced/multi-data-center/index.adoc[Multi-data center licensing option] enabled.
+A prerequisite for using a Routing driver with routing context is that the Neo4j database is operated on a link:/docs/operations-manual/3.5/clustering[Causal Cluster] with the link:/docs/operations-manual/3.5/clustering-advanced/multi-data-center[Multi-data center licensing option] enabled.
 Additionally, the routing contexts must be defined within the cluster as routing _policies_.
-For details on how to configure multi-data center routing policies for a Causal Cluster, please refer to link:docs/operations-manual/3.5/clustering-advanced/multi-data-center/load-balancing/index.adoc[Operations Manual -> Causal Clustering].
+For details on how to configure multi-data center routing policies for a Causal Cluster, please refer to link:/docs/operations-manual/3.5/clustering-advanced/multi-data-center/load-balancing[Operations Manual -> Causal Clustering].
 ====
 
 
@@ -262,7 +262,7 @@ include::{python-examples}/config_unencrypted_example.py[tags=config-unencrypted
 ====
 
 The server can be modified to require encryption for all connections.
-Please see the link:docs/operations-manual/3.5/configuration/connectors/index.adoc[Operations Manual -> Configure Neo4j connectors] for more information.
+Please see the link:/docs/operations-manual/3.5/configuration/connectors[Operations Manual -> Configure Neo4j connectors] for more information.
 
 An attempt to connect to a server using an encryption setting not allowed by that server will result in a xref:client-applications.adoc#driver-service-unavailable[_Service unavailable_] status.
 
