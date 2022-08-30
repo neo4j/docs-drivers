@@ -115,7 +115,7 @@ include::{common-partial}/cypher-workflow.adoc[tag=type-mapping]
 == Exceptions and error handling
 
 When executing *Cypher* or carrying out other operations with the driver, certain exceptions and error cases may arise.
-*_Server-generated exceptions_* are each associated with a link:docs/status-codes/4.3/index.adoc#status-codes[*_status code_*] that describes the nature of the problem and a message that provides more detail.
+*_Server-generated exceptions_* are each associated with a link:/docs/status-codes/4.3#status-codes[*_status code_*] that describes the nature of the problem and a message that provides more detail.
 
 The classifications are listed in the table below.
 
