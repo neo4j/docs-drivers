@@ -30,7 +30,7 @@ In the general case, only the xref:client-applications.adoc#driver-connection-ur
 
 NOTE: The official drivers do not support HTTP communication.
 If you need an HTTP driver, choose one of the community drivers.
-See also the link:docs/http-api/4.0/index.adoc#http-api[HTTP API documentation].
+See also the link:/docs/http-api/4.0#http-api[HTTP API documentation].
 
 [[driver-get-started-installation]]
 == Driver versions and installation
