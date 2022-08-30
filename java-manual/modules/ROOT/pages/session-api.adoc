@@ -1,0 +1,221 @@
+[[java-driver-session-api]]
+= The session API
+
+include::{common-partial}/session-api.adoc[tag=abstract]
+
+
+[[java-driver-simple-sessions]]
+== Simple sessions
+
+include::{common-partial}/session-api.adoc[tag=simple-sessions]
+
+
+[[java-driver-simple-lifecycle]]
+=== Lifecycle
+
+include::{common-partial}/session-api.adoc[tag=simple-lifecycle]
+
+[source, java, indent=0]
+----
+try (Session session = driver.session(...)) {
+    // transactions go here
+}
+----
+
+*_Sessions can be configured in a number of different ways_*.
+This is carried out by supplying configuration inside the session constructor.
+See xref:session-api.adoc#java-driver-session-configuration[Session configuration] for more details.
+
+
+[[java-driver-simple-transaction-fn]]
+=== Transaction functions
+
+include::{common-partial}/session-api.adoc[tag=simple-transaction-fn]
+
+[source, java, indent=0]
+----
+include::{java-examples}/TransactionFunctionExample.java[tags=transaction-function]
+----
+
+
+[[java-driver-simple-autocommit-transactions]]
+=== Auto-commit transactions
+
+include::{common-partial}/session-api.adoc[tag=simple-autocommit-transactions]
+
+[source, java, indent=0]
+----
+include::{java-examples}/AutocommitTransactionExample.java[tags=autocommit-transaction]
+----
+
+
+[[java-driver-simple-result-consume]]
+=== Consuming results
+
+include::{common-partial}/session-api.adoc[tag=simple-result-consume]
+
+[source, java, indent=0]
+----
+include::{java-examples}/ResultConsumeExample.java[tags=result-consume]
+----
+
+
+[[java-driver-simple-result-retain]]
+=== Retaining results
+
+include::{common-partial}/session-api.adoc[tag=simple-result-retain]
+
+[source, java, indent=0]
+----
+include::{java-examples}/ResultRetainExample.java[tags=result-retain]
+----
+
+
+[[java-driver-async-sessions]]
+== Asynchronous sessions
+
+include::{common-partial}/session-api.adoc[tag=async-sessions]
+
+
+[[driver-async-lifecycle]]
+=== Lifecycle
+
+include::{common-partial}/session-api.adoc[tag=async-lifecycle]
+
+See xref:session-api.adoc#java-driver-session-configuration[Session configuration] for more details.
+
+
+[[java-driver-async-transaction-fn]]
+=== Transaction functions
+
+include::{common-partial}/session-api.adoc[tag=async-transaction-fn]
+
+[source, java, indent=0]
+----
+include::{java-examples}/AsyncTransactionFunctionExample.java[tags=async-transaction-function]
+----
+
+
+[[java-driver-async-autocommit-transactions]]
+=== Auto-commit transactions
+
+include::{common-partial}/session-api.adoc[tag=async-autocommit-transactions]
+
+[source, java, indent=0]
+----
+include::{java-examples}/AsyncAutocommitTransactionExample.java[tags=async-autocommit-transaction]
+----
+
+=== Combining Transactions
+
+include::{common-partial}/session-api.adoc[tag=async-multiple-tx]
+
+[source, java, indent=0]
+----
+include::{java-examples}/AsyncRunMultipleTransactionExample.java[tags=async-multiple-tx]
+----
+
+[[java-driver-async-result-consume]]
+=== Consuming results
+
+include::{common-partial}/session-api.adoc[tag=async-result-consume]
+
+[source, java, indent=0]
+----
+include::{java-examples}/AsyncResultConsumeExample.java[tags=async-result-consume]
+----
+
+
+[[java-driver-rx-sessions]]
+== Reactive Sessions
+
+include::{common-partial}/session-api.adoc[tag=rx-sessions]
+
+[NOTE]
+====
+Reactive sessions will typically be used in a client application that is already oriented towards the reactive style; it is expected that a reactive dependency or framework is in place.
+
+Refer to xref:get-started.adoc[Get started] for more information on recommended dependencies.
+====
+
+
+[[java-driver-rx-lifecycle]]
+=== Lifecycle
+
+include::{common-partial}/session-api.adoc[tag=rx-lifecycle]
+
+
+[[java-driver-rx-transaction-fn]]
+=== Transaction functions
+
+include::{common-partial}/session-api.adoc[tag=rx-transaction-fn]
+
+[source, java, indent=0]
+----
+include::{java-examples}/RxTransactionFunctionExample.java[tags=rx-transaction-function]
+----
+
+Sessions can be configured in a number of different ways.
+This is carried out by supplying configuration inside the session constructor.
+See xref:session-api.adoc#java-driver-session-configuration[Session configuration] for more details.
+
+
+[[java-driver-rx-autocommit-transactions]]
+=== Auto-commit transactions
+
+include::{common-partial}/session-api.adoc[tag=rx-autocommit-transactions]
+
+[source, java, indent=0]
+----
+include::{java-examples}/RxAutocommitTransactionExample.java[tags=rx-autocommit-transaction]
+----
+
+
+[[java-driver-rx-result-consume]]
+=== Consuming results
+
+include::{common-partial}/session-api.adoc[tag=rx-result-consume]
+
+[source, java, indent=0]
+----
+include::{java-examples}/RxResultConsumeExample.java[tags=rx-result-consume]
+----
+
+
+[[java-driver-rx-cancellation]]
+=== Cancellation
+
+include::{common-partial}/session-api.adoc[tag=rx-cancellation]
+
+
+[[java-driver-session-configuration]]
+== Session configuration
+
+include::{common-partial}/session-api.adoc[tag=Bookmarks]
+
+include::{common-partial}/session-api.adoc[tag=DefaultAccessMode]
+
+include::{common-partial}/session-api.adoc[tag=Database]
+
+`Fetch Size`::
+The number of records to fetch in each batch from the server.
+Neo4j 4.0 introduces the ability to pull records in batches, allowing the client application to take control of data population and apply back pressure to the server.
+This `FetchSize` applies to xref:session-api.adoc#java-driver-simple-sessions[simple sessions] and xref:session-api.adoc#java-driver-async-sessions[async-sessions] whereas reactive sessions can be controlled directly using the request method of the subscription.
++
+*Default:* 1000 records
+
+include::{common-partial}/session-api.adoc[tag=TransactionConfiguration]
+
+include::{common-partial}/session-api.adoc[tag=TransactionTimeout]
+
+[source, java, indent=0]
+----
+include::{java-examples}/TransactionTimeoutConfigExample.java[tags=transaction-timeout-config]
+----
+
+include::{common-partial}/session-api.adoc[tag=TransactionMetadata]
+
+[source, java, indent=0]
+----
+include::{java-examples}/TransactionMetadataConfigExample.java[tags=transaction-metadata-config]
+----

@@ -1,0 +1,135 @@
+[[python-driver-cypher-workflow]]
+= Cypher workflow
+
+include::{common-partial}/cypher-workflow.adoc[tag=abstract]
+
+
+== Overview
+
+include::{common-partial}/cypher-workflow.adoc[tag=overview]
+
+
+[[python-driver-sessions]]
+== Sessions
+
+include::{common-partial}/cypher-workflow.adoc[tag=sessions]
+
+The session classes are described in xref:session-api.adoc[The session API].
+For more details, please see the xref:get-started.adoc#python-driver-api-docs[API documentation].
+
+
+[[python-driver-transactions]]
+== Transactions
+
+include::{common-partial}/cypher-workflow.adoc[tag=transactions]
+
+To learn more about how to use unmanaged transactions, see xref:get-started.adoc#python-driver-api-docs[API documentation] for the relevant language.
+
+
+[[python-driver-queries-results]]
+== Queries and results
+
+include::{common-partial}/cypher-workflow.adoc[tag=queries-results]
+
+
+[[python-driver-causal-chaining]]
+== Causal chaining and bookmarks
+
+include::{common-partial}/cypher-workflow.adoc[tag=causal-chaining]
+
+.Pass bookmarks
+======
+[source, python, indent=0]
+----
+include::{python-examples}/test_pass_bookmarks_example.py[tags=pass-bookmarks-import]
+----
+
+[source, python, indent=0]
+----
+include::{python-examples}/test_pass_bookmarks_example.py[tags=pass-bookmarks]
+----
+======
+
+
+[[python-driver-access-modes-transaction]]
+== Routing transactions using access modes
+
+include::{common-partial}/cypher-workflow.adoc[tag=access-modes-transaction]
+
+.Read-write transaction
+======
+[source, python, indent=0]
+----
+include::{python-examples}/test_read_write_transaction_example.py[tags=read-write-transaction]
+----
+======
+
+
+[[python-driver-databases]]
+== Databases and execution context
+
+include::{common-partial}/cypher-workflow.adoc[tag=databases]
+
+
+[role=enterprise-edition]
+[[python-database-selection]]
+=== Database selection
+
+include::{common-partial}/cypher-workflow.adoc[tag=database-selection]
+
+.Database selection on session creation
+======
+[source, python, indent=0]
+----
+include::{python-examples}/test_database_selection_example.py[tags=database-selection-import]
+----
+
+[source, python, indent=0]
+----
+include::{python-examples}/test_database_selection_example.py[tags=database-selection]
+----
+======
+
+
+[[python-driver-type-mapping]]
+== Type mapping
+
+include::{common-partial}/cypher-workflow.adoc[tag=type-mapping]
+
+.Map Neo4j types to Python types
+======
+[options="header", cols="<40m,<60a"]
+|===
+| Neo4j Type | Python 3 Type
+| null | `None`
+| List | `list`
+| Map | `dict`
+| Boolean | `bool`
+| Integer | `int`
+| Float | `float`
+| String | `str`
+| ByteArray | `bytearray`
+| Date | *`neo4j.time.Date`*
+| Time | *`neo4j.time.Time`†*
+| LocalTime | *`neo4j.time.Time`††*
+| DateTime | *`neo4j.time.DateTime`†*
+| LocalDateTime | *`neo4j.time.DateTime`††*
+| Duration | *`neo4j.time.Duration`**
+| Point | *`neo4j.spatial.Point`*
+| Node | *`neo4j.graph.Node`*
+| Relationship | *`neo4j.graph.Relationship`*
+| Path | *`neo4j.graph.Path`*
+|===
+
++*+ A `datetime.timedelta` object passed as a parameter will always be implicitly converted to `neo4j.time.Duration`
+
+† Where `tzinfo` *_is not_* `None`
+
+†† Where `tzinfo` *_is_* `None`
+======
+
+
+[[python-driver-exceptions-errors]]
+== Exceptions and error handling
+
+include::{common-partial}/cypher-workflow.adoc[tag=exceptions-errors]

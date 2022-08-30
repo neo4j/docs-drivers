@@ -1,0 +1,131 @@
+[[dotnet-driver-cypher-workflow]]
+= Cypher workflow
+
+include::{common-partial}/cypher-workflow.adoc[tag=abstract]
+
+
+== Overview
+
+include::{common-partial}/cypher-workflow.adoc[tag=overview]
+
+
+[[dotnet-driver-sessions]]
+== Sessions
+
+include::{common-partial}/cypher-workflow.adoc[tag=sessions]
+
+The session classes are described in xref:session-api.adoc[The session API].
+For more details, please see the xref:get-started.adoc#dotnet-driver-api-docs[API documentation].
+
+
+[[dotnet-driver-transactions]]
+== Transactions
+
+include::{common-partial}/cypher-workflow.adoc[tag=transactions]
+
+To learn more about how to use unmanaged transactions, see xref:get-started.adoc#dotnet-driver-api-docs[API documentation].
+
+
+[[dotnet-driver-queries-results]]
+== Queries and results
+
+include::{common-partial}/cypher-workflow.adoc[tag=queries-results]
+
+
+[[dotnet-driver-causal-chaining]]
+== Causal chaining and bookmarks
+
+include::{common-partial}/cypher-workflow.adoc[tag=causal-chaining]
+
+.Pass bookmarks
+======
+[source, csharp, indent=0]
+----
+include::{dotnet-examples}/Examples.cs[tags=pass-bookmarks]
+----
+
+// .Import bookmarks
+// [source, csharp, indent=0]
+// ----
+// include::{dotnet-examples}/Examples.cs[tags=pass-bookmarks-import]
+// ----
+======
+
+
+[[dotnet-driver-access-modes-transaction]]
+== Routing transactions using access modes
+
+include::{common-partial}/cypher-workflow.adoc[tag=access-modes-transaction]
+
+.Read-write transaction
+======
+[source, csharp, indent=0]
+----
+include::{dotnet-examples}/Examples.cs[tags=read-write-transaction]
+----
+
+// .Import read write transactions
+// ----
+// include::{dotnet-examples}/Examples.cs[tags=read-write-transaction-import]
+// ----
+======
+
+
+[[dotnet-driver-databases]]
+== Databases and execution context
+
+include::{common-partial}/cypher-workflow.adoc[tag=databases]
+
+
+[role=enterprise-edition]
+[[dotnet-database-selection]]
+=== Database selection
+
+include::{common-partial}/cypher-workflow.adoc[tag=database-selection]
+
+.Database selection on session creation
+======
+[source, csharp, indent=0]
+----
+include::{dotnet-examples}/Examples.cs[tags=database-selection]
+----
+======
+
+
+[[dotnet-driver-type-mapping]]
+== Type mapping
+
+include::{common-partial}/cypher-workflow.adoc[tag=type-mapping]
+
+.Map Neo4j types to .NET types
+[options="header", cols="<40m,<60a"]
+|===
+| Neo4j Cypher Type        | .NET Type
+| `null` | `null`
+| `List` | `IList<object>`
+| `Map` | `IDictionary<string, object>`
+| `Boolean` | `bool`
+| `Integer` | `long`
+| `Float` | `double`
+| `String` | `string`
+| `ByteArray` | `byte[]`
+| `Date` | *`LocalDate`*
+| `Time` | *`OffsetTime`*
+| `LocalTime` | *`LocalTime`*
+| `DateTime`* | *`ZonedDateTime`*
+| `LocalDateTime` | *`LocalDateTime`*
+| `Duration` | *`Duration`*
+| `Point` | *`Point`*
+| `Node` | *`INode`*
+| `Relationship` | *`IRelationship`*
+| `Path` | *`IPath`*
+|===
+
++*+ Time zone names adhere to the https://www.iana.org/time-zones[IANA system], rather than the https://docs.microsoft.com/en-us/windows-hardware/manufacture/desktop/default-time-zones[Windows system].
+Inbound conversion is carried out using http://cldr.unicode.org/development/development-process/design-proposals/extended-windows-olson-zid-mapping[Extended Windows-Olson zid mapping] as defined by Unicode CLDR.
+
+
+[[dotnet-driver-exceptions-errors]]
+== Exceptions and error handling
+
+include::{common-partial}/cypher-workflow.adoc[tag=exceptions-errors]
