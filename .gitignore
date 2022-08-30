@@ -1,6 +1,9 @@
+*.iml
+*.ipr
+*.iws
+*.sw?
 *~
-\#*
-build/
+.DS_Store
 .cache
 .cache-main
 .cache-main
@@ -9,21 +12,34 @@ build/
 .cache-tests
 .cache-tests
 .classpath
-.DS_Store
 .externalToolBuilders/
 .factorypath
 .gradle
+.gradletasknamecache
 .idea
-*.iml
-*.ipr
-*.iws
 .java-version
 .mailmap
 .project
 .scala_dependencies
 .settings
 .shell_history
+Thumbs.db
+\#*
+bin/teamcity/
+build/
+devenv.local
+shared/
+src/main/_common-and-old/
 tags
 target/
-Thumbs.db
-devenv.local
+
+# docs project
+.env
+node_modules/
+
+# use worktrees for clones of content from other branches so Antora can access it
+worktrees/
+
+# examples for this version of each driver are cloned to an Antora modules dir
+*/modules/api/
+modules/ROOT/partials/driver-sources/

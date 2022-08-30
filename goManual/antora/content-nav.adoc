@@ -1,6 +1,0 @@
-* xref:index.adoc[]
-* xref:get-started/index.adoc[]
-* xref:client-applications/index.adoc[]
-* xref:cypher-workflow/index.adoc[]
-* xref:session-api/index.adoc[]
-* xref:terminology/index.adoc[]

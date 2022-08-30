@@ -1,0 +1,90 @@
+site:
+  title: Neo4j Docs
+  url: https://neo4j.com/docs
+  start_page: dotnet-manual::index.adoc
+
+content:
+  sources:
+  - url : ./
+    branches: ['4.4','4.3','4.2']
+    edit_url: https://github.com/neo-technology/driver-documentation-antora/tree/{refname}/{path}
+    worktrees: true
+    start_paths:
+    - dotnet-manual
+    - go-manual
+    - java-manual
+    - javascript-manual
+    - python-manual
+    - common-content
+    exclude:
+    - '!**/_includes/*'
+    - '!**/readme.adoc'
+    - '!**/README.adoc'
+  - url : ./
+    branches: ['4.1','4.0','1.7']
+    edit_url: https://github.com/neo-technology/driver-documentation-antora/tree/{refname}/{path}
+    worktrees: true
+    exclude:
+    - '!**/_includes/*'
+    - '!**/readme.adoc'
+    - '!**/README.adoc'
+ui:
+  bundle:
+    url: https://s3-eu-west-1.amazonaws.com/static-content.neo4j.com/build/ui-bundle-latest.zip
+    snapshot: true
+  output_dir: /assets
+
+urls:
+  html_extension_style: indexify
+
+antora:
+  extensions:
+  - require: "@neo4j-antora/antora-modify-sitemaps"
+    sitemap_version: '4.4'
+    sitemap_loc_version: 'current'
+    move_sitemaps_to_components: true
+    data:
+      components:
+        driver-manual: '4.1'
+
+asciidoc:
+  extensions:
+  - "@neo4j-documentation/remote-include"
+  - "@neo4j-documentation/macros"
+  - "@neo4j-antora/antora-page-roles"
+  - "@neo4j-antora/antora-table-footnotes"
+  attributes:
+    page-theme: docs
+    page-type: Docs
+    page-search-type: Docs
+    page-search-site: Reference Docs
+    page-canonical-root: /docs
+    page-pagination: true
+    page-no-canonical: true
+    page-origin-private: false
+    page-hide-toc: false
+    page-mixpanel: 4bfb2414ab973c741b6f067bf06d5575
+    # page-add-notes-module: review-note@
+    # page-add-notes-tags: review@
+    includePDF: false
+    nonhtmloutput: ""
+    # sectnums: true, removed so they are off by default
+    # sectnumlevel: 3,
+    experimental: ''
+    copyright: 2021
+    common-license-page-uri: https://neo4j.com/docs/license/
+    docs-base-uri: https://neo4j.com/docs
+    cypher-manual-uri: https://neo4j.com/docs/cypher-manual
+    http-api-uri: https://neo4j.com/docs/http-api
+    operations-manual-uri: https://neo4j.com/docs/operations-manual
+    status-codes-uri: https://neo4j.com/docs/status-codes
+    api-docs-base-uri     : https://neo4j.com/docs/api
+    kerberos-add-on-base-uri: https://neo4j.com/docs/add-on/kerberos/1.0@
+    http-api-base-uri: https://development.neo4j.dev/docs/http-api/current
+    neo4j-version: 4.4@
+    driver-version: 4.4@
+    driverSeries: 4.4@
+    common-partial: common-content:ROOT:partial$@
+    common-image: common-content:ROOT:image$@    
+    
+

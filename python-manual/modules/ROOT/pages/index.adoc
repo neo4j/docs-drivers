@@ -1,0 +1,54 @@
+[[python-drivers]]
+ifndef::backend-pdf[]
+= The Neo4j Python Driver Manual v{driver-version}
+:description: This is the manual for Neo4j Python Driver version {driver-version}, authored by the Neo4j Team. 
+endif::[]
+ifdef::backend-pdf[]
+= The Neo4j Python Driver Manual v{driver-version}
+:description: This is the manual for Neo4j Python Driver version {driver-version}, authored by the Neo4j Team. 
+endif::[]
+:project-version:
+:manual-title: Neo4j Python Driver Manual {project-version}
+:source-indent: 0
+:icons: font
+:iconfont-cdn: https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.0.0/css/font-awesome.min.css
+// :example-caption!:
+// :table-caption!:
+:api-docs-base-uri: https://neo4j.com/docs/api
+
+
+ifndef::backend-pdf[]
+License: link:{common-license-page-uri}[Creative Commons 4.0]
+endif::[]
+ifdef::backend-pdf[]
+Copyright (C) {copyright}
+
+License: <<license, Creative Commons 4.0>>
+endif::[]
+
+This manual covers the following areas:
+
+* xref:get-started.adoc[Get started] -- An overview of the official Neo4j Python Driver and how to connect to a Neo4j database.
+* xref:client-applications.adoc[Client applications] -- How to manage database connections within an application.
+* xref:cypher-workflow.adoc[Cypher workflow] -- How to create units of work and provide a logical context for that work.
+* xref:session-api.adoc[The session API] -- How the types and values used by Cypher map to native language types.
+* xref:terminology.adoc[Driver terminology] -- Terminology for drivers.
+
+_Who should read this?_
+
+This manual is written for Python developers building a Neo4j client application.
+
+[.discrete.ad]
+== link:https://graphacademy.neo4j.com/?ref=guides[Learn with GraphAcademy^]
+
+image::https://graphacademy.neo4j.com/courses/app-python/badge/[float=left]
+
+[.discrete]
+=== link:https://graphacademy.neo4j.com/courses/app-python/?ref=guides[Building Neo4j Applications with Python^]
+
+In this free course, follow a walk through the steps to integrate Neo4j into your Python projects.
+You will learn about the Neo4j Python Driver, how sessions and transactions work and how to query Neo4j from an existing application.
+
+link:https://graphacademy.neo4j.com/courses/app-python/?ref=guides[Learn more^,role=button]
+
+

@@ -1,0 +1,55 @@
+[[go-driver-get-started]]
+= Get started
+:description: This section gives an overview of the official Neo4j Go Driver and how to connect to a Neo4j database with a "Hello World" example. 
+
+
+[[driver-get-started-about]]
+== About the official Go driver
+
+include::{common-partial}/get-started.adoc[tag=about]
+
+In the general case, only the xref:client-applications.adoc#go-driver-connection-uris[connection URI] needs to be modified when changes are made to the topology.
+
+include::{common-partial}/get-started.adoc[tag=about-note]
+
+[[driver-get-started-installation]]
+== Driver versions and installation
+
+include::{common-partial}/get-started.adoc[tag=versions]
+
+
+.Acquire the driver
+======
+
+To find the latest version of the driver, visit https://github.com/neo4j/neo4j-go-driver/releases.
+
+To install the latest version of the driver using `go get`:
+
+[source, shell, subs="attributes, specialcharacters", indent=0]
+----
+go get github.com/neo4j/neo4j-go-driver/v4
+----
+
+The release notes for this driver are available https://github.com/neo4j/neo4j-go-driver/wiki[here].
+
+======
+
+
+[[driver-get-started-hello-world-example]]
+== A "Hello World" example
+
+The example below shows the minimal configuration necessary to interact with *Neo4j* through the Go driver.
+
+.Hello World
+======
+[source, go, indent=0]
+----
+include::{go-examples}/examples_test.go[tags=hello-world]
+----
+======
+
+
+[[go-driver-api-docs]]
+== Driver API docs
+
+For a comprehensive listing of all driver functionality, please see the https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v4[Go API reference documentation].
