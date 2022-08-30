@@ -159,7 +159,7 @@ Unlike other kinds of Cypher Query, `PERIODIC COMMIT` queries do not participate
 
 Therefore, the only way to execute `PERIODIC COMMIT` from a driver is to use auto-commit transactions.
 
-Please refer to the link:docs/cypher-manual/4.2/query-tuning/using/index.adoc#query-using-periodic-commit-hint[Cypher Manual -> `PERIODIC COMMIT` query hint].
+Please refer to the link:/docs/cypher-manual/4.2/query-tuning/using#query-using-periodic-commit-hint[Cypher Manual -> `PERIODIC COMMIT` query hint].
 ====
 
 # end::simple-autocommit-transactions[]
@@ -408,7 +408,7 @@ Unlike other kinds of Cypher Query, `PERIODIC COMMIT` queries do not participate
 
 Therefore, the only way to execute them from a driver is to use auto-commit transactions.
 
-Please refer to the link:docs/cypher-manual/4.2/query-tuning/using/index.adoc#query-using-periodic-commit-hint[Cypher Manual -> `PERIODIC COMMIT` query hint].
+Please refer to the link:/docs/cypher-manual/4.2/query-tuning/using#query-using-periodic-commit-hint[Cypher Manual -> `PERIODIC COMMIT` query hint].
 ====
 
 # end::async-autocommit-transactions[]
@@ -626,7 +626,7 @@ The only way to execute `PERIODIC COMMIT` Cypher Queries is to auto-commit the t
 
 Unlike other kinds of Cypher query, `PERIODIC COMMIT` queries do not participate in the causal chain.
 
-Please refer to the link:docs/cypher-manual/4.2/query-tuning/using/index.adoc#query-using-periodic-commit-hint[Cypher Manual -> `PERIODIC COMMIT` query hint].
+Please refer to the link:/docs/cypher-manual/4.2/query-tuning/using#query-using-periodic-commit-hint[Cypher Manual -> `PERIODIC COMMIT` query hint].
 ====
 
 # end::rx-autocommit-transactions[]
@@ -754,7 +754,7 @@ In other cases, this setting is inherited. Note that transaction functions will 
 Database::
 The database with which the session will interact.
 When you are working with a database which is not the default (i.e. the `system` database or another database in Neo4j 4.0 Enterprise Edition), you can explicitly configure the database which the driver is executing transactions against.
-See link:docs/operations-manual/4.2/manage-databases/introduction/index.adoc#manage-databases-default[Operations Manual -> The default database] for more information on databases.
+See link:/docs/operations-manual/4.2/manage-databases/introduction#manage-databases-default[Operations Manual -> The default database] for more information on databases.
 +
 *Default:* the default database as configured on the server.
 
@@ -782,7 +782,7 @@ Additional configuration can be provided to transaction which are executed.
 
 A timeout value can be provided and transactions which take longer than this value to execute on the server will be terminated.
 This value will override the value set by `+dbms.transaction.timeout+`. If no value is provided, the default is taken by the server setting
-(see link:docs/operations-manual/4.2/monitoring/transaction-management/index.adoc[Operations Manual -> Transaction Management]).
+(see link:/docs/operations-manual/4.2/monitoring/transaction-management[Operations Manual -> Transaction Management]).
 
 Note: Using with Neo4j 4.1 and earlier it is possible for the driver to override any value set with `+dbms.transaction.timeout+`.
 In 4.2 and later, `+dbms.transaction.timeout+` also acts as a maximum which the driver cannot override. For example, with
