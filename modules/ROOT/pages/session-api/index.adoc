@@ -186,7 +186,7 @@ Unlike other kinds of Cypher Query, `PERIODIC COMMIT` queries do not participate
 
 Therefore, the only way to execute `PERIODIC COMMIT` from a driver is to use auto-commit transactions.
 
-Please refer to the link:docs/cypher-manual/4.1/query-tuning/using/index.adoc#query-using-periodic-commit-hint[Cypher Manual -> `PERIODIC COMMIT` query hint].
+Please refer to the link:/docs/cypher-manual/4.1/query-tuning/using#query-using-periodic-commit-hint[Cypher Manual -> `PERIODIC COMMIT` query hint].
 ====
 
 [.tabbed-example]
@@ -442,7 +442,7 @@ Unlike other kinds of Cypher Query, `PERIODIC COMMIT` queries do not participate
 
 Therefore, the only way to execute them from a driver is to use auto-commit transactions.
 
-Please refer to the link:docs/cypher-manual/4.1/query-tuning/using/index.adoc#query-using-periodic-commit-hint[Cypher Manual -> `PERIODIC COMMIT` query hint].
+Please refer to the link:/docs/cypher-manual/4.1/query-tuning/using#query-using-periodic-commit-hint[Cypher Manual -> `PERIODIC COMMIT` query hint].
 ====
 
 [.tabbed-example]
@@ -641,7 +641,7 @@ The only way to execute `PERIODIC COMMIT` Cypher Queries is to auto-commit the t
 
 Unlike other kinds of Cypher query, `PERIODIC COMMIT` queries do not participate in the causal chain.
 
-Please refer to the link:docs/cypher-manual/4.1/query-tuning/using/index.adoc#query-using-periodic-commit-hint[Cypher Manual -> `PERIODIC COMMIT` query hint].
+Please refer to the link:/docs/cypher-manual/4.1/query-tuning/using#query-using-periodic-commit-hint[Cypher Manual -> `PERIODIC COMMIT` query hint].
 ====
 
 [.tabbed-example]
@@ -749,7 +749,7 @@ In other cases, this setting is inherited. Note that transaction functions will 
 Database::
 The database with which the session will interact.
 When you are working with a database which is not the default (i.e. the `system` database or another database in Neo4j 4.0 Enterprise Edition), you can explicitly configure the database which the driver is executing transactions against.
-See link:docs/operations-manual/4.1/manage-databases/introduction/index.adoc#manage-databases-default[Operations Manual -> The default database] for more information on databases.
+See link:/docs/operations-manual/4.1/manage-databases/introduction#manage-databases-default[Operations Manual -> The default database] for more information on databases.
 +
 *Default:* the default database as configured on the server.
 
