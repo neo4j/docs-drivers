@@ -127,7 +127,7 @@ Starting with *Neo4j 4.0*, client-server communication uses only *_unencrypted l
 
 This is a change from previous versions, which switched on encryption by default, but generated a self-signed certificate out of the box.
 
-When a full certificate is installed, and encryption is enabled on the driver, full certificate checks are carried out (refer to link:docs/operations-manual/4.4/security/ssl-framework/index.adoc[Operations Manual -> SSL framework]).
+When a full certificate is installed, and encryption is enabled on the driver, full certificate checks are carried out (refer to link:/docs/operations-manual/4.4/security/ssl-framework[Operations Manual -> SSL framework]).
 Full certificates provide better overall security than self-signed certificates as they include a complete chain of trust back to a root certificate authority.
 
 # end::uris[]
@@ -283,7 +283,7 @@ Routing contexts are defined by means of *_server policies_* and allow customiza
 
 .Configure a routing driver with routing context
 ====
-This example will assume that *Neo4j* has been configured for server policies as described in link:docs/operations-manual/4.4/clustering-advanced/multi-data-center/load-balancing/index.adoc[Neo4j Operations Manual -> Load balancing for multi-data center systems].
+This example will assume that *Neo4j* has been configured for server policies as described in link:/docs/operations-manual/4.4/clustering-advanced/multi-data-center/load-balancing[Neo4j Operations Manual -> Load balancing for multi-data center systems].
 In particular, a server policy called `europe` has been defined.
 Additionally, we have a server `neo01.graph.example.com` to which we wish to direct the driver.
 
@@ -295,10 +295,10 @@ This URI will use the server policy `europe`:
 [NOTE]
 .Server-side configuration to enable routing drivers with routing context
 ====
-A prerequisite for using a routing driver with routing context is that the *Neo4j* database is operated on a link:docs/operations-manual/4.4/clustering/index.adoc[Causal Cluster] with the link:docs/operations-manual/4.4/clustering-advanced/multi-data-center/index.adoc[Multi-data center licensing option] enabled.
+A prerequisite for using a routing driver with routing context is that the *Neo4j* database is operated on a link:/docs/operations-manual/4.4/clustering[Causal Cluster] with the link:/docs/operations-manual/4.4/clustering-advanced/multi-data-center[Multi-data center licensing option] enabled.
 Additionally, the routing contexts must be defined within the cluster as *_routing policies_*.
 
-For details on how to configure *_multi-data center routing policies_* for a Causal Cluster, please refer to link:docs/operations-manual/4.4/clustering-advanced/multi-data-center/load-balancing/index.adoc[Operations Manual -> Causal Clustering].
+For details on how to configure *_multi-data center routing policies_* for a Causal Cluster, please refer to link:/docs/operations-manual/4.4/clustering-advanced/multi-data-center/load-balancing[Operations Manual -> Causal Clustering].
 ====
 
 [NOTE]
@@ -307,7 +307,7 @@ For details on how to configure *_multi-data center routing policies_* for a Cau
 If you are using a *_single instance_* of *Neo4j*, deployed on a remote machine whilst using the `neo4j` URI scheme, *_you will need to complete additional configuration of the server_*.
 
 To make the server aware of its deployment environment, you need to configure
-link:docs/operations-manual/4.4/reference/configuration-settings/index.adoc#config_dbms.default_advertised_address[`default_advertised_address`]
+link:/docs/operations-manual/4.4/reference/configuration-settings#config_dbms.default_advertised_address[`default_advertised_address`]
 with your deployment machine's host name, as visible from the client machine.
 ====
 
@@ -1087,7 +1087,7 @@ This scheme is used in conjunction with Neo4j's Single Sign-On feature.
 [NOTE]
 --
 The bearer scheme requires configuring Single Sign-On on the server.
-See the Operations Manual for information on how to configure it link:docs/operations-manual/{neo4j-version}/authentication-authorization/sso-integration[Operations Manual -> Integration with Single Sign-On services^].
+See the Operations Manual for information on how to configure it link:/docs/operations-manual/{neo4j-version}/authentication-authorization/sso-integration[Operations Manual -> Integration with Single Sign-On services^].
 Once configured, clients can discover Neo4j's configuration through the Discovery API.
 --
 
