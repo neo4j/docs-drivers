@@ -1,8 +1,5 @@
 = Neo4j Driver Documentation
 
-:oracle-download: http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
-:openjdk-download: http://openjdk.java.net/install/
-:maven-download: https://maven.apache.org/download.cgi
 
 == Contents
 
@@ -17,14 +14,22 @@ The examples for each of the driver languages are generated out of each driver's
 * https://github.com/neo4j/neo4j-python-driver[`neo4j-python-driver`]
 
 
-== Usage
+## Usage
 
-First, set up your environment.
+1. Clone the repository and checkout the branch you want to build.
+2. `npm install` to install the required node.js packages
+3. To build and view the HTML:`npm start`
 
-If this is your first time, make a copy of _devenv.local.template_ called _devenv.local_.
-Fill in the necessary values.
 
-Source the common _devenv_: `source devenv`.
+## Notes
 
-Build stuff by running `./gradlew <task>`, for example `./gradlew build`.
-Run `./gradlew tasks --all` to see all available tasks.
+This repo mostly functions in the same way as any other Antora repo, such as docs-getting-started, docs-java-reference. 
+
+The key difference with driver-documentation is that it requires an extra step to fetch the api examples that appear in the docs.
+
+This step uses the `fetch.js` script, which reads an Antora playbook (default: `preview.yml`) to determine which branches and which driver languages are included in the source content for when the playbook is used by Antora to generate HTML.
+
+For every branch and language combination, the api examples are cloned to the relevant path in the driver-documentation repo.
+
+When building HTML with a `preview.yml` playbook, only the active branch is used to generate output. In this case, the examples are cloned to a _/modules/_ path relevant to the driver language, for example _dotnet-manual/modules/api/examples_.
+

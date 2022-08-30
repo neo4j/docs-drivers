@@ -1,6 +1,0 @@
-* xref:index.adoc[]
-* xref:get-started/index.adoc[]
-* xref:client-applications/index.adoc[]
-* xref:sessions-transactions/index.adoc[]
-* xref:cypher-values/index.adoc[]
-* xref:terminology/index.adoc[]
