@@ -1,0 +1,17 @@
+name: go-manual
+title: Neo4j Go Driver Manual
+version: '4.3'
+start_page: ROOT:index.adoc
+nav:
+- modules/ROOT/content-nav.adoc
+asciidoc:
+  attributes:
+    neo4j-version: '4.3'
+    neo4j-version-exact: '4.3.0'
+    neo4j-buildnumber: '4.3'
+    driver-version: "4.3"
+    go-driver-version: "4.3"
+    go-examples: api:example$/neo4j/test-integration
+    common-partial: 4.3@common-content:ROOT:partial$
+    common-image: 4.3@common-content:ROOT:image$
+    go-driver-apidoc-version: '4.3'

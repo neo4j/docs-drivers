@@ -1,5 +1,0 @@
-[colophon]
-[[js-driver-colophon]]
-= Colophon
-
-include::{common-content}/colophon.adoc[tag=colophon]
