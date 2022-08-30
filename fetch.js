@@ -12,8 +12,8 @@ const argv = yargs(hideBin(process.argv))
   .alias('p', 'playbookFile')
   .argv
 
-// this file is in branch 4.4 or a branch created from 4.4 (eg a PR branch)
-const workingBranch = '4.4'
+// this file is in branch dev or a branch created from dev (eg a PR branch)
+const workingBranch = 'dev'
 
 // use preview.yml as the default playbook
 let playbookFile = path.join(__dirname, (argv.playbookFile || 'preview.yml'))
@@ -73,7 +73,8 @@ langs.forEach (function(lang) {
   sourceBranches.forEach (function(branch) {
 
     let worktreeBranch = branch == 'HEAD' ? workingBranch : branch
-    let branchPath = (playbook.asciidoc.attributes["neo4j-version"].includes(worktreeBranch))  ? path.join(__dirname) : path.join(__dirname, 'worktrees', worktreeBranch)
+
+    let branchPath = (playbook.asciidoc.attributes["neo4j-version"].includes(worktreeBranch) || worktreeBranch == 'dev')  ? path.join(__dirname) : path.join(__dirname, 'worktrees', worktreeBranch)
     
     let langPath, clonePath, antoraYMLFile
 

@@ -6,7 +6,7 @@ site:
 content:
   sources:
   - url : ./
-    branches: ['5.0','4.4','4.3','4.2']
+    branches: ['dev','4.4','4.3','4.2']
     edit_url: https://github.com/neo-technology/driver-documentation-antora/tree/{refname}/{path}
     worktrees: true
     start_paths:
@@ -81,9 +81,9 @@ asciidoc:
     api-docs-base-uri     : https://neo4j.com/docs/api
     kerberos-add-on-base-uri: https://neo4j.com/docs/add-on/kerberos/1.0@
     http-api-base-uri: https://development.neo4j.dev/docs/http-api/current
-    neo4j-version: 4.4@
-    driver-version: 4.4@
-    driverSeries: 4.4@
+    neo4j-version: 5.0@
+    driver-version: 5.0@
+    driverSeries: 5.0@
     common-partial: common-content:ROOT:partial$@
     common-image: common-content:ROOT:image$@    
     
