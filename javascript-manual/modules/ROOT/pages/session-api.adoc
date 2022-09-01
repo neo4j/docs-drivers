@@ -40,7 +40,7 @@ include::{common-partial}/session-api.adoc[tag=async-autocommit-transactions]
 include::{javascript-examples}/examples.test.js[tags=async-autocommit-transaction]
 ----
 
-=== Combining Transactions
+=== Combining transactions
 
 include::{common-partial}/session-api.adoc[tag=async-multiple-tx]
 

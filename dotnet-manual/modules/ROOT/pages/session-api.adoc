@@ -106,7 +106,7 @@ include::{common-partial}/session-api.adoc[tag=async-autocommit-transactions]
 include::{dotnet-examples}/ExamplesAsync.cs[tags=async-autocommit-transaction]
 ----
 
-=== Combining Transactions
+=== Combining transactions
 
 include::{common-partial}/session-api.adoc[tag=async-multiple-tx]
 
