@@ -54,6 +54,6 @@ content:
     worktrees: true
 ```
 
-If any of this seems complicated, it isn't really. Almost all of the time you are interested in building a single version of the content, from the branch you currently have checked out. When doing that with `npm run start` (the same command you would use in other repos) there isn't any functional difference as a writer. The only difference is the existence of the api docs, fetched to a folder that is listed in `.gitignore`, so you mostly won't even notice it's there.
+Most of the time you don't need to think about any of this: usually you are interested in building a single version of the content, from the branch you currently have checked out. When doing that with `npm run start` (the same command you would use in other repos) there isn't any functional difference as a writer. The only difference is the existence of the api docs, fetched to a folder that is listed in `.gitignore`, so you mostly won't even notice it's there.
 
 If you do want to build all the versions, you might occasinally get tripped up by having, or not having workspace folders when you need them, but if things aren't going your way you can run `npm run clean` to remove the build and any cloned content paths, and then you can try `npm run deploy`. If it fails, try adding the worktrees again first with `worktrees:add` and trying `npm run deploy` again.
