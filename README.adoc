@@ -1,8 +1,5 @@
 = Neo4j Driver Documentation
 
-:oracle-download: http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
-:openjdk-download: http://openjdk.java.net/install/
-:maven-download: https://maven.apache.org/download.cgi
 
 == Contents
 
@@ -17,7 +14,46 @@ The examples for each of the driver languages are generated out of each driver's
 * https://github.com/neo4j/neo4j-python-driver[`neo4j-python-driver`]
 
 
+## Usage
 
-== Usage
+1. Clone the repository and checkout the branch you want to build.
+2. `npm install` to install the required node.js packages
+3. To build and view the HTML:`npm start`
 
-The drivers manuals are built using the build tooling in the https://github.com/neo-technology/neo4j-manual-modeling-antora/[neo4j-manual-modeling-antora] repo. Information on how to build drivers manuals locally can be found in the wiki of that repository.
+
+## Notes
+
+This repo mostly functions in the same way as any other Antora repo, such as docs-getting-started, docs-java-reference. 
+
+The key difference with driver-documentation is that it requires an extra step to fetch the api examples that appear in the docs.
+
+This step uses the `fetch.js` script, which reads an Antora playbook (default: `preview.yml`) to determine which branches and which driver languages are included in the source content for when the playbook is used by Antora to generate HTML.
+
+For every branch and language combination, the api examples are cloned to the relevant path in the driver-documentation repo.
+
+When building HTML with a `preview.yml` playbook, only the active branch is used to generate output. In this case, the examples are cloned to a _/modules/_ path relevant to the driver language, for example _dotnet-manual/modules/api/examples_.
+
+
+When building HTML with a `publish.yml` playbook, content from multiple branches can be built at the same time. If you have branch 4.4 checked out, and you want to build driver docs for 4.3 as well as 4.4, you need to have somewhere that the api examples can be cloned to.
+
+For this, we make use of git **[worktrees](https://git-scm.com/docs/git-worktree)**.
+
+A worktree allows you to have multiple branches checked out at the same time, to different locations.
+
+Running `npm run worktrees:add` creates a worktree folder under _/worktrees/_ for each of the other branches, from 4.3 to 1.7.
+
+With those worktrees in place, the fetch script can then be given the `publish.yml` playbook, and it can clone the api examples to the corresponding worktree locations. So for the 4.3 dotnet-manual, for example, they are cloned to _worktrees/4.3/dotnet-manual/modules/api/examples_.
+
+When we use Antora to build the HTML, we also have to specify in the playbook that we are using worktrees, which we define in the content section:
+
+```
+content:
+  sources:
+  - url : ./
+    ...
+    worktrees: true
+```
+
+Most of the time you don't need to think about any of this: usually you are interested in building a single version of the content, from the branch you currently have checked out. When doing that with `npm run start` (the same command you would use in other repos) there isn't any functional difference as a writer. The only difference is the existence of the api docs, fetched to a folder that is listed in `.gitignore`, so you mostly won't even notice it's there.
+
+If you do want to build all the versions, you might occasinally get tripped up by having, or not having workspace folders when you need them, but if things aren't going your way you can run `npm run clean` to remove the build and any cloned content paths, and then you can try `npm run deploy`. If it fails, try adding the worktrees again first with `worktrees:add` and trying `npm run deploy` again.
