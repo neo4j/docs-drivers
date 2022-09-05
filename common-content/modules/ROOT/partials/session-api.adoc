@@ -488,7 +488,7 @@ include::{javascript-examples}/examples.test.js[tags=async-result-consume]
 ======
 
 [[driver-async-multiple-transactions]]
-=== Combining Transactions
+=== Combining transactions
 
 # tag::async-multiple-tx[]
 
@@ -500,7 +500,7 @@ The driver provides a language idiomatic way to combine multiple transactions wi
 
 
 [[driver-rx-sessions]]
-== Reactive Sessions
+== Reactive sessions
 
 # tag::rx-sessions[]
 
@@ -778,7 +778,7 @@ Additional configuration can be provided to transaction which are executed.
 
 # tag::TransactionTimeout[]
 
-=== Transaction Timeout
+=== Transaction timeout
 
 A timeout value can be provided and transactions which take longer than this value to execute on the server will be terminated.
 This value will override the value set by `+dbms.transaction.timeout+`. If no value is provided, the default is taken by the server setting
