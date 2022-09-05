@@ -766,7 +766,7 @@ In other cases, this setting is inherited. Note that transaction functions will 
 
 # end::DefaultAccessMode[]
 
-## tag::Database[]
+# tag::Database[]
 
 Database::
 The database with which the session will interact.
