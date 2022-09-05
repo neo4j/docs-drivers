@@ -106,7 +106,7 @@ include::{common-partial}/session-api.adoc[tag=async-autocommit-transactions]
 include::{java-examples}/AsyncAutocommitTransactionExample.java[tags=async-autocommit-transaction]
 ----
 
-=== Combining Transactions
+=== Combining transactions
 
 include::{common-partial}/session-api.adoc[tag=async-multiple-tx]
 
@@ -127,7 +127,7 @@ include::{java-examples}/AsyncResultConsumeExample.java[tags=async-result-consum
 
 
 [[java-driver-rx-sessions]]
-== Reactive Sessions
+== Reactive sessions
 
 include::{common-partial}/session-api.adoc[tag=rx-sessions]
 
