@@ -40,7 +40,7 @@ include::{common-partial}/session-api.adoc[tag=async-autocommit-transactions]
 include::{javascript-examples}/examples.test.js[tags=async-autocommit-transaction]
 ----
 
-=== Combining Transactions
+=== Combining transactions
 
 include::{common-partial}/session-api.adoc[tag=async-multiple-tx]
 
@@ -61,7 +61,7 @@ include::{javascript-examples}/examples.test.js[tags=async-result-consume]
 
 
 [[js-driver-rx-sessions]]
-== Reactive Sessions
+== Reactive sessions
 
 include::{common-partial}/session-api.adoc[tag=rx-sessions]
 
