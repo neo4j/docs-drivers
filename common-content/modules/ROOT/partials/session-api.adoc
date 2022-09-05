@@ -766,12 +766,12 @@ In other cases, this setting is inherited. Note that transaction functions will 
 
 # end::DefaultAccessMode[]
 
-# tag::Database[]
+## tag::Database[]
 
 Database::
 The database with which the session will interact.
 When working with a database which is not the default (i.e. the `system` database or another database in Neo4j 4.0 Enterprise Edition), you can explicitly configure the database which the driver is executing transactions against.
-
++
 [WARNING]
 ====
 The resolution of database aliases occurs at connection creation time, which is not under the control of the session.
@@ -779,13 +779,13 @@ It is therefore not recommended to alter database aliases while there are live s
 The per-user home database is resolved at session creation and when first impersonating a user.
 Therefore, the creation of a new session is necessary to reflect a changed home database.
 ====
-
++
 See link:/docs/operations-manual/4.4/manage-databases/introduction#manage-databases-default[Operations Manual -> The default database] for more information on databases.
-
++
 See below and link:/docs/cypher-manual/4.4/access-control/dbms-administration#access-control-dbms-administration-impersonation[Cypher Manual -> The `DBMS IMPERSONATE` privileges] for more information on impersonation.
-
++
 *Default:* the default database as configured on the server.
-
++
 # end::Database[]
 
 `Fetch Size`::
