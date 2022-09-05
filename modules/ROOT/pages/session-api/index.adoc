@@ -1,6 +1,6 @@
 [[driver-session-api]]
 = The session API
-:description: This section details the Session API that are made available by the driver, with each Session class oriented towards a different form of programming.  This section describes simple sessions, transactions executed within a simple session and the results thereof.  This section describes asynchronous sessions, transactions executed within an asynchronous session and the results thereof.  This section describes reactive sessions, transactions executed within a reactive session and the results thereof.  This section details the configuration options available when constructing a session. 
+:description: This section details the Session API that are made available by the driver, with each Session class oriented towards a different form of programming.  This section describes simple sessions, transactions executed within a simple session and the results thereof.  This section describes asynchronous sessions, transactions executed within an asynchronous session and the results thereof.  This section describes reactive sessions, transactions executed within a reactive session and the results thereof.  This section details the configuration options available when constructing a session.
 
 This chapter describes the following:
 
@@ -519,7 +519,7 @@ include::{javascript-examples}/examples.test.js[tags=async-result-consume]
 
 
 [[driver-rx-sessions]]
-== Reactive Sessions
+== Reactive sessions
 
 [NOTE]
 ====
