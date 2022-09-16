@@ -6,7 +6,7 @@
   "scripts": {
     "clean": "rm -rf build && rm -rf */modules/api && rm -rf modules/ROOT/partials/driver-sources",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "npm run fetch && nodemon -e adoc --exec \"npm run build && npm run serve\"",
+    "start": "nodemon -e adoc --exec \"npm run build && npm run serve\"",
     "deploy": "npm run worktrees:refresh && npm run fetch -- -p publish.yml && npm run publish",
     "fetch:preview": "npm run fetch",
     "fetch:publish": "npm run fetch -- -p publish.yml",
@@ -31,8 +31,8 @@
   },
   "homepage": "https://github.com/neo4j/driver-documentation#readme",
   "dependencies": {
-    "@antora/cli": "^3.0.1",
-    "@antora/site-generator-default": "^3.0.1",
+    "@antora/cli": "^3.1.0",
+    "@antora/site-generator-default": "^3.1.0",
     "@neo4j-antora/antora-add-notes": "^0.1.6",
     "@neo4j-antora/antora-modify-sitemaps": "^0.4.3",
     "@neo4j-antora/antora-page-roles": "^0.3.1",
