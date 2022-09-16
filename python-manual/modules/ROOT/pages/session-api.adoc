@@ -46,7 +46,7 @@ include::{python-examples}/test_transaction_function_example.py[tags=transaction
 
 
 [[python-driver-simple-autocommit-transactions]]
-=== Auto-commit transactions
+=== Auto-commit transactions (or implicit transactions)
 
 include::{common-partial}/session-api.adoc[tag=simple-autocommit-transactions]
 

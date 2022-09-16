@@ -39,7 +39,7 @@ include::{java-examples}/TransactionFunctionExample.java[tags=transaction-functi
 
 
 [[java-driver-simple-autocommit-transactions]]
-=== Auto-commit transactions
+=== Auto-commit transactions (or implicit transactions)
 
 include::{common-partial}/session-api.adoc[tag=simple-autocommit-transactions]
 
@@ -97,7 +97,7 @@ include::{java-examples}/AsyncTransactionFunctionExample.java[tags=async-transac
 
 
 [[java-driver-async-autocommit-transactions]]
-=== Auto-commit transactions
+=== Auto-commit transactions (or implicit transactions)
 
 include::{common-partial}/session-api.adoc[tag=async-autocommit-transactions]
 
@@ -161,7 +161,7 @@ See xref:session-api.adoc#java-driver-session-configuration[Session configuratio
 
 
 [[java-driver-rx-autocommit-transactions]]
-=== Auto-commit transactions
+=== Auto-commit transactions (or implicit transactions)
 
 include::{common-partial}/session-api.adoc[tag=rx-autocommit-transactions]
 
