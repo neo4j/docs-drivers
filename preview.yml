@@ -64,5 +64,5 @@ asciidoc:
     driver-version: 4.3@
     driverSeries: 4.3@
     http-api-base-uri: https://development.neo4j.dev/docs/http-api/current
-    
-    
+    check-mark: icon:check[]
+    cross-mark: icon:times[]
