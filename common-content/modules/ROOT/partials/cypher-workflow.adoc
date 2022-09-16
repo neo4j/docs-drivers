@@ -457,24 +457,24 @@ All types can be potentially found in the result, although not all types can be 
 [options="header", cols=",,"]
 |===
 | Cypher Type | Parameter | Result
-| `null`* | ✔ | ✔
-| `List`  | ✔ | ✔
-| `Map`   | ✔ | ✔
-| `Boolean` | ✔ | ✔
-| `Integer` | ✔ | ✔
-| `Float` | ✔ | ✔
-| `String` | ✔ | ✔
-| `ByteArray` | ✔ | ✔
-| `Date` | ✔ | ✔
-| `Time` | ✔ | ✔
-| `LocalTime` | ✔ | ✔
-| `DateTime` | ✔ | ✔
-| `LocalDateTime` | ✔ | ✔
-| `Duration` | ✔ | ✔
-| `Point` | ✔ | ✔
-| `Node`** | | ✔
-| `Relationship`** | | ✔
-| `Path`** | | ✔
+| `null`* | {check-mark} | {check-mark}
+| `List`  | {check-mark} | {check-mark}
+| `Map`   | {check-mark} | {check-mark}
+| `Boolean` | {check-mark} | {check-mark}
+| `Integer` | {check-mark} | {check-mark}
+| `Float` | {check-mark} | {check-mark}
+| `String` | {check-mark} | {check-mark}
+| `ByteArray` | {check-mark} | {check-mark}
+| `Date` | {check-mark} | {check-mark}
+| `Time` | {check-mark} | {check-mark}
+| `LocalTime` | {check-mark} | {check-mark}
+| `DateTime` | {check-mark} | {check-mark}
+| `LocalDateTime` | {check-mark} | {check-mark}
+| `Duration` | {check-mark} | {check-mark}
+| `Point` | {check-mark} | {check-mark}
+| `Node`** | | {check-mark}
+| `Relationship`** | | {check-mark}
+| `Path`** | | {check-mark}
 |===
 
 +*+ The null marker is not a type but a placeholder for absence of value.
