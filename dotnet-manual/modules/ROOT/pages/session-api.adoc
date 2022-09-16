@@ -39,7 +39,7 @@ include::{dotnet-examples}/Examples.cs[tags=transaction-function]
 
 
 [[dotnet-driver-simple-autocommit-transactions]]
-=== Auto-commit transactions
+=== Auto-commit transactions (or implicit transactions)
 
 include::{common-partial}/session-api.adoc[tag=simple-autocommit-transactions]
 
@@ -97,7 +97,7 @@ include::{dotnet-examples}/ExamplesAsync.cs[tags=async-transaction-function]
 
 
 [[dotnet-driver-async-autocommit-transactions]]
-=== Auto-commit transactions
+=== Auto-commit transactions (or implicit transactions)
 
 include::{common-partial}/session-api.adoc[tag=async-autocommit-transactions]
 
@@ -161,7 +161,7 @@ See xref:session-api.adoc#dotnet-driver-session-configuration[Session configurat
 
 
 [[dotnet-driver-rx-autocommit-transactions]]
-=== Auto-commit transactions
+=== Auto-commit transactions (or implicit transactions)
 
 include::{common-partial}/session-api.adoc[tag=rx-autocommit-transactions]
 
