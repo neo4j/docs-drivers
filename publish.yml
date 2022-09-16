@@ -86,5 +86,7 @@ asciidoc:
     driverSeries: 4.4@
     common-partial: common-content:ROOT:partial$@
     common-image: common-content:ROOT:image$@    
+    check-mark: icon:check[]
+    cross-mark: icon:times[]
     
 

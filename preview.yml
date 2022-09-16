@@ -73,3 +73,6 @@ asciidoc:
     http-api-base-uri: https://development.neo4j.dev/docs/http-api/current
     common-partial: 4.4@common-content:ROOT:partial$@
     common-image: 4.4@common-content:ROOT:image$@
+    check-mark: icon:check[]
+    cross-mark: icon:times[]
+
