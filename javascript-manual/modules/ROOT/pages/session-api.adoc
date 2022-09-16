@@ -31,7 +31,7 @@ include::{javascript-examples}/examples.test.js[tags=async-transaction-function]
 
 
 [[js-driver-async-autocommit-transactions]]
-=== Auto-commit transactions
+=== Auto-commit transactions (or implicit transactions)
 
 include::{common-partial}/session-api.adoc[tag=async-autocommit-transactions]
 
@@ -96,7 +96,7 @@ See xref:session-api.adoc#js-driver-session-configuration[Session configuration]
 
 
 [[js-driver-rx-autocommit-transactions]]
-=== Auto-commit transactions
+=== Auto-commit transactions (or implicit transactions)
 
 include::{common-partial}/session-api.adoc[tag=rx-autocommit-transactions]
 
