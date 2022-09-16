@@ -50,3 +50,5 @@ In this free course, follow a walk through the steps to integrate Neo4j into you
 You will learn about the Neo4j .Net Driver, how sessions and transactions work and how to query Neo4j from an existing application.
 
 link:https://graphacademy.neo4j.com/courses/app-dotnet/?ref=guides[Learn more^,role=button]
+
+
