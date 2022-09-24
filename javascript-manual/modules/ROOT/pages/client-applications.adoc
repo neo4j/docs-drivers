@@ -39,7 +39,7 @@ https://neo4j.com/aura/[*Neo4j Aura*] is a *_secure hosted service_* backed by f
 
 To connect to *Neo4j Aura*, driver users must *_enable encryption_* and the complete set of certificate checks (the latter of which are enabled by default).
 
-For more information, see xref:client-applications.adoc#driver-configuration-examples[Examples] below.
+For more information, see xref:client-applications.adoc#js-driver-configuration-examples[Examples] below.
 ====
 
 include::{common-partial}/client-applications.adoc[tag=default-security-changes]
