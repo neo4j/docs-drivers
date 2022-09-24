@@ -779,7 +779,7 @@ Therefore, the creation of a new session is necessary to reflect a changed home 
 +
 See link:/docs/operations-manual/5.0/manage-databases/introduction#manage-databases-default[Operations Manual -> The default database] for more information on databases.
 +
-See below and link:docs/cypher-manual/5.0/access-control/dbms-administration.adoc#access-control-dbms-administration-impersonation[Cypher Manual -> The `DBMS IMPERSONATE` privileges] for more information on impersonation.
+See below and link:/docs/cypher-manual/5.0/access-control/dbms-administration.adoc#access-control-dbms-administration-impersonation[Cypher Manual -> The `DBMS IMPERSONATE` privileges] for more information on impersonation.
 +
 *Default:* the default database as configured on the server.
 +
