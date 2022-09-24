@@ -306,7 +306,7 @@ For details on how to configure *_multi-data center routing policies_* for a Cau
 ====
 If you are using a *_single instance_* of *Neo4j*, deployed on a remote machine whilst using the `neo4j` URI scheme, *_you will need to complete additional configuration of the server_*.
 
-To make the server aware of its deployment environment, you need to configure link:docs/operations-manual/5.0/reference/configuration-settings/#config_server.default_advertised_address[`default_advertised_address`] with your deployment machine's host name, as visible from the client machine.
+To make the server aware of its deployment environment, you need to configure link:/docs/operations-manual/5.0/reference/configuration-settings/#config_server.default_advertised_address[`default_advertised_address`] with your deployment machine's host name, as visible from the client machine.
 ====
 
 # end::routing-context[]
