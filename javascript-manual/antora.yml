@@ -11,7 +11,7 @@ asciidoc:
     neo4j-buildnumber: '4.4'
     driver-version: "4.4"
     javascript-driver-version: "4.4.0"
-    javascript-examples: api:example$packages/neo4j-driver/test
     javascript-driver-apidoc-version: '4.4'
+    javascript-examples: https://raw.githubusercontent.com/neo4j/neo4j-javascript-driver/{javascript-driver-apidoc-version}/packages/neo4j-driver/test
     common-partial: 4.4@common-content:ROOT:partial$
     common-image: 4.4@common-content:ROOT:image$
