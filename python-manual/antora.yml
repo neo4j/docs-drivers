@@ -11,7 +11,7 @@ asciidoc:
     neo4j-buildnumber: '4.2'
     driver-version: "4.2"
     python-driver-version: "4.2.1"
-    python-examples: api:example$tests/integration/examples
     python-driver-apidoc-version: '4.2'
+    python-examples: https://raw.githubusercontent.com/neo4j/neo4j-python-driver/{python-driver-apidoc-version}/tests/integration/examples
     common-partial: 4.2@common-content:ROOT:partial$
     common-image: 4.2@common-content:ROOT:image$
