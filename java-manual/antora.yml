@@ -1,15 +1,15 @@
 name: java-manual
 title: Neo4j Java Driver Manual
-version: '5.0'
+version: '5'
 start_page: ROOT:index.adoc
 nav:
 - modules/ROOT/content-nav.adoc
 asciidoc:
   attributes:
-    neo4j-version: '5.0'
-    driver-version: "5.0"
-    java-driver-version: "5.0.0"
+    neo4j-version: "5.1"
+    driver-version: "5.1"
+    java-driver-version: "5.1.0"
     java-examples: api:example$examples/src/main/java/org/neo4j/docs/driver
-    java-driver-apidoc-version: '5.0'
-    common-partial: 5.0@common-content:ROOT:partial$
-    common-image: 5.0@common-content:ROOT:image$
+    java-driver-apidoc-version: '5.1'
+    common-partial: 5@common-content:ROOT:partial$
+    common-image: 5@common-content:ROOT:image$

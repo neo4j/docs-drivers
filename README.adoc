@@ -25,35 +25,40 @@ The examples for each of the driver languages are generated out of each driver's
 
 This repo mostly functions in the same way as any other Antora repo, such as docs-getting-started, docs-java-reference. 
 
-The key difference with driver-documentation is that it requires an extra step to fetch the api examples that appear in the docs.
+The key difference with driver-documentation is that it includes remote content from the Neo4j Driver repos.
+To do this, the repo uses the https://www.npmjs.com/package/@neo4j-documentation/remote-include[neo4j-documentation/remote-include] package as an asciidoc extension.
 
-This step uses the `fetch.js` script, which reads an Antora playbook (default: `preview.yml`) to determine which branches and which driver languages are included in the source content for when the playbook is used by Antora to generate HTML.
+Code from the driver repos is included by adding attributes to the `antora.yml` file.
+The `antora.yml` file contains an attribute that contains a path to the examples.
 
-For every branch and language combination, the api examples are cloned to the relevant path in the driver-documentation repo.
-
-When building HTML with a `preview.yml` playbook, only the active branch is used to generate output. In this case, the examples are cloned to a _/modules/_ path relevant to the driver language, for example _dotnet-manual/modules/api/examples_.
-
-
-When building HTML with a `publish.yml` playbook, content from multiple branches can be built at the same time. If you have branch 4.4 checked out, and you want to build driver docs for 4.3 as well as 4.4, you need to have somewhere that the api examples can be cloned to.
-
-For this, we make use of git **[worktrees](https://git-scm.com/docs/git-worktree)**.
-
-A worktree allows you to have multiple branches checked out at the same time, to different locations.
-
-Running `npm run worktrees:add` creates a worktree folder under _/worktrees/_ for each of the other branches, from 4.3 to 1.7.
-
-With those worktrees in place, the fetch script can then be given the `publish.yml` playbook, and it can clone the api examples to the corresponding worktree locations. So for the 4.3 dotnet-manual, for example, they are cloned to _worktrees/4.3/dotnet-manual/modules/api/examples_.
-
-When we use Antora to build the HTML, we also have to specify in the playbook that we are using worktrees, which we define in the content section:
+Note that from Antora 3.1.0, attributes can be referenced by other attributes, allowing the following configuration:
 
 ```
-content:
-  sources:
-  - url : ./
-    ...
-    worktrees: true
+asciidoc:
+  attributes:
+    dotnet-driver-apidoc-version: '4.4'
+    dotnet-examples: https://raw.githubusercontent.com/neo4j/neo4j-dotnet-driver/{dotnet-driver-apidoc-version}/Neo4j.Driver/Neo4j.Driver.Tests.Integration
 ```
 
-Most of the time you don't need to think about any of this: usually you are interested in building a single version of the content, from the branch you currently have checked out. When doing that with `npm run start` (the same command you would use in other repos) there isn't any functional difference as a writer. The only difference is the existence of the api docs, fetched to a folder that is listed in `.gitignore`, so you mostly won't even notice it's there.
+In the driver code repo, include example code, with a start and end tag:
 
-If you do want to build all the versions, you might occasinally get tripped up by having, or not having workspace folders when you need them, but if things aren't going your way you can run `npm run clean` to remove the build and any cloned content paths, and then you can try `npm run deploy`. If it fails, try adding the worktrees again first with `worktrees:add` and trying `npm run deploy` again.
+```
+            // tag::transaction-function[]
+            public void AddPerson(string name)
+            {
+                using (var session = Driver.Session())
+                {
+                    session.WriteTransaction(tx => tx.Run("CREATE (a:Person {name: $name})", new {name}).Consume());
+                }
+            }
+            // end::transaction-function[]
+```
+
+In a page, to include the `transaction-function` code, use the `\{dotnet-examples}` attribute, adding the tag to the options:
+
+```
+[source, csharp, indent=0]
+----
+\include::{dotnet-examples}/Examples.cs[tags=transaction-function]
+----
+```
