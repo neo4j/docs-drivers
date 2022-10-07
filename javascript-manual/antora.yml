@@ -1,17 +1,17 @@
 name: javascript-manual
 title: Neo4j JavaScript Driver Manual
-version: '5.0'
+version: '5'
 start_page: ROOT:index.adoc
 nav:
 - modules/ROOT/content-nav.adoc
 asciidoc:
   attributes:
-    neo4j-version: '5.0'
+    neo4j-version: '5'
     neo4j-version-exact: '5.0.0'
     neo4j-buildnumber: '5.0'
     driver-version: "5.0"
     javascript-driver-version: "5.0.0"
-    javascript-driver-apidoc-version: '5.0'
-    javascript-examples: https://raw.githubusercontent.com/neo4j/neo4j-javascript-driver/{javascript-driver-apidoc-version}/packages/neo4j-driver/test
-    common-partial: 5.0@common-content:ROOT:partial$
-    common-image: 5.0@common-content:ROOT:image$
+    javascript-driver-apidoc-release: '5.0'
+    javascript-examples: https://raw.githubusercontent.com/neo4j/neo4j-javascript-driver/{javascript-driver-apidoc-release}/packages/neo4j-driver/test
+    common-partial: 5@common-content:ROOT:partial$
+    common-image: 5@common-content:ROOT:image$

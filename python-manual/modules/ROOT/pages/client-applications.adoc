@@ -343,7 +343,7 @@ include::{python-examples}/test_custom_auth_example.py[tags=custom-auth]
 == Configuration
 
 //include::{common-partial}/client-applications.adoc[tag=configuration-ConnectionAcquisitionTimeout]
-link:https://neo4j.com/docs/api/python-driver/{neo4j-version}/api.html#connection-acquisition-timeout[`ConnectionAcquisitionTimeout`]::
+link:https://neo4j.com/docs/api/python-driver/{python-driver-apidoc-release}/api.html#connection-acquisition-timeout[`ConnectionAcquisitionTimeout`]::
 
 The maximum amount of time in secondsfootnote:[Other drivers may use milliseconds instead of seconds for this configuration.] a session will wait when requesting a connection from the connection pool.
 For connection pools where all connections are currently being used and the `MaxConnectionPoolSize` limit has been reached, a session will wait this duration for a connection to be made available.
@@ -371,7 +371,7 @@ include::{python-examples}/test_config_connection_pool_example.py[tags=config-co
 ======
 
 //include::{common-partial}/client-applications.adoc[tag=configuration-ConnectionTimeout]
-link:https://neo4j.com/docs/api/python-driver/{neo4j-version}/api.html#connection-timeout[`ConnectionTimeout`]::
+link:https://neo4j.com/docs/api/python-driver/{python-driver-apidoc-release}/api.html#connection-timeout[`ConnectionTimeout`]::
 
 The maximum amount of time in secondsfootnote:[Other drivers may use milliseconds instead of seconds for this configuration.] to wait for a TCP connection to be established.
 Connections are only created when a session requires one unless there is an available connection in the connection pool.
@@ -419,7 +419,7 @@ include::{python-examples}/test_config_unencrypted_example.py[tags=config-unencr
 ======
 
 //include::{common-partial}/client-applications.adoc[tag=configuration-MaxConnectionLifetime]
-link:https://neo4j.com/docs/api/python-driver/{neo4j-version}/api.html#max-connection-lifetime[`MaxConnectionLifetime`]::
+link:https://neo4j.com/docs/api/python-driver/{python-driver-apidoc-release}/api.html#max-connection-lifetime[`MaxConnectionLifetime`]::
 
 The maximum duration in secondsfootnote:[Other drivers may use milliseconds instead of seconds for this configuration.] the driver will keep a connection for before being removed from the pool.
 Note that while the driver will respect this value, it is possible that the network environment will close connections inside this lifetime.
@@ -441,7 +441,7 @@ include::{common-partial}/client-applications.adoc[tag=configuration-MaxConnecti
 *Default:* 100 connections
 
 //include::{common-partial}/client-applications.adoc[tag=configuration-MaxTransactionRetryTime]
-link:https://neo4j.com/docs/api/python-driver/{neo4j-version}/api.html#max-transaction-retry-time[`MaxTransactionRetryTime`]::
+link:https://neo4j.com/docs/api/python-driver/{python-driver-apidoc-release}/api.html#max-transaction-retry-time[`MaxTransactionRetryTime`]::
 
 The maximum amount of time in secondsfootnote:[Other drivers may use milliseconds instead of seconds for this configuration.] that a managed transaction will retry for before failing.
 Queries that are executed within a managed transaction gain the benefit of being retried when a transient error occurs.

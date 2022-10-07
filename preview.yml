@@ -31,7 +31,7 @@ urls:
 antora:
   extensions:
   - require: "@neo4j-antora/antora-modify-sitemaps"
-    sitemap_version: '5.0'
+    sitemap_version: '5'
     sitemap_loc_version: 'current'
     move_sitemaps_to_components: true
 
@@ -67,11 +67,11 @@ asciidoc:
     status-codes-uri: https://neo4j.com/docs/status-codes
     api-docs-base-uri     : https://neo4j.com/docs/api
     kerberos-add-on-base-uri: https://neo4j.com/docs/add-on/kerberos/1.0@
-    neo4j-version: 5.0@
-    driver-version: 5.0-preew@
-    driverSeries: 5.0@
+    neo4j-version: 5@
+    driver-version: 5.0@
+    driverSeries: 5@
     http-api-base-uri: https://development.neo4j.dev/docs/http-api/current
-    common-partial: 5.0@common-content:ROOT:partial$@
-    common-image: 5.0@common-content:ROOT:image$@
+    common-partial: 5@common-content:ROOT:partial$@
+    common-image: 5@common-content:ROOT:image$@
     check-mark: icon:check[]
     cross-mark: icon:times[]
