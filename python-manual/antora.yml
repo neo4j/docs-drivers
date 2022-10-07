@@ -10,7 +10,7 @@ asciidoc:
     neo4j-buildnumber: '5.0'
     driver-version: "5.0"
     python-driver-version: "5.0.0"
-    python-examples: api:example$tests/integration/examples
     python-driver-apidoc-version: '5.0'
+    python-examples: https://raw.githubusercontent.com/neo4j/neo4j-python-driver/{python-driver-apidoc-version}/tests/integration/examples
     common-partial: 5.0@common-content:ROOT:partial$
     common-image: 5.0@common-content:ROOT:image$
