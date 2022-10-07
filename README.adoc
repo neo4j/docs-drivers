@@ -25,13 +25,40 @@ The examples for each of the driver languages are generated out of each driver's
 
 This repo mostly functions in the same way as any other Antora repo, such as docs-getting-started, docs-java-reference. 
 
-The key difference with driver-documentation is that it requires an extra step to fetch the api examples that appear in the docs.
+The key difference with driver-documentation is that it includes remote content from the Neo4j Driver repos.
+To do this, the repo uses the https://www.npmjs.com/package/@neo4j-documentation/remote-include[neo4j-documentation/remote-include] package as an asciidoc extension.
 
-This step uses the `fetch.js` script, which reads an Antora playbook (default: `preview.yml`) to determine which branches and which driver languages are included in the source content for when the playbook is used by Antora to generate HTML.
+Code from the driver repos is included by adding attributes to the `antora.yml` file.
+The `antora.yml` file contains an attribute that contains a path to the examples.
 
-For every branch and language combination, the api examples are cloned to the relevant path in the driver-documentation repo.
+Note that from Antora 3.1.0, attributes can be referenced by other attributes, allowing the following configuration:
 
-When building HTML with a `preview.yml` playbook, only the active branch is used to generate output. In this case, the examples are cloned to a _/modules/_ path relevant to the driver language, for example _dotnet-manual/modules/api/examples_.
+```
+asciidoc:
+  attributes:
+    dotnet-driver-apidoc-version: '4.4'
+    dotnet-examples: https://raw.githubusercontent.com/neo4j/neo4j-dotnet-driver/{dotnet-driver-apidoc-version}/Neo4j.Driver/Neo4j.Driver.Tests.Integration
+```
 
-For an example of generating output from more than one branch, see the 4.4 branch.
+In the driver code repo, include example code, with a start and end tag:
 
+```
+            // tag::transaction-function[]
+            public void AddPerson(string name)
+            {
+                using (var session = Driver.Session())
+                {
+                    session.WriteTransaction(tx => tx.Run("CREATE (a:Person {name: $name})", new {name}).Consume());
+                }
+            }
+            // end::transaction-function[]
+```
+
+In a page, to include the `transaction-function` code, use the `\{dotnet-examples}` attribute, adding the tag to the options:
+
+```
+[source, csharp, indent=0]
+----
+\include::{dotnet-examples}/Examples.cs[tags=transaction-function]
+----
+```
