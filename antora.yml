@@ -9,19 +9,24 @@ asciidoc:
     neo4j-version: '4.1'
     neo4j-version-exact: '4.1.1'
     neo4j-buildnumber: '4.1'
-    dotnet-examples: 'partial$driver-sources/dotnet-driver/Neo4j.Driver/Neo4j.Driver.Tests.Integration'
-    go-examples: 'partial$driver-sources/go-driver/neo4j/test-integration'
-    java-examples: 'partial$driver-sources/java-driver/examples/src/main/java/org/neo4j/docs/driver'
-    javascript-examples: 'partial$driver-sources/javascript-driver/test'
-    python-examples: 'partial$driver-sources/python-driver/tests/integration/examples'
     driver-version: "4.1"
+    # dotnet
     dotnet-driver-version: "4.1.1"
-    go-driver-version: "4.1"
-    java-driver-version: "4.1.4"
-    javascript-driver-version: "4.1.2"
-    python-driver-version: "4.1"
     dotnet-driver-apidoc-version: "4.1"
+    dotnet-examples: https://raw.githubusercontent.com/neo4j/neo4j-dotnet-driver/{dotnet-driver-apidoc-version}/Neo4j.Driver/Neo4j.Driver.Tests.Integration
+    # go
+    go-driver-version: "4.1"
     go-driver-apidoc-version: "4.0"
+    go-examples: https://raw.githubusercontent.com/neo4j/neo4j-go-driver/{go-driver-apidoc-version}/neo4j/test-integration
+    # java
+    java-driver-version: "4.1.4"
     java-driver-apidoc-version: "4.1"
+    java-examples: https://raw.githubusercontent.com/neo4j/neo4j-java-driver/{java-driver-apidoc-version}/examples/src/main/java/org/neo4j/docs/driver
+    # javascript
+    javascript-driver-version: "4.1.2"
     javascript-driver-apidoc-version: "4.1"
+    javascript-examples: https://raw.githubusercontent.com/neo4j/neo4j-javascript-driver/{javascript-driver-apidoc-version}/test
+    # python
+    python-driver-version: "4.1"
     python-driver-apidoc-version: "4.1"
+    python-examples: https://raw.githubusercontent.com/neo4j/neo4j-python-driver/{python-driver-apidoc-version}/tests/integration/examples
