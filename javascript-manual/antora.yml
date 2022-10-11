@@ -14,5 +14,5 @@ asciidoc:
     javascript-driver-version: "5.0.0"
     javascript-driver-apidoc-release: '5.0'
     javascript-examples: https://raw.githubusercontent.com/neo4j/neo4j-javascript-driver/{javascript-driver-apidoc-release}/packages/neo4j-driver/test
-    common-partial: 5@common-content:ROOT:partial$
-    common-image: 5@common-content:ROOT:image$
+    common-partial: '{neo4j-version}@common-content:ROOT:partial$'
+    common-image: '{neo4j-version}@common-content:ROOT:image$'

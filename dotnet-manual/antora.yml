@@ -14,5 +14,5 @@ asciidoc:
     dotnet-driver-version: "5.0.0"
     dotnet-driver-apidoc-release: '5.0'
     dotnet-examples: https://raw.githubusercontent.com/neo4j/neo4j-dotnet-driver/{dotnet-driver-apidoc-release}/Neo4j.Driver/Neo4j.Driver.Tests.Integration
-    common-partial: 5@common-content:ROOT:partial$
-    common-image: 5@common-content:ROOT:image$ 
+    common-partial: '{neo4j-version}@common-content:ROOT:partial$'
+    common-image: '{neo4j-version}@common-content:ROOT:image$' 
