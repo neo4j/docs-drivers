@@ -6,10 +6,11 @@ nav:
 - modules/ROOT/content-nav.adoc
 asciidoc:
   attributes:
+    neo4j-version-short: '5'
     neo4j-version: '5.0'
     driver-version: "5.0"
     java-driver-version: "5.0.0"
-    java-driver-apidoc-version: '5.0'
-    java-examples: https://raw.githubusercontent.com/neo4j/neo4j-java-driver/{java-driver-apidoc-version}/examples/src/main/java/org/neo4j/docs/driver
-    common-partial: 5.0@common-content:ROOT:partial$
-    common-image: 5.0@common-content:ROOT:image$
+    java-driver-apidoc-release: '5.0'
+    java-examples: https://raw.githubusercontent.com/neo4j/neo4j-java-driver/{java-driver-apidoc-release}/examples/src/main/java/org/neo4j/docs/driver
+    common-partial: '{neo4j-version}@common-content:ROOT:partial$'
+    common-image: '{neo4j-version}@common-content:ROOT:image$'

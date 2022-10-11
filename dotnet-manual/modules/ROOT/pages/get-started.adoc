@@ -93,4 +93,4 @@ include::{dotnet-examples}/Examples.cs[tags=hello-world]
 [[dotnet-driver-api-docs]]
 == Driver API docs
 
-For a comprehensive listing of all driver functionality, please see the {api-docs-base-uri}/dotnet-driver/{driver-version}/[.NET API reference documentation].
+For a comprehensive listing of all driver functionality, please see the {neo4j-docs-base-uri}/api/dotnet-driver/{driver-version}/[.NET API reference documentation].

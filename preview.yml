@@ -58,20 +58,21 @@ asciidoc:
     # sectnums: true, removed so they are off by default
     # sectnumlevel: 3,
     experimental: ''
-    copyright: 2021
+    copyright: 2022
     common-license-page-uri: https://neo4j.com/docs/license/
-    docs-base-uri: https://neo4j.com/docs
-    cypher-manual-uri: https://neo4j.com/docs/cypher-manual
-    http-api-uri: https://neo4j.com/docs/http-api
-    operations-manual-uri: https://neo4j.com/docs/operations-manual
-    status-codes-uri: https://neo4j.com/docs/status-codes
-    api-docs-base-uri     : https://neo4j.com/docs/api
-    kerberos-add-on-base-uri: https://neo4j.com/docs/add-on/kerberos/1.0@
+    # neo4j versions - can be overriden
+    neo4j-version-short: 5@
     neo4j-version: 5.0@
-    driver-version: 5.0-preew@
-    driverSeries: 5.0@
-    http-api-base-uri: https://development.neo4j.dev/docs/http-api/current
+    neo4j-version-exact: 5.0.0@
+    neo4j-buildnumber: 5.0@
+    # driver version - can be overriden
+    driver-version: 5.0@
+    # common files - can be overriden
     common-partial: 5.0@common-content:ROOT:partial$@
     common-image: 5.0@common-content:ROOT:image$@
+    # checks and crosses used in tables
     check-mark: icon:check[]
     cross-mark: icon:times[]
+    # attributes for doc links to other manuals in preview playbook
+    neo4j-base-uri: https://neo4j.com 
+    neo4j-docs-base-uri: https://neo4j.com/docs

@@ -36,8 +36,8 @@ Note that from Antora 3.1.0, attributes can be referenced by other attributes, a
 ```
 asciidoc:
   attributes:
-    dotnet-driver-apidoc-version: '4.4'
-    dotnet-examples: https://raw.githubusercontent.com/neo4j/neo4j-dotnet-driver/{dotnet-driver-apidoc-version}/Neo4j.Driver/Neo4j.Driver.Tests.Integration
+    dotnet-driver-apidoc-release: '5.0'
+    dotnet-examples: https://raw.githubusercontent.com/neo4j/neo4j-dotnet-driver/{dotnet-driver-apidoc-release}/Neo4j.Driver/Neo4j.Driver.Tests.Integration
 ```
 
 In the driver code repo, include example code, with a start and end tag:

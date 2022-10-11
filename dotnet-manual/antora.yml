@@ -6,12 +6,13 @@ nav:
 - modules/ROOT/content-nav.adoc
 asciidoc:
   attributes:
+    neo4j-version-short: '5'
     neo4j-version: '5.0'
     neo4j-version-exact: '5.0.0'
     neo4j-buildnumber: '5.0'
     driver-version: "5.0"
     dotnet-driver-version: "5.0.0"
-    dotnet-driver-apidoc-version: '5.0'
-    dotnet-examples: https://raw.githubusercontent.com/neo4j/neo4j-dotnet-driver/{dotnet-driver-apidoc-version}/Neo4j.Driver/Neo4j.Driver.Tests.Integration
-    common-partial: 5.0@common-content:ROOT:partial$
-    common-image: 5.0@common-content:ROOT:image$ 
+    dotnet-driver-apidoc-release: '5.0'
+    dotnet-examples: https://raw.githubusercontent.com/neo4j/neo4j-dotnet-driver/{dotnet-driver-apidoc-release}/Neo4j.Driver/Neo4j.Driver.Tests.Integration
+    common-partial: '{neo4j-version}@common-content:ROOT:partial$'
+    common-image: '{neo4j-version}@common-content:ROOT:image$' 
