@@ -114,17 +114,7 @@ A connection URI identifies a graph database and how to connect to it.
 
 The *_encryption_* and *_trust_* settings provide detail to how that connection should be secured.
 
-[CAUTION]
-====
-*There are significant changes to security settings between Neo4j 3.x and Neo4j 4.x*
-
-Please consider the information in this section before upgrading from a previous version.
-
-The https://neo4j.com/docs/migration-guide/current/[Migration Guide] is also a good source of information about changes in functionality.
-====
-
 Starting with *Neo4j 4.0*, client-server communication uses only *_unencrypted local connections by default_*.
-
 This is a change from previous versions, which switched on encryption by default, but generated a self-signed certificate out of the box.
 
 When a full certificate is installed, and encryption is enabled on the driver, full certificate checks are carried out (refer to link:/docs/operations-manual/5.0/security/ssl-framework[Operations Manual -> SSL framework]).
@@ -140,23 +130,6 @@ To connect to *Neo4j Aura*, driver users must *_enable encryption_* and the comp
 
 For more information, see xref:client-applications.adoc#driver-configuration-examples[Examples] below.
 ====
-
-# tag::default-security-changes[]
-
-.Changes in default security settings between 3.x and 4.x
-[options="header"]
-|===
-| Setting | Neo4j 4.x | Neo4j 3.x (Drivers 1.x)
-| Bundled certificate | none | auto-generated, self-signed
-| Driver encryption   | off  | on
-| Bolt interface      | localhost |localhost
-| Certificate expiry check  | on  |on
-| Certificate CA check  | on  | off
-| Certificate hostname check  | on  | off
-|===
-
-# end::default-security-changes[]
-
 
 [[initial-address-resolution]]
 === Initial address resolution
@@ -802,53 +775,32 @@ The table below illustrates examples of how to connect to a service with routing
 ----
 GraphDatabase.driver("neo4j+s://graph.example.com:7687", auth)
 ----
-
-For Python Driver versions before 4.0.0 you need this snippet instead:
-[source, python, indent=0]
-----
-GraphDatabase.driver("neo4j://graph.example.com:7687", auth,
-    "encrypted"=True, "trust"=TRUST_SYSTEM_CA_SIGNED_CERTIFICATES)
-----
 | This is the default (and only option) for Neo4j Aura
 
-|Neo4j 4.x
+|Neo4j 5.x
 |Unsecured
 |
 [source, python, indent=0]
 ----
 GraphDatabase.driver("neo4j://graph.example.com:7687", auth)
 ----
-|This is the default for Neo4j 4.x series
+|This is the default for Neo4j 5.x series
 
-|Neo4j 4.x
+|Neo4j 5.x
 |Secured with full certificate
 |
 [source, python, indent=0]
 ----
 GraphDatabase.driver("neo4j+s://graph.example.com:7687", auth)
 ----
-
-For Python Driver versions before 4.0.0 you need this snippet instead:
-[source, python, indent=0]
-----
-GraphDatabase.driver("neo4j://graph.example.com:7687", auth,
-    "encrypted"=True, "trust"=TRUST_SYSTEM_CA_SIGNED_CERTIFICATES)
-----
 |
 
-|Neo4j 4.x
+|Neo4j 5.x
 |Secured with self-signed certificate
 |
 [source, python, indent=0]
 ----
 neo4j.driver("neo4j+ssc://graph.example.com:7687", auth)
-----
-
-For Python Driver versions before 4.0.0 you need this snippet instead:
-[source, python, indent=0]
-----
-GraphDatabase.driver("neo4j://graph.example.com:7687", auth,
-    "encrypted"=True, "trust"=TRUST_ALL_CERTIFICATES)
 ----
 |
 
@@ -859,13 +811,6 @@ GraphDatabase.driver("neo4j://graph.example.com:7687", auth,
 ----
 neo4j.driver("neo4j+s://graph.example.com:7687", auth)
 ----
-
-For Python Driver versions before 4.0.0 you need this snippet instead:
-[source, python, indent=0]
-----
-GraphDatabase.driver("neo4j://graph.example.com:7687", auth,
-    "encrypted"=True, "trust"=TRUST_SYSTEM_CA_SIGNED_CERTIFICATES)
-----
 |
 
 |Neo4j 3.x
@@ -874,13 +819,6 @@ GraphDatabase.driver("neo4j://graph.example.com:7687", auth,
 [source, python, indent=0]
 ----
 neo4j.driver("neo4j+ssc://graph.example.com:7687", auth)
-----
-
-For Python Driver versions before 4.0.0 you need this snippet instead:
-[source, python, indent=0]
-----
-GraphDatabase.driver("neo4j://graph.example.com:7687", auth,
-    "encrypted"=True, "trust"=TRUST_ALL_CERTIFICATES)
 ----
 |This is the default for Neo4j 3.x series
 
@@ -1312,7 +1250,7 @@ Specify a custom server address resolver used by the routing driver to resolve t
 
 Specify whether to use an encrypted connection between the driver and server.
 +
-*Default:* None
+*Default:* False
 
 # end::configuration-Encryption[]
 
@@ -1486,19 +1424,21 @@ include::{python-examples}/test_config_max_retry_time_example.py[tags=config-max
 
 # tag::configuration-TrustStrategy[]
 
-`TrustStrategy`::
+`TrustedCertificates`::
 
 Specify how to determine the authenticity of encryption certificates provided by the Neo4j instance that you are connecting to.
-There are three choices as to which strategy to use:
-
-* `TRUST_SYSTEM_CA_SIGNED_CERTIFICATES` - Accept any certificate that can be verified against the system store.
-
-* `TRUST_CUSTOM_CA_SIGNED_CERTIFICATES` - Accept any certificate that can be verified against a custom CA.
-
-* `TRUST_ALL_CERTIFICATES` - Accept any certificate provided by the server, regardless of CA chain. *We do not recommend using this setting for production environments.*
 
 +
-*Default:* `TRUST_SYSTEM_CA_SIGNED_CERTIFICATES` (Note - only when encryption is enabled)
+
+Possible values are:
++
+* `neo4j.TrustSystemCAs()` - Accept any certificate that can be verified against the system store.
+* `neo4j.TrustCustomCAs("/path/ca1.crt", "/path/ca2.crt", ...)` - Accept certificates at specified paths.
+* `neo4j.TrustAll()` - Accept any certificate, including self-signed ones. *Not recommended for production environments.*
+
+
++
+*Default:* `neo4j.TrustSystemCAs()` (Only when encryption is enabled)
 
 # end::configuration-TrustStrategy[]
 
