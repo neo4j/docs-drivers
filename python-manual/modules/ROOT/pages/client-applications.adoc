@@ -420,4 +420,5 @@ logging.getLogger("neo4j").setLevel(logging.DEBUG)
 == Async
 Starting from version 5.0, the driver can also function asynchronously.
 The flow to connect and interact with the database is the same, except that async functions have the `Async` prefix and that database function calls need to `await` the result.
+
 More information can be found in the link:https://neo4j.com/docs/api/python-driver/5.0/async_api.html[API documentation].

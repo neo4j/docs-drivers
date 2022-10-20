@@ -1461,7 +1461,8 @@ include::{python-examples}/test_config_max_retry_time_example.py[tags=config-max
 
 `TrustedCertificates`::
 
-Specify how to determine the authenticity of encryption certificates provided by the Neo4j instance that you are connecting to. If encryption is disabled, this option has no effect.
+Specify how to determine the authenticity of encryption certificates provided by the Neo4j instance that you are connecting to. 
+If encryption is disabled, this option has no effect.
 
 +
 
