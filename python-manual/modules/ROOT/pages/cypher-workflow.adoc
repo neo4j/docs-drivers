@@ -56,6 +56,9 @@ include::{python-examples}/test_pass_bookmarks_example.py[tags=pass-bookmarks]
 
 include::{common-partial}/cypher-workflow.adoc[tag=access-modes-transaction]
 
+[NOTE]
+The methods `execute_read` and `execute_write` were called `read_transaction` and `write_transaction` in version 4.x.
+
 .Read-write transaction
 ======
 [source, python, indent=0]
@@ -274,3 +277,5 @@ include::{python-examples}/test_geospatial_types_example.py[tags=geospatial-type
 == Exceptions and error handling
 
 include::{common-partial}/cypher-workflow.adoc[tag=exceptions-errors]
+
+The exception method `is_retriable()` gives insights into whether a further attempt might be successful.

@@ -101,8 +101,7 @@ These cases include connection issues, server role changes (e.g. leadership elec
 
 ====
 
-[NOTE]
-The methods `execute_read` and `execute_write` were called `read_transaction` and `write_transaction` in version 4.x.
+
 
 # end::simple-transaction-fn[]
 

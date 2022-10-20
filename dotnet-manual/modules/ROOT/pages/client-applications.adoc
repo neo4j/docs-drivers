@@ -102,11 +102,11 @@ include::{common-partial}/client-applications.adoc[tag=examples-pt2]
 .Connecting to a service
 The tables below illustrate examples of how to connect to a service with routing:
 
-.Neo4j Aura, secured with full certificate
+.Neo4j Aura or Neo4j >= 4.x, secured with full certificate
 [cols="<15s,<85a"]
 |===
 | Product
-| Neo4j Aura
+| Neo4j Aura, Neo4j >= 4.x
 
 | Security
 | Secured with full certificate
@@ -116,26 +116,17 @@ The tables below illustrate examples of how to connect to a service with routing
 [source, csharp, indent=0]
 ----
 GraphDatabase.Driver("neo4j+s://graph.example.com:7687", auth)
-----
-
-If you do not have at least the .NET Driver 4.0.1 patch installed, you will need this snippet instead:
-
-[source, csharp, indent=0]
-----
-String uri = "neo4j://graph.example.com:7687";
-IDriver driver = GraphDatabase.Driver(uri, auth,
-           o => o.WithEncryptionLevel(EncryptionLevel.Encrypted));
 ----
 
 | Comments
 | This is the default (and only option) for Neo4j Aura.
 |===
 
-.Neo4j 4.x, unsecured
+.Neo4j >= 4.x, unsecured
 [cols="<15s,<85a"]
 |===
 | Product
-| Neo4j 4.x
+| Neo4j >= 4.x
 
 | Security
 | Unsecured
@@ -148,40 +139,14 @@ GraphDatabase.Driver("neo4j://graph.example.com:7687", auth);
 ----
 
 | Comments
-| This is the default for Neo4j 4.x series
+| This is the default for Neo4j >= 4.x series
 |===
 
-.Neo4j 4.x, secured with full certificate
+.Neo4j >= 4.x, secured with self-signed certificate
 [cols="<15s,<85a"]
 |===
 | Product
-| Neo4j 4.x
-
-| Security
-| Secured with full certificate
-
-| Code snippet
-|
-[source, csharp, indent=0]
-----
-GraphDatabase.Driver("neo4j+s://graph.example.com:7687", auth)
-----
-
-If you do not have at least the .NET Driver 4.0.1 patch installed, you will need this snippet instead:
-
-[source, csharp, indent=0]
-----
-String uri = "neo4j://graph.example.com:7687";
-IDriver driver = GraphDatabase.Driver(uri, auth,
-           o => o.WithEncryptionLevel(EncryptionLevel.Encrypted));
-----
-|===
-
-.Neo4j 4.x, secured with self-signed certificate
-[cols="<15s,<85a"]
-|===
-| Product
-| Neo4j 4.x
+| Neo4j >= 4.x
 
 | Security
 | Secured with self-signed certificate
@@ -191,89 +156,6 @@ IDriver driver = GraphDatabase.Driver(uri, auth,
 [source, csharp, indent=0]
 ----
 GraphDatabase.Driver("neo4j+ssc://graph.example.com:7687", auth)
-----
-
-If you do not have at least the .NET Driver 4.0.1 patch installed, you will need this snippet instead:
-
-[source, csharp, indent=0]
-----
-String uri = "neo4j://graph.example.com:7687";
-IDriver driver = GraphDatabase.Driver(uri, auth,
-           o => o.WithEncryptionLevel(EncryptionLevel.Encrypted)
-                 .WithTrustManager(TrustManager.CreateInsecure()));
-----
-|===
-
-.Neo4j 3.x, secured with full certificate
-[cols="<15s,<85a"]
-|===
-| Product
-| Neo4j 3.x
-
-| Security
-| Secured with full certificate
-
-| Code snippet
-|
-[source, csharp, indent=0]
-----
-GraphDatabase.Driver("neo4j+s://graph.example.com:7687", auth)
-----
-
-If you do not have at least the .NET Driver 4.0.1 patch installed, you will need this snippet instead:
-
-[source, csharp, indent=0]
-----
-String uri = "neo4j://graph.example.com:7687";
-IDriver driver = GraphDatabase.Driver(uri, auth,
-           o => o.WithEncryptionLevel(EncryptionLevel.Encrypted));
-----
-|===
-
-.Neo4j 3.x, secured with self-signed certificate
-[cols="<15s,<85a"]
-|===
-| Product
-| Neo4j 3.x
-
-| Security
-| Secured with self-signed certificate
-
-| Code snippet
-|
-[source, csharp, indent=0]
-----
-GraphDatabase.Driver("neo4j+ssc://graph.example.com:7687", auth)
-----
-
-If you do not have at least the .NET Driver 4.0.1 patch installed, you will need this snippet instead:
-
-[source, csharp, indent=0]
-----
-String uri = "neo4j://graph.example.com:7687";
-IDriver driver = GraphDatabase.Driver(uri, auth,
-           o => o.WithEncryptionLevel(EncryptionLevel.Encrypted)
-                 .WithTrustManager(TrustManager.CreateInsecure()));
-----
-
-| Comments
-| This is the default for Neo4j 3.x series
-|===
-
-.Neo4j 3.x, unsecured
-[cols="<15s,<85a"]
-|===
-| Product
-| Neo4j 3.x
-
-| Security
-| Unsecured
-
-| Code snippet
-|
-[source, csharp, indent=0]
-----
-GraphDatabase.Driver("neo4j://graph.example.com:7687", auth);
 ----
 |===
 
@@ -430,6 +312,11 @@ include::{dotnet-examples}/Examples.cs[tags=config-max-retry-time]
 ======
 
 include::{common-partial}/client-applications.adoc[tag=configuration-TrustStrategy]
+
+* `TrustManager.CreateChainTrust()` - Accept any certificate that can be verified against the system store.
+* `TrustManager.CreateCertTrust(new []{"/path/ca1.crt", "/path/ca2.crt"})` - *[Default]* Accept certificates at specified paths.
+* `TrustManager.CreateInsecure()` - Accept any certificate, including self-signed ones. *Not recommended for production environments.*
+
 +
 .Configure trusted certificates
 ======

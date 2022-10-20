@@ -105,11 +105,11 @@ include::{common-partial}/client-applications.adoc[tag=examples-pt2]
 .Connecting to a service
 The tables below illustrate examples of how to connect to a service with routing:
 
-.Neo4j Aura, secured with full certificate
+.Neo4j Aura or Neo4j >= 4.x, secured with full certificate
 [cols="<15s,<85a"]
 |===
 | Product
-| Neo4j Aura
+| Neo4j Aura, Neo4j >= 4.x
 
 | Security
 | Secured with full certificate
@@ -363,7 +363,12 @@ include::{python-examples}/test_config_max_retry_time_example.py[tags=config-max
 ======
 
 include::{common-partial}/client-applications.adoc[tag=configuration-TrustStrategy]
-+
+
+* `neo4j.TrustSystemCAs()` - Accept any certificate that can be verified against the system store.
+* `neo4j.TrustCustomCAs("/path/ca1.crt", "/path/ca2.crt", ...)` - *[Default]* Accept certificates at specified paths.
+* `neo4j.TrustAll()` - Accept any certificate, including self-signed ones. *Not recommended for production environments.*
+
+
 .Configure trusted certificates
 ======
 [source, python, indent=0]

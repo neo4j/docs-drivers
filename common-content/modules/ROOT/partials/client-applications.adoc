@@ -376,109 +376,34 @@ The table below illustrates examples of how to connect to a service with routing
 ----
 GraphDatabase.Driver("neo4j+s://graph.example.com:7687", auth)
 ----
-
-If you do not have at least the .NET Driver 4.0.1 patch installed, you will need this snippet instead:
-
-[source, csharp, indent=0]
-----
-String uri = "neo4j://graph.example.com:7687";
-IDriver driver = GraphDatabase.Driver(uri, auth,
-           o => o.WithEncryptionLevel(EncryptionLevel.Encrypted));
-----
 |Comments | This is the default (and only option) for Neo4j Aura
 
-|Neo4j 4.x
+|Neo4j >= 4.x
 |Unsecured
 |
 [source, csharp, indent=0]
 ----
 GraphDatabase.Driver("neo4j://graph.example.com:7687", auth);
 ----
-|This is the default for Neo4j 4.x series
+|This is the default for Neo4j >= 4.x series
 
-|Neo4j 4.x
+|Neo4j >= 4.x
 |Secured with full certificate
 |
 [source, csharp, indent=0]
 ----
 GraphDatabase.Driver("neo4j+s://graph.example.com:7687", auth)
 ----
-
-If you do not have at least the .NET Driver 4.0.1 patch installed, you will need this snippet instead:
-
-[source, csharp, indent=0]
-----
-String uri = "neo4j://graph.example.com:7687";
-IDriver driver = GraphDatabase.Driver(uri, auth,
-           o => o.WithEncryptionLevel(EncryptionLevel.Encrypted));
-----
 |
 
-|Neo4j 4.x
+|Neo4j >= 4.x
 |Secured with self-signed certificate
 |
 [source, csharp, indent=0]
 ----
 GraphDatabase.Driver("neo4j+ssc://graph.example.com:7687", auth)
 ----
-
-If you do not have at least the .NET Driver 4.0.1 patch installed, you will need this snippet instead:
-
-[source, csharp, indent=0]
-----
-String uri = "neo4j://graph.example.com:7687";
-IDriver driver = GraphDatabase.Driver(uri, auth,
-           o => o.WithEncryptionLevel(EncryptionLevel.Encrypted)
-                 .WithTrustManager(TrustManager.CreateInsecure()));
-----
 |
-
-|Neo4j 3.x
-|Secured with full certificate
-|
-[source, csharp, indent=0]
-----
-GraphDatabase.Driver("neo4j+s://graph.example.com:7687", auth)
-----
-
-If you do not have at least the .NET Driver 4.0.1 patch installed, you will need this snippet instead:
-
-[source, csharp, indent=0]
-----
-String uri = "neo4j://graph.example.com:7687";
-IDriver driver = GraphDatabase.Driver(uri, auth,
-           o => o.WithEncryptionLevel(EncryptionLevel.Encrypted));
-----
-|
-
-|Neo4j 3.x
-|Secured with self-signed certificate
-|
-[source, csharp, indent=0]
-----
-GraphDatabase.Driver("neo4j+ssc://graph.example.com:7687", auth)
-----
-
-If you do not have at least the .NET Driver 4.0.1 patch installed, you will need this snippet instead:
-
-[source, csharp, indent=0]
-----
-String uri = "neo4j://graph.example.com:7687";
-IDriver driver = GraphDatabase.Driver(uri, auth,
-           o => o.WithEncryptionLevel(EncryptionLevel.Encrypted)
-                 .WithTrustManager(TrustManager.CreateInsecure()));
-----
-|This is the default for Neo4j 3.x series
-
-|Neo4j 3.x
-|Unsecured
-|
-[source, csharp, indent=0]
-----
-GraphDatabase.Driver("neo4j://graph.example.com:7687", auth);
-----
-|
-
 |===
 
 [NOTE]
@@ -1426,19 +1351,11 @@ include::{python-examples}/test_config_max_retry_time_example.py[tags=config-max
 
 `TrustedCertificates`::
 
-Specify how to determine the authenticity of encryption certificates provided by the Neo4j instance that you are connecting to.
+Specify how to determine the authenticity of encryption certificates provided by the Neo4j instance that you are connecting to. If encryption is disabled, this option has no effect.
 
 +
 
 Possible values are:
-+
-* `neo4j.TrustSystemCAs()` - Accept any certificate that can be verified against the system store.
-* `neo4j.TrustCustomCAs("/path/ca1.crt", "/path/ca2.crt", ...)` - Accept certificates at specified paths.
-* `neo4j.TrustAll()` - Accept any certificate, including self-signed ones. *Not recommended for production environments.*
-
-
-+
-*Default:* `neo4j.TrustSystemCAs()` (Only when encryption is enabled)
 
 # end::configuration-TrustStrategy[]
 
