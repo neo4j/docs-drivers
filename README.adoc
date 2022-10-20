@@ -18,7 +18,7 @@ The examples for each of the driver languages are generated out of each driver's
 
 1. Clone the repository and checkout the branch you want to build.
 2. `npm install` to install the required node.js packages
-3. To build and view the HTML:`npm start`
+3. To build and view the HTML: `npm start`
 
 
 ## Notes
