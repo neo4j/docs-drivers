@@ -1,6 +1,6 @@
 name: python-manual
 title: Neo4j Python Driver Manual
-version: '5.0'
+version: '5'
 start_page: ROOT:index.adoc
 nav:
 - modules/ROOT/content-nav.adoc
@@ -13,5 +13,5 @@ asciidoc:
     python-driver-version: "5.0.0"
     python-driver-apidoc-release: '5.0'
     python-examples: https://raw.githubusercontent.com/neo4j/neo4j-python-driver/{python-driver-apidoc-release}/tests/integration/examples
-    common-partial: '{neo4j-version}@common-content:ROOT:partial$'
-    common-image: '{neo4j-version}@common-content:ROOT:image$'
+    common-partial: '5@common-content:ROOT:partial$'
+    common-image: '5@common-content:ROOT:image$'
