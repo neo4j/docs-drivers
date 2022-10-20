@@ -164,7 +164,7 @@ Therefore, the only way to execute these queries from a driver is to use auto-co
 
 Please refer to the following for more details:
 
-* link:/docs/cypher-manual/{neo4j-version-short}/clauses/call-subquery#subquery-call-in-transactions[Cypher Manual -> `CALL {} IN TRANSACTIONS`]
+* link:{neo4j-docs-base-uri}/cypher-manual/{page-version}/clauses/call-subquery#subquery-call-in-transactions[Cypher Manual -> `CALL {} IN TRANSACTIONS`]
 ====
 
 # end::simple-autocommit-transactions[]
@@ -418,7 +418,7 @@ Therefore, the only way to execute these queries from a driver is to use auto-co
 
 Please refer to the following for more details:
 
-* link:/docs/cypher-manual/{neo4j-version-short}/clauses/call-subquery#subquery-call-in-transactions[Cypher Manual -> `CALL {} IN TRANSACTIONS`]
+* link:{neo4j-docs-base-uri}/cypher-manual/{page-version}/clauses/call-subquery#subquery-call-in-transactions[Cypher Manual -> `CALL {} IN TRANSACTIONS`]
 ====
 
 # end::async-autocommit-transactions[]
@@ -640,7 +640,7 @@ Therefore, the only way to execute these queries from a driver is to use auto-co
 
 Please refer to the following for more details:
 
-* link:/docs/cypher-manual/{neo4j-version-short}/clauses/call-subquery#subquery-call-in-transactions[Cypher Manual -> `CALL {} IN TRANSACTIONS`]
+* link:{neo4j-docs-base-uri}/cypher-manual/{page-version}/clauses/call-subquery#subquery-call-in-transactions[Cypher Manual -> `CALL {} IN TRANSACTIONS`]
 ====
 
 # end::rx-autocommit-transactions[]
@@ -777,9 +777,9 @@ The per-user home database is resolved at session creation and when first impers
 Therefore, the creation of a new session is necessary to reflect a changed home database.
 ====
 +
-See link:/docs/operations-manual/{neo4j-version-short}/manage-databases/introduction#manage-databases-default[Operations Manual -> The default database] for more information on databases.
+See link:{neo4j-docs-base-uri}/operations-manual/{page-version}/manage-databases/introduction#manage-databases-default[Operations Manual -> The default database] for more information on databases.
 +
-See below and link:/docs/cypher-manual/{neo4j-version-short}/access-control/dbms-administration.adoc#access-control-dbms-administration-impersonation[Cypher Manual -> The `DBMS IMPERSONATE` privileges] for more information on impersonation.
+See below and link:{neo4j-docs-base-uri}/cypher-manual/{page-version}/access-control/dbms-administration.adoc#access-control-dbms-administration-impersonation[Cypher Manual -> The `DBMS IMPERSONATE` privileges] for more information on impersonation.
 +
 *Default:* the default database as configured on the server.
 +
@@ -798,7 +798,7 @@ Impersonated User::
 Users can run transactions against the database as different users if they have been granted explicit permission for doing so.
 When impersonating a user, the query is run within the complete security context of the impersonated user and not the authenticated user (i.e., home database, permissions, etc.).
 +
-See link:/docs/operations-manual/{neo4j-version-short}/manage-databases/introduction#manage-databases-home[Operations Manual -> Per-user home databases] for more information on default database per-user.
+See link:{neo4j-docs-base-uri}/operations-manual/{page-version}/manage-databases/introduction#manage-databases-home[Operations Manual -> Per-user home databases] for more information on default database per-user.
 +
 *Default:* None (Sessions will be created with the logged user)
 
@@ -820,7 +820,7 @@ Additional configuration can be provided to transaction which are executed.
 
 A timeout value can be provided and transactions which take longer than this value to execute on the server will be terminated.
 This value will override the value set by `+dbms.transaction.timeout+`. If no value is provided, the default is taken by the server setting
-(see link:/docs/operations-manual/{neo4j-version-short}/monitoring/transaction-management[Operations Manual -> Transaction Management]).
+(see link:{neo4j-docs-base-uri}/operations-manual/{page-version}/monitoring/transaction-management[Operations Manual -> Transaction Management]).
 
 Note: Using with Neo4j 4.1 and earlier it is possible for the driver to override any value set with `+dbms.transaction.timeout+`.
 In 4.2 and later, `+dbms.transaction.timeout+` also acts as a maximum which the driver cannot override. For example, with
