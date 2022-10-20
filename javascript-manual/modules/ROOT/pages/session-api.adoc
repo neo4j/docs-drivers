@@ -24,6 +24,9 @@ See xref:session-api.adoc#js-driver-session-configuration[Session configuration]
 
 include::{common-partial}/session-api.adoc[tag=async-transaction-fn]
 
+[CAUTION]
+The methods `executeRead` and `executeWrite` have replaced `readTransaction` and `writeTransaction`, which are deprecated in version 5.x and will be removed in version 6.0.
+
 [source, javascript, indent=0]
 ----
 include::{javascript-examples}/examples.test.js[tags=async-transaction-function]
@@ -84,6 +87,9 @@ include::{common-partial}/session-api.adoc[tag=rx-lifecycle]
 === Transaction functions
 
 include::{common-partial}/session-api.adoc[tag=rx-transaction-fn]
+
+[CAUTION]
+The methods `executeRead` and `executeWrite` have replaced `readTransaction` and `writeTransaction`, which are deprecated in version 5.x and will be removed in version 6.0.
 
 [source, javascript, indent=0]
 ----
