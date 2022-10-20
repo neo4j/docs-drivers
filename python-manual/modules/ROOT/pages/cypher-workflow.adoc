@@ -56,9 +56,6 @@ include::{python-examples}/test_pass_bookmarks_example.py[tags=pass-bookmarks]
 
 include::{common-partial}/cypher-workflow.adoc[tag=access-modes-transaction]
 
-[NOTE]
-The methods `execute_read` and `execute_write` were called `read_transaction` and `write_transaction` in version 4.x.
-
 .Read-write transaction
 ======
 [source, python, indent=0]

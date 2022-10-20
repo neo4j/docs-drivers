@@ -32,6 +32,9 @@ See xref:session-api.adoc#java-driver-session-configuration[Session configuratio
 
 include::{common-partial}/session-api.adoc[tag=simple-transaction-fn]
 
+[CAUTION]
+The methods `executeRead` and `executeWrite` have replaced `readTransaction` and `writeTransaction`, which are deprecated in version 5.x and will be removed in version 6.0.
+
 [source, java, indent=0]
 ----
 include::{java-examples}/TransactionFunctionExample.java[tags=transaction-function]
@@ -89,6 +92,9 @@ See xref:session-api.adoc#java-driver-session-configuration[Session configuratio
 === Transaction functions
 
 include::{common-partial}/session-api.adoc[tag=async-transaction-fn]
+
+[CAUTION]
+The methods `executeReadAsync` and `executeWriteAsync` have replaced `readTransactionAsync` and `writeTransactionAsync`, which are deprecated in version 5.x and will be removed in version 6.0.
 
 [source, java, indent=0]
 ----
@@ -149,6 +155,9 @@ include::{common-partial}/session-api.adoc[tag=rx-lifecycle]
 === Transaction functions
 
 include::{common-partial}/session-api.adoc[tag=rx-transaction-fn]
+
+[CAUTION]
+The methods `executeRead` and `executeWrite` have replaced `readTransaction` and `writeTransaction`, which are deprecated in version 5.x and will be removed in version 6.0.
 
 [source, java, indent=0]
 ----

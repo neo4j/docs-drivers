@@ -94,7 +94,7 @@ See xref:session-api.adoc#dotnet-driver-session-configuration[Session configurat
 include::{common-partial}/session-api.adoc[tag=async-transaction-fn]
 
 [CAUTION]
-The methods `ExecuteRead` and `ExecuteWrite` have replaced `ReadTransaction` and `WriteTransaction`, which are deprecated in version 5.x and will be removed in version 6.0.
+The methods `ExecuteReadAsync` and `ExecuteWriteAsync` have replaced `ReadTransactionAsync` and `WriteTransactionAsync`, which are deprecated in version 5.x and will be removed in version 6.0.
 
 [source, csharp, indent=0]
 ----
