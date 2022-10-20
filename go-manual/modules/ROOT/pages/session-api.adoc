@@ -28,6 +28,9 @@ See xref:session-api.adoc#go-driver-session-configuration[Session configuration]
 
 include::{common-partial}/session-api.adoc[tag=simple-transaction-fn]
 
+[CAUTION]
+The methods `ExecuteRead` and `ExecuteWrite` have replaced `ReadTransaction` and `WriteTransaction`, which are deprecated in version 5.x and will be removed in version 6.0.
+
 [source, go, indent=0]
 ----
 include::{go-examples}/examples_test.go[tags=transaction-function]
