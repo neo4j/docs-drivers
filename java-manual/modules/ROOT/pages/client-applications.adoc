@@ -308,8 +308,8 @@ include::{java-examples}/ConfigMaxRetryTimeExample.java[tags=config-max-retry-ti
 include::{common-partial}/client-applications.adoc[tag=configuration-TrustStrategy]
 +
 
-* `Config.TrustStrategy.trustSystemCertificates()` - Accept any certificate that can be verified against the system store.
-* `Config.TrustStrategy.trustCustomCertificateSignedBy("/path/ca1.crt", "/path/ca2.crt", ...)` - *[Default]* Accept certificates at specified paths.
+* `Config.TrustStrategy.trustSystemCertificates()` - *[Default]* Accept any certificate that can be verified against the system store.
+* `Config.TrustStrategy.trustCustomCertificateSignedBy("/path/ca1.crt", "/path/ca2.crt", ...)` - Accept certificates at specified paths.
 * `Config.TrustStrategy.trustAllCertificates()` - Accept any certificate, including self-signed ones. *Not recommended for production environments.*
 
 .Configure trusted certificates

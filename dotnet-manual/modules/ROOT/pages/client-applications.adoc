@@ -313,8 +313,8 @@ include::{dotnet-examples}/Examples.cs[tags=config-max-retry-time]
 
 include::{common-partial}/client-applications.adoc[tag=configuration-TrustStrategy]
 
-* `TrustManager.CreateChainTrust()` - Accept any certificate that can be verified against the system store.
-* `TrustManager.CreateCertTrust(new []{"/path/ca1.crt", "/path/ca2.crt"})` - *[Default]* Accept certificates at specified paths.
+* `TrustManager.CreateChainTrust()` - *[Default]* Accept any certificate that can be verified against the system store.
+* `TrustManager.CreateCertTrust(new []{"/path/ca1.crt", "/path/ca2.crt"})` - Accept certificates at specified paths.
 * `TrustManager.CreateInsecure()` - Accept any certificate, including self-signed ones. *Not recommended for production environments.*
 
 +
