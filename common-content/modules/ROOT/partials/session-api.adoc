@@ -98,7 +98,10 @@ To that end, transaction functions can return values but these should be derived
 *_When a transaction fails, the driver retry logic is invoked_*.
 For several failure cases, the transaction can be immediately retried against a different server.
 These cases include connection issues, server role changes (e.g. leadership elections) and transient errors.
+
 ====
+
+
 
 # end::simple-transaction-fn[]
 

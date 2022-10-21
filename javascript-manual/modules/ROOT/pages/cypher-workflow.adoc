@@ -242,3 +242,5 @@ include::{javascript-examples}/examples.test.js[tags=geospatial-types-wgs84]
 == Exceptions and error handling
 
 include::{common-partial}/cypher-workflow.adoc[tag=exceptions-errors]
+
+The method `isRetriableError` gives insights into whether a further attempt might be successful.
