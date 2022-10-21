@@ -15,7 +15,7 @@ This section describes how to create units of work and provide a logical context
 
 # tag::overview[]
 
-The Neo4j Drivers expose a Cypher Channel over which database work can be carried out (see the link:{neo4j-docs-base-uri}/cypher-manual/5.0[Cypher Manual] for more information
+The Neo4j Drivers expose a Cypher Channel over which database work can be carried out (see the link:{neo4j-docs-base-uri}/cypher-manual/{page-version}[Cypher Manual] for more information
 on the Cypher Query Language).
 
 Work itself is organized into *_sessions_*, *_transactions_* and *_queries_*, as follows:
@@ -647,7 +647,7 @@ Inbound conversion is carried out using http://cldr.unicode.org/development/deve
 # tag::exceptions-errors[]
 
 When executing *Cypher* or carrying out other operations with the driver, certain exceptions and error cases may arise.
-*_Server-generated exceptions_* are each associated with a link:{neo4j-docs-base-uri}/status-codes/5.0#status-codes[*_status code_*] that describes the nature of the problem and a message that provides more detail.
+*_Server-generated exceptions_* are each associated with a link:{neo4j-docs-base-uri}/status-codes/{page-version}[*_status code_*] that describes the nature of the problem and a message that provides more detail.
 
 The classifications are listed in the table below.
 
