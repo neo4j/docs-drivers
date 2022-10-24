@@ -129,3 +129,5 @@ Inbound conversion is carried out using http://cldr.unicode.org/development/deve
 == Exceptions and error handling
 
 include::{common-partial}/cypher-workflow.adoc[tag=exceptions-errors]
+
+The exception property `CanBeRetried` gives insights into whether a further attempt might be successful.

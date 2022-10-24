@@ -96,11 +96,11 @@ include::{common-partial}/client-applications.adoc[tag=examples-pt2]
 .Connecting to a service
 The tables below illustrate examples of how to connect to a service with routing:
 
-.Neo4j Aura, secured with full certificate
+.Neo4j Aura or Neo4j >= 4.x, secured with full certificate
 [cols="<15s,<85a"]
 |===
 | Product
-| Neo4j Aura
+| Neo4j Aura, Neo4j >= 4.x
 
 | Security
 | Secured with full certificate
@@ -116,11 +116,11 @@ neo4j.NewDriver("neo4j+s://graph.example.com:7687", auth)
 | This is the default (and only option) for Neo4j Aura.
 |===
 
-.Neo4j 4.x, unsecured
+.Neo4j >= 4.x, unsecured
 [cols="<15s,<85a"]
 |===
 | Product
-| Neo4j 4.x
+| Neo4j >= 4.x
 
 | Security
 | Unsecured
@@ -133,31 +133,14 @@ neo4j.NewDriver("neo4j://graph.example.com:7687", auth);
 ----
 
 | Comments
-| This is the default for Neo4j 4.x series
+| This is the default for Neo4j >= 4.x series
 |===
 
-.Neo4j 4.x, secured with full certificate
+.Neo4j >= 4.x, secured with self-signed certificate
 [cols="<15s,<85a"]
 |===
 | Product
-| Neo4j 4.x
-
-| Security
-| Secured with full certificate
-
-| Code snippet
-|
-[source, go, indent=0]
-----
-neo4j.NewDriver("neo4j+s://graph.example.com:7687", auth)
-----
-|===
-
-.Neo4j 4.x, secured with self-signed certificate
-[cols="<15s,<85a"]
-|===
-| Product
-| Neo4j 4.x
+| Neo4j >= 4.x
 
 | Security
 | Secured with self-signed certificate
@@ -167,60 +150,6 @@ neo4j.NewDriver("neo4j+s://graph.example.com:7687", auth)
 [source, go, indent=0]
 ----
 neo4j.NewDriver("neo4j+ssc://graph.example.com:7687", auth)
-----
-|===
-
-.Neo4j 3.x, secured with full certificate
-[cols="<15s,<85a"]
-|===
-| Product
-| Neo4j 3.x
-
-| Security
-| Secured with full certificate
-
-| Code snippet
-|
-[source, go, indent=0]
-----
-neo4j.NewDriver("neo4j+s://graph.example.com:7687", auth)
-----
-|===
-
-.Neo4j 3.x, secured with self-signed certificate
-[cols="<15s,<85a"]
-|===
-| Product
-| Neo4j 3.x
-
-| Security
-| Secured with self-signed certificate
-
-| Code snippet
-|
-[source, go, indent=0]
-----
-neo4j.NewDriver("neo4j+ssc://graph.example.com:7687", auth)
-----
-
-| Comments
-| This is the default for Neo4j 3.x series
-|===
-
-.Neo4j 3.x, unsecured
-[cols="<15s,<85a"]
-|===
-| Product
-| Neo4j 3.x
-
-| Security
-| Unsecured
-
-| Code snippet
-|
-[source, go, indent=0]
-----
-neo4j.NewDriver("neo4j://graph.example.com:7687", auth);
 ----
 |===
 

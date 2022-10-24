@@ -274,3 +274,5 @@ include::{python-examples}/test_geospatial_types_example.py[tags=geospatial-type
 == Exceptions and error handling
 
 include::{common-partial}/cypher-workflow.adoc[tag=exceptions-errors]
+
+The exception method `is_retriable()` gives insights into whether a further attempt might be successful.

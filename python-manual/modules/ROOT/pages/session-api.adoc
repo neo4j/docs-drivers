@@ -31,6 +31,9 @@ See xref:session-api.adoc#python-driver-session-configuration[Session configurat
 
 include::{common-partial}/session-api.adoc[tag=simple-transaction-fn]
 
+[CAUTION]
+The methods `execute_read` and `execute_write` have replaced `read_transaction` and `write_transaction`, which are deprecated in version 5.x and will be removed in version 6.0.
+
 .Transaction function
 ======
 [source, python, indent=0]
@@ -43,7 +46,6 @@ include::{python-examples}/test_transaction_function_example.py[tags=transaction
 include::{python-examples}/test_transaction_function_example.py[tags=transaction-function]
 ----
 ======
-
 
 [[python-driver-simple-autocommit-transactions]]
 === Auto-commit transactions (or implicit transactions)

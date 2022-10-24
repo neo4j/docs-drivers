@@ -75,9 +75,9 @@ asciidoc:
     common-license-page-uri: https://neo4j.com/docs/license/
     # neo4j versions - can be overriden
     neo4j-version-short: 5@
-    neo4j-version: 5.0@
-    neo4j-version-exact: 5.0.0@
-    neo4j-buildnumber: 5.0@
+    neo4j-version: 5.1@
+    neo4j-version-exact: 5.1.0@
+    neo4j-buildnumber: 5.1@
     # driver version - can be overriden
     driver-version: 5.0@
     # common files - can be overriden

@@ -105,11 +105,11 @@ include::{common-partial}/client-applications.adoc[tag=examples-pt2]
 .Connecting to a service
 The tables below illustrate examples of how to connect to a service with routing:
 
-.Neo4j Aura, secured with full certificate
+.Neo4j Aura or Neo4j >= 4.x, secured with full certificate
 [cols="<15s,<85a"]
 |===
 | Product
-| Neo4j Aura
+| Neo4j Aura, Neo4j >= 4.x
 
 | Security
 | Secured with full certificate
@@ -121,22 +121,15 @@ The tables below illustrate examples of how to connect to a service with routing
 GraphDatabase.driver("neo4j+s://graph.example.com:7687", auth)
 ----
 
-For Python Driver versions before 4.0.0 you need this snippet instead:
-[source, python, indent=0]
-----
-GraphDatabase.driver("neo4j://graph.example.com:7687", auth,
-    "encrypted"=True, "trust"=TRUST_SYSTEM_CA_SIGNED_CERTIFICATES)
-----
-
 | Comments
 | This is the default (and only option) for Neo4j Aura.
 |===
 
-.Neo4j 4.x, unsecured
+.Neo4j >= 4.x, unsecured
 [cols="<15s,<85a"]
 |===
 | Product
-| Neo4j 4.x
+| Neo4j >= 4.x
 
 | Security
 | Unsecured
@@ -149,38 +142,14 @@ GraphDatabase.driver("neo4j://graph.example.com:7687", auth)
 ----
 
 | Comments
-| This is the default for Neo4j 4.x series
+| This is the default for Neo4j >= 4.x series
 |===
 
-.Neo4j 4.x, secured with full certificate
+.Neo4j >= 4.x, secured with self-signed certificate
 [cols="<15s,<85a"]
 |===
 | Product
-| Neo4j 4.x
-
-| Security
-| Secured with full certificate
-
-| Code snippet
-|
-[source, python, indent=0]
-----
-GraphDatabase.driver("neo4j+s://graph.example.com:7687", auth)
-----
-
-For Python Driver versions before 4.0.0 you need this snippet instead:
-[source, python, indent=0]
-----
-GraphDatabase.driver("neo4j://graph.example.com:7687", auth,
-    "encrypted"=True, "trust"=TRUST_SYSTEM_CA_SIGNED_CERTIFICATES)
-----
-|===
-
-.Neo4j 4.x, secured with self-signed certificate
-[cols="<15s,<85a"]
-|===
-| Product
-| Neo4j 4.x
+| Neo4j >= 4.x
 
 | Security
 | Secured with self-signed certificate
@@ -189,82 +158,7 @@ GraphDatabase.driver("neo4j://graph.example.com:7687", auth,
 |
 [source, python, indent=0]
 ----
-neo4j.driver("neo4j+ssc://graph.example.com:7687", auth)
-----
-
-For Python Driver versions before 4.0.0 you need this snippet instead:
-[source, python, indent=0]
-----
-GraphDatabase.driver("neo4j://graph.example.com:7687", auth,
-    "encrypted"=True, "trust"=TRUST_ALL_CERTIFICATES)
-----
-|===
-
-.Neo4j 3.x, secured with full certificate
-[cols="<15s,<85a"]
-|===
-| Product
-| Neo4j 3.x
-
-| Security
-| Secured with full certificate
-
-| Code snippet
-|
-[source, python, indent=0]
-----
-neo4j.driver("neo4j+s://graph.example.com:7687", auth)
-----
-
-For Python Driver versions before 4.0.0 you need this snippet instead:
-[source, python, indent=0]
-----
-GraphDatabase.driver("neo4j://graph.example.com:7687", auth,
-    "encrypted"=True, "trust"=TRUST_SYSTEM_CA_SIGNED_CERTIFICATES)
-----
-|===
-
-.Neo4j 3.x, secured with self-signed certificate
-[cols="<15s,<85a"]
-|===
-| Product
-| Neo4j 3.x
-
-| Security
-| Secured with self-signed certificate
-
-| Code snippet
-|
-[source, python, indent=0]
-----
-neo4j.driver("neo4j+ssc://graph.example.com:7687", auth)
-----
-
-For Python Driver versions before 4.0.0 you need this snippet instead:
-[source, python, indent=0]
-----
-GraphDatabase.driver("neo4j://graph.example.com:7687", auth,
-    "encrypted"=True, "trust"=TRUST_ALL_CERTIFICATES)
-----
-
-| Comments
-| This is the default for Neo4j 3.x series
-|===
-
-.Neo4j 3.x, unsecured
-[cols="<15s,<85a"]
-|===
-| Product
-| Neo4j 3.x
-
-| Security
-| Unsecured
-
-| Code snippet
-|
-[source, python, indent=0]
-----
-neo4j.driver("neo4j://graph.example.com:7687", auth)
+GraphDatabase.driver("neo4j+ssc://graph.example.com:7687", auth)
 ----
 |===
 
@@ -469,7 +363,12 @@ include::{python-examples}/test_config_max_retry_time_example.py[tags=config-max
 ======
 
 include::{common-partial}/client-applications.adoc[tag=configuration-TrustStrategy]
-+
+
+* `neo4j.TrustSystemCAs()` - *[Default]* Accept any certificate that can be verified against the system store.
+* `neo4j.TrustCustomCAs("/path/ca1.crt", "/path/ca2.crt", ...)` - Accept certificates at specified paths.
+* `neo4j.TrustAll()` - Accept any certificate, including self-signed ones. *Not recommended for production environments.*
+
+
 .Configure trusted certificates
 ======
 [source, python, indent=0]
@@ -517,3 +416,9 @@ logging.getLogger("neo4j").addHandler(handler)
 logging.getLogger("neo4j").setLevel(logging.DEBUG)
 # from now on, DEBUG logging to stderr is enabled in the driver
 ----
+
+== Async
+Starting from version 5.0, the driver can also function asynchronously.
+The flow to connect and interact with the database is the same, except that async functions have the `Async` prefix and that database function calls need to `await` the result.
+
+More information can be found in the link:https://neo4j.com/docs/api/python-driver/5.0/async_api.html[API documentation].
