@@ -90,4 +90,4 @@ include::{javascript-examples}/examples.test.js[tags=hello-world]
 [[js-driver-api-docs]]
 == Driver API docs
 
-For a comprehensive listing of all driver functionality, please see the {api-docs-base-uri}/javascript-driver/{driver-version}/[JavaScript API reference documentation].
+For a comprehensive listing of all driver functionality, please see the link:{neo4j-docs-base-uri}/api/javascript-driver/{javascript-driver-apidoc-version}/[JavaScript API reference documentation].

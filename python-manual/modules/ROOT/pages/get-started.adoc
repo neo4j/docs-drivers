@@ -84,4 +84,4 @@ include::{python-examples}/test_driver_introduction_example.py[tags=driver-intro
 [[python-driver-api-docs]]
 == Driver API docs
 
-For a comprehensive listing of all driver functionality, please see the {api-docs-base-uri}/python-driver/{driver-version}/[Python API reference documentation].
+For a comprehensive listing of all driver functionality, please see the link:{neo4j-docs-base-uri}/api/python-driver/{python-driver-apidoc-version}/[Python API reference documentation].
