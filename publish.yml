@@ -88,5 +88,8 @@ asciidoc:
     common-image: common-content:ROOT:image$@    
     check-mark: icon:check[]
     cross-mark: icon:times[]
+    # attributes for doc links to other manuals in publish playbook
+    neo4j-base-uri: '' 
+    neo4j-docs-base-uri: /docs 
     
 
