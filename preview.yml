@@ -66,3 +66,6 @@ asciidoc:
     http-api-base-uri: https://development.neo4j.dev/docs/http-api/current
     common-partial: 3.5@common-content:ROOT:partial$
     common-image: 3.5@common-content:ROOT:image$
+    # attributes for doc links to other manuals in preview playbook
+    neo4j-base-uri: https://neo4j.com 
+    neo4j-docs-base-uri: https://neo4j.com/docs
