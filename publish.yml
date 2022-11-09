@@ -7,7 +7,7 @@ content:
   sources:
   - url : ./
     branches: ['5.0','4.4','4.3','4.2']
-    edit_url: https://github.com/neo-technology/driver-documentation-antora/tree/{refname}/{path}
+    edit_url: https://github.com/neo4j/driver-documentation/tree/{refname}/{path}
     worktrees: true
     start_paths:
     - dotnet-manual
@@ -22,7 +22,7 @@ content:
     - '!**/README.adoc'
   - url : ./
     branches: ['4.1','4.0','1.7']
-    edit_url: https://github.com/neo-technology/driver-documentation-antora/tree/{refname}/{path}
+    edit_url: https://github.com/neo4j/driver-documentation/tree/{refname}/{path}
     worktrees: true
     exclude:
     - '!**/_includes/*'
