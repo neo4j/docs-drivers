@@ -75,3 +75,6 @@ asciidoc:
     common-image: 5.0@common-content:ROOT:image$@
     check-mark: icon:check[]
     cross-mark: icon:times[]
+    # attributes for doc links to other manuals in preview playbook
+    neo4j-base-uri: https://neo4j.com
+    neo4j-docs-base-uri: https://neo4j.com/docs
