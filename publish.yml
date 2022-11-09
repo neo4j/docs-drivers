@@ -68,5 +68,7 @@ asciidoc:
     driverSeries: 4.1@
     common-partial: common-content:ROOT:partial$@
     common-image: common-content:ROOT:image$@    
-    
+    # attributes for doc links to other manuals in publish playbook
+    neo4j-base-uri: ''
+    neo4j-docs-base-uri: /docs
 
