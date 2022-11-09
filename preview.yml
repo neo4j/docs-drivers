@@ -7,7 +7,7 @@ content:
   sources:
   - url : ./
     branches: ['HEAD']
-    edit_url: https://github.com/neo-technology/driver-documentation-antora/tree/{refname}/{path}
+    edit_url: https://github.com/neo4j/driver-documentation/tree/{refname}/{path}
     start_paths:
     - dotnet-manual
     - go-manual
@@ -70,9 +70,11 @@ asciidoc:
     neo4j-version: 4.4@
     driver-version: 4.4-preview@
     driverSeries: 4.4@
-    http-api-base-uri: https://development.neo4j.dev/docs/http-api/current
+    http-api-base-uri: https://neo4j.com/docs/http-api/current
     common-partial: 4.4@common-content:ROOT:partial$@
     common-image: 4.4@common-content:ROOT:image$@
     check-mark: icon:check[]
     cross-mark: icon:times[]
+    neo4j-base-uri: https://neo4j.com
+    neo4j-docs-base-uri: https://neo4j.com/docs
 

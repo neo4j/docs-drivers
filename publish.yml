@@ -80,7 +80,7 @@ asciidoc:
     status-codes-uri: https://neo4j.com/docs/status-codes
     api-docs-base-uri     : https://neo4j.com/docs/api
     kerberos-add-on-base-uri: https://neo4j.com/docs/add-on/kerberos/1.0@
-    http-api-base-uri: https://development.neo4j.dev/docs/http-api/current
+    http-api-base-uri: https://neo4j.com/docs/http-api/current
     neo4j-version: 4.4@
     driver-version: 4.4@
     driverSeries: 4.4@
@@ -88,5 +88,6 @@ asciidoc:
     common-image: common-content:ROOT:image$@    
     check-mark: icon:check[]
     cross-mark: icon:times[]
-    
+    neo4j-base-uri: ''
+    neo4j-docs-base-uri: /docs    
 
