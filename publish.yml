@@ -87,14 +87,6 @@ asciidoc:
     check-mark: icon:check[]
     cross-mark: icon:times[]
     # attributes for doc links to other manuals in publish playbook
-    neo4j-base-uri: '' 
-    neo4j-docs-base-uri: /docs 
-    # page-ad-image: https://dist.neo4j.com/wp-content/uploads/20220901150057/Artboard-12.png
-    page-ad-overline-link: https://neo4j.com/nodes-2022
-    page-ad-overline: 16-17 November 2022
-    page-ad-title: NODES 2022
-    page-ad-description: Join us for a free, two-day virtual conference of technical presentations by developers and data scientists, solving problems with graphs.
-    page-ad-link: https://neo4j.com/nodes-2022
-    page-ad-underline-role: button
-    page-ad-underline: Save your space
-    
+    neo4j-base-uri: ''
+    neo4j-docs-base-uri: /docs
+  
