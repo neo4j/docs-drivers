@@ -6,12 +6,8 @@ nav:
 - modules/ROOT/content-nav.adoc
 asciidoc:
   attributes:
-    neo4j-version: '5.1'
-    neo4j-version-exact: '5.1.0'
-    neo4j-buildnumber: '5.1'
-    driver-version: "5.1"
-    dotnet-driver-version: "5.1.0"
-    dotnet-examples: api:example$Neo4j.Driver/Neo4j.Driver.Tests.Integration
-    dotnet-driver-apidoc-version: '5.1'
+    dotnet-driver-version: '5.2' # the version of the api docs published at https://neo4j.com/docs/api/dotnet-driver/
+    dotnet-driver-apidoc-release: '5.0' # the github branch or release that contains examples included in docs
+    dotnet-examples: https://raw.githubusercontent.com/neo4j/neo4j-dotnet-driver/{dotnet-driver-apidoc-release}/Neo4j.Driver/Neo4j.Driver.Tests.Integration
     common-partial: 5@common-content:ROOT:partial$
     common-image: 5@common-content:ROOT:image$ 

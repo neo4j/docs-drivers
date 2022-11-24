@@ -1,11 +1,11 @@
 [[drivers]]
 ifndef::backend-pdf[]
-= The Neo4j Java Driver Manual v{driver-version}
-:description: This is the manual for Neo4j Java Driver version {driver-version}, authored by the Neo4j Team. 
+= The Neo4j Java Driver Manual v{java-driver-version}
+:description: This is the manual for Neo4j Java Driver version {java-driver-version}, authored by the Neo4j Team. 
 endif::[]
 ifdef::backend-pdf[]
-= The Neo4j Java Driver Manual v{driver-version}
-:description: This is the manual for Neo4j Java Driver version {driver-version}, authored by the Neo4j Team. 
+= The Neo4j Java Driver Manual v{java-driver-version}
+:description: This is the manual for Neo4j Java Driver version {java-driver-version}, authored by the Neo4j Team. 
 endif::[]
 :project-version:
 :manual-title: Neo4j Java Driver Manual {project-version}
