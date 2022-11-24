@@ -148,15 +148,15 @@ The coercion methods, except `asObject()` and `asString()`, throw a `Uncoercible
 To avoid this kind exception, the `isNull()` or `asTypeName(TypeName defaultValue)` can be used, depending on the
 need.
 
-[source, java, indent=0]
-----
-include::{java-examples}/ReadingValuesExample.java[tags=java-driver-reading-values-non-null]
-----
+// [source, java, indent=0]
+// ----
+// include::{java-examples}/ReadingValuesExample.java[tags=java-driver-reading-values-non-null]
+// ----
 
-[source, java, indent=0]
-----
-include::{java-examples}/ReadingValuesExample.java[tags=java-driver-reading-values-null]
-----
+// [source, java, indent=0]
+// ----
+// include::{java-examples}/ReadingValuesExample.java[tags=java-driver-reading-values-null]
+// ----
 
 For more information, see https://neo4j.com/docs/api/java-driver/{java-driver-version}/org/neo4j/driver/Value.html[Java Driver API documentation -> Interface Value].
 
