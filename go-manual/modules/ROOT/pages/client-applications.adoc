@@ -36,8 +36,6 @@ To connect to *Neo4j Aura*, driver users must *_enable encryption_* and the comp
 For more information, see xref:client-applications.adoc#go-driver-configuration-examples[Examples] below.
 ====
 
-include::{common-partial}/client-applications.adoc[tag=default-security-changes]
-
 
 [[go-initial-address-resolution]]
 === Initial address resolution
