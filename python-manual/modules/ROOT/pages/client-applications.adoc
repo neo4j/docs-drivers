@@ -7,17 +7,12 @@ include::{common-partial}/client-applications.adoc[tag=abstract]
 [[python-driver-driver-object]]
 == The Driver Object
 
-include::{common-partial}/client-applications.adoc[tag=object-pt1]
-
-To construct a driver instance, a xref:client-applications.adoc#python-driver-connection-uris[connection URI] and xref:client-applications.adoc#python-driver-authentication[authentication information] must be supplied.
-
-include::{common-partial}/client-applications.adoc[tag=object-pt2]
 
 .The driver lifecycle
 ====
 [source, python, indent=0]
 ----
-include::{python-examples}/test_driver_lifecycle_example.py[tags=driver-lifecycle-import]
+include::{python-examples}/test_driver_lifecycle_example.py[tags=drivr-lifecycle-import]
 ----
 
 [source, python, indent=0]
