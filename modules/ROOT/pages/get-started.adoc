@@ -45,7 +45,7 @@ In cases where at least one peer is below version 4.0, communication will occur 
 [NOTE]
 Drivers 1.7 do not support multiple databases and Neo4j Fabric, features introduced in Neo4j 4.0.
 To be able to run multiple databases online concurrently and to do distributed queries over them, you must upgrade Drivers from 1.7 to 4.0.
-For information, see For information, see link:{upgrade-current-uri}/migration/drivers/drivers-changes/[Upgrade and Migration Guide -> Drivers changes].
+For information, see For information, see link:{neo4j-docs-base-uri}/upgrade-migration-guide/current/migration/drivers/drivers-changes/[Upgrade and Migration Guide -> Drivers changes].
 
 Wherever possible, it is recommended to use the latest stable driver release available.
 This will provide the greatest degree of stability and will ensure that the full set of server functionality is available.
