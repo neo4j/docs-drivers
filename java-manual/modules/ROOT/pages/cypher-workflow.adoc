@@ -158,7 +158,7 @@ include::{java-examples}/ReadingValuesExample.java[tags=java-driver-reading-valu
 include::{java-examples}/ReadingValuesExample.java[tags=java-driver-reading-values-null]
 ----
 
-For more information, see https://neo4j.com/docs/api/java-driver/{neo4j-version}/org/neo4j/driver/Value.html[Java Driver API documentation -> Interface Value].
+For more information, see https://neo4j.com/docs/api/java-driver/{java-driver-version}/org/neo4j/driver/Value.html[Java Driver API documentation -> Interface Value].
 
 
 [[java-driver-exceptions-errors]]

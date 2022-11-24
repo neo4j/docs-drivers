@@ -1,11 +1,11 @@
 [[python-drivers]]
 ifndef::backend-pdf[]
-= The Neo4j Python Driver Manual v{driver-version}
-:description: This is the manual for Neo4j Python Driver version {driver-version}, authored by the Neo4j Team. 
+= The Neo4j Python Driver Manual v{python-driver-version}
+:description: This is the manual for Neo4j Python Driver version {python-driver-version}, authored by the Neo4j Team. 
 endif::[]
 ifdef::backend-pdf[]
-= The Neo4j Python Driver Manual v{driver-version}
-:description: This is the manual for Neo4j Python Driver version {driver-version}, authored by the Neo4j Team. 
+= The Neo4j Python Driver Manual v{python-driver-version}
+:description: This is the manual for Neo4j Python Driver version {python-driver-version}, authored by the Neo4j Team. 
 endif::[]
 :project-version:
 :manual-title: Neo4j Python Driver Manual {project-version}

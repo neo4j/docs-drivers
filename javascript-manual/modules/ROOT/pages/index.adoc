@@ -1,11 +1,11 @@
 [[js-drivers]]
 ifndef::backend-pdf[]
-= The Neo4j JavaScript Driver Manual v{driver-version}
-:description: This is the manual for Neo4j JavaScript Driver version {driver-version}, authored by the Neo4j Team. 
+= The Neo4j JavaScript Driver Manual v{javascript-driver-version}
+:description: This is the manual for Neo4j JavaScript Driver version {javascript-driver-version}, authored by the Neo4j Team. 
 endif::[]
 ifdef::backend-pdf[]
-= The Neo4j JavaScript Driver Manual v{driver-version}
-:description: This is the manual for Neo4j JavaScript Driver version {driver-version}, authored by the Neo4j Team. 
+= The Neo4j JavaScript Driver Manual v{javascript-driver-version}
+:description: This is the manual for Neo4j JavaScript Driver version {javascript-driver-version}, authored by the Neo4j Team. 
 endif::[]
 :project-version:
 :manual-title: Neo4j JavaScript Driver Manual {project-version}
