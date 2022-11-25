@@ -16,15 +16,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/neo4j/driver-documentation.git"
+    "url": "git+https://github.com/neo4j/docs-drivers.git"
   },
   "keywords": [],
   "author": "Neo4j",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/neo4j/driver-documentation/issues"
+    "url": "https://github.com/neo4j/docs-drivers/issues"
   },
-  "homepage": "https://github.com/neo4j/driver-documentation#readme",
+  "homepage": "https://github.com/neo4j/docs-drivers#readme",
   "dependencies": {
     "@antora/cli": "^3.1.0",
     "@antora/site-generator-default": "^3.1.2",

@@ -1,6 +1,6 @@
 [[go-driver-get-started]]
 = Get started
-:description: This section gives an overview of the official Neo4j Go Driver and how to connect to a Neo4j database with a "Hello World" example. 
+:description: This section gives an overview of the official Neo4j Go Driver and how to connect to a Neo4j database with a "Hello World" example.
 
 
 [[driver-get-started-about]]
@@ -52,4 +52,4 @@ include::{go-examples}/examples_test.go[tags=hello-world]
 [[go-driver-api-docs]]
 == Driver API docs
 
-For a comprehensive listing of all driver functionality, please see the https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v4[Go API reference documentation].
+For a comprehensive listing of all driver functionality, please see the https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5[Go API reference documentation].
