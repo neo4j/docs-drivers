@@ -27,7 +27,7 @@
   "homepage": "https://github.com/neo4j/driver-documentation#readme",
   "dependencies": {
     "@antora/cli": "^3.1.0",
-    "@antora/site-generator-default": "^3.1.0",
+    "@antora/site-generator-default": "^3.1.2",
     "@neo4j-antora/antora-add-notes": "^0.1.6",
     "@neo4j-antora/antora-modify-sitemaps": "^0.4.3",
     "@neo4j-antora/antora-page-roles": "^0.3.1",
@@ -41,5 +41,10 @@
   "devDependencies": {
     "express": "^4.17.1",
     "nodemon": "^2.0.15"
+  },
+  "overrides": {
+    "@antora/site-generator-default": {
+      "glob-parent": "6.0.2"
+    }
   }
 }
