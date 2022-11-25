@@ -1,6 +1,6 @@
 [[driver-get-started]]
 = Get started
-:description: This section gives an overview of the official Neo4j drivers and how to connect to a Neo4j database with a "Hello World" example. 
+:description: This section gives an overview of the official Neo4j drivers and how to connect to a Neo4j database with a "Hello World" example.
 
 
 [[driver-get-started-about]]
@@ -47,8 +47,7 @@ In cases where at least one peer is below version 4.0, communication will occur 
 [NOTE]
 Drivers 1.7 do not support multiple databases and Neo4j Fabric, features introduced in Neo4j 4.0.
 To be able to run multiple databases online concurrently and to do distributed queries over them, you must upgrade Drivers from 1.7 to 4.0.
-For information, see https://neo4j.com/docs/migration-guide/4.0/upgrade-driver/[4.0 Migration Guide -> Chapter 6. Upgrade Neo4j drivers].
-
+For information, see link:{neo4j-docs-base-uri}/upgrade-migration-guide/current/version-4/migration/drivers/drivers-changes/[Upgrade and Migration Guide -> Drivers changes].
 
 Wherever possible, it is recommended to use the latest stable driver release available.
 This will provide the greatest degree of stability and will ensure that the full set of server functionality is available.
@@ -383,7 +382,7 @@ For a comprehensive listing of all driver functionality, refer to the *API docum
 ====
 [.include-with-dotnet]
 ======
-{api-docs-base-uri}/dotnet-driver/{driver-version}/
+{neo4j-docs-base-uri}/api/dotnet-driver/{driver-version}/
 ======
 
 [.include-with-go]
@@ -391,20 +390,19 @@ For a comprehensive listing of all driver functionality, refer to the *API docum
 https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v4
 ======
 
-
 [.include-with-java]
 ======
-{api-docs-base-uri}/java-driver/{driver-version}/
+{neo4j-docs-base-uri}/api/java-driver/{driver-version}/
 ======
 
 [.include-with-javascript]
 ======
-{api-docs-base-uri}/javascript-driver/{driver-version}/
+{neo4j-docs-base-uri}/api/javascript-driver/{driver-version}/
 ======
 
 [.include-with-python]
 ======
-{api-docs-base-uri}/python-driver/{driver-version}/
+{neo4j-docs-base-uri}/api/python-driver/{driver-version}/
 ======
 
 ====
