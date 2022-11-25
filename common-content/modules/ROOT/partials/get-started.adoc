@@ -59,7 +59,7 @@ In the general case, only the xref:client-applications.adoc#driver-connection-ur
 The official drivers do not support HTTP communication.
 If you need an HTTP driver, choose one of the community drivers.
 
-See also the {http-api-base-uri}[HTTP API documentation].
+See also the link:{docs-base-uri}/http-api/current/[HTTP API documentation].
 ====
 
 # end::about-note[]
