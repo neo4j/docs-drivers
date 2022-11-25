@@ -1,6 +1,6 @@
 [[driver-get-started]]
 = Get started
-:description: This section gives an overview of the official Neo4j drivers and how to connect to a Neo4j database with a "Hello World" example. 
+:description: This section gives an overview of the official Neo4j drivers and how to connect to a Neo4j database with a "Hello World" example.
 
 [[driver-get-started-about]]
 == About the official drivers
@@ -44,7 +44,7 @@ The 1.x series drivers have been built for Neo4j 3.x.
 [NOTE]
 Drivers 1.7 do not support multiple databases and Neo4j Fabric, features introduced in Neo4j 4.0.
 To be able to run multiple databases online concurrently and to do distributed queries over them, you must upgrade to Drivers 4.0.
-For information, see link:{upgrade-current-uri}/migration/drivers/drivers-changes/[Upgrade and Migration Guide -> Drivers changes].
+For information, see link:{neo4j-docs-base-uri}/upgrade-migration-guide/current/version-4/migration/drivers/drivers-changes/[Upgrade and Migration Guide -> Drivers changes].
 
 [NOTE]
 The Go 1.8 driver does support multiple databases.
@@ -335,7 +335,7 @@ For a comprehensive listing of all driver functionality, refer to the *API docum
 ====
 [.include-with-dotnet]
 ======
-{api-docs-base-uri}/dotnet-driver/{driver-version}/
+{neo4j-docs-base-uri}/api/dotnet-driver/{driver-version}/
 ======
 
 [.include-with-go]
@@ -345,16 +345,16 @@ https://godoc.org/github.com/neo4j/neo4j-go-driver/neo4j
 
 [.include-with-java]
 ======
-{api-docs-base-uri}/java-driver/{driver-version}/
+{neo4j-docs-base-uri}/api/java-driver/{driver-version}/
 ======
 
 [.include-with-javascript]
 ======
-{api-docs-base-uri}/javascript-driver/{driver-version}/
+{neo4j-docs-base-uri}/api/javascript-driver/{driver-version}/
 ======
 
 [.include-with-python]
 ======
-{api-docs-base-uri}/python-driver/{driver-version}/
+{neo4j-docs-base-uri}/api/python-driver/{driver-version}/
 ======
 ====

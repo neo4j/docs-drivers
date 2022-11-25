@@ -1,6 +1,6 @@
 [[driver-client-applications]]
 = Client applications
-:description: This section describes how to manage database connections within an application. 
+:description: This section describes how to manage database connections within an application.
 
 This section contains the following:
 
@@ -928,7 +928,7 @@ include::{python-examples}/kerberos_auth_example.py[tags=kerberos-auth]
 
 [NOTE]
 --
-The Kerberos authentication token can only be understood by the server if the server has the link:{kerberos-add-on-base-uri}[Kerberos Add-on] installed.
+The Kerberos authentication token can only be understood by the server if the server has the link:{neo4j-docs-base-uri}/kerberos-add-on/current/[Kerberos Add-on] installed.
 --
 
 
