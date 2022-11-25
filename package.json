@@ -1,6 +1,6 @@
 {
   "name": "driver-documentation",
-  "version": "4.4",
+  "version": "5",
   "description": "Neo4j Driver Documentation",
   "main": "server.js",
   "scripts": {
