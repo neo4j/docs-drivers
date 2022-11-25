@@ -45,5 +45,6 @@
   "overrides": {
     "@antora/site-generator-default": {
       "glob-parent": "6.0.2"
+    }
   }
 }
