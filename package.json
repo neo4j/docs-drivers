@@ -1,6 +1,6 @@
 {
   "name": "driver-documentation",
-  "version": "5.0",
+  "version": "5",
   "description": "Neo4j Driver Documentation",
   "main": "server.js",
   "scripts": {
@@ -16,18 +16,18 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/neo4j/driver-documentation.git"
+    "url": "git+https://github.com/neo4j/docs-drivers.git"
   },
   "keywords": [],
   "author": "Neo4j",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/neo4j/driver-documentation/issues"
+    "url": "https://github.com/neo4j/docs-drivers/issues"
   },
-  "homepage": "https://github.com/neo4j/driver-documentation#readme",
+  "homepage": "https://github.com/neo4j/docs-drivers#readme",
   "dependencies": {
     "@antora/cli": "^3.1.0",
-    "@antora/site-generator-default": "^3.1.0",
+    "@antora/site-generator-default": "^3.1.2",
     "@neo4j-antora/antora-add-notes": "^0.1.6",
     "@neo4j-antora/antora-modify-sitemaps": "^0.4.3",
     "@neo4j-antora/antora-page-roles": "^0.3.1",
@@ -35,11 +35,15 @@
     "@neo4j-documentation/macros": "^1.0.2",
     "@neo4j-documentation/remote-include": "^1.0.0",
     "js-yaml": "^4.1.0",
-    "simple-git": "^2.40.0",
+    "simple-git": "^3.5.0",
     "yargs": "^17.5.1"
   },
   "devDependencies": {
     "express": "^4.17.1",
     "nodemon": "^2.0.15"
+  },
+  "overrides": {
+    "@antora/site-generator-default": {
+      "glob-parent": "6.0.2"
   }
 }

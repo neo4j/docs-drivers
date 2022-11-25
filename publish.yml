@@ -6,8 +6,8 @@ site:
 content:
   sources:
   - url : ./
-    branches: ['5.0','4.4','4.3','4.2']
-    edit_url: https://github.com/neo4j/driver-documentation/tree/{refname}/{path}
+    branches: ['5.x','4.4','4.3','4.2']
+    edit_url: https://github.com/neo4j/docs-drivers/tree/{refname}/{path}
     worktrees: true
     start_paths:
     - dotnet-manual
@@ -22,7 +22,7 @@ content:
     - '!**/README.adoc'
   - url : ./
     branches: ['4.1','4.0','1.7']
-    edit_url: https://github.com/neo4j/driver-documentation/tree/{refname}/{path}
+    edit_url: https://github.com/neo4j/docs-drivers/tree/{refname}/{path}
     worktrees: true
     exclude:
     - '!**/_includes/*'
@@ -79,7 +79,7 @@ asciidoc:
     neo4j-version-exact: 5.1.0@
     neo4j-buildnumber: 5.1@
     # driver version - can be overriden
-    driver-version: 5.0@
+    driver-version: 5@
     # common files - can be overriden
     common-partial: common-content:ROOT:partial$@
     common-image: common-content:ROOT:image$@
@@ -89,4 +89,4 @@ asciidoc:
     # attributes for doc links to other manuals in publish playbook
     neo4j-base-uri: ''
     neo4j-docs-base-uri: /docs
-  
+

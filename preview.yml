@@ -7,7 +7,7 @@ content:
   sources:
   - url : ./
     branches: ['HEAD']
-    edit_url: https://github.com/neo4j/driver-documentation/tree/{refname}/{path}
+    edit_url: https://github.com/neo4j/docs-drivers/tree/{refname}/{path}
     start_paths:
     - dotnet-manual
     - go-manual
@@ -66,7 +66,7 @@ asciidoc:
     neo4j-version-exact: 5.0.0@
     neo4j-buildnumber: 5.0@
     # driver version - can be overriden
-    driver-version: 5.0@
+    driver-version: 5@
     # common files - can be overriden
     common-partial: 5.0@common-content:ROOT:partial$@
     common-image: 5.0@common-content:ROOT:image$@
@@ -74,5 +74,5 @@ asciidoc:
     check-mark: icon:check[]
     cross-mark: icon:times[]
     # attributes for doc links to other manuals in preview playbook
-    neo4j-base-uri: https://neo4j.com 
+    neo4j-base-uri: https://neo4j.com
     neo4j-docs-base-uri: https://neo4j.com/docs
