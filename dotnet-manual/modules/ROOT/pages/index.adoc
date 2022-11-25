@@ -1,18 +1,17 @@
 [[dotnet-drivers]]
 ifndef::backend-pdf[]
 = The Neo4j .NET Driver Manual v{dotnet-driver-version}
-:description: This is the manual for Neo4j .NET Driver version {dotnet-driver-version}, authored by the Neo4j Team. 
+:description: This is the manual for Neo4j .NET Driver version {dotnet-driver-version}, authored by the Neo4j Team.
 endif::[]
 ifdef::backend-pdf[]
 = The Neo4j .NET Driver Manual v{dotnet-driver-version}
-:description: This is the manual for Neo4j .NET Driver version {dotnet-driver-version}, authored by the Neo4j Team. 
+:description: This is the manual for Neo4j .NET Driver version {dotnet-driver-version}, authored by the Neo4j Team.
 endif::[]
 :project-version:
 :manual-title: Neo4j .NET Driver Manual {project-version}
 :source-indent: 0
 :icons: font
 :iconfont-cdn: https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.0.0/css/font-awesome.min.css
-:api-docs-base-uri: https://neo4j.com/docs/api
 
 
 ifndef::backend-pdf[]
