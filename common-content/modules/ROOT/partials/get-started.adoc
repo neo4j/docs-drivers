@@ -69,19 +69,6 @@ See also the link:{neo4j-docs-base-uri}/http-api/{page-version}#http-api[HTTP AP
 
 # tag::versions[]
 
-Starting with *Neo4j 4.0*, *_the versioning scheme for the database, driver and protocol have all been aligned_*.
-This simplifies general compatibility concerns.
-
-Cross-version compatibility is still available, and minimum support for current and previous versions between both server and driver is guaranteed.
-More specifically, this means that *Neo4j 4.0* is guaranteed to be compatible with both *4.0 Drivers* and *1.7 Drivers*, and the *4.0 Drivers* are guaranteed to be compatible with both *Neo4j 4.0* and *Neo4j 3.5*.
-In cases where at least one peer is below version 4.0, communication will occur in *_fallback mode, limiting functionality to that available in the lowest-versioned component_*.
-
-[NOTE]
-Drivers 1.7 do not support multiple databases and Neo4j Fabric, features introduced in Neo4j 4.0.
-To be able to run multiple databases online concurrently and to do distributed queries over them, you must upgrade Drivers from 1.7 to 4.0.
-For information, see link:https://neo4j.com/docs/migration-guide/4.0/upgrade-driver/[4.0 Migration Guide -> Chapter 6. Upgrade Neo4j drivers].
-
-
 Wherever possible, it is recommended to use the latest stable driver release available.
 This will provide the greatest degree of stability and will ensure that the full set of server functionality is available.
 The drivers, when used with *Neo4j Enterprise Edition*, come with full cluster routing support.
