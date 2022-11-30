@@ -7,7 +7,7 @@ The Python driver allows you to connect and interact with a Neo4j database throu
 
 == Install the driver
 
-Use `pip` to install the Neo4j Python driver:
+Use `pip` to install the Neo4j Python driver. Note that you need a running Neo4j database in order to use the driver with it. If you do not have one, see the xref:install#get-an-instance[Get an instance] section.
 
 [source,bash]
 ----
@@ -15,26 +15,6 @@ pip install neo4j
 ----
 
 xref:install#install-driver[More info on installing the driver ->]
-
-
-== Get a Neo4j instance
-
-You need a running Neo4j database in order to use the driver with it.
-The easiest way to spin up a local instance is through a link:{neo4j-docs-base-uri}/operations-manual/current/docker/introduction/[Docker container]:
-
-[source,bash]
-----
-docker run \
-   -p7474:7474 \
-   -p7687:7687 \
-   -d \
-   -e NEO4J_AUTH=neo4j/secretgraph \  # set login credentials
-   neo4j:latest
-----
-
-Alternatively, you can get a free cloud instance through <<Aura>>.
-
-xref:install#get-an-instance[More ways and info on getting a Neo4j instance ->]
 
 
 == Connect to the database
@@ -60,7 +40,7 @@ xref:connect.adoc[More info on connecting to a database ->]
 You can execute a <<Cypher>> statement by creating a session and using the methods `Session.execute_read()` and `Session.execute_write()`.
 Do not hardcode or concatenate parameters: use placeholders and specify the parameters as keyword arguments.
 
-.Get the name of all 42 year-olds.
+.Get the name of all 42 year-olds
 [source, python, role=nocollapse]
 ----
 def match_person_nodes(tx, age):
