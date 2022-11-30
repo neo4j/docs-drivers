@@ -27,7 +27,7 @@ with driver.session(database="neo4j") as session:
     ))
 ----
 
-where *(1)* specifies the Cypher query and *(2)* is a _query parameter_. These are wrapped in a transaction function *(3)*, which is passed a callback to `Session.execute_write()` together with an arbitrary numbers of keyword arguments *(4)*.
+where *(1)* specifies the Cypher query and *(2)* is a _query parameter_. The query and its parameters are wrapped in a transaction function *(3)*, which is passed as callback to `Session.execute_write()` together with an arbitrary numbers of keyword arguments *(4)*.
 
 [NOTE]
 `MERGE` creates a new node matching the requirements unless one already exists, in which case nothing is done. For strict node creation, use the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/create/[`CREATE`] clause.
@@ -142,12 +142,12 @@ with driver.session(database="neo4j") as session:
 2. *security reasons*: link:https://neo4j.com/developer/kb/protecting-against-cypher-injection/[protecting against Cypher injection].
 
 [NOTE]
-There can be circumstances where your query structure prevents the usage of parameters in all its parts. For those advanced use cases, see link:query-advanced#_dynamic_values_in_property_keys_relationship_types_and_labels[Dynamic values in property keys, relationship types, and labels].
+There can be circumstances where your query structure prevents the usage of parameters in all its parts. For those advanced use cases, see xref:query-advanced#_dynamic_values_in_property_keys_relationship_types_and_labels[Dynamic values in property keys, relationship types, and labels].
 
 
 == Anatomy of a query
 
-Before you can run a query, you need to obtain a session from the driver with the `Driver.session()` method *(1)*. The `database` parameter is optional but recommended for performance, and further xref:[configuration parameters] can be included. Within a session, use the methods link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Session.execute_read[`Session.execute_read()`] and link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Session.execute_write[`Session.execute_write()`] *(2)*, depending on whether you want to retrieve data from the database or alter it. Both methods take a _transaction function_ callback *(3)* and an arbitrary number of positional and keyword arguments *(4)* which are handed down to the transaction function. The transaction function *(5)* is responsible for actually carrying out the queries and processing the result. Queries are specified with the link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Transaction.run[`Transaction.run()`] method *(6)*, which returns a link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Result[`Result`] object. You can then process the result *(7)* using xref:result#manipulate-result[any of the `Result` methods], or simply casting it to `list`.
+Before you can run a query, you need to obtain a session from the driver with the `Driver.session()` method *(1)*. The `database` parameter is optional but recommended for performance, and further xref:transactions#_session_configuration[configuration parameters] can be included. Within a session, use the methods link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Session.execute_read[`Session.execute_read()`] and link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Session.execute_write[`Session.execute_write()`] *(2)*, depending on whether you want to retrieve data from the database or alter it. Both methods take a _transaction function_ callback *(3)* and an arbitrary number of positional and keyword arguments *(4)* which are handed down to the transaction function. The transaction function *(5)* is responsible for actually carrying out the queries and processing the result. Queries are specified with the link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Transaction.run[`Transaction.run()`] method *(6)*, which returns a link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Result[`Result`] object. You can then process the result *(7)* using xref:result#manipulate-result[any of the `Result` methods], or simply casting it to `list`.
 
 .Retrieve people whose name starts with `Al`.
 [source,python]

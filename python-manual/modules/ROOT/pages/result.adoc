@@ -1,6 +1,6 @@
 = Work with the result
 
-The output of a query is a `Result` object. This object does not directly contain the result records, but rather encpsulates the Cypher result in a rich data structure that requires some parsing within the transaction function.
+The output of a query is a `Result` object. This object does not directly contain the result records, but rather encapsulates the Cypher result in a rich data structure that requires some parsing within the transaction function.
 
 [[manipulate-result]]
 == Manipulate the result
@@ -115,7 +115,7 @@ with driver.session(database="neo4j") as session:
 
 == Transform to pandas DataFrame
 
-The method `Result.to_df()` converts the result into a pandas DataFrame. This method is only available if the `pandas` library is installed.
+The method `.to_df()` converts the result into a pandas DataFrame. This method is only available if the `pandas` library is installed.
 
 .Return a DataFrame with two columns (`n` and `m`) and 10 rows
 [source,python]
@@ -128,7 +128,7 @@ with driver.session(database="neo4j") as session:
     df = session.execute_read(pandas_df)
 ----
 
-This transformer accepts two optional arguments:
+This method accepts two optional arguments:
 
 - `expand` -- If `True`, some data structures in the result will be recursively expanded and flattened. More info in the link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Result.to_df[API documentation].
 - `parse_dates` -- If `True`, columns exclusively containing `time.DateTime` objects, `time.Date` objects, or `None`, will be converted to `pandas.Timestamp`.
@@ -136,7 +136,7 @@ This transformer accepts two optional arguments:
 
 == Transform to graph
 
-The method `Result.graph()` converts the result into a graph. To make the most out of this method, your query should return a graph-like result instead of a single column. The resulting graph object exposes the properties `nodes` and `relationships`, which are set views into xref:data-types#node[`Node`] and xref:data-types#relationship[`Relationship`] objects.
+The method `.graph()` converts the result into a graph. To make the most out of this method, your query should return a graph-like result instead of a single column. The resulting graph object exposes the properties `nodes` and `relationships`, which are set views into xref:data-types#node[`Node`] and xref:data-types#relationship[`Relationship`] objects.
 
 You can use the graph format for further processing or to visualize the query result. An example implementation that uses the `pyvis` library to draw the graph is below.
 

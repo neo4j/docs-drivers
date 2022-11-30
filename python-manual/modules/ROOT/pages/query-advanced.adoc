@@ -2,9 +2,9 @@
 
 == Auto-commit transactions
 
-This is the most basic and limited form with which to run a Cypher query. The driver will not automatically retry auto-commit transactions, as it does instead for queries run with xref:transactions#managed-transactions[transaction functions].
+This is the most basic and limited form with which to run a Cypher query. The driver will not automatically retry auto-commit transactions, as it does instead for queries run with xref:transactions#managed-transactions[managed transactions].
 
-You run an auto-commit transaction through the method link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Session.run[`Session.run()`]. It returns a `Result` object that needs to be processed with the xref:result#manipulate-result[related methods].
+You run an auto-commit transaction with the method link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Session.run[`Session.run()`]. It returns a `Result` object that needs to be processed with the xref:result#manipulate-result[related methods].
 
 [source,python]
 ----

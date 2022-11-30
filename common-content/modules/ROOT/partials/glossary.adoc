@@ -1,5 +1,5 @@
 [glossary]
-[[LTS]]LTS:: A _Long Term Support_ release is one guaranteed to be supported for a number of years. Neo4j 4.4 is LTS, and Neo4j 5.LTS will be LTS.
+[[LTS]]LTS:: A _Long Term Support_ release is one guaranteed to be supported for a number of years. Neo4j 4.4 is LTS, and Neo4j 5 will also have an LTS version.
 [[Aura]]Aura:: link:https://neo4j.com/cloud/platform/aura-graph-database/[Aura] is Neo4j's fully managed cloud service. It comes with both free and paid plans.
 [[Driver]]Driver:: A link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.Driver[`Driver`] object holds the details required to establish connections with a Neo4j database. Every Neo4j-backed application requires a `Driver` object.
 [[Cypher]]Cypher:: link:https://neo4j.com/docs/getting-started/current/cypher-intro/[Cypher] is Neo4j's graph query language that lets you retrieve data from the graph. It is like SQL, but for graphs.

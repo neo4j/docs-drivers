@@ -16,12 +16,12 @@ with GraphDatabase.driver(URI, auth=AUTH) as driver: # <1>
     driver.verify_connectivity() # <2>
 ----
 
-Creating a `Driver` instance *(1)* only provides information on _how_ to access the database, but does not actually _establish_ a connection. Connection is deferred to when the first query is executed. To verify immediately that the driver can connect to the database (valid credentials, compatible versions, etc), use the `.verify_connectivity()` method *(2)* after initializing the driver.
+Creating a `Driver` instance *(1)* only provides information on _how_ to access the database, but does not actually _establish_ a connection. Connection is instead deferred to when the first query is executed. To verify immediately that the driver can connect to the database (valid credentials, compatible versions, etc), use the `.verify_connectivity()` method *(2)* after initializing the driver.
 
 Both the creation of a `Driver` object and the connection verification can raise a number of different link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#errors[exceptions]. Since error handling can get quite verbose, and a connection error is a blocker for any subsequnt task, the most common choice is to let the program crash should an exception occurr during connection.
 
 `Driver` objects are _immutable_, _thread-safe_, and fairly _expensive to create_.
-Share them across threads (but not across processes!) and use xref:query-simple#impersonation[impersonation] to query the database with a different user.
+Share them across threads (but not across processes!) and use xref:transactions#impersonation[impersonation] to query the database with a different user.
 If you want to alter a `Driver` configuration, you will need to create a new object.
 
 

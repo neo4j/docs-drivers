@@ -274,14 +274,12 @@ with GraphDatabase.driver(URI, auth=AUTH) as driver:
             "MERGE (p:Person {name: $name}) RETURN p AS person",
             name="Alice"
         )
-        records = list(result)
-
-        for record in records:
-            node = record["person"]
-            print(f"Node ID: {node.element_id}\n"
-                  f"Labels: {node.labels}\n"
-                  f"Properties: {node.items()}\n"
-            )
+        record = result.single()
+        node = record["person"]
+        print(f"Node ID: {node.element_id}\n"
+              f"Labels: {node.labels}\n"
+              f"Properties: {node.items()}\n"
+        )
 
 # Node ID: 4:73e9a61b-b501-476d-ad6f-8d7edf459251:0
 # Labels: frozenset({'Person'})
@@ -312,19 +310,18 @@ with GraphDatabase.driver(URI, auth=AUTH) as driver:
             MERGE (friend:Person {name: $friend_name})
             MERGE (p)-[r:KNOWS]->(friend)
             SET r.status = $status, r.since = $date
+            RETURN r AS friendship
             """, name="Alice", status="BFF", date=Date.today(), friend_name="Bob",
         )
-        records = list(result)
-
-        for record in records:
-            relationship = record["friendship"]
-            print(f"Relationship ID: {relationship.element_id}\n"
-                  f"Start node: {relationship.start_node}\n"
-                  f"End node: {relationship.end_node}\n"
-                  f"Type: {relationship.type}\n"
-                  f"Friends since: {relationship.get('since')}\n"
-                  f"All properties: {relationship.items()}\n"
-            )
+        record = result.single()
+        relationship = record["friendship"]
+        print(f"Relationship ID: {relationship.element_id}\n"
+              f"Start node: {relationship.start_node}\n"
+              f"End node: {relationship.end_node}\n"
+              f"Type: {relationship.type}\n"
+              f"Friends since: {relationship.get('since')}\n"
+              f"All properties: {relationship.items()}\n"
+        )
 
 # Relationship ID: 5:73e9a61b-b501-476d-ad6f-8d7edf459251:1
 # Start node: <Node element_id='4:73e9a61b-b501-476d-ad6f-8d7edf459251:0' labels=frozenset({'Person'}) properties={'name': 'Alice'}>

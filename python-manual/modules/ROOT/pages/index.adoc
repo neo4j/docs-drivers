@@ -16,6 +16,7 @@ pip install neo4j
 
 xref:install#install-driver[More info on installing the driver ->]
 
+
 == Get a Neo4j instance
 
 You need a running Neo4j database in order to use the driver with it.
@@ -35,6 +36,7 @@ Alternatively, you can get a free cloud instance through <<Aura>>.
 
 xref:install#get-an-instance[More ways and info on getting a Neo4j instance ->]
 
+
 == Connect to the database
 
 You connect to a database by creating a <<Driver>> object and providing a URL and an authentication token. Once you have created a `Driver` instance, you can call the `.verify_connectivity()` method to ensure that a working connection can be established.
@@ -46,8 +48,8 @@ from neo4j import GraphDatabase
 URI = "<URL for Neo4j database>"
 AUTH = ("<Username>", "<Password>")
 
-driver = GraphDatabase.driver(URI, auth=AUTH)
-driver.verify_connectivity()
+with GraphDatabase.driver(URI, auth=AUTH) as driver:
+    driver.verify_connectivity()
 ----
 
 xref:connect.adoc[More info on connecting to a database ->]
@@ -58,9 +60,9 @@ xref:connect.adoc[More info on connecting to a database ->]
 You can execute a <<Cypher>> statement by creating a session and using the methods `Session.execute_read()` and `Session.execute_write()`.
 Do not hardcode or concatenate parameters: use placeholders and specify the parameters as keyword arguments.
 
+.Get the name of all 42 year-olds.
 [source, python, role=nocollapse]
 ----
-# Get the name of all 42 year-olds.
 def match_person_nodes(tx, age):
     result = tx.run(
         "MATCH (p:Person {age: $age}) RETURN p.name AS name",
