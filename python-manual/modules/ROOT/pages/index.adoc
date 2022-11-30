@@ -5,7 +5,7 @@
 The Python driver allows you to connect and interact with a Neo4j database through a Python application.
 
 
-== Install the driver
+== Installation
 
 Use `pip` to install the Neo4j Python driver. Note that you need a running Neo4j database in order to use the driver with it. If you do not have one, see the xref:install#get-an-instance[Get an instance] section.
 
