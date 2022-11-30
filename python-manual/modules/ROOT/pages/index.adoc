@@ -1,51 +1,101 @@
-[[python-drivers]]
-ifndef::backend-pdf[]
-= The Neo4j Python Driver Manual v{python-driver-version}
-:description: This is the manual for Neo4j Python Driver version {python-driver-version}, authored by the Neo4j Team. 
-endif::[]
-ifdef::backend-pdf[]
-= The Neo4j Python Driver Manual v{python-driver-version}
-:description: This is the manual for Neo4j Python Driver version {python-driver-version}, authored by the Neo4j Team. 
-endif::[]
-:project-version:
-:manual-title: Neo4j Python Driver Manual {project-version}
-:source-indent: 0
-:icons: font
-:iconfont-cdn: https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.0.0/css/font-awesome.min.css
+:page-toclevels: 0
+
+= Build applications with Neo4j and Python
+
+The Python driver allows you to connect and interact with a Neo4j database through a Python application.
 
 
-ifndef::backend-pdf[]
-License: link:{common-license-page-uri}[Creative Commons 4.0]
-endif::[]
-ifdef::backend-pdf[]
-Copyright (C) {copyright}
+== Install the driver
 
-License: <<license, Creative Commons 4.0>>
-endif::[]
+Use `pip` to install the Neo4j Python driver:
 
-This manual covers the following areas:
+[source,bash]
+----
+pip install neo4j
+----
 
-* xref:get-started.adoc[Get started] -- An overview of the official Neo4j Python Driver and how to connect to a Neo4j database.
-* xref:client-applications.adoc[Client applications] -- How to manage database connections within an application.
-* xref:cypher-workflow.adoc[Cypher workflow] -- How to create units of work and provide a logical context for that work.
-* xref:session-api.adoc[The session API] -- How the types and values used by Cypher map to native language types.
-* xref:terminology.adoc[Driver terminology] -- Terminology for drivers.
+xref:install#install-driver[More info on installing the driver ->]
 
-_Who should read this?_
+== Get a Neo4j instance
 
-This manual is written for Python developers building a Neo4j client application.
+You need a running Neo4j database in order to use the driver with it.
+The easiest way to spin up a local instance is through a link:{neo4j-docs-base-uri}/operations-manual/current/docker/introduction/[Docker container]:
 
-[.discrete.ad]
-== link:https://graphacademy.neo4j.com/?ref=guides[Learn with GraphAcademy^]
+[source,bash]
+----
+docker run \
+   -p7474:7474 \
+   -p7687:7687 \
+   -d \
+   -e NEO4J_AUTH=neo4j/secretgraph \  # set login credentials
+   neo4j:latest
+----
 
-image::https://graphacademy.neo4j.com/courses/app-python/badge/[float=left]
+Alternatively, you can get a free cloud instance through <<Aura>>.
 
-[.discrete]
-=== link:https://graphacademy.neo4j.com/courses/app-python/?ref=guides[Building Neo4j Applications with Python^]
+xref:install#get-an-instance[More ways and info on getting a Neo4j instance ->]
 
-In this free course, follow a walk through the steps to integrate Neo4j into your Python projects.
-You will learn about the Neo4j Python Driver, how sessions and transactions work and how to query Neo4j from an existing application.
+== Connect to the database
 
-link:https://graphacademy.neo4j.com/courses/app-python/?ref=guides[Learn more^,role=button]
+You connect to a database by creating a <<Driver>> object and providing a URL and an authentication token. Once you have created a `Driver` instance, you can call the `.verify_connectivity()` method to ensure that a working connection can be established.
+
+[source,python]
+----
+from neo4j import GraphDatabase
+
+URI = "<URL for Neo4j database>"
+AUTH = ("<Username>", "<Password>")
+
+driver = GraphDatabase.driver(URI, auth=AUTH)
+driver.verify_connectivity()
+----
+
+xref:connect.adoc[More info on connecting to a database ->]
 
 
+== Query the database
+
+You can execute a <<Cypher>> statement by creating a session and using the methods `Session.execute_read()` and `Session.execute_write()`.
+Do not hardcode or concatenate parameters: use placeholders and specify the parameters as keyword arguments.
+
+[source, python, role=nocollapse]
+----
+# Get the name of all 42 year-olds.
+def match_person_nodes(tx, age):
+    result = tx.run(
+        "MATCH (p:Person {age: $age}) RETURN p.name AS name",
+        age=age)
+    records = list(result)
+    summary = result.consume()
+    return records, summary
+
+with driver.session(database="neo4j") as session:
+    records, summary = session.execute_read(match_person_nodes, age=42)
+
+# Summary information
+print("The query `{query}` returned {records_count} records in {time} ms.".format(
+    query=summary.query, records_count=len(records),
+    time=summary.result_available_after,
+))
+
+# Loop through results and do something with them
+for person in records:
+    print(person)
+----
+
+xref:query-simple.adoc[More info on querying the database ->]
+
+
+== Close connections and sessions
+
+Unless you created them using the `with` statement, you should call the `.close()` method on all `Driver` and `Session` instances to release any resources still held by them.
+
+[source,python]
+session.close()
+driver.close()
+
+
+[discrete.glossary]
+== Glossary
+
+include::{common-partial}/glossary.adoc[]

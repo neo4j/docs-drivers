@@ -1,0 +1,45 @@
+= Installation
+
+[#install-driver]
+== Install the driver
+
+Use `pip` to install the link:https://pypi.org/project/neo4j/[Neo4j Python Driver] (requires Python >= 3.7):
+
+[source,bash]
+----
+pip install neo4j
+----
+
+Always use the latest version of the driver, as it will always work both with the previous Neo4j <<LTS>> release and with the current and next major releases.
+The latest `5.x` driver supports connection to any Neo4j 5 and 4.4 instance, and will also be compatible with Neo4j 6. For a detailed list of changes across versions, see the link:https://github.com/neo4j/neo4j-python-driver/wiki/5.x-changelog[driver's changelog].
+
+[NOTE]
+To get the driver on an air-gapped machine, link:https://pypi.org/project/neo4j/#files[download the latest driver] tarball and install it with `pip install neo4j-<version>.tar.gz`.
+
+
+[#get-an-instance]
+== Get a Neo4j instance
+
+You need a running Neo4j database in order to use the driver with it.
+The easiest way to spin up a *local instance* is through a link:{neo4j-docs-base-uri}/operations-manual/current/docker/introduction/[Docker container] (requires `docker.io`). The command below runs the latest Neo4j version in Docker, setting the admin username to `neo4j` and password to `secretgraph`:
+
+[source,bash]
+----
+docker run \
+   -p7474:7474 \                       # forward port 7474 (HTTP)
+   -p7687:7687 \                       # forward port 7687 (Bolt)
+   -d \                                # run in background
+   -e NEO4J_AUTH=neo4j/secretgraph \   # set login credentials
+   neo4j:latest
+----
+
+Alternatively, you can obtain a free *cloud instance* through <<Aura>>.
+Take a note of the connection URI and of the login credentials.
+
+You can also link:https://neo4j.com/download-center/#community[install Neo4j on your system], or use link:https://neo4j.com/download-center/#desktop[Neo4j Desktop] to create a local development environment (not for production).
+
+
+[discrete.glossary]
+== Glossary
+
+include::{common-partial}/glossary.adoc[]

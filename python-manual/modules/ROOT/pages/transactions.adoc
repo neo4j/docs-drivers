@@ -1,0 +1,279 @@
+= Fine-grained transaction control
+
+When xref:query-simple.adoc[querying the database] through a session, the driver automatically creates a _transaction_. A transaction is a unit of work that is either _committed_ in its entirety or _rolled back_ on failure. You can include multiple Cypher statements in a single query, as for example when using `MATCH` and `MERGE` in sequence to xref:query-simple#update-database[update the database], but you cannot have multiple queries and interleave some client-logic in between them. For these more advanced use-cases, the driver provides functions to take full control over the transaction lifecycle.
+
+
+== Obtain a session
+
+Before running a transaction, you need to obtain a _session_. Sessions act as concrete query channels between the driver and the server. In particular, sessions borrow connections from the _connection pool_ as needed, and ensure <<causal consistency>> is enforced.
+
+Sessions are created with the method link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#session[`Driver.session()`], with the keyword argument `database` allowing to specify the xref:_database_selection[target database].
+
+[source,python]
+----
+with driver.session(database="neo4j") as session:
+    ...
+----
+
+Session creation is a lightweight operation, so sessions can be created and destroyed without significant cost. When a session is closed, it is returned to the connection pool to be later reused. Each connection pool has *a finite number of sessions*, so if you open sessions without ever closing them, your application could run out of them.
+
+*Sessions are _not_ thread safe*: share the main `Driver` object across threads, but make sure each thread creates its own sessions.
+
+
+[[managed-transactions]]
+== Run a managed transaction
+
+A transaction can contain any number of queries. As Neo4j is <<ACID>> compliant, *queries within a transaction will either be executed as a whole or not at all*: you cannot get a part of the transaction succeeding and another failing. Use transactions to group together related queries which work together to achieve a single _logical_ database operation.
+
+A managed transaction is created with the methods link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Session.execute_read[`Session.execute_read()`] and link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Session.execute_write[`Session.execute_write()`], depending on whether you want to retrieve data from the database or alter it. Both methods take a _transaction function_ callback *(1)* and an arbitrary number of positional and keyword arguments *(2)* which are handed down to the transaction function. The transaction function *(3)* is responsible for actually carrying out the queries and processing the result. Queries are specified with the link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Transaction.run[`Transaction.run()`] method *(4)*, which returns a link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Result[`Result`] object. You can then xref:result#manipulate-result[process the result] *(5)* using any of the `Result` methods, or simply casting it to list.
+
+.Retrieve people whose name starts with `Al`.
+[source,python]
+----
+def match_person_nodes(tx, name_filter): # <3>
+    result = tx.run( # <4>
+        "MATCH (p:Person) WHERE p.name STARTS WITH $filter "
+        "RETURN p.name as name ORDER BY name",
+        filter=name_filter)
+    return list(result)  # return a list of Record objects # <5>
+
+with driver.session(database="neo4j") as session:
+    people = session.execute_read(
+        match_person_nodes, # <1>
+        "Al", # <2>
+    )
+    for person in people:
+        print(person.data())  # obtain dict representation
+----
+
+*Do not hardcode or concatenate parameters directly into the query*. Use xref:query-simple#query-parameters[query parameters] instead, both for performance and security reasons.
+
+*Transaction functions should never return the `Result` object directly*. Instead, always process the result in some way; at minimum, cast it to list. Within a transaction function, a `return` statement results in the transaction being committed, while the transaction is automatically rolled back if an exception is raised.
+
+.A transaction with multiple queries, client logic, and potential roll backs.
+[source,python]
+----
+from neo4j import GraphDatabase
+
+
+URI = "neo4j://localhost"
+AUTH = ("neo4j", "secret")
+employee_threshold=10
+
+
+def main():
+    with GraphDatabase.driver(URI, auth=AUTH) as driver:
+        with driver.session(database="neo4j") as session:
+            for i in range(100):
+                name = "Thor"+str(i)
+                org_id = session.execute_write(employ_person_tx, name)
+                print(f"User {name} added to organization {org_id}")
+
+
+def employ_person_tx(tx, name):
+    # Create new Person node with given name, if not existing already
+    result = tx.run("MERGE (p:Person {name: $name}) RETURN p.name AS name",
+                    name=name)
+
+    # Obtain most recent organization ID and the number of people linked to it
+    result = tx.run(
+        "MATCH (o:Organization) "
+        "RETURN o.id AS id, COUNT{(p:Person)-[r:WORKS_FOR]->(o)} AS employees_n "
+        "ORDER BY o.created_date DESC "
+        "LIMIT 1"
+    )
+    org = result.single()
+
+    if org is not None and org["employees_n"] == 0:
+        raise Exception("Most recent organization is empty.")
+        # Transaction will roll back -> not even Person is created!
+
+    # If org does not have too many employees, add this Person to that
+    if org is not None and org.get("employees_n") < employee_threshold:
+        result = tx.run(
+            "MATCH (o:Organization {id: $org_id}) "
+            "MATCH (p:Person {name: $name}) "
+            "MERGE (p)-[r:WORKS_FOR]->(o) "
+            "RETURN $org_id AS id",
+            org_id=org["id"], name=name
+        )
+
+    # Otherwise, create a new Organization and link Person to it
+    else:
+        from neo4j.time import Date
+        result = tx.run(
+            "MATCH (p:Person {name: $name}) "
+            "CREATE (o:Organization {id: randomuuid(), created_date: datetime()}) "
+            "MERGE (p)-[r:WORKS_FOR]->(o) "
+            "RETURN o.id AS id",
+            name=name, date=Date.today()
+        )
+
+    # Return the Organization ID to which the new Person ends up in
+    return result.single()["id"]
+
+
+if __name__ == "__main__":
+    main()
+----
+
+Should a transaction fail for a reason that the driver deems transient, it will automatically retry to run the transaction function (with an exponentially increasing delay). For this reason, *transaction functions must be _idempotent_* (i.e., they should produce the same effect when run several times), because you do not know upfront how many times they are going to be executed. In practice, this means that you should not edit nor rely on globals, for example. Note that although transactions functions might be executed multiple times, the queries inside it will always run only once.
+
+A session can chain multiple transactions, but *only one single transaction can be active within a session at any given time*. To maintain multiple concurrent transactions, use multiple concurrent sessions.
+
+
+[#unit_of_work-decorator]
+=== Further transaction function configuration
+
+The decorator link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.unit_of_work[`unit_of_work()`] allows to exert further control on transaction functions. You can specify:
+
+- a transaction timeout (in seconds). Transactions that run longer will be terminated by the server. The default value is set on the server side.
+- a dictionary of metadata that gets attached to the transaction. These metadata get logged in the server `query.log`, and are visible in the output of the `SHOW TRANSACTIONS` Cypher command. Use this to tag transactions.
+
+[source,python]
+----
+from neo4j import unit_of_work
+
+@unit_of_work(timeout=5, metadata={"app_name": "people"})
+def count_people(tx):
+    result = tx.run("MATCH (a:Person) RETURN count(a) AS people")
+    record = result.single()
+    return record["people"]
+
+
+with driver.session(database="neo4j") as session:
+    people_n = session.execute_read(count_people)
+----
+
+
+== Session configuration
+
+=== Database selection
+
+It is recommended to *always specify the database explicitly* with the `database` parameter, even on single-database instances. This allows the driver to work more efficiently, as it does not have to resolve the home database first. If no database is given, the link:{neo4j-docs-base-uri}/operations-manual/current/manage-databases/introduction#manage-databases-default[default database] set in the Neo4j instance settings is used.
+
+
+=== Request routing
+
+In a cluster environment, all sessions are opened in write mode. You can change this by explicitly setting the `default_access_mode` parameter to either `neo4j.READ_ACCESS` or `neo4j.WRITE_ACCESS`. Note that `execute_read` and `execute_write` automatically override the session's default access mode.
+
+[source, python]
+----
+import neo4j
+
+with driver.session(
+    database="neo4j",
+    default_access_mode=neo4j.READ_ACCESS
+) as session:
+    ...
+----
+
+[[access-control-note]]
+[NOTE]
+====
+Although executing a _write_ query under read mode will likely result in a runtime error, *you should not rely on `execute_read/write` for access control.* The difference between the two methods is that `read` transactions will be routed to any node of a cluster, whereas `write` ones will be directed to the _Leader_. However, you should not rely on this behavior for security purposes. In fact, depending on the server version and settings, the server or cluster might allow none, some, or all write-statements to be executed even in transactions marked as _read_.
+====
+
+
+[#impersonation]
+=== Run queries as a different user (impersonation)
+
+You can execute a query under the security context of a different user with the parameter `impersonated_user`, specifying the name of the user to impersonate. For this to work, the user under which the `Driver` was created needs to have the link:{neo4j-docs-base-uri}/cypher-manual/current/access-control/dbms-administration#access-control-dbms-administration-impersonation[appropriate permissions]. Impersonating a user is cheaper than creating a new `Driver` object.
+
+When impersonating a user, the query is run within the complete security context of the impersonated user and not the authenticated user (i.e., home database, permissions, etc.).
+
+[source, python]
+----
+with driver.session(
+    database="neo4j",
+    impersonated_user="somebody_else"
+) as session:
+    ...
+----
+
+
+[[explicit-transactions]]
+== Explicit transactions
+
+You can have full control over transactions by manually beginning one with the method link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Session.begin_transaction[`Session.begin_transaction()`]. You run queries inside an explicit transaction with the method link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Transaction.run[`Transaction.run()`].
+
+[source,python]
+----
+with driver.session() as session:
+    with session.begin_transaction() as tx:
+        # use tx.run() to run queries
+----
+
+Closing an explicit transaction can either happen automatically at the end of a `with` block, or can be explicitly controlled through the methods link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Transaction.commit[`Transaction.commit()`], link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Transaction.rollback[`Transaction.rollback()`] or link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Transaction.close[`Transaction.close()`].
+
+Explicit transactions are most useful for applications that need to distribute Cypher execution across multiple functions for the same transaction, or for applications that need to run multiple queries within a single transaction but without the automatic retries provided by managed transactions.
+
+[source,python]
+----
+import neo4j
+from os import sleep
+
+
+def transfer_to_other_bank(driver, customer_id, other_bank_id, amount):
+    with driver.session(database="neo4j") as session:
+        tx = session.begin_transaction()
+        # or just use a `with` context on `tx` instead of try/finally
+        try:
+            if not customer_balance_check(tx, customer_id, amount):
+                # give up
+                return
+
+            other_bank_transfer_api(customer_id, other_bank_id, amount)
+            # Now the money has been transferred => can't rollback anymore
+            # (cannot rollback external services interactions)
+
+            try:
+                decrease_customer_balance(tx, customer_id, amount)
+                tx.commit()
+            except Exception as e:
+                request_inspection(customer_id, other_bank_id, amount, e)
+                raise  # roll back
+        finally:
+            tx.close()  # rolls back if not yet committed
+
+
+def customer_balance_check(tx, customer_id, amount):
+    query = ("MATCH (c:Customer {id: $id}) "
+             "RETURN c.balance >= $amount AS sufficient")
+    result = tx.run(query, id=customer_id, amount=amount)
+    record = result.single(strict=True)
+    return record["sufficient"]
+
+
+def other_bank_transfer_api(customer_id, other_bank_id, amount):
+    ...  # make some API call to other bank
+
+
+def decrease_customer_balance(tx, customer_id, amount, attempts=3):
+    query = ("MATCH (c:Customer {id: $id}) "
+             "SET c.balance = c.balance - $amount")
+    try:
+        result = tx.run(query, id=customer_id, amount=amount)
+    # if error is transient, attempt to retry the query after short delay
+    except (DriverError, Neo4jError) as e:
+        if e.is_retryable() and attempts > 0:
+            sleep(1)
+            decrease_customer_balance(tx, customer_id, amount, attempts=attempts-1)
+        else:
+            raise
+    result.consume()
+
+
+def request_inspection(customer_id, other_bank_id, amount, e):
+    # manual cleanup required; log this or similar
+    print("WARNING: transaction rolled back due to exception:", repr(e))
+    print("customer_id:", customer_id, "other_bank_id:", other_bank_id,
+          "amount:", amount)
+
+----
+
+
+[discrete.glossary]
+== Glossary
+
+include::{common-partial}/glossary.adoc[]

@@ -1,0 +1,41 @@
+= Async query flow
+
+To interact with the database in an asyncronous way, create an `AsyncDriver` with `AsyncGraphDatabase()`. The workflow is very similar to the syncronous version, except that you must use `await` on all async calls, and define as `async` all functions that should be awaited.
+
+.An async driver example
+[source,python, role=nocollapse]
+----
+import asyncio
+from neo4j import AsyncGraphDatabase
+
+
+async def get_people(tx):
+    result = await tx.run("MATCH (a:Person) RETURN a.name AS name")
+    records = await result.values()
+    return records
+
+
+async def main():
+    URI = "<URI for Neo4j database>"
+    AUTH = ("<Username>", "<Password>")
+
+    async with AsyncGraphDatabase.driver(URI, auth=AUTH) as driver:
+        async with driver.session(database="neo4j") as session:
+            records = await session.read_transaction(get_people)
+            print(records)
+
+
+asyncio.run(main())
+----
+
+[TIP]
+Async implements a concurrency model, but it is not the only possible one. Multithreading is also possible, although asyncio is often easier to implement in an application.
+
+[WARNING]
+There is a known issue with Python 3.8 and the async driver where it gradually slows down. It is generally recommended to use the latest supported version of Python for the best performance, stability, and security.
+
+
+[discrete.glossary]
+== Glossary
+
+include::{common-partial}/glossary.adoc[]

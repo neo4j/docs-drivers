@@ -1,0 +1,99 @@
+= Coordinate different transactions with bookmarks
+
+When working with a Neo4j cluster, <<causal_consistency>> is enforced by default in most cases, which guarantees that a query is able to read changes made by previous queries. However, if you xref:transactions.adoc[take control of transactions] or if your application is running concurrent transactions, you might need to use _bookmarks_ to avoid the cluster falling back to <<eventual_consistency>>.
+
+A _bookmark_ is a token that represents some state of the database. By passing one or multiple bookmarks along with a query, the server will make sure that the query does not get executed before the represented state(s) have been established.
+
+[TIP]
+The usage of bookmarks can negatively impact performance, since all queries are forced to wait for the latest changes to be propagated across the cluster. For simple use-cases, try to group queries within a single transaction, or within a single session.
+
+Bookmark management happens automatically for queries run within a single session, so that you can trust that queries inside one session are causally chained.
+
+[source,python]
+----
+with driver.session() as session:
+    session.execute_write(lambda tx: tx.run("<QUERY 1>"))
+    session.execute_write(lambda tx: tx.run("<QUERY 2>"))  # can read QUERY 1
+    session.execute_write(lambda tx: tx.run("<QUERY 3>"))  # can read QUERY 1,2
+    ...
+----
+
+If your application uses multiple sessions instead, you might need to ensure that one session has completed all its transactions before another session is allowed to run its queries. In those cases, you can collect the bookmarks from some sessions using the method `Session.last_bookmarks()` *(1), (2)*, and use them to initialize another session with the `bookmarks` parameter *(3)*.
+
+In the example below, `session_a` and `session_b` are allowed to run concurrently, while `session_c` will wait until their results have been propagated. This guarantees the `Person` nodes `session_c` wants to act on actually exist.
+
+.Coordinate multiple sessions using bookmarks
+[source,python]
+----
+from neo4j import GraphDatabase, Bookmarks
+
+
+URI = "<URI for Neo4j database>"
+AUTH = ("<Username>", "<Password>")
+
+def main():
+    with GraphDatabase.driver(URI, auth=AUTH) as driver:
+        create_some_friends(driver)
+
+
+def create_some_friends(driver):
+    saved_bookmarks = Bookmarks()  # To collect the sessions' bookmarks
+
+    # Create the first person and employment relationship.
+    with driver.session() as session_a:
+        session_a.execute_write(create_person, "Alice")
+        session_a.execute_write(employ, "Alice", "Wayne Enterprises")
+        saved_bookmarks += session_a.last_bookmarks()
+
+    # Create the second person and employment relationship.
+    with driver.session() as session_b:
+        session_b.execute_write(create_person, "Bob")
+        session_b.execute_write(employ, "Bob", "LexCorp")
+        saved_bookmarks += session_b.last_bookmarks()
+
+    # Create a friendship between the two people created above.
+    with driver.session(bookmarks=saved_bookmarks) as session_c:
+        session_c.execute_write(create_friendship, "Alice", "Bob")
+        session_c.execute_read(print_friendships)
+
+
+# Create a person node.
+def create_person(tx, name):
+    tx.run("CREATE (:Person {name: $name})", name=name)
+
+
+# Create an employment relationship to a pre-existing company node.
+# This relies on the person first having been created.
+def employ(tx, person_name, company_name):
+    tx.run("MATCH (person:Person {name: $person_name}) "
+           "MATCH (company:Company {name: $company_name}) "
+           "CREATE (person)-[:WORKS_FOR]->(company)",
+           person_name=person_name, company_name=company_name)
+
+
+# Create a friendship between two people.
+def create_friendship(tx, name_a, name_b):
+    tx.run("MATCH (a:Person {name: $name_a}) "
+           "MATCH (b:Person {name: $name_b}) "
+           "MERGE (a)-[:KNOWS]->(b)",
+           name_a=name_a, name_b=name_b)
+
+
+# Retrieve and display all friendships.
+def print_friendships(tx):
+    result = tx.run("MATCH (a)-[:KNOWS]->(b) RETURN a.name, b.name")
+    for record in result:
+        print("{} knows {}".format(record["a.name"], record["b.name"]))
+
+
+if __name__ == "__main__":
+    main()
+----
+
+image:{common-image}/driver-passing-bookmarks.svg[]
+
+
+[discrete.glossary]
+== Glossary
+
+include::{common-partial}/glossary.adoc[]

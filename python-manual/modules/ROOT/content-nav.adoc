@@ -1,8 +1,20 @@
-* xref:index.adoc[]
-* xref:get-started.adoc[]
-* xref:client-applications.adoc[]
-* xref:cypher-workflow.adoc[]
-* xref:session-api.adoc[]
-// ** xref:session-api/simple.adoc[Simple sessions]
-// ** xref:session-api/configuration.adoc[Session configuration]
-* xref:terminology.adoc[]
+* *Basic workflow*
+
+* xref:index.adoc[Get started]
+* xref:install.adoc[Installation]
+* xref:connect.adoc[Connect to the database]
+* xref:query-simple.adoc[Query the database]
+
+* *Advanced usage*
+
+* xref:result.adoc[Work with the result]
+* xref:transactions.adoc[Fine-grained transaction control]
+* xref:bookmarks.adoc[Coordinate different transactions with bookmarks]
+* xref:query-advanced.adoc[Further query mechanisms]
+* xref:async.adoc[Async query workflow]
+* xref:performance.adoc[Performance recommendations]
+
+* *Reference*
+
+* xref:connect-advanced.adoc[Advanced connection information]
+* xref:data-types.adoc[Data types and mapping to Cypher types]
