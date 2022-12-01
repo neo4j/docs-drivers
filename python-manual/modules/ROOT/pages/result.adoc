@@ -2,7 +2,7 @@
 
 The output of a query is a `Result` object. This object does not directly contain the result records, but rather encapsulates the Cypher result in a rich data structure that requires some parsing within the transaction function.
 
-[[manipulate-result]]
+[#manipulate-result]
 == Manipulate the result
 
 When running a query, *the result records are not immediately and entirely fetched and returned by the server*. Instead, results come as a _lazy stream_. In particular, when the driver receives some records from the server, they are initially _buffered_ in a background queue. Records stay in the buffer until they are _consumed_ by the application, at which point they are _removed from the buffer_. There is thus no way to retrieve a previous record from the stream, unless manually saved in an auxiliary data structure. When no more records are available, the result is _exhausted_.

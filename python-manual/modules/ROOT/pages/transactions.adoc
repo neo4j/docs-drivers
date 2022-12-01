@@ -20,7 +20,7 @@ Session creation is a lightweight operation, so sessions can be created and dest
 *Sessions are _not_ thread safe*: share the main `Driver` object across threads, but make sure each thread creates its own sessions.
 
 
-[[managed-transactions]]
+[#managed-transactions]
 == Run a managed transaction
 
 A transaction can contain any number of queries. As Neo4j is <<ACID>> compliant, *queries within a transaction will either be executed as a whole or not at all*: you cannot get a part of the transaction succeeding and another failing. Use transactions to group together related queries which work together to achieve a single _logical_ database operation.
@@ -178,7 +178,7 @@ with driver.session(
     ...
 ----
 
-[[access-control-note]]
+[#access-control-note]
 [NOTE]
 ====
 Although executing a _write_ query under read mode will likely result in a runtime error, *you should not rely on `execute_read/write` for access control.* The difference between the two methods is that `read` transactions will be routed to any node of a cluster, whereas `write` ones will be directed to the _Leader_. However, you should not rely on this behavior for security purposes. In fact, depending on the server version and settings, the server or cluster might allow none, some, or all write-statements to be executed even in transactions marked as _read_.
@@ -202,7 +202,7 @@ with driver.session(
 When impersonating a user, the query is run within the complete security context of the impersonated user and not the authenticated user (i.e., home database, permissions, etc.).
 
 
-[[explicit-transactions]]
+[#explicit-transactions]
 == Explicit transactions
 
 You can have full control over transactions by manually beginning one with the method link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Session.begin_transaction[`Session.begin_transaction()`]. You run queries inside an explicit transaction with the method link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Transaction.run[`Transaction.run()`].
