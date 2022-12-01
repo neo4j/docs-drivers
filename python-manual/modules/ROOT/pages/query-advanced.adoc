@@ -71,12 +71,7 @@ label = "Person"
 with driver.session(database="neo4j") as session:
     session.run(
         "CALL apoc.merge.node($labels, $properties)",
-        {
-            "labels": [label],
-            "properties": {
-                property_key: "Alice",
-            },
-        }
+        labels=[label], properties={property_key: "Alice"},
     )
 ----
 
