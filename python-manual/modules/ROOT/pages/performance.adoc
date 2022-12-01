@@ -33,7 +33,7 @@ session.run("MATCH (p:Person {name: 'Alice'}) RETURN p")
 session.run("MATCH (p:Person {name: " + name + "}) RETURN p")
 ----
 
-- *Specify node labels* in all queries. To learn how to combine labels, see link:{neo4j-docs-base-uri}/cypher-manual/current/syntax/expressions/#query-syntax-label[Cyper -- Label expressions].
+- *Specify node labels* in all queries. To learn how to combine labels, see link:{neo4j-docs-base-uri}/cypher-manual/current/syntax/expressions/#query-syntax-label[Cypher -- Label expressions].
 +
 [source,python,role=noheader]
 ----
@@ -54,8 +54,8 @@ session.run("MATCH (p {name: $name}) RETURN p", name="Alice")
 # Good practice
 numbers = [{"value": random()} for _ in range(10000)]
 session.run("""
-    WITH $numbers as batch
-    UNWIND batch as node
+    WITH $numbers AS batch
+    UNWIND batch AS node
     MERGE (n:Number)
     SET n.value = node.value
     """, numbers=numbers,
@@ -106,24 +106,6 @@ session.run("MATCH (p:Person {name: $name}) RETURN p", name="Alice")
 # Bad practice
 session.run("MATCH (p:Person) WHERE p.name = $name RETURN p", name="Alice")
 ----
-
-////
-- In a cluster, *route read queries to link:{neo4j-docs-base-uri}/operations-manual/current/clustering/introduction/#clustering-secondary-mode[secondary nodes]*. You do this by specifying `routing_="r"` in a xref:query-simple.adoc[`Driver.execute_query()`] call, or `default_access_mode=neo4j.READ_ACCESS` when creating a new xref:transactions.adoc[session].
-+
-[source,python,role=noheader]
-----
-# Good practice
-driver.execute_query("MATCH (p:Person) RETURN p", routing_="r")
-session.execute_read(read_transaction_func)
-----
-+
-[source,python,role=noheader]
-----
-# Bad practice
-driver.execute_query("MATCH (p:Person) RETURN p")  # defaults to routing_="w"
-session.execute_write(read_transaction_func)
-----
-////
 
 - *Create indexes for properties that you often filter against*. For example, if you often look up `Person` nodes by the `name` property, it is beneficial to create an index on `Person.name`. You can create indexes with the `CREATE INDEX` Cypher function, for both nodes and relationships. For more information, see link:{neo4j-docs-base-uri}/cypher-manual/current/indexes-for-search-performance/[Indexes for search performance].
 +
@@ -186,6 +168,7 @@ Batch size 128
 +-----------------+----------------+----------------+---------------------+
 
 Total database accesses: ?
+"""
 ----
 
 - *Use concurrency*, either in the form of multithreading or with the xref:async.adoc[async version of the driver]. This is likely to be more impactful on performance if you parallelize complex and time-consuming queries in your application, but not so much if you run many simple ones.

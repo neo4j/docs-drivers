@@ -209,7 +209,7 @@ You can have full control over transactions by manually beginning one with the m
 
 [source,python]
 ----
-with driver.session() as session:
+with driver.session(database="neo4j") as session:
     with session.begin_transaction() as tx:
         # use tx.run() to run queries
 ----
@@ -220,8 +220,8 @@ Explicit transactions are most useful for applications that need to distribute C
 
 [source,python]
 ----
-import neo4j
 from os import sleep
+import neo4j
 
 
 def transfer_to_other_bank(driver, customer_id, other_bank_id, amount):

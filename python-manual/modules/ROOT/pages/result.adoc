@@ -121,7 +121,7 @@ The method `.to_df()` converts the result into a pandas DataFrame. This method i
 [source,python]
 ----
 def pandas_df(tx):
-    result = tx.run("UNWIND range(1, 10) AS n RETURN n, n+1 as m")
+    result = tx.run("UNWIND range(1, 10) AS n RETURN n, n+1 AS m")
     return result.to_df()
 
 with driver.session(database="neo4j") as session:

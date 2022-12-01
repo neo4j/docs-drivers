@@ -1,6 +1,6 @@
 = Data types and mapping to Cypher types
 
-The tables in this section show the mapping between Cyper data types and Python types.
+The tables in this section show the mapping between Cypher data types and Python types.
 
 == Core data types
 
@@ -43,9 +43,9 @@ Sub-second values are measured to nanosecond precision and the types are mostly 
 .How to use temporal types in queries
 [source,python]
 ----
-from neo4j import GraphDatabase
 from datetime import datetime
 import pytz
+from neo4j import GraphDatabase
 from neo4j.time import DateTime
 
 
@@ -111,7 +111,7 @@ Represents an instant capturing the time, and the timezone offset in seconds, bu
 from neo4j.time import Time
 
 t = Time(hour=7, minute=47, nanosecond=4123, tzinfo=pytz.FixedOffset(-240))
-print(t)  # '07:47:00.000004000-04:00'
+print(t)  # '07:47:00.000004123-04:00'
 ----
 
 For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/types/temporal.html#time[API documentation -- Temporal data types -- Time].
@@ -126,7 +126,7 @@ Represents an instant capturing the time of day, but not the date, nor the timez
 from neo4j.time import Time
 
 t = Time(hour=7, minute=47, nanosecond=4123)
-print(t)  # '07:47:00.000004000'
+print(t)  # '07:47:00.000004123'
 ----
 
 For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/types/temporal.html#time[API documentation -- Temporal data types -- Time].
@@ -139,10 +139,11 @@ Represents an instant capturing the date, the time, and the timezone identifier.
 [source, python]
 ----
 from neo4j.time import DateTime
+import pytz
 
 dt = DateTime(year=2021, month=11, day=2, hour=7, minute=47, nanosecond=4123)
 dt = pytz.timezone("US/Eastern").localize(dt)  # time zone localization (optional)
-print(dt)  # '2021-11-02T07:47:00.000004000-04:00'
+print(dt)  # '2021-11-02T07:47:00.000004123-04:00'
 ----
 
 For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/types/temporal.html#datetime[API documentation -- Temporal data types -- DateTime].
@@ -157,7 +158,7 @@ Represents an instant capturing the date and the time, but not the timezone.
 from neo4j.time import DateTime
 
 dt = DateTime(year=2021, month=11, day=2, hour=7, minute=47, nanosecond=4123)
-print(dt)  # '2021-11-02T07:47:00.000004000'
+print(dt)  # '2021-11-02T07:47:00.000004123'
 ----
 
 For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/types/temporal.html#datetime[API documentation -- Temporal data types -- DateTime].
