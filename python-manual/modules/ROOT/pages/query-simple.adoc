@@ -92,8 +92,9 @@ To create new nodes and relationships linking it to an already existing node, us
 def update_person(tx, name, friend):
     result = tx.run("""
         MATCH (p:Person {name: $name})
-        MERGE (p)-[:KNOWS]->(:Person {name: $friend})
-        """, name="Alice", friend="Bob"
+        MERGE (friend:Person {name: $friend_name})
+        MERGE (p)-[:KNOWS]->(friend)
+        """, name="Alice", friend_name="Bob"
     )
     summary = result.consume()
     return summary

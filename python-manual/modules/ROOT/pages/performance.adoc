@@ -72,33 +72,6 @@ for _ in range(10000):
 [TIP]
 The most efficient way of performing a _first import_ of large amounts of data into a new database is the link:{neo4j-docs-base-uri}/operations-manual/current/tutorial/neo4j-admin-import/[`neo4j-admin database import`] command.
 
-
-////
-- *Split nodes and relationships creation when inserting a lot of records*.
-+
-[source,python,role=noheader]
-----
-# Good practice
-for _ in range(10000):
-    session.run("""
-        MERGE (n:Number {value: $value})
-        MERGE (g:Group {value: $value2})
-        MERGE (n)-[:BELONGS]->(g)
-        """, value=random.random(), value2=random.random(),
-    )
-----
-+
-[source,python,role=noheader]
-----
-# Bad practice
-for _ in range(10000):
-    session.run(
-        "MERGE (n:Number {value: $value})-[:BELONGS]->(g:Group {value: $value2})",
-        value=random.random(), value2=random.random(),
-    )
-----
-////
-
 - *Filter for properties inline*, as opposed to filtering in the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/with/[`WHERE`] clause.
 +
 [source,python,role=noheader]

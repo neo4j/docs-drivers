@@ -31,10 +31,10 @@ A managed transaction is created with the methods link:{neo4j-docs-base-uri}/api
 [source,python]
 ----
 def match_person_nodes(tx, name_filter): # <3>
-    result = tx.run( # <4>
-        "MATCH (p:Person) WHERE p.name STARTS WITH $filter "
-        "RETURN p.name as name ORDER BY name",
-        filter=name_filter)
+    result = tx.run(""" # <4>
+        MATCH (p:Person) WHERE p.name STARTS WITH $filter
+        RETURN p.name as name ORDER BY name
+        """, filter=name_filter)
     return list(result)  # return a list of Record objects # <5>
 
 with driver.session(database="neo4j") as session:
@@ -72,16 +72,18 @@ def main():
 
 def employ_person_tx(tx, name):
     # Create new Person node with given name, if not existing already
-    result = tx.run("MERGE (p:Person {name: $name}) RETURN p.name AS name",
-                    name=name)
+    result = tx.run("""
+        MERGE (p:Person {name: $name})
+        RETURN p.name AS name
+        """, name=name)
 
     # Obtain most recent organization ID and the number of people linked to it
-    result = tx.run(
-        "MATCH (o:Organization) "
-        "RETURN o.id AS id, COUNT{(p:Person)-[r:WORKS_FOR]->(o)} AS employees_n "
-        "ORDER BY o.created_date DESC "
-        "LIMIT 1"
-    )
+    result = tx.run("""
+        MATCH (o:Organization)
+        RETURN o.id AS id, COUNT{(p:Person)-[r:WORKS_FOR]->(o)} AS employees_n
+        ORDER BY o.created_date DESC
+        LIMIT 1
+    """)
     org = result.single()
 
     if org is not None and org["employees_n"] == 0:
@@ -90,23 +92,23 @@ def employ_person_tx(tx, name):
 
     # If org does not have too many employees, add this Person to that
     if org is not None and org.get("employees_n") < employee_threshold:
-        result = tx.run(
-            "MATCH (o:Organization {id: $org_id}) "
-            "MATCH (p:Person {name: $name}) "
-            "MERGE (p)-[r:WORKS_FOR]->(o) "
-            "RETURN $org_id AS id",
-            org_id=org["id"], name=name
+        result = tx.run("""
+            MATCH (o:Organization {id: $org_id})
+            MATCH (p:Person {name: $name})
+            MERGE (p)-[r:WORKS_FOR]->(o)
+            RETURN $org_id AS id
+            """, org_id=org["id"], name=name
         )
 
     # Otherwise, create a new Organization and link Person to it
     else:
         from neo4j.time import Date
-        result = tx.run(
-            "MATCH (p:Person {name: $name}) "
-            "CREATE (o:Organization {id: randomuuid(), created_date: datetime()}) "
-            "MERGE (p)-[r:WORKS_FOR]->(o) "
-            "RETURN o.id AS id",
-            name=name, date=Date.today()
+        result = tx.run("""
+            MATCH (p:Person {name: $name})
+            CREATE (o:Organization {id: randomuuid(), created_date: datetime()})
+            MERGE (p)-[r:WORKS_FOR]->(o)
+            RETURN o.id AS id
+            """, name=name, date=Date.today()
         )
 
     # Return the Organization ID to which the new Person ends up in
@@ -192,8 +194,10 @@ def transfer_to_other_bank(driver, customer_id, other_bank_id, amount):
 
 
 def customer_balance_check(tx, customer_id, amount):
-    query = ("MATCH (c:Customer {id: $id}) "
-             "RETURN c.balance >= $amount AS sufficient")
+    query = ("""
+        MATCH (c:Customer {id: $id})
+        RETURN c.balance >= $amount AS sufficient
+    """)
     result = tx.run(query, id=customer_id, amount=amount)
     record = result.single(strict=True)
     return record["sufficient"]
@@ -203,18 +207,12 @@ def other_bank_transfer_api(customer_id, other_bank_id, amount):
     ...  # make some API call to other bank
 
 
-def decrease_customer_balance(tx, customer_id, amount, attempts=3):
-    query = ("MATCH (c:Customer {id: $id}) "
-             "SET c.balance = c.balance - $amount")
-    try:
-        result = tx.run(query, id=customer_id, amount=amount)
-    # if error is transient, attempt to retry the query after short delay
-    except (DriverError, Neo4jError) as e:
-        if e.is_retryable() and attempts > 0:
-            sleep(1)
-            decrease_customer_balance(tx, customer_id, amount, attempts=attempts-1)
-        else:
-            raise
+def decrease_customer_balance(tx, customer_id, amount):
+    query = ("""
+        MATCH (c:Customer {id: $id})
+        SET c.balance = c.balance - $amount
+    """)
+    result = tx.run(query, id=customer_id, amount=amount)
     result.consume()
 
 

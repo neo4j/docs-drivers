@@ -1,6 +1,6 @@
-= Async query flow
+= Run concurrent queries and transactions
 
-To interact with the database in an asynchronous way, create an `AsyncDriver` with `AsyncGraphDatabase.driver()`. The workflow is very similar to the synchronous version, except that you must use `await` on all async calls, and define as `async` all functions that should be awaited.
+The driver is compatible with Python's `asyncio`, which allows to implement concurrent workflows. To interact with the database in an asynchronous way, create an `AsyncDriver` with `AsyncGraphDatabase.driver()`. The workflow is very similar to the synchronous version, except that you must use `await` on all async calls, and define as `async` all functions that should be awaited.
 
 .An async driver example
 [source,python, role=nocollapse]
