@@ -1,6 +1,6 @@
-= Coordinate different transactions with bookmarks
+= Coordinate concurrent transactions with bookmarks
 
-When working with a Neo4j cluster, <<causal_consistency>> is enforced by default in most cases, which guarantees that a query is able to read changes made by previous queries. However, if you xref:transactions.adoc[take control of transactions] or if your application is running concurrent transactions, you might need to use _bookmarks_ to avoid the cluster falling back to <<eventual_consistency>>.
+When working with a Neo4j cluster, the driver automatically enforces <<causal_consistency>> for transactions within the same session, which guarantees that a query is able to read changes made by previous queries. However, if you xref:transactions.adoc[take control of transactions] or if your application is running concurrent transactions, you might need to use _bookmarks_ to avoid the cluster falling back to <<eventual_consistency>>.
 
 A _bookmark_ is a token that represents some state of the database. By passing one or multiple bookmarks along with a query, the server will make sure that the query does not get executed before the represented state(s) have been established.
 

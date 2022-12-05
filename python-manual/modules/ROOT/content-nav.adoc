@@ -7,9 +7,9 @@
 
 * *Advanced usage*
 
-* xref:result.adoc[Work with the result]
-* xref:transactions.adoc[Fine-grained transaction control]
-* xref:bookmarks.adoc[Coordinate different transactions with bookmarks]
+* xref:result.adoc[Manipulate query results]
+* xref:transactions.adoc[Run your own transactions]
+* xref:bookmarks.adoc[Coordinate concurrent transactions with bookmarks]
 * xref:concurrency.adoc[Run concurrent queries and transactions]
 * xref:query-advanced.adoc[Further query mechanisms]
 * xref:performance.adoc[Performance recommendations]
