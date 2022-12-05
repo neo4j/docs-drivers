@@ -7,7 +7,7 @@ When xref:query-simple.adoc[querying the database] through a session, the driver
 
 Before running a transaction, you need to obtain a _session_. Sessions act as concrete query channels between the driver and the server. In particular, sessions borrow connections from the _connection pool_ as needed, and ensure <<causal consistency>> is enforced.
 
-Sessions are created with the method link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#session[`Driver.session()`], with the keyword argument `database` allowing to specify the xref:_database_selection[target database].
+Sessions are created with the method link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#session[`Driver.session()`], with the keyword argument `database` allowing to specify the xref:_database_selection[target database]. For further parameters, see xref:_session_configuration[Session configuration].
 
 [source,python]
 ----
@@ -15,7 +15,7 @@ with driver.session(database="neo4j") as session:
     ...
 ----
 
-Session creation is a lightweight operation, so sessions can be created and destroyed without significant cost. When a session is closed, it is returned to the connection pool to be later reused. Each connection pool has *a finite number of sessions*, so if you open sessions without ever closing them, your application could run out of them.
+Session creation is a lightweight operation, so sessions can be created and destroyed without significant cost. Always xref:_close_sessions[close sessions] when you are done with them.
 
 *Sessions are _not_ thread safe*: share the main `Driver` object across threads, but make sure each thread creates its own sessions.
 
@@ -48,7 +48,7 @@ with driver.session(database="neo4j") as session:
 
 *Do not hardcode or concatenate parameters directly into the query*. Use xref:query-simple#query-parameters[query parameters] instead, both for performance and security reasons.
 
-*Transaction functions should never return the `Result` object directly*. Instead, always process the result in some way; at minimum, cast it to list. Within a transaction function, a `return` statement results in the transaction being committed, while the transaction is automatically rolled back if an exception is raised.
+*Transaction functions should never return the `Result` object directly*. Instead, always xref:result.adoc[process the result] in some way; at minimum, cast it to list. Within a transaction function, a `return` statement results in the transaction being committed, while the transaction is automatically rolled back if an exception is raised.
 
 .A transaction with multiple queries, client logic, and potential roll backs.
 [source,python]
@@ -146,66 +146,10 @@ with driver.session(database="neo4j") as session:
 ----
 
 
-== Session configuration
-
-=== Database selection
-
-It is recommended to *always specify the database explicitly* with the `database` parameter, even on single-database instances. This allows the driver to work more efficiently, as it does not have to resolve the home database first. If no database is given, the link:{neo4j-docs-base-uri}/operations-manual/current/manage-databases/introduction#manage-databases-default[default database] set in the Neo4j instance settings is used.
-
-[source, python]
-----
-import neo4j
-
-with driver.session(
-    database="neo4j"
-) as session:
-    ...
-----
-
-
-=== Request routing
-
-In a cluster environment, all sessions are opened in write mode, routing them to the leader. You can change this by explicitly setting the `default_access_mode` parameter to either `neo4j.READ_ACCESS` or `neo4j.WRITE_ACCESS`. Note that `execute_read` and `execute_write` automatically override the session's default access mode.
-
-[source, python]
-----
-import neo4j
-
-with driver.session(
-    database="neo4j",
-    default_access_mode=neo4j.READ_ACCESS
-) as session:
-    ...
-----
-
-[#access-control-note]
-[NOTE]
-====
-Although executing a _write_ query under read mode will likely result in a runtime error, *you should not rely on `execute_read/write` for access control.* The difference between the two methods is that `read` transactions will be routed to any node of a cluster, whereas `write` ones will be directed to the _Leader_. However, you should not rely on this behavior for security purposes. In fact, depending on the server version and settings, the server or cluster might allow none, some, or all write-statements to be executed even in transactions marked as _read_.
-====
-
-
-[#impersonation]
-=== Run queries as a different user (impersonation)
-
-You can execute a query under the security context of a different user with the parameter `impersonated_user`, specifying the name of the user to impersonate. For this to work, the user under which the `Driver` was created needs to have the link:{neo4j-docs-base-uri}/cypher-manual/current/access-control/dbms-administration#access-control-dbms-administration-impersonation[appropriate permissions]. Impersonating a user is cheaper than creating a new `Driver` object.
-
-[source, python]
-----
-with driver.session(
-    database="neo4j",
-    impersonated_user="somebody_else"
-) as session:
-    ...
-----
-
-When impersonating a user, the query is run within the complete security context of the impersonated user and not the authenticated user (i.e., home database, permissions, etc.).
-
-
 [#explicit-transactions]
-== Explicit transactions
+== Run an explicit transaction
 
-You can have full control over transactions by manually beginning one with the method link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Session.begin_transaction[`Session.begin_transaction()`]. You run queries inside an explicit transaction with the method link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Transaction.run[`Transaction.run()`].
+You can achieve full control over transactions by manually beginning one with the method link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Session.begin_transaction[`Session.begin_transaction()`]. You run queries inside an explicit transaction with the method link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Transaction.run[`Transaction.run()`].
 
 [source,python]
 ----
@@ -280,6 +224,80 @@ def request_inspection(customer_id, other_bank_id, amount, e):
     print("customer_id:", customer_id, "other_bank_id:", other_bank_id,
           "amount:", amount)
 
+----
+
+
+== Session configuration
+
+=== Database selection
+
+It is recommended to *always specify the database explicitly* with the `database` parameter, even on single-database instances. This allows the driver to work more efficiently, as it does not have to resolve the home database first. If no database is given, the link:{neo4j-docs-base-uri}/operations-manual/current/manage-databases/introduction#manage-databases-default[default database] set in the Neo4j instance settings is used.
+
+[source, python]
+----
+import neo4j
+
+with driver.session(
+    database="neo4j"
+) as session:
+    ...
+----
+
+
+=== Request routing
+
+In a cluster environment, all sessions are opened in write mode, routing them to the leader. You can change this by explicitly setting the `default_access_mode` parameter to either `neo4j.READ_ACCESS` or `neo4j.WRITE_ACCESS`. Note that `.execute_read()` and `.execute_write()` automatically override the session's default access mode.
+
+[source, python]
+----
+import neo4j
+
+with driver.session(
+    database="neo4j",
+    default_access_mode=neo4j.READ_ACCESS
+) as session:
+    ...
+----
+
+[#access-control-note]
+[NOTE]
+====
+Although executing a _write_ query under read mode will likely result in a runtime error, *you should not rely on this for access control.* The difference between the two modes is that _read_ transactions will be routed to any node of a cluster, whereas _write_ ones will be directed to the leader. Still, depending on the server version and settings, the server might allow none, some, or all _write_ statements to be executed even in _read_ transactions.
+
+Similar remarks hold for the `.execute_read()` and `.execute_write()` methods.
+====
+
+
+[#impersonation]
+=== Run queries as a different user (impersonation)
+
+You can execute a query under the security context of a different user with the parameter `impersonated_user`, specifying the name of the user to impersonate. For this to work, the user under which the `Driver` was created needs to have the link:{neo4j-docs-base-uri}/cypher-manual/current/access-control/dbms-administration#access-control-dbms-administration-impersonation[appropriate permissions]. Impersonating a user is cheaper than creating a new `Driver` object.
+
+[source, python]
+----
+with driver.session(
+    database="neo4j",
+    impersonated_user="somebody_else"
+) as session:
+    ...
+----
+
+When impersonating a user, the query is run within the complete security context of the impersonated user and not the authenticated user (i.e., home database, permissions, etc.).
+
+
+== Close sessions
+
+Each connection pool has *a finite number of sessions*, so if you open sessions without ever closing them, your application could run out of them. It is thus recommended to create sessions using the `with` statement, which automatically closes them when the application is done with them. When a session is closed, it is returned to the connection pool to be later reused.
+
+If you do not use `with`, remember to call the `.close()` method when you have finished using a session.
+
+[source,python]
+----
+session = driver.session(database="neo4j")
+# ...
+# session usage
+# ...
+session.close()
 ----
 
 

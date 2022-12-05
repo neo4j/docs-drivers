@@ -4,10 +4,12 @@
 
 The Python driver allows you to connect and interact with a Neo4j database through a Python application.
 
+[TIP]
+You need a running Neo4j database to use the driver with it. If you do not have one yet, xref:install#get-an-instance[get an instance] for free.
 
 == Installation
 
-Use `pip` to install the Neo4j Python driver. Note that you need a running Neo4j database in order to use the driver with it. If you do not have one, see the xref:install#get-an-instance[Get an instance] section.
+Install the Neo4j Python driver with `pip`:
 
 [source,bash]
 ----
@@ -19,7 +21,7 @@ xref:install#install-driver[More info on installing the driver ->]
 
 == Connect to the database
 
-You connect to a database by creating a <<Driver>> object and providing a URL and an authentication token. Once you have created a `Driver` instance, you can call the `.verify_connectivity()` method to ensure that a working connection can be established.
+Connect to a database by creating a <<Driver>> object and providing a URL and an authentication token. Once you have a `Driver` instance, use the `.verify_connectivity()` method to ensure that a working connection can be established.
 
 [source,python]
 ----
@@ -37,7 +39,7 @@ xref:connect.adoc[More info on connecting to a database ->]
 
 == Query the database
 
-You can execute a <<Cypher>> statement by creating a session and using the methods `Session.execute_read()` and `Session.execute_write()`.
+Execute a <<Cypher>> statement by creating a session and using the methods `Session.execute_read()` and `Session.execute_write()`.
 Do not hardcode or concatenate parameters: use placeholders and specify the parameters as keyword arguments.
 
 .Get the name of all 42 year-olds

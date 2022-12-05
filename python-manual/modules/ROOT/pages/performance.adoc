@@ -18,7 +18,7 @@ driver.session()
 
 // - Execute as many queries within the same session. Minimise the number of transactions?
 
-- *Use xref:query-simple#query-parameters[query parameters]* instead of hardcoding or concatenating values into queries.
+- *Use xref:query-simple#query-parameters[query parameters]* instead of hardcoding or concatenating values into queries. This allows the database to properly cache queries.
 +
 [source,python,role=noheader]
 ----
@@ -68,7 +68,12 @@ session.run("""
 for _ in range(10000):
     session.run("MERGE (:Number {value: $value})", value=random())
 ----
++
+[TIP]
+The most efficient way of performing a _first import_ of large amounts of data into a new database is the link:{neo4j-docs-base-uri}/operations-manual/current/tutorial/neo4j-admin-import/[`neo4j-admin database import`] command.
 
+
+////
 - *Split nodes and relationships creation when inserting a lot of records*.
 +
 [source,python,role=noheader]
@@ -92,6 +97,7 @@ for _ in range(10000):
         value=random.random(), value2=random.random(),
     )
 ----
+////
 
 - *Filter for properties inline*, as opposed to filtering in the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/with/[`WHERE`] clause.
 +
