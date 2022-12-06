@@ -27,6 +27,7 @@ Connect to a database by creating a <<Driver>> object and providing a URL and an
 ----
 from neo4j import GraphDatabase
 
+# URI examples: "neo4j://localhost", "neo4j+s://xxx.databases.neo4j.io"
 URI = "<URI for Neo4j database>"
 AUTH = ("<Username>", "<Password>")
 
@@ -72,7 +73,7 @@ xref:query-simple.adoc[More info on querying the database ->]
 
 == Close connections and sessions
 
-Unless you created them using the `with` statement, you should call the `.close()` method on all `Driver` and `Session` instances to release any resources still held by them.
+Unless you created them using the `with` statement, call the `.close()` method on all `Driver` and `Session` instances to release any resources still held by them.
 
 [source,python]
 session.close()

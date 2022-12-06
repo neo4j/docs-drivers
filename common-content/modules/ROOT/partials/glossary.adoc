@@ -10,3 +10,4 @@
 [[causal_consistency]]causal consistency:: A database is causally consistent if read and write queries are seen by every replica of the cluster in the same order. This is stronger than eventual consistency.
 [[null]]null:: The null marker is not a type but a placeholder for absence of value.
 For more information, see link:/docs/cypher-manual/4.4/syntax/working-with-null[Cypher Manual -- Working with `null`].
+[[transaction]]transaction:: A transaction is a unit of work that is either _committed_ in its entirety or _rolled back_ on failure. An example is a bank transfer: it involves multiple steps, but they must _all_ succeed or be reverted, to avoid money being subtracted from one account but not added to the other.

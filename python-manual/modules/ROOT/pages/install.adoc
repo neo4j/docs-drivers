@@ -1,5 +1,7 @@
 = Installation
 
+To start creating a Neo4j Python application, you first need to install the Python Driver and get a Neo4j database instance to connect to.
+
 [#install-driver]
 == Install the driver
 

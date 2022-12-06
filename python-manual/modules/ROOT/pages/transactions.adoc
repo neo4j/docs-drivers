@@ -1,6 +1,6 @@
 = Run your own transactions
 
-When xref:query-simple.adoc[querying the database] through a session, the driver automatically creates a _transaction_. A transaction is a unit of work that is either _committed_ in its entirety or _rolled back_ on failure. You can include multiple Cypher statements in a single query, as for example when using `MATCH` and `MERGE` in sequence to xref:query-simple#_update_the_database[update the database], but you cannot have multiple queries and interleave some client-logic in between them. For these more advanced use-cases, the driver provides functions to take full control over the transaction lifecycle.
+When xref:query-simple.adoc[querying the database] with transaction functions, the driver automatically creates a *<<transaction>>*. You can easily include multiple queries in a single transaction function, but to design more involved use-cases it is important to understand how transactions work within the driver.
 
 
 == Obtain a session

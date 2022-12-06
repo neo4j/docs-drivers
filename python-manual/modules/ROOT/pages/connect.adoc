@@ -1,5 +1,7 @@
 = Connection
 
+Once you have xref:install.adoc#install-driver[installed the driver] and have xref:install.adoc#get-an-instance[a running Neo4j instance], you are ready to connect your application to the database.
+
 == Connect to the database
 
 You connect to a database by creating a <<Driver>> object and providing a URL and an authentication token.
@@ -27,12 +29,12 @@ If you want to alter a `Driver` configuration, you will need to create a new obj
 
 == Close connections
 
-Always close `Driver` objects to free up all allocated resources, even upon unsuccessful connection or runtime errors. Either instantiate the `Driver` using the `with` statement, or call the `Driver.close()` method explicitly.
+Always close `Driver` objects to free up all allocated resources, even upon unsuccessful connection or runtime errors. Either instantiate the `Driver` object using the `with` statement, or call the `Driver.close()` method explicitly.
 
 
 == Further connection parameters
 
-For more `Driver` configuration parameters, see xref:connect-advanced.adoc[Advanced connection information].
+For more `Driver` configuration parameters and further connection settings, see xref:connect-advanced.adoc[Advanced connection information].
 
 
 [discrete.glossary]

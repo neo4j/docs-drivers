@@ -1,7 +1,5 @@
 = Performance recommendations
 
-// users ask info on how to handle high throughput
-
 - *Specify the target database on all queries* with the `database` parameter when creating new xref:transactions.adoc[sessions]. If no database is provided, the driver has to send an extra request to the server to figure out what the default database is. The overhead is minimal for a single session, but becomes significant over hundreds of sessions.
 +
 [source,python,role=noheader]
@@ -71,6 +69,7 @@ for _ in range(10000):
 +
 [TIP]
 The most efficient way of performing a _first import_ of large amounts of data into a new database is the link:{neo4j-docs-base-uri}/operations-manual/current/tutorial/neo4j-admin-import/[`neo4j-admin database import`] command.
+// source:  https://community.neo4j.com/t5/neo4j-graph-platform/improving-data-writing-efficiency-in-python/td-p/39520
 
 - *Filter for properties inline*, as opposed to filtering in the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/with/[`WHERE`] clause.
 +
@@ -150,11 +149,9 @@ Total database accesses: ?
 """
 ----
 
-- *Use concurrency*, either in the form of multithreading or with the xref:async.adoc[async version of the driver]. This is likely to be more impactful on performance if you parallelize complex and time-consuming queries in your application, but not so much if you run many simple ones.
+- *Use xref:concurrency.adoc[concurrency]*, either in the form of multithreading or with the async version of the driver. This is likely to be more impactful on performance if you parallelize complex and time-consuming queries in your application, but not so much if you run many simple ones.
 
 // - with SET, specify individual properties one by one instead of using += (too low impact)
-
-// https://community.neo4j.com/t5/neo4j-graph-platform/improving-data-writing-efficiency-in-python/td-p/39520
 
 
 [discrete.glossary]

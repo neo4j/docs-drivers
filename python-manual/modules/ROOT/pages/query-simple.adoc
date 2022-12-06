@@ -1,6 +1,6 @@
 = Query the database
 
-You can run a query against the database using <<Cypher>> and the methods `Session.execute_read()` and `Session.execute_write()`. In case of a retryable error, the driver will automatically retry to run the query.
+You can run a query against the database using <<Cypher>> and the methods `Session.execute_read()` and `Session.execute_write()`.
 
 
 == Write to the database
@@ -176,7 +176,7 @@ with driver.session(database="neo4j") as session:  # <1>
 You can find more information about sessions and transactions in the section xref:transactions.adoc[Run your own transactions].
 
 [TIP]
-Should a transaction fail for a reason that the driver deems transient, it will automatically retry to run the transaction function. For this reason, *transaction functions must be _idempotent_* (i.e., they should produce the same effect when run several times), because you do not know upfront how many times they are going to be executed. In practice, this means that you should not edit nor rely on globals, for example. Note that although transactions functions might be executed multiple times, the queries inside it will always run only once.
+The driver might automatically retry to run a failed transaction. For this reason, *transaction functions must be _idempotent_* (i.e., they should produce the same effect when run several times), because you do not know how many times they might be executed. In practice, this means that you should not edit nor rely on globals, for example. Note that although transactions functions might be executed multiple times, the queries inside it will always run only once.
 
 
 == A full example
