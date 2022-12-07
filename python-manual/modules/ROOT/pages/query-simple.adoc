@@ -110,8 +110,7 @@ with driver.session(database="neo4j") as session:
 [WARNING]
 ====
 It might feel tempting to create new relationships with a single `MERGE` clause, such as: +
-`MERGE (:Person {name: "Alice"})-[KNOWS]->(:Person {name: "Bob"})`.
-+
+`MERGE (:Person {name: "Alice"})-[KNOWS]->(:Person {name: "Bob"})`. +
 However, this would result in the creation of an _extra_ `Alice` node, so that you would end up with unintended duplicate records.
 To avoid this, always `MATCH` the elements that you want to update, and use the resulting reference in the `MERGE` clause (as shown in the previous example).
 See link:https://neo4j.com/developer/kb/understanding-how-merge-works/[Understanding how MERGE works].
@@ -190,7 +189,7 @@ with driver.session(database="neo4j") as session:  # <1>
 You can find more information about sessions and transactions in the section xref:transactions.adoc[Run your own transactions].
 
 [TIP]
-The driver might automatically retry to run a failed transaction.
+The driver may automatically retry to run a failed transaction.
 For this reason, *transaction functions must be _idempotent_* (i.e., they should produce the same effect when run several times), because you do not know how many times they might be executed.
 In practice, this means that you should not edit nor rely on globals, for example.
 Note that although transactions functions might be executed multiple times, the queries inside it will always run only once.

@@ -20,8 +20,7 @@ When no more records are available, the result is _exhausted_.
 It is up to the transaction function to do all the processing.
 To process a result, you have two main options:
 
-1.
-cast the result object to `list`, which yields a list of link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Record[`Record`] objects.
+1. cast the result object to `list`, which yields a list of link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Record[`Record`] objects.
 Use the `.data()` method on a `Record` to obtain a dict-like view, or the `.get(key, default=None)` method to retrieve the value for a given key.
 // give some margin to upcoming code block
 {empty} +
@@ -45,8 +44,7 @@ with driver.session(database="neo4j") as session:
         print(person.data())  # or person.get("name")
 ----
 
-2.
-use any of the of the link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#result[`Result`] methods.
+2. use any of the of the link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#result[`Result`] methods.
 The ones most commonly needed are listed in the table below.
 +
 .An essential list of `Result` methods.

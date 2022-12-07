@@ -40,8 +40,7 @@ Some timezones (e.g., `pytz.utc`) work exclusively with the built-in `datetime.d
 | Duration      | `neo4j.time.Duration`
 |===
 
-† Where `tzinfo` is not `None`.
-+
+† Where `tzinfo` is not `None`. +
 †† Where `tzinfo` is `None`.
 
 .How to use temporal types in queries
@@ -204,8 +203,7 @@ For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current
 
 === `CartesianPoint`
 
-Represents a point in 2D/3D Cartesian space.
-+
+Represents a point in 2D/3D Cartesian space. +
 Exposes properties `x`, `y`, `z` (the latter for 3D points only).
 
 [source, python]
@@ -227,8 +225,7 @@ For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current
 
 === `WGS84Point`
 
-Represents a point in the World Geodetic System (WGS84).
-+
+Represents a point in the World Geodetic System (WGS84). +
 Exposes properties `longitude`, `latitude`, `height` (the latter for 3D points only), which are aliases for `x`, `y`, `z`.
 
 [source,python]
@@ -268,8 +265,7 @@ For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current
 
 
 === `Node`
-Represents a node in a graph.
-+
+Represents a node in a graph. +
 The property `element_id` provides an identifier for the entity.
 This should be used with care, as no guarantees are given about the mapping between id values and elements outside the scope of a single transaction.
 
@@ -304,8 +300,7 @@ For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current
 
 === `Relationship`
 
-Represents a relationship in a graph.
-+
+Represents a relationship in a graph. +
 The property `element_id` provides an identifier for the entity.
 This should be used with care, as no guarantees are given about the mapping between id values and elements outside the scope of a single transaction.
 
