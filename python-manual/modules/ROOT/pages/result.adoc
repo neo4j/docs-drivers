@@ -1,17 +1,28 @@
 = Manipulate query results
 
-In the xref:query-simple.adoc[basic query workflows] examples, transaction functions never returned a query result directly. Instead, they always _manipulated_ it in some way: either casting it to list, or calling a specific method. This is because the driver's output of a query is a `Result` object, which does not directly contain the result records. Rather, it encapsulates the Cypher result in a rich data structure that requires some parsing within the transaction function.
+In the xref:query-simple.adoc[basic query workflows] examples, transaction functions never returned a query result directly.
+Instead, they always _manipulated_ it in some way: either casting it to list, or calling a specific method.
+This is because the driver's output of a query is a `Result` object, which does not directly contain the result records.
+Rather, it encapsulates the Cypher result in a rich data structure that requires some parsing within the transaction function.
 
 This section shows how to work with a `Result` object so as to extract data in the form that is most convenient for your application.
 
 [#manipulate-result]
 == Manipulate the result
 
-When running a query, *the result records are not immediately and entirely fetched and returned by the server*. Instead, results come as a _lazy stream_. In particular, when the driver receives some records from the server, they are initially _buffered_ in a background queue. Records stay in the buffer until they are _consumed_ by the application, at which point they are _removed from the buffer_. There is thus no way to retrieve a previous record from the stream, unless manually saved in an auxiliary data structure. When no more records are available, the result is _exhausted_.
+When running a query, *the result records are not immediately and entirely fetched and returned by the server*.
+Instead, results come as a _lazy stream_.
+In particular, when the driver receives some records from the server, they are initially _buffered_ in a background queue.
+Records stay in the buffer until they are _consumed_ by the application, at which point they are _removed from the buffer_.
+There is thus no way to retrieve a previous record from the stream, unless manually saved in an auxiliary data structure.
+When no more records are available, the result is _exhausted_.
 
-It is up to the transaction function to do all the processing. To process a result, you have two main options:
+It is up to the transaction function to do all the processing.
+To process a result, you have two main options:
 
-1. cast the result object to `list`, which yields a list of link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Record[`Record`] objects. Use the `.data()` method on a `Record` to obtain a dict-like view, or the `.get(key, default=None)` method to retrieve the value for a given key.
+1.
+cast the result object to `list`, which yields a list of link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Record[`Record`] objects.
+Use the `.data()` method on a `Record` to obtain a dict-like view, or the `.get(key, default=None)` method to retrieve the value for a given key.
 // give some margin to upcoming code block
 {empty} +
 {empty} +
@@ -34,7 +45,9 @@ with driver.session(database="neo4j") as session:
         print(person.data())  # or person.get("name")
 ----
 
-2. use any of the of the link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#result[`Result`] methods. The ones most commonly needed are listed in the table below.
+2.
+use any of the of the link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#result[`Result`] methods.
+The ones most commonly needed are listed in the table below.
 +
 .An essential list of `Result` methods.
 [cols="2,3"]
@@ -42,13 +55,15 @@ with driver.session(database="neo4j") as session:
 |Name |Description
 
 |`value(key=0, default=None)`
-|Return the remainder of the result as a list. If `key` is specified, only the given property will be included, and `default` allows to specify a value for nodes lacking that property.
+|Return the remainder of the result as a list.
+If `key` is specified, only the given property is included, and `default` allows to specify a value for nodes lacking that property.
 
 |`fetch(n)`
 |Return up to `n` records from the result.
 
 |`single(strict=False)`
-|Return the next and only remaining record, or `None`. Calling this method always exhausts the result.
+|Return the next and only remaining record, or `None`.
+Calling this method always exhausts the result.
 
 If more than one record is available,
 
@@ -56,19 +71,23 @@ If more than one record is available,
 - `strict==True` -- a `ResultNotSingleError` is raised.
 
 |`peek()`
-|Return the next record from the result without consuming it. This leaves the record in the buffer for further processing.
+|Return the next record from the result without consuming it.
+This leaves the record in the buffer for further processing.
 
 |`data(*keys)`
-|Return a JSON-like dump of the raw result. Only use it for debugging purposes.
+|Return a JSON-like dump of the raw result.
+Only use it for debugging purposes.
 
 |`consume()`
-|Return the query link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#resultsummary[`ResultSummary`]. It exhausts the result, so should only be called when data processing is over.
+|Return the query link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#resultsummary[`ResultSummary`].
+It exhausts the result, so should only be called when data processing is over.
 |===
 +
 See the link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#result[API documentation] for a complete list of `Result` methods.
 
 [WARNING]
-A transaction function must not return the `neo4j.Result` itself. Doing so is roughly equivalent to returning a _pointer_ to the result buffer, which gets invalidated as soon as the query's transaction is over.
+A transaction function must not return the `neo4j.Result` itself.
+Doing so is roughly equivalent to returning a _pointer_ to the result buffer, which gets invalidated as soon as the query's transaction is over.
 
 
 [discrete]
@@ -118,7 +137,8 @@ with driver.session(database="neo4j") as session:
 
 == Transform to pandas DataFrame
 
-The method `.to_df()` converts the result into a pandas DataFrame. This method is only available if the `pandas` library is installed.
+The method `.to_df()` converts the result into a pandas DataFrame.
+This method is only available if the `pandas` library is installed.
 
 .Return a DataFrame with two columns (`n` and `m`) and 10 rows
 [source,python]
@@ -133,15 +153,19 @@ with driver.session(database="neo4j") as session:
 
 This method accepts two optional arguments:
 
-- `expand` -- If `True`, some data structures in the result will be recursively expanded and flattened. More info in the link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Result.to_df[API documentation].
-- `parse_dates` -- If `True`, columns exclusively containing `time.DateTime` objects, `time.Date` objects, or `None`, will be converted to `pandas.Timestamp`.
+- `expand` -- If `True`, some data structures in the result are recursively expanded and flattened.
+More info in the link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Result.to_df[API documentation].
+- `parse_dates` -- If `True`, columns exclusively containing `time.DateTime` objects, `time.Date` objects, or `None`, are converted to `pandas.Timestamp`.
 
 
 == Transform to graph
 
-The method `.graph()` converts the result into a graph. To make the most out of this method, your query should return a graph-like result instead of a single column. The resulting graph object exposes the properties `nodes` and `relationships`, which are set views into xref:data-types#node[`Node`] and xref:data-types#relationship[`Relationship`] objects.
+The method `.graph()` converts the result into a graph.
+To make the most out of this method, your query should return a graph-like result instead of a single column.
+The resulting graph object exposes the properties `nodes` and `relationships`, which are set views into xref:data-types#node[`Node`] and xref:data-types#relationship[`Relationship`] objects.
 
-You can use the graph format for further processing or to visualize the query result. An example implementation that uses the `pyvis` library to draw the graph is below.
+You can use the graph format for further processing or to visualize the query result.
+An example implementation that uses the `pyvis` library to draw the graph is below.
 
 .Visualize graph result with `pyvis`.
 [source,python]

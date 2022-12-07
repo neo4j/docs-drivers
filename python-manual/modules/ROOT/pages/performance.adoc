@@ -1,6 +1,8 @@
 = Performance recommendations
 
-- *Specify the target database on all queries* with the `database` parameter when creating new xref:transactions.adoc[sessions]. If no database is provided, the driver has to send an extra request to the server to figure out what the default database is. The overhead is minimal for a single session, but becomes significant over hundreds of sessions.
+- *Specify the target database on all queries* with the `database` parameter when creating new xref:transactions.adoc[sessions].
+If no database is provided, the driver has to send an extra request to the server to figure out what the default database is.
+The overhead is minimal for a single session, but becomes significant over hundreds of sessions.
 +
 [source,python,role=noheader]
 ----
@@ -14,9 +16,11 @@ driver.session(database="<DB NAME>")
 driver.session()
 ----
 
-// - Execute as many queries within the same session. Minimise the number of transactions?
+// - Execute as many queries within the same session.
+Minimise the number of transactions?
 
-- *Use xref:query-simple#query-parameters[query parameters]* instead of hardcoding or concatenating values into queries. This allows the database to properly cache queries.
+- *Use xref:query-simple#query-parameters[query parameters]* instead of hardcoding or concatenating values into queries.
+This allows the database to properly cache queries.
 +
 [source,python,role=noheader]
 ----
@@ -31,7 +35,8 @@ session.run("MATCH (p:Person {name: 'Alice'}) RETURN p")
 session.run("MATCH (p:Person {name: " + name + "}) RETURN p")
 ----
 
-- *Specify node labels* in all queries. To learn how to combine labels, see link:{neo4j-docs-base-uri}/cypher-manual/current/syntax/expressions/#query-syntax-label[Cypher -- Label expressions].
+- *Specify node labels* in all queries.
+To learn how to combine labels, see link:{neo4j-docs-base-uri}/cypher-manual/current/syntax/expressions/#query-syntax-label[Cypher -- Label expressions].
 +
 [source,python,role=noheader]
 ----
@@ -85,7 +90,10 @@ session.run("MATCH (p:Person {name: $name}) RETURN p", name="Alice")
 session.run("MATCH (p:Person) WHERE p.name = $name RETURN p", name="Alice")
 ----
 
-- *Create indexes for properties that you often filter against*. For example, if you often look up `Person` nodes by the `name` property, it is beneficial to create an index on `Person.name`. You can create indexes with the `CREATE INDEX` Cypher function, for both nodes and relationships. For more information, see link:{neo4j-docs-base-uri}/cypher-manual/current/indexes-for-search-performance/[Indexes for search performance].
+- *Create indexes for properties that you often filter against*.
+For example, if you often look up `Person` nodes by the `name` property, it is beneficial to create an index on `Person.name`.
+You can create indexes with the `CREATE INDEX` Cypher function, for both nodes and relationships.
+For more information, see link:{neo4j-docs-base-uri}/cypher-manual/current/indexes-for-search-performance/[Indexes for search performance].
 +
 [source,python,role=noheader]
 ----
@@ -93,7 +101,9 @@ session.run("MATCH (p:Person) WHERE p.name = $name RETURN p", name="Alice")
 session.run("CREATE INDEX person_name FOR (n:Person) ON (n.name)")
 ----
 
-- link:{neo4j-docs-base-uri}/cypher-manual/current/query-tuning/basic-example/#_profile_query[*Profile your queries*] to locate queries whose performance can be improved. You can profile queries by prepending them with `PROFILE`. The server output is available in the `profile` property of the link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#resultsummary[`ResultSummary`] object.
+- link:{neo4j-docs-base-uri}/cypher-manual/current/query-tuning/basic-example/#_profile_query[*Profile your queries*] to locate queries whose performance can be improved.
+You can profile queries by prepending them with `PROFILE`.
+The server output is available in the `profile` property of the link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#resultsummary[`ResultSummary`] object.
 +
 [source,python,role=noheader nocollapse]
 ----
@@ -121,7 +131,9 @@ Total database accesses: 12, total allocated memory: 184
 """
 ----
 +
-In case some queries were so slow that you are unable to even run them in reasonable times, you can prepend them with `EXPLAIN` instead of `PROFILE`. This will return the _plan_ that the server would use to run the query, but without executing it. The server output is available in the `plan` property of the link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#resultsummary[`ResultSummary`] object.
+In case some queries are so slow that you are unable to even run them in reasonable times, you can prepend them with `EXPLAIN` instead of `PROFILE`.
+This will return the _plan_ that the server would use to run the query, but without executing it.
+The server output is available in the `plan` property of the link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#resultsummary[`ResultSummary`] object.
 +
 [source,python,role=noheader nocollapse]
 ----
@@ -149,7 +161,8 @@ Total database accesses: ?
 """
 ----
 
-- *Use xref:concurrency.adoc[concurrency]*, either in the form of multithreading or with the async version of the driver. This is likely to be more impactful on performance if you parallelize complex and time-consuming queries in your application, but not so much if you run many simple ones.
+- *Use xref:concurrency.adoc[concurrency]*, either in the form of multithreading or with the async version of the driver.
+This is likely to be more impactful on performance if you parallelize complex and time-consuming queries in your application, but not so much if you run many simple ones.
 
 // - with SET, specify individual properties one by one instead of using += (too low impact)
 

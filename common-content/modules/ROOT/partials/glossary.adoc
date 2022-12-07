@@ -1,13 +1,21 @@
 [glossary]
-[[LTS]]LTS:: A _Long Term Support_ release is one guaranteed to be supported for a number of years. Neo4j 4.4 is LTS, and Neo4j 5 will also have an LTS version.
-[[Aura]]Aura:: link:https://neo4j.com/cloud/platform/aura-graph-database/[Aura] is Neo4j's fully managed cloud service. It comes with both free and paid plans.
-[[Driver]]Driver:: A link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.Driver[`Driver`] object holds the details required to establish connections with a Neo4j database. Every Neo4j-backed application requires a `Driver` object.
-[[Cypher]]Cypher:: link:https://neo4j.com/docs/getting-started/current/cypher-intro/[Cypher] is Neo4j's graph query language that lets you retrieve data from the graph. It is like SQL, but for graphs.
+[[LTS]]LTS:: A _Long Term Support_ release is one guaranteed to be supported for a number of years.
+Neo4j 4.4 is LTS, and Neo4j 5 will also have an LTS version.
+[[Aura]]Aura:: link:https://neo4j.com/cloud/platform/aura-graph-database/[Aura] is Neo4j's fully managed cloud service.
+It comes with both free and paid plans.
+[[Driver]]Driver:: A link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.Driver[`Driver`] object holds the details required to establish connections with a Neo4j database.
+Every Neo4j-backed application requires a `Driver` object.
+[[Cypher]]Cypher:: link:https://neo4j.com/docs/getting-started/current/cypher-intro/[Cypher] is Neo4j's graph query language that lets you retrieve data from the graph.
+It is like SQL, but for graphs.
 [[APOC]]APOC:: link:https://neo4j.com/labs/apoc/current/introduction/[Awesome Procedures On Cypher (APOC)] is a library of (many) functions that can not be easily expressed in Cypher itself.
-[[Bolt]]Bolt:: link:https://neo4j.com/docs/bolt/current/bolt/[Bolt] is the protocol used for interaction between Neo4j instances and drivers. It listens on port 7687 by default.
-[[ACID]]ACID:: Atomicity, Consistency, Isolation, Durability (ACID) are properties guaranteeing that database transactions are processed reliably. An ACID-compliant DBMS ensures that the data in the database remains accurate and consistent despite failures.
-[[eventual_consistency]]eventual consistency:: A database is eventually consistent if it provides the guarantee that all cluster replicas will, _at some point in time_, store the latest version of the data.
-[[causal_consistency]]causal consistency:: A database is causally consistent if read and write queries are seen by every replica of the cluster in the same order. This is stronger than eventual consistency.
+[[Bolt]]Bolt:: link:https://neo4j.com/docs/bolt/current/bolt/[Bolt] is the protocol used for interaction between Neo4j instances and drivers.
+It listens on port 7687 by default.
+[[ACID]]ACID:: Atomicity, Consistency, Isolation, Durability (ACID) are properties guaranteeing that database transactions are processed reliably.
+An ACID-compliant DBMS ensures that the data in the database remains accurate and consistent despite failures.
+[[eventual_consistency]]eventual consistency:: A database is eventually consistent if it provides the guarantee that all cluster members will, _at some point in time_, store the latest version of the data.
+[[causal_consistency]]causal consistency:: A database is causally consistent if read and write queries are seen by every member of the cluster in the same order.
+This is stronger than eventual consistency.
 [[null]]null:: The null marker is not a type but a placeholder for absence of value.
 For more information, see link:/docs/cypher-manual/4.4/syntax/working-with-null[Cypher Manual -- Working with `null`].
-[[transaction]]transaction:: A transaction is a unit of work that is either _committed_ in its entirety or _rolled back_ on failure. An example is a bank transfer: it involves multiple steps, but they must _all_ succeed or be reverted, to avoid money being subtracted from one account but not added to the other.
+[[transaction]]transaction:: A transaction is a unit of work that is either _committed_ in its entirety or _rolled back_ on failure.
+An example is a bank transfer: it involves multiple steps, but they must _all_ succeed or be reverted, to avoid money being subtracted from one account but not added to the other.

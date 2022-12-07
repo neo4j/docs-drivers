@@ -4,7 +4,8 @@
 
 == Connection protocols and security
 
-Communication between the driver and the server is mediated by <<Bolt>>. The scheme of the server URI determines whether the connection is encrypted and, if so, what type of certificates are accepted.
+Communication between the driver and the server is mediated by <<Bolt>>.
+The scheme of the server URI determines whether the connection is encrypted and, if so, what type of certificates are accepted.
 
 [options="header", cols="20,40,40"]
 |===
@@ -26,7 +27,9 @@ Communication between the driver and the server is mediated by <<Bolt>>. The sch
 |===
 
 [TIP]
-The driver receives a _routing table_ from the server upon successful connection, regardless of whether the instance is a proper cluster environment or a single-machine environment. The driver's routing behavior works in tandem with link:{neo4j-docs-base-uri}/operations-manual/current/clustering/[Neo4j's clustering] by directing read/write transactions to appropriate cluster members. If you want to target a _specific_ machine, use a link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#bolt-driver-ref[`BoltDriver`] object and `bolt`, `bolt+s`, or `bolt+ssc` URI schemes instead.
+The driver receives a _routing table_ from the server upon successful connection, regardless of whether the instance is a proper cluster environment or a single-machine environment.
+The driver's routing behavior works in tandem with link:{neo4j-docs-base-uri}/operations-manual/current/clustering/[Neo4j's clustering] by directing read/write transactions to appropriate cluster members.
+If you want to target a _specific_ machine, use a link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#bolt-driver-ref[`BoltDriver`] object and `bolt`, `bolt+s`, or `bolt+ssc` URI schemes instead.
 
 The connection scheme to use is not your choice, but is rather determined by the server requirements.
 You must know the right server scheme upfront, as no metadata is exposed prior to connection.
@@ -36,7 +39,8 @@ If you are unsure, ask the database administrator.
 
 === Basic authentication (default)
 
-The basic authentication scheme relies on traditional username and password. These can either be the credentials for your local installation, or the ones provided with an Aura instance.
+The basic authentication scheme relies on traditional username and password.
+These can either be the credentials for your local installation, or the ones provided with an Aura instance.
 
 [source,python]
 ----
@@ -70,7 +74,8 @@ driver = GraphDatabase.driver(uri, auth=bearer_auth(token))
 ----
 
 [NOTE]
-The bearer authentication scheme requires link:{neo4j-docs-base-uri}/operations-manual/current/authentication-authorization/sso-integration[configuring Single Sign-On on the server]. Once configured, clients can discover Neo4j's configuration through the link:{neo4j-docs-base-uri}/http-api/current/discovery/[Discovery API].
+The bearer authentication scheme requires link:{neo4j-docs-base-uri}/operations-manual/current/authentication-authorization/sso-integration[configuring Single Sign-On on the server].
+Once configured, clients can discover Neo4j's configuration through the link:{neo4j-docs-base-uri}/http-api/current/discovery/[Discovery API].
 
 === Custom authentication
 
@@ -82,7 +87,8 @@ If authentication is disabled on the server, the `auth` parameter can be omitted
 
 == Custom address resolver
 
-You can specify a custom _resolver_ function to resolve host and port values ahead of DNS resolution. This function is called with a 2-tuple of `(host, port)` and should return an iterable of 2-tuples `(host, port)`.
+You can specify a custom _resolver_ function to resolve host and port values ahead of DNS resolution.
+This function is called with a 2-tuple of `(host, port)` and should return an iterable of 2-tuples `(host, port)`.
 
 In the following example, the connection to `example.com` on port `9999` is resolved to `localhost` on port `7687`:
 

@@ -5,7 +5,8 @@
 The Python driver allows you to connect and interact with a Neo4j database through a Python application.
 
 [TIP]
-You need a running Neo4j database to use the driver with it. If you do not have one yet, xref:install#get-an-instance[get an instance] for free.
+You need a running Neo4j database to use the driver with it.
+If you do not have one yet, xref:install#get-an-instance[get an instance] for free.
 
 == Installation
 
@@ -21,7 +22,8 @@ xref:install#install-driver[More info on installing the driver ->]
 
 == Connect to the database
 
-Connect to a database by creating a <<Driver>> object and providing a URL and an authentication token. Once you have a `Driver` instance, use the `.verify_connectivity()` method to ensure that a working connection can be established.
+Connect to a database by creating a <<Driver>> object and providing a URL and an authentication token.
+Once you have a `Driver` instance, use the `.verify_connectivity()` method to ensure that a working connection can be established.
 
 [source,python]
 ----

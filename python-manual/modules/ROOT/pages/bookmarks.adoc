@@ -1,8 +1,12 @@
 = Coordinate parallel transactions
 
-When working with a Neo4j cluster, the driver automatically enforces <<causal_consistency>> for transactions within the same session, which guarantees that a query is able to read changes made by previous queries. The same does not happen by default for multiple xref:transactions.adoc[transactions] running in parallel though. In that case, you can use _bookmarks_ to have one transaction wait for the result of another to be propagated across the cluster before running its own work. This is not a requirement, and *you should only use bookmarks if you _need_ casual consistency across different transactions*.
+When working with a Neo4j cluster, the driver automatically enforces <<causal_consistency>> for transactions within the same session, which guarantees that a query is able to read changes made by previous queries.
+The same does not happen by default for multiple xref:transactions.adoc[transactions] running in parallel though.
+In that case, you can use _bookmarks_ to have one transaction wait for the result of another to be propagated across the cluster before running its own work.
+This is not a requirement, and *you should only use bookmarks if you _need_ casual consistency across different transactions*.
 
-A _bookmark_ is a token that represents some state of the database. By passing one or multiple bookmarks along with a query, the server will make sure that the query does not get executed before the represented state(s) have been established.
+A _bookmark_ is a token that represents some state of the database.
+By passing one or multiple bookmarks along with a query, the server will make sure that the query does not get executed before the represented state(s) have been established.
 
 == Bookmarks within a single session
 
@@ -19,9 +23,11 @@ with driver.session() as session:
 
 == Bookmarks across multiple sessions
 
-If your application uses multiple sessions instead, you might need to ensure that one session has completed all its transactions before another session is allowed to run its queries. In those cases, you can collect the bookmarks from some sessions using the method `Session.last_bookmarks()` *(1), (2)*, store them into a `Bookmarks` object, and use them to initialize another session with the `bookmarks` parameter *(3)*.
+If your application uses multiple sessions instead, you may need to ensure that one session has completed all its transactions before another session is allowed to run its queries.
+In those cases, you can collect the bookmarks from some sessions using the method `Session.last_bookmarks()` *(1), (2)*, store them into a `Bookmarks` object, and use them to initialize another session with the `bookmarks` parameter *(3)*.
 
-In the example below, `session_a` and `session_b` are allowed to run concurrently, while `session_c` will wait until their results have been propagated. This guarantees the `Person` nodes `session_c` wants to act on actually exist.
+In the example below, `session_a` and `session_b` are allowed to run concurrently, while `session_c` waits until their results have been propagated.
+This guarantees the `Person` nodes `session_c` wants to act on actually exist.
 
 .Coordinate multiple sessions using bookmarks
 [source,python]
@@ -94,7 +100,8 @@ if __name__ == "__main__":
 image:{common-image}/driver-passing-bookmarks.svg[]
 
 [TIP]
-The usage of bookmarks can negatively impact performance, since all queries are forced to wait for the latest changes to be propagated across the cluster. For simple use-cases, try to group queries within a single transaction, or within a single session.
+The use of bookmarks can negatively impact performance, since all queries are forced to wait for the latest changes to be propagated across the cluster.
+For simple use-cases, try to group queries within a single transaction, or within a single session.
 
 
 [discrete.glossary]

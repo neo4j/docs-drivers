@@ -22,9 +22,12 @@ For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current
 
 == Temporal types
 
-Temporal data types are implemented by the `neo4j.time` module. It provides a set of types compliant with ISO-8601 and Cypher, which are similar to those found in Python's native `datetime` module. To convert between driver and native types, use the methods `.from_native()` and `.to_native()` (does not apply to `Duration`).
+Temporal data types are implemented by the `neo4j.time` module.
+It provides a set of types compliant with ISO-8601 and Cypher, which are similar to those found in Python's native `datetime` module.
+To convert between driver and native types, use the methods `.from_native()` and `.to_native()` (does not apply to `Duration`).
 
-Sub-second values are measured to nanosecond precision and the types are mostly compatible with link:https://pypi.org/project/pytz/[pytz]. Some timezones (e.g., `pytz.utc`) work exclusively with the built-in `datetime.datetime`.
+Sub-second values are measured to nanosecond precision and the types are mostly compatible with link:https://pypi.org/project/pytz/[pytz].
+Some timezones (e.g., `pytz.utc`) work exclusively with the built-in `datetime.datetime`.
 
 [options="header"]
 |===
@@ -37,7 +40,8 @@ Sub-second values are measured to nanosecond precision and the types are mostly 
 | Duration      | `neo4j.time.Duration`
 |===
 
-† Where `tzinfo` is not `None`. +
+† Where `tzinfo` is not `None`.
++
 †† Where `tzinfo` is `None`.
 
 .How to use temporal types in queries
@@ -166,7 +170,9 @@ For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current
 
 === `Duration`
 
-Represents the difference between two points in time. A `datetime.timedelta` object passed as a parameter will always be implicitly converted to `neo4j.time.Duration`. It is not possible to convert from `neo4j.time.Duration` to `datetime.timedelta` (because `datetime.timedelta` lacks month support).
+Represents the difference between two points in time.
+A `datetime.timedelta` object passed as a parameter will always be implicitly converted to `neo4j.time.Duration`.
+It is not possible to convert from `neo4j.time.Duration` to `datetime.timedelta` (because `datetime.timedelta` lacks month support).
 
 [source, python]
 ----
@@ -183,7 +189,8 @@ For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current
 
 Cypher supports spatial values (points), and Neo4j can store these point values as properties on nodes and relationships.
 
-The object attribute `srid` (short for _Spatial Reference Identifier_) is a number identifying the coordinate system the spatial type is to be interpreted in. You can think of it as a unique identifier for each spatial type.
+The object attribute `srid` (short for _Spatial Reference Identifier_) is a number identifying the coordinate system the spatial type is to be interpreted in.
+You can think of it as a unique identifier for each spatial type.
 
 [options="header"]
 |===
@@ -197,7 +204,8 @@ For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current
 
 === `CartesianPoint`
 
-Represents a point in 2D/3D Cartesian space. +
+Represents a point in 2D/3D Cartesian space.
++
 Exposes properties `x`, `y`, `z` (the latter for 3D points only).
 
 [source, python]
@@ -219,7 +227,8 @@ For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current
 
 === `WGS84Point`
 
-Represents a point in the World Geodetic System (WGS84). +
+Represents a point in the World Geodetic System (WGS84).
++
 Exposes properties `longitude`, `latitude`, `height` (the latter for 3D points only), which are aliases for `x`, `y`, `z`.
 
 [source,python]
@@ -244,7 +253,8 @@ For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current
 
 == Graph types
 
-*Graph types are only passed as results and may not be used as parameters*. The section xref:result#_transform_to_graph[Work with the result -- Transform to graph] contains an example with graph types.
+*Graph types are only passed as results and may not be used as parameters*.
+The section xref:result#_transform_to_graph[Work with the result -- Transform to graph] contains an example with graph types.
 
 [options="header"]
 |===
@@ -258,8 +268,10 @@ For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current
 
 
 === `Node`
-Represents a node in a graph. +
-The property `element_id` provides an identifier for the entity. This should be used with care, as no guarantees are given about the mapping between id values and elements outside the scope of a single transaction.
+Represents a node in a graph.
++
+The property `element_id` provides an identifier for the entity.
+This should be used with care, as no guarantees are given about the mapping between id values and elements outside the scope of a single transaction.
 
 [source,python]
 ----
@@ -292,8 +304,10 @@ For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current
 
 === `Relationship`
 
-Represents a relationship in a graph. +
-The property `element_id` provides an identifier for the entity. This should be used with care, as no guarantees are given about the mapping between id values and elements outside the scope of a single transaction.
+Represents a relationship in a graph.
++
+The property `element_id` provides an identifier for the entity.
+This should be used with care, as no guarantees are given about the mapping between id values and elements outside the scope of a single transaction.
 
 [source,python]
 ----
@@ -390,7 +404,9 @@ For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current
 
 == Exceptions
 
-The driver can raise a number of different exceptions. A full list is available in the link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#errors[API documentation]. For a list of errors the server can return, see the link:{neo4j-docs-base-uri}/status-codes/current/[Status code] page.
+The driver can raise a number of different exceptions.
+A full list is available in the link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#errors[API documentation].
+For a list of errors the server can return, see the link:{neo4j-docs-base-uri}/status-codes/current/[Status code] page.
 
 .Root exception types
 [options="header", cols="<25m,<75a"]
@@ -403,7 +419,8 @@ The driver can raise a number of different exceptions. A full list is available 
 
 Some server errors are marked as safe to retry without need to alter the original request.
 Examples of such errors are deadlocks and memory issues.
-All driver's exception types implement the method `.is_retryable()`, which gives insights into whether a further attempt might be successful. This is particular useful when running queries in xref:transactions#explicit-transactions[explicit transactions], to know if a failed query should be run again.
+All driver's exception types implement the method `.is_retryable()`, which gives insights into whether a further attempt might be successful.
+This is particular useful when running queries in xref:transactions#explicit-transactions[explicit transactions], to know if a failed query should be run again.
 
 
 [discrete.glossary]
