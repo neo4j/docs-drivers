@@ -1,0 +1,126 @@
+= Further query mechanisms
+
+== Auto-commit transactions
+
+This is the most basic and limited form with which to run a Cypher query.
+The driver will not automatically retry auto-commit transactions, as it does instead for queries run with xref:transactions#managed-transactions[managed transactions].
+
+You run an auto-commit transaction with the method link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Session.run[`Session.run()`].
+It returns a `Result` object that needs to be processed with the xref:result#manipulate-result[related methods].
+
+[source,python]
+----
+with driver.session() as session:
+    session.run("CREATE (a:Person {name: $name})", name=name)
+----
+
+An auto-commit transaction gets committed _at the latest_ when the session is destroyed, or before another transaction is executed within the same session.
+Other than that, there is no clear guarantee on when exactly an auto-commit transaction will be committed during the lifetime of a session.
+To ensure an auto-commit transaction is committed, you can call the `.consume()` method on its result.
+
+Auto-commit transactions should only be used when xref:transactions#managed-transactions[transaction functions] do not fit the purpose, or for quick prototyping.
+
+[TIP]
+*This method is the only one that can be used for link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/call-subquery/#subquery-call-in-transactions[`CALL {} IN TRANSACTIONS`] and link:{neo4j-docs-base-uri}/cypher-manual/current/query-tuning/using/#query-using-periodic-commit-hint[`PERIODIC COMMIT`] queries*.
+
+
+=== Configure auto-commit transactions with the `Query` object
+
+The link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Query[`Query`] object allows to specify a query timeout and to attach metadata to the transaction.
+The metadata is visible in the server logs (as described for the xref:transactions#unit_of_work-decorator[`unit_of_work`] decorator).
+
+[source,python]
+----
+from neo4j import Query
+
+with driver.session() as session:
+    query = Query("CREATE (a:Person {name: $name})",
+                  timeout=1.0,
+                  metadata={"app_name": "people"})
+    result = session.run(query, name=name)
+----
+
+
+== Dynamic values in property keys, relationship types, and labels
+
+In general, you should not concatenate parameters directly into a query, but rather use xref:query-simple#query-parameters[query parameters].
+There can however be circumstances where your query structure prevents the usage of parameters in all its parts.
+In fact, although parameters can be used for literals and expressions as well as node and relationship ids, they cannot be used for the following constructs:
+
+- property keys, so `MATCH (n) WHERE n.$param = 'something'` is invalid;
+- relationship types, so `MATCH (n)-[:$param]->(m)` is invalid;
+- labels, so `MATCH (n:$param)` is invalid.
+
+For those queries, you are forced to use string concatenation.
+To protect against Cypher injections you should enclose the dynamic values in backticks and escape them yourself.
+Notice that Cypher processes Unicode, so take care of the Unicode literal `\u0060` as well.
+
+.Manually escaping dynamic labels before concatenation.
+[source,python]
+----
+label = "Person"
+# convert \u0060 to literal backtick and then escape backticks
+escaped_label = label.replace("\\u0060", "`").replace("`", "``")
+
+with driver.session(database="neo4j") as session:
+    session.run(
+        f"MATCH (p:`{escaped_label}` {{name: $name}}) RETURN p.name",
+        name="Alice",
+    )
+----
+
+Another workaround, which avoids string concatenation, is using the <<APOC>> procedure link:{neo4j-docs-base-uri}/apoc/current/overview/apoc.merge/apoc.merge.node/[`apoc.merge.node`].
+It supports dynamic labels and property keys, but only for node insertion.
+
+.Using `apoc.merge.node` to create a node with dynamic labels/property keys.
+[source,python]
+----
+property_key = "name"
+label = "Person"
+
+with driver.session(database="neo4j") as session:
+    session.run(
+        "CALL apoc.merge.node($labels, $properties)",
+        labels=[label], properties={property_key: "Alice"},
+    )
+----
+
+[NOTE]
+If you are running Neo4j in Docker, APOC needs to be enabled when starting the container.
+See link:https://neo4j.com/labs/apoc/current/installation/#docker[APOC - Installation - Docker].
+
+
+== Logging
+
+The driver logs messages through the native `logging` library to a logger named `neo4j`.
+To redirect log messages to standard output, use the link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.debug.watch[watch] function:
+
+[source,python]
+----
+import sys
+from neo4j.debug import watch
+
+watch("neo4j", out=sys.stdout)
+----
+
+////
+== Import CSV data
+
+The most common use case for using `Session.run()` is for importing CSV data into a Neo4j database.
+
+.Import CSV data into a Neo4j database
+[source,python]
+----
+LOAD CSV FROM 'file:///friends.csv' AS line
+CALL {
+    WITH line
+    CREATE (:Person {name: line[1], age: toInteger(line[2])})
+} IN TRANSACTIONS OF 2 ROWS
+----
+////
+
+
+[discrete.glossary]
+== Glossary
+
+include::{common-partial}/glossary.adoc[]
