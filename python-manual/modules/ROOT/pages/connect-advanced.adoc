@@ -87,28 +87,40 @@ If authentication is disabled on the server, the `auth` parameter can be omitted
 
 == Custom address resolver
 
-You can specify a custom _resolver_ function to resolve host and port values ahead of DNS resolution.
-This function is called with a 2-tuple of `(host, port)` and should return an iterable of 2-tuples `(host, port)`.
+When creating a `Driver` object, you can specify a _resolver_ function to resolve any addresses the driver receives ahead of DNS resolution.
+Your resolver function is called with an link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Address[`Address`] object and should return an iterable of link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Address[`Address`] objects (or values that can be used to construct `Address` objects)
 
 In the following example, the connection to `example.com` on port `9999` is resolved to `localhost` on port `7687`:
 
 [source,python]
 ----
-from neo4j import GraphDatabase
+import neo4j
 
 
 def custom_resolver(socket_address):
-    if socket_address == ("example.com", 9999):
-        yield "::1", 7687
-        yield "127.0.0.1", 7687
-    else:
-        from socket import gaierror
-        raise gaierror("Unexpected socket address %r" % socket_address)
+    # assert isinstance(socket_address, neo4j.Address)
+    if socket_address != ("example.com", 9999):
+        raise OSError(f"Unexpected socket address {socket_address!r}")
+
+    # You can return any neo4j.Address object
+    yield neo4j.Address(("localhost", 7687))  # IPv4
+    yield neo4j.Address(("::1", 7687, 0, 0))  # IPv6
+    yield neo4j.Address.parse("localhost:7687")
+    yield neo4j.Address.parse("[::1]:7687")
+
+    # or any tuple that can be passed to neo4j.Address(...).
+    # This will initially be interpreted as IPv4, but DNS resolution
+    # will turn it into IPv6 if appropriate.
+    yield "::1", 7687
+    # This will be interpreted as IPv6 directly, but DNS resolution will
+    # still happen.
+    yield "::1", 7687, 0, 0
+    yield "127.0.0.1", 7687
 
 
-driver = GraphDatabase.driver("neo4j://example.com:9999",
-                              auth=(user, password),
-                              resolver=custom_resolver)
+driver = neo4j.GraphDatabase.driver("neo4j://example.com:9999",
+                                    auth=("neo4j", "secretgraph"),
+                                    resolver=custom_resolver)
 ----
 
 
