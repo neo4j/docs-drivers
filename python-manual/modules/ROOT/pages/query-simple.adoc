@@ -145,10 +145,8 @@ with driver.session(database="neo4j") as session:
 Instead, always use placeholders and specify the link:{neo4j-docs-base-uri}/cypher-manual/current/syntax/parameters/[Cypher parameters] as keyword arguments or in a dictionary, as shown in the previous examples.
 This is for:
 
-1.
-*performance benefits*: Neo4j compiles and caches queries, but can only do so if the query structure is unchanged;
-2.
-*security reasons*: link:https://neo4j.com/developer/kb/protecting-against-cypher-injection/[protecting against Cypher injection].
+1. *performance benefits*: Neo4j compiles and caches queries, but can only do so if the query structure is unchanged;
+2. *security reasons*: link:https://neo4j.com/developer/kb/protecting-against-cypher-injection/[protecting against Cypher injection].
 
 [NOTE]
 There can be circumstances where your query structure prevents the usage of parameters in all its parts.
