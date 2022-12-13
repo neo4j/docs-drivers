@@ -19,3 +19,9 @@
 
 * xref:connect-advanced.adoc[Advanced connection information]
 * xref:data-types.adoc[Data types and mapping to Cypher types]
+
+* *GraphAcademy courses*
+
+* link:https://graphacademy.neo4j.com/courses/modeling-fundamentals/[Graph Data Modeling Fundamentals]
+* link:https://graphacademy.neo4j.com/courses/cypher-intermediate-queries/[Intermediate Cypher Queries]
+* link:https://graphacademy.neo4j.com/courses/app-python/[Building Neo4j Applications with Python]
