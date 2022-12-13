@@ -401,7 +401,7 @@ For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current
 
 The driver can raise a number of different exceptions.
 A full list is available in the link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#errors[API documentation].
-For a list of errors the server can return, see the link:{neo4j-docs-base-uri}/status-codes/current/[Status code] page.
+For a list of errors the server can return, see the link:{neo4j-docs-base-uri}/status-codes/{page-version}[Status code] page.
 
 .Root exception types
 [options="header", cols="<25m,<75a"]
