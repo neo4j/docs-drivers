@@ -23,7 +23,9 @@ ifdef::backend-pdf[]
 <<<
 endif::[]
 
+ifndef::backend-pdf[]
 [discrete.glossary]
+endif::[]
 == Glossary
 
 include::{common-partial}/glossary.adoc[]
