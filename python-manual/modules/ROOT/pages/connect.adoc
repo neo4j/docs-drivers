@@ -40,8 +40,9 @@ Either instantiate the `Driver` object using the `with` statement, or call the `
 
 For more `Driver` configuration parameters and further connection settings, see xref:connect-advanced.adoc[Advanced connection information].
 
-
+ifndef::backend-pdf[]
 [discrete.glossary]
 == Glossary
 
 include::{common-partial}/glossary.adoc[]
+endif::[]

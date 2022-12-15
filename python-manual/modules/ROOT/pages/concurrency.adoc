@@ -40,8 +40,9 @@ Multithreading is also possible, although `asyncio` is often easier to implement
 There is a known issue with Python 3.8 and the async driver where it gradually slows down.
 It is generally recommended to use the latest supported version of Python for the best performance, stability, and security.
 
-
+ifndef::backend-pdf[]
 [discrete.glossary]
 == Glossary
 
 include::{common-partial}/glossary.adoc[]
+endif::[]

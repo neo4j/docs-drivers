@@ -1,88 +1,33 @@
-:page-toclevels: 0
-
+ifdef::backend-pdf[]
+= The Neo4j Python Driver Manual v{python-driver-version}
+endif::[]
+ifndef::backend-pdf[]
 = Build applications with Neo4j and Python
+:page-toclevels: 0
+endif::[]
 
-The Python driver allows you to connect and interact with a Neo4j database through a Python application.
+// If we are building the PDF, add a heading and include the quickstart information offset by one level 
+ifdef::backend-pdf[]
+== Quickstart
 
-[TIP]
-You need a running Neo4j database to use the driver with it.
-If you do not have one yet, xref:install#get-an-instance[get an instance] for free.
+include::partial$/quickstart.adoc[leveloffset=+1]
+endif::[]
 
-== Installation
-
-Install the Neo4j Python driver with `pip`:
-
-[source,bash]
-----
-pip install neo4j
-----
-
-xref:install#install-driver[More info on installing the driver ->]
+// If we are building HTML, just include the content of the quickstart partial as-is
+ifndef::backend-pdf[]
+include::partial$/quickstart.adoc[]
+endif::[]
 
 
-== Connect to the database
-
-Connect to a database by creating a <<Driver>> object and providing a URL and an authentication token.
-Once you have a `Driver` instance, use the `.verify_connectivity()` method to ensure that a working connection can be established.
-
-[source,python]
-----
-from neo4j import GraphDatabase
-
-# URI examples: "neo4j://localhost", "neo4j+s://xxx.databases.neo4j.io"
-URI = "<URI for Neo4j database>"
-AUTH = ("<Username>", "<Password>")
-
-with GraphDatabase.driver(URI, auth=AUTH) as driver:
-    driver.verify_connectivity()
-----
-
-xref:connect.adoc[More info on connecting to a database ->]
-
-
-== Query the database
-
-Execute a <<Cypher>> statement by creating a session and using the methods `Session.execute_read()` and `Session.execute_write()`.
-Do not hardcode or concatenate parameters: use placeholders and specify the parameters as keyword arguments.
-
-.Get the name of all 42 year-olds
-[source, python, role=nocollapse]
-----
-def match_person_nodes(tx, age):
-    result = tx.run(
-        "MATCH (p:Person {age: $age}) RETURN p.name AS name",
-        age=age)
-    records = list(result)
-    summary = result.consume()
-    return records, summary
-
-with driver.session(database="neo4j") as session:
-    records, summary = session.execute_read(match_person_nodes, age=42)
-
-# Summary information
-print("The query `{query}` returned {records_count} records in {time} ms.".format(
-    query=summary.query, records_count=len(records),
-    time=summary.result_available_after,
-))
-
-# Loop through results and do something with them
-for person in records:
-    print(person)
-----
-
-xref:query-simple.adoc[More info on querying the database ->]
-
-
-== Close connections and sessions
-
-Unless you created them using the `with` statement, call the `.close()` method on all `Driver` and `Session` instances to release any resources still held by them.
-
-[source,python]
-session.close()
-driver.close()
-
+ifdef::backend-pdf[]
+<<<
+endif::[]
 
 [discrete.glossary]
 == Glossary
 
 include::{common-partial}/glossary.adoc[]
+
+ifdef::backend-pdf[]
+<<<
+endif::[]
