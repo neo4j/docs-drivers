@@ -258,8 +258,9 @@ with GraphDatabase.driver(URI, auth=AUTH) as driver:
             print(person.data())  # get a dict view
 ----
 
-
+ifndef::backend-pdf[]
 [discrete.glossary]
 == Glossary
 
 include::{common-partial}/glossary.adoc[]
+endif::[]

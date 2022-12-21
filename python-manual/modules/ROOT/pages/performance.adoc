@@ -163,8 +163,9 @@ This is likely to be more impactful on performance if you parallelize complex an
 
 // - with SET, specify individual properties one by one instead of using += (too low impact)
 
-
+ifndef::backend-pdf[]
 [discrete.glossary]
 == Glossary
 
 include::{common-partial}/glossary.adoc[]
+endif::[]
