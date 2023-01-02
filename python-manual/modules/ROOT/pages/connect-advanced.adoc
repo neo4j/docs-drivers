@@ -119,7 +119,7 @@ def custom_resolver(socket_address):
 
 
 driver = neo4j.GraphDatabase.driver("neo4j://example.com:9999",
-                                    auth=("neo4j", "secretgraph"),
+                                    auth=(user, password),
                                     resolver=custom_resolver)
 ----
 
