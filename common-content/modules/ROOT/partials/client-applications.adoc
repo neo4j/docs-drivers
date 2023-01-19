@@ -268,9 +268,9 @@ A prerequisite for using load balancing policies with the driver is that the dat
 
 *_Connection URIs_* are typically formed according to the following pattern:
 
-[source, shell, indent=0]
+[source, shell]
 ----
-neo4j://<HOST>:<PORT>[?<ROUTING_CONTEXT>]
+neo4j://<HOST>:<PORT>[?policy=<POLICY-NAME>]
 ----
 
 This targets a routed *Neo4j* service that may be fulfilled by either a cluster or a single instance.
