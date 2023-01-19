@@ -75,10 +75,10 @@ include::{go-examples}/examples_test.go[tags=config-custom-resolver]
 include::{common-partial}/client-applications.adoc[tag=routing-table]
 
 
-[[go-driver-routing-context]]
-=== Routing context
+[[go-driver-load-balancing-policies]]
+=== Load balancing policies
 
-include::{common-partial}/client-applications.adoc[tag=routing-context]
+include::{common-partial}/client-applications.adoc[tag=load-balancing-policies]
 
 
 [[go-driver-configuration-examples]]

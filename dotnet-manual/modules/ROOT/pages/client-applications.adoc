@@ -81,10 +81,10 @@ include::{dotnet-examples}/Examples.cs[tags=config-custom-resolver]
 include::{common-partial}/client-applications.adoc[tag=routing-table]
 
 
-[[dotnet-driver-routing-context]]
-=== Routing context
+[[dotnet-driver-load-balancing-policies]]
+=== Load balancing policies
 
-include::{common-partial}/client-applications.adoc[tag=routing-context]
+include::{common-partial}/client-applications.adoc[tag=load-balancing-policies]
 
 
 [[dotnet-driver-configuration-examples]]
