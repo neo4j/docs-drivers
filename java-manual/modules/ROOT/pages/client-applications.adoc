@@ -82,7 +82,6 @@ include::{java-examples}/ConfigCustomResolverExample.java[tags=config-custom-res
 include::{common-partial}/client-applications.adoc[tag=routing-table]
 
 
-[[java-driver-load-balancing-policies]]
 === Load balancing policies
 
 include::{common-partial}/client-applications.adoc[tag=load-balancing-policies]
