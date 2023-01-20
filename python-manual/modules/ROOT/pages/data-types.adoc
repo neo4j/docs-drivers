@@ -399,7 +399,7 @@ For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current
 
 == Extended types
 
-The driver supports more types as query parameters, which will be automatically mapped to one of the xref:_core_types[core types]. Because of this conversion, and because the server does not know anything about the extended types, the driver will never return these types in results, but always their corresponding mapping.
+The driver supports more types as query parameters, which get automatically mapped to one of the xref:_core_types[core types]. Because of this conversion, and because the server does not know anything about the extended types, the driver will never return these types in results, but always their corresponding mapping.
 
 [options="header"]
 |===
