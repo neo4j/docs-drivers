@@ -103,8 +103,9 @@ image:{common-image}/driver-passing-bookmarks.svg[]
 The use of bookmarks can negatively impact performance, since all queries are forced to wait for the latest changes to be propagated across the cluster.
 For simple use-cases, try to group queries within a single transaction, or within a single session.
 
-
+ifndef::backend-pdf[]
 [discrete.glossary]
 == Glossary
 
 include::{common-partial}/glossary.adoc[]
+endif::[]

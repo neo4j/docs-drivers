@@ -417,8 +417,9 @@ Examples of such errors are deadlocks and memory issues.
 All driver's exception types implement the method `.is_retryable()`, which gives insights into whether a further attempt might be successful.
 This is particular useful when running queries in xref:transactions#explicit-transactions[explicit transactions], to know if a failed query should be run again.
 
-
+ifndef::backend-pdf[]
 [discrete.glossary]
 == Glossary
 
 include::{common-partial}/glossary.adoc[]
+endif::[]

@@ -119,7 +119,7 @@ def custom_resolver(socket_address):
 
 
 driver = neo4j.GraphDatabase.driver("neo4j://example.com:9999",
-                                    auth=("neo4j", "secretgraph"),
+                                    auth=(user, password),
                                     resolver=custom_resolver)
 ----
 
@@ -128,8 +128,9 @@ driver = neo4j.GraphDatabase.driver("neo4j://example.com:9999",
 
 You can find all `Driver` configuration parameters in the link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#driver-configuration[API documentation].
 
-
+ifndef::backend-pdf[]
 [discrete.glossary]
 == Glossary
 
 include::{common-partial}/glossary.adoc[]
+endif::[]
