@@ -75,10 +75,9 @@ include::{go-examples}/examples_test.go[tags=config-custom-resolver]
 include::{common-partial}/client-applications.adoc[tag=routing-table]
 
 
-[[go-driver-routing-context]]
-=== Routing context
+=== Load balancing policies
 
-include::{common-partial}/client-applications.adoc[tag=routing-context]
+include::{common-partial}/client-applications.adoc[tag=load-balancing-policies]
 
 
 [[go-driver-configuration-examples]]
@@ -87,7 +86,7 @@ include::{common-partial}/client-applications.adoc[tag=routing-context]
 include::{common-partial}/client-applications.adoc[tag=examples-pt1]
 
 In a clustered environment, the URI address will resolve to one of more of the core members; for standalone installations, this will simply point to that server address.
-The `ROUTING_CONTEXT` option allows for customization of the routing table and is discussed in more detail in xref:client-applications.adoc#go-driver-routing-context[Routing context].
+The `policy` parameter allows for customization of the routing table and is discussed in more detail in xref:client-applications.adoc#_load_balancing_policies[load balancing policies].
 
 include::{common-partial}/client-applications.adoc[tag=examples-pt2]
 
