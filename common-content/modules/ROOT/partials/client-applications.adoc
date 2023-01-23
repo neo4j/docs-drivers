@@ -117,7 +117,7 @@ The *_encryption_* and *_trust_* settings provide detail to how that connection 
 Starting with *Neo4j 4.0*, client-server communication uses only *_unencrypted local connections by default_*.
 This is a change from previous versions, which switched on encryption by default, but generated a self-signed certificate out of the box.
 
-When a full certificate is installed, and encryption is enabled on the driver, full certificate checks are carried out (refer to link:/docs/operations-manual/5.0/security/ssl-framework[Operations Manual -> SSL framework]).
+When a full certificate is installed, and encryption is enabled on the driver, full certificate checks are carried out (refer to link:{neo4j-docs-base-uri}/operations-manual/{page-version}/security/ssl-framework[Operations Manual -> SSL framework]).
 Full certificates provide better overall security than self-signed certificates as they include a complete chain of trust back to a root certificate authority.
 
 # end::uris[]
@@ -250,8 +250,6 @@ The driver does not expose any API to work directly with the routing table, but 
 # tag::load-balancing-policies[]
 
 A `policy` parameter can be included in the query string of a `neo4j://` URI, to customize the routing table and take advantage of link:{neo4j-docs-base-uri}/operations-manual/{page-version}/clustering/clustering-advanced/multi-data-center-routing/[multi-data center routing settings].
-
-For example, if Neo4j is configured with a _link:{neo4j-docs-base-uri}/operations-manual/{page-version}/clustering/clustering-advanced/multi-data-center-routing/#mdc-server-tags[server tag]_ called `europe`, the parameter `policy=europe` can be appended to the connection URI to enforce usage of that tag. In practice, if the server is reachable at `neo01.graph.example.com`, the URI with server policy `europe` is `neo4j://neo01.graph.example.com?policy=europe`.
 
 [NOTE]
 ====
