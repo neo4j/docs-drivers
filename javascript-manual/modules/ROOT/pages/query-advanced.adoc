@@ -1,16 +1,17 @@
 = Further query mechanisms
 
-== Auto-commit transactions
+== Auto-commit (or implicit) transactions
 
 This is the most basic and limited form with which to run a Cypher query.
 The driver will not automatically retry auto-commit transactions, as it does instead for queries run with xref:transactions#managed-transactions[managed transactions].
+Auto-commit transactions should only be used when xref:transactions#managed-transactions[transaction functions] do not fit the purpose, or for quick prototyping.
 
 You run an auto-commit transaction with the method link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Session.run[`Session.run()`].
 It returns a `Result` object that needs to be processed with the xref:result#manipulate-result[related methods].
 
 [source,python]
 ----
-with driver.session() as session:
+with driver.session(database='neo4j') as session:
     session.run("CREATE (a:Person {name: $name})", name=name)
 ----
 
@@ -18,10 +19,31 @@ An auto-commit transaction gets committed _at the latest_ when the session is de
 Other than that, there is no clear guarantee on when exactly an auto-commit transaction will be committed during the lifetime of a session.
 To ensure an auto-commit transaction is committed, you can call the `.consume()` method on its result.
 
-Auto-commit transactions should only be used when xref:transactions#managed-transactions[transaction functions] do not fit the purpose, or for quick prototyping.
+Since the driver cannot figure out whether the query in a `session.run()` call requires a read or write session with the database, it defaults to write. If your auto-commit transaction contains read queries only, there is a performance gain in xref:transactions#_request_routing[making the driver aware] by setting the keyword argument `default_access_mode=neo4j.READ_ACCESS` when creating the session.
 
 [TIP]
-*This method is the only one that can be used for link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/call-subquery/#subquery-call-in-transactions[`CALL {} IN TRANSACTIONS`] and link:{neo4j-docs-base-uri}/cypher-manual/current/query-tuning/using/#query-using-periodic-commit-hint[`PERIODIC COMMIT`] queries*.
+*Auto-commit transactions are the only ones that can be used for link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/call-subquery/#subquery-call-in-transactions[`CALL { ... } IN TRANSACTIONS`] queries*.
+
+
+=== Import CSV files
+
+The most common use case for using `Session.run()` is for importing large CSV files into the database, and preventing timeout errors due to the size of the transaction.
+
+.Import CSV data into a Neo4j database
+[source,python]
+----
+with driver.session(database='neo4j') as session:
+    result = session.run("""
+        LOAD CSV FROM 'https://data.neo4j.com/bands/artists.csv' AS line
+        CALL {
+            WITH line
+            MERGE (:Artist {name: line[1], age: toInteger(line[2])})
+        } IN TRANSACTIONS OF 2 ROWS
+    """)
+    print(result.consume().counters)
+----
+
+For more information, see link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/load-csv/[Cypher -- Clauses -- Load CSV].
 
 
 === Configure auto-commit transactions with the `Query` object
@@ -33,7 +55,7 @@ The metadata is visible in the server logs (as described for the xref:transactio
 ----
 from neo4j import Query
 
-with driver.session() as session:
+with driver.session(database='neo4j') as session:
     query = Query("CREATE (a:Person {name: $name})",
                   timeout=1.0,
                   metadata={"app_name": "people"})
@@ -103,21 +125,6 @@ from neo4j.debug import watch
 watch("neo4j", out=sys.stdout)
 ----
 
-////
-== Import CSV data
-
-The most common use case for using `Session.run()` is for importing CSV data into a Neo4j database.
-
-.Import CSV data into a Neo4j database
-[source,python]
-----
-LOAD CSV FROM 'file:///friends.csv' AS line
-CALL {
-    WITH line
-    CREATE (:Person {name: line[1], age: toInteger(line[2])})
-} IN TRANSACTIONS OF 2 ROWS
-----
-////
 
 ifndef::backend-pdf[]
 [discrete.glossary]

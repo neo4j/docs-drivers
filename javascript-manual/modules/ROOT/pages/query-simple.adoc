@@ -1,11 +1,11 @@
 = Query the database
 
-You can run a query against the database using <<Cypher>> and the methods `Session.execute_read()` and `Session.execute_write()`.
+You can run a query against the database using <<Cypher>> and the methods `Session.executeRead()` and `Session.executeWrite()`.
 
 
 == Write to the database
 
-To create a node representing a person named `Alice`, use the `Session.execute_write()` method in combination with the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/merge/[`MERGE`] clause:
+To create a node representing a person named `Alice`, use the `Session.executeWrite()` method in combination with the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/merge/[`MERGE`] clause:
 
 .Create a node representing a person named `Alice`
 [source, python]
