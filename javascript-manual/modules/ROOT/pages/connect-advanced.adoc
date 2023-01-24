@@ -1,0 +1,136 @@
+= Advanced connection information
+
+
+
+== Connection protocols and security
+
+Communication between the driver and the server is mediated by <<Bolt>>.
+The scheme of the server URI determines whether the connection is encrypted and, if so, what type of certificates are accepted.
+
+[options="header", cols="20,40,40"]
+|===
+|URL scheme
+|Encryption
+|Comment
+
+|neo4j
+|{cross-mark}
+|Default for local setups
+
+|neo4j+s
+|{check-mark} (only CA-signed certificates)
+|Default for Aura
+
+|neo4j+ssc
+|{check-mark} (CA- and self-signed certificates)
+|
+|===
+
+[TIP]
+The driver receives a _routing table_ from the server upon successful connection, regardless of whether the instance is a proper cluster environment or a single-machine environment.
+The driver's routing behavior works in tandem with link:{neo4j-docs-base-uri}/operations-manual/current/clustering/[Neo4j's clustering] by directing read/write transactions to appropriate cluster members.
+If you want to target a _specific_ machine, use a link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#bolt-driver-ref[`BoltDriver`] object and `bolt`, `bolt+s`, or `bolt+ssc` URI schemes instead.
+
+The connection scheme to use is not your choice, but is rather determined by the server requirements.
+You must know the right server scheme upfront, as no metadata is exposed prior to connection.
+If you are unsure, ask the database administrator.
+
+== Authentication methods
+
+=== Basic authentication (default)
+
+The basic authentication scheme relies on traditional username and password.
+These can either be the credentials for your local installation, or the ones provided with an Aura instance.
+
+[source,python]
+----
+from neo4j import GraphDatabase
+
+driver = GraphDatabase.driver(uri, auth=(user, password))
+----
+
+[INFO]
+The basic authentication scheme can also be used to authenticate against an LDAP server (Enterprise Edition only).
+
+=== Kerberos authentication
+The Kerberos authentication scheme requires a base64-encoded ticket.
+It can only be used if the server has the link:{neo4j-docs-base-uri}/kerberos-add-on/current/deployment/[Kerberos Add-on installed].
+
+[source,python]
+----
+from neo4j import GraphDatabase, kerberos_auth
+
+driver = GraphDatabase.driver(uri, auth=kerberos_auth(ticket))
+----
+
+=== Bearer authentication
+The bearer authentication scheme requires a base64-encoded token provided by an Identity Provider through Neo4j's link:{neo4j-docs-base-uri}/operations-manual/current/authentication-authorization/sso-integration[Single Sign-On feature].
+
+[source,python]
+----
+from neo4j import GraphDatabase, bearer_auth
+
+driver = GraphDatabase.driver(uri, auth=bearer_auth(token))
+----
+
+[NOTE]
+The bearer authentication scheme requires link:{neo4j-docs-base-uri}/operations-manual/current/authentication-authorization/sso-integration[configuring Single Sign-On on the server].
+Once configured, clients can discover Neo4j's configuration through the link:{neo4j-docs-base-uri}/http-api/current/discovery/[Discovery API].
+
+=== Custom authentication
+
+Use the function link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.custom_auth[`custom_auth`] to log into a server having a custom authentication scheme.
+
+[NOTE]
+If authentication is disabled on the server, the `auth` parameter can be omitted entirely.
+
+
+== Custom address resolver
+
+When creating a `Driver` object, you can specify a _resolver_ function to resolve any addresses the driver receives ahead of DNS resolution.
+Your resolver function is called with an link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Address[`Address`] object and should return an iterable of link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Address[`Address`] objects (or values that can be used to construct `Address` objects)
+
+In the following example, the connection to `example.com` on port `9999` is resolved to `localhost` on port `7687`:
+
+[source,python]
+----
+import neo4j
+
+
+def custom_resolver(socket_address):
+    # assert isinstance(socket_address, neo4j.Address)
+    if socket_address != ("example.com", 9999):
+        raise OSError(f"Unexpected socket address {socket_address!r}")
+
+    # You can return any neo4j.Address object
+    yield neo4j.Address(("localhost", 7687))  # IPv4
+    yield neo4j.Address(("::1", 7687, 0, 0))  # IPv6
+    yield neo4j.Address.parse("localhost:7687")
+    yield neo4j.Address.parse("[::1]:7687")
+
+    # or any tuple that can be passed to neo4j.Address(...).
+    # This will initially be interpreted as IPv4, but DNS resolution
+    # will turn it into IPv6 if appropriate.
+    yield "::1", 7687
+    # This will be interpreted as IPv6 directly, but DNS resolution will
+    # still happen.
+    yield "::1", 7687, 0, 0
+    yield "127.0.0.1", 7687
+
+
+driver = neo4j.GraphDatabase.driver("neo4j://example.com:9999",
+                                    auth=(user, password),
+                                    resolver=custom_resolver)
+----
+
+
+== Further connection parameters
+
+You can find all `Driver` configuration parameters in the link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#driver-configuration[API documentation].
+
+ifndef::backend-pdf[]
+[discrete.glossary]
+== Glossary
+
+include::{common-partial}/glossary.adoc[]
+endif::[]

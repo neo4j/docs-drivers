@@ -1,0 +1,266 @@
+= Query the database
+
+You can run a query against the database using <<Cypher>> and the methods `Session.execute_read()` and `Session.execute_write()`.
+
+
+== Write to the database
+
+To create a node representing a person named `Alice`, use the `Session.execute_write()` method in combination with the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/merge/[`MERGE`] clause:
+
+.Create a node representing a person named `Alice`
+[source, python]
+----
+def create_person(tx, name):  # <3>
+    result = tx.run(
+        "MERGE (:Person {name: $name})",  # <1>
+        name=name  # <2>
+    )
+    summary = result.consume()
+    return summary
+
+with driver.session(database="neo4j") as session:
+    summary = session.execute_write(create_person, name="Alice")  # <4>
+
+    print("Created {nodes_created} nodes in {time} ms.".format(
+        nodes_created=summary.counters.nodes_created,
+        time=summary.result_available_after
+    ))
+----
+
+where *(1)* specifies the Cypher query and *(2)* is a _query parameter_.
+The query and its parameters are wrapped in a transaction function *(3)*, which is passed as callback to `Session.execute_write()` together with an arbitrary numbers of keyword arguments *(4)*.
+
+[NOTE]
+`MERGE` creates a new node matching the requirements unless one already exists, in which case nothing is done.
+For strict node creation, use the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/create/[`CREATE`] clause.
+
+
+== Read from the database
+
+To retrieve information from the database, use the `Session.execute_read()` method in combination with the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/match/[`MATCH`] clause:
+
+.Retrieve all `Person` nodes
+[source, python, role=nocollapse]
+----
+def get_people(tx):
+    result = tx.run("MATCH (p:Person) RETURN p.name AS name")
+    records = list(result)  # a list of Record objects
+    summary = result.consume()
+    return records, summary
+
+with driver.session(database="neo4j") as session:
+    records, summary = session.execute_read(get_people)
+
+    # Summary information
+    print("The query `{query}` returned {records_count} records in {time} ms.".format(
+        query=summary.query, records_count=len(records),
+        time=summary.result_available_after
+    ))
+
+    # Loop through results and do something with them
+    for person in records:
+        print(person.data())  # obtain record as dict
+----
+
+where `records` contains the actual result as a list of link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Record[`Record`] objects, and `summary` is a link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#resultsummary[`ResultSummary`] object, containing a summary of execution from the server.
+
+
+== Update the database
+
+To update a node's information in the database, use `MATCH` together with the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/set/[`SET`] clause in a `Session.execute_write()` call:
+
+.Update node `Alice` to add an `age` property
+[source, python]
+----
+def update_person(tx, name, age):
+    result = tx.run("""
+        MATCH (p:Person {name: $name})
+        SET p.age = $age
+        """, name=name, age=age
+    )
+    summary = result.consume()
+    return summary
+
+with driver.session(database="neo4j") as session:
+    summary = session.execute_write(update_person, name="Alice", age=42)
+    print(f"Query counters: {summary.counters}.")
+----
+
+To create new nodes and relationships linking it to an already existing node, use a combination of `MATCH` and `MERGE` in a `Session.execute_write()` call:
+
+.Create a relationship `KNOWS` between `Alice` and `Bob`
+[source, python]
+----
+def update_person(tx, name, friend):
+    result = tx.run("""
+        MATCH (p:Person {name: $name})
+        MERGE (friend:Person {name: $friend_name})
+        MERGE (p)-[:KNOWS]->(friend)
+        """, name="Alice", friend_name="Bob"
+    )
+    summary = result.consume()
+    return summary
+
+with driver.session(database="neo4j") as session:
+    summary = session.execute_write(update_person,
+                                    name="Alice", friend="Bob")
+    print(f"Query counters: {summary.counters}.")
+----
+
+[WARNING]
+====
+It might feel tempting to create new relationships with a single `MERGE` clause, such as: +
+`MERGE (:Person {name: "Alice"})-[KNOWS]->(:Person {name: "Bob"})`. +
+However, this would result in the creation of an _extra_ `Alice` node, so that you would end up with unintended duplicate records.
+To avoid this, always `MATCH` the elements that you want to update, and use the resulting reference in the `MERGE` clause (as shown in the previous example).
+See link:https://neo4j.com/developer/kb/understanding-how-merge-works/[Understanding how MERGE works].
+====
+
+
+== Delete from the database
+To remove a node and any relationship attached to it, use link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/delete/[`DETACH DELETE`] in a `Session.execute_write()` call:
+
+.Remove the `Alice` node
+[source,python]
+----
+def delete_person(tx, name):
+    result = tx.run("""
+        MATCH (p:Person {name: $name})
+        DETACH DELETE p
+        """, name="Alice"
+    )
+    summary = result.consume()
+    return summary
+
+with driver.session(database="neo4j") as session:
+    summary = session.execute_write(delete_person, name="Alice")
+    print(f"Query counters: {summary.counters}.")
+----
+
+
+[#query-parameters]
+== How to pass parameters to queries
+
+*Do not hardcode or concatenate parameters directly into queries*.
+Instead, always use placeholders and specify the link:{neo4j-docs-base-uri}/cypher-manual/current/syntax/parameters/[Cypher parameters] as keyword arguments or in a dictionary, as shown in the previous examples.
+This is for:
+
+1. *performance benefits*: Neo4j compiles and caches queries, but can only do so if the query structure is unchanged;
+2. *security reasons*: link:https://neo4j.com/developer/kb/protecting-against-cypher-injection/[protecting against Cypher injection].
+
+[NOTE]
+There can be circumstances where your query structure prevents the usage of parameters in all its parts.
+For those advanced use cases, see xref:query-advanced#_dynamic_values_in_property_keys_relationship_types_and_labels[Dynamic values in property keys, relationship types, and labels].
+
+
+== Anatomy of a query
+
+Before you can run a query, you need to obtain a session from the driver with the `Driver.session()` method *(1)*.
+The `database` parameter is optional but recommended for performance, and further xref:transactions#_session_configuration[configuration parameters] can be included.
+
+Within a session, use the methods link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Session.execute_read[`Session.execute_read()`] and link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Session.execute_write[`Session.execute_write()`] *(2)*, depending on whether you want to retrieve data from the database or alter it.
+Both methods take a _transaction function_ callback *(3)* and an arbitrary number of positional and keyword arguments *(4)* which are handed down to the transaction function.
+
+The transaction function *(5)* is responsible for actually carrying out the queries and xref:result.adoc[processing the result].
+Queries are specified with the link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Transaction.run[`Transaction.run()`] method *(6)*, which returns a link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Result[`Result`] object.
+You can then process the result *(7)* using xref:result#manipulate-result[any of the `Result` methods], or simply casting it to `list`.
+
+.Retrieve people whose name starts with `Al`.
+[source,python]
+----
+def match_person_nodes(tx, name_filter): # <5>
+    result = tx.run(""" # <6>
+        MATCH (p:Person) WHERE p.name STARTS WITH $filter
+        RETURN p.name AS name ORDER BY name
+        """, filter=name_filter)
+    return list(result)  # return a list of Record objects # <7>
+
+with driver.session(database="neo4j") as session:  # <1>
+    people = session.execute_read(  # <2>
+        match_person_nodes, # <3>
+        "Al", # <4>
+    )
+    for person in people:
+        print(person.data())  # obtain dict representation
+----
+
+You can find more information about sessions and transactions in the section xref:transactions.adoc[Run your own transactions].
+
+[TIP]
+The driver may automatically retry to run a failed transaction.
+For this reason, *transaction functions must be _idempotent_* (i.e., they should produce the same effect when run several times), because you do not know how many times they might be executed.
+In practice, this means that you should not edit nor rely on globals, for example.
+Note that although transactions functions might be executed multiple times, the queries inside it will always run only once.
+
+
+== A full example
+
+[source, python]
+----
+from neo4j import GraphDatabase
+
+
+URI = "<URI to Neo4j database>"
+AUTH = ("<Username>", "<Password>")
+
+people = [{"name": "Alice", "age": 42, "friends": ["Bob", "Peter", "Anna"]},
+          {"name": "Bob", "age": 19},
+          {"name": "Peter", "age": 50},
+          {"name": "Anna", "age": 30}]
+
+def create_person(tx, person):
+    tx.run("MERGE (p:Person {name: $person.name, age: $person.age})",
+           person=person)
+
+def add_friends(tx, person):
+    tx.run("""
+        MATCH (p:Person {name: $person.name})
+        UNWIND $person.friends AS friend_name
+        MATCH (friend:Person {name: friend_name})
+        MERGE (p)-[:KNOWS]->(friend)
+        """, person=person
+    )
+
+def get_friends(tx, name, age):
+    result = tx.run("""
+        MATCH (p:Person {name: $name})-[:KNOWS]-(friend:Person)
+        WHERE friend.age < $age
+        RETURN friend
+        """, name="Alice", age=40
+    )
+    records = list(result)  # transform to a list of Node objects
+    summary = result.consume()
+    return records, summary
+
+
+with GraphDatabase.driver(URI, auth=AUTH) as driver:
+    with driver.session(database="neo4j") as session:
+        # Create some nodes
+        for person in people:
+            session.execute_write(create_person, person)
+
+        # Create some relationships
+        for person in people:
+            if person.get("friends"):
+                session.execute_write(add_friends, person)
+
+        # Retrieve Alice's friends who are under 40
+        records, summary = session.execute_read(get_friends, "Alice", 40)
+
+        # Summary information
+        print("The query `{query}` returned {records_count} records in {time} ms.".format(
+            query=summary.query, records_count=len(records),
+            time=summary.result_available_after
+        ))
+
+        # Loop through results and do something with them
+        for person in records:
+            print(person.data())  # get a dict view
+----
+
+ifndef::backend-pdf[]
+[discrete.glossary]
+== Glossary
+
+include::{common-partial}/glossary.adoc[]
+endif::[]
