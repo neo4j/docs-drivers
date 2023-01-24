@@ -403,13 +403,13 @@ The driver supports more types as query parameters, which get automatically mapp
 
 [options="header"]
 |===
-| Parameter Type  | Mapped Python Type
-| tuple         | `list`
-| bytearray | `bytes`
-| numpy `ndarray`         | `list` (nested)
-| pandas `DataFrame`         | `dict`
-| pandas `Series`         | `list`
-| pandas `Array`         | `list`
+| Parameter Type     | Mapped Python Type
+| tuple              | `list`
+| bytearray          | `bytes`
+| numpy `ndarray`    | `list` (nested)
+| pandas `DataFrame` | `dict`
+| pandas `Series`    | `list`
+| pandas `Array`     | `list`
 |===
 
 
