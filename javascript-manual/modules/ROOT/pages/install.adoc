@@ -35,7 +35,7 @@ var neo4j = require('neo4j-driver')
 [NOTE]
 --
 There are slight differences in how you can use the driver in a Node.js application and in an interactive (REPL) Node.js session.
-This is ultimately on Node.js itself, and not really on the driver.
+This is ultimately on Node.js itself, not on the driver.
 The examples in the manual are suitable to be run in a REPL session as they are, but you can also copy-paste them in files and run them as scripts.
 --
 

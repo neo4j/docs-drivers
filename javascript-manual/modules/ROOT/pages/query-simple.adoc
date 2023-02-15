@@ -7,28 +7,26 @@ You can run a query against the database using <<Cypher>> and the methods `Sessi
 
 To create a node representing a person named `Alice`, use the `Session.executeWrite()` method in combination with the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/merge/[`MERGE`] clause:
 
-.Create a node representing a person named `Alice`
-[source, python]
+.Create a node representing a `Person` named `Alice`
+[source, javascript]
 ----
-def create_person(tx, name):  # <3>
-    result = tx.run(
-        "MERGE (:Person {name: $name})",  # <1>
-        name=name  # <2>
-    )
-    summary = result.consume()
-    return summary
+var session = driver.session(database='neo4j')
 
-with driver.session(database="neo4j") as session:
-    summary = session.execute_write(create_person, name="Alice")  # <4>
+var summary = await session.executeWrite(async tx => {  // <3>
+  let result = await tx.run(
+    'MERGE (p:Person {name: $name})', {  // <1>
+     name: 'Alice'  // <2>
+  })
+  return result.summary
+})
 
-    print("Created {nodes_created} nodes in {time} ms.".format(
-        nodes_created=summary.counters.nodes_created,
-        time=summary.result_available_after
-    ))
+  console.log(`Created ${summary.counters.updates().nodesCreated} nodes in ${summary.resultAvailableAfter} ms.`)
+
+  session.close()
 ----
 
 where *(1)* specifies the Cypher query and *(2)* is a _query parameter_.
-The query and its parameters are wrapped in a transaction function *(3)*, which is passed as callback to `Session.execute_write()` together with an arbitrary numbers of keyword arguments *(4)*.
+The query execution is delegated to an anonymous transaction function, which is passed as callback to `Session.executeWrite()` *(3)*.
 
 [NOTE]
 `MERGE` creates a new node matching the requirements unless one already exists, in which case nothing is done.
@@ -37,104 +35,101 @@ For strict node creation, use the link:{neo4j-docs-base-uri}/cypher-manual/curre
 
 == Read from the database
 
-To retrieve information from the database, use the `Session.execute_read()` method in combination with the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/match/[`MATCH`] clause:
+To retrieve information from the database, use the `Session.executeRead()` method in combination with the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/match/[`MATCH`] clause:
 
 .Retrieve all `Person` nodes
-[source, python, role=nocollapse]
+[source, javascript, role=nocollapse]
 ----
-def get_people(tx):
-    result = tx.run("MATCH (p:Person) RETURN p.name AS name")
-    records = list(result)  # a list of Record objects
-    summary = result.consume()
-    return records, summary
+var session = driver.session(database='neo4j')
 
-with driver.session(database="neo4j") as session:
-    records, summary = session.execute_read(get_people)
+var {records, summary} = await session.executeRead(async tx => {
+  let result = await tx.run('MATCH (p:Person) RETURN p.name AS name')
+  return {records: result.records, summary: result.summary}
+})
 
-    # Summary information
-    print("The query `{query}` returned {records_count} records in {time} ms.".format(
-        query=summary.query, records_count=len(records),
-        time=summary.result_available_after
-    ))
+console.log(`The query \`${summary.query.text}\` returned ${records.length} nodes.\n`)
 
-    # Loop through results and do something with them
-    for person in records:
-        print(person.data())  # obtain record as dict
+for(let record of records) {
+  console.log(`Person with name: ${record.get('name')}`)
+  console.log(`Available properties for this node are: ${record.keys}\n`)
+}
 ----
 
-where `records` contains the actual result as a list of link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Record[`Record`] objects, and `summary` is a link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#resultsummary[`ResultSummary`] object, containing a summary of execution from the server.
+where `records` contains the actual result as a list of link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/record.js~Record.html[`Record`] objects, and `summary` is a link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/result-summary.js~ResultSummary.html[`ResultSummary`] object, containing a summary of execution from the server.
 
 
 == Update the database
 
-To update a node's information in the database, use `MATCH` together with the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/set/[`SET`] clause in a `Session.execute_write()` call:
+To update a node's information in the database, use `MATCH` together with the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/set/[`SET`] clause in a `Session.executeWrite()` call:
 
 .Update node `Alice` to add an `age` property
-[source, python]
+[source, javascript]
 ----
-def update_person(tx, name, age):
-    result = tx.run("""
-        MATCH (p:Person {name: $name})
-        SET p.age = $age
-        """, name=name, age=age
-    )
-    summary = result.consume()
-    return summary
+var session = driver.session(database='neo4j')
 
-with driver.session(database="neo4j") as session:
-    summary = session.execute_write(update_person, name="Alice", age=42)
-    print(f"Query counters: {summary.counters}.")
+var summary = await session.executeWrite(async tx => {
+  let result = await tx.run(`
+    MATCH (p:Person WHERE name = $name)
+    SET p.age = $age
+    `, { name: 'Alice', age: 42 }
+  )
+  return result.summary
+})
+
+console.log(`Query counters:`)
+console.log(summary.counters.updates())
 ----
 
-To create new nodes and relationships linking it to an already existing node, use a combination of `MATCH` and `MERGE` in a `Session.execute_write()` call:
+To create new nodes and relationships linking it to an already existing node, use a combination of `MATCH` and `MERGE` in a `Session.executeWrite()` call:
 
 .Create a relationship `KNOWS` between `Alice` and `Bob`
-[source, python]
+[source, javascript]
 ----
-def update_person(tx, name, friend):
-    result = tx.run("""
-        MATCH (p:Person {name: $name})
-        MERGE (friend:Person {name: $friend_name})
-        MERGE (p)-[:KNOWS]->(friend)
-        """, name="Alice", friend_name="Bob"
-    )
-    summary = result.consume()
-    return summary
+var session = driver.session(database='neo4j')
 
-with driver.session(database="neo4j") as session:
-    summary = session.execute_write(update_person,
-                                    name="Alice", friend="Bob")
-    print(f"Query counters: {summary.counters}.")
+var summary = await session.executeWrite(async tx => {
+  let result = await tx.run(`
+    MATCH (p:Person WHERE p.name = $name)
+    MERGE (friend:Person {name: $friend_name})
+    MERGE (p)-[:KNOWS]->(friend)
+    `, { name: 'Alice', friend_name: 'Bob' }
+  )
+  return result.summary
+})
+
+console.log(`Query counters:`)
+console.log(summary.counters.updates())
 ----
 
 [WARNING]
 ====
-It might feel tempting to create new relationships with a single `MERGE` clause, such as: +
+It may feel tempting to create new relationships with a single `MERGE` clause, such as: +
 `MERGE (:Person {name: "Alice"})-[KNOWS]->(:Person {name: "Bob"})`. +
 However, this would result in the creation of an _extra_ `Alice` node, so that you would end up with unintended duplicate records.
-To avoid this, always `MATCH` the elements that you want to update, and use the resulting reference in the `MERGE` clause (as shown in the previous example).
+To avoid this, always break out a path creation: `MATCH` (or `MERGE`) the nodes you need, and use the resulting references to `MERGE` the relationship (as shown in the previous example).
 See link:https://neo4j.com/developer/kb/understanding-how-merge-works/[Understanding how MERGE works].
 ====
 
 
 == Delete from the database
-To remove a node and any relationship attached to it, use link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/delete/[`DETACH DELETE`] in a `Session.execute_write()` call:
+To remove a node and any relationship attached to it, use link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/delete/[`DETACH DELETE`] in a `Session.executeWrite()` call:
 
 .Remove the `Alice` node
-[source,python]
+[source, javascript]
 ----
-def delete_person(tx, name):
-    result = tx.run("""
-        MATCH (p:Person {name: $name})
-        DETACH DELETE p
-        """, name="Alice"
-    )
-    summary = result.consume()
-    return summary
+var session = driver.session(database='neo4j')
 
-with driver.session(database="neo4j") as session:
-    summary = session.execute_write(delete_person, name="Alice")
-    print(f"Query counters: {summary.counters}.")
+var summary = await session.executeWrite(async tx => {
+  let result = await tx.run(`
+    MATCH (p:Person WHERE p.name = $name)
+    DETACH DELETE p
+    `, { name: 'Alice' }
+  )
+  return result.summary
+})
+
+console.log(`Query counters:`)
+console.log(summary.counters.updates())
 ----
 
 
@@ -156,32 +151,34 @@ For those advanced use cases, see xref:query-advanced#_dynamic_values_in_propert
 == Anatomy of a query
 
 Before you can run a query, you need to obtain a session from the driver with the `Driver.session()` method *(1)*.
-The `database` parameter is optional but recommended for performance, and further xref:transactions#_session_configuration[configuration parameters] can be included.
+The `database` parameter is optional but recommended for xref:performance.adoc[performance], and further xref:transactions#_session_configuration[configuration parameters] can be included.
 
-Within a session, use the methods link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Session.execute_read[`Session.execute_read()`] and link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Session.execute_write[`Session.execute_write()`] *(2)*, depending on whether you want to retrieve data from the database or alter it.
-Both methods take a _transaction function_ callback *(3)* and an arbitrary number of positional and keyword arguments *(4)* which are handed down to the transaction function.
+Within a session, use the methods link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/session.js~Session.html#instance-method-executeRead[`Session.executeRead()`] and link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/session.js~Session.html#instance-method-executeWrite[`Session.executeWrite()`] *(2)*, depending on whether you want to retrieve data from the database or alter it.
+Both methods take a _transaction function_ callback.
 
-The transaction function *(5)* is responsible for actually carrying out the queries and xref:result.adoc[processing the result].
-Queries are specified with the link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Transaction.run[`Transaction.run()`] method *(6)*, which returns a link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Result[`Result`] object.
-You can then process the result *(7)* using xref:result#manipulate-result[any of the `Result` methods], or simply casting it to `list`.
+The callback transaction function is responsible for actually carrying out the queries and xref:result.adoc[processing the result].
+Queries are specified with the link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/transaction.js~Transaction.html#instance-method-run[`Transaction.run()`] method *(3)*, which takes a query and its parameters (as an object *(4)*), and returns a link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/result.js~Result.html[`Result`] object.
+You may then result the result records and summary for later usage *(5)*.
 
 .Retrieve people whose name starts with `Al`.
-[source,python]
+[source, javascript]
 ----
-def match_person_nodes(tx, name_filter): # <5>
-    result = tx.run(""" # <6>
-        MATCH (p:Person) WHERE p.name STARTS WITH $filter
-        RETURN p.name AS name ORDER BY name
-        """, filter=name_filter)
-    return list(result)  # return a list of Record objects # <7>
+var session = driver.session(database='neo4j')  // <1>
 
-with driver.session(database="neo4j") as session:  # <1>
-    people = session.execute_read(  # <2>
-        match_person_nodes, # <3>
-        "Al", # <4>
-    )
-    for person in people:
-        print(person.data())  # obtain dict representation
+var {records, summary} = await session.executeRead(async tx => {  // <2>
+  let result = await tx.run(`  // <3>
+    MATCH (p:Person WHERE p.name STARTS WITH $filter)
+    RETURN p.name AS name ORDER BY name
+    `, { filter: 'Al'}  // <4>
+  )
+  return {records: result.records, summary: result.summary}  // <5>
+})
+
+console.log(`The query \`${summary.query.text}\` returned ${records.length} nodes.\n`)
+
+for(let record of records) {
+  console.log(`Person with name: ${record.get('name')}`)
+  console.log(`Available properties for this node are: ${record.keys}\n`)
 ----
 
 You can find more information about sessions and transactions in the section xref:transactions.adoc[Run your own transactions].
@@ -195,67 +192,76 @@ Note that although transactions functions might be executed multiple times, the 
 
 == A full example
 
-[source, python]
+[source, javascript]
 ----
-from neo4j import GraphDatabase
+(async () => {
+  var neo4j = require('neo4j-driver')
 
+  const URI = 'neo4j://localhost'
+  const USER = 'neo4j'
+  const PASSWORD = 'verysecret'
 
-URI = "<URI to Neo4j database>"
-AUTH = ("<Username>", "<Password>")
+  let people = [{"name": "Alice", "age": 42, "friends": ["Bob", "Peter", "Anna"]},
+                {"name": "Bob", "age": 19},
+                {"name": "Peter", "age": 50},
+                {"name": "Anna", "age": 30}]
 
-people = [{"name": "Alice", "age": 42, "friends": ["Bob", "Peter", "Anna"]},
-          {"name": "Bob", "age": 19},
-          {"name": "Peter", "age": 50},
-          {"name": "Anna", "age": 30}]
+  try {
+    var driver = neo4j.driver(URI,  neo4j.auth.basic(USER, PASSWORD))
+    await driver.verifyConnectivity()
+  } catch(err) {
+    return
+    console.log(`Connection error\n${err}\nCause: ${err.cause}`)
+  }
 
-def create_person(tx, person):
-    tx.run("MERGE (p:Person {name: $person.name, age: $person.age})",
-           person=person)
+  var session = driver.session(database='neo4j')
 
-def add_friends(tx, person):
-    tx.run("""
-        MATCH (p:Person {name: $person.name})
-        UNWIND $person.friends AS friend_name
-        MATCH (friend:Person {name: friend_name})
-        MERGE (p)-[:KNOWS]->(friend)
-        """, person=person
+  // Create some nodes
+  for(let person of people) {
+    await session.executeWrite(async tx => {
+      await tx.run("MERGE (p:Person {name: $person.name, age: $person.age})",
+                   {person: person}
+      )
+    })
+  }
+
+  // Create some relationships
+  for(let person of people) {
+    if(person.friends != undefined) {
+      await session.executeWrite(async tx => {
+        tx.run(`
+          MATCH (p:Person {name: $person.name})
+          UNWIND $person.friends AS friend_name
+          MATCH (friend:Person {name: friend_name})
+          MERGE (p)-[:KNOWS]->(friend)
+          `, {person: person}
+        )
+      })
+    }
+  }
+
+  // Retrieve Alice's friends who are under 40
+  var {records, summary} = await session.executeRead(async tx => {
+    let result = await tx.run(`
+      MATCH (p:Person {name: $name})-[:KNOWS]-(friend:Person)
+      WHERE friend.age < $age
+      RETURN friend
+      `, {name: 'Alice', age: 40}
     )
+    return {records: result.records, summary: result.summary}
+  })
 
-def get_friends(tx, name, age):
-    result = tx.run("""
-        MATCH (p:Person {name: $name})-[:KNOWS]-(friend:Person)
-        WHERE friend.age < $age
-        RETURN friend
-        """, name="Alice", age=40
-    )
-    records = list(result)  # transform to a list of Node objects
-    summary = result.consume()
-    return records, summary
+  // Loop through results and do something with them
+  for(let person of records) {
+    // `person.friend` is an object of type Node
+    console.log(person.get('friend'))
+  }
 
+  // Summary information
+  console.log(`The query \`${summary.query.text}\` returned ${records.length} records in ${summary.resultAvailableAfter} ms.`)
 
-with GraphDatabase.driver(URI, auth=AUTH) as driver:
-    with driver.session(database="neo4j") as session:
-        # Create some nodes
-        for person in people:
-            session.execute_write(create_person, person)
-
-        # Create some relationships
-        for person in people:
-            if person.get("friends"):
-                session.execute_write(add_friends, person)
-
-        # Retrieve Alice's friends who are under 40
-        records, summary = session.execute_read(get_friends, "Alice", 40)
-
-        # Summary information
-        print("The query `{query}` returned {records_count} records in {time} ms.".format(
-            query=summary.query, records_count=len(records),
-            time=summary.result_available_after
-        ))
-
-        # Loop through results and do something with them
-        for person in records:
-            print(person.data())  # get a dict view
+  await driver.close()
+})();
 ----
 
 ifndef::backend-pdf[]
