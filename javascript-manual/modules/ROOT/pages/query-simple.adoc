@@ -1,6 +1,11 @@
 = Query the database
 
-You can run a query against the database using <<Cypher>> and the methods `Session.executeRead()` and `Session.executeWrite()`.
+You can run queries against the database using <<Cypher>> and the methods `Session.executeRead()` and `Session.executeWrite()`.
+
+[NOTE]
+====
+Due to the usage of `async/await`, the examples in this page need to be wrapped in an `async` function. See xref:_a_full_example[a full example] if you are unsure how to do it.
+====
 
 
 == Write to the database
@@ -20,9 +25,9 @@ var summary = await session.executeWrite(async tx => {  // <3>
   return result.summary
 })
 
-  console.log(`Created ${summary.counters.updates().nodesCreated} nodes in ${summary.resultAvailableAfter} ms.`)
+console.log(`Created ${summary.counters.updates().nodesCreated} nodes in ${summary.resultAvailableAfter} ms.`)
 
-  session.close()
+session.close()
 ----
 
 where *(1)* specifies the Cypher query and *(2)* is a _query parameter_.
@@ -146,6 +151,9 @@ This is for:
 [NOTE]
 There can be circumstances where your query structure prevents the usage of parameters in all its parts.
 For those advanced use cases, see xref:query-advanced#_dynamic_values_in_property_keys_relationship_types_and_labels[Dynamic values in property keys, relationship types, and labels].
+
+
+== Error handling
 
 
 == Anatomy of a query

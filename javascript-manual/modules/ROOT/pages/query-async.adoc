@@ -1,0 +1,53 @@
+= Run non-blocking asynchronous queries
+
+https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises
+
+[source, javascript]
+----
+// Run a Cypher statement, reading the result in a streaming manner as records arrive:
+session
+  .run('MERGE (alice:Person {name : $nameParam}) RETURN alice.name AS name', {
+    nameParam: 'Alice'
+  })
+  .subscribe({
+    onKeys: keys => {
+      console.log(keys)
+    },
+    onNext: record => {
+      console.log(record.get('name'))
+    },
+    onCompleted: () => {
+      session.close() // returns a Promise
+    },
+    onError: error => {
+      console.log(error)
+    }
+  })
+----
+
+[source, javascript]
+----
+// the Promise way, where the complete result is collected before we act on it:
+session
+  .run('MERGE (james:Person {name : $nameParam}) RETURN james.name AS name', {
+    nameParam: 'James'
+  })
+  .then(result => {
+    result.records.forEach(record => {
+      console.log(record.get('name'))
+    })
+  })
+  .catch(error => {
+    console.log(error)
+  })
+  .then(() => session.close())
+----
+
+-
+
+ifndef::backend-pdf[]
+[discrete.glossary]
+== Glossary
+
+include::{common-partial}/glossary.adoc[]
+endif::[]

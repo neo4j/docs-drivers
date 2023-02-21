@@ -7,7 +7,7 @@ Once you have xref:install.adoc#install-driver[installed the driver] and have xr
 
 You connect to a database by creating a <<Driver>> object and providing a URL and an authentication token.
 
-[source, javascript]
+[source, javascript, role=nocollapse]
 ----
 (async () => {
   var neo4j = require('neo4j-driver')
@@ -23,6 +23,8 @@ You connect to a database by creating a <<Driver>> object and providing a URL an
   } catch(err) {
     console.log(`Connection error\n${err}\nCause: ${err.cause}`)
   }
+
+  // Use the driver to run queries
 
   await driver.close()
 })();
