@@ -1,6 +1,6 @@
 = Run your own transactions
 
-When xref:query-simple.adoc[querying the database] with transaction functions, the driver automatically creates a *<<transaction>>*.
+When xref:query-simple.adoc[querying the database with transaction functions], the driver automatically creates a *<<transaction>>*.
 You can easily include multiple queries in a single transaction function, but to design more involved use-cases it is important to understand how transactions work within the driver.
 
 
@@ -10,19 +10,19 @@ Before running a transaction, you need to obtain a _session_.
 Sessions act as concrete query channels between the driver and the server.
 In particular, sessions borrow connections from the _connection pool_ as needed, and ensure <<causal consistency>> is enforced.
 
-Sessions are created with the method link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#session[`Driver.session()`], with the keyword argument `database` allowing to specify the xref:_database_selection[target database].
+Sessions are created with the method link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/driver.js~Driver.html#instance-method-session[`Driver.session()`].
+It takes a single (optional) object parameter, with the property `database` allowing to specify the xref:_database_selection[target database].
 For further parameters, see xref:_session_configuration[Session configuration].
 
 [source,python]
 ----
-with driver.session(database="neo4j") as session:
-    ...
+session = driver.session({database: 'neo4j'})
 ----
 
 Session creation is a lightweight operation, so sessions can be created and destroyed without significant cost.
 Always xref:_close_sessions[close sessions] when you are done with them.
 
-*Sessions are _not_ thread safe*: share the main `Driver` object across threads, but make sure each thread creates its own sessions.
+*Sessions are _not_ thread safe*: you can share the main `Driver` object across threads, but make sure each thread creates its own sessions.
 
 
 [#managed-transactions]
@@ -32,115 +32,123 @@ A transaction can contain any number of queries.
 As Neo4j is <<ACID>> compliant, *queries within a transaction will either be executed as a whole or not at all*: you cannot get a part of the transaction succeeding and another failing.
 Use transactions to group together related queries which work together to achieve a single _logical_ database operation.
 
-A managed transaction is created with the methods link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Session.execute_read[`Session.execute_read()`] and link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Session.execute_write[`Session.execute_write()`], depending on whether you want to retrieve data from the database or alter it.
-Both methods take a _transaction function_ callback *(1)* and an arbitrary number of positional and keyword arguments *(2)* which are handed down to the transaction function.
-The transaction function *(3)* is responsible for actually carrying out the queries and processing the result.
-Queries are specified with the link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Transaction.run[`Transaction.run()`] method *(4)*, which returns a link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Result[`Result`] object.
-You can then xref:result#manipulate-result[process the result] *(5)* using any of the `Result` methods, or simply casting it to list.
+A managed transaction is created with the methods link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/session.js~Session.html#instance-method-executeRead[`Session.executeRead()`] and link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/session.js~Session.html#instance-method-executeRead[`Session.executeWrite()`], depending on whether you want to _retrieve_ data from the database or _alter_ it.
+Both methods take a _transaction function_ callback *(1)*, which is responsible of actually carrying out the queries and processing the result.
+Queries are specified with the link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/transaction.js~Transaction.html#instance-method-run[`Transaction.run()`] method *(2)*, where you provide a Cypher query *(3)* and an object of query parameters *(4)* which returns a link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/result.js~Result.html[`Result`] object.
+You can then process the result records and query summary *(5)*.
 
 .Retrieve people whose name starts with `Al`.
-[source,python]
+[source, javascript]
 ----
-def match_person_nodes(tx, name_filter): # <3>
-    result = tx.run(""" # <4>
-        MATCH (p:Person) WHERE p.name STARTS WITH $filter
-        RETURN p.name as name ORDER BY name
-        """, filter=name_filter)
-    return list(result)  # return a list of Record objects # <5>
+let session, result
+session = driver.session({database: 'neo4j'})
+result = await session.executeRead(async tx => { // <1>
+  return await tx.run(`  // <2>
+    MATCH (p:Person) WHERE p.name STARTS WITH $filter  // <3>
+    RETURN p.name as name ORDER BY name
+    `, {filter: 'Al'}  // <4>
+  )
+})
 
-with driver.session(database="neo4j") as session:
-    people = session.execute_read(
-        match_person_nodes, # <1>
-        "Al", # <2>
-    )
-    for person in people:
-        print(person.data())  # obtain dict representation
+console.log(`The query \`${result.summary.query.text}\`\nreturned ${result.records.length} nodes.\n`)
+for(let person in result.records) {  // <5>
+  console.log(person)
+}
 ----
 
 *Do not hardcode or concatenate parameters directly into the query*.
 Use xref:query-simple#query-parameters[query parameters] instead, both for performance and security reasons.
 
-*Transaction functions should never return the `Result` object directly*.
-Instead, always xref:result.adoc[process the result] in some way; at minimum, cast it to list.
 Within a transaction function, a `return` statement results in the transaction being committed, while the transaction is automatically rolled back if an exception is raised.
 
 .A transaction with multiple queries, client logic, and potential roll backs.
-[source,python]
+[source, javascript]
 ----
-from neo4j import GraphDatabase
+(async () => {
+  var neo4j = require('neo4j-driver')
 
+  const URI = 'neo4j://localhost'
+  const USER = 'neo4j'
+  const PASSWORD = 'verysecret'
+  let driver, session, result
+  let employeeThreshold=10
 
-URI = "neo4j://localhost"
-AUTH = ("neo4j", "secret")
-employee_threshold=10
+  try {
+    driver = neo4j.driver(URI, neo4j.auth.basic(USER, PASSWORD))
+    await driver.verifyConnectivity()
+  } catch(err) {
+    console.log(`-- Connection error --\n${err}\n-- Cause --\n${err.cause}`)
+    return
+  }
 
+  session = driver.session({database: 'neo4j'})
+  for(let i=0; i<100; i++) {
+    let name = `Neo-${i.toString()}`
+    let orgId = await session.executeWrite(async tx => {
+      let result, orgInfo
 
-def main():
-    with GraphDatabase.driver(URI, auth=AUTH) as driver:
-        with driver.session(database="neo4j") as session:
-            for i in range(100):
-                name = "Thor"+str(i)
-                org_id = session.execute_write(employ_person_tx, name)
-                print(f"User {name} added to organization {org_id}")
-
-
-def employ_person_tx(tx, name):
-    # Create new Person node with given name, if not existing already
-    result = tx.run("""
+      // Create new Person node with given name, if not already existing
+      await tx.run(`
         MERGE (p:Person {name: $name})
         RETURN p.name AS name
-        """, name=name
-    )
+        `, {name: name}
+      )
 
-    # Obtain most recent organization ID and the number of people linked to it
-    result = tx.run("""
+      // Obtain most recent organization ID and the number of people linked to it
+      result = await tx.run(`
         MATCH (o:Organization)
-        RETURN o.id AS id, COUNT{(p:Person)-[r:WORKS_FOR]->(o)} AS employees_n
-        ORDER BY o.created_date DESC
+        RETURN o.id AS id, COUNT{(p:Person)-[r:WORKS_FOR]->(o)} AS employeesN
+        ORDER BY o.createdDate DESC
         LIMIT 1
-    """)
-    org = result.single()
+      `)
+      if(result.records.length > 0) {
+        orgInfo = result.records[0]
+      }
 
-    if org is not None and org["employees_n"] == 0:
-        raise Exception("Most recent organization is empty.")
-        # Transaction will roll back -> not even Person is created!
+      if(orgInfo != undefined && orgInfo['employeesN'] == 0) {
+        throw new Error('Most recent organization is empty.')
+        // Transaction will roll back -> not even Person is created!
+      }
 
-    # If org does not have too many employees, add this Person to that
-    if org is not None and org.get("employees_n") < employee_threshold:
-        result = tx.run("""
-            MATCH (o:Organization {id: $org_id})
-            MATCH (p:Person {name: $name})
-            MERGE (p)-[r:WORKS_FOR]->(o)
-            RETURN $org_id AS id
-            """, org_id=org["id"], name=name
+      // If org does not have too many employees, add this Person to that
+      if(orgInfo != undefined && orgInfo['employeesN'] < employeeThreshold) {
+        result = await tx.run(`
+          MATCH (o:Organization {id: $orgId})
+          MATCH (p:Person {name: $name})
+          MERGE (p)-[r:WORKS_FOR]->(o)
+          RETURN $orgId AS id
+          `, {orgId: orgInfo['id'], name: name}
         )
 
-    # Otherwise, create a new Organization and link Person to it
-    else:
-        from neo4j.time import Date
-        result = tx.run("""
-            MATCH (p:Person {name: $name})
-            CREATE (o:Organization {id: randomuuid(), created_date: datetime()})
-            MERGE (p)-[r:WORKS_FOR]->(o)
-            RETURN o.id AS id
-            """, name=name, date=Date.today()
+      // Otherwise, create a new Organization and link Person to it
+      } else {
+        result = await tx.run(`
+          MATCH (p:Person {name: $name})
+          CREATE (o:Organization {id: randomuuid(), createdDate: datetime()})
+          MERGE (p)-[r:WORKS_FOR]->(o)
+          RETURN o.id AS id
+          `, {name: name, date: neo4j.DateTime.fromStandardDate(new Date())}
         )
+      }
 
-    # Return the Organization ID to which the new Person ends up in
-    return result.single()["id"]
-
-
-if __name__ == "__main__":
-    main()
+      // Return the Organization ID to which the new Person ends up in
+      return result.records[0].get('id')
+    })
+    console.log(`User ${name} added to organization ${orgId}`)
+  }
+  await session.close()
+  await driver.close()
+})()
 ----
 
 Should a transaction fail for a reason that the driver deems transient, it automatically retries to run the transaction function (with an exponentially increasing delay).
 For this reason, *transaction functions must be _idempotent_* (i.e., they should produce the same effect when run several times), because you do not know upfront how many times they are going to be executed.
 In practice, this means that you should not edit nor rely on globals, for example.
-Note that although transactions functions might be executed multiple times, the queries inside it will always run only once.
+Note that although transaction functions might be executed multiple times, the queries inside it will always run only once.
 
 A session can chain multiple transactions, but *only one single transaction can be active within a session at any given time*.
-To maintain multiple concurrent transactions, use multiple concurrent sessions.
+This means that a query must be completed before the next one can run, and it is the reason why the previous examples all use the `async/await` syntax.
+To maintain multiple concurrent transactions, see xref:query-async.adoc[how to run non-blocking queries].
 
 
 [#unit_of_work-decorator]

@@ -1,0 +1,9 @@
+= Reactive sessions
+
+
+ifndef::backend-pdf[]
+[discrete.glossary]
+== Glossary
+
+include::{common-partial}/glossary.adoc[]
+endif::[]

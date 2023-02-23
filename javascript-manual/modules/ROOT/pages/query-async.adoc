@@ -1,5 +1,7 @@
 = Run non-blocking asynchronous queries
 
+The examples in xref:query-simple.adoc[Query the database] are great to start with, but they have one drawback:
+
 https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises
 
 [source, javascript]
