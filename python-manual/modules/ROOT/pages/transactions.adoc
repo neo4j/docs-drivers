@@ -260,8 +260,6 @@ If no database is given, the link:{neo4j-docs-base-uri}/operations-manual/curren
 
 [source, python]
 ----
-import neo4j
-
 with driver.session(
     database="neo4j"
 ) as session:
