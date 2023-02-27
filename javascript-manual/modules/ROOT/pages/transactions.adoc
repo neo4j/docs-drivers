@@ -70,8 +70,8 @@ Within a transaction function, a `return` statement results in the transaction b
   const URI = 'neo4j://localhost'
   const USER = 'neo4j'
   const PASSWORD = 'verysecret'
-  let driver, session, result
-  let employeeThreshold=10
+  let driver, session
+  let employeeThreshold = 10
 
   try {
     driver = neo4j.driver(URI, neo4j.auth.basic(USER, PASSWORD))
@@ -83,8 +83,8 @@ Within a transaction function, a `return` statement results in the transaction b
 
   session = driver.session({database: 'neo4j'})
   for(let i=0; i<100; i++) {
-    let name = `Neo-${i.toString()}`
-    let orgId = await session.executeWrite(async tx => {
+    const name = `Neo-${i.toString()}`
+    const orgId = await session.executeWrite(async tx => {
       let result, orgInfo
 
       // Create new Person node with given name, if not already existing
@@ -151,115 +151,113 @@ This means that a query must be completed before the next one can run, and it is
 To maintain multiple concurrent transactions, see xref:query-async.adoc[how to run non-blocking queries].
 
 
-[#unit_of_work-decorator]
 === Further transaction function configuration
 
-The decorator link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.unit_of_work[`unit_of_work()`] allows to exert further control on transaction functions.
-It allows to specify:
+Both `executeRead` and `executeWrite` take a second optional parameter of type link:{neo4j-docs-base-uri}/api/javascript-driver/current/typedef/index.html#static-typedef-TransactionConfig[`TransactionConfig`], which allows to supply further configuration parameters.
+You can specify:
 
-- a transaction timeout (in seconds).
+- a transaction timeout (in milliseconds).
 Transactions that run longer will be terminated by the server.
 The default value is set on the server side.
-- a dictionary of metadata that gets attached to the transaction.
-These metadata get logged in the server `query.log`, and are visible in the output of the `SHOW TRANSACTIONS` Cypher command.
+- an object of metadata that gets attached to the transaction.
+These metadata get logged in the server `query.log`, and are visible in the output of the `SHOW TRANSACTIONS YIELD *` Cypher command.
 Use this to tag transactions.
 
-[source,python]
+[source, javascript]
 ----
-from neo4j import unit_of_work
-
-@unit_of_work(timeout=5, metadata={"app_name": "people"})
-def count_people(tx):
-    result = tx.run("MATCH (a:Person) RETURN count(a) AS people")
-    record = result.single()
-    return record["people"]
-
-
-with driver.session(database="neo4j") as session:
-    people_n = session.execute_read(count_people)
+let session = driver.session({database: 'neo4j'})
+const people_n = await session.executeRead(async tx => {
+  return await tx.run("MATCH (a:Person) RETURN count(a) AS people")
+  }, {timeout: 5000, metadata: {"app_name": "people"}}
+)
 ----
 
 
 [#explicit-transactions]
 == Run an explicit transaction
 
-You can achieve full control over transactions by manually beginning one with the method link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Session.begin_transaction[`Session.begin_transaction()`].
-You run queries inside an explicit transaction with the method link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Transaction.run[`Transaction.run()`].
+You can achieve full control over transactions by manually beginning one with the method link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/session.js~Session.html#instance-method-beginTransaction[`Session.beginTransaction()`].
+You run queries inside an explicit transaction with the method link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/transaction.js~Transaction.html#instance-method-run[`Transaction.run()`], as you do in transaction functions.
 
-[source,python]
+[source, javascript]
 ----
-with driver.session(database="neo4j") as session:
-    with session.begin_transaction() as tx:
-        # use tx.run() to run queries
+let session = driver.session({database: 'neo4j'})
+transaction = await session.beginTransaction()
+
+// use transaction.run() to run queries
+
+await transaction.close()
+await session.close()
 ----
 
-Closing an explicit transaction can either happen automatically at the end of a `with` block, or can be explicitly controlled through the methods link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Transaction.commit[`Transaction.commit()`], link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Transaction.rollback[`Transaction.rollback()`], or link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Transaction.close[`Transaction.close()`].
+The behavior and lifetime of an explicit transaction is controlled through the methods link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/transaction.js~Transaction.html#instance-method-commit[`Transaction.commit()`], link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/transaction.js~Transaction.html#instance-method-rollback[`Transaction.rollback()`], or link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/transaction.js~Transaction.html#instance-method-close[`Transaction.close()`].
 
 Explicit transactions are most useful for applications that need to distribute Cypher execution across multiple functions for the same transaction, or for applications that need to run multiple queries within a single transaction but without the automatic retries provided by managed transactions.
 
-[source,python]
+[source, javascript]
 ----
-from os import sleep
-import neo4j
+async function transfer_to_other_bank(driver, customer_id, other_bank_id, amount) {
+  const session = driver.session({database: 'neo4j'})
+  const tx = await session.beginTransaction()
+  try {
+    if(false === check_customer_balance(tx, customer_id, amount)) {
+      // give up
+      return
+    }
 
+    other_bank_transfer_api(customer_id, other_bank_id, amount)
+    // Now the money has been transferred => can't rollback anymore
+    // (cannot rollback external services interactions)
 
-def transfer_to_other_bank(driver, customer_id, other_bank_id, amount):
-    with driver.session(database="neo4j") as session:
-        tx = session.begin_transaction()
-        # or just use a `with` context on `tx` instead of try/finally
-        try:
-            if not customer_balance_check(tx, customer_id, amount):
-                # give up
-                return
+    try {
+      decrease_customer_balance(tx, customer_id, amount)
+      await tx.commit()
+    catch (error) {
+      request_inspection(customer_id, other_bank_id, amount, e)
+      throw error  // roll back
+    }
+  } finally {
+    await tx.close()  // rolls back if not yet committed
+    await session.close()
+  }
+}
 
-            other_bank_transfer_api(customer_id, other_bank_id, amount)
-            # Now the money has been transferred => can't rollback anymore
-            # (cannot rollback external services interactions)
+async function customer_balance_check(tx, customer_id, amount) {
+  result = await tx.run(`
+    MATCH (c:Customer {id: $id})
+    RETURN c.balance >= $amount AS sufficient
+    `, {id: customer_id, amount: amount}
+  )
+  return result.records[0]['sufficient']
+}
 
-            try:
-                decrease_customer_balance(tx, customer_id, amount)
-                tx.commit()
-            except Exception as e:
-                request_inspection(customer_id, other_bank_id, amount, e)
-                raise  # roll back
-        finally:
-            tx.close()  # rolls back if not yet committed
+async function other_bank_transfer_api(customer_id, other_bank_id, amount) {
+  ...
+  // make some API call to other bank
+}
 
+async function decrease_customer_balance(tx, customer_id, amount) {
+  await tx.run(`
+    MATCH (c:Customer {id: $id})
+    SET c.balance = c.balance - $amount
+    `, {id: customer_id, amount: amount}
+  )
+}
 
-def customer_balance_check(tx, customer_id, amount):
-    query = ("""
-        MATCH (c:Customer {id: $id})
-        RETURN c.balance >= $amount AS sufficient
-    """)
-    result = tx.run(query, id=customer_id, amount=amount)
-    record = result.single(strict=True)
-    return record["sufficient"]
-
-
-def other_bank_transfer_api(customer_id, other_bank_id, amount):
-    ...
- # make some API call to other bank
-
-
-def decrease_customer_balance(tx, customer_id, amount):
-    query = ("""
-        MATCH (c:Customer {id: $id})
-        SET c.balance = c.balance - $amount
-    """)
-    result = tx.run(query, id=customer_id, amount=amount)
-    result.consume()
-
-
-def request_inspection(customer_id, other_bank_id, amount, e):
-    # manual cleanup required; log this or similar
-    print("WARNING: transaction rolled back due to exception:", repr(e))
-    print("customer_id:", customer_id, "other_bank_id:", other_bank_id,
-          "amount:", amount)
-
+async function request_inspection(customer_id, other_bank_id, amount, error) {
+  // manual cleanup required; log this or similar
+  console.log('WARNING: transaction rolled back due to exception:')
+  console.log(error)
+  console.log(`customer_id: ${customer_id}, 'other_bank_id:', ${other_bank_id},
+    'amount:', ${amount})
+}
 ----
 
 
 == Session configuration
+
+When creating a session, you can provide an optional parameter of type  link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/driver.js~SessionConfig.html[`SessionConfig`] to specify session configuration values.
+
 
 === Database selection
 
@@ -267,58 +265,49 @@ It is recommended to *always specify the database explicitly* with the `database
 This allows the driver to work more efficiently, as it does not have to resolve the home database first.
 If no database is given, the link:{neo4j-docs-base-uri}/operations-manual/current/manage-databases/introduction#manage-databases-default[default database] set in the Neo4j instance settings is used.
 
-[source, python]
+[source, javascript]
 ----
-import neo4j
-
-with driver.session(
-    database="neo4j"
-) as session:
-    ...
+const session = driver.session({database: 'neo4j'}
 ----
 
 
 === Request routing
 
 In a cluster environment, all sessions are opened in write mode, routing them to the leader.
-You can change this by explicitly setting the `default_access_mode` parameter to either `neo4j.READ_ACCESS` or `neo4j.WRITE_ACCESS`.
-Note that `.execute_read()` and `.execute_write()` automatically override the session's default access mode.
+You can change this by explicitly setting the `defaultAccessMode` parameter to either `neo4j.session.READ` or `neo4j.session.WRITE`.
+Note that `.executeRead()` and `.executeWrite()` automatically override the session's default access mode.
 
-[source, python]
+[source, javascript]
 ----
-import neo4j
-
-with driver.session(
-    database="neo4j",
-    default_access_mode=neo4j.READ_ACCESS
-) as session:
-    ...
+const session = driver.session({
+  database: 'neo4j',
+  defaultAccessMode: neo4j.session.READ
+})
 ----
 
 [#access-control-note]
 [NOTE]
 ====
-Although executing a _write_ query in read mode likely results in a runtime error, *you should not rely on this for access control.* The difference between the two modes is that _read_ transactions will be routed to any node of a cluster, whereas _write_ ones will be directed to the leader.
+Although executing a _write_ query in read mode likely results in a runtime error, *you should not rely on this for access control.* The difference between the two modes is that _read_ transactions are routed to any node of a cluster, whereas _write_ ones are directed to the leader.
 Still, depending on the server version and settings, the server might allow none, some, or all _write_ statements to be executed even in _read_ transactions.
 
-Similar remarks hold for the `.execute_read()` and `.execute_write()` methods.
+Similar remarks hold for the `.executeRead()` and `.executeWrite()` methods.
 ====
 
 
 [#impersonation]
 === Run queries as a different user (impersonation)
 
-You can execute a query under the security context of a different user with the parameter `impersonated_user`, specifying the name of the user to impersonate.
+You can execute a query under the security context of a different user with the parameter `impersonatedUser`, specifying the name of the user to impersonate.
 For this to work, the user under which the `Driver` was created needs to have the link:{neo4j-docs-base-uri}/cypher-manual/current/access-control/dbms-administration#access-control-dbms-administration-impersonation[appropriate permissions].
 Impersonating a user is cheaper than creating a new `Driver` object.
 
-[source, python]
+[source, javascript]
 ----
-with driver.session(
-    database="neo4j",
-    impersonated_user="somebody_else"
-) as session:
-    ...
+const session = driver.session({
+    database: 'neo4j',
+    impersonatedUser: 'somebodyElse'
+})
 ----
 
 When impersonating a user, the query is run within the complete security context of the impersonated user and not the authenticated user (i.e., home database, permissions, etc.).
@@ -327,18 +316,15 @@ When impersonating a user, the query is run within the complete security context
 == Close sessions
 
 Each connection pool has *a finite number of sessions*, so if you open sessions without ever closing them, your application could run out of them.
-It is thus recommended to create sessions using the `with` statement, which automatically closes them when the application is done with them.
-When a session is closed, it is returned to the connection pool to be later reused.
+It is thus important to be adamant in always closing sessions when you are done with them, so that they can be returned to the connection pool to be later reused.
 
-If you do not use `with`, remember to call the `.close()` method when you have finished using a session.
-
-[source,python]
+[source, javascript]
 ----
-session = driver.session(database="neo4j")
-# ...
-# session usage
-# ...
-session.close()
+const session = driver.session({database: 'neo4j'})
+
+// session usage
+
+await session.close()
 ----
 
 ifndef::backend-pdf[]
