@@ -191,7 +191,6 @@ Explicit transactions are most useful for applications that need to distribute C
 
 [source,python]
 ----
-from os import sleep
 import neo4j
 
 
@@ -230,7 +229,7 @@ def customer_balance_check(tx, customer_id, amount):
 
 def other_bank_transfer_api(customer_id, other_bank_id, amount):
     ...
- # make some API call to other bank
+    # make some API call to other bank
 
 
 def decrease_customer_balance(tx, customer_id, amount):
