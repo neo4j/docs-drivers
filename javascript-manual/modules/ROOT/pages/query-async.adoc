@@ -1,17 +1,57 @@
 = Run non-blocking asynchronous queries
 
-The examples in xref:query-simple.adoc[Query the database] are great to start with, but they have one drawback:
+The examples in xref:query-simple.adoc[Query the database] use the `async/await` syntax, which forces the driver to work synchronously. When using `await` with a query, your application is forced to wait for the server to retrieve all the results from your query and transmit them to the driver. This is not a problem for most use cases, but for queries that have a long processing time or a large result set, asynchronous handling may speed up your application.
 
-https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises
+There are three ways to run asynchronous queries:
+
+- *Promise API* -- the query result is returned as a `Promise`. The promise is only resolved when the full result set is available to the driver. Best suited for queries with a large server processing time, but the result of which you want to process in bulk. Eager consumption.
+- *Streaming API* -- allows to read the result as a stream, so that each result record is processed as soon as it is available. Best suited for queries where records processing is individual. Lazy consumption.
+- *Reactive API* -- allows to control the rate at which records are retrieved from the server. Best suited for reactive applications, where stream control is needed. Learn more in xref:query-reactive.adoc[Reactive sessions].
+
+== Promise API
+
+The Promise API allows you to run a query and receive the result as a `Promise`. You can think of this query method as allowing you to specify a Cypher query and a number of callbacks that are executed depending on the query outcome.
 
 [source, javascript]
 ----
-// Run a Cypher statement, reading the result in a streaming manner as records arrive:
+let session = driver.session({database: 'neo4j'})
 session
-  .run('MERGE (alice:Person {name : $nameParam}) RETURN alice.name AS name', {
-    nameParam: 'Alice'
+  .run('MERGE (p:Person WHERE p.name = $name) RETURN p.name AS name', {  // <1>
+    name: 'Alice'
   })
-  .subscribe({
+  .then(result => {  // <2>
+    result.records.forEach(record => {
+      console.log(record.get('name'))
+    })
+    return result
+  })
+  .catch(error => {  // <3>
+    console.log(error)
+  })
+  .then(() => session.close())  // <4>
+----
+
+<1> Run a query with `session.run()`
+<2> Specify callback for successful runs with `.then()`, taking query result as input
+<3> Specify callback for failed runs, taking driver error as input
+<4> Specify callback to run regardless of query outcome
+
+[TIP]
+====
+The default return value of `session.run()` is a `Promise`. If you prepend `await` to `session.run()` as shown in xref:query-simple.adoc[Query the database], you effectively force your application to wait until the result is ready, and you obtain either a `result` or an `error`.
+====
+
+
+== Streaming API
+
+[source, javascript]
+----
+let session = driver.session({database: 'neo4j'})
+session
+  .run('MERGE (p:Person WHERE p.name = $name) RETURN p.name AS name', {  // <1>
+    name: 'Alice'
+  })
+  .subscribe({  // <2>
     onKeys: keys => {
       console.log(keys)
     },
@@ -26,26 +66,6 @@ session
     }
   })
 ----
-
-[source, javascript]
-----
-// the Promise way, where the complete result is collected before we act on it:
-session
-  .run('MERGE (james:Person {name : $nameParam}) RETURN james.name AS name', {
-    nameParam: 'James'
-  })
-  .then(result => {
-    result.records.forEach(record => {
-      console.log(record.get('name'))
-    })
-  })
-  .catch(error => {
-    console.log(error)
-  })
-  .then(() => session.close())
-----
-
--
 
 ifndef::backend-pdf[]
 [discrete.glossary]
