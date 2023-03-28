@@ -1,16 +1,26 @@
 = Run non-blocking asynchronous queries
 
-The examples in xref:query-simple.adoc[Query the database] use the `async/await` syntax, which forces the driver to work synchronously. When using `await` with a query, your application is forced to wait for the server to retrieve all the results from your query and transmit them to the driver. This is not a problem for most use cases, but for queries that have a long processing time or a large result set, asynchronous handling may speed up your application.
+The examples in xref:query-simple.adoc[Query the database] use the `async/await` syntax, which forces the driver to work synchronously.
+When using `await` with a query, your application waits for the server to retrieve all query results and transmit them to the driver.
+This is not a problem for most use cases, but for queries that have a long processing time or a large result set, asynchronous handling may speed up your application.
 
 There are three ways to run asynchronous queries:
 
-- *Promise API* -- the query result is returned as a `Promise`. The promise is only resolved when the full result set is available to the driver. Best suited for queries with a large server processing time, but the result of which you want to process in bulk. Eager consumption.
-- *Streaming API* -- allows to read the result as a stream, so that each result record is processed as soon as it is available. Best suited for queries where records processing is individual. Lazy consumption.
-- *Reactive API* -- allows to control the rate at which records are retrieved from the server. Best suited for reactive applications, where stream control is needed. Learn more in xref:query-reactive.adoc[Reactive sessions].
+- *Promise API* -- the query result is returned as a link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises[`Promise`].
+The promise is only resolved when the full result set is available to the driver.
+Best suited for queries with a large server processing time, but the result of which you want to process in one go.
+Your application receives the result in bulk, for eager consumption.
+- *Streaming API* -- the query result is returned as a stream, so that each result record is processed as soon as it is available.
+Best suited for queries where records processing is individual.
+Your application receives the result in bits, for lazy consumption.
+- *Reactive API* -- allows to control the rate at which records are retrieved from the server.
+Best suited for reactive applications, where stream control is needed.
+Learn more in xref:query-reactive.adoc[Reactive sessions].
 
 == Promise API
 
-The Promise API allows you to run a query and receive the result as a `Promise`. You can think of this query method as allowing you to specify a Cypher query and a number of callbacks that are executed depending on the query outcome.
+The Promise API allows you to run a query and receive the result as a link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises[`Promise`].
+You can think of this query method as allowing you to specify a Cypher query and a number of callbacks that are executed depending on the query outcome.
 
 [source, javascript]
 ----
@@ -32,40 +42,89 @@ session
 ----
 
 <1> Run a query with `session.run()`
-<2> Specify callback for successful runs with `.then()`, taking query result as input
+<2> Specify callback for successful runs, taking query result as input
 <3> Specify callback for failed runs, taking driver error as input
 <4> Specify callback to run regardless of query outcome
 
 [TIP]
 ====
-The default return value of `session.run()` is a `Promise`. If you prepend `await` to `session.run()` as shown in xref:query-simple.adoc[Query the database], you effectively force your application to wait until the result is ready, and you obtain either a `result` or an `error`.
+The default return value of `session.run()` is a `Promise`.
+If you prepend `await` to `session.run()` as shown in xref:query-simple.adoc[Query the database], you effectively force your application to wait until the result is ready, and you obtain the corresponding of either `result` or `error` from the example above.
 ====
+
+=== Combine multiple transactions
+
+To run multiple queries within the same transaction, use `Promise.all()`.
+It runs asynchronous operations concurrently, so you can submit multiple queries at the same time and wait for them all to finish.
+
+.Retrieve people's names and assign each of them to the company Neo4j
+[source, javascript]
+----
+const companyName = 'Neo4j'
+const session = driver.session({database: 'neo4j'})
+try {
+  const names = await session.executeRead(async tx => {
+    const result = await tx.run('MATCH (p:Person) RETURN p.name AS name')
+    return result.records.map(record => record.get('name'))
+  })
+
+  const relationshipsCreated = await session.executeWrite(tx =>
+    Promise.all(  // group together all Promises
+      names.map(name =>
+        tx.run(`
+          MATCH (emp:Person {name: $personName})
+          MERGE (com:Company {name: $companyName})
+          MERGE (emp)-[:WORKS_FOR]->(com)
+          `, { personName: name, companyName: companyName }
+        )
+        .then(result => result.summary.counters.updates().relationshipsCreated)
+      )
+    ).then(values => values.reduce((a, b) => a + b))  // aggregate results
+  )
+
+  console.log(`Created ${relationshipsCreated} employees relationships.`)
+} finally {
+  await session.close()
+}
+----
 
 
 == Streaming API
 
-[source, javascript]
+The Streaming API allows you to run a query and receive results individually, as soon as the server has them ready.
+You can specify a callback to process each record.
+This API is particularly fit for cases in which it may take the server a different time to retrieve the different records, but you want to process each of them as soon as they are available.
+
+[source, javascript, role=nocollapse]
 ----
 let session = driver.session({database: 'neo4j'})
 session
-  .run('MERGE (p:Person WHERE p.name = $name) RETURN p.name AS name', {  // <1>
+  .run('MERGE (p:Person {name: $name}) RETURN p.name AS name', {  // <1>
     name: 'Alice'
   })
   .subscribe({  // <2>
-    onKeys: keys => {
+    onKeys: keys => {  // <3>
+      console.log('Result columns are:')
       console.log(keys)
     },
-    onNext: record => {
-      console.log(record.get('name'))
+    onNext: record => {  // <4>
+      console.log(`Name: ${record.get('name')}`)
     },
-    onCompleted: () => {
+    onCompleted: () => {  // <5>
       session.close() // returns a Promise
     },
-    onError: error => {
+    onError: error => {  // <6>
       console.log(error)
     }
   })
 ----
+
+<1> Run a query with `session.run()`
+<2> Attach a handler to the result stream
+<3> The `onKeys` callback receives the list of result columns
+<4> The `onNext` callback is invoked every time a record is received
+<5> The `onCompleted` callback is invoked when the transaction is over
+<6> The `onError` is triggered in case of error
 
 ifndef::backend-pdf[]
 [discrete.glossary]

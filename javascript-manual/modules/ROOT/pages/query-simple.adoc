@@ -15,17 +15,18 @@ To create a node representing a person named `Alice`, use the `Session.executeWr
 .Create a node representing a `Person` named `Alice`
 [source, javascript]
 ----
-let session, result
-
-session = driver.session({database: 'neo4j'})
-result = await session.executeWrite(async tx => {  // <3>
-  return await tx.run(
-    'MERGE (p:Person {name: $name})',  // <1>
-     {name: 'Alice'}  // <2>
-  )
-})
-console.log(`Created ${result.summary.counters.updates().nodesCreated} nodes in ${result.summary.resultAvailableAfter} ms.`)
-await session.close()
+let session = driver.session({database: 'neo4j'})
+try {
+  const result = await session.executeWrite(async tx => {  // <3>
+    return await tx.run(
+      'MERGE (p:Person {name: $name})',  // <1>
+       {name: 'Alice'}  // <2>
+    )
+  })
+  console.log(`Created ${result.summary.counters.updates().nodesCreated} nodes in ${result.summary.resultAvailableAfter} ms.`)
+} finally {
+  await session.close()
+}
 ----
 
 where *(1)* specifies the Cypher query and *(2)* is an object of _query parameters_.
@@ -43,20 +44,20 @@ To retrieve information from the database, use the `Session.executeRead()` metho
 .Retrieve all `Person` nodes
 [source, javascript]
 ----
-let session, result
+let session = driver.session({database: 'neo4j'})
+try {
+  const result = await session.executeRead(async tx => {
+    return await tx.run('MATCH (p:Person) RETURN p.name AS name')
+  })
 
-session = driver.session({database: 'neo4j'})
-result = await session.executeRead(async tx => {
-  return await tx.run('MATCH (p:Person) RETURN p.name AS name')
-})
-
-console.log(`The query \`${result.summary.query.text}\` returned ${result.records.length} nodes.\n`)
-for(let record of result.records) {
-  console.log(`Person with name: ${record.get('name')}`)
-  console.log(`Available properties for this node are: ${record.keys}\n`)
+  console.log(`The query \`${result.summary.query.text}\` returned ${result.records.length} nodes.\n`)
+  for(let record of result.records) {
+    console.log(`Person with name: ${record.get('name')}`)
+    console.log(`Available properties for this node are: ${record.keys}\n`)
+  }
+} finally {
+  await session.close()
 }
-
-await session.close()
 ----
 
 where `result.records` contains the actual result as a list of link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/record.js~Record.html[`Record`] objects, and `result.summary` is a link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/result-summary.js~ResultSummary.html[`ResultSummary`] object, containing a summary of execution from the server.
@@ -69,21 +70,21 @@ To update a node's information in the database, use `MATCH` together with the li
 .Update node `Alice` to add an `age` property
 [source, javascript]
 ----
-let session, result
+let session = driver.session({database: 'neo4j'})
+try {
+  const result = await session.executeWrite(async tx => {
+    return await tx.run(`
+      MATCH (p:Person WHERE p.name = $name)
+      SET p.age = $age
+      `, { name: 'Alice', age: 42 }
+    )
+  })
 
-session = driver.session({database: 'neo4j'})
-result = await session.executeWrite(async tx => {
-  return await tx.run(`
-    MATCH (p:Person WHERE p.name = $name)
-    SET p.age = $age
-    `, { name: 'Alice', age: 42 }
-  )
-})
-
-console.log(`Query counters:`)
-console.log(result.summary.counters.updates())
-
-await session.close()
+  console.log(`Query counters:`)
+  console.log(result.summary.counters.updates())
+} finally {
+  await session.close()
+}
 ----
 
 To create new nodes and relationships linking it to an already existing node, use a combination of `MATCH` and `MERGE` in a `Session.executeWrite()` call:
@@ -91,22 +92,22 @@ To create new nodes and relationships linking it to an already existing node, us
 .Create a relationship `KNOWS` between `Alice` and `Bob`
 [source, javascript]
 ----
-let session, result
+let session = driver.session({database: 'neo4j'})
+try {
+  const result = await session.executeWrite(async tx => {
+    return await tx.run(`
+      MATCH (p:Person WHERE p.name = $name)
+      MERGE (friend:Person {name: $friend_name})
+      MERGE (p)-[:KNOWS]->(friend)
+      `, { name: 'Alice', friend_name: 'Bob' }
+    )
+  })
 
-session = driver.session({database: 'neo4j'})
-result = await session.executeWrite(async tx => {
-  return await tx.run(`
-    MATCH (p:Person WHERE p.name = $name)
-    MERGE (friend:Person {name: $friend_name})
-    MERGE (p)-[:KNOWS]->(friend)
-    `, { name: 'Alice', friend_name: 'Bob' }
-  )
-})
-
-console.log(`Query counters:`)
-console.log(result.summary.counters.updates())
-
-await session.close()
+  console.log(`Query counters:`)
+  console.log(result.summary.counters.updates())
+} finally {
+  await session.close()
+}
 ----
 
 [WARNING]
@@ -125,21 +126,21 @@ To remove a node and any relationship attached to it, use link:{neo4j-docs-base-
 .Remove the `Alice` node
 [source, javascript]
 ----
-let session, result
+let session = driver.session({database: 'neo4j'})
+try {
+  const result = await session.executeWrite(async tx => {
+    return await tx.run(`
+      MATCH (p:Person WHERE p.name = $name)
+      DETACH DELETE p
+      `, { name: 'Alice' }
+    )
+  })
 
-session = driver.session({database: 'neo4j'})
-result = await session.executeWrite(async tx => {
-  return await tx.run(`
-    MATCH (p:Person WHERE p.name = $name)
-    DETACH DELETE p
-    `, { name: 'Alice' }
-  )
-})
-
-console.log(`Query counters:`)
-console.log(result.summary.counters.updates())
-
-await session.close()
+  console.log(`Query counters:`)
+  console.log(result.summary.counters.updates())
+} finally {
+  await session.close()
+}
 ----
 
 
@@ -171,29 +172,29 @@ Both methods take a _transaction function_ callback.
 
 The callback transaction function is responsible for actually carrying out the queries and xref:result.adoc[processing the result].
 Queries are specified with the link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/transaction.js~Transaction.html#instance-method-run[`Transaction.run()`] method *(3)*, which takes a query and its parameters (as an object *(4)*), and returns a link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/result.js~Result.html[`Result`] object.
-You may then result the result records and summary for later usage *(5)*.
+When the processing is over, the session is closed *(5)*.
 
 .Retrieve people whose name starts with `Al`.
 [source, javascript]
 ----
-let session, result
+let session = driver.session({database: 'neo4j'})  // <1>
+try {
+  const result = await session.executeRead(async tx => {  // <2>
+    return await tx.run(`  // <3>
+      MATCH (p:Person WHERE p.name STARTS WITH $filter)
+      RETURN p.name AS name ORDER BY name
+      `, { filter: 'Al'}  // <4>
+    )
+  })
 
-session = driver.session({database: 'neo4j'})  // <1>
-result = await session.executeRead(async tx => {  // <2>
-  return await tx.run(`  // <3>
-    MATCH (p:Person WHERE p.name STARTS WITH $filter)
-    RETURN p.name AS name ORDER BY name
-    `, { filter: 'Al'}  // <4>
-  )
-})
-
-console.log(`The query \`${result.summary.query.text}\` returned ${result.records.length} nodes.\n`)
-for(let record of result.records) {
-  console.log(`Person with name: ${record.get('name')}`)
-  console.log(`Available properties for this node are: ${record.keys}\n`)
+  console.log(`The query \`${result.summary.query.text}\` returned ${result.records.length} nodes.\n`)
+  for(let record of result.records) {
+    console.log(`Person with name: ${record.get('name')}`)
+    console.log(`Available properties for this node are: ${record.keys}\n`)
+  }
+} finally {
+  await session.close()  // <5>
 }
-
-await session.close()
 ----
 
 You can find more information about sessions and transactions in the section xref:transactions.adoc[Run your own transactions].
@@ -209,9 +210,9 @@ Note that although transactions functions might be executed multiple times, the 
 
 [source, javascript]
 ----
-(async () => {
-  var neo4j = require('neo4j-driver')
+const neo4j = require('neo4j-driver');
 
+(async () => {
   const URI = 'neo4j://localhost'
   const USER = 'neo4j'
   const PASSWORD = 'verysecret'

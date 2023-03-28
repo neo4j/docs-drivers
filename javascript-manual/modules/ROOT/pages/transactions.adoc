@@ -14,7 +14,7 @@ Sessions are created with the method link:{neo4j-docs-base-uri}/api/javascript-d
 It takes a single (optional) object parameter, with the property `database` allowing to specify the xref:_database_selection[target database].
 For further parameters, see xref:_session_configuration[Session configuration].
 
-[source,python]
+[source, javascript]
 ----
 session = driver.session({database: 'neo4j'})
 ----
@@ -64,9 +64,9 @@ Within a transaction function, a `return` statement results in the transaction b
 .A transaction with multiple queries, client logic, and potential roll backs.
 [source, javascript]
 ----
-(async () => {
-  var neo4j = require('neo4j-driver')
+const neo4j = require('neo4j-driver');
 
+(async () => {
   const URI = 'neo4j://localhost'
   const USER = 'neo4j'
   const PASSWORD = 'verysecret'
@@ -184,7 +184,9 @@ You run queries inside an explicit transaction with the method link:{neo4j-docs-
 let session = driver.session({database: 'neo4j'})
 transaction = await session.beginTransaction()
 
-// use transaction.run() to run queries
+// await transaction.run('<QUERY 1>')
+// await transaction.run('<QUERY 2>')
+// ...
 
 await transaction.close()
 await session.close()
@@ -194,20 +196,16 @@ The behavior and lifetime of an explicit transaction is controlled through the m
 
 Explicit transactions are most useful for applications that need to distribute Cypher execution across multiple functions for the same transaction, or for applications that need to run multiple queries within a single transaction but without the automatic retries provided by managed transactions.
 
+.Example stub with an explicit transaction involving external APIs
 [source, javascript]
 ----
 async function transfer_to_other_bank(driver, customer_id, other_bank_id, amount) {
   const session = driver.session({database: 'neo4j'})
   const tx = await session.beginTransaction()
   try {
-    if(false === check_customer_balance(tx, customer_id, amount)) {
-      // give up
+    if(! check_customer_balance(tx, customer_id, amount)) {
       return
     }
-
-    other_bank_transfer_api(customer_id, other_bank_id, amount)
-    // Now the money has been transferred => can't rollback anymore
-    // (cannot rollback external services interactions)
 
     try {
       decrease_customer_balance(tx, customer_id, amount)
@@ -216,6 +214,10 @@ async function transfer_to_other_bank(driver, customer_id, other_bank_id, amount
       request_inspection(customer_id, other_bank_id, amount, e)
       throw error  // roll back
     }
+
+    await other_bank_transfer_api(customer_id, other_bank_id, amount)
+    // Now the money has been transferred => can't rollback anymore
+    // (cannot rollback external services interactions)
   } finally {
     await tx.close()  // rolls back if not yet committed
     await session.close()
@@ -317,14 +319,16 @@ When impersonating a user, the query is run within the complete security context
 
 Each connection pool has *a finite number of sessions*, so if you open sessions without ever closing them, your application could run out of them.
 It is thus important to be adamant in always closing sessions when you are done with them, so that they can be returned to the connection pool to be later reused.
+The best way is to wrap session usage in a `try/finally` block, calling `session.close()` in the `finally` clause.
 
 [source, javascript]
 ----
-const session = driver.session({database: 'neo4j'})
-
-// session usage
-
-await session.close()
+let session = driver.session({database: 'neo4j'})
+try {
+  // use session to run queries
+} finally {
+  await session.close()
+}
 ----
 
 ifndef::backend-pdf[]
