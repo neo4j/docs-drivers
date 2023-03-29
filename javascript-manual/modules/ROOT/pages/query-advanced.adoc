@@ -42,11 +42,11 @@ The most common use case for using `Session.run()` is for importing large CSV fi
 let session = driver.session({database: 'neo4j'})
 try {
   const result = await session.run(`
-      LOAD CSV FROM 'https://data.neo4j.com/bands/artists.csv' AS line
-      CALL {
-          WITH line
-          MERGE (:Artist {name: line[1], age: toInteger(line[2])})
-      } IN TRANSACTIONS OF 2 ROWS
+    LOAD CSV FROM 'https://data.neo4j.com/bands/artists.csv' AS line
+    CALL {
+        WITH line
+        MERGE (:Artist {name: line[1], age: toInteger(line[2])})
+    } IN TRANSACTIONS OF 2 ROWS
   `)
   console.log(result.summary.counters.updates())
 } finally {
@@ -95,7 +95,7 @@ let dangerousLabel = 'Special Person\\u0060'
 let escapedLabel = dangerousLabel.replaceAll('\\u0060', '`').replaceAll('`', '``')
 
 let session = driver.session({database: 'neo4j'})
-const result = await session.run('MATCH (p:`'+escapedLabel+'`) RETURN p.name')
+const result = await session.run('MATCH (p:`' + escapedLabel + '`) RETURN p.name')
 console.log(`Executed query: ${result.summary.query.text}`)
 ----
 
@@ -122,6 +122,39 @@ try {
 [NOTE]
 If you are running Neo4j in Docker, APOC needs to be enabled when starting the container.
 See link:https://neo4j.com/labs/apoc/current/installation/#docker[APOC - Installation - Docker].
+
+
+== Logging
+
+Logging on driver instance
+
+
+  // Specify the logging configuration for the driver. Object should have two properties `level` and `logger`.
+  //
+  // Property `level` represents the logging level which should be one of: 'error', 'warn', 'info' or 'debug'. This property is optional and
+  // its default value is 'info'. Levels have priorities: 'error': 0, 'warn': 1, 'info': 2, 'debug': 3. Enabling a certain level also enables all
+  // levels with lower priority. For example: 'error', 'warn' and 'info' will be logged when 'info' level is configured.
+  //
+  // Property `logger` represents the logging function which will be invoked for every log call with an acceptable level. The function should
+  // take two string arguments `level` and `message`. The function should not execute any blocking or long-running operations
+  // because it is often executed on a hot path.
+  //
+  // No logging is done by default. See `neo4j.logging` object that contains predefined logging implementations.
+  logging: {
+    level: 'info',
+    logger: (level, message) => console.log(level + ' ' + message)
+  },
+
+The driver logs messages through the native `logging` library to a logger named `neo4j`.
+To redirect log messages to standard output, use the link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.debug.watch[watch] function:
+
+[source,python]
+----
+import sys
+from neo4j.debug import watch
+
+watch("neo4j", out=sys.stdout)
+----
 
 
 ifndef::backend-pdf[]
