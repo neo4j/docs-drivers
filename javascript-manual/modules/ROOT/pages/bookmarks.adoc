@@ -61,7 +61,7 @@ const neo4j = require('neo4j-driver');
 })()
 
 async function createFriends(driver) {
-  savedBookmarks = []  // To collect the sessions' bookmarks
+  let savedBookmarks = []  // To collect the sessions' bookmarks
 
   // Create the first person and employment relationship.
   const sessionA = driver.session({database: 'neo4j'})
