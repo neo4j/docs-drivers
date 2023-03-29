@@ -58,7 +58,7 @@ Notice that Cypher processes Unicode, so take care of the Unicode literal `\u006
 .Manually escaping dynamic labels before concatenation.
 [source,python]
 ----
-label = "Person"
+label = "Person\\u0060n"
 # convert \u0060 to literal backtick and then escape backticks
 escaped_label = label.replace("\\u0060", "`").replace("`", "``")
 
