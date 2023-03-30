@@ -170,7 +170,7 @@ The `database` parameter is optional but recommended for xref:performance.adoc[p
 Within a session, use the methods link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/session.js~Session.html#instance-method-executeRead[`Session.executeRead()`] and link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/session.js~Session.html#instance-method-executeWrite[`Session.executeWrite()`] *(2)*, depending on whether you want to retrieve data from the database or alter it.
 Both methods take a _transaction function_ callback.
 
-The callback transaction function is responsible for actually carrying out the queries and xref:result.adoc[processing the result].
+It is the transaction function who is responsible for actually carrying out the query.
 Queries are specified with the link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/transaction.js~Transaction.html#instance-method-run[`Transaction.run()`] method *(3)*, which takes a query and its parameters (as an object *(4)*), and returns a link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/result.js~Result.html[`Result`] object.
 When the processing is over, the session is closed *(5)*.
 

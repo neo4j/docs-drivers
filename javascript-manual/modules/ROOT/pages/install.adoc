@@ -18,7 +18,7 @@ For a detailed list of changes across versions, see the link:https://github.com/
 
 [NOTE]
 --
-There is also a link:https://www.npmjs.com/package/neo4j-driver-lite[lite version] of the Neo4j JavaScript Driver, which includes the same features as the regular driver but without support for xref:#[Reactive sessions].
+There is also a link:https://www.npmjs.com/package/neo4j-driver-lite[lite version] of the Neo4j JavaScript Driver, which includes the same features as the regular driver but without support for xref:reactive-sessions.adoc[Reactive sessions].
 You can install it with `npm i neo4j-driver-lite`.
 --
 

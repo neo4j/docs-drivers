@@ -15,7 +15,7 @@ Best suited for queries where records processing is individual.
 Your application receives the result in bits, for lazy consumption.
 - *Reactive API* -- allows to control the rate at which records are retrieved from the server.
 Best suited for reactive applications, where stream control is needed.
-Learn more in xref:query-reactive.adoc[Reactive sessions].
+Learn more in xref:reactive-sessions.adoc[Reactive sessions].
 
 == Promise API
 
