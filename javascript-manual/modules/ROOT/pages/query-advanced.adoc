@@ -31,6 +31,9 @@ Since the driver cannot figure out whether the query in a `session.run()` call r
 [TIP]
 *Implicit transactions are the only ones that can be used for link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/call-subquery/#subquery-call-in-transactions[`CALL { ... } IN TRANSACTIONS`] queries*.
 
+[TIP]
+You can run an implicit transaction with a xref:query-reactive.adoc[reactive session] as well.
+
 
 === Import CSV files
 
@@ -126,35 +129,50 @@ See link:https://neo4j.com/labs/apoc/current/installation/#docker[APOC - Install
 
 == Logging
 
-Logging on driver instance
+When creating a `Driver` instance, you may optionally specify its logging configuration.
 
+Logging is off by default.
+To turn it on, specify the `logging` option when you initialize the driver.
+As value, use the function `neo4j.logging.console()`, which logs to console and takes an optional parameter `level`. The logging level can be either `error`, `warn`, `info`, or `debug`.
+Enabling one level automatically enables all higher priority ones, and its default is `info`.
 
-  // Specify the logging configuration for the driver. Object should have two properties `level` and `logger`.
-  //
-  // Property `level` represents the logging level which should be one of: 'error', 'warn', 'info' or 'debug'. This property is optional and
-  // its default value is 'info'. Levels have priorities: 'error': 0, 'warn': 1, 'info': 2, 'debug': 3. Enabling a certain level also enables all
-  // levels with lower priority. For example: 'error', 'warn' and 'info' will be logged when 'info' level is configured.
-  //
-  // Property `logger` represents the logging function which will be invoked for every log call with an acceptable level. The function should
-  // take two string arguments `level` and `message`. The function should not execute any blocking or long-running operations
-  // because it is often executed on a hot path.
-  //
-  // No logging is done by default. See `neo4j.logging` object that contains predefined logging implementations.
-  logging: {
-    level: 'info',
-    logger: (level, message) => console.log(level + ' ' + message)
-  },
-
-The driver logs messages through the native `logging` library to a logger named `neo4j`.
-To redirect log messages to standard output, use the link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.debug.watch[watch] function:
-
-[source,python]
+.Creating a driver with logging of level `debug` to console.
+[source, javascript]
 ----
-import sys
-from neo4j.debug import watch
-
-watch("neo4j", out=sys.stdout)
+neo4j.driver(
+  uri,
+  neo4j.auth.basic(user, password),
+  {  // driver config
+    logging: neo4j.logging.console('debug')
+  }
+)
 ----
+
+You may also specify a custom logger function, for example to log to a file.
+In that case, the `logging` option expects two properties:
+
+- `level`: either `error`, `warn`, `info`, or `debug`.
+Enabling one level automatically enables all higher priority ones.
+Defaults to `info`.
+- `logger`: a function invoked when a message needs to be logged.
+Takes `level, message` as input.
+
+.Creating a driver with logging of level `error` to console.
+[source, javascript]
+----
+neo4j.driver(
+  uri,
+  neo4j.auth.basic(user, password),
+  {  // driver config
+    logging: {
+      level: 'error',
+      logger: (level, message) => console.log(level + ' ' + message)
+    }
+  }
+)
+----
+
+You can find more information about logging in the link:{neo4j-docs-base-uri}/api/javascript-driver/current/function/index.html#static-function-driver[API documentation].
 
 
 ifndef::backend-pdf[]

@@ -1,5 +1,23 @@
 = Reactive sessions
 
+Typical of reactive programming, consumers control the rate at which they consume records from queries and the driver in turn manages the rate at which records are requested from the
+
+
+[source, javascript]
+----
+const session = driver.rxSession()
+const result = session.executeRead(tx =>
+  tx
+    .run('MATCH (p:Product) WHERE p.id = $id RETURN p.title', { id: 0 })
+    .records()
+    .pipe(
+      map(r => r.get(0)),
+      materialize(),
+      toArray()
+    )
+)
+----
+
 
 ifndef::backend-pdf[]
 [discrete.glossary]
