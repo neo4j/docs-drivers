@@ -2,7 +2,7 @@
 
 The tables in this section show the mapping between Cypher data types and Python types.
 
-== Core data types
+== Core types
 
 [options="header"]
 |===
@@ -397,11 +397,43 @@ with GraphDatabase.driver(URI, auth=AUTH) as driver:
 For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.graph.Path[API documentation -- Graph types -- Path].
 
 
+== Extended types
+
+The driver supports more types as query parameters, which get automatically mapped to one of the xref:_core_types[core types]. Because of this conversion, and because the server does not know anything about the extended types, the driver will never return these types in results, but always their corresponding mapping.
+
+[options="header"]
+|===
+| Parameter Type     | Mapped Python Type
+| tuple              | `list`
+| bytearray          | `bytes`
+| numpy `ndarray`    | `list` (nested)
+| pandas `DataFrame` | `dict`
+| pandas `Series`    | `list`
+| pandas `Array`     | `list`
+|===
+
+
+In general, if you are unsure about the type conversion that would happen on a given parameter, you can test it as in the following example:
+
+[source, python]
+----
+import neo4j
+
+with neo4j.GraphDatabase.driver(URI, auth=AUTH) as driver:
+    with driver.session() as session:
+        type_in = ("foo", "bar")
+        result = session.run("RETURN $x", x=type_in)
+        type_out = result.single()[0]
+        print(type(type_out))  # <class 'list'>
+        print(type_out)        # ['foo', 'bar']
+----
+
+
 == Exceptions
 
 The driver can raise a number of different exceptions.
 A full list is available in the link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#errors[API documentation].
-For a list of errors the server can return, see the link:{neo4j-docs-base-uri}/status-codes/current/[Status code] page.
+For a list of errors the server can return, see the link:{neo4j-docs-base-uri}/status-codes/{page-version}[Status code] page.
 
 .Root exception types
 [options="header", cols="<25m,<75a"]

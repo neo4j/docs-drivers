@@ -15,7 +15,7 @@ This section describes how to create units of work and provide a logical context
 
 # tag::overview[]
 
-The Neo4j Drivers expose a Cypher Channel over which database work can be carried out (see the link:/docs/cypher-manual/5.0[Cypher Manual] for more information
+The Neo4j Drivers expose a Cypher Channel over which database work can be carried out (see the link:{neo4j-docs-base-uri}/cypher-manual/{page-version}[Cypher Manual] for more information
 on the Cypher Query Language).
 
 Work itself is organized into *_sessions_*, *_transactions_* and *_queries_*, as follows:
@@ -35,7 +35,7 @@ This effect is known as xref:terminology.adoc#term-causal-chaining[*_causal chai
 
 # tag::sessions[]
 
-Sessions are *_lightweight containers for causally chained sequences of transactions_* (see link:/docs/operations-manual/5.0/clustering/introduction#causal-consistency-explained[Operations Manual -> Causal consistency]).
+Sessions are *_lightweight containers for causally chained sequences of transactions_* (see link:{neo4j-docs-base-uri}/operations-manual/{page-version}/clustering/introduction#causal-consistency-explained[Operations Manual -> Causal consistency]).
 They essentially provide context for storing transaction sequencing information in the form of bookmarks.
 
 When a transaction begins, the session in which it is contained acquires a connection from the driver connection pool.
@@ -77,7 +77,7 @@ This approach is recommended for most client applications.
 A convenient *_short-form alternative_* is the xref:terminology.adoc#term-auto-commit[*_auto-commit_*] transaction mechanism.
 This provides a limited form of transaction management for single-query transactions, as a trade-off for a slightly smaller code overhead.
 This form of transaction is useful for *_quick scripts and environments where high availability guarantees are not required_*.
-It is also the required form of transaction for running link:/docs/cypher-manual/5.0/clauses/call-subquery#subquery-call-in-transactions[Cypher Manual -> `CALL {} IN TRANSACTIONS`] queries, which are the only type of Cypher Query to manage their own transactions.
+It is also the required form of transaction for running link:{neo4j-docs-base-uri}/cypher-manual/{page-version}/clauses/call-subquery#subquery-call-in-transactions[Cypher Manual -> `CALL {} IN TRANSACTIONS`] queries, which are the only type of Cypher Query to manage their own transactions.
 
 A lower-level *_unmanaged transaction API_* is also available for advanced use cases.
 This is useful when an alternative transaction management layer is applied by the client, in which error handling and retries need to be managed in a custom way.
@@ -100,12 +100,12 @@ To execute a Cypher Query, the *_query text_* is required along with an optional
 The text can contain *_parameter placeholders_* that are substituted with the corresponding values at runtime.
 While it is possible to run non-parameterized Cypher Queries, *_good programming practice is to use parameters in Cypher Queries whenever possible_*.
 This allows for the caching of queries within the Cypher Engine, which is beneficial for performance.
-Parameter values should adhere to link:/docs/cypher-manual/5.0/syntax/values[Cypher values].
+Parameter values should adhere to link:{neo4j-docs-base-uri}/cypher-manual/{page-version}/syntax/values[Cypher values].
 
 A result summary is also generally available.
 This contains additional information relating to the query execution and the result content.
 For an `EXPLAIN` or `PROFILE` query, this is where the query plan is returned.
-See link:/docs/cypher-manual/5.0/query-tuning/how-do-i-profile-a-query[Cypher Manual -> Profiling a query] for more information on these queries.
+See link:{neo4j-docs-base-uri}/cypher-manual/{page-version}/query-tuning/how-do-i-profile-a-query[Cypher Manual -> Profiling a query] for more information on these queries.
 
 # end::queries-results[]
 
@@ -118,7 +118,7 @@ See link:/docs/cypher-manual/5.0/query-tuning/how-do-i-profile-a-query[Cypher Ma
 When working with a *_Causal Cluster_*, transactions can be chained, via a session, to ensure *_causal consistency_*.
 This means that for any two transactions, it is guaranteed that the second transaction will begin only after the first has been successfully committed.
 This is true even if the transactions are carried out on different physical cluster members.
-For more information on Causal Clusters, please refer to link:/docs/operations-manual/5.0/clustering[Operations Manual -> Clustering].
+For more information on Causal Clusters, please refer to link:{neo4j-docs-base-uri}/operations-manual/{page-version}/clustering[Operations Manual -> Clustering].
 
 Internally, causal chaining is carried out by passing bookmarks between transactions.
 Each bookmark records one or more points in transactional history for a particular database, and can be used to inform cluster members to carry out units of work in a particular sequence.
@@ -310,13 +310,13 @@ include::{python-examples}/test_read_write_transaction_example.py[tags=read-writ
 
 For *_Community Edition_*, this is limited to *_one user database_*, plus the `system` database.
 
-From a driver API perspective, sessions have a DBMS scope, and the default database for a session can be selected on session construction. The default database is used as a target for queries that don't explicitly specify a database with a `USE` clause. See link:/docs/cypher-manual/5.0/clauses/use[Cypher Manual -> USE] for details about the `USE` clause.
+From a driver API perspective, sessions have a DBMS scope, and the default database for a session can be selected on session construction. The default database is used as a target for queries that don't explicitly specify a database with a `USE` clause. See link:{neo4j-docs-base-uri}/cypher-manual/{page-version}/clauses/use[Cypher Manual -> USE] for details about the `USE` clause.
 
 In a multi-database environment, *_the server tags one database as default_*.
 This is selected whenever a session is created without naming a particular database as default.
 In an environment with a single database, that database is always the default.
 
-For more information about managing multiple databases within the same DBMS, refer to link:/docs/cypher-manual/5.0/introduction/neo4j-databases-graphs[Cypher Manual -> Neo4j databases and graphs], which has a full breakdown of the *Neo4j* data storage hierarchy.
+For more information about managing multiple databases within the same DBMS, refer to link:{neo4j-docs-base-uri}/cypher-manual/{page-version}/introduction/neo4j-databases-graphs[Cypher Manual -> Neo4j databases and graphs], which has a full breakdown of the *Neo4j* data storage hierarchy.
 
 The following example illustrates how to work with databases:
 
@@ -358,7 +358,7 @@ The database name must not be `null`, nor an empty string.
 *_The selection of database is only possible when the driver is connected against Neo4j Enterprise Edition_*.
 Changing to any other database than the default database in Neo4j Community Edition will lead to a runtime error.
 
-The following example illustrates the concept of DBMS link:/docs/cypher-manual/5.0/introduction/transactions#dbms-transactions[Cypher Manual -> Transactions] and shows how queries to multiple databases can be issued in one driver transaction. It is annotated with comments describing how each operation impacts database transactions.
+The following example illustrates the concept of DBMS link:{neo4j-docs-base-uri}/cypher-manual/{page-version}/introduction/transactions#dbms-transactions[Cypher Manual -> Transactions] and shows how queries to multiple databases can be issued in one driver transaction. It is annotated with comments describing how each operation impacts database transactions.
 
 [source, indent=0]
 ----
@@ -478,7 +478,7 @@ All types can be potentially found in the result, although not all types can be 
 |===
 
 +*+ The null marker is not a type but a placeholder for absence of value.
-For information on how to work with null in Cypher, please refer to link:/docs/cypher-manual/5.0/syntax/working-with-null[Cypher Manual -> Working with `null`].
+For information on how to work with null in Cypher, please refer to link:{neo4j-docs-base-uri}/cypher-manual/{page-version}/syntax/working-with-null[Cypher Manual -> Working with `null`].
 
 +**+ Nodes, relationships and paths are passed in results as snapshots of the original graph entities.
    While the original entity IDs are included in these snapshots, no permanent link is retained back to the underlying server-side entities, which may be deleted or otherwise altered independently of the client copies.
@@ -647,7 +647,7 @@ Inbound conversion is carried out using http://cldr.unicode.org/development/deve
 # tag::exceptions-errors[]
 
 When executing *Cypher* or carrying out other operations with the driver, certain exceptions and error cases may arise.
-*_Server-generated exceptions_* are each associated with a link:/docs/status-codes/5.0#status-codes[*_status code_*] that describes the nature of the problem and a message that provides more detail.
+*_Server-generated exceptions_* are each associated with a link:{neo4j-docs-base-uri}/status-codes/{page-version}[*_status code_*] that describes the nature of the problem and a message that provides more detail.
 
 The classifications are listed in the table below.
 

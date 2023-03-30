@@ -117,7 +117,7 @@ The *_encryption_* and *_trust_* settings provide detail to how that connection 
 Starting with *Neo4j 4.0*, client-server communication uses only *_unencrypted local connections by default_*.
 This is a change from previous versions, which switched on encryption by default, but generated a self-signed certificate out of the box.
 
-When a full certificate is installed, and encryption is enabled on the driver, full certificate checks are carried out (refer to link:/docs/operations-manual/5.0/security/ssl-framework[Operations Manual -> SSL framework]).
+When a full certificate is installed, and encryption is enabled on the driver, full certificate checks are carried out (refer to link:{neo4j-docs-base-uri}/operations-manual/{page-version}/security/ssl-framework[Operations Manual -> SSL framework]).
 Full certificates provide better overall security than self-signed certificates as they include a complete chain of trust back to a root certificate authority.
 
 # end::uris[]
@@ -245,44 +245,18 @@ The driver does not expose any API to work directly with the routing table, but 
 # end::routing-table[]
 
 
-[[driver-routing-context]]
-=== Routing context
+=== Load balancing policies
 
-# tag::routing-context[]
+# tag::load-balancing-policies[]
 
-A routing context can be included as the query part of a `neo4j://` URI.
-
-Routing contexts are defined by means of *_server policies_* and allow customization of the contents of the routing table.
-
-.Configure a routing driver with routing context
-====
-This example will assume that *Neo4j* has been configured for server policies as described in link:/docs/operations-manual/5.0/clustering-advanced/multi-data-center/load-balancing[Neo4j Operations Manual -> Load balancing for multi-data center systems].
-In particular, a server policy called `europe` has been defined.
-Additionally, we have a server `neo01.graph.example.com` to which we wish to direct the driver.
-
-This URI will use the server policy `europe`:
-
-`neo4j://neo01.graph.example.com?policy=europe`
-====
+A `policy` parameter can be included in the query string of a `neo4j://` URI, to customize the routing table and take advantage of link:{neo4j-docs-base-uri}/operations-manual/{page-version}/clustering/clustering-advanced/multi-data-center-routing/[multi-data center routing settings].
 
 [NOTE]
-.Server-side configuration to enable routing drivers with routing context
 ====
-A prerequisite for using a routing driver with routing context is that the *Neo4j* database is operated on a link:/docs/operations-manual/5.0/clustering[Causal Cluster] with the link:/docs/operations-manual/5.0/clustering-advanced/multi-data-center[Multi-data center licensing option] enabled.
-Additionally, the routing contexts must be defined within the cluster as *_routing policies_*.
-
-For details on how to configure *_multi-data center routing policies_* for a Causal Cluster, please refer to link:/docs/operations-manual/5.0/clustering-advanced/multi-data-center/load-balancing[Operations Manual -> Causal Clustering].
+A prerequisite for using load balancing policies with the driver is that the database is operated on a link:{neo4j-docs-base-uri}/operations-manual/{page-version}/clustering[cluster], and that some link:{neo4j-docs-base-uri}/operations-manual/{page-version}/clustering/clustering-advanced/multi-data-center-routing/#mdc-policy-definitions[server policies] are set up.
 ====
 
-[NOTE]
-.Exposing a single instance deployment on a remote host using the `neo4j` URI scheme
-====
-If you are using a *_single instance_* of *Neo4j*, deployed on a remote machine whilst using the `neo4j` URI scheme, *_you will need to complete additional configuration of the server_*.
-
-To make the server aware of its deployment environment, you need to configure link:/docs/operations-manual/5.0/reference/configuration-settings/#config_server.default_advertised_address[`default_advertised_address`] with your deployment machine's host name, as visible from the client machine.
-====
-
-# end::routing-context[]
+# end::load-balancing-policies[]
 
 
 [[driver-configuration-examples]]
@@ -292,9 +266,9 @@ To make the server aware of its deployment environment, you need to configure li
 
 *_Connection URIs_* are typically formed according to the following pattern:
 
-[source, shell, indent=0]
+[source, shell]
 ----
-neo4j://<HOST>:<PORT>[?<ROUTING_CONTEXT>]
+neo4j://<HOST>:<PORT>[?policy=<POLICY-NAME>]
 ----
 
 This targets a routed *Neo4j* service that may be fulfilled by either a cluster or a single instance.

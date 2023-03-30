@@ -82,19 +82,17 @@ include::{java-examples}/ConfigCustomResolverExample.java[tags=config-custom-res
 include::{common-partial}/client-applications.adoc[tag=routing-table]
 
 
-[[java-driver-routing-context]]
-=== Routing context
+=== Load balancing policies
 
-include::{common-partial}/client-applications.adoc[tag=routing-context]
+include::{common-partial}/client-applications.adoc[tag=load-balancing-policies]
 
 
-[[java-driver-configuration-examples]]
 === Examples
 
 include::{common-partial}/client-applications.adoc[tag=examples-pt1]
 
 In a clustered environment, the URI address will resolve to one of more of the core members; for standalone installations, this will simply point to that server address.
-The `ROUTING_CONTEXT` option allows for customization of the routing table and is discussed in more detail in xref:client-applications.adoc#java-driver-routing-context[Routing context].
+The `policy` parameter allows for customization of the routing table and is discussed in more detail in xref:client-applications.adoc#_load_balancing_policies[load balancing policies].
 
 include::{common-partial}/client-applications.adoc[tag=examples-pt2]
 
