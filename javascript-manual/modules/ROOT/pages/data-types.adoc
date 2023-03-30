@@ -251,7 +251,6 @@ For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current
 == Graph types
 
 *Graph types are only passed as results and may not be used as parameters*.
-The section xref:result#_transform_to_graph[Work with the result -- Transform to graph] contains an example with graph types.
 
 [options="header"]
 |===
