@@ -88,39 +88,19 @@ If authentication is disabled on the server, the authentication parameter can be
 == Custom address resolver
 
 When creating a `Driver` object, you can specify a _resolver_ function to resolve any addresses the driver receives ahead of DNS resolution.
-Your resolver function is called with an link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Address[`Address`] object and should return an iterable of link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Address[`Address`] objects (or values that can be used to construct `Address` objects)
 
-In the following example, the connection to `example.com` on port `9999` is resolved to `localhost` on port `7687`:
-
+.Expand a single address into multiple ones
 [source, javascript]
 ----
-import neo4j
-
-
-def custom_resolver(socket_address):
-    # assert isinstance(socket_address, neo4j.Address)
-    if socket_address != ("example.com", 9999):
-        raise OSError(f"Unexpected socket address {socket_address!r}")
-
-    # You can return any neo4j.Address object
-    yield neo4j.Address(("localhost", 7687))  # IPv4
-    yield neo4j.Address(("::1", 7687, 0, 0))  # IPv6
-    yield neo4j.Address.parse("localhost:7687")
-    yield neo4j.Address.parse("[::1]:7687")
-
-    # or any tuple that can be passed to neo4j.Address(...).
-    # This will initially be interpreted as IPv4, but DNS resolution
-    # will turn it into IPv6 if appropriate.
-    yield "::1", 7687
-    # This will be interpreted as IPv6 directly, but DNS resolution will
-    # still happen.
-    yield "::1", 7687, 0, 0
-    yield "127.0.0.1", 7687
-
-
-driver = neo4j.GraphDatabase.driver("neo4j://example.com:9999",
-                                    auth=(user, password),
-                                    resolver=custom_resolver)
+uri = 'neo4j://example.com'
+addresses = [
+  'a.example.com:7575',
+  'b.example.com:7676',
+  'c.example.com:8787'
+]
+driver = neo4j.driver(uri, neo4j.auth.basic(user, password), {
+  resolver: address => addresses
+})
 ----
 
 

@@ -11,7 +11,6 @@
 * xref:transactions.adoc[Run your own transactions]
 * xref:query-async.adoc[Asynchronous queries]
 * xref:bookmarks.adoc[Coordinate parallel transactions]
-* xref:reactive-sessions.adoc[Reactive sessions]
 * xref:query-advanced.adoc[Further query mechanisms]
 * xref:performance.adoc[Performance recommendations]
 

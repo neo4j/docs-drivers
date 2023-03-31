@@ -4,8 +4,9 @@ The examples in xref:query-simple.adoc[Query the database] use the `async/await`
 When using `await` with a query, your application waits for the server to retrieve all query results and transmit them to the driver.
 This is not a problem for most use cases, but for queries that have a long processing time or a large result set, asynchronous handling may speed up your application.
 
-There are three ways to run asynchronous queries:
+There are several ways of running asynchronous queries:
 
+- *Asynchronous iteration* -- the query result is processed (iteratively) as quickly as your application can handle.
 - *Promise API* -- the query result is returned as a link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises[`Promise`].
 The promise is only resolved when the full result set is available to the driver.
 Best suited for queries with a large server processing time, but the result of which you want to process in one go.
@@ -13,35 +14,64 @@ Your application receives the result in bulk, for eager consumption.
 - *Streaming API* -- the query result is returned as a stream, so that each result record is processed as soon as it is available.
 Best suited for queries where records processing is individual.
 Your application receives the result in bits, for lazy consumption.
-- *Reactive API* -- allows to control the rate at which records are retrieved from the server.
-Best suited for reactive applications, where stream control is needed.
-Learn more in xref:reactive-sessions.adoc[Reactive sessions].
+- *Reactive API* -- for reactive applications.
+
+== Asynchronous iteration
+
+The `Result` object supports link:https://javascript.info/async-iterators-generators[asynchronous iteration].
+This allows your application to process data at its own pace, with the driver modulating the speed at which records are streamed from the server accordingly, applying <<backpressure>>.
+With async iterators, you get the guarantee that your application does not receive data faster than it can process.
+
+[source, javascript]
+----
+let session = driver.session()
+try {
+  const result = session.executeWrite(async tx => {  // <1>
+    return session.run(
+      'MERGE (p:Person {name: $name}) RETURN p.name AS name',
+      {name: 'Alice'}
+    )
+  })
+  for await (const record of result) {  // <2>
+    console.log(record.get('name'))
+  }
+} finally {
+  await session.close()
+}
+----
+
+<1> Run a query
+<2> Process records with async iteration
 
 == Promise API
 
 The Promise API allows you to run a query and receive the result as a link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises[`Promise`].
-You can think of this query method as allowing you to specify a Cypher query and a number of callbacks that are executed depending on the query outcome.
+You can think of this query method as allowing you to specify a Cypher query and a number of callbacks that are asynchronously executed depending on the query outcome.
 
-[source, javascript]
+[source, javascript, role=nocollapse]
 ----
 let session = driver.session({database: 'neo4j'})
-session
-  .run('MERGE (p:Person WHERE p.name = $name) RETURN p.name AS name', {  // <1>
-    name: 'Alice'
+
+const result = session.executeWrite(async tx => {  // <1>
+  return session.run(
+    'MERGE (p:Person {name: $name}) RETURN p.name AS name',
+    {name: 'Alice'}
+  )
+})
+
+result.then(result => {  // <2>
+  result.records.forEach(record => {
+    console.log(record.get('name'))
   })
-  .then(result => {  // <2>
-    result.records.forEach(record => {
-      console.log(record.get('name'))
-    })
-    return result
-  })
-  .catch(error => {  // <3>
-    console.log(error)
-  })
-  .then(() => session.close())  // <4>
+  return result
+})
+.catch(error => {  // <3>
+  console.log(error)
+})
+.then(() => session.close())  // <4>
 ----
 
-<1> Run a query with `session.run()`
+<1> Run a query
 <2> Specify callback for successful runs, taking query result as input
 <3> Specify callback for failed runs, taking driver error as input
 <4> Specify callback to run regardless of query outcome
@@ -119,12 +149,42 @@ session
   })
 ----
 
-<1> Run a query with `session.run()`
+<1> Run a query
 <2> Attach a handler to the result stream
 <3> The `onKeys` callback receives the list of result columns
 <4> The `onNext` callback is invoked every time a record is received
 <5> The `onCompleted` callback is invoked when the transaction is over
 <6> The `onError` is triggered in case of error
+
+
+== Reactive API
+
+Typical of reactive programming, in a reactive flow consumers control the rate at which they consume records from queries, and the driver in turn manages the rate at which records are requested from the server.
+The reactive API is typically used in applications that are already oriented towards the reactive style.
+
+[source, javascript]
+----
+let session = driver.rxSession()  // <1>
+let result = session
+  .run('MERGE (p:Person {name: $name}) RETURN p.name AS name', {  // <2>
+    name: 'Alice'
+  })
+  .records()  // <3>
+  .pipe(  // <4>
+    rxjs.map(record => record.get('name')),
+    //rxjs.materialize(),  // optional, turns outputs into Notifications
+    rxjs.toArray()
+  )
+  .subscribe((name) => console.log(name))
+----
+<1> Obtain a reactive session
+<2> Run a query
+<3> Obtain an observable for result records
+<4> Reactive processing
+
+[NOTE]
+The reactive API requires a link:{neo4j-docs-base-uri}/docs/api/javascript-driver/current/class/src/session-rx.js~RxSession.html[`RxSession`] and returns a link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/src/result-rx.js~RxResult.html[`RxResult`].
+
 
 ifndef::backend-pdf[]
 [discrete.glossary]
