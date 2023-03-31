@@ -32,7 +32,7 @@ Since the driver cannot figure out whether the query in a `session.run()` call r
 *Implicit transactions are the only ones that can be used for link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/call-subquery/#subquery-call-in-transactions[`CALL { ... } IN TRANSACTIONS`] queries*.
 
 [TIP]
-You can run an implicit transaction with a xref:reactive-sessions.adoc[reactive session] as well.
+You can run an implicit transaction with a xref:query-async#_reactive_api.adoc[reactive session] as well.
 
 
 === Import CSV files

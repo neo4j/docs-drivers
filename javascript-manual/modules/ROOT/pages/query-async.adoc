@@ -164,6 +164,8 @@ The reactive API is typically used in applications that are already oriented tow
 
 [source, javascript]
 ----
+const rxjs = require('rxjs');
+
 let session = driver.rxSession()  // <1>
 let result = session
   .run('MERGE (p:Person {name: $name}) RETURN p.name AS name', {  // <2>
