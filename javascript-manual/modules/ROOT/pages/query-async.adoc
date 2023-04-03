@@ -27,9 +27,9 @@ With async iterators, you get the guarantee that your application does not recei
 
 [source, javascript]
 ----
-let session = driver.session()
+const session = driver.session()
 try {
-  peopleRecords = session.executeWrite(async tx => {
+  const peopleRecords = session.executeWrite(async tx => {
     const result = session.run(  // <1>
       'MERGE (p:Person {name: $name}) RETURN p.name AS name',
       {name: 'Alice'}
@@ -48,10 +48,12 @@ try {
 
 <1> Run a query
 <2> Process records with async iteration
-<3> Return processed results
+<3> Return _processed_ results (and not the raw query result)
 
-can't read results twice, it's a cursor
-processing happens inside transaction function
+There are two important points to the usage of the async iterator:
+
+- *you can async-iterate only _once_ per query result*. Once the result _cursor_ reaches the end of the stream, it does not rewind, so you cannot iterate over a result more than once. If you need to process the data more than once in your application, you have to manually store it in an auxiliary data structure (like a list, as above).
+- *the processing of the result happens _inside_ the <<transaction_function>>*. You *should not* return the raw result out of the transaction function and _then_ iterate over it. That workflow only works with the xref:_promise_api[Promise API].
 
 
 == Promise API
@@ -61,15 +63,13 @@ You can think of this query method as allowing you to specify a Cypher query and
 
 [source, javascript, role=nocollapse]
 ----
-let session = driver.session({database: 'neo4j'})
-
+const session = driver.session({database: 'neo4j'})
 const result = session.executeWrite(async tx => {  // <1>
-  return session.run(
+  return tx.run(
     'MERGE (p:Person {name: $name}) RETURN p.name AS name',
     {name: 'Alice'}
   )
 })
-
 result.then(result => {  // <2>
   result.records.forEach(record => {
     console.log(record.get('name'))
@@ -89,8 +89,8 @@ result.then(result => {  // <2>
 
 [TIP]
 ====
-The default return value of `session.run()` is a `Promise`.
-If you prepend `await` to `session.run()` as shown in xref:query-simple.adoc[Query the database], you effectively force your application to wait until the result is ready, and you obtain the corresponding of either `result` or `error` from the example above.
+The default return value of `tx.run()` is a `Promise`.
+If you prepend `await` to `tx.run()` as shown in xref:query-simple.adoc[Query the database], you effectively force your application to wait until the result is ready, and you obtain the corresponding of either `result` or `error` from the example above.
 ====
 
 
@@ -139,8 +139,10 @@ This API is particularly fit for cases in which it may take the server a differe
 
 [source, javascript, role=nocollapse]
 ----
-let session = driver.session({database: 'neo4j'})
-session
+const session = driver.session({database: 'neo4j'})
+const records = session.executeWrite(tx => {
+  let peopleRecords = []
+  tx
   .run('MERGE (p:Person {name: $name}) RETURN p.name AS name', {  // <1>
     name: 'Alice'
   })
@@ -150,7 +152,8 @@ session
       console.log(keys)
     },
     onNext: record => {  // <4>
-      console.log(`Name: ${record.get('name')}`)
+      console.log(`Processing ${record.get('name')}`)
+      peopleRecords.push(record)
     },
     onCompleted: () => {  // <5>
       session.close() // returns a Promise
@@ -159,6 +162,8 @@ session
       console.log(error)
     }
   })
+  return peopleRecords
+})
 ----
 
 <1> Run a query
@@ -167,6 +172,8 @@ session
 <4> The `onNext` callback is invoked every time a record is received
 <5> The `onCompleted` callback is invoked when the transaction is over
 <6> The `onError` is triggered in case of error
+
+Notice that *the processing of the result happens _inside_ the <<transaction_function>>*. You *should not* return the raw result out of the transaction function and _then_ subscribe to it.
 
 
 == Reactive API
@@ -178,8 +185,8 @@ The reactive API is typically used in applications that are already oriented tow
 ----
 const rxjs = require('rxjs');
 
-let session = driver.rxSession()  // <1>
-let rxResult = session.executeRead(tx => {
+const rxSession = driver.rxSession()  // <1>
+const rxResult = rxSession.executeRead(tx => {
   return tx
     .run('MERGE (p:Person {name: $name}) RETURN p.name AS name', {  // <2>
       name: 'Alice'
@@ -207,4 +214,5 @@ ifndef::backend-pdf[]
 == Glossary
 
 include::{common-partial}/glossary.adoc[]
+include::../partials/glossary.adoc[]
 endif::[]

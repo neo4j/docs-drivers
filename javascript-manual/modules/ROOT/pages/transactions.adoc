@@ -33,7 +33,7 @@ As Neo4j is <<ACID>> compliant, *queries within a transaction will either be exe
 Use transactions to group together related queries which work together to achieve a single _logical_ database operation.
 
 A managed transaction is created with the methods link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/session.js~Session.html#instance-method-executeRead[`Session.executeRead()`] and link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/session.js~Session.html#instance-method-executeRead[`Session.executeWrite()`], depending on whether you want to _retrieve_ data from the database or _alter_ it.
-Both methods take a _transaction function_ callback *(1)*, which is responsible of actually carrying out the queries and processing the result.
+Both methods take a <<transaction_function>> callback *(1)*, which is responsible of actually carrying out the queries and processing the result.
 Queries are specified with the link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/transaction.js~Transaction.html#instance-method-run[`Transaction.run()`] method *(2)*, where you provide a Cypher query *(3)* and an object of query parameters *(4)* which returns a link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/result.js~Result.html[`Result`] object.
 You can then process the result records and query summary *(5)*.
 
@@ -336,4 +336,5 @@ ifndef::backend-pdf[]
 == Glossary
 
 include::{common-partial}/glossary.adoc[]
+include::../partials/glossary.adoc[]
 endif::[]
