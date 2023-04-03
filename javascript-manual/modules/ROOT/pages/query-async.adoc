@@ -16,6 +16,9 @@ Best suited for queries where records processing is individual.
 Your application receives the result in bits, for lazy consumption.
 - *Reactive API* -- for reactive applications.
 
+[INFO]
+Processing inside transaction function, except for Promise
+
 == Asynchronous iteration
 
 The `Result` object supports link:https://javascript.info/async-iterators-generators[asynchronous iteration].
@@ -26,15 +29,18 @@ With async iterators, you get the guarantee that your application does not recei
 ----
 let session = driver.session()
 try {
-  const result = session.executeWrite(async tx => {  // <1>
-    return session.run(
+  peopleRecords = session.executeWrite(async tx => {
+    const result = session.run(  // <1>
       'MERGE (p:Person {name: $name}) RETURN p.name AS name',
       {name: 'Alice'}
     )
+    records = []
+    for await (const record of result) {  // <2>
+      console.log(`Processing ${record.get('name')}`)
+      records.push(record)
+    }
+    return records  // <3>
   })
-  for await (const record of result) {  // <2>
-    console.log(record.get('name'))
-  }
 } finally {
   await session.close()
 }
@@ -42,6 +48,11 @@ try {
 
 <1> Run a query
 <2> Process records with async iteration
+<3> Return processed results
+
+can't read results twice, it's a cursor
+processing happens inside transaction function
+
 
 == Promise API
 
@@ -81,6 +92,7 @@ result.then(result => {  // <2>
 The default return value of `session.run()` is a `Promise`.
 If you prepend `await` to `session.run()` as shown in xref:query-simple.adoc[Query the database], you effectively force your application to wait until the result is ready, and you obtain the corresponding of either `result` or `error` from the example above.
 ====
+
 
 === Combine multiple transactions
 
@@ -167,17 +179,19 @@ The reactive API is typically used in applications that are already oriented tow
 const rxjs = require('rxjs');
 
 let session = driver.rxSession()  // <1>
-let result = session
-  .run('MERGE (p:Person {name: $name}) RETURN p.name AS name', {  // <2>
-    name: 'Alice'
+let rxResult = session.executeRead(tx => {
+  return tx
+    .run('MERGE (p:Person {name: $name}) RETURN p.name AS name', {  // <2>
+      name: 'Alice'
+    })
+    .records()  // <3>
+    .pipe(  // <4>
+      rxjs.map(record => record.get('name')),
+      //rxjs.materialize(),  // optional, turns outputs into Notifications
+      rxjs.toArray()
+    )
   })
-  .records()  // <3>
-  .pipe(  // <4>
-    rxjs.map(record => record.get('name')),
-    //rxjs.materialize(),  // optional, turns outputs into Notifications
-    rxjs.toArray()
-  )
-  .subscribe((name) => console.log(name))
+rxResult.subscribe((name) => console.log(name))
 ----
 <1> Obtain a reactive session
 <2> Run a query
