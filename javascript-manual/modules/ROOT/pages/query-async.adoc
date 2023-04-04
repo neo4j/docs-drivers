@@ -29,17 +29,17 @@ With async iterators, you get the guarantee that your application does not recei
 ----
 const session = driver.session()
 try {
-  const peopleRecords = session.executeWrite(async tx => {
+  const peopleNames = session.executeWrite(async tx => {
     const result = session.run(  // <1>
       'MERGE (p:Person {name: $name}) RETURN p.name AS name',
       {name: 'Alice'}
     )
-    records = []
+    let names = []
     for await (const record of result) {  // <2>
       console.log(`Processing ${record.get('name')}`)
-      records.push(record)
+      names.push(record.get('name'))
     }
-    return records  // <3>
+    return names  // <3>
   })
 } finally {
   await session.close()
