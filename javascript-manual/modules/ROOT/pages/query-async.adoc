@@ -140,9 +140,9 @@ This API is particularly fit for cases in which it may take the server a differe
 [source, javascript, role=nocollapse]
 ----
 const session = driver.session({database: 'neo4j'})
-const records = session.executeWrite(tx => {
-  let peopleRecords = []
-  tx
+let peopleNames = []
+
+session
   .run('MERGE (p:Person {name: $name}) RETURN p.name AS name', {  // <1>
     name: 'Alice'
   })
@@ -153,7 +153,7 @@ const records = session.executeWrite(tx => {
     },
     onNext: record => {  // <4>
       console.log(`Processing ${record.get('name')}`)
-      peopleRecords.push(record)
+      peopleNames.push(record.get('name'))
     },
     onCompleted: () => {  // <5>
       session.close() // returns a Promise
@@ -162,8 +162,6 @@ const records = session.executeWrite(tx => {
       console.log(error)
     }
   })
-  return peopleRecords
-})
 ----
 
 <1> Run a query
@@ -172,8 +170,6 @@ const records = session.executeWrite(tx => {
 <4> The `onNext` callback is invoked every time a record is received
 <5> The `onCompleted` callback is invoked when the transaction is over
 <6> The `onError` is triggered in case of error
-
-Notice that *the processing of the result happens _inside_ the <<transaction_function>>*. You *should not* return the raw result out of the transaction function and _then_ subscribe to it.
 
 
 == Reactive API
