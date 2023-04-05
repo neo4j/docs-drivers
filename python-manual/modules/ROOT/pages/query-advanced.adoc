@@ -1,28 +1,29 @@
 = Further query mechanisms
 
-== Auto-commit (or implicit) transactions
+[[implicit-transactions]]
+== Implicit (or auto-commit) transactions
 
 This is the most basic and limited form with which to run a Cypher query.
-The driver will not automatically retry auto-commit transactions, as it does instead for queries run with xref:transactions#managed-transactions[managed transactions].
-Auto-commit transactions should only be used when xref:transactions#managed-transactions[transaction functions] do not fit the purpose, or for quick prototyping.
+The driver will not automatically retry implicit transactions, as it does instead for queries run with xref:transactions#managed-transactions[managed transactions].
+Implicit transactions should only be used when xref:transactions#managed-transactions[transaction functions] do not fit the purpose, or for quick prototyping.
 
-You run an auto-commit transaction with the method link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Session.run[`Session.run()`].
+You run an implicit transaction with the method link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Session.run[`Session.run()`].
 It returns a `Result` object that needs to be processed with the xref:result#manipulate-result[related methods].
 
 [source,python]
 ----
-with driver.session(database='neo4j') as session:
+with driver.session(database="neo4j") as session:
     session.run("CREATE (a:Person {name: $name})", name=name)
 ----
 
-An auto-commit transaction gets committed _at the latest_ when the session is destroyed, or before another transaction is executed within the same session.
-Other than that, there is no clear guarantee on when exactly an auto-commit transaction will be committed during the lifetime of a session.
-To ensure an auto-commit transaction is committed, you can call the `.consume()` method on its result.
+An implicit transaction gets committed _at the latest_ when the session is destroyed, or before another transaction is executed within the same session.
+Other than that, there is no clear guarantee on when exactly an implicit transaction will be committed during the lifetime of a session.
+To ensure an implicit transaction is committed, you can call the `.consume()` method on its result.
 
-Since the driver cannot figure out whether the query in a `session.run()` call requires a read or write session with the database, it defaults to write. If your auto-commit transaction contains read queries only, there is a performance gain in xref:transactions#_request_routing[making the driver aware] by setting the keyword argument `default_access_mode=neo4j.READ_ACCESS` when creating the session.
+Since the driver cannot figure out whether the query in a `session.run()` call requires a read or write session with the database, it defaults to write. If your implicit transaction contains read queries only, there is a performance gain in xref:transactions#_request_routing[making the driver aware] by setting the keyword argument `default_access_mode=neo4j.READ_ACCESS` when creating the session.
 
 [TIP]
-*Auto-commit transactions are the only ones that can be used for link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/call-subquery/#subquery-call-in-transactions[`CALL { ... } IN TRANSACTIONS`] queries*.
+*Implicit transactions are the only ones that can be used for link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/call-subquery/#subquery-call-in-transactions[`CALL { ... } IN TRANSACTIONS`] queries*.
 
 
 === Import CSV files
@@ -32,7 +33,7 @@ The most common use case for using `Session.run()` is for importing large CSV fi
 .Import CSV data into a Neo4j database
 [source,python]
 ----
-with driver.session(database='neo4j') as session:
+with driver.session(database="neo4j") as session:
     result = session.run("""
         LOAD CSV FROM 'https://data.neo4j.com/bands/artists.csv' AS line
         CALL {
@@ -46,7 +47,7 @@ with driver.session(database='neo4j') as session:
 For more information, see link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/load-csv/[Cypher -- Clauses -- Load CSV].
 
 
-=== Configure auto-commit transactions with the `Query` object
+=== Transaction configuration
 
 The link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Query[`Query`] object allows to specify a query timeout and to attach metadata to the transaction.
 The metadata is visible in the server logs (as described for the xref:transactions#unit_of_work-decorator[`unit_of_work`] decorator).
@@ -123,6 +124,24 @@ import sys
 from neo4j.debug import watch
 
 watch("neo4j", out=sys.stdout)
+----
+
+.Example of log output upon driver connection
+[source, log]
+----
+[DEBUG   ] [Thread 139807941394432] [Task None           ] 2023-03-31 09:31:39,616  [#0000]  _: <POOL> created, routing address IPv4Address(('localhost', 7687))
+[DEBUG   ] [Thread 139807941394432] [Task None           ] 2023-03-31 09:31:39,616  [#0000]  _: <POOL> acquire routing connection, access_mode='WRITE', database='neo4j'
+[DEBUG   ] [Thread 139807941394432] [Task None           ] 2023-03-31 09:31:39,616  [#0000]  _: <ROUTING> checking table freshness (readonly=False): table expired=True, has_server_for_mode=False, table routers={IPv4Address(('localhost', 7687))} => False
+[DEBUG   ] [Thread 139807941394432] [Task None           ] 2023-03-31 09:31:39,616  [#0000]  _: <POOL> attempting to update routing table from IPv4Address(('localhost', 7687))
+[DEBUG   ] [Thread 139807941394432] [Task None           ] 2023-03-31 09:31:39,616  [#0000]  _: <RESOLVE> in: localhost:7687
+[DEBUG   ] [Thread 139807941394432] [Task None           ] 2023-03-31 09:31:39,617  [#0000]  _: <RESOLVE> dns resolver out: 127.0.0.1:7687
+[DEBUG   ] [Thread 139807941394432] [Task None           ] 2023-03-31 09:31:39,617  [#0000]  _: <POOL> _acquire router connection, database='neo4j', address=ResolvedIPv4Address(('127.0.0.1', 7687))
+[DEBUG   ] [Thread 139807941394432] [Task None           ] 2023-03-31 09:31:39,617  [#0000]  _: <POOL> trying to hand out new connection
+[DEBUG   ] [Thread 139807941394432] [Task None           ] 2023-03-31 09:31:39,617  [#0000]  C: <OPEN> 127.0.0.1:7687
+[DEBUG   ] [Thread 139807941394432] [Task None           ] 2023-03-31 09:31:39,619  [#AF18]  C: <MAGIC> 0x6060B017
+[DEBUG   ] [Thread 139807941394432] [Task None           ] 2023-03-31 09:31:39,619  [#AF18]  C: <HANDSHAKE> 0x00000005 0x00020404 0x00000104 0x00000003
+[DEBUG   ] [Thread 139807941394432] [Task None           ] 2023-03-31 09:31:39,620  [#AF18]  S: <HANDSHAKE> 0x00000005
+[DEBUG   ] [Thread 139807941394432] [Task None           ] 2023-03-31 09:31:39,620  [#AF18]  C: HELLO {'user_agent': 'neo4j-python/5.6.0 Python/3.10.6-final-0 (linux)', 'routing': {'address': 'localhost:7687'}, 'scheme': 'basic', 'principal': 'neo4j', 'credentials': '*******'}
 ----
 
 
