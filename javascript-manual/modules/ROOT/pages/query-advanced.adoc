@@ -108,9 +108,8 @@ It supports dynamic labels and property keys, but only for node insertion.
 .Using `apoc.merge.node` to create a node with dynamic labels/property keys
 [source, javascript]
 ----
-propertyKey = "name"
-label = "Person"
-
+const propertyKey = 'name'
+const label = 'Person'
 let session = driver.session({database: 'neo4j'})
 try {
   await session.run(
@@ -118,7 +117,7 @@ try {
     {labels: [label], properties: {property_key: 'Alice'}},
   )
 } finally {
-  session.close()
+  await session.close()
 }
 ----
 
