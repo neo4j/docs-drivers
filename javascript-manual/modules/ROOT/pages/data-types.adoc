@@ -45,51 +45,66 @@ Temporal objects are immutable.
 |===
 
 .How to use temporal types in queries
-[source,python]
+[source, javascript]
 ----
-from datetime import datetime
-import pytz
-from neo4j import GraphDatabase
-from neo4j.time import DateTime
+const neo4j = require('neo4j-driver');
+const URI = 'neo4j://localhost';
+const USER = 'neo4j';
+const PASSWORD = 'verysecret';
 
+(async () => {
+  const driver = neo4j.driver(URI, neo4j.auth.basic(USER, PASSWORD))
+  const session = driver.session({database: 'neo4j'})
 
-URI = "neo4j://localhost:7687"
-AUTH = ("neo4j", "secretgraph")
+  const friendsSince = new neo4j.types.DateTime(1999, 11, 23, 7, 47, 0, 4123, -4*3600, 'US/Eastern')
 
+  // JS native types work as well.
+  // They don't support the full feature-set of Neo4j's type though.
+  // let jsFriendsSince = new Date(1999, 11, 23, 7, 47, 0)
+  // jsFriendsSince = new neo4j.types.Date.fromStandardDate(jsFriendsSince)
 
-friends_since = DateTime(year=1999, month=11, day=23,
-                         hour=7, minute=47, nanosecond=4123)
-friends_since = pytz.timezone("US/Eastern").localize(friends_since)
+  // Create a friendship with the given DateTime, and return the DateTime
+  const result = await session.executeWrite(async tx => {
+    return await tx.run(`
+      MERGE (a:Person {name: $name})
+      MERGE (b:Person {name: $friend})
+      MERGE (a)-[friendship:KNOWS]->(b)
+      SET friendship.since = $friendsSince
+      RETURN friendship.since
+      `, {
+        name: 'Alice', friend: 'Bob',
+        friendsSince: friendsSince  // or friendsSince: jsFriendsSince
+      }
+    )
+  })
+  const outDateTime = result.records[0].get('friendship.since')
+  console.log(outDateTime)
+  /*
+  DateTime {
+    year: Integer { low: 1999, high: 0 },
+    month: Integer { low: 11, high: 0 },
+    day: Integer { low: 23, high: 0 },
+    hour: Integer { low: 6, high: 0 },
+    minute: Integer { low: 47, high: 0 },
+    second: Integer { low: 0, high: 0 },
+    nanosecond: Integer { low: 4123, high: 0 },
+    timeZoneOffsetSeconds: Integer { low: -18000, high: -1 },
+    timeZoneId: 'US/Eastern'
+  }
+ */
 
-# Python's native datetimes work as well.
-# They don't support the full feature-set of Neo4j's type though.
-# py_friends_since = datetime(year=1999, month=11, day=23, hour=7, minute=47)
-# py_friends_since = pytz.timezone("US/Eastern").localize(py_friends_since)
+  // Convert DateTime to JS native Date (lossy)
+  const jsOutDateTime = outDateTime.toStandardDate()
+  console.log(jsOutDateTime)
+  // 1999-11-23T11:47:00.000Z
 
-# Create a friendship with the given DateTime, and return the DateTime
-with GraphDatabase.driver(URI, auth=AUTH) as driver:
-    with driver.session() as session:
-        result = session.run("""
-            MERGE (a:Person {name: $name})
-            MERGE (b:Person {name: $friend})
-            MERGE (a)-[friendship:KNOWS]->(b)
-            SET friendship.since = $friends_since
-            RETURN friendship.since
-            """, name="Alice", friend="Bob",
-            friends_since=friends_since  # or friends_since=py_friends_since
-        )
-        records = list(result)
-        out_datetime = records[0]["friendship.since"]
-        print(out_datetime)  # 1999-11-23T07:47:00.000004123-05:00
-
-        # Converting DateTime to native datetime (lossy)
-        py_out_datetime = out_datetime.to_native()  # type: datetime
-        print(py_out_datetime)  # 1999-11-23 07:47:00.000004-05:00
-
+  await session.close()
+  await driver.close()
+})()
 ----
 
 
-=== `Date`
+=== Date
 
 Represents an instant capturing the date, but not the time, nor the timezone.
 
@@ -103,7 +118,7 @@ d.toString() // '2021-11-02'
 For full documentation, see link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/temporal-types.js~Date.html[API documentation -- Date].
 
 
-=== `Time`
+=== Time
 
 Represents an instant capturing the time, and the timezone offset in seconds, but not the date.
 
@@ -125,7 +140,7 @@ d.toString() // '07:47:00.000004123-04:00'
 For full documentation, see link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/temporal-types.js~Time.html[API documentation -- Time].
 
 
-=== `LocalTime`
+=== LocalTime
 
 Represents an instant capturing the time of day, but not the date, nor the timezone.
 
@@ -139,7 +154,7 @@ d.toString() // '07:47:00.000004123'
 For full documentation, see link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/temporal-types.js~LocalTime.html[API documentation -- LocalTime].
 
 
-=== `DateTime`
+=== DateTime
 
 Represents an instant capturing the date, the time, and the timezone identifier.
 Timezone parameters (offset and identifier) are optional.
@@ -166,7 +181,7 @@ d.toString() // '2021-11-02T07:47:00.000004123-04:00[US/Eastern]'
 For full documentation, see link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/temporal-types.js~DateTime.html[API documentation -- DateTime].
 
 
-=== `LocalDateTime`
+=== LocalDateTime
 
 Represents an instant capturing the date and the time, but not the timezone.
 
@@ -190,7 +205,7 @@ d.toString() // '2021-11-02T07:47:00.000004123'
 For full documentation, see link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/temporal-types.js~LocalDateTime.html[API documentation -- LocalDateTime].
 
 
-=== `Duration`
+=== Duration
 
 Represents the difference between two points in time.
 
@@ -283,8 +298,8 @@ For full documentation, see link:{neo4j-docs-base-uri}/api/javascript-driver/cur
 | Cypher Type  | JavaScript Type
 | Node         | xref:_node[`neo4j.types.Node`]
 | Relationship | xref:_relationship[`neo4j.types.Relationship`]
-| Path         | xref:_path[`neo4j.types.Path`]
-|              | xref:_pathsegment[`neo4j.types.PathSegment`]
+| Path         | xref:_path_pathsegment[`neo4j.types.Path`]
+|              | xref:_path_pathsegment[`neo4j.types.PathSegment`]
 |===
 
 === Node
@@ -302,12 +317,12 @@ const PASSWORD = 'verysecret';
 (async () => {
   const driver = neo4j.driver(URI, neo4j.auth.basic(USER, PASSWORD))
   const session = driver.session({database: 'neo4j'})
-  result = await session.run(
+  const result = await session.run(
     'MERGE (p:Person {name: $name}) RETURN p AS person', {
       name: 'Alice'
     }
   )
-  node = result.records[0].get('person')
+  const node = result.records[0].get('person')
   console.log(node)
   /*
   Node {
@@ -317,6 +332,8 @@ const PASSWORD = 'verysecret';
     elementId: '4:d6154461-ff34-42a9-b7c3-d32673913419:393'
   }
   */
+  await session.close()
+  await driver.close()
 })()
 ----
 
@@ -339,7 +356,7 @@ const PASSWORD = 'verysecret';
 (async () => {
   const driver = neo4j.driver(URI, neo4j.auth.basic(USER, PASSWORD))
   const session = driver.session({database: 'neo4j'})
-  result = await session.run(`
+  const result = await session.run(`
     MERGE (p:Person {name: $name})
     MERGE (friend:Person {name: $friend_name})
     MERGE (p)-[r:KNOWS]->(friend)
@@ -350,7 +367,7 @@ const PASSWORD = 'verysecret';
       date: new neo4j.types.Date.fromStandardDate(new Date())
     }
   )
-  relationship = result.records[0].get('friendship')
+  const relationship = result.records[0].get('friendship')
   console.log(relationship)
   /*
   Relationship {
@@ -367,6 +384,8 @@ const PASSWORD = 'verysecret';
     endNodeElementId: '4:d6154461-ff34-42a9-b7c3-d32673913419:394'
   }
   */
+  await session.close()
+  await driver.close()
 })()
 ----
 
@@ -389,12 +408,12 @@ const PASSWORD = 'verysecret';
   const session = driver.session({database: 'neo4j'})
 
   // Create some :Person nodes linked by :KNOWS relationships
-  await add_friend(session, 'Alice', 'BFF', 'Bob', new neo4j.types.Date.fromStandardDate(new Date()))
-  await add_friend(session, 'Bob', 'Fiends', 'Sofia', new neo4j.types.Date.fromStandardDate(new Date()))
-  await add_friend(session, 'Sofia', 'Acquaintances', 'Sara', new neo4j.types.Date.fromStandardDate(new Date()))
+  await addFriend(session, 'Alice', 'BFF', 'Bob', new neo4j.types.Date.fromStandardDate(new Date()))
+  await addFriend(session, 'Bob', 'Fiends', 'Sofia', new neo4j.types.Date.fromStandardDate(new Date()))
+  await addFriend(session, 'Sofia', 'Acquaintances', 'Sara', new neo4j.types.Date.fromStandardDate(new Date()))
 
   // Follow :KNOWS relationships outgoing from Alice three times, return as path
-  result = await session.executeRead(async tx => {
+  const result = await session.executeRead(async tx => {
     return await tx.run(`
       MATCH p = (:Person {name: $name})-[:KNOWS*3]->(:Person)
       RETURN p AS friendsChain
@@ -403,7 +422,7 @@ const PASSWORD = 'verysecret';
       }
     )
   })
-  path = result.records[0].get('friendsChain')
+  const path = result.records[0].get('friendsChain')
   console.log(path)
   /*
   Path {
@@ -439,9 +458,11 @@ const PASSWORD = 'verysecret';
     length: 3
   }
   */
+  await session.close()
+  await driver.close()
 })()
 
-async function add_friend(session, name, status, friendName, date) {
+async function addFriend(session, name, status, friendName, date) {
   await session.executeWrite(async tx => {
     await tx.run(`
       MERGE (p:Person {name: $name})
@@ -456,7 +477,7 @@ async function add_friend(session, name, status, friendName, date) {
 }
 ----
 
-For full documentation, see link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/graph-types.js~Path.html[API documentation -- Path], link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/graph-types.js~PathSegment.html[API documentation -- PathSegment].
+For full documentation, see link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/graph-types.js~Path.html[API documentation -- Path] and link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/graph-types.js~PathSegment.html[PathSegment].
 
 
 == Errors

@@ -27,7 +27,7 @@ The scheme of the server URI determines whether the connection is encrypted and,
 [TIP]
 The driver receives a _routing table_ from the server upon successful connection, regardless of whether the instance is a proper cluster environment or a single-machine environment.
 The driver's routing behavior works in tandem with link:{neo4j-docs-base-uri}/operations-manual/current/clustering/[Neo4j's clustering] by directing read/write transactions to appropriate cluster members.
-If you want to target a _specific_ machine, use a link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#bolt-driver-ref[`BoltDriver`] object and `bolt`, `bolt+s`, or `bolt+ssc` URI schemes instead.
+If you want to target a _specific_ machine, use the `bolt`, `bolt+s`, or `bolt+ssc` URI schemes instead.
 
 The connection scheme to use is not your choice, but is rather determined by the server requirements.
 You must know the right server scheme upfront, as no metadata is exposed prior to connection.

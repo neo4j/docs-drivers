@@ -23,4 +23,5 @@
 
 * link:https://graphacademy.neo4j.com/courses/modeling-fundamentals/[Graph Data Modeling Fundamentals]
 * link:https://graphacademy.neo4j.com/courses/cypher-intermediate-queries/[Intermediate Cypher Queries]
-* link:https://graphacademy.neo4j.com/courses/app-python/[Building Neo4j Applications with Python]
+* link:https://graphacademy.neo4j.com/courses/app-nodejs/[Building Neo4j Applications with Node.js]
+* link:https://graphacademy.neo4j.com/courses/app-typescript/[Building Neo4j Applications with TypeScript]

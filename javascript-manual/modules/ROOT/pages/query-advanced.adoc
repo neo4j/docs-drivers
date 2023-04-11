@@ -6,13 +6,13 @@ This is the most basic and limited form with which to run a Cypher query.
 The driver will not automatically retry implicit transactions, as it does instead for queries run with xref:transactions#managed-transactions[managed transactions].
 Implicit transactions should only be used when xref:transactions#managed-transactions[transaction functions] do not fit the purpose, or for quick prototyping.
 
-You run an implicit transaction with the method link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Session.run[`Session.run()`], which returns a link:{neo4j-docs-base-uri}/api/api/javascript-driver/current/class/lib6/result.js~Result.html[`Result`] object.
+You run an implicit transaction with the method link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/session.js~Session.html#instance-method-run[`Session.run()`], which returns a link:{neo4j-docs-base-uri}/api/api/javascript-driver/current/class/lib6/result.js~Result.html[`Result`] object.
 
 [source, javascript]
 ----
 let session = driver.session({database: 'neo4j'})
 try {
-  const result = await tx.run(`
+  const result = await session.run(`
     MATCH (p:Person WHERE p.name STARTS WITH $filter)
     RETURN p.name AS name ORDER BY name
     `, { filter: 'Al'}

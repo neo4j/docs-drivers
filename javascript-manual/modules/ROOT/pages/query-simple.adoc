@@ -161,6 +161,24 @@ For those advanced use cases, see xref:query-advanced#_dynamic_values_in_propert
 
 == Error handling
 
+To avoid an error in one query to crash your application, you can wrap queries into `try/catch` blocks.
+We avoid proper error handling throughout this manual to make examples lighter to parse.
+Here below an example with a `try/catch/finally` block.
+
+[source, javascript]
+----
+let session = driver.session({database: 'neo4j'})
+try {
+  const result = await session.executeRead(async tx => {
+    return await tx.run('MATCH (p:Person) RETURN p')
+  })
+} catch(err) {
+  console.log(`Error in query\n${error}`)
+} finally {
+  await session.close()
+}
+----
+
 
 == Anatomy of a query
 
@@ -174,7 +192,7 @@ It is the transaction function who is responsible for actually carrying out the 
 Queries are specified with the link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/transaction.js~Transaction.html#instance-method-run[`Transaction.run()`] method *(3)*, which takes a query and its parameters (as an object *(4)*), and returns a link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/result.js~Result.html[`Result`] object.
 When the processing is over, the session is closed *(5)*.
 
-.Retrieve people whose name starts with `Al`.
+.Retrieve people whose name starts with `Al`
 [source, javascript]
 ----
 let session = driver.session({database: 'neo4j'})  // <1>
