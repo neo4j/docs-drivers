@@ -148,6 +148,20 @@ neo4j.driver(
 )
 ----
 
+.Example of log output upong driver connection
+[source, log]
+----
+1681215847749 INFO Routing driver 0 created for server address localhost:7687
+1681215847765 INFO Routing table is stale for database: "neo4j" and access mode: "WRITE": RoutingTable[database=neo4j, expirationTime=0, currentTime=1681215847765, routers=[], readers=[], writers=[]]
+1681215847773 DEBUG Connection [0][] created towards localhost:7687(127.0.0.1)
+1681215847773 DEBUG Connection [0][] C: HELLO {user_agent: 'neo4j-javascript/5.3.0', ...}
+1681215847778 DEBUG Connection [0][] S: SUCCESS {"signature":112,"fields":[{"server":"Neo4j/5.8.0","connection_id":"bolt-1782","hints":{"connection.recv_timeout_seconds":{"low":120,"high":0}}}]}
+1681215847778 DEBUG Connection [0][bolt-1782] created for the pool localhost:7687
+1681215847778 DEBUG Connection [0][bolt-1782] acquired from the pool localhost:7687
+1681215847779 DEBUG Connection [0][bolt-1782] C: ROUTE {"address":"localhost:7687"} [] {"db":"neo4j"}
+1681215847781 DEBUG Connection [0][bolt-1782] S: SUCCESS {"signature":112,"fields":[{"rt":{"servers":[{"addresses":["localhost:7687"],"role":"WRITE"},{"addresses":["localhost:7687"],"role":"READ"},{"addresses":["localhost:7687"],"role":"ROUTE"}],"ttl":{"low":300,"high":0},"db":"neo4j"}}]}
+----
+
 You may also specify a custom logger function, for example to log to a file.
 In that case, the `logging` option expects two properties:
 
