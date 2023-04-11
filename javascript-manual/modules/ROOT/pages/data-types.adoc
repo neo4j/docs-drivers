@@ -36,12 +36,12 @@ Temporal objects are immutable.
 [options="header"]
 |===
 | Cypher Type   | JavaScript Type
-| Date          | link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/temporal-types.js~Date.html[`Date`]
-| Time          | link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/temporal-types.js~Time.html[`Time`]
-| LocalTime     | link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/temporal-types.js~LocalTime.html[`LocalTime`]
-| DateTime      | link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/temporal-types.js~DateTime.html[`DateTime`]
-| LocalDateTime | link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/temporal-types.js~LocalDateTime.html[`LocalDateTime`]
-| Duration      | link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/temporal-types.js~Duration.html[`Duration`]
+| Date          | xref:_date[`Date`]
+| Time          | xref:_time[`Time`]
+| LocalTime     | xref:_localtime[`LocalTime`]
+| DateTime      | xref:_datetime[`DateTime`]
+| LocalDateTime | xref:_localdatetime[`LocalDateTime`]
+| Duration      | xref:_duration[`Duration`]
 |===
 
 .How to use temporal types in queries
@@ -215,64 +215,63 @@ For full documentation, see link:{neo4j-docs-base-uri}/api/javascript-driver/cur
 
 Cypher supports spatial values (points), and Neo4j can store these point values as properties on nodes and relationships.
 
-The object attribute `srid` (short for _Spatial Reference Identifier_) is a number identifying the coordinate system the spatial type is to be interpreted in.
+The driver has a single type link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/spatial-types.js~Point.html[`neo4j.types.Point`], which can behave as a 2D/3D cartesian or WGS-84 point, depending on the `SRID` it is initialized with.
+The `SRID` (short for _Spatial Reference Identifier_) is a number identifying the coordinate system the spatial type is to be interpreted in.
 You can think of it as a unique identifier for each spatial type.
 
-[options="header"]
+[options="header", cols="<20m,<80a"]
 |===
-| Cypher Type       | Python Type
-| Point             | `neo4j.spatial.Point`
-| Point (Cartesian) | `neo4j.spatial.CartesianPoint`
-| Point (WGS-84)    | `neo4j.spatial.WGS84Point`
+| SRID   | Description
+| `7203` | 2D point in the cartesian space.
+| `9157` | 3D point in the cartesian space.
+| `4326` | 2D point in the WGS84 space.
+| `4979` | 3D point in the WGS84 space.
 |===
 
-For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/types/spatial.html[API documentation -- Spatial types].
-
-=== `CartesianPoint`
-
-Represents a point in 2D/3D Cartesian space. +
-Exposes properties `x`, `y`, `z` (the latter for 3D points only).
-
+.Points in cartesian space
 [source, javascript]
 ----
-from neo4j.spatial import CartesianPoint
+// A 2D Point in cartesian space
+const point2d = new neo4j.types.Point(
+  7203, // SRID
+  1, // x
+  5.1 // y
+)
+// Point { srid: 4979, x: 1, y: -2 }
 
-# A 2D CartesianPoint
-point = CartesianPoint((1.23, 4.56))
-print(point.x, point.y, point.srid)
-# 1.23 4.56 7203
-
-# A 3D CartesianPoint
-point = CartesianPoint((1.23, 4.56, 7.89))
-print(point.x, point.y, point.z, point.srid)
-# 1.23 4.56 7.8 9157
+// A 3D Point in cartesian space
+const point3d = new neo4j.types.Point(
+  9157, // SRID
+  1, // x
+  -2, // y
+  3.1 // z
+)
+// Point { srid: 4979, x: 1, y: -2, z: 3.1 }
 ----
 
-For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/types/spatial.html#cartesianpoint[API documentation -- Spatial types -- CartesianPoint].
-
-=== `WGS84Point`
-
-Represents a point in the World Geodetic System (WGS84). +
-Exposes properties `longitude`, `latitude`, `height` (the latter for 3D points only), which are aliases for `x`, `y`, `z`.
-
-[source,python]
+.Points in WGS-84 space
+[source, javascript]
 ----
-from neo4j.spatial import WGS84Point
+// A 2D point in WGS-84 space
+const point2d = new neo4j.types.Point(
+  4326, // SRID
+  1, // x
+  -2, // y
+  3.1 // z
+)
+// Point { srid: 4979, x: 1, y: -2}
 
-# A 2D WGS84Point
-point = WGS84Point((1.23, 4.56))
-print(point.longitude, point.latitude, point.srid)
-# or print(point.x, point.y, point.srid)
-# 1.23 4.56 4326
-
-# A 3D WGS84Point
-point = WGS84Point((1.23, 4.56, 7.89))
-print(point.longitude, point.latitude, point.height, point.srid)
-# or print(point.x, point.y, point.z, point.srid)
-# 1.23 4.56 7.89 4979
+// A 3D point in WGS-84 space
+const point3d = new neo4j.types.Point(
+  4979, // SRID
+  1, // x
+  -2, // y
+  3.1 // z
+)
+// Point { srid: 4979, x: 1, y: -2, z: 3.1 }
 ----
 
-For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/types/spatial.html#wgs84point[API documentation -- Spatial types -- WSG84Point].
+For full documentation, see link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/spatial-types.js~Point.html[API documentation -- Point].
 
 
 == Graph types
@@ -281,166 +280,193 @@ For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current
 
 [options="header"]
 |===
-| Cypher Type  | Python Type
-| Node         | `neo4j.graph.Node`
-| Relationship | `neo4j.graph.Relationship`
-| Path         | `neo4j.graph.Path`
+| Cypher Type  | JavaScript Type
+| Node         | xref:_node[`neo4j.types.Node`]
+| Relationship | xref:_relationship[`neo4j.types.Relationship`]
+| Path         | xref:_path[`neo4j.types.Path`]
+|              | xref:_pathsegment[`neo4j.types.PathSegment`]
 |===
 
-For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#graph-data-types[API documentation -- Graph types].
-
-
-=== `Node`
+=== Node
 Represents a node in a graph. +
-The property `element_id` provides an identifier for the entity.
+The property `elementId` provides an identifier for the entity.
 This should be used with care, as no guarantees are given about the mapping between id values and elements outside the scope of a single transaction.
 
-[source,python]
+[source, javascript]
 ----
-from neo4j import GraphDatabase
+const neo4j = require('neo4j-driver');
+const URI = 'neo4j://localhost';
+const USER = 'neo4j';
+const PASSWORD = 'verysecret';
 
-
-URI = "neo4j://localhost:7687"
-AUTH = ("neo4j", "secretgraph")
-
-with GraphDatabase.driver(URI, auth=AUTH) as driver:
-    with driver.session() as session:
-        result = session.run(
-            "MERGE (p:Person {name: $name}) RETURN p AS person",
-            name="Alice"
-        )
-        record = result.single()
-        node = record["person"]
-        print(f"Node ID: {node.element_id}\n"
-              f"Labels: {node.labels}\n"
-              f"Properties: {node.items()}\n"
-        )
-
-# Node ID: 4:73e9a61b-b501-476d-ad6f-8d7edf459251:0
-# Labels: frozenset({'Person'})
-# Properties: dict_items([('name', 'Alice')])
+(async () => {
+  const driver = neo4j.driver(URI, neo4j.auth.basic(USER, PASSWORD))
+  const session = driver.session({database: 'neo4j'})
+  result = await session.run(
+    'MERGE (p:Person {name: $name}) RETURN p AS person', {
+      name: 'Alice'
+    }
+  )
+  node = result.records[0].get('person')
+  console.log(node)
+  /*
+  Node {
+    identity: Integer { low: 393, high: 0 },  // deprecated
+    labels: [ 'Person' ],
+    properties: { name: 'Alice' },
+    elementId: '4:d6154461-ff34-42a9-b7c3-d32673913419:393'
+  }
+  */
+})()
 ----
 
-For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.graph.Node[API documentation -- Graph types -- Node].
+For full documentation, see link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/graph-types.js~Node.html[API documentation -- Node].
 
 
-=== `Relationship`
+=== Relationship
 
 Represents a relationship in a graph. +
-The property `element_id` provides an identifier for the entity.
-This should be used with care, as no guarantees are given about the mapping between id values and elements outside the scope of a single transaction.
+The property `elementId` provides an identifier for the entity.
+This should be used with care, as no guarantees are given about the mapping between id values and elements outside the scope of a single transaction. The same applies to `startNodeElementId` and `endNodeElementId`.
 
-[source,python]
+[source, javascript]
 ----
-from neo4j import GraphDatabase
-from neo4j.time import Date
+const neo4j = require('neo4j-driver');
+const URI = 'neo4j://localhost';
+const USER = 'neo4j';
+const PASSWORD = 'verysecret';
 
-
-URI = "neo4j://localhost:7687"
-AUTH = ("neo4j", "secretgraph")
-
-with GraphDatabase.driver(URI, auth=AUTH) as driver:
-    with driver.session() as session:
-        result = session.run("""
-            MERGE (p:Person {name: $name})
-            MERGE (friend:Person {name: $friend_name})
-            MERGE (p)-[r:KNOWS]->(friend)
-            SET r.status = $status, r.since = $date
-            RETURN r AS friendship
-            """, name="Alice", status="BFF", date=Date.today(), friend_name="Bob",
-        )
-        record = result.single()
-        relationship = record["friendship"]
-        print(f"Relationship ID: {relationship.element_id}\n"
-              f"Start node: {relationship.start_node}\n"
-              f"End node: {relationship.end_node}\n"
-              f"Type: {relationship.type}\n"
-              f"Friends since: {relationship.get('since')}\n"
-              f"All properties: {relationship.items()}\n"
-        )
-
-# Relationship ID: 5:73e9a61b-b501-476d-ad6f-8d7edf459251:1
-# Start node: <Node element_id='4:73e9a61b-b501-476d-ad6f-8d7edf459251:0' labels=frozenset({'Person'}) properties={'name': 'Alice'}>
-# End node: <Node element_id='4:73e9a61b-b501-476d-ad6f-8d7edf459251:2' labels=frozenset({'Person'}) properties={'name': 'Bob'}>
-# Type: KNOWS
-# Friends since: 2022-11-07
-# All properties: dict_items([('since', neo4j.time.Date(2022, 11, 7)), ('status', 'BFF')])
+(async () => {
+  const driver = neo4j.driver(URI, neo4j.auth.basic(USER, PASSWORD))
+  const session = driver.session({database: 'neo4j'})
+  result = await session.run(`
+    MERGE (p:Person {name: $name})
+    MERGE (friend:Person {name: $friend_name})
+    MERGE (p)-[r:KNOWS]->(friend)
+    SET r.status = $status, r.since = $date
+    RETURN r AS friendship
+    `, {
+      name: 'Alice', status: 'BFF', friend_name: 'Bob',
+      date: new neo4j.types.Date.fromStandardDate(new Date())
+    }
+  )
+  relationship = result.records[0].get('friendship')
+  console.log(relationship)
+  /*
+  Relationship {
+    identity: Integer { low: 388, high: 0 },  // deprecated
+    start: Integer { low: 393, high: 0 },  // deprecated
+    end: Integer { low: 394, high: 0 },  // deprecated
+    type: 'KNOWS',
+    properties: {
+      since: Date { year: [Integer], month: [Integer], day: [Integer] },
+      status: 'BFF'
+    },
+    elementId: '5:d6154461-ff34-42a9-b7c3-d32673913419:388',
+    startNodeElementId: '4:d6154461-ff34-42a9-b7c3-d32673913419:393',
+    endNodeElementId: '4:d6154461-ff34-42a9-b7c3-d32673913419:394'
+  }
+  */
+})()
 ----
 
-For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.graph.Relationship[API documentation -- Graph types -- Relationship].
+For full documentation, see link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/graph-types.js~Relationship.html[API documentation -- Relationship].
 
 
-=== `Path`
+=== Path, PathSegment
 
-Represents a path in a graph.
+`Path` represents a path in a graph, while `PathSegment` represents its individual links.
 
-[source,python]
+[source, javascript]
 ----
-from neo4j import GraphDatabase
-from neo4j.time import Date
+const neo4j = require('neo4j-driver');
+const URI = 'neo4j://localhost';
+const USER = 'neo4j';
+const PASSWORD = 'verysecret';
 
+(async () => {
+  const driver = neo4j.driver(URI, neo4j.auth.basic(USER, PASSWORD))
+  const session = driver.session({database: 'neo4j'})
 
-URI = "neo4j://localhost:7687"
-AUTH = ("neo4j", "secretgraph")
+  // Create some :Person nodes linked by :KNOWS relationships
+  await add_friend(session, 'Alice', 'BFF', 'Bob', new neo4j.types.Date.fromStandardDate(new Date()))
+  await add_friend(session, 'Bob', 'Fiends', 'Sofia', new neo4j.types.Date.fromStandardDate(new Date()))
+  await add_friend(session, 'Sofia', 'Acquaintances', 'Sara', new neo4j.types.Date.fromStandardDate(new Date()))
 
-def add_friend(tx, name, status, date, friend_name):
-    tx.run("""
-        MERGE (p:Person {name: $name})
-        MERGE (friend:Person {name: $friend_name})
-        MERGE (p)-[r:KNOWS]->(friend)
-        SET r.status = $status, r.since = $date
-        """, name=name, status=status, date=date, friend_name=friend_name
+  // Follow :KNOWS relationships outgoing from Alice three times, return as path
+  result = await session.executeRead(async tx => {
+    return await tx.run(`
+      MATCH p = (:Person {name: $name})-[:KNOWS*3]->(:Person)
+      RETURN p AS friendsChain
+      `, {
+        name: 'Alice'
+      }
     )
+  })
+  path = result.records[0].get('friendsChain')
+  console.log(path)
+  /*
+  Path {
+    start: Node {
+      identity: Integer { low: 393, high: 0 },
+      labels: [ 'Person' ],
+      properties: { name: 'Alice' },
+      elementId: '4:d6154461-ff34-42a9-b7c3-d32673913419:393'
+    },
+    end: Node {
+      identity: Integer { low: 396, high: 0 },
+      labels: [ 'Person' ],
+      properties: { name: 'Sara' },
+      elementId: '4:d6154461-ff34-42a9-b7c3-d32673913419:396'
+    },
+    segments: [
+      PathSegment {
+        start: [Node],
+        relationship: [Relationship],
+        end: [Node]
+      },
+      PathSegment {
+        start: [Node],
+        relationship: [Relationship],
+        end: [Node]
+      },
+      PathSegment {
+        start: [Node],
+        relationship: [Relationship],
+        end: [Node]
+      }
+    ],
+    length: 3
+  }
+  */
+})()
 
-with GraphDatabase.driver(URI, auth=AUTH) as driver:
-    with driver.session() as session:
-        # Create some :Person nodes linked by :KNOWS relationships
-        session.execute_write(add_friend, name="Alice", status="BFF",
-                              date=Date.today(), friend_name="Bob")
-        session.execute_write(add_friend, name="Bob", status="Fiends",
-                              date=Date.today(), friend_name="Sofia")
-        session.execute_write(add_friend, name="Sofia", status="Acquaintances",
-                              date=Date.today(), friend_name="Sara")
-
-        # Follow :KNOWS relationships outgoing from Alice three times, return as path
-        result = session.run("""
-            MATCH path=(:Person {name: $name})-[:KNOWS*3]->(:Person)
-            RETURN path
-            """, name="Alice"
-        )
-        record = result.single()
-        path = record["path"]
-
-        print("-- Path breakdown --")
-        for friendship in path:
-            print("{name} is friends with {friend} ({status})".format(
-                name=friendship.start_node.get("name"),
-                friend=friendship.end_node.get("name"),
-                status=friendship.get("status"),
-            ))
+async function add_friend(session, name, status, friendName, date) {
+  await session.executeWrite(async tx => {
+    await tx.run(`
+      MERGE (p:Person {name: $name})
+      MERGE (friend:Person {name: $friendName})
+      MERGE (p)-[r:KNOWS]->(friend)
+      SET r.status = $status, r.since = $date
+      `, {
+        name: name, status: status, friendName: friendName, date: date
+      }
+    )
+  })
+}
 ----
 
-For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.graph.Path[API documentation -- Graph types -- Path].
+For full documentation, see link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/graph-types.js~Path.html[API documentation -- Path], link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/graph-types.js~PathSegment.html[API documentation -- PathSegment].
 
 
-== Exceptions
+== Errors
 
-The driver can raise a number of different exceptions.
-A full list is available in the link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#errors[API documentation].
+All errors raised by the driver are of type link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/error.js~Neo4jError.html[`Neo4jError`].
 For a list of errors the server can return, see the link:{neo4j-docs-base-uri}/status-codes/current/[Status code] page.
-
-.Root exception types
-[options="header", cols="<25m,<75a"]
-|===
-| Classification    | Description
-|Neo4jError         | Errors reported by the Neo4j server (e.g., wrong Cypher syntax, bad connection, wrong credentials, ...)
-
-|DriverError        | Errors reported by the driver (e.g., bad usage of parameters or transactions, improper handling of results, ...)
-|===
 
 Some server errors are marked as safe to retry without need to alter the original request.
 Examples of such errors are deadlocks and memory issues.
-All driver's exception types implement the method `.is_retryable()`, which gives insights into whether a further attempt might be successful.
+All driver's exception types implement the method `.isRetryable()`, which gives insights into whether a further attempt might be successful.
 This is particular useful when running queries in xref:transactions#explicit-transactions[explicit transactions], to know if a failed query should be run again.
 
 ifndef::backend-pdf[]

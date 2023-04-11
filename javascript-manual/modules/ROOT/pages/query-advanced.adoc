@@ -90,7 +90,7 @@ For those queries, you are forced to use string concatenation.
 To link:https://neo4j.com/developer/kb/protecting-against-cypher-injection/[protect against Cypher injections], you should enclose the dynamic values in backticks and escape them yourself.
 Notice that Cypher processes Unicode, so take care of the Unicode literal `\u0060` as well.
 
-.Manually escaping dynamic labels before concatenation.
+.Manually escaping dynamic labels before concatenation
 [source, javascript]
 ----
 let dangerousLabel = 'Special Person\\u0060'
@@ -105,7 +105,7 @@ console.log(`Executed query: ${result.summary.query.text}`)
 Another workaround, which avoids string concatenation, is using the <<APOC>> procedure link:{neo4j-docs-base-uri}/apoc/current/overview/apoc.merge/apoc.merge.node/[`apoc.merge.node`].
 It supports dynamic labels and property keys, but only for node insertion.
 
-.Using `apoc.merge.node` to create a node with dynamic labels/property keys.
+.Using `apoc.merge.node` to create a node with dynamic labels/property keys
 [source, javascript]
 ----
 propertyKey = "name"
@@ -136,7 +136,7 @@ To turn it on, specify the `logging` option when you initialize the driver.
 As value, use the function `neo4j.logging.console()`, which logs to console and takes an optional parameter `level`. The logging level can be either `error`, `warn`, `info`, or `debug`.
 Enabling one level automatically enables all higher priority ones, and its default is `info`.
 
-.Creating a driver with logging of level `debug` to console.
+.Creating a driver with logging of level `debug` to console
 [source, javascript]
 ----
 neo4j.driver(
@@ -157,7 +157,7 @@ Defaults to `info`.
 - `logger`: a function invoked when a message needs to be logged.
 Takes `level, message` as input.
 
-.Creating a driver with logging of level `error` to console.
+.Creating a driver with logging of level `error` to console
 [source, javascript]
 ----
 neo4j.driver(
