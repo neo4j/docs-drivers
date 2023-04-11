@@ -186,7 +186,7 @@ def visualize_result(query_graph, nodes_text_properties):
                               relationship.end_node.element_id,
                               title=relationship.type)
 
-    visual_graph.show('network.html')
+    visual_graph.show('network.html', notebook=False)
 
 
 def main():
