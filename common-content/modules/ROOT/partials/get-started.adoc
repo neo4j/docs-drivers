@@ -39,7 +39,7 @@ The following languages and frameworks are officially supported by Neo4j:
 | Java 17.
 
 | JavaScript
-| All link:https://github.com/nodejs/LTS[LTS versions of Node.JS], specifically the 4.x and 6.x series runtimes.
+| All link:https://github.com/nodejs/LTS[LTS versions of Node.JS].
 
 | Python
 | Python 3.7 and above.
