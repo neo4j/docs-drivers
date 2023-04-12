@@ -13,6 +13,7 @@
 * xref:bookmarks.adoc[Coordinate parallel transactions]
 * xref:query-advanced.adoc[Further query mechanisms]
 * xref:performance.adoc[Performance recommendations]
+* xref:browser-websockets.adoc[Usage within a browser (WebSockets)]
 
 * *Reference*
 

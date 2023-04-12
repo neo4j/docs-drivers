@@ -30,7 +30,7 @@ var driver = neo4j.driver(
 )
 ----
 
-[NOTE]
+[WARNING]
 Code running in a browser is visible to the client, **including your database credentials**.
 You have to take extra steps to ensure that no unauthorized access is allowed.
 
@@ -57,3 +57,12 @@ import neo4j from 'https://cdn.jsdelivr.net/npm/neo4j-driver@X.Y.Z/lib/browser/n
 
 It is not required to explicitly close the driver on a web page, unless its lifetime does not correspond to the lifetime of the page.
 The reason for this is that web browsers are supposed to gracefully terminate all open WebSockets when a page is closed.
+
+
+ifndef::backend-pdf[]
+[discrete.glossary]
+== Glossary
+
+include::{common-partial}/glossary.adoc[]
+include::../partials/glossary.adoc[]
+endif::[]

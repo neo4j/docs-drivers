@@ -22,7 +22,7 @@ This allows the database to properly cache queries.
 [source, javascript]
 ----
 // Good practice
-session.run('MATCH (p:Person {name: $name}) RETURN p', {name: 'Alice'})
+session.run('MATCH (p:Person {name: $name}) RETURN p', { name: 'Alice' })
 ----
 +
 [source, javascript]
@@ -38,13 +38,13 @@ To learn how to combine labels, see link:{neo4j-docs-base-uri}/cypher-manual/cur
 [source, javascript]
 ----
 // Good practice
-session.run('MATCH (p:Person|Animal {name: $name}) RETURN p', {name: 'Alice'})
+session.run('MATCH (p:Person|Animal {name: $name}) RETURN p', { name: 'Alice' })
 ----
 +
 [source, javascript]
 ----
 // Bad practice
-session.run('MATCH (p {name: $name}) RETURN p', {name: 'Alice'})
+session.run('MATCH (p {name: $name}) RETURN p', { name: 'Alice' })
 ----
 
 - *Batch queries when creating a lot of records* using the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/with/[`WITH`] and link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/unwind/[`UNWIND`] Cypher clauses.
@@ -61,7 +61,7 @@ session.run(`
     WITH $numbers AS batch
     UNWIND batch AS node
     MERGE (n:Number {value: node.value})
-    `, {numbers: numbers}
+    `, { numbers: numbers }
 )
 ----
 +
@@ -69,7 +69,7 @@ session.run(`
 ----
 // Bad practice
 for(let i=0; i<10000; i++) {
-  session.run('MERGE (:Number {value: $value})', {value: Math.random()})
+  session.run('MERGE (:Number {value: $value})', { value: Math.random() })
 }
 ----
 +
@@ -82,13 +82,13 @@ The most efficient way of performing a _first import_ of large amounts of data i
 [source, javascript]
 ----
 // Good practice
-session.run('MATCH (p:Person WHERE p.name = $name) RETURN p', {name: 'Alice'})
+session.run('MATCH (p:Person WHERE p.name = $name) RETURN p', { name: 'Alice' })
 ----
 +
 [source, javascript]
 ----
 // Bad practice
-session.run('MATCH (p:Person) WHERE p.name = $name RETURN p', {name: 'Alice'})
+session.run('MATCH (p:Person) WHERE p.name = $name RETURN p', { name: 'Alice' })
 ----
 
 - *Create indexes for properties that you often filter against*.
@@ -99,7 +99,7 @@ For more information, see link:{neo4j-docs-base-uri}/cypher-manual/current/index
 [source, javascript]
 ----
 // Create an index on Person.name
-session.run('CREATE INDEX person_name FOR (n:Person) ON (n.name)')
+session.run('CREATE INDEX personName FOR (n:Person) ON (n.name)')
 ----
 
 - link:{neo4j-docs-base-uri}/cypher-manual/current/query-tuning/basic-example/#_profile_query[*Profile your queries*] to locate queries whose performance can be improved.
@@ -108,7 +108,7 @@ The server output is available in the `profile` property of the link:{neo4j-docs
 +
 [source, javascript, role=nocollapse]
 ----
-const result = session.run('PROFILE MATCH (p {name: $name}) RETURN p', {name: 'Alice'})
+const result = session.run('PROFILE MATCH (p {name: $name}) RETURN p', { name: 'Alice' })
 console.log(result.summary.profile.arguments['string-representation'])
 
 /*
@@ -137,7 +137,7 @@ The server output is available in the `plan` property of the link:{neo4j-docs-ba
 +
 [source, javascript, role=nocollapse]
 ----
-const result = session.run('EXPLAIN MATCH (p {name: $name}) RETURN p', {name: 'Alice'})
+const result = session.run('EXPLAIN MATCH (p {name: $name}) RETURN p', { name: 'Alice' })
 console.log(result.summary.plan.arguments['string-representation'])
 
 /*
@@ -169,4 +169,5 @@ ifndef::backend-pdf[]
 == Glossary
 
 include::{common-partial}/glossary.adoc[]
+include::../partials/glossary.adoc[]
 endif::[]

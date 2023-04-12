@@ -81,7 +81,8 @@ const driver = neo4j.driver(
 )
 ----
 
-[NOTE]
+=== No authentication
+
 If authentication is disabled on the server, the authentication parameter can be omitted entirely.
 
 
@@ -114,4 +115,5 @@ ifndef::backend-pdf[]
 == Glossary
 
 include::{common-partial}/glossary.adoc[]
+include::../partials/glossary.adoc[]
 endif::[]

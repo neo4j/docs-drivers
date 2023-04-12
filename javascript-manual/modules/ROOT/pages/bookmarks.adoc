@@ -32,8 +32,8 @@ try {
 
 == Bookmarks across multiple sessions
 
-If your application uses multiple sessions instead, you may need to ensure that one session has completed all its transactions before another session is allowed to run its queries.
-In those cases, you can collect the bookmarks from some sessions using the method `Session.lastBookmarks()` *(1), (2)*, store them into a `Bookmarks` object, and use them to initialize another session with the `bookmarks` parameter *(3)*.
+If your application uses multiple sessions, you may need to ensure that one session has completed all its transactions before another session is allowed to run its queries.
+In those cases, you can collect the bookmarks from some sessions using the method `Session.lastBookmarks()` *(1), (2)*, store them into a list, and use them to initialize another session with the `bookmarks` parameter *(3)*.
 
 In the example below, `sessionA` and `sessionB` are allowed to run concurrently, while `sessionC` waits until their results have been propagated.
 This guarantees the `Person` nodes `sessionC` wants to act on actually exist.
@@ -48,7 +48,6 @@ const neo4j = require('neo4j-driver');
   const USER = 'neo4j'
   const PASSWORD = 'verysecret'
   let driver
-
   try {
     driver = neo4j.driver(URI, neo4j.auth.basic(USER, PASSWORD))
     await driver.verifyConnectivity()
@@ -56,7 +55,6 @@ const neo4j = require('neo4j-driver');
     console.log(`-- Connection error --\n${err}\n-- Cause --\n${err.cause}`)
     return
   }
-
   await createFriends(driver)
 })()
 
@@ -96,7 +94,7 @@ async function createFriends(driver) {
 // Create a person node.
 async function createPerson(session, name) {
   await session.executeWrite(async tx => {
-    await tx.run('CREATE (:Person {name: $name})', {name: name})
+    await tx.run('CREATE (:Person {name: $name})', { name: name })
   })
 }
 
@@ -108,7 +106,7 @@ async function employPerson(session, personName, companyName) {
       MATCH (person:Person {name: $personName})
       MATCH (company:Company {name: $companyName})
       CREATE (person)-[:WORKS_FOR]->(company)`,
-      {personName: personName, companyName: companyName}
+      { personName: personName, companyName: companyName }
     )
   })
 }
@@ -120,7 +118,7 @@ async function createFriendship(session, nameA, nameB) {
       MATCH (a:Person {name: $nameA})
       MATCH (b:Person {name: $nameB})
       MERGE (a)-[:KNOWS]->(b)
-      `, {nameA: nameA, nameB: nameB}
+      `, { nameA: nameA, nameB: nameB }
     )
   })
 }
@@ -128,7 +126,7 @@ async function createFriendship(session, nameA, nameB) {
 // Retrieve and display all friendships.
 async function printFriendships(session) {
   const result = await session.executeRead(async tx => {
-    return await tx.run("MATCH (a)-[:KNOWS]->(b) RETURN a.name, b.name")
+    return await tx.run('MATCH (a)-[:KNOWS]->(b) RETURN a.name, b.name')
   })
   for(record of result.records) {
     console.log(`${record.get('a.name')} knows ${record.get('b.name')}`)

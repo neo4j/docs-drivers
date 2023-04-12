@@ -17,7 +17,10 @@ try {
     RETURN p.name AS name ORDER BY name
     `, { filter: 'Al'}
   )
-  console.log(`The query \`${result.summary.query.text}\` returned ${result.records.length} nodes.\n`)
+  console.log(
+    `The query \`${result.summary.query.text}\`` +
+    `returned ${result.records.length} nodes.\n`
+  )
   for(let record of result.records) {
     console.log(`Person with name: ${record.get('name')}`)
   }
@@ -71,7 +74,7 @@ let session = driver.session({database: 'neo4j'})
 const result = await session.run(
   'MATCH (a:Person) RETURN count(a) AS people'
   {},  // query parameters
-  {timeout: 5000, metadata: {'app_name': 'people'}}  // transaction config
+  { timeout: 5000, metadata: {'app_name': 'people'} }  // transactionConfig
 )
 ----
 
@@ -93,9 +96,9 @@ Notice that Cypher processes Unicode, so take care of the Unicode literal `\u006
 .Manually escaping dynamic labels before concatenation
 [source, javascript]
 ----
-let dangerousLabel = 'Special Person\\u0060'
+const dangerousLabel = 'Special Person\\u0060'
 // convert \u0060 to literal backtick, then escape backticks
-let escapedLabel = dangerousLabel.replaceAll('\\u0060', '`').replaceAll('`', '``')
+const escapedLabel = dangerousLabel.replaceAll('\\u0060', '`').replaceAll('`', '``')
 
 let session = driver.session({database: 'neo4j'})
 const result = await session.run('MATCH (p:`' + escapedLabel + '`) RETURN p.name')

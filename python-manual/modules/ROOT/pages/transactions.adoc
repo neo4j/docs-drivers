@@ -335,4 +335,5 @@ ifndef::backend-pdf[]
 == Glossary
 
 include::{common-partial}/glossary.adoc[]
+include::../partials/glossary.adoc[]
 endif::[]

@@ -6,7 +6,7 @@ This is not a problem for most use cases, but for queries that have a long proce
 
 There are several ways of running asynchronous queries:
 
-- *Asynchronous iteration* -- the query result is processed (iteratively) as quickly as your application can handle.
+- *Asynchronous iteration* -- the query result is processed (iteratively) as quickly as your application can handle. The driver modulates the amount of records transmitted by the server accordingly.
 - *Promise API* -- the query result is returned as a link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises[`Promise`].
 The promise is only resolved when the full result set is available to the driver.
 Best suited for queries with a large server processing time, but the result of which you want to process in one go.
@@ -16,13 +16,14 @@ Best suited for queries where records processing is individual.
 Your application receives the result in bits, for lazy consumption.
 - *Reactive API* -- for reactive applications.
 
-[INFO]
-Processing inside transaction function, except for Promise
+[NOTE]
+When using `await tx.run()` in a transaction function, you may return the query result _out_ of the transaction function as-is for further processing.
+On the other hand, *for async queries, you have to process the result _inside_ the transaction function* (except for the Promise API).
 
 == Asynchronous iteration
 
 The `Result` object supports link:https://javascript.info/async-iterators-generators[asynchronous iteration].
-This allows your application to process data at its own pace, with the driver modulating the speed at which records are streamed from the server accordingly, applying <<backpressure>>.
+This allows your application to process data at its own pace, with the driver accordingly modulating the speed at which records are streamed from the server, applying <<backpressure>>.
 With async iterators, you get the guarantee that your application does not receive data faster than it can process.
 
 [source, javascript]
@@ -30,9 +31,9 @@ With async iterators, you get the guarantee that your application does not recei
 const session = driver.session()
 try {
   const peopleNames = session.executeWrite(async tx => {
-    const result = session.run(  // <1>
+    const result = tx.run(  // <1>
       'MERGE (p:Person {name: $name}) RETURN p.name AS name',
-      {name: 'Alice'}
+      { name: 'Alice' }
     )
     let names = []
     for await (const record of result) {  // <2>
@@ -58,7 +59,7 @@ There are two important points to the usage of the async iterator:
 
 == Promise API
 
-The Promise API allows you to run a query and receive the result as a link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises[`Promise`].
+The Promise API allows to run a query and receive the result as a link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises[`Promise`].
 You can think of this query method as allowing you to specify a Cypher query and a number of callbacks that are asynchronously executed depending on the query outcome.
 
 [source, javascript, role=nocollapse]
@@ -67,7 +68,7 @@ const session = driver.session({database: 'neo4j'})
 const result = session.executeWrite(async tx => {  // <1>
   return tx.run(
     'MERGE (p:Person {name: $name}) RETURN p.name AS name',
-    {name: 'Alice'}
+    { name: 'Alice' }
   )
 })
 result.then(result => {  // <2>
@@ -133,9 +134,10 @@ try {
 
 == Streaming API
 
-The Streaming API allows you to run a query and receive results individually, as soon as the server has them ready.
+The Streaming API allows to run a query and receive results individually, as soon as the server has them ready.
 You can specify a callback to process each record.
 This API is particularly fit for cases in which it may take the server a different time to retrieve the different records, but you want to process each of them as soon as they are available.
+The behavior is similar to the xref:_asynchronous_iteration[async iterator]; the programming style is different.
 
 [source, javascript, role=nocollapse]
 ----
@@ -175,7 +177,7 @@ session
 == Reactive API
 
 Typical of reactive programming, in a reactive flow consumers control the rate at which they consume records from queries, and the driver in turn manages the rate at which records are requested from the server.
-The reactive API is typically used in applications that are already oriented towards the reactive style.
+The reactive API is recommended for applications that are already oriented towards the reactive style.
 
 [source, javascript]
 ----

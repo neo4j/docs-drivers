@@ -28,7 +28,7 @@ var neo4j = require('neo4j-driver');
   try {
     driver = neo4j.driver(URI,  neo4j.auth.basic(USER, PASSWORD))
     await driver.verifyConnectivity()
-    console.log(`Connection estabilished`)
+    console.log('Connection estabilished')
     console.log(serverInfo)
   } catch(err) {
     console.log(`Connection error\n${err}\nCause: ${err.cause}`)
@@ -50,15 +50,15 @@ Do not hardcode or concatenate parameters: use placeholders and specify the para
 let session = driver.session({database: 'neo4j'})
 try {
   const result = await session.executeRead(async tx => {
-    return await tx.run('MATCH (p:Person {age: $age}) RETURN p.name AS name', {age: 42})
+    return await tx.run('MATCH (p:Person {age: $age}) RETURN p.name AS name', { age: 42 })
   })
 
   // Summary information
-  console.log(`
-    >> The query \`${result.summary.query.text}\`
-    returned ${result.records.length} records
-    in ${result.summary.resultAvailableAfter} ms.
-  `)
+  console.log(
+    `>> The query \`${result.summary.query.text}\`` +
+    `returned ${result.records.length} records` +
+    `in ${result.summary.resultAvailableAfter} ms.`
+  )
 
   // Loop through results and do something with them
   console.log('>> Results')
@@ -75,7 +75,8 @@ xref:query-simple.adoc[More info on querying the database ->]
 
 == Close driver connection
 
-Call the `.close()` method on the `Driver` instance when you are finished with it, to release any resources still held by it. The same applies to any open sessions.
+Call the `.close()` method on the `Driver` instance when you are finished with it, to release any resources still held by it.
+The same applies to any open sessions.
 
 [source, javascript]
 ----

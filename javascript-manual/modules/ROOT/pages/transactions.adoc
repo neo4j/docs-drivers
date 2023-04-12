@@ -49,10 +49,12 @@ result = await session.executeRead(async tx => { // <1>
     `, {filter: 'Al'}  // <4>
   )
 })
-
-console.log(`The query \`${result.summary.query.text}\`\nreturned ${result.records.length} nodes.\n`)
-for(let person in result.records) {  // <5>
-  console.log(person)
+console.log(
+  `The query \`${result.summary.query.text}\`` +
+  `returned ${result.records.length} nodes.\n`
+)
+for(let record in result.records) {  // <5>
+  console.log(record.get('name'))
 }
 ----
 
@@ -61,7 +63,7 @@ Use xref:query-simple#query-parameters[query parameters] instead, both for perfo
 
 Within a transaction function, a `return` statement results in the transaction being committed, while the transaction is automatically rolled back if an exception is raised.
 
-.A transaction with multiple queries, client logic, and potential roll backs.
+.A transaction with multiple queries, client logic, and potential roll backs
 [source, javascript]
 ----
 const neo4j = require('neo4j-driver');
@@ -91,10 +93,10 @@ const neo4j = require('neo4j-driver');
       await tx.run(`
         MERGE (p:Person {name: $name})
         RETURN p.name AS name
-        `, {name: name}
+        `, { name: name }
       )
 
-      // Obtain most recent organization ID and the number of people linked to it
+      // Obtain most recent organization ID and number of people linked to it
       result = await tx.run(`
         MATCH (o:Organization)
         RETURN o.id AS id, COUNT{(p:Person)-[r:WORKS_FOR]->(o)} AS employeesN
@@ -117,7 +119,7 @@ const neo4j = require('neo4j-driver');
           MATCH (p:Person {name: $name})
           MERGE (p)-[r:WORKS_FOR]->(o)
           RETURN $orgId AS id
-          `, {orgId: orgInfo['id'], name: name}
+          `, { orgId: orgInfo['id'], name: name }
         )
 
       // Otherwise, create a new Organization and link Person to it
@@ -127,7 +129,7 @@ const neo4j = require('neo4j-driver');
           CREATE (o:Organization {id: randomuuid(), createdDate: datetime()})
           MERGE (p)-[r:WORKS_FOR]->(o)
           RETURN o.id AS id
-          `, {name: name, date: neo4j.DateTime.fromStandardDate(new Date())}
+          `, { name: name }
         )
       }
 
@@ -142,13 +144,13 @@ const neo4j = require('neo4j-driver');
 ----
 
 Should a transaction fail for a reason that the driver deems transient, it automatically retries to run the transaction function (with an exponentially increasing delay).
-For this reason, *transaction functions must be _idempotent_* (i.e., they should produce the same effect when run several times), because you do not know upfront how many times they are going to be executed.
+For this reason, *transaction functions should produce the same effect when run several times (_idempotent_)*, because you do not know upfront how many times they are going to be executed.
 In practice, this means that you should not edit nor rely on globals, for example.
 Note that although transaction functions might be executed multiple times, the queries inside it will always run only once.
 
 A session can chain multiple transactions, but *only one single transaction can be active within a session at any given time*.
 This means that a query must be completed before the next one can run, and it is the reason why the previous examples all use the `async/await` syntax.
-To maintain multiple concurrent transactions, see xref:query-async.adoc[how to run non-blocking queries].
+To maintain multiple concurrent transactions, see xref:query-async.adoc[how to run asynchronous queries].
 
 
 === Further transaction function configuration
@@ -166,9 +168,9 @@ Use this to tag transactions.
 [source, javascript]
 ----
 let session = driver.session({database: 'neo4j'})
-const people_n = await session.executeRead(async tx => {
-  return await tx.run("MATCH (a:Person) RETURN count(a) AS people")
-  }, {timeout: 5000, metadata: {"app_name": "people"}}
+const people_n = await session.executeRead(
+  async tx => { return await tx.run('MATCH (a:Person) RETURN count(a)') },
+  { timeout: 5000, metadata: {'app_name': 'people'} }  // TransactionConfig
 )
 ----
 
@@ -182,7 +184,7 @@ You run queries inside an explicit transaction with the method link:{neo4j-docs-
 [source, javascript]
 ----
 let session = driver.session({database: 'neo4j'})
-transaction = await session.beginTransaction()
+let transaction = await session.beginTransaction()
 
 // await transaction.run('<QUERY 1>')
 // await transaction.run('<QUERY 2>')
@@ -199,23 +201,22 @@ Explicit transactions are most useful for applications that need to distribute C
 .Example stub with an explicit transaction involving external APIs
 [source, javascript]
 ----
-async function transfer_to_other_bank(driver, customer_id, other_bank_id, amount) {
+async function transferToOtherBank(driver, customerId, otherBankId, amount) {
   const session = driver.session({database: 'neo4j'})
   const tx = await session.beginTransaction()
   try {
-    if(! check_customer_balance(tx, customer_id, amount)) {
+    if(! checkCustomerBalance(tx, customerId, amount))
       return
-    }
 
     try {
-      decrease_customer_balance(tx, customer_id, amount)
+      decreaseCustomerBalance(tx, customerId, amount)
       await tx.commit()
-    catch (error) {
-      request_inspection(customer_id, other_bank_id, amount, e)
+    } catch (error) {
+      requestInspection(customerId, otherBankId, amount, e)
       throw error  // roll back
     }
 
-    await other_bank_transfer_api(customer_id, other_bank_id, amount)
+    await otherBankTransferApi(customerId, otherBankId, amount)
     // Now the money has been transferred => can't rollback anymore
     // (cannot rollback external services interactions)
   } finally {
@@ -224,34 +225,32 @@ async function transfer_to_other_bank(driver, customer_id, other_bank_id, amount
   }
 }
 
-async function customer_balance_check(tx, customer_id, amount) {
+async function checkCustomerBalance(tx, customerId, amount) {
   result = await tx.run(`
     MATCH (c:Customer {id: $id})
     RETURN c.balance >= $amount AS sufficient
-    `, {id: customer_id, amount: amount}
+    `, { id: customerId, amount: amount }
   )
-  return result.records[0]['sufficient']
+  return result.records[0].get('sufficient')
 }
 
-async function other_bank_transfer_api(customer_id, other_bank_id, amount) {
+async function otherBankTransferApi(customerId, otherBankId, amount) {
   ...
   // make some API call to other bank
 }
 
-async function decrease_customer_balance(tx, customer_id, amount) {
+async function decreaseCustomerBalance(tx, customerId, amount) {
   await tx.run(`
     MATCH (c:Customer {id: $id})
     SET c.balance = c.balance - $amount
-    `, {id: customer_id, amount: amount}
+    `, { id: customerId, amount: amount }
   )
 }
 
-async function request_inspection(customer_id, other_bank_id, amount, error) {
+async function requestInspection(customerId, otherBankId, amount, error) {
   // manual cleanup required; log this or similar
   console.log('WARNING: transaction rolled back due to exception:')
   console.log(error)
-  console.log(`customer_id: ${customer_id}, 'other_bank_id:', ${other_bank_id},
-    'amount:', ${amount})
 }
 ----
 
@@ -263,9 +262,9 @@ When creating a session, you can provide an optional parameter of type  link:{ne
 
 === Database selection
 
-It is recommended to *always specify the database explicitly* with the `database` parameter, even on single-database instances.
+You should *always specify the database explicitly* with the `database` parameter, even on single-database instances.
 This allows the driver to work more efficiently, as it does not have to resolve the home database first.
-If no database is given, the link:{neo4j-docs-base-uri}/operations-manual/current/manage-databases/introduction#manage-databases-default[default database] set in the Neo4j instance settings is used.
+If no database is given, the link:{neo4j-docs-base-uri}/operations-manual/current/manage-databases/introduction#manage-databases-default[user home database] set in the Neo4j instance settings is used.
 
 [source, javascript]
 ----

@@ -26,12 +26,11 @@ Note that this can lead to a loss of precision.
 == Temporal types
 
 Temporal data types are ISO-8601-compliant.
-To serialize them to string, use the `toString()` method.
+To serialize them to string, use the `.toString()` method.
+Temporal objects are immutable.
 
 Sub-second values are measured to nanosecond precision.
-To convert between driver and native types, use the methods `.fromStandardDate()` and `.toStandardDate()` (does not apply to `Duration`). Since JavaScript date types do not support nanoseconds, `.fromStandardDate()` allows a nanoseconds argument (optional), and `toStandardDate()` drops the nanoseconds.
-
-Temporal objects are immutable.
+To convert between driver and native types, use the methods `.fromStandardDate()` and `.toStandardDate()` (does not apply to `Duration`). Since JavaScript date types do not support nanoseconds, `.fromStandardDate()` allows a nanoseconds argument (optional), and `.toStandardDate()` drops the nanoseconds.
 
 [options="header"]
 |===
@@ -230,8 +229,8 @@ For full documentation, see link:{neo4j-docs-base-uri}/api/javascript-driver/cur
 
 Cypher supports spatial values (points), and Neo4j can store these point values as properties on nodes and relationships.
 
-The driver has a single type link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/spatial-types.js~Point.html[`neo4j.types.Point`], which can behave as a 2D/3D cartesian or WGS-84 point, depending on the `SRID` it is initialized with.
-The `SRID` (short for _Spatial Reference Identifier_) is a number identifying the coordinate system the spatial type is to be interpreted in.
+The driver has a single type link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/spatial-types.js~Point.html[`neo4j.types.Point`], which can behave as a 2D/3D cartesian/WGS-84 point, depending on the `SRID` it is initialized with.
+The `SRID` (short for _Spatial Reference Identifier_) is a number identifying the coordinate system the point is to be interpreted in.
 You can think of it as a unique identifier for each spatial type.
 
 [options="header", cols="<20m,<80a"]
@@ -360,11 +359,10 @@ const PASSWORD = 'verysecret';
     MERGE (p:Person {name: $name})
     MERGE (friend:Person {name: $friend_name})
     MERGE (p)-[r:KNOWS]->(friend)
-    SET r.status = $status, r.since = $date
+    SET r.status = $status, r.since = date()
     RETURN r AS friendship
     `, {
-      name: 'Alice', status: 'BFF', friend_name: 'Bob',
-      date: new neo4j.types.Date.fromStandardDate(new Date())
+      name: 'Alice', status: 'BFF', friend_name: 'Bob'
     }
   )
   const relationship = result.records[0].get('friendship')
@@ -408,9 +406,9 @@ const PASSWORD = 'verysecret';
   const session = driver.session({database: 'neo4j'})
 
   // Create some :Person nodes linked by :KNOWS relationships
-  await addFriend(session, 'Alice', 'BFF', 'Bob', new neo4j.types.Date.fromStandardDate(new Date()))
-  await addFriend(session, 'Bob', 'Fiends', 'Sofia', new neo4j.types.Date.fromStandardDate(new Date()))
-  await addFriend(session, 'Sofia', 'Acquaintances', 'Sara', new neo4j.types.Date.fromStandardDate(new Date()))
+  await addFriend(session, 'Alice', 'BFF', 'Bob')
+  await addFriend(session, 'Bob', 'Fiends', 'Sofia')
+  await addFriend(session, 'Sofia', 'Acquaintances', 'Sara')
 
   // Follow :KNOWS relationships outgoing from Alice three times, return as path
   const result = await session.executeRead(async tx => {
@@ -462,15 +460,15 @@ const PASSWORD = 'verysecret';
   await driver.close()
 })()
 
-async function addFriend(session, name, status, friendName, date) {
+async function addFriend(session, name, status, friendName) {
   await session.executeWrite(async tx => {
     await tx.run(`
       MERGE (p:Person {name: $name})
       MERGE (friend:Person {name: $friendName})
       MERGE (p)-[r:KNOWS]->(friend)
-      SET r.status = $status, r.since = $date
+      SET r.status = $status, r.since = date()
       `, {
-        name: name, status: status, friendName: friendName, date: date
+        name: name, status: status, friendName: friendName
       }
     )
   })
@@ -495,4 +493,5 @@ ifndef::backend-pdf[]
 == Glossary
 
 include::{common-partial}/glossary.adoc[]
+include::../partials/glossary.adoc[]
 endif::[]
