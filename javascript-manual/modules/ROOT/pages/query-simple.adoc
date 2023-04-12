@@ -1,0 +1,317 @@
+= Query the database
+
+You can run queries against the database using <<Cypher>> and the methods `Session.executeRead()` and `Session.executeWrite()`.
+
+[NOTE]
+====
+Due to the usage of `async/await`, the examples in this page need to be wrapped in an `async` function. See xref:_a_full_example[a full example] if you are unsure how to do it.
+====
+
+
+== Write to the database
+
+To create a node representing a person named `Alice`, use the `Session.executeWrite()` method in combination with the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/merge/[`MERGE`] clause:
+
+.Create a node representing a `Person` named `Alice`
+[source, javascript]
+----
+let session = driver.session({database: 'neo4j'})
+try {
+  const result = await session.executeWrite(async tx => {  // <3>
+    return await tx.run(
+      'MERGE (p:Person {name: $name})',  // <1>
+       {name: 'Alice'}  // <2>
+    )
+  })
+  console.log(
+    `Created ${result.summary.counters.updates().nodesCreated} nodes` +
+    `in ${result.summary.resultAvailableAfter} ms.`
+  )
+} finally {
+  await session.close()
+}
+----
+
+where *(1)* specifies the Cypher query and *(2)* is an object of _query parameters_.
+The query execution is delegated to an anonymous transaction function, which is passed as callback to `Session.executeWrite()` *(3)*.
+
+[NOTE]
+`MERGE` creates a new node matching the requirements unless one already exists, in which case nothing is done.
+For strict node creation, use the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/create/[`CREATE`] clause.
+
+
+== Read from the database
+
+To retrieve information from the database, use the `Session.executeRead()` method in combination with the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/match/[`MATCH`] clause:
+
+.Retrieve all `Person` nodes
+[source, javascript]
+----
+let session = driver.session({database: 'neo4j'})
+try {
+  const result = await session.executeRead(async tx => {
+    return await tx.run('MATCH (p:Person) RETURN p.name AS name')
+  })
+  console.log(
+    `The query \`${result.summary.query.text}\`` +
+    `returned ${result.records.length} nodes.\n`
+  )
+  for(let record of result.records) {
+    console.log(`Person with name: ${record.get('name')}`)
+    console.log(`Available properties for this node are: ${record.keys}\n`)
+  }
+} finally {
+  await session.close()
+}
+----
+
+where `result.records` contains the actual result as a list of link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/record.js~Record.html[`Record`] objects, and `result.summary` is a link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/result-summary.js~ResultSummary.html[`ResultSummary`] object, containing a summary of execution from the server.
+
+
+== Update the database
+
+To update a node's information in the database, use `MATCH` together with the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/set/[`SET`] clause in a `Session.executeWrite()` call:
+
+.Update node `Alice` to add an `age` property
+[source, javascript]
+----
+let session = driver.session({database: 'neo4j'})
+try {
+  const result = await session.executeWrite(async tx => {
+    return await tx.run(`
+      MATCH (p:Person WHERE p.name = $name)
+      SET p.age = $age
+      `, { name: 'Alice', age: 42 }
+    )
+  })
+  console.log('Query counters:')
+  console.log(result.summary.counters.updates())
+} finally {
+  await session.close()
+}
+----
+
+To create new nodes and relationships linking it to an already existing node, use a combination of `MATCH` and `MERGE` in a `Session.executeWrite()` call:
+
+.Create a relationship `KNOWS` between `Alice` and `Bob`
+[source, javascript]
+----
+let session = driver.session({database: 'neo4j'})
+try {
+  const result = await session.executeWrite(async tx => {
+    return await tx.run(`
+      MATCH (p:Person WHERE p.name = $name)
+      MERGE (friend:Person {name: $friend_name})
+      MERGE (p)-[:KNOWS]->(friend)
+      `, { name: 'Alice', friend_name: 'Bob' }
+    )
+  })
+  console.log('Query counters:')
+  console.log(result.summary.counters.updates())
+} finally {
+  await session.close()
+}
+----
+
+[WARNING]
+====
+It may feel tempting to create new relationships with a single `MERGE` clause, such as: +
+`MERGE (:Person {name: "Alice"})-[KNOWS]->(:Person {name: "Bob"})`. +
+However, this would result in the creation of an _extra_ `Alice` node, so that you would end up with unintended duplicate records.
+To avoid this, always break out a path creation: `MATCH` (or `MERGE`) the nodes you need, and use the resulting references to `MERGE` the relationship (as shown in the previous example).
+See link:https://neo4j.com/developer/kb/understanding-how-merge-works/[Understanding how MERGE works].
+====
+
+
+== Delete from the database
+To remove a node and any relationship attached to it, use link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/delete/[`DETACH DELETE`] in a `Session.executeWrite()` call:
+
+.Remove the `Alice` node
+[source, javascript]
+----
+let session = driver.session({database: 'neo4j'})
+try {
+  const result = await session.executeWrite(async tx => {
+    return await tx.run(`
+      MATCH (p:Person WHERE p.name = $name)
+      DETACH DELETE p
+      `, { name: 'Alice' }
+    )
+  })
+  console.log('Query counters:')
+  console.log(result.summary.counters.updates())
+} finally {
+  await session.close()
+}
+----
+
+
+[#query-parameters]
+== How to pass parameters to queries
+
+*Do not hardcode or concatenate parameters directly into queries*.
+Instead, always use placeholders and specify the link:{neo4j-docs-base-uri}/cypher-manual/current/syntax/parameters/[Cypher parameters] as keyword arguments or in a dictionary, as shown in the previous examples.
+This is for:
+
+1. *performance benefits*: Neo4j compiles and caches queries, but can only do so if the query structure is unchanged;
+2. *security reasons*: link:https://neo4j.com/developer/kb/protecting-against-cypher-injection/[protecting against Cypher injection].
+
+[NOTE]
+There can be circumstances where your query structure prevents the usage of parameters in all its parts.
+For those advanced use cases, see xref:query-advanced#_dynamic_values_in_property_keys_relationship_types_and_labels[Dynamic values in property keys, relationship types, and labels].
+
+
+== Error handling
+
+To avoid an error in one query crashing your application, you can wrap queries into `try/catch` blocks.
+We avoid proper error handling throughout this manual to make examples lighter to parse, and because appropriate error handling depends on the application.
+Here below an example with a `try/catch/finally` block.
+
+[source, javascript]
+----
+let session = driver.session({database: 'neo4j'})
+try {
+  const result = await session.executeRead(async tx => {
+    return await tx.run('MATCH (p:Person) RETURN p')
+  })
+} catch(err) {
+  console.log(`Error in query\n${error}`)
+} finally {
+  await session.close()
+}
+----
+
+
+== Anatomy of a query
+
+Before you can run a query, you need to obtain a session from the driver with the `Driver.session()` method *(1)*.
+The `database` parameter is optional but recommended for xref:performance.adoc[performance], and further xref:transactions#_session_configuration[configuration parameters] can be included.
+
+Within a session, use the methods link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/session.js~Session.html#instance-method-executeRead[`Session.executeRead()`] and link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/session.js~Session.html#instance-method-executeWrite[`Session.executeWrite()`] *(2)*, depending on whether you want to retrieve data from the database or alter it.
+Both methods take a _transaction function_ callback.
+
+It is the transaction function who is responsible for actually carrying out the query.
+Queries are specified with the link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/transaction.js~Transaction.html#instance-method-run[`Transaction.run()`] method *(3)*, which takes a query and its parameters (as an object *(4)*), and returns a link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/result.js~Result.html[`Result`] object.
+When the processing is over, the session is closed *(5)*.
+
+.Retrieve people whose name starts with `Al`
+[source, javascript]
+----
+let session = driver.session({database: 'neo4j'})  // <1>
+try {
+  const result = await session.executeRead(async tx => {  // <2>
+    return await tx.run(`  // <3>
+      MATCH (p:Person WHERE p.name STARTS WITH $filter)
+      RETURN p.name AS name ORDER BY name
+      `, { filter: 'Al'}  // <4>
+    )
+  })
+  console.log(
+    `The query \`${result.summary.query.text}\`` +
+    `returned ${result.records.length} nodes.\n`
+  )
+  for(let record of result.records) {
+    console.log(`Person with name: ${record.get('name')}`)
+    console.log(`Available properties for this node are: ${record.keys}\n`)
+  }
+} finally {
+  await session.close()  // <5>
+}
+----
+
+You can find more information about sessions and transactions in the section xref:transactions.adoc[Run your own transactions].
+
+[TIP]
+The driver may automatically retry to run a failed transaction.
+For this reason, *transaction functions should produce the same effect when run several times (_idempotent_)*, because you do not know how many times they might be executed.
+In practice, this means that you should not edit nor rely on globals, for example.
+Note that although transactions functions might be executed multiple times, the queries inside it will always run only once.
+
+
+== A full example
+
+[source, javascript]
+----
+const neo4j = require('neo4j-driver');
+
+(async () => {
+  const URI = 'neo4j://localhost'
+  const USER = 'neo4j'
+  const PASSWORD = 'verysecret'
+  let driver, session, result
+
+  let people = [{'name': 'Alice', 'age': 42, 'friends': ['Bob', 'Peter', 'Anna']},
+                {'name': 'Bob', 'age': 19},
+                {'name': 'Peter', 'age': 50},
+                {'name': 'Anna', 'age': 30}]
+
+  // Connect to database
+  try {
+    driver = neo4j.driver(URI,  neo4j.auth.basic(USER, PASSWORD))
+    await driver.verifyConnectivity()
+  } catch(err) {
+    return
+    console.log(`Connection error\n${err}\nCause: ${err.cause}`)
+  }
+  session = driver.session({database: 'neo4j'})
+
+  // Create some nodes
+  for(let person in people) {
+    await session.executeWrite(async tx => {
+      await tx.run(
+        'MERGE (p:Person {name: $person.name, age: $person.age})',
+        { person: person }
+      )
+    })
+  }
+
+  // Create some relationships
+  for(let person in people) {
+    if(person.friends != undefined) {
+      await session.executeWrite(async tx => {
+        await tx.run(`
+          MATCH (p:Person {name: $person.name})
+          UNWIND $person.friends AS friendName
+          MATCH (friend:Person {name: friendName})
+          MERGE (p)-[:KNOWS]->(friend)
+          `, { person: person }
+        )
+      })
+    }
+  }
+
+  // Retrieve Alice's friends who are under 40
+  result = await session.executeRead(async tx => {
+    return await tx.run(`
+      MATCH (p:Person {name: $name})-[:KNOWS]-(friend:Person)
+      WHERE friend.age < $age
+      RETURN friend
+      `, { name: 'Alice', age: 40 }
+    )
+  })
+
+  // Loop through results and do something with them
+  for(let person in result.records) {
+    // `person.friend` is an object of type `Node`
+    console.log(person.get('friend'))
+  }
+
+  // Summary information
+  console.log(
+    `The query \`${result.summary.query.text}\`` +
+    `returned ${result.records.length} records` +
+    `in ${result.summary.resultAvailableAfter} ms.`
+  )
+
+  await session.close()
+  await driver.close()
+})();
+----
+
+ifndef::backend-pdf[]
+[discrete.glossary]
+== Glossary
+
+include::{common-partial}/glossary.adoc[]
+include::../partials/glossary.adoc[]
+endif::[]

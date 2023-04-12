@@ -1,0 +1,2 @@
+[[transaction_function]]transaction function:: A transaction function is a callback executed by an `execute_read` or `execute_write` call. The driver automatically re-executes the callback in case of server failure.
+[[Driver]]Driver:: A link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Driver[`Driver`] object holds the details required to establish connections with a Neo4j database.

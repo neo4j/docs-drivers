@@ -1,0 +1,199 @@
+= Further query mechanisms
+
+== Implicit (or auto-commit) transactions
+
+This is the most basic and limited form with which to run a Cypher query.
+The driver will not automatically retry implicit transactions, as it does instead for queries run with xref:transactions#managed-transactions[managed transactions].
+Implicit transactions should only be used when xref:transactions#managed-transactions[transaction functions] do not fit the purpose, or for quick prototyping.
+
+You run an implicit transaction with the method link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/session.js~Session.html#instance-method-run[`Session.run()`], which returns a link:{neo4j-docs-base-uri}/api/api/javascript-driver/current/class/lib6/result.js~Result.html[`Result`] object.
+
+[source, javascript]
+----
+let session = driver.session({database: 'neo4j'})
+try {
+  const result = await session.run(`
+    MATCH (p:Person WHERE p.name STARTS WITH $filter)
+    RETURN p.name AS name ORDER BY name
+    `, { filter: 'Al'}
+  )
+  console.log(
+    `The query \`${result.summary.query.text}\`` +
+    `returned ${result.records.length} nodes.\n`
+  )
+  for(let record of result.records) {
+    console.log(`Person with name: ${record.get('name')}`)
+  }
+} finally {
+  await session.close()
+}
+----
+
+Since the driver cannot figure out whether the query in a `session.run()` call requires a read or write session with the database, it defaults to write. If your implicit transaction contains read queries only, there is a performance gain in xref:transactions#_request_routing[making the driver aware] by setting the keyword argument `defaultAccessMode=neo4j.session.READ` when creating the session.
+
+[TIP]
+*Implicit transactions are the only ones that can be used for link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/call-subquery/#subquery-call-in-transactions[`CALL { ... } IN TRANSACTIONS`] queries*.
+
+[TIP]
+You can run an implicit transaction with a xref:query-async#_reactive_api.adoc[reactive session] as well.
+
+
+=== Import CSV files
+
+The most common use case for using `Session.run()` is for importing large CSV files into the database, and preventing timeout errors due to the size of the transaction.
+
+.Import CSV data into a Neo4j database
+[source, javascript]
+----
+let session = driver.session({database: 'neo4j'})
+try {
+  const result = await session.run(`
+    LOAD CSV FROM 'https://data.neo4j.com/bands/artists.csv' AS line
+    CALL {
+        WITH line
+        MERGE (:Artist {name: line[1], age: toInteger(line[2])})
+    } IN TRANSACTIONS OF 2 ROWS
+  `)
+  console.log(result.summary.counters.updates())
+} finally {
+  await session.close()
+}
+----
+
+For more information, see link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/load-csv/[Cypher -- Clauses -- Load CSV].
+
+
+=== Timeout and metadata configuration
+
+`session.run()` takes an optional third parameter of type link:{neo4j-docs-base-uri}/api/javascript-driver/current/typedef/index.html#static-typedef-TransactionConfig[`TransactionConfig`], which allows to specify a query timeout and to attach metadata to the transaction.
+The metadata is visible in the server logs (as described for the xref:transactions#_further_transaction_function_configuration[transaction functions configuration]).
+
+[source, javascript]
+----
+let session = driver.session({database: 'neo4j'})
+const result = await session.run(
+  'MATCH (a:Person) RETURN count(a) AS people'
+  {},  // query parameters
+  { timeout: 5000, metadata: {'app_name': 'people'} }  // transactionConfig
+)
+----
+
+
+== Dynamic values in property keys, relationship types, and labels
+
+In general, you should not concatenate parameters directly into a query, but rather use xref:query-simple#query-parameters[query parameters].
+There can however be circumstances where your query structure prevents the usage of parameters in all its parts.
+In fact, although parameters can be used for literals and expressions as well as node and relationship ids, they cannot be used for the following constructs:
+
+- property keys, so `MATCH (n) WHERE n.$param = 'something'` is invalid;
+- relationship types, so `MATCH (n)-[:$param]->(m)` is invalid;
+- labels, so `MATCH (n:$param)` is invalid.
+
+For those queries, you are forced to use string concatenation.
+To link:https://neo4j.com/developer/kb/protecting-against-cypher-injection/[protect against Cypher injections], you should enclose the dynamic values in backticks and escape them yourself.
+Notice that Cypher processes Unicode, so take care of the Unicode literal `\u0060` as well.
+
+.Manually escaping dynamic labels before concatenation
+[source, javascript]
+----
+const dangerousLabel = 'Special Person\\u0060'
+// convert \u0060 to literal backtick, then escape backticks
+const escapedLabel = dangerousLabel.replaceAll('\\u0060', '`').replaceAll('`', '``')
+
+let session = driver.session({database: 'neo4j'})
+const result = await session.run('MATCH (p:`' + escapedLabel + '`) RETURN p.name')
+console.log(`Executed query: ${result.summary.query.text}`)
+----
+
+Another workaround, which avoids string concatenation, is using the <<APOC>> procedure link:{neo4j-docs-base-uri}/apoc/current/overview/apoc.merge/apoc.merge.node/[`apoc.merge.node`].
+It supports dynamic labels and property keys, but only for node insertion.
+
+.Using `apoc.merge.node` to create a node with dynamic labels/property keys
+[source, javascript]
+----
+const propertyKey = 'name'
+const label = 'Person'
+let session = driver.session({database: 'neo4j'})
+try {
+  await session.run(
+    'CALL apoc.merge.node($labels, $properties)',
+    {labels: [label], properties: {property_key: 'Alice'}},
+  )
+} finally {
+  await session.close()
+}
+----
+
+[NOTE]
+If you are running Neo4j in Docker, APOC needs to be enabled when starting the container.
+See link:https://neo4j.com/labs/apoc/current/installation/#docker[APOC - Installation - Docker].
+
+
+== Logging
+
+When creating a `Driver` instance, you may optionally specify its logging configuration.
+
+Logging is off by default.
+To turn it on, specify the `logging` option when you initialize the driver.
+As value, use the function `neo4j.logging.console()`, which logs to console and takes an optional parameter `level`. The logging level can be either `error`, `warn`, `info`, or `debug`.
+Enabling one level automatically enables all higher priority ones, and its default is `info`.
+
+.Creating a driver with logging of level `debug` to console
+[source, javascript]
+----
+neo4j.driver(
+  uri,
+  neo4j.auth.basic(user, password),
+  {  // driver config
+    logging: neo4j.logging.console('debug')
+  }
+)
+----
+
+.Example of log output upong driver connection
+[source, log]
+----
+1681215847749 INFO Routing driver 0 created for server address localhost:7687
+1681215847765 INFO Routing table is stale for database: "neo4j" and access mode: "WRITE": RoutingTable[database=neo4j, expirationTime=0, currentTime=1681215847765, routers=[], readers=[], writers=[]]
+1681215847773 DEBUG Connection [0][] created towards localhost:7687(127.0.0.1)
+1681215847773 DEBUG Connection [0][] C: HELLO {user_agent: 'neo4j-javascript/5.3.0', ...}
+1681215847778 DEBUG Connection [0][] S: SUCCESS {"signature":112,"fields":[{"server":"Neo4j/5.8.0","connection_id":"bolt-1782","hints":{"connection.recv_timeout_seconds":{"low":120,"high":0}}}]}
+1681215847778 DEBUG Connection [0][bolt-1782] created for the pool localhost:7687
+1681215847778 DEBUG Connection [0][bolt-1782] acquired from the pool localhost:7687
+1681215847779 DEBUG Connection [0][bolt-1782] C: ROUTE {"address":"localhost:7687"} [] {"db":"neo4j"}
+1681215847781 DEBUG Connection [0][bolt-1782] S: SUCCESS {"signature":112,"fields":[{"rt":{"servers":[{"addresses":["localhost:7687"],"role":"WRITE"},{"addresses":["localhost:7687"],"role":"READ"},{"addresses":["localhost:7687"],"role":"ROUTE"}],"ttl":{"low":300,"high":0},"db":"neo4j"}}]}
+----
+
+You may also specify a custom logger function, for example to log to a file.
+In that case, the `logging` option expects two properties:
+
+- `level`: either `error`, `warn`, `info`, or `debug`.
+Enabling one level automatically enables all higher priority ones.
+Defaults to `info`.
+- `logger`: a function invoked when a message needs to be logged.
+Takes `level, message` as input.
+
+.Creating a driver with logging of level `error` to console
+[source, javascript]
+----
+neo4j.driver(
+  uri,
+  neo4j.auth.basic(user, password),
+  {  // driver config
+    logging: {
+      level: 'error',
+      logger: (level, message) => console.log(level + ' ' + message)
+    }
+  }
+)
+----
+
+You can find more information about logging in the link:{neo4j-docs-base-uri}/api/javascript-driver/current/function/index.html#static-function-driver[API documentation].
+
+
+ifndef::backend-pdf[]
+[discrete.glossary]
+== Glossary
+
+include::{common-partial}/glossary.adoc[]
+endif::[]

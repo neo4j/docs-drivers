@@ -1,0 +1,68 @@
+# Usage within a browser (WebSockets)
+
+There is a special browser version of the driver, which supports connecting to Neo4j over WebSockets.
+You can include it in an HTML page using one of the following tags:
+
+[source, html]
+----
+<!-- Direct reference -->
+<script src="lib/browser/neo4j-web.min.js"></script>
+
+<!-- unpkg CDN non-minified -->
+<script src="https://unpkg.com/neo4j-driver"></script>
+<!-- unpkg CDN minified for production use, version X.Y.Z -->
+<script src="https://unpkg.com/neo4j-driver@X.Y.Z/lib/browser/neo4j-web.min.js"></script>
+
+<!-- jsDelivr CDN non-minified -->
+<script src="https://cdn.jsdelivr.net/npm/neo4j-driver"></script>
+<!-- jsDelivr CDN minified for production use, version X.Y.Z -->
+<script src="https://cdn.jsdelivr.net/npm/neo4j-driver@X.Y.Z/lib/browser/neo4j-web.min.js"></script>
+----
+
+Including the driver in the page makes a global `neo4j` object available, through which you may then xref:connect.adoc[connect] and xref:query-simple.adoc[query] a Neo4j database, in the same way as you would do for a local application.
+
+.Connection example
+[source, javascript]
+----
+var driver = neo4j.driver(
+  'neo4j://localhost',
+  neo4j.auth.basic('neo4j', 'password')
+)
+----
+
+[WARNING]
+Code running in a browser is visible to the client, **including your database credentials**.
+You have to take extra steps to ensure that no unauthorized access is allowed.
+
+Starting from version 5.4, the browser version is also exported as an ECMA Script Module.
+You can import it using one of the following statements:
+
+[source, javascript]
+----
+// Direct reference
+import neo4j from 'lib/browser/neo4j-web.esm.min.js'
+
+// unpkg CDN non-minified , version X.Y.Z where X.Y.Z >= 5.4.0
+import neo4j from 'https://unpkg.com/neo4j-driver@X.Y.Z/lib/browser/neo4j-web.esm.js'
+
+// unpkg CDN minified for production use, version X.Y.Z where X.Y.Z >= 5.4.0
+import neo4j from 'https://unpkg.com/neo4j-driver@X.Y.Z/lib/browser/neo4j-web.esm.min.js'
+
+// jsDelivr CDN non-minified, version X.Y.Z where X.Y.Z >= 5.4.0
+import neo4j from 'https://cdn.jsdelivr.net/npm/neo4j-driver@X.Y.Z/lib/browser/neo4j-web.esm.js'
+
+// jsDelivr CDN minified for production use, version X.Y.Z where X.Y.Z >= 5.4.0
+import neo4j from 'https://cdn.jsdelivr.net/npm/neo4j-driver@X.Y.Z/lib/browser/neo4j-web.esm.min.js'
+----
+
+It is not required to explicitly close the driver on a web page, unless its lifetime does not correspond to the lifetime of the page.
+The reason for this is that web browsers are supposed to gracefully terminate all open WebSockets when a page is closed.
+
+
+ifndef::backend-pdf[]
+[discrete.glossary]
+== Glossary
+
+include::{common-partial}/glossary.adoc[]
+include::../partials/glossary.adoc[]
+endif::[]

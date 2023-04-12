@@ -1,0 +1,497 @@
+= Data types and mapping to Cypher types
+
+The tables in this section show the mapping between Cypher data types and JavaScript types.
+
+== Core data types
+
+[options="header"]
+|===
+| Cypher Type | JavaScript Type
+| <<null>>    | `null`
+| List        | `Array`
+| Map         | `Object`
+| Boolean     | `Boolean`
+| Integer     | link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/integer.js~Integer.html[`Integer`]
+| Float       | `Number`
+| String      | `String`
+| ByteArray   | `Int8Array`
+|===
+
+[TIP]
+link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/integer.js~Integer.html[`Integer`] is not one of JavaScript's native types, but rather a custom one accomodating Cypher's precision.
+You can disable this through the link:{neo4j-docs-base-uri}/api/javascript-driver/current/function/index.html#configuration[`disableLosslessIntegers` configuration entry] when instantiating the driver, so that JavaScript's native `Number` type is used instead.
+Note that this can lead to a loss of precision.
+
+
+== Temporal types
+
+Temporal data types are ISO-8601-compliant.
+To serialize them to string, use the `.toString()` method.
+Temporal objects are immutable.
+
+Sub-second values are measured to nanosecond precision.
+To convert between driver and native types, use the methods `.fromStandardDate()` and `.toStandardDate()` (does not apply to `Duration`). Since JavaScript date types do not support nanoseconds, `.fromStandardDate()` allows a nanoseconds argument (optional), and `.toStandardDate()` drops the nanoseconds.
+
+[options="header"]
+|===
+| Cypher Type   | JavaScript Type
+| Date          | xref:_date[`Date`]
+| Time          | xref:_time[`Time`]
+| LocalTime     | xref:_localtime[`LocalTime`]
+| DateTime      | xref:_datetime[`DateTime`]
+| LocalDateTime | xref:_localdatetime[`LocalDateTime`]
+| Duration      | xref:_duration[`Duration`]
+|===
+
+.How to use temporal types in queries
+[source, javascript]
+----
+const neo4j = require('neo4j-driver');
+const URI = 'neo4j://localhost';
+const USER = 'neo4j';
+const PASSWORD = 'verysecret';
+
+(async () => {
+  const driver = neo4j.driver(URI, neo4j.auth.basic(USER, PASSWORD))
+  const session = driver.session({database: 'neo4j'})
+
+  const friendsSince = new neo4j.types.DateTime(1999, 11, 23, 7, 47, 0, 4123, -4*3600, 'US/Eastern')
+
+  // JS native types work as well.
+  // They don't support the full feature-set of Neo4j's type though.
+  // let jsFriendsSince = new Date(1999, 11, 23, 7, 47, 0)
+  // jsFriendsSince = new neo4j.types.Date.fromStandardDate(jsFriendsSince)
+
+  // Create a friendship with the given DateTime, and return the DateTime
+  const result = await session.executeWrite(async tx => {
+    return await tx.run(`
+      MERGE (a:Person {name: $name})
+      MERGE (b:Person {name: $friend})
+      MERGE (a)-[friendship:KNOWS]->(b)
+      SET friendship.since = $friendsSince
+      RETURN friendship.since
+      `, {
+        name: 'Alice', friend: 'Bob',
+        friendsSince: friendsSince  // or friendsSince: jsFriendsSince
+      }
+    )
+  })
+  const outDateTime = result.records[0].get('friendship.since')
+  console.log(outDateTime)
+  /*
+  DateTime {
+    year: Integer { low: 1999, high: 0 },
+    month: Integer { low: 11, high: 0 },
+    day: Integer { low: 23, high: 0 },
+    hour: Integer { low: 6, high: 0 },
+    minute: Integer { low: 47, high: 0 },
+    second: Integer { low: 0, high: 0 },
+    nanosecond: Integer { low: 4123, high: 0 },
+    timeZoneOffsetSeconds: Integer { low: -18000, high: -1 },
+    timeZoneId: 'US/Eastern'
+  }
+ */
+
+  // Convert DateTime to JS native Date (lossy)
+  const jsOutDateTime = outDateTime.toStandardDate()
+  console.log(jsOutDateTime)
+  // 1999-11-23T11:47:00.000Z
+
+  await session.close()
+  await driver.close()
+})()
+----
+
+
+=== Date
+
+Represents an instant capturing the date, but not the time, nor the timezone.
+
+[source, javascript]
+----
+d = new neo4j.Date(2021, 11, 2)
+// Date { year: 2021, month: 11, day: 2 }
+d.toString() // '2021-11-02'
+----
+
+For full documentation, see link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/temporal-types.js~Date.html[API documentation -- Date].
+
+
+=== Time
+
+Represents an instant capturing the time, and the timezone offset in seconds, but not the date.
+
+[source, javascript]
+----
+d = new neo4j.Time(7, 47, 0, 4123, -4*3600)
+/*
+Time {
+  hour: 7,
+  minute: 47,
+  second: 0,
+  nanosecond: 4123,
+  timeZoneOffsetSeconds: -14400
+}
+*/
+d.toString() // '07:47:00.000004123-04:00'
+----
+
+For full documentation, see link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/temporal-types.js~Time.html[API documentation -- Time].
+
+
+=== LocalTime
+
+Represents an instant capturing the time of day, but not the date, nor the timezone.
+
+[source, javascript]
+----
+d = new neo4j.LocalTime(7, 47, 0, 4123)
+// LocalTime { hour: 7, minute: 47, second: 0, nanosecond: 4123 }
+d.toString() // '07:47:00.000004123'
+----
+
+For full documentation, see link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/temporal-types.js~LocalTime.html[API documentation -- LocalTime].
+
+
+=== DateTime
+
+Represents an instant capturing the date, the time, and the timezone identifier.
+Timezone parameters (offset and identifier) are optional.
+
+[source, javascript]
+----
+d = new neo4j.DateTime(2021, 11, 2, 7, 47, 0, 4123, -4*3600, 'US/Eastern')
+/*
+DateTime {
+  year: 2021,
+  month: 11,
+  day: 2,
+  hour: 7,
+  minute: 47,
+  second: 0,
+  nanosecond: 4123,
+  timeZoneOffsetSeconds: -14400,
+  timeZoneId: 'US/Eastern'
+}
+*/
+d.toString() // '2021-11-02T07:47:00.000004123-04:00[US/Eastern]'
+----
+
+For full documentation, see link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/temporal-types.js~DateTime.html[API documentation -- DateTime].
+
+
+=== LocalDateTime
+
+Represents an instant capturing the date and the time, but not the timezone.
+
+[source, javascript]
+----
+d = new neo4j.LocalDateTime(2021, 11, 2, 7, 47, 0, 4123)
+/*
+LocalDateTime {
+  year: 2021,
+  month: 11,
+  day: 2,
+  hour: 7,
+  minute: 47,
+  second: 0,
+  nanosecond: 4123
+}
+*/
+d.toString() // '2021-11-02T07:47:00.000004123'
+----
+
+For full documentation, see link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/temporal-types.js~LocalDateTime.html[API documentation -- LocalDateTime].
+
+
+=== Duration
+
+Represents the difference between two points in time.
+
+[source, javascript]
+----
+const d = new neo4j.Duration(1, 2, 3, 4)
+/*
+Duration {
+  months: 1,
+  days: 2,
+  seconds: Integer { low: 3, high: 0 },
+  nanoseconds: Integer { low: 4, high: 0 }
+}
+*/
+d.toString() // 'P1M2DT3.000000004S'
+----
+
+For full documentation, see link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/temporal-types.js~Duration.html[API documentation -- Duration].
+
+
+== Spatial types
+
+Cypher supports spatial values (points), and Neo4j can store these point values as properties on nodes and relationships.
+
+The driver has a single type link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/spatial-types.js~Point.html[`neo4j.types.Point`], which can behave as a 2D/3D cartesian/WGS-84 point, depending on the `SRID` it is initialized with.
+The `SRID` (short for _Spatial Reference Identifier_) is a number identifying the coordinate system the point is to be interpreted in.
+You can think of it as a unique identifier for each spatial type.
+
+[options="header", cols="<20m,<80a"]
+|===
+| SRID   | Description
+| `7203` | 2D point in the cartesian space.
+| `9157` | 3D point in the cartesian space.
+| `4326` | 2D point in the WGS84 space.
+| `4979` | 3D point in the WGS84 space.
+|===
+
+.Points in cartesian space
+[source, javascript]
+----
+// A 2D Point in cartesian space
+const point2d = new neo4j.types.Point(
+  7203, // SRID
+  1, // x
+  5.1 // y
+)
+// Point { srid: 4979, x: 1, y: -2 }
+
+// A 3D Point in cartesian space
+const point3d = new neo4j.types.Point(
+  9157, // SRID
+  1, // x
+  -2, // y
+  3.1 // z
+)
+// Point { srid: 4979, x: 1, y: -2, z: 3.1 }
+----
+
+.Points in WGS-84 space
+[source, javascript]
+----
+// A 2D point in WGS-84 space
+const point2d = new neo4j.types.Point(
+  4326, // SRID
+  1, // x
+  -2, // y
+  3.1 // z
+)
+// Point { srid: 4979, x: 1, y: -2}
+
+// A 3D point in WGS-84 space
+const point3d = new neo4j.types.Point(
+  4979, // SRID
+  1, // x
+  -2, // y
+  3.1 // z
+)
+// Point { srid: 4979, x: 1, y: -2, z: 3.1 }
+----
+
+For full documentation, see link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/spatial-types.js~Point.html[API documentation -- Point].
+
+
+== Graph types
+
+*Graph types are only passed as results and may not be used as parameters*.
+
+[options="header"]
+|===
+| Cypher Type  | JavaScript Type
+| Node         | xref:_node[`neo4j.types.Node`]
+| Relationship | xref:_relationship[`neo4j.types.Relationship`]
+| Path         | xref:_path_pathsegment[`neo4j.types.Path`]
+|              | xref:_path_pathsegment[`neo4j.types.PathSegment`]
+|===
+
+=== Node
+Represents a node in a graph. +
+The property `elementId` provides an identifier for the entity.
+This should be used with care, as no guarantees are given about the mapping between id values and elements outside the scope of a single transaction.
+
+[source, javascript]
+----
+const neo4j = require('neo4j-driver');
+const URI = 'neo4j://localhost';
+const USER = 'neo4j';
+const PASSWORD = 'verysecret';
+
+(async () => {
+  const driver = neo4j.driver(URI, neo4j.auth.basic(USER, PASSWORD))
+  const session = driver.session({database: 'neo4j'})
+  const result = await session.run(
+    'MERGE (p:Person {name: $name}) RETURN p AS person', {
+      name: 'Alice'
+    }
+  )
+  const node = result.records[0].get('person')
+  console.log(node)
+  /*
+  Node {
+    identity: Integer { low: 393, high: 0 },  // deprecated
+    labels: [ 'Person' ],
+    properties: { name: 'Alice' },
+    elementId: '4:d6154461-ff34-42a9-b7c3-d32673913419:393'
+  }
+  */
+  await session.close()
+  await driver.close()
+})()
+----
+
+For full documentation, see link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/graph-types.js~Node.html[API documentation -- Node].
+
+
+=== Relationship
+
+Represents a relationship in a graph. +
+The property `elementId` provides an identifier for the entity.
+This should be used with care, as no guarantees are given about the mapping between id values and elements outside the scope of a single transaction. The same applies to `startNodeElementId` and `endNodeElementId`.
+
+[source, javascript]
+----
+const neo4j = require('neo4j-driver');
+const URI = 'neo4j://localhost';
+const USER = 'neo4j';
+const PASSWORD = 'verysecret';
+
+(async () => {
+  const driver = neo4j.driver(URI, neo4j.auth.basic(USER, PASSWORD))
+  const session = driver.session({database: 'neo4j'})
+  const result = await session.run(`
+    MERGE (p:Person {name: $name})
+    MERGE (friend:Person {name: $friend_name})
+    MERGE (p)-[r:KNOWS]->(friend)
+    SET r.status = $status, r.since = date()
+    RETURN r AS friendship
+    `, {
+      name: 'Alice', status: 'BFF', friend_name: 'Bob'
+    }
+  )
+  const relationship = result.records[0].get('friendship')
+  console.log(relationship)
+  /*
+  Relationship {
+    identity: Integer { low: 388, high: 0 },  // deprecated
+    start: Integer { low: 393, high: 0 },  // deprecated
+    end: Integer { low: 394, high: 0 },  // deprecated
+    type: 'KNOWS',
+    properties: {
+      since: Date { year: [Integer], month: [Integer], day: [Integer] },
+      status: 'BFF'
+    },
+    elementId: '5:d6154461-ff34-42a9-b7c3-d32673913419:388',
+    startNodeElementId: '4:d6154461-ff34-42a9-b7c3-d32673913419:393',
+    endNodeElementId: '4:d6154461-ff34-42a9-b7c3-d32673913419:394'
+  }
+  */
+  await session.close()
+  await driver.close()
+})()
+----
+
+For full documentation, see link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/graph-types.js~Relationship.html[API documentation -- Relationship].
+
+
+=== Path, PathSegment
+
+`Path` represents a path in a graph, while `PathSegment` represents its individual links.
+
+[source, javascript]
+----
+const neo4j = require('neo4j-driver');
+const URI = 'neo4j://localhost';
+const USER = 'neo4j';
+const PASSWORD = 'verysecret';
+
+(async () => {
+  const driver = neo4j.driver(URI, neo4j.auth.basic(USER, PASSWORD))
+  const session = driver.session({database: 'neo4j'})
+
+  // Create some :Person nodes linked by :KNOWS relationships
+  await addFriend(session, 'Alice', 'BFF', 'Bob')
+  await addFriend(session, 'Bob', 'Fiends', 'Sofia')
+  await addFriend(session, 'Sofia', 'Acquaintances', 'Sara')
+
+  // Follow :KNOWS relationships outgoing from Alice three times, return as path
+  const result = await session.executeRead(async tx => {
+    return await tx.run(`
+      MATCH p = (:Person {name: $name})-[:KNOWS*3]->(:Person)
+      RETURN p AS friendsChain
+      `, {
+        name: 'Alice'
+      }
+    )
+  })
+  const path = result.records[0].get('friendsChain')
+  console.log(path)
+  /*
+  Path {
+    start: Node {
+      identity: Integer { low: 393, high: 0 },
+      labels: [ 'Person' ],
+      properties: { name: 'Alice' },
+      elementId: '4:d6154461-ff34-42a9-b7c3-d32673913419:393'
+    },
+    end: Node {
+      identity: Integer { low: 396, high: 0 },
+      labels: [ 'Person' ],
+      properties: { name: 'Sara' },
+      elementId: '4:d6154461-ff34-42a9-b7c3-d32673913419:396'
+    },
+    segments: [
+      PathSegment {
+        start: [Node],
+        relationship: [Relationship],
+        end: [Node]
+      },
+      PathSegment {
+        start: [Node],
+        relationship: [Relationship],
+        end: [Node]
+      },
+      PathSegment {
+        start: [Node],
+        relationship: [Relationship],
+        end: [Node]
+      }
+    ],
+    length: 3
+  }
+  */
+  await session.close()
+  await driver.close()
+})()
+
+async function addFriend(session, name, status, friendName) {
+  await session.executeWrite(async tx => {
+    await tx.run(`
+      MERGE (p:Person {name: $name})
+      MERGE (friend:Person {name: $friendName})
+      MERGE (p)-[r:KNOWS]->(friend)
+      SET r.status = $status, r.since = date()
+      `, {
+        name: name, status: status, friendName: friendName
+      }
+    )
+  })
+}
+----
+
+For full documentation, see link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/graph-types.js~Path.html[API documentation -- Path] and link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/graph-types.js~PathSegment.html[PathSegment].
+
+
+== Errors
+
+All errors raised by the driver are of type link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/error.js~Neo4jError.html[`Neo4jError`].
+For a list of errors the server can return, see the link:{neo4j-docs-base-uri}/status-codes/current/[Status code] page.
+
+Some server errors are marked as safe to retry without need to alter the original request.
+Examples of such errors are deadlocks and memory issues.
+All driver's exception types implement the method `.isRetryable()`, which gives insights into whether a further attempt might be successful.
+This is particular useful when running queries in xref:transactions#explicit-transactions[explicit transactions], to know if a failed query should be run again.
+
+ifndef::backend-pdf[]
+[discrete.glossary]
+== Glossary
+
+include::{common-partial}/glossary.adoc[]
+include::../partials/glossary.adoc[]
+endif::[]

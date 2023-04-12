@@ -6,7 +6,7 @@ ifndef::backend-pdf[]
 :page-toclevels: 0
 endif::[]
 
-// If we are building the PDF, add a heading and include the quickstart information offset by one level 
+// If we are building the PDF, add a heading and include the quickstart information offset by one level
 ifdef::backend-pdf[]
 == Quickstart
 
@@ -29,6 +29,7 @@ endif::[]
 == Glossary
 
 include::{common-partial}/glossary.adoc[]
+include::../partials/glossary.adoc[]
 
 ifdef::backend-pdf[]
 <<<

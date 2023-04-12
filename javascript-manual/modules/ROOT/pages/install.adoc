@@ -1,0 +1,44 @@
+= Installation
+
+To create a Neo4j JavaScript application, you first need to install the JavaScript Driver and get a Neo4j database instance to connect to.
+
+[#install-driver]
+== Install the driver
+
+Use `npm` to install the link:https://www.npmjs.com/package/neo4j-driver[Neo4j JavaScript Driver] (requires `npm` and any LTS version of `node.js`):
+
+[source,bash]
+----
+npm i neo4j-driver
+----
+
+Always use the latest version of the driver, as it will always work both with the previous Neo4j <<LTS>> release and with the current and next major releases.
+The latest `5.x` driver supports connection to any Neo4j 5 and 4.4 instance, and will also be compatible with Neo4j 6.
+For a detailed list of changes across versions, see the link:https://github.com/neo4j/neo4j-javascript-driver/wiki/5.0-changelog[driver's changelog].
+
+[NOTE]
+--
+There is also a link:https://www.npmjs.com/package/neo4j-driver-lite[lite version] of the Neo4j JavaScript Driver, which includes the same features as the regular driver but without support for the xref:query-async#_reactive_api[Reactive API].
+You can install it with `npm i neo4j-driver-lite`.
+--
+
+== Include the driver
+
+Unless you are going to xref:browser-websockets.adoc[use the driver within a web browser], you use the JavaScript driver in a Node.js or TypeScript application.
+To include the driver in your application, use `require`:
+
+[source, javascript]
+----
+const neo4j = require('neo4j-driver')
+----
+
+
+include::{common-partial}/install.adoc[tag=get-an-instance,opts=bla]
+
+
+ifndef::backend-pdf[]
+[discrete.glossary]
+== Glossary
+
+include::{common-partial}/glossary.adoc[]
+endif::[]

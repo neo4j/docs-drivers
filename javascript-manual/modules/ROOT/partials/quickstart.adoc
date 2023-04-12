@@ -1,0 +1,85 @@
+== Installation
+
+Install the Neo4j Javascript driver with `npm`:
+
+[source,bash]
+----
+npm i neo4j-driver
+----
+
+xref:install#install-driver[More info on installing the driver ->]
+
+
+== Connect to the database
+
+Connect to a database by creating a <<Driver>> object and providing a URL and an authentication token.
+Once you have a `Driver` instance, use the `.verifyConnectivity()` method to ensure that a working connection can be established.
+
+[source, javascript]
+----
+var neo4j = require('neo4j-driver');
+(async () => {
+  // URI examples: 'neo4j://localhost', 'neo4j+s://xxx.databases.neo4j.io'
+  const URI = '<URI to Neo4j database>'
+  const USER = '<Username>'
+  const PASSWORD = '<Password>'
+  let driver
+
+  try {
+    driver = neo4j.driver(URI,  neo4j.auth.basic(USER, PASSWORD))
+    await driver.verifyConnectivity()
+    console.log('Connection estabilished')
+    console.log(serverInfo)
+  } catch(err) {
+    console.log(`Connection error\n${err}\nCause: ${err.cause}`)
+  }
+})();
+----
+
+xref:connect.adoc[More info on connecting to a database ->]
+
+
+== Query the database
+
+Execute a <<Cypher>> statement by creating a session and using the methods `Session.executeRead()` and `Session.executeWrite()`.
+Do not hardcode or concatenate parameters: use placeholders and specify the parameters as keyword arguments.
+
+[source, javascript, role=nocollapse]
+----
+// Get the name of all 42 year-olds
+let session = driver.session({database: 'neo4j'})
+try {
+  const result = await session.executeRead(async tx => {
+    return await tx.run('MATCH (p:Person {age: $age}) RETURN p.name AS name', { age: 42 })
+  })
+
+  // Summary information
+  console.log(
+    `>> The query \`${result.summary.query.text}\`` +
+    `returned ${result.records.length} records` +
+    `in ${result.summary.resultAvailableAfter} ms.`
+  )
+
+  // Loop through results and do something with them
+  console.log('>> Results')
+  for(record of result.records) {
+    console.log(record.get('name'))
+  }
+} finally {
+  session.close()
+}
+----
+
+xref:query-simple.adoc[More info on querying the database ->]
+
+
+== Close driver connection
+
+Call the `.close()` method on the `Driver` instance when you are finished with it, to release any resources still held by it.
+The same applies to any open sessions.
+
+[source, javascript]
+----
+session.close()
+driver.close()
+----
