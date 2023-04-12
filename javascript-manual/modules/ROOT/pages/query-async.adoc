@@ -206,6 +206,9 @@ rxResult.subscribe((name) => console.log(name))
 [NOTE]
 The reactive API requires a link:{neo4j-docs-base-uri}/docs/api/javascript-driver/current/class/src/session-rx.js~RxSession.html[`RxSession`] and returns a link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/src/result-rx.js~RxResult.html[`RxResult`].
 
+[NOTE]
+The reactive API is not available in the lite version of the driver.
+
 
 ifndef::backend-pdf[]
 [discrete.glossary]
