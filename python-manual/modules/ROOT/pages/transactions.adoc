@@ -1,7 +1,8 @@
 = Run your own transactions
 
-When xref:query-simple.adoc[querying the database] with transaction functions, the driver automatically creates a *<<transaction>>*.
-You can easily include multiple queries in a single transaction function, but to design more involved use-cases it is important to understand how transactions work within the driver.
+When xref:query-simple.adoc[querying the database with `execute_query()`], the driver automatically creates a _transaction_. A transaction is a unit of work that is either _committed_ in its entirety or _rolled back_ on failure. You can include multiple Cypher statements in a single query, as for example when using `MATCH` and `MERGE` in sequence to xref:query-simple#_update_the_database[update the database], but you cannot have multiple queries and interleave some client-logic in between them.
+
+For these more advanced use-cases, the driver provides functions to take full control over the transaction lifecycle. These are called _managed transactions_, and you can think of them as a way of unwrapping the flow of `execute_query()` and being able to specify its desired behavior in more places.
 
 
 == Obtain a session
@@ -36,10 +37,10 @@ A managed transaction is created with the methods link:{neo4j-docs-base-uri}/api
 Both methods take a _transaction function_ callback *(1)* and an arbitrary number of positional and keyword arguments *(2)* which are handed down to the transaction function.
 The transaction function *(3)* is responsible for actually carrying out the queries and processing the result.
 Queries are specified with the link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Transaction.run[`Transaction.run()`] method *(4)*, which returns a link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Result[`Result`] object.
-You can then xref:result#manipulate-result[process the result] *(5)* using any of the `Result` methods, or simply casting it to list.
+You can then process the result *(5)* using any of the `Result` methods, as you would do with a xref:result#_custom_transformers[custom transformer].
 
 .Retrieve people whose name starts with `Al`.
-[source,python]
+[source, python]
 ----
 def match_person_nodes(tx, name_filter): # <3>
     result = tx.run(""" # <4>
@@ -65,7 +66,7 @@ Instead, always xref:result.adoc[process the result] in some way; at minimum, ca
 Within a transaction function, a `return` statement results in the transaction being committed, while the transaction is automatically rolled back if an exception is raised.
 
 .A transaction with multiple queries, client logic, and potential roll backs.
-[source,python]
+[source, python]
 ----
 from neo4j import GraphDatabase
 
@@ -156,7 +157,7 @@ The default value is set on the server side.
 These metadata get logged in the server `query.log`, and are visible in the output of the `SHOW TRANSACTIONS` Cypher command.
 Use this to tag transactions.
 
-[source,python]
+[source, python]
 ----
 from neo4j import unit_of_work
 
@@ -178,7 +179,7 @@ with driver.session(database="neo4j") as session:
 You can achieve full control over transactions by manually beginning one with the method link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Session.begin_transaction[`Session.begin_transaction()`].
 You run queries inside an explicit transaction with the method link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Transaction.run[`Transaction.run()`].
 
-[source,python]
+[source, python]
 ----
 with driver.session(database="neo4j") as session:
     with session.begin_transaction() as tx:
@@ -189,7 +190,7 @@ Closing an explicit transaction can either happen automatically at the end of a 
 
 Explicit transactions are most useful for applications that need to distribute Cypher execution across multiple functions for the same transaction, or for applications that need to run multiple queries within a single transaction but without the automatic retries provided by managed transactions.
 
-[source,python]
+[source, python]
 ----
 import neo4j
 
@@ -321,12 +322,12 @@ When a session is closed, it is returned to the connection pool to be later reus
 
 If you do not use `with`, remember to call the `.close()` method when you have finished using a session.
 
-[source,python]
+[source, python]
 ----
 session = driver.session(database="neo4j")
-# ...
+
 # session usage
-# ...
+
 session.close()
 ----
 
