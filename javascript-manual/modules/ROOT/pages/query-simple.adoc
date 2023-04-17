@@ -100,7 +100,7 @@ let session = driver.session({database: 'neo4j'})
 try {
   const result = await session.executeWrite(async tx => {
     return await tx.run(`
-      MATCH (p:Person WHERE p.name = $name)
+      MATCH (p:Person) WHERE p.name = $name
       MERGE (friend:Person {name: $friend_name})
       MERGE (p)-[:KNOWS]->(friend)
       `, { name: 'Alice', friend_name: 'Bob' }
@@ -133,7 +133,7 @@ let session = driver.session({database: 'neo4j'})
 try {
   const result = await session.executeWrite(async tx => {
     return await tx.run(`
-      MATCH (p:Person WHERE p.name = $name)
+      MATCH (p:Person) WHERE p.name = $name
       DETACH DELETE p
       `, { name: 'Alice' }
     )
@@ -201,7 +201,7 @@ let session = driver.session({database: 'neo4j'})  // <1>
 try {
   const result = await session.executeRead(async tx => {  // <2>
     return await tx.run(`  // <3>
-      MATCH (p:Person WHERE p.name STARTS WITH $filter)
+      MATCH (p:Person) WHERE p.name STARTS WITH $filter
       RETURN p.name AS name ORDER BY name
       `, { filter: 'Al'}  // <4>
     )
