@@ -79,7 +79,7 @@ let session = driver.session({database: 'neo4j'})
 try {
   const result = await session.executeWrite(async tx => {
     return await tx.run(`
-      MATCH (p:Person WHERE p.name = $name)
+      MATCH (p:Person) WHERE p.name = $name
       SET p.age = $age
       `, { name: 'Alice', age: 42 }
     )
