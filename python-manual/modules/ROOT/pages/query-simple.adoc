@@ -1,6 +1,6 @@
 = Query the database
 
-You can run a query against the database using <<Cypher>> and the method `Session.execute_query()`.
+You can run a query against the database using <<Cypher>> and the method `Driver.execute_query()`.
 
 [TIP]
 `Driver.execute_query()` was introduced with the version 5.8 of the driver. +
@@ -9,7 +9,7 @@ For queries with earlier versions, see xref:transactions.adoc[Run your own trans
 
 == Write to the database
 
-To create a node representing a person named `Alice`, use the `Session.execute_write()` method in combination with the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/merge/[`MERGE`]:
+To create a node representing a person named `Alice`, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/merge/[`MERGE`]:
 
 .Create a node representing a person named `Alice`
 [source, python]
@@ -61,7 +61,7 @@ where `records` contains the actual result as a list, `keys` contains the column
 
 == Update the database
 
-To update a node's information in the database, use the Cypher clauses `MATCH` and link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/set/[`SET`]:
+To update a node's information in the database, use the Cypher clauses link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/match/[`MATCH`] and link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/set/[`SET`]:
 
 .Update node `Alice` to add an `age` property
 [source, python]
@@ -116,7 +116,7 @@ print(f"Query counters: {summary.counters}.")
 
 
 [#query-parameters]
-== How to pass parameters to queries
+== Query parameters
 
 *Do not hardcode or concatenate parameters directly into queries*.
 Instead, always use placeholders and specify the link:{neo4j-docs-base-uri}/cypher-manual/current/syntax/parameters/[Cypher parameters], as shown in the previous examples.
@@ -158,7 +158,7 @@ For those advanced use cases, see xref:query-advanced#_dynamic_values_in_propert
 
 == Error handling
 
-Because `.execute_query()` can potentially raise a number of different exceptions, the best way to handle errors is to catch all exceptions in a single block:
+Because `.execute_query()` can potentially raise a number of different exceptions, the best way to handle errors is to catch all exceptions in a single `try/except` block:
 
 [source, python]
 ----
@@ -170,6 +170,9 @@ except Exception as e:
 
 
 == Query configuration
+
+You can supply further keyword arguments to alter the default behavior of `.execute_query()`.
+Configuration parameters are suffixed with `_`.
 
 === Database selection
 

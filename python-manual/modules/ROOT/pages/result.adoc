@@ -8,7 +8,7 @@ This section shows how to work with a `Result` object so as to extract data in t
 
 == Result as a list
 
-By default, xref:query-simple[`Driver.execute_query()`] returns an link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.EagerResult[`EagerResult`] object. It contains the result records as a list, so it is easy to loop through them.
+By default, xref:query-simple.adoc[`Driver.execute_query()`] returns an link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.EagerResult[`EagerResult`] object. It contains the result records as a list, so it is easy to loop through them.
 
 [source, python]
 ----

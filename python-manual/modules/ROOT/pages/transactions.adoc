@@ -14,7 +14,7 @@ In particular, sessions borrow connections from the _connection pool_ as needed,
 Sessions are created with the method link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#session[`Driver.session()`], with the keyword argument `database` allowing to specify the xref:_database_selection[target database].
 For further parameters, see xref:_session_configuration[Session configuration].
 
-[source,python]
+[source, python]
 ----
 with driver.session(database="neo4j") as session:
     ...
@@ -286,6 +286,7 @@ with driver.session(
 ----
 
 [#access-control-note]
+// .Routing ≠ Access control
 [NOTE]
 ====
 Although executing a _write_ query in read mode likely results in a runtime error, *you should not rely on this for access control.* The difference between the two modes is that _read_ transactions will be routed to any node of a cluster, whereas _write_ ones will be directed to the leader.
