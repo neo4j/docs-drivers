@@ -87,6 +87,8 @@ xref:transactions.adoc[More info on running transactions ->]
 
 Unless you created them using the `with` statement, call the `.close()` method on all `Driver` and `Session` instances to release any resources still held by them.
 
-[source,python]
+[source, python]
+----
 session.close()
 driver.close()
+----

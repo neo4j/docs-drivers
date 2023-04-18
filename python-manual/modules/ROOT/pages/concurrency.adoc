@@ -5,15 +5,44 @@ To interact with the database in an asynchronous way, create an `AsyncDriver` wi
 The workflow is very similar to the synchronous version, except that you must use `await` on all async calls, and define as `async` all functions that should be awaited.
 If you need <<causal_consistency>> across different transactions, use xref:bookmarks.adoc[bookmarks].
 
-.An async driver example
-[source,python, role=nocollapse]
+.An async driver example with `execute_query`
+[source, python]
 ----
 import asyncio
 from neo4j import AsyncGraphDatabase
 
 
-URI = "<URI for Neo4j database>"
-AUTH = ("<Username>", "<Password>")
+async def main():
+    URI = "<URI for Neo4j database>"
+    AUTH = ("<Username>", "<Password>")
+
+    async with AsyncGraphDatabase.driver(URI, auth=AUTH) as driver:
+        records, summary, keys = await driver.execute_query(
+            "MATCH (a:Person) RETURN a.name AS name",
+            database_="neo4j")
+        names = [record["name"] for record in records]
+        print(names)
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
+----
+
+.An async driver example with transaction functions
+[source, python]
+----
+import asyncio
+from neo4j import AsyncGraphDatabase
+
+
+async def main():
+    URI = "<URI for Neo4j database>"
+    AUTH = ("<Username>", "<Password>")
+
+    async with AsyncGraphDatabase.driver(URI, auth=AUTH) as driver:
+        async with driver.session(database="neo4j") as session:
+            records = await session.read_transaction(get_people)
+            print(records)
 
 
 async def get_people(tx):
@@ -22,14 +51,8 @@ async def get_people(tx):
     return records
 
 
-async def main():
-    async with AsyncGraphDatabase.driver(URI, auth=AUTH) as driver:
-        async with driver.session(database="neo4j") as session:
-            records = await session.read_transaction(get_people)
-            print(records)
-
-
-asyncio.run(main())
+if __name__ == "__main__":
+    asyncio.run(main())
 ----
 
 [TIP]
@@ -39,6 +62,7 @@ Multithreading is also possible, although `asyncio` is often easier to implement
 [WARNING]
 There is a known issue with Python 3.8 and the async driver where it gradually slows down.
 It is generally recommended to use the latest supported version of Python for the best performance, stability, and security.
+
 
 ifndef::backend-pdf[]
 [discrete.glossary]

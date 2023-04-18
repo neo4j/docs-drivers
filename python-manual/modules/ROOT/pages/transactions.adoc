@@ -161,7 +161,7 @@ Use this to tag transactions.
 ----
 from neo4j import unit_of_work
 
-@unit_of_work(timeout=5, metadata={"app_name": "people"})
+@unit_of_work(timeout=5, metadata={"app_name": "people_tracker"})
 def count_people(tx):
     result = tx.run("MATCH (a:Person) RETURN count(a) AS people")
     record = result.single()

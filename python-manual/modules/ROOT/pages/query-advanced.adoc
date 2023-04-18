@@ -4,8 +4,8 @@
 == Implicit (or auto-commit) transactions
 
 This is the most basic and limited form with which to run a Cypher query.
-The driver will not automatically retry implicit transactions, as it does instead for queries run with xref:transactions#managed-transactions[managed transactions].
-Implicit transactions should only be used when xref:transactions#managed-transactions[transaction functions] do not fit the purpose, or for quick prototyping.
+The driver will not automatically retry implicit transactions, as it does instead for queries run with xref:query-simple.adoc[`execute_query()`] and with xref:transactions#managed-transactions[managed transactions].
+Implicit transactions should only be used when the other driver query interfaces do not fit the purpose, or for quick prototyping.
 
 You run an implicit transaction with the method link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Session.run[`Session.run()`].
 It returns a `Result` object that needs to be processed with the xref:result#manipulate-result[related methods].
@@ -79,33 +79,33 @@ To protect against Cypher injections you should enclose the dynamic values in ba
 Notice that Cypher processes Unicode, so take care of the Unicode literal `\u0060` as well.
 
 .Manually escaping dynamic labels before concatenation.
-[source,python]
+[source, python]
 ----
 label = "Person\\u0060n"
 # convert \u0060 to literal backtick and then escape backticks
 escaped_label = label.replace("\\u0060", "`").replace("`", "``")
 
-with driver.session(database="neo4j") as session:
-    session.run(
-        f"MATCH (p:`{escaped_label}` {{name: $name}}) RETURN p.name",
-        name="Alice",
-    )
+driver.execute_query(
+    f"MATCH (p:`{escaped_label}` {{name: $name}}) RETURN p.name",
+    name="Alice",
+    database_="neo4j"
+)
 ----
 
 Another workaround, which avoids string concatenation, is using the <<APOC>> procedure link:{neo4j-docs-base-uri}/apoc/current/overview/apoc.merge/apoc.merge.node/[`apoc.merge.node`].
 It supports dynamic labels and property keys, but only for node insertion.
 
 .Using `apoc.merge.node` to create a node with dynamic labels/property keys.
-[source,python]
+[source, python]
 ----
 property_key = "name"
 label = "Person"
 
-with driver.session(database="neo4j") as session:
-    session.run(
-        "CALL apoc.merge.node($labels, $properties)",
-        labels=[label], properties={property_key: "Alice"},
-    )
+driver.execute_query(
+    "CALL apoc.merge.node($labels, $properties)",
+    labels=[label], properties={property_key: "Alice"},
+    database_="neo4j"
+)
 ----
 
 [NOTE]

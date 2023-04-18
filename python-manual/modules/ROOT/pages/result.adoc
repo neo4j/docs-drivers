@@ -33,7 +33,7 @@ This method is only available if the `pandas` library is installed.
 ----
 import neo4j
 
-driver.execute_query(
+pandas_df = driver.execute_query(
     "UNWIND range(1, 10) AS n RETURN n, n+1 as m",
     database_="neo4j",
     result_transformer_=neo4j.Result.to_df
@@ -95,7 +95,7 @@ def main():
         )
 
         # Query to get a graphy result
-        result = driver.execute_query("""
+        graph_result = driver.execute_query("""
             MATCH (a:Person {name: $name})-[r]-(b)
             RETURN a, r, b
             """, name="Arthur",
@@ -107,7 +107,7 @@ def main():
             "Person": "name",
             "Film": "title",
         }
-        visualize_result(result, nodes_text_properties)
+        visualize_result(graph_result, nodes_text_properties)
 
 
 def visualize_result(query_graph, nodes_text_properties):
@@ -191,9 +191,8 @@ Doing so is roughly equivalent to returning a _pointer_ to the result buffer, wh
 .A custom transformer using `single` and `consume`
 [source, python]
 ----
+# Get a single record (or an exception) and the summary from a result.
 def get_single_person(result):
-    """Get a single record (or an exception) and the summary from a result."""
-
     record = result.single(strict=True)
     summary = result.consume()
     return record, summary

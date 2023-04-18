@@ -4,7 +4,7 @@ You can run a query against the database using <<Cypher>> and the method `Sessio
 
 [TIP]
 `Driver.execute_query()` was introduced with the version 5.8 of the driver. +
-For earlier versions, see xref:transactions.adoc[Run your own transactions].
+For queries with earlier versions, see xref:transactions.adoc[Run your own transactions].
 
 
 == Write to the database
@@ -19,7 +19,6 @@ _, summary, _ = driver.execute_query(
     name="Alice",  # <2>
     database_="neo4j",  # <3>
 )
-
 print("Created {nodes_created} nodes in {time} ms.".format(
     nodes_created=summary.counters.nodes_created,
     time=summary.result_available_after
@@ -83,7 +82,7 @@ To create new nodes and relationships linking it to an already existing node, us
 ----
 records, summary, keys = driver.execute_query("""
     MATCH (p:Person {name: $name})
-    MERGE (p)-[KNOWS]->(:Person {name: $friend})
+    MERGE (p)-[:KNOWS]->(:Person {name: $friend})
     """, name="Alice", friend="Bob",
     database_="neo4j",
 )
@@ -180,7 +179,7 @@ If no database is given, the link:{neo4j-docs-base-uri}/operations-manual/curren
 
 [source, python]
 ----
-records, summary, keys = driver.execute_query(
+driver.execute_query(
     "MATCH (p:Person) RETURN p.name",
     database_="neo4j",
 )
@@ -194,7 +193,7 @@ To improve performance on read queries, you can use the argument `routing_="r"` 
 
 [source, python]
 ----
-records, summary, keys = driver.execute_query(
+driver.execute_query(
     "MATCH (p:Person) RETURN p.name",
     routing_="r",  # short for neo4j.RoutingControl.READ
     database_="neo4j",
@@ -213,7 +212,7 @@ Impersonating a user is cheaper than creating a new `Driver` object.
 
 [source, python]
 ----
-records, summary, keys = driver.execute_query(
+driver.execute_query(
     "MATCH (p:Person) RETURN p.name",
     impersonated_user_="somebody_else",
     database_="neo4j",

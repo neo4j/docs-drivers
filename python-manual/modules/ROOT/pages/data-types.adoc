@@ -67,24 +67,20 @@ friends_since = pytz.timezone("US/Eastern").localize(friends_since)
 
 # Create a friendship with the given DateTime, and return the DateTime
 with GraphDatabase.driver(URI, auth=AUTH) as driver:
-    with driver.session() as session:
-        result = session.run("""
-            MERGE (a:Person {name: $name})
-            MERGE (b:Person {name: $friend})
-            MERGE (a)-[friendship:KNOWS]->(b)
-            SET friendship.since = $friends_since
-            RETURN friendship.since
-            """, name="Alice", friend="Bob",
-            friends_since=friends_since  # or friends_since=py_friends_since
-        )
-        records = list(result)
-        out_datetime = records[0]["friendship.since"]
-        print(out_datetime)  # 1999-11-23T07:47:00.000004123-05:00
+    records, summary, keys = driver.execute_query("""
+        MERGE (a:Person {name: $name})
+        MERGE (b:Person {name: $friend})
+        MERGE (a)-[friendship:KNOWS {since: $friends_since}]->(b)
+        RETURN friendship.since
+        """, name="Alice", friend="Bob",
+        friends_since=friends_since  # or friends_since=py_friends_since
+    )
+    out_datetime = records[0]["friendship.since"]
+    print(out_datetime)  # 1999-11-23T07:47:00.000004123-05:00
 
-        # Converting DateTime to native datetime (lossy)
-        py_out_datetime = out_datetime.to_native()  # type: datetime
-        print(py_out_datetime)  # 1999-11-23 07:47:00.000004-05:00
-
+    # Converting DateTime to native datetime (lossy)
+    py_out_datetime = out_datetime.to_native()  # type: datetime
+    print(py_out_datetime)  # 1999-11-23 07:47:00.000004-05:00
 ----
 
 For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#temporal-data-types[API documentation -- Temporal data types].
@@ -228,7 +224,7 @@ For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current
 Represents a point in the World Geodetic System (WGS84). +
 Exposes properties `longitude`, `latitude`, `height` (the latter for 3D points only), which are aliases for `x`, `y`, `z`.
 
-[source,python]
+[source, python]
 ----
 from neo4j.spatial import WGS84Point
 
@@ -269,7 +265,7 @@ Represents a node in a graph. +
 The property `element_id` provides an identifier for the entity.
 This should be used with care, as no guarantees are given about the mapping between id values and elements outside the scope of a single transaction.
 
-[source,python]
+[source, python]
 ----
 from neo4j import GraphDatabase
 
@@ -278,12 +274,12 @@ URI = "neo4j://localhost:7687"
 AUTH = ("neo4j", "secretgraph")
 
 with GraphDatabase.driver(URI, auth=AUTH) as driver:
-    with driver.session() as session:
-        result = session.run(
-            "MERGE (p:Person {name: $name}) RETURN p AS person",
-            name="Alice"
-        )
-        record = result.single()
+    records, _, _ = driver.execute_query(
+        "MERGE (p:Person {name: $name}) RETURN p AS person",
+        name="Alice",
+        database_="neo4j",
+    )
+    for record in records:
         node = record["person"]
         print(f"Node ID: {node.element_id}\n"
               f"Labels: {node.labels}\n"
@@ -304,26 +300,22 @@ Represents a relationship in a graph. +
 The property `element_id` provides an identifier for the entity.
 This should be used with care, as no guarantees are given about the mapping between id values and elements outside the scope of a single transaction.
 
-[source,python]
+[source, python]
 ----
 from neo4j import GraphDatabase
-from neo4j.time import Date
 
 
 URI = "neo4j://localhost:7687"
 AUTH = ("neo4j", "secretgraph")
 
 with GraphDatabase.driver(URI, auth=AUTH) as driver:
-    with driver.session() as session:
-        result = session.run("""
-            MERGE (p:Person {name: $name})
-            MERGE (friend:Person {name: $friend_name})
-            MERGE (p)-[r:KNOWS]->(friend)
-            SET r.status = $status, r.since = $date
-            RETURN r AS friendship
-            """, name="Alice", status="BFF", date=Date.today(), friend_name="Bob",
-        )
-        record = result.single()
+    records, _, _ = driver.execute_query("""
+        MERGE (p:Person {name: $name})
+        MERGE (p)-[r:KNOWS {status: $status, since: date()}]->(friend:Person {name: $friend_name})
+        RETURN r AS friendship
+        """, name="Alice", status="BFF", friend_name="Bob",
+    )
+    for record in records:
         relationship = record["friendship"]
         print(f"Relationship ID: {relationship.element_id}\n"
               f"Start node: {relationship.start_node}\n"
@@ -348,50 +340,46 @@ For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current
 
 Represents a path in a graph.
 
-[source,python]
+[source, python]
 ----
 from neo4j import GraphDatabase
 from neo4j.time import Date
 
 
 URI = "neo4j://localhost:7687"
-AUTH = ("neo4j", "secretgraph")
+AUTH = ("neo4j", "verysecret")
 
-def add_friend(tx, name, status, date, friend_name):
-    tx.run("""
+def add_friend(driver, name, status, date, friend_name):
+    driver.execute_query("""
         MERGE (p:Person {name: $name})
-        MERGE (friend:Person {name: $friend_name})
-        MERGE (p)-[r:KNOWS]->(friend)
-        SET r.status = $status, r.since = $date
-        """, name=name, status=status, date=date, friend_name=friend_name
+        MERGE (p)-[r:KNOWS {status: $status, since: $date}]->(friend:Person {name: $friend_name})
+        """, name=name, status=status, date=date, friend_name=friend_name,
+        database_="neo4j",
     )
 
 with GraphDatabase.driver(URI, auth=AUTH) as driver:
-    with driver.session() as session:
-        # Create some :Person nodes linked by :KNOWS relationships
-        session.execute_write(add_friend, name="Alice", status="BFF",
-                              date=Date.today(), friend_name="Bob")
-        session.execute_write(add_friend, name="Bob", status="Fiends",
-                              date=Date.today(), friend_name="Sofia")
-        session.execute_write(add_friend, name="Sofia", status="Acquaintances",
-                              date=Date.today(), friend_name="Sara")
+    # Create some :Person nodes linked by :KNOWS relationships
+    add_friend(driver, name="Alice", status="BFF", date=Date.today(), friend_name="Bob")
+    add_friend(driver, name="Bob", status="Fiends", date=Date.today(), friend_name="Sofia")
+    add_friend(driver, name="Sofia", status="Acquaintances", date=Date.today(), friend_name="Sofia")
 
-        # Follow :KNOWS relationships outgoing from Alice three times, return as path
-        result = session.run("""
-            MATCH path=(:Person {name: $name})-[:KNOWS*3]->(:Person)
-            RETURN path
-            """, name="Alice"
-        )
-        record = result.single()
-        path = record["path"]
+    # Follow :KNOWS relationships outgoing from Alice three times, return as path
+    records, _, _ = driver.execute_query("""
+        MATCH path=(:Person {name: $name})-[:KNOWS*3]->(:Person)
+        RETURN path AS friendship_chain
+        """, name="Alice",
+        database_="neo4j",
+    )
+    path = records[0]["friendship_chain"]
 
-        print("-- Path breakdown --")
-        for friendship in path:
-            print("{name} is friends with {friend} ({status})".format(
-                name=friendship.start_node.get("name"),
-                friend=friendship.end_node.get("name"),
-                status=friendship.get("status"),
-            ))
+    print("-- Path breakdown --")
+    for friendship in path:
+        print("{name} is friends with {friend} ({status})".format(
+            name=friendship.start_node.get("name"),
+            friend=friendship.end_node.get("name"),
+            status=friendship.get("status"),
+        ))
+
 ----
 
 For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.graph.Path[API documentation -- Graph types -- Path].
@@ -420,12 +408,11 @@ In general, if you are unsure about the type conversion that would happen on a g
 import neo4j
 
 with neo4j.GraphDatabase.driver(URI, auth=AUTH) as driver:
-    with driver.session() as session:
-        type_in = ("foo", "bar")
-        result = session.run("RETURN $x", x=type_in)
-        type_out = result.single()[0]
-        print(type(type_out))  # <class 'list'>
-        print(type_out)        # ['foo', 'bar']
+    type_in = ("foo", "bar")
+    records, _, _ = driver.execute_query("RETURN $x AS type_out", x=type_in)
+    type_out = records[0].get("type_out")
+    print(type(type_out))  # <class 'list'>
+    print(type_out)        # ['foo', 'bar']
 ----
 
 
