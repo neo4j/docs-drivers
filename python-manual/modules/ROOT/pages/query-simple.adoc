@@ -125,7 +125,7 @@ This is for:
 1. *performance benefits*: Neo4j compiles and caches queries, but can only do so if the query structure is unchanged;
 2. *security reasons*: link:https://neo4j.com/developer/kb/protecting-against-cypher-injection/[protecting against Cypher injection].
 
-Query parameters can be passed either as several keyword arguments, or grouped together in a dictionary as a single second argument:
+Query parameters can be passed either as several keyword arguments, or grouped together in a dictionary as value to the `parameters_` keyword argument. In case of mix, keyword-argument parameters take precedence over dictionary ones.
 
 .Pass query parameters as keyword arguments
 [source, python]
@@ -146,10 +146,12 @@ parameters = {
 }
 driver.execute_query(
     "MERGE (:Person {name: $name})",
-    parameters,
+    parameters_=parameters,
     database_="neo4j",
 )
 ----
+
+**None of your keyword query parameters may end with a single underscore.** This is to avoid collisions with the keyword configuration parameters. If you need to use such parameter names, pass them in a dictionary.
 
 [NOTE]
 There can be circumstances where your query structure prevents the usage of parameters in all its parts.
