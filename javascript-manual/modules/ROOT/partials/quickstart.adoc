@@ -41,39 +41,65 @@ xref:connect.adoc[More info on connecting to a database ->]
 
 == Query the database
 
-Execute a <<Cypher>> statement by creating a session and using the methods `Session.executeRead()` and `Session.executeWrite()`.
+Execute a <<Cypher>> statement with the method `Driver.executeQuery()`.
 Do not hardcode or concatenate parameters: use placeholders and specify the parameters as keyword arguments.
 
 [source, javascript, role=nocollapse]
 ----
 // Get the name of all 42 year-olds
-let session = driver.session({database: 'neo4j'})
-try {
-  const result = await session.executeRead(async tx => {
-    return await tx.run('MATCH (p:Person {age: $age}) RETURN p.name AS name', { age: 42 })
-  })
+const { records, summary, keys } = await driver.executeQuery(
+  'MATCH (p:Person {age: $age}) RETURN p.name AS name',
+  { age: 42 }
+)
 
-  // Summary information
-  console.log(
-    `>> The query \`${result.summary.query.text}\`` +
-    `returned ${result.records.length} records` +
-    `in ${result.summary.resultAvailableAfter} ms.`
-  )
+// Summary information
+console.log(
+  `>> The query ${summary.query.text} ` +
+  `returned ${records.length} records ` +
+  `in ${summary.resultAvailableAfter} ms.`
+)
 
-  // Loop through results and do something with them
-  console.log('>> Results')
-  for(record of result.records) {
-    console.log(record.get('name'))
-  }
-} finally {
-  session.close()
+// Loop through results and do something with them
+console.log('>> Results')
+for(record of records) {
+  console.log(record.get('name'))
 }
 ----
 
 xref:query-simple.adoc[More info on querying the database ->]
 
 
-== Close driver connection
+== Run your own transactions
+
+For more advanced use-cases, you can take full control over the transaction lifecycle. A transaction is a unit of work that is either committed in its entirety or rolled back on failure. Use the methods `Session.executeRead()` and `Session.executeWrite()` to run managed transactions.
+
+[source, javascript, role=nocollapse]
+----
+let session = driver.session({database: 'neo4j'})
+try {
+  const { records, summary } = await session.executeRead(async tx => {
+    return await tx.run(`
+      MATCH (p:Person WHERE p.name STARTS WITH $filter)
+      RETURN p.name AS name ORDER BY name
+      `, { filter: 'Al'}
+    )
+  })
+  console.log(
+    `The query ${result.summary.query.text} returned ${result.records.length} nodes.`
+  )
+  for(let record of result.records) {
+    console.log(`Person with name: ${record.get('name')}`)
+    console.log(`Available properties for this node are: ${record.keys}\n`)
+  }
+} finally {
+  await session.close()
+}
+----
+
+xref:transactions.adoc[More info on running transactions ->]
+
+
+== Close connections and sessions
 
 Call the `.close()` method on the `Driver` instance when you are finished with it, to release any resources still held by it.
 The same applies to any open sessions.
