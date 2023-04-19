@@ -170,6 +170,9 @@ except Exception as e:
     ...  # handle exception
 ----
 
+[TIP]
+The driver automatically retries to run a failed query, if the failure is deemed to be transient (for example due to temporary server unavailability).
+
 
 == Query configuration
 
