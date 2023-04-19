@@ -88,7 +88,7 @@ with driver.session(database="neo4j") as session:
 
 To create new nodes and relationships linking it to an already existing node, use a combination of `MATCH` and `MERGE` in a `Session.execute_write()` call:
 
-.Create a relationship `KNOWS` between `Alice` and `Bob`
+.Create a relationship `:KNOWS` between `Alice` and `Bob`
 [source, python]
 ----
 def update_person(tx, name, friend):
@@ -110,7 +110,7 @@ with driver.session(database="neo4j") as session:
 [WARNING]
 ====
 It might feel tempting to create new relationships with a single `MERGE` clause, such as: +
-`MERGE (:Person {name: "Alice"})-[KNOWS]->(:Person {name: "Bob"})`. +
+`MERGE (:Person {name: "Alice"})-[:KNOWS]->(:Person {name: "Bob"})`. +
 However, this would result in the creation of an _extra_ `Alice` node, so that you would end up with unintended duplicate records.
 To avoid this, always `MATCH` the elements that you want to update, and use the resulting reference in the `MERGE` clause (as shown in the previous example).
 See link:https://neo4j.com/developer/kb/understanding-how-merge-works/[Understanding how MERGE works].
