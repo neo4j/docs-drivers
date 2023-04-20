@@ -3,8 +3,8 @@
 == Implicit (or auto-commit) transactions
 
 This is the most basic and limited form with which to run a Cypher query.
-The driver will not automatically retry implicit transactions, as it does instead for queries run with xref:transactions#managed-transactions[managed transactions].
-Implicit transactions should only be used when xref:transactions#managed-transactions[transaction functions] do not fit the purpose, or for quick prototyping.
+The driver will not automatically retry implicit transactions, as it does instead for queries run with xref:query-simple.adoc[`execute_query()`] and with xref:transactions#managed-transactions[managed transactions].
+Implicit transactions should only be used when the other driver query interfaces do not fit the purpose, or for quick prototyping.
 
 You run an implicit transaction with the method link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/session.js~Session.html#instance-method-run[`Session.run()`], which returns a link:{neo4j-docs-base-uri}/api/api/javascript-driver/current/class/lib6/result.js~Result.html[`Result`] object.
 
@@ -12,18 +12,10 @@ You run an implicit transaction with the method link:{neo4j-docs-base-uri}/api/j
 ----
 let session = driver.session({database: 'neo4j'})
 try {
-  const result = await session.run(`
-    MATCH (p:Person WHERE p.name STARTS WITH $filter)
-    RETURN p.name AS name ORDER BY name
-    `, { filter: 'Al'}
+  const result = await session.run(
+    'MERGE (a:Person {name: $name})',
+    { name: 'Alice'}
   )
-  console.log(
-    `The query \`${result.summary.query.text}\`` +
-    `returned ${result.records.length} nodes.\n`
-  )
-  for(let record of result.records) {
-    console.log(`Person with name: ${record.get('name')}`)
-  }
 } finally {
   await session.close()
 }
@@ -74,7 +66,7 @@ let session = driver.session({database: 'neo4j'})
 const result = await session.run(
   'MATCH (a:Person) RETURN count(a) AS people'
   {},  // query parameters
-  { timeout: 5000, metadata: {'app_name': 'people'} }  // transactionConfig
+  { timeout: 5000, metadata: {'appName': 'peopleTracker'} }  // transactionConfig
 )
 ----
 
@@ -100,8 +92,11 @@ const dangerousLabel = 'Special Person\\u0060'
 // convert \u0060 to literal backtick, then escape backticks
 const escapedLabel = dangerousLabel.replaceAll('\\u0060', '`').replaceAll('`', '``')
 
-let session = driver.session({database: 'neo4j'})
-const result = await session.run('MATCH (p:`' + escapedLabel + '`) RETURN p.name')
+const result = await driver.executeQuery(
+  'MATCH (p:`' + escapedLabel + '`) RETURN p.name',
+  {},
+  {database: 'neo4j'}
+)
 console.log(`Executed query: ${result.summary.query.text}`)
 ----
 
@@ -113,15 +108,11 @@ It supports dynamic labels and property keys, but only for node insertion.
 ----
 const propertyKey = 'name'
 const label = 'Person'
-let session = driver.session({database: 'neo4j'})
-try {
-  await session.run(
-    'CALL apoc.merge.node($labels, $properties)',
-    {labels: [label], properties: {property_key: 'Alice'}},
-  )
-} finally {
-  await session.close()
-}
+const result = await driver.executeQuery(
+  'CALL apoc.merge.node($labels, $properties)',
+  {labels: [label], properties: {property_key: 'Alice'}},
+  {database: 'neo4j'}
+)
 ----
 
 [NOTE]

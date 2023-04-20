@@ -53,7 +53,6 @@ const PASSWORD = 'verysecret';
 
 (async () => {
   const driver = neo4j.driver(URI, neo4j.auth.basic(USER, PASSWORD))
-  const session = driver.session({database: 'neo4j'})
 
   const friendsSince = new neo4j.types.DateTime(1999, 11, 23, 7, 47, 0, 4123, -4*3600, 'US/Eastern')
 
@@ -63,19 +62,17 @@ const PASSWORD = 'verysecret';
   // jsFriendsSince = new neo4j.types.Date.fromStandardDate(jsFriendsSince)
 
   // Create a friendship with the given DateTime, and return the DateTime
-  const result = await session.executeWrite(async tx => {
-    return await tx.run(`
-      MERGE (a:Person {name: $name})
-      MERGE (b:Person {name: $friend})
-      MERGE (a)-[friendship:KNOWS]->(b)
-      SET friendship.since = $friendsSince
-      RETURN friendship.since
-      `, {
-        name: 'Alice', friend: 'Bob',
-        friendsSince: friendsSince  // or friendsSince: jsFriendsSince
-      }
-    )
-  })
+  const result = await driver.executeQuery(`
+    MERGE (a:Person {name: $name})
+    MERGE (b:Person {name: $friend})
+    MERGE (a)-[friendship:KNOWS]->(b)
+    SET friendship.since = $friendsSince
+    RETURN friendship.since
+    `, {
+      name: 'Alice', friend: 'Bob',
+      friendsSince: friendsSince  // or friendsSince: jsFriendsSince
+    }
+  )
   const outDateTime = result.records[0].get('friendship.since')
   console.log(outDateTime)
   /*
@@ -97,7 +94,6 @@ const PASSWORD = 'verysecret';
   console.log(jsOutDateTime)
   // 1999-11-23T11:47:00.000Z
 
-  await session.close()
   await driver.close()
 })()
 ----
@@ -315,11 +311,9 @@ const PASSWORD = 'verysecret';
 
 (async () => {
   const driver = neo4j.driver(URI, neo4j.auth.basic(USER, PASSWORD))
-  const session = driver.session({database: 'neo4j'})
-  const result = await session.run(
-    'MERGE (p:Person {name: $name}) RETURN p AS person', {
-      name: 'Alice'
-    }
+  const result = await driver.executeQuery(
+    'MERGE (p:Person {name: $name}) RETURN p AS person',
+    { name: 'Alice' }
   )
   const node = result.records[0].get('person')
   console.log(node)
@@ -331,7 +325,6 @@ const PASSWORD = 'verysecret';
     elementId: '4:d6154461-ff34-42a9-b7c3-d32673913419:393'
   }
   */
-  await session.close()
   await driver.close()
 })()
 ----
@@ -354,8 +347,7 @@ const PASSWORD = 'verysecret';
 
 (async () => {
   const driver = neo4j.driver(URI, neo4j.auth.basic(USER, PASSWORD))
-  const session = driver.session({database: 'neo4j'})
-  const result = await session.run(`
+  const result = await driver.executeQuery(`
     MERGE (p:Person {name: $name})
     MERGE (friend:Person {name: $friend_name})
     MERGE (p)-[r:KNOWS]->(friend)
@@ -382,7 +374,6 @@ const PASSWORD = 'verysecret';
     endNodeElementId: '4:d6154461-ff34-42a9-b7c3-d32673913419:394'
   }
   */
-  await session.close()
   await driver.close()
 })()
 ----
@@ -403,23 +394,20 @@ const PASSWORD = 'verysecret';
 
 (async () => {
   const driver = neo4j.driver(URI, neo4j.auth.basic(USER, PASSWORD))
-  const session = driver.session({database: 'neo4j'})
 
   // Create some :Person nodes linked by :KNOWS relationships
-  await addFriend(session, 'Alice', 'BFF', 'Bob')
-  await addFriend(session, 'Bob', 'Fiends', 'Sofia')
-  await addFriend(session, 'Sofia', 'Acquaintances', 'Sara')
+  await addFriend(driver, 'Alice', 'BFF', 'Bob')
+  await addFriend(driver, 'Bob', 'Fiends', 'Sofia')
+  await addFriend(driver, 'Sofia', 'Acquaintances', 'Sara')
 
   // Follow :KNOWS relationships outgoing from Alice three times, return as path
-  const result = await session.executeRead(async tx => {
-    return await tx.run(`
-      MATCH p = (:Person {name: $name})-[:KNOWS*3]->(:Person)
-      RETURN p AS friendsChain
-      `, {
-        name: 'Alice'
-      }
-    )
-  })
+  const result = await driver.executeQuery(`
+    MATCH p = (:Person {name: $name})-[:KNOWS*3]->(:Person)
+    RETURN p AS friendsChain
+    `, {
+      name: 'Alice'
+    }
+  )
   const path = result.records[0].get('friendsChain')
   console.log(path)
   /*
@@ -456,22 +444,19 @@ const PASSWORD = 'verysecret';
     length: 3
   }
   */
-  await session.close()
   await driver.close()
 })()
 
-async function addFriend(session, name, status, friendName) {
-  await session.executeWrite(async tx => {
-    await tx.run(`
-      MERGE (p:Person {name: $name})
-      MERGE (friend:Person {name: $friendName})
-      MERGE (p)-[r:KNOWS]->(friend)
-      SET r.status = $status, r.since = date()
-      `, {
-        name: name, status: status, friendName: friendName
-      }
-    )
-  })
+async function addFriend(driver, name, status, friendName) {
+  await driver.executeQuery(`
+    MERGE (p:Person {name: $name})
+    MERGE (friend:Person {name: $friendName})
+    MERGE (p)-[r:KNOWS]->(friend)
+    SET r.status = $status, r.since = date()
+    `, {
+      name: name, status: status, friendName: friendName
+    }
+  )
 }
 ----
 
@@ -487,6 +472,7 @@ Some server errors are marked as safe to retry without need to alter the origina
 Examples of such errors are deadlocks and memory issues.
 All driver's exception types implement the method `.isRetryable()`, which gives insights into whether a further attempt might be successful.
 This is particular useful when running queries in xref:transactions#explicit-transactions[explicit transactions], to know if a failed query should be run again.
+
 
 ifndef::backend-pdf[]
 [discrete.glossary]
