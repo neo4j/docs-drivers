@@ -56,8 +56,8 @@ driver.execute_query("MATCH (p {name: $name}) RETURN p", name="Alice")
 # Good practice
 numbers = [{"value": random()} for _ in range(10000)]
 driver.execute_query("""
-    WITH $numbers as batch
-    UNWIND batch as node
+    WITH $numbers AS batch
+    UNWIND batch AS node
     MERGE (n:Number)
     SET n.value = node.value
     """, numbers=numbers,
