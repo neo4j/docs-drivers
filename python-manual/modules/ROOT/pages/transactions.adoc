@@ -287,9 +287,9 @@ If `key` is specified, only the given property is included, while `default` allo
 a|Return the next and only remaining record, or `None`.
 Calling this method always exhausts the result.
 
-If more than one record is available,
+If more (or less) than one record is available,
 
-- `strict==False` -- a warning is generated and the first of these is returned;
+- `strict==False` -- a warning is generated and the first of these is returned (if any);
 - `strict==True` -- a `ResultNotSingleError` is raised.
 
 |`peek()`

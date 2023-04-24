@@ -20,12 +20,12 @@ for person in records:  # <1>
     # person.name or person.age are also valid
 
 # Some summary information  <2>
-print(f"Query `{query}` returned {records_count} records in {time} ms.".format(
+print("Query `{query}` returned {records_count} records in {time} ms.".format(
     query=summary.query, records_count=len(records),
     time=summary.result_available_after
 ))
 
-print("Available keys are {keys}")  # ['name', 'age'] <3>
+print(f"Available keys are {keys}")  # ['name', 'age'] <3>
 ----
 
 
