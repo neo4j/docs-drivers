@@ -1,34 +1,41 @@
 = Manipulate query results
 
-The driver's output of a query is a link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Result[`Result`] object, which does not directly contain the result records.
-Rather, it encapsulates the Cypher result in a rich data structure that requires some parsing on the client side.
-
-This section shows how to work with a `Result` object so as to extract data in the form that is most convenient for your application.
+This section shows how to work with a query's result so as to extract data in the form that is most convenient for your application.
 
 
 == Result as a list
 
-By default, xref:query-simple.adoc[`Driver.execute_query()`] returns an link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.EagerResult[`EagerResult`] object. It contains the result records as a list, so it is easy to loop through them.
+By default, xref:query-simple.adoc[`Driver.execute_query()`] returns an link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.EagerResult[`EagerResult`] object.
+It contains the result records as a list, so it is easy to loop through them *(1)*.
+It also contains a link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#resultsummary[`ResultSummary`] of the query result, with metadata and information about the result *(2)*, and the `keys` available in the returned rows *(3)*.
 
 [source, python]
 ----
 records, summary, keys = driver.execute_query(
-    "MATCH (a:Person) RETURN a.name AS name",
+    "MATCH (a:Person) RETURN a.name AS name, a.age AS age",
     database_="neo4j",
 )
-for person in records:
+for person in records:  # <1>
     print(person)
-----
+    # person.name or person.age are also valid
 
-This is enough for most use-cases. For more advanded scenarios, you can use the parameter `result_transformer_` to provide a function that further manipulates the link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Result[`neo4j.Result`] object resulting from your query. The value returned by the transformer will in turn be returned by `execute_query()`. The driver provides some transformers, but you can also craft your own.
+# Some summary information  <2>
+print(f"Query `{query}` returned {records_count} records in {time} ms.".format(
+    query=summary.query, records_count=len(records),
+    time=summary.result_available_after
+))
+
+print("Available keys are {keys}")  # ['name', 'age'] <3>
+----
 
 
 == Transform to pandas DataFrame
 
-The transformer `neo4j.Result.to_df` converts the result into a pandas DataFrame.
+The driver can transform the result into a pandas DataFrame.
+To achieve this, use the `.execute_query()` keyword argument `result_transformer_` and set it to `neo4j.Result.to_df`.
 This method is only available if the `pandas` library is installed.
 
-.Return a DataFrame with two columns (`n` and `m`) and 10 rows
+.Return a DataFrame with two columns (`n`, `m`) and 10 rows
 [source, python]
 ----
 import neo4j
@@ -38,6 +45,7 @@ pandas_df = driver.execute_query(
     database_="neo4j",
     result_transformer_=neo4j.Result.to_df
 )
+print(type(pandas_df))  # <class 'pandas.core.frame.DataFrame'>
 ----
 
 This transformer accepts two optional arguments:
@@ -52,9 +60,10 @@ If you need to pass parameters to `to_df`, use `lambda` functions: +
 
 == Transform to graph
 
-The transformer `neo4j.Result.graph` converts the result into a graph.
-To make the most out of this transformer, your query should return a graph-like result instead of a single column.
-The graph transformer exposes the properties `nodes` and `relationships`, which are set views into xref:data-types#node[`Node`] and xref:data-types#relationship[`Relationship`] objects.
+The driver can transform the result into a collection of graph objects.
+To achieve this, use the `.execute_query()` keyword argument `result_transformer_` and set it to `neo4j.Result.graph`.
+To make the most out of this method, your query should return a graph-like result instead of a single column.
+The graph transformer exposes the properties `nodes` and `relationships`, which are set views into xref:data-types#_node[`Node`] and xref:data-types#_relationship[`Relationship`] objects.
 
 You can use the graph format for further processing or to visualize the query result.
 An example implementation that uses the `pyvis` library to draw the graph is below.
@@ -136,57 +145,16 @@ if __name__ == "__main__":
 image::{common-image}/pyvis-example.png[]
 
 
-[[custom-transformers]]
 == Custom transformers
 
-You can create a custom transformer to further manipulate the link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#result[`Result`] object resulting from a query. A transformer takes a `Result` object and can output any data structure. The transformer's return value is in turn returned by `.execute_query()`.
+For more advanded scenarios, you can use the parameter `result_transformer_` to provide a custom function that further manipulates the link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Result[`Result`] object resulting from your query.
+A transformer takes a `Result` object and can output any data structure. The transformer's return value is in turn returned by `.execute_query()`.
 
-Beware that, unless one of the built-in transformers is used, *the result records are not immediately and entirely fetched and returned by the server*. Instead, results come as a _lazy stream_. In particular, when the driver receives some records from the server, they are initially _buffered_ in a background queue. Records stay in the buffer until they are _consumed_ by the application, at which point they are _removed from the buffer_. There is thus no way to retrieve a previous record from the stream, unless manually saved in an auxiliary data structure. When no more records are available, the result is _exhausted_.
-
-Inside a transformer function you can use any of the link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#result[`Result`] methods. The ones most commonly needed are listed in the table below.
-
-.An essential list of `Result` methods
-[cols="2,3"]
-|===
-|Name |Description
-
-|`value(key=0, default=None)`
-|Return the remainder of the result as a list.
-If `key` is specified, only the given property is included, while `default` allows to specify a value for nodes lacking that property.
-
-|`fetch(n)`
-|Return up to `n` records from the result.
-
-|`single(strict=False)`
-a|Return the next and only remaining record, or `None`.
-Calling this method always exhausts the result.
-
-If more than one record is available,
-
-- `strict==False` -- a warning is generated and the first of these is returned;
-- `strict==True` -- a `ResultNotSingleError` is raised.
-
-|`peek()`
-|Return the next record from the result without consuming it.
-This leaves the record in the buffer for further processing.
-
-|`data(*keys)`
-|Return a JSON-like dump of the raw result.
-Only use it for debugging/prototyping purposes.
-
-|`consume()`
-|Return the query link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#resultsummary[`ResultSummary`].
-It exhausts the result, so should only be called when data processing is over.
-|===
-
-See the link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#result[API documentation] for a complete list of `Result` methods.
+Inside a transformer function you can use xref:transactionn[any of the `Result` methods].
 
 [WARNING]
-A transformer **must not** return the `neo4j.Result` itself.
+A transformer **must not** return the `Result` object itself.
 Doing so is roughly equivalent to returning a _pointer_ to the result buffer, which gets invalidated as soon as the query's transaction is over.
-
-
-=== Examples
 
 .A custom transformer using `single` and `consume`
 [source, python]
@@ -212,6 +180,7 @@ print("The query `{query}` returned {record} in {time} ms.".format(
 .A custom transformer using `fetch` and `peek`
 [source, python]
 ----
+# Get exactly 5 records, or an exception.
 def exactly_5(result):
     records = result.fetch(5)
 

@@ -8,7 +8,7 @@ The driver will not automatically retry implicit transactions, as it does instea
 Implicit transactions should only be used when the other driver query interfaces do not fit the purpose, or for quick prototyping.
 
 You run an implicit transaction with the method link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Session.run[`Session.run()`].
-It returns a `Result` object that needs to be processed with the xref:result#custom-transformers[related methods].
+It returns a `Result` object that needs to be xref:transactions#process-result[processed accordingly].
 
 [source, python]
 ----

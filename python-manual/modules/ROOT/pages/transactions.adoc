@@ -37,7 +37,7 @@ A managed transaction is created with the methods link:{neo4j-docs-base-uri}/api
 Both methods take a _transaction function_ callback *(1)* and an arbitrary number of positional and keyword arguments *(2)* which are handed down to the transaction function.
 The transaction function *(3)* is responsible for actually carrying out the queries and processing the result.
 Queries are specified with the link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Transaction.run[`Transaction.run()`] method *(4)*, which returns a link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Result[`Result`] object.
-You can then process the result *(5)* using any of the `Result` methods, as you would do with a xref:result#_custom_transformers[custom transformer].
+You can then xref:process-result[process the result] *(5)* using any of the `Result` methods.
 
 .Retrieve people whose name starts with `Al`.
 [source, python]
@@ -62,7 +62,7 @@ with driver.session(database="neo4j") as session:
 Use xref:query-simple#query-parameters[query parameters] instead, both for performance and security reasons.
 
 *Transaction functions should never return the `Result` object directly*.
-Instead, always xref:result.adoc[process the result] in some way; at minimum, cast it to list.
+Instead, always xref:process-result[process the result] in some way; at minimum, cast it to list.
 Within a transaction function, a `return` statement results in the transaction being committed, while the transaction is automatically rolled back if an exception is raised.
 
 .A transaction with multiple queries, client logic, and potential roll backs.
@@ -145,7 +145,7 @@ To maintain multiple concurrent transactions, use multiple concurrent sessions.
 
 
 [#unit_of_work-decorator]
-=== Further transaction function configuration
+=== Transaction function configuration
 
 The decorator link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.unit_of_work[`unit_of_work()`] allows to exert further control on transaction functions.
 It allows to specify:
@@ -249,6 +249,63 @@ def request_inspection(customer_id, other_bank_id, amount, e):
           "amount:", amount)
 
 ----
+
+
+[[process-result]]
+== Process query results
+
+The driver's output of a query is a link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Result[`Result`] object, which does not directly contain the result records.
+Rather, it encapsulates the Cypher result in a rich data structure that requires some parsing on the client side.
+
+When working with a `Result` object, there are two things to keep in mind:
+
+- *The result records are not immediately and entirely fetched and returned by the server*.
+Instead, results come as a _lazy stream_.
+In particular, when the driver receives some records from the server, they are initially _buffered_ in a background queue.
+Records stay in the buffer until they are _consumed_ by the application, at which point they are _removed from the buffer_.
+When no more records are available, the result is _exhausted_.
+- *The result acts as a _cursor_*.
+This means that there is no way to retrieve a previous record from the stream, unless you saved it in an auxiliary data structure.
+
+**The easiest way of processing a result is by casting it to list**, which yields a list of link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Record[`Record`] objects.
+Otherwise, a `Result` object implements a number of methods for processing records.
+The most commonly needed ones are listed below.
+
+// .An essential list of `Result` methods
+[cols="2,3"]
+|===
+|Name |Description
+
+|`value(key=0, default=None)`
+|Return the remainder of the result as a list.
+If `key` is specified, only the given property is included, while `default` allows to specify a value for nodes lacking that property.
+
+|`fetch(n)`
+|Return up to `n` records from the result.
+
+|`single(strict=False)`
+a|Return the next and only remaining record, or `None`.
+Calling this method always exhausts the result.
+
+If more than one record is available,
+
+- `strict==False` -- a warning is generated and the first of these is returned;
+- `strict==True` -- a `ResultNotSingleError` is raised.
+
+|`peek()`
+|Return the next record from the result without consuming it.
+This leaves the record in the buffer for further processing.
+
+|`data(*keys)`
+|Return a JSON-like dump of the raw result.
+Only use it for debugging/prototyping purposes.
+
+|`consume()`
+|Return the query link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#resultsummary[`ResultSummary`].
+It exhausts the result, so should only be called when data processing is over.
+|===
+
+For a complete list of `Result` methods, see link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#result[API documentation -- Result].
 
 
 == Session configuration

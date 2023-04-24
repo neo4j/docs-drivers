@@ -247,7 +247,7 @@ For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current
 == Graph types
 
 *Graph types are only passed as results and may not be used as parameters*.
-The section xref:result#_transform_to_graph[Work with the result -- Transform to graph] contains an example with graph types.
+The section xref:transformers#_transform_to_graph[Manipulate query results -- Transform to graph] contains an example with graph types.
 
 [options="header"]
 |===
@@ -347,7 +347,7 @@ from neo4j.time import Date
 
 
 URI = "neo4j://localhost:7687"
-AUTH = ("neo4j", "verysecret")
+AUTH = ("neo4j", "secretgraph")
 
 def add_friend(driver, name, status, date, friend_name):
     driver.execute_query("""
@@ -435,6 +435,7 @@ Some server errors are marked as safe to retry without need to alter the origina
 Examples of such errors are deadlocks and memory issues.
 All driver's exception types implement the method `.is_retryable()`, which gives insights into whether a further attempt might be successful.
 This is particular useful when running queries in xref:transactions#explicit-transactions[explicit transactions], to know if a failed query should be run again.
+
 
 ifndef::backend-pdf[]
 [discrete.glossary]

@@ -6,20 +6,22 @@ The workflow is very similar to the synchronous version, except that you must us
 If you need <<causal_consistency>> across different transactions, use xref:bookmarks.adoc[bookmarks].
 
 .An async driver example with `execute_query`
-[source, python]
+[source, python, role=nocollapse]
 ----
 import asyncio
 from neo4j import AsyncGraphDatabase
 
 
-async def main():
-    URI = "<URI for Neo4j database>"
-    AUTH = ("<Username>", "<Password>")
+URI = "<URI for Neo4j database>"
+AUTH = ("<Username>", "<Password>")
 
+
+async def main():
     async with AsyncGraphDatabase.driver(URI, auth=AUTH) as driver:
         records, summary, keys = await driver.execute_query(
             "MATCH (a:Person) RETURN a.name AS name",
-            database_="neo4j")
+            database_="neo4j"
+        )
         names = [record["name"] for record in records]
         print(names)
 
@@ -29,16 +31,17 @@ if __name__ == "__main__":
 ----
 
 .An async driver example with transaction functions
-[source, python]
+[source, python, role=nocollapse]
 ----
 import asyncio
 from neo4j import AsyncGraphDatabase
 
 
-async def main():
-    URI = "<URI for Neo4j database>"
-    AUTH = ("<Username>", "<Password>")
+URI = "<URI for Neo4j database>"
+AUTH = ("<Username>", "<Password>")
 
+
+async def main():
     async with AsyncGraphDatabase.driver(URI, auth=AUTH) as driver:
         async with driver.session(database="neo4j") as session:
             records = await session.read_transaction(get_people)
