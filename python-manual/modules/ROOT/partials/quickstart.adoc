@@ -32,22 +32,17 @@ xref:connect.adoc[More info on connecting to a database ->]
 
 == Query the database
 
-Execute a <<Cypher>> statement by creating a session and using the methods `Session.execute_read()` and `Session.execute_write()`.
+Execute a <<Cypher>> statement with the method `Driver.execute_query()`.
 Do not hardcode or concatenate parameters: use placeholders and specify the parameters as keyword arguments.
 
-.Get the name of all 42 year-olds
-[source, python, role=nocollapse]
+[source, python]
 ----
-def match_person_nodes(tx, age):
-    result = tx.run(
-        "MATCH (p:Person {age: $age}) RETURN p.name AS name",
-        age=age)
-    records = list(result)
-    summary = result.consume()
-    return records, summary
-
-with driver.session(database="neo4j") as session:
-    records, summary = session.execute_read(match_person_nodes, age=42)
+# Get the name of all 42 year-olds
+records, summary, keys = driver.execute_query(
+    "MATCH (p:Person WHERE age = $age) RETURN p.name AS name",
+    age=42,
+    database_="neo4j",
+)
 
 # Summary information
 print("The query `{query}` returned {records_count} records in {time} ms.".format(
@@ -63,12 +58,37 @@ for person in records:
 xref:query-simple.adoc[More info on querying the database ->]
 
 
+== Run your own transactions
+
+For more advanced use-cases, you can take full control over the transaction lifecycle. A transaction is a unit of work that is either committed in its entirety or rolled back on failure. Use the methods `Session.execute_read()` and `Session.execute_write()` to run managed transactions.
+
+[source, python]
+----
+def match_person_nodes(tx, name_filter):
+    result = tx.run("""
+        MATCH (p:Person) WHERE p.name STARTS WITH $filter
+        RETURN p.name AS name ORDER BY name
+        """, filter=name_filter)
+    return list(result)  # return a list of Record objects
+
+with driver.session(database="neo4j") as session:
+    people = session.execute_read(
+        match_person_nodes,
+        "Al"
+    )
+    for person in people:
+        print(person.data())  # obtain dict representation
+----
+
+xref:transactions.adoc[More info on running transactions ->]
+
+
 == Close connections and sessions
 
 Unless you created them using the `with` statement, call the `.close()` method on all `Driver` and `Session` instances to release any resources still held by them.
 
-[source,python]
+[source, python]
+----
 session.close()
 driver.close()
-
-
+----

@@ -4,13 +4,13 @@
 == Implicit (or auto-commit) transactions
 
 This is the most basic and limited form with which to run a Cypher query.
-The driver will not automatically retry implicit transactions, as it does instead for queries run with xref:transactions#managed-transactions[managed transactions].
-Implicit transactions should only be used when xref:transactions#managed-transactions[transaction functions] do not fit the purpose, or for quick prototyping.
+The driver will not automatically retry implicit transactions, as it does instead for queries run with xref:query-simple.adoc[`execute_query()`] and with xref:transactions#managed-transactions[managed transactions].
+Implicit transactions should only be used when the other driver query interfaces do not fit the purpose, or for quick prototyping.
 
 You run an implicit transaction with the method link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Session.run[`Session.run()`].
-It returns a `Result` object that needs to be processed with the xref:result#manipulate-result[related methods].
+It returns a `Result` object that needs to be xref:transactions#process-result[processed accordingly].
 
-[source,python]
+[source, python]
 ----
 with driver.session(database="neo4j") as session:
     session.run("CREATE (a:Person {name: $name})", name=name)
@@ -31,7 +31,7 @@ Since the driver cannot figure out whether the query in a `session.run()` call r
 The most common use case for using `Session.run()` is for importing large CSV files into the database, and preventing timeout errors due to the size of the transaction.
 
 .Import CSV data into a Neo4j database
-[source,python]
+[source, python]
 ----
 with driver.session(database="neo4j") as session:
     result = session.run("""
@@ -52,11 +52,11 @@ For more information, see link:{neo4j-docs-base-uri}/cypher-manual/current/claus
 The link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Query[`Query`] object allows to specify a query timeout and to attach metadata to the transaction.
 The metadata is visible in the server logs (as described for the xref:transactions#unit_of_work-decorator[`unit_of_work`] decorator).
 
-[source,python]
+[source, python]
 ----
 from neo4j import Query
 
-with driver.session(database='neo4j') as session:
+with driver.session(database="neo4j") as session:
     query = Query("CREATE (a:Person {name: $name})",
                   timeout=1.0,
                   metadata={"app_name": "people"})
@@ -79,33 +79,33 @@ To protect against Cypher injections you should enclose the dynamic values in ba
 Notice that Cypher processes Unicode, so take care of the Unicode literal `\u0060` as well.
 
 .Manually escaping dynamic labels before concatenation.
-[source,python]
+[source, python]
 ----
 label = "Person\\u0060n"
 # convert \u0060 to literal backtick and then escape backticks
 escaped_label = label.replace("\\u0060", "`").replace("`", "``")
 
-with driver.session(database="neo4j") as session:
-    session.run(
-        f"MATCH (p:`{escaped_label}` {{name: $name}}) RETURN p.name",
-        name="Alice",
-    )
+driver.execute_query(
+    f"MATCH (p:`{escaped_label}` {{name: $name}}) RETURN p.name",
+    name="Alice",
+    database_="neo4j"
+)
 ----
 
 Another workaround, which avoids string concatenation, is using the <<APOC>> procedure link:{neo4j-docs-base-uri}/apoc/current/overview/apoc.merge/apoc.merge.node/[`apoc.merge.node`].
 It supports dynamic labels and property keys, but only for node insertion.
 
 .Using `apoc.merge.node` to create a node with dynamic labels/property keys.
-[source,python]
+[source, python]
 ----
 property_key = "name"
 label = "Person"
 
-with driver.session(database="neo4j") as session:
-    session.run(
-        "CALL apoc.merge.node($labels, $properties)",
-        labels=[label], properties={property_key: "Alice"},
-    )
+driver.execute_query(
+    "CALL apoc.merge.node($labels, $properties)",
+    labels=[label], properties={property_key: "Alice"},
+    database_="neo4j"
+)
 ----
 
 [NOTE]
@@ -118,7 +118,7 @@ See link:https://neo4j.com/labs/apoc/current/installation/#docker[APOC - Install
 The driver logs messages through the native `logging` library to a logger named `neo4j`.
 To redirect log messages to standard output, use the link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.debug.watch[watch] function:
 
-[source,python]
+[source, python]
 ----
 import sys
 from neo4j.debug import watch

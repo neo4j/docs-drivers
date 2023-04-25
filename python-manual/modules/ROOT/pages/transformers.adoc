@@ -1,0 +1,225 @@
+= Manipulate query results
+
+This section shows how to work with a query's result so as to extract data in the form that is most convenient for your application.
+
+
+== Result as a list
+
+By default, xref:query-simple.adoc[`Driver.execute_query()`] returns an link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.EagerResult[`EagerResult`] object.
+It contains the result records as a list, so it is easy to loop through them *(1)*.
+It also contains a link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#resultsummary[`ResultSummary`] of the query result, with metadata and information about the result *(2)*, and the `keys` available in the returned rows *(3)*.
+
+[source, python]
+----
+records, summary, keys = driver.execute_query(
+    "MATCH (a:Person) RETURN a.name AS name, a.age AS age",
+    database_="neo4j",
+)
+for person in records:  # <1>
+    print(person)
+    # person.name or person.age are also valid
+
+# Some summary information  <2>
+print("Query `{query}` returned {records_count} records in {time} ms.".format(
+    query=summary.query, records_count=len(records),
+    time=summary.result_available_after
+))
+
+print(f"Available keys are {keys}")  # ['name', 'age'] <3>
+----
+
+
+== Transform to pandas DataFrame
+
+The driver can transform the result into a pandas DataFrame.
+To achieve this, use the `.execute_query()` keyword argument `result_transformer_` and set it to `neo4j.Result.to_df`.
+This method is only available if the `pandas` library is installed.
+
+.Return a DataFrame with two columns (`n`, `m`) and 10 rows
+[source, python]
+----
+import neo4j
+
+pandas_df = driver.execute_query(
+    "UNWIND range(1, 10) AS n RETURN n, n+1 as m",
+    database_="neo4j",
+    result_transformer_=neo4j.Result.to_df
+)
+print(type(pandas_df))  # <class 'pandas.core.frame.DataFrame'>
+----
+
+This transformer accepts two optional arguments:
+
+- `expand` -- If `True`, some data structures in the result will be recursively expanded and flattened. More info in the link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Result.to_df[API documentation].
+- `parse_dates` -- If `True`, columns exclusively containing `time.DateTime` objects, `time.Date` objects, or `None`, will be converted to `pandas.Timestamp`.
+
+[NOTE]
+If you need to pass parameters to `to_df`, use `lambda` functions: +
+`result_transformer_=lambda res: res.to_df(True)`
+
+
+== Transform to graph
+
+The driver can transform the result into a collection of graph objects.
+To achieve this, use the `.execute_query()` keyword argument `result_transformer_` and set it to `neo4j.Result.graph`.
+To make the most out of this method, your query should return a graph-like result instead of a single column.
+The graph transformer exposes the properties `nodes` and `relationships`, which are set views into xref:data-types#_node[`Node`] and xref:data-types#_relationship[`Relationship`] objects.
+
+You can use the graph format for further processing or to visualize the query result.
+An example implementation that uses the `pyvis` library to draw the graph is below.
+
+.Visualize graph result with `pyvis`
+[source, python]
+----
+import pyvis
+from neo4j import GraphDatabase
+import neo4j
+
+
+URI = "<URI for Neo4j database>"
+AUTH = ("<Username>", "<Password>")
+
+
+def main():
+    with GraphDatabase.driver(URI, auth=AUTH) as driver:
+        # Create some friends
+        input_list = [("Arthur", "Guinevre"),
+                      ("Arthur", "Lancelot"),
+                      ("Arthur", "Merlin")]
+        driver.execute_query("""
+            UNWIND $pairs AS pair
+            MERGE (a:Person {name: pair[0]})
+            MERGE (a)-[:KNOWS]->(friend:Person {name: pair[1]})
+            """, pairs=input_list,
+            database_="neo4j",
+        )
+
+        # Create a film
+        driver.execute_query("""
+            MERGE (film:Film {title: $title})
+            MERGE (liker:Person {name: $person_name})
+            MERGE (liker)-[:LIKES]->(film)
+            """, title="Wall-E", person_name="Arthur",
+            database_="neo4j",
+        )
+
+        # Query to get a graphy result
+        graph_result = driver.execute_query("""
+            MATCH (a:Person {name: $name})-[r]-(b)
+            RETURN a, r, b
+            """, name="Arthur",
+            result_transformer_=neo4j.Result.graph,
+        )
+
+        # Draw graph
+        nodes_text_properties = {  # what property to use as text for each node
+            "Person": "name",
+            "Film": "title",
+        }
+        visualize_result(graph_result, nodes_text_properties)
+
+
+def visualize_result(query_graph, nodes_text_properties):
+    visual_graph = pyvis.network.Network()
+
+    for node in query_graph.nodes:
+        node_label = list(node.labels)[0]
+        node_text = node[nodes_text_properties[node_label]]
+        visual_graph.add_node(node.element_id, node_text, group=node_label)
+
+    for relationship in query_graph.relationships:
+        visual_graph.add_edge(
+            relationship.start_node.element_id,
+            relationship.end_node.element_id,
+            title=relationship.type
+        )
+
+    visual_graph.show('network.html', notebook=False)
+
+
+if __name__ == "__main__":
+    main()
+----
+
+.Graph visualization of example above
+image::{common-image}/pyvis-example.png[]
+
+
+== Custom transformers
+
+For more advanded scenarios, you can use the parameter `result_transformer_` to provide a custom function that further manipulates the link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Result[`Result`] object resulting from your query.
+A transformer takes a `Result` object and can output any data structure. The transformer's return value is in turn returned by `.execute_query()`.
+
+Inside a transformer function you can use xref:transactionn[any of the `Result` methods].
+
+[WARNING]
+A transformer **must not** return the `Result` object itself.
+Doing so is roughly equivalent to returning a _pointer_ to the result buffer, which gets invalidated as soon as the query's transaction is over.
+
+.A custom transformer using `single` and `consume`
+[source, python]
+----
+# Get a single record (or an exception) and the summary from a result.
+def get_single_person(result):
+    record = result.single(strict=True)
+    summary = result.consume()
+    return record, summary
+
+
+record, summary = driver.execute_query(
+    "MATCH (a:Person {name: $name}) RETURN a.name AS name",
+    name="Alice",
+    database_="neo4j",
+    result_transformer_=get_single_person,
+)
+print("The query `{query}` returned {record} in {time} ms.".format(
+      query=summary.query, record=record, time=summary.result_available_after))
+----
+
+
+.A custom transformer using `fetch` and `peek`
+[source, python]
+----
+# Get exactly 5 records, or an exception.
+def exactly_5(result):
+    records = result.fetch(5)
+
+    if len(records) != 5:
+        raise Exception(f"Expected exactly 5 records, found only {len(records)}.")
+    if result.peek():
+        raise Exception("Expected exactly 5 records, found more.")
+
+    return records
+
+
+records = driver.execute_query(
+    "MATCH (a:Person) RETURN a.name AS name",
+    database_="neo4j",
+    result_transformer_=exactly_5,
+)
+----
+
+
+////
+[source, python]
+----
+def transformer(result):
+    return result
+
+result = driver.execute_query("MATCH (a:Person) RETURN a.name AS name;", result_transformer_=transformer)
+print(result)
+print(result.single())
+----
+results in
+`neo4j.exceptions.ResultConsumedError: The result is out of scope. The associated transaction has been closed. Results can only be used while the transaction is open.`
+on the second print.
+////
+
+
+ifndef::backend-pdf[]
+[discrete.glossary]
+== Glossary
+
+include::{common-partial}/glossary.adoc[]
+include::../partials/glossary.adoc[]
+endif::[]

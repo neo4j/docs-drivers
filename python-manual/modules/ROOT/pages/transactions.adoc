@@ -1,7 +1,8 @@
 = Run your own transactions
 
-When xref:query-simple.adoc[querying the database] with transaction functions, the driver automatically creates a *<<transaction>>*.
-You can easily include multiple queries in a single transaction function, but to design more involved use-cases it is important to understand how transactions work within the driver.
+When xref:query-simple.adoc[querying the database with `execute_query()`], the driver automatically creates a _transaction_. A transaction is a unit of work that is either _committed_ in its entirety or _rolled back_ on failure. You can include multiple Cypher statements in a single query, as for example when using `MATCH` and `MERGE` in sequence to xref:query-simple#_update_the_database[update the database], but you cannot have multiple queries and interleave some client-logic in between them.
+
+For these more advanced use-cases, the driver provides functions to take full control over the transaction lifecycle. These are called _managed transactions_, and you can think of them as a way of unwrapping the flow of `execute_query()` and being able to specify its desired behavior in more places.
 
 
 == Obtain a session
@@ -13,7 +14,7 @@ In particular, sessions borrow connections from the _connection pool_ as needed,
 Sessions are created with the method link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#session[`Driver.session()`], with the keyword argument `database` allowing to specify the xref:_database_selection[target database].
 For further parameters, see xref:_session_configuration[Session configuration].
 
-[source,python]
+[source, python]
 ----
 with driver.session(database="neo4j") as session:
     ...
@@ -36,10 +37,10 @@ A managed transaction is created with the methods link:{neo4j-docs-base-uri}/api
 Both methods take a _transaction function_ callback *(1)* and an arbitrary number of positional and keyword arguments *(2)* which are handed down to the transaction function.
 The transaction function *(3)* is responsible for actually carrying out the queries and processing the result.
 Queries are specified with the link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Transaction.run[`Transaction.run()`] method *(4)*, which returns a link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Result[`Result`] object.
-You can then xref:result#manipulate-result[process the result] *(5)* using any of the `Result` methods, or simply casting it to list.
+You can then xref:process-result[process the result] *(5)* using any of the `Result` methods.
 
 .Retrieve people whose name starts with `Al`.
-[source,python]
+[source, python]
 ----
 def match_person_nodes(tx, name_filter): # <3>
     result = tx.run(""" # <4>
@@ -61,11 +62,11 @@ with driver.session(database="neo4j") as session:
 Use xref:query-simple#query-parameters[query parameters] instead, both for performance and security reasons.
 
 *Transaction functions should never return the `Result` object directly*.
-Instead, always xref:result.adoc[process the result] in some way; at minimum, cast it to list.
+Instead, always xref:process-result[process the result] in some way; at minimum, cast it to list.
 Within a transaction function, a `return` statement results in the transaction being committed, while the transaction is automatically rolled back if an exception is raised.
 
 .A transaction with multiple queries, client logic, and potential roll backs.
-[source,python]
+[source, python]
 ----
 from neo4j import GraphDatabase
 
@@ -144,7 +145,7 @@ To maintain multiple concurrent transactions, use multiple concurrent sessions.
 
 
 [#unit_of_work-decorator]
-=== Further transaction function configuration
+=== Transaction function configuration
 
 The decorator link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.unit_of_work[`unit_of_work()`] allows to exert further control on transaction functions.
 It allows to specify:
@@ -156,11 +157,11 @@ The default value is set on the server side.
 These metadata get logged in the server `query.log`, and are visible in the output of the `SHOW TRANSACTIONS` Cypher command.
 Use this to tag transactions.
 
-[source,python]
+[source, python]
 ----
 from neo4j import unit_of_work
 
-@unit_of_work(timeout=5, metadata={"app_name": "people"})
+@unit_of_work(timeout=5, metadata={"app_name": "people_tracker"})
 def count_people(tx):
     result = tx.run("MATCH (a:Person) RETURN count(a) AS people")
     record = result.single()
@@ -178,7 +179,7 @@ with driver.session(database="neo4j") as session:
 You can achieve full control over transactions by manually beginning one with the method link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Session.begin_transaction[`Session.begin_transaction()`].
 You run queries inside an explicit transaction with the method link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Transaction.run[`Transaction.run()`].
 
-[source,python]
+[source, python]
 ----
 with driver.session(database="neo4j") as session:
     with session.begin_transaction() as tx:
@@ -189,7 +190,7 @@ Closing an explicit transaction can either happen automatically at the end of a 
 
 Explicit transactions are most useful for applications that need to distribute Cypher execution across multiple functions for the same transaction, or for applications that need to run multiple queries within a single transaction but without the automatic retries provided by managed transactions.
 
-[source,python]
+[source, python]
 ----
 import neo4j
 
@@ -250,6 +251,63 @@ def request_inspection(customer_id, other_bank_id, amount, e):
 ----
 
 
+[[process-result]]
+== Process query results
+
+The driver's output of a query is a link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Result[`Result`] object, which does not directly contain the result records.
+Rather, it encapsulates the Cypher result in a rich data structure that requires some parsing on the client side.
+
+When working with a `Result` object, there are two things to keep in mind:
+
+- *The result records are not immediately and entirely fetched and returned by the server*.
+Instead, results come as a _lazy stream_.
+In particular, when the driver receives some records from the server, they are initially _buffered_ in a background queue.
+Records stay in the buffer until they are _consumed_ by the application, at which point they are _removed from the buffer_.
+When no more records are available, the result is _exhausted_.
+- *The result acts as a _cursor_*.
+This means that there is no way to retrieve a previous record from the stream, unless you saved it in an auxiliary data structure.
+
+**The easiest way of processing a result is by casting it to list**, which yields a list of link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Record[`Record`] objects.
+Otherwise, a `Result` object implements a number of methods for processing records.
+The most commonly needed ones are listed below.
+
+// .An essential list of `Result` methods
+[cols="2,3"]
+|===
+|Name |Description
+
+|`value(key=0, default=None)`
+|Return the remainder of the result as a list.
+If `key` is specified, only the given property is included, while `default` allows to specify a value for nodes lacking that property.
+
+|`fetch(n)`
+|Return up to `n` records from the result.
+
+|`single(strict=False)`
+a|Return the next and only remaining record, or `None`.
+Calling this method always exhausts the result.
+
+If more (or less) than one record is available,
+
+- `strict==False` -- a warning is generated and the first of these is returned (if any);
+- `strict==True` -- a `ResultNotSingleError` is raised.
+
+|`peek()`
+|Return the next record from the result without consuming it.
+This leaves the record in the buffer for further processing.
+
+|`data(*keys)`
+|Return a JSON-like dump of the raw result.
+Only use it for debugging/prototyping purposes.
+
+|`consume()`
+|Return the query link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#resultsummary[`ResultSummary`].
+It exhausts the result, so should only be called when data processing is over.
+|===
+
+For a complete list of `Result` methods, see link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#result[API documentation -- Result].
+
+
 == Session configuration
 
 === Database selection
@@ -285,6 +343,7 @@ with driver.session(
 ----
 
 [#access-control-note]
+// .Routing ≠ Access control
 [NOTE]
 ====
 Although executing a _write_ query in read mode likely results in a runtime error, *you should not rely on this for access control.* The difference between the two modes is that _read_ transactions will be routed to any node of a cluster, whereas _write_ ones will be directed to the leader.
@@ -321,12 +380,12 @@ When a session is closed, it is returned to the connection pool to be later reus
 
 If you do not use `with`, remember to call the `.close()` method when you have finished using a session.
 
-[source,python]
+[source, python]
 ----
 session = driver.session(database="neo4j")
-# ...
+
 # session usage
-# ...
+
 session.close()
 ----
 
