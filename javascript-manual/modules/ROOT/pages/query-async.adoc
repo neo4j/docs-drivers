@@ -90,8 +90,8 @@ result.then(result => {  // <2>
 
 [TIP]
 ====
-The default return value of `tx.run()` is a `Promise`.
-If you prepend `await` to `tx.run()` as shown in xref:query-simple.adoc[Query the database], you effectively force your application to wait until the result is ready, and you obtain the corresponding of either `result` or `error` from the example above.
+The Promise API holds for `Driver.executeQuery()` as well.
+If you prepend `await` to an `.executeQuery()` call, as shown in xref:query-simple.adoc[Query the database], you effectively force your application to wait until the result is ready, and you obtain the corresponding of either `result` or `error` from the example above.
 ====
 
 

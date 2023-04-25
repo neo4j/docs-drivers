@@ -1,35 +1,40 @@
 = Performance recommendations
 
-- *Specify the target database on all queries* with the `database` parameter when creating new xref:transactions.adoc[sessions].
+- *Specify the target database on all queries* using the `database` parameter, both in xref:query-simple.adoc[`Driver.executeQuery()`] calls and when creating new xref:transactions.adoc[sessions].
 If no database is provided, the driver has to send an extra request to the server to figure out what the default database is.
 The overhead is minimal for a single session, but becomes significant over hundreds of sessions.
 +
 [source, javascript]
 ----
 // Good practice
+driver.executeQuery('<QUERY>', {}, {database: '<DB NAME>'})
 driver.session({database: '<DB NAME>'})
 ----
 +
 [source, javascript]
 ----
 // Bad practice
+driver.executeQuery('<QUERY>')
 driver.session()
 ----
 
 - *Use xref:query-simple#query-parameters[query parameters]* instead of hardcoding or concatenating values into queries.
-This allows the database to properly cache queries.
+This allows to leverage the database's query cache.
 +
 [source, javascript]
 ----
 // Good practice
-session.run('MATCH (p:Person {name: $name}) RETURN p', { name: 'Alice' })
+driver.executeQuery(
+  'MATCH (p:Person {name: $name}) RETURN p',
+  { name: 'Alice' }  // query parameters
+)
 ----
 +
 [source, javascript]
 ----
 // Bad practice
-session.run('MATCH (p:Person {name: "Alice"}) RETURN p')
-session.run('MATCH (p:Person {name: ' + name + '}) RETURN p')
+driver.executeQuery('MATCH (p:Person {name: "Alice"}) RETURN p')
+driver.executeQuery('MATCH (p:Person {name: ' + name + '}) RETURN p')
 ----
 
 - *Specify node labels* in all queries.
@@ -38,13 +43,13 @@ To learn how to combine labels, see link:{neo4j-docs-base-uri}/cypher-manual/cur
 [source, javascript]
 ----
 // Good practice
-session.run('MATCH (p:Person|Animal {name: $name}) RETURN p', { name: 'Alice' })
+driver.executeQuery('MATCH (p:Person|Animal {name: $name}) RETURN p', { name: 'Alice' })
 ----
 +
 [source, javascript]
 ----
 // Bad practice
-session.run('MATCH (p {name: $name}) RETURN p', { name: 'Alice' })
+driver.executeQuery('MATCH (p {name: $name}) RETURN p', { name: 'Alice' })
 ----
 
 - *Batch queries when creating a lot of records* using the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/with/[`WITH`] and link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/unwind/[`UNWIND`] Cypher clauses.
@@ -56,8 +61,7 @@ numbers = []
 for(let i=0; i<10000; i++) {
   numbers.push({value: Math.random()})
 }
-
-session.run(`
+driver.executeQuery(`
     WITH $numbers AS batch
     UNWIND batch AS node
     MERGE (n:Number {value: node.value})
@@ -69,27 +73,13 @@ session.run(`
 ----
 // Bad practice
 for(let i=0; i<10000; i++) {
-  session.run('MERGE (:Number {value: $value})', { value: Math.random() })
+  driver.executeQuery('MERGE (:Number {value: $value})', { value: Math.random() })
 }
 ----
 +
 [TIP]
 The most efficient way of performing a _first import_ of large amounts of data into a new database is the link:{neo4j-docs-base-uri}/operations-manual/current/tutorial/neo4j-admin-import/[`neo4j-admin database import`] command.
 // source:  https://community.neo4j.com/t5/neo4j-graph-platform/improving-data-writing-efficiency-in-python/td-p/39520
-
-- *Filter for properties inline*, as opposed to filtering in the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/with/[`WHERE`] clause.
-+
-[source, javascript]
-----
-// Good practice
-session.run('MATCH (p:Person WHERE p.name = $name) RETURN p', { name: 'Alice' })
-----
-+
-[source, javascript]
-----
-// Bad practice
-session.run('MATCH (p:Person) WHERE p.name = $name RETURN p', { name: 'Alice' })
-----
 
 - *Create indexes for properties that you often filter against*.
 For example, if you often look up `Person` nodes by the `name` property, it is beneficial to create an index on `Person.name`.
@@ -99,7 +89,7 @@ For more information, see link:{neo4j-docs-base-uri}/cypher-manual/current/index
 [source, javascript]
 ----
 // Create an index on Person.name
-session.run('CREATE INDEX personName FOR (n:Person) ON (n.name)')
+driver.executeQuery('CREATE INDEX personName FOR (n:Person) ON (n.name)')
 ----
 
 - link:{neo4j-docs-base-uri}/cypher-manual/current/query-tuning/basic-example/#_profile_query[*Profile your queries*] to locate queries whose performance can be improved.
@@ -108,7 +98,7 @@ The server output is available in the `profile` property of the link:{neo4j-docs
 +
 [source, javascript, role=nocollapse]
 ----
-const result = session.run('PROFILE MATCH (p {name: $name}) RETURN p', { name: 'Alice' })
+const result = driver.executeQuery('PROFILE MATCH (p {name: $name}) RETURN p', { name: 'Alice' })
 console.log(result.summary.profile.arguments['string-representation'])
 
 /*
@@ -137,7 +127,7 @@ The server output is available in the `plan` property of the link:{neo4j-docs-ba
 +
 [source, javascript, role=nocollapse]
 ----
-const result = session.run('EXPLAIN MATCH (p {name: $name}) RETURN p', { name: 'Alice' })
+const result = driver.executeQuery('EXPLAIN MATCH (p {name: $name}) RETURN p', { name: 'Alice' })
 console.log(result.summary.plan.arguments['string-representation'])
 
 /*
