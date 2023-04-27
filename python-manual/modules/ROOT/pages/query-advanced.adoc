@@ -28,7 +28,7 @@ Since the driver cannot figure out whether the query in a `session.run()` call r
 
 === Import CSV files
 
-The most common use case for using `Session.run()` is for importing large CSV files into the database, and preventing timeout errors due to the size of the transaction.
+The most common use case for using `Session.run()` is for importing large CSV files into the database with the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/load-csv[`LOAD CSV`] Cypher clause, and preventing timeout errors due to the size of the transaction.
 
 .Import CSV data into a Neo4j database
 [source, python]
@@ -43,6 +43,10 @@ with driver.session(database="neo4j") as session:
     """)
     print(result.consume().counters)
 ----
+
+[NOTE]
+While `LOAD CSV` can be a convenience, there is nothing _wrong_ in deferring the parsing of the CSV file to your Python application and avoiding `LOAD CSV`.
+In fact, moving the parsing logic to the application can give you more control over the importing process.
 
 For more information, see link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/load-csv/[Cypher -- Clauses -- Load CSV].
 
