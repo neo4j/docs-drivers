@@ -269,7 +269,7 @@ If no database is given, the link:{neo4j-docs-base-uri}/operations-manual/curren
 
 [source, javascript]
 ----
-const session = driver.session({database: 'neo4j'}
+const session = driver.session({database: 'neo4j'})
 ----
 
 
