@@ -17,7 +17,7 @@ For further parameters, see xref:_session_configuration[Session configuration].
 
 [source, javascript]
 ----
-session = driver.session({database: 'neo4j'})
+session = driver.session({ database: 'neo4j' })
 ----
 
 Session creation is a lightweight operation, so sessions can be created and destroyed without significant cost.
@@ -42,7 +42,7 @@ You can then process the result records and query summary *(5)*.
 [source, javascript]
 ----
 let session, result
-session = driver.session({database: 'neo4j'})
+session = driver.session({ database: 'neo4j' })
 result = await session.executeRead(async tx => { // <1>
   return await tx.run(`  // <2>
     MATCH (p:Person) WHERE p.name STARTS WITH $filter  // <3>
@@ -84,7 +84,7 @@ const neo4j = require('neo4j-driver');
     return
   }
 
-  session = driver.session({database: 'neo4j'})
+  session = driver.session({ database: 'neo4j' })
   for(let i=0; i<100; i++) {
     const name = `Neo-${i.toString()}`
     const orgId = await session.executeWrite(async tx => {
@@ -168,7 +168,7 @@ Use this to tag transactions.
 
 [source, javascript]
 ----
-let session = driver.session({database: 'neo4j'})
+let session = driver.session({ database: 'neo4j' })
 const people_n = await session.executeRead(
   async tx => { return await tx.run('MATCH (a:Person) RETURN count(a)') },
   { timeout: 5000, metadata: {'app_name': 'people'} }  // TransactionConfig
@@ -184,7 +184,7 @@ You run queries inside an explicit transaction with the method link:{neo4j-docs-
 
 [source, javascript]
 ----
-let session = driver.session({database: 'neo4j'})
+let session = driver.session({ database: 'neo4j' })
 let transaction = await session.beginTransaction()
 
 // await transaction.run('<QUERY 1>')
@@ -203,7 +203,7 @@ Explicit transactions are most useful for applications that need to distribute C
 [source, javascript]
 ----
 async function transferToOtherBank(driver, customerId, otherBankId, amount) {
-  const session = driver.session({database: 'neo4j'})
+  const session = driver.session({ database: 'neo4j' })
   const tx = await session.beginTransaction()
   try {
     if(! checkCustomerBalance(tx, customerId, amount))
@@ -269,7 +269,9 @@ If no database is given, the link:{neo4j-docs-base-uri}/operations-manual/curren
 
 [source, javascript]
 ----
-const session = driver.session({database: 'neo4j'})
+const session = driver.session({
+  database: 'neo4j'
+})
 ----
 
 

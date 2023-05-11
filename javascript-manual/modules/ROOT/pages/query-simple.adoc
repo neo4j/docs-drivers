@@ -21,8 +21,8 @@ To create a node representing a person named `Alice`, use the Cypher clause link
 ----
 const { records, summary } = await driver.executeQuery(
   'MERGE (p:Person {name: $name})',  // <1>
-   {name: 'Alice'}  // <2>
-   {database: 'neo4j'}  // <3>
+   { name: 'Alice' },  // <2>
+   { database: 'neo4j' }  // <3>
 )
 console.log(
   `Created ${summary.counters.updates().nodesCreated} nodes ` +
@@ -47,7 +47,7 @@ To retrieve information from the database, use the Cypher clause link:{neo4j-doc
 const { records, summary } = await driver.executeQuery(
   'MATCH (p:Person) RETURN p.name AS name'
   {},
-  {database: 'neo4j'}
+  { database: 'neo4j' }
 )
 console.log(
   `The query \`${summary.query.text}\` ` +
@@ -73,7 +73,7 @@ const { _, summary } = await driver.executeQuery(`
   MATCH (p:Person WHERE p.name = $name)
   SET p.age = $age
   `, { name: 'Alice', age: 42 },
-  {database: 'neo4j'}
+  { database: 'neo4j' }
 )
 console.log('Query counters:')
 console.log(summary.counters.updates())
@@ -89,7 +89,7 @@ const { records, summary } = await driver.executeQuery(`
   MERGE (friend:Person {name: $friendName})
   MERGE (p)-[:KNOWS]->(friend)
   `, { name: 'Alice', friendName: 'Bob' },
-  {database: 'neo4j'}
+  { database: 'neo4j' }
 )
 console.log('Query counters:')
 console.log(summary.counters.updates())
@@ -115,7 +115,7 @@ const { _, summary } = await session.executeQuery(`
   MATCH (p:Person WHERE p.name = $name)
   DETACH DELETE p
   `, { name: 'Alice' },
-  {database: 'neo4j'}
+  { database: 'neo4j' }
 )
 console.log('Query counters:')
 console.log(summary.counters.updates())
@@ -253,7 +253,8 @@ const neo4j = require('neo4j-driver');
   for(let person of people) {
     await driver.executeQuery(
       'MERGE (p:Person {name: $person.name, age: $person.age})',
-      { person: person }
+      { person: person },
+      { database: 'neo4j' }
     )
   }
 
@@ -265,7 +266,8 @@ const neo4j = require('neo4j-driver');
         UNWIND $person.friends AS friendName
         MATCH (friend:Person {name: friendName})
         MERGE (p)-[:KNOWS]->(friend)
-        `, { person: person }
+        `, { person: person },
+        { database: 'neo4j' }
       )
     }
   }
@@ -275,7 +277,8 @@ const neo4j = require('neo4j-driver');
     MATCH (p:Person {name: $name})-[:KNOWS]-(friend:Person)
     WHERE friend.age < $age
     RETURN friend
-    `, { name: 'Alice', age: 40 }
+    `, { name: 'Alice', age: 40 },
+    { database: 'neo4j' }
   )
 
   // Loop through results and do something with them
