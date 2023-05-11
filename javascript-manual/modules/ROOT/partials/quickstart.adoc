@@ -49,7 +49,8 @@ Do not hardcode or concatenate parameters: use placeholders and specify the para
 // Get the name of all 42 year-olds
 const { records, summary, keys } = await driver.executeQuery(
   'MATCH (p:Person {age: $age}) RETURN p.name AS name',
-  { age: 42 }
+  { age: 42 },
+  { database: 'neo4j' }
 )
 
 // Summary information
@@ -75,7 +76,7 @@ For more advanced use-cases, you can take full control over the transaction life
 
 [source, javascript, role=nocollapse]
 ----
-let session = driver.session({database: 'neo4j'})
+let session = driver.session({ database: 'neo4j' })
 try {
   const { records, summary } = await session.executeRead(async tx => {
     return await tx.run(`
