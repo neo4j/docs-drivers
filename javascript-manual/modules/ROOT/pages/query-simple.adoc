@@ -45,7 +45,7 @@ To retrieve information from the database, use the Cypher clause link:{neo4j-doc
 [source, javascript]
 ----
 const { records, summary } = await driver.executeQuery(
-  'MATCH (p:Person) RETURN p.name AS name'
+  'MATCH (p:Person) RETURN p.name AS name',
   {},
   { database: 'neo4j' }
 )
