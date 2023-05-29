@@ -1,0 +1,38 @@
+# Explore the query execution summary
+
+After all results coming from a query have been processed, the server ends the transaction by returning a summary of execution.
+It comes as a link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#resultsummary[`ResultSummary`] object, and it contains information among which:
+
+- **Query counters** -- What changes the query triggered on the server
+- **Notifications** -- Extra information raised by the server while running the query
+- **Query plan** -- How the database executed the query
+- Timing information and query request summary.
+
+
+## Query counters
+
+The property `ResultSummary.counters` contains counters for the operations that a query triggered (as a link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#summarycounters[`SummaryCounters`] object).
+
+.Insert some data and display the query counters
+[source, python]
+----
+summary = driver.execute_query("""
+    MERGE (p:Person {name: $name})
+    MERGE (p)-[:KNOWS]->(:Person {name: $friend})
+    """, name="Mark", friend="Bob",
+    database_="neo4j",
+).summary
+print(summary.counters)
+# {'_contains_updates': True, 'labels_added': 2, 'relationships_created': 1,
+   'nodes_created': 2, 'properties_set': 2}
+----
+
+There are two additional properties which are not strictly counters:
+
+- `contains_updates` -- whether the query triggered any write operation on the database on which it ran
+- `contains_system_updates` -- whether the query updated the `system` database
+
+## Notifications
+
+
+## Query plan
