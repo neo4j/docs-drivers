@@ -301,7 +301,7 @@ This leaves the record in the buffer for further processing.
 Only use it for debugging/prototyping purposes.
 
 |`consume()`
-|Return the query link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#resultsummary[`ResultSummary`].
+|Return the query xref:result-summary.adoc[result summary].
 It exhausts the result, so should only be called when data processing is over.
 |===
 

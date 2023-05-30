@@ -163,6 +163,8 @@ Total database accesses: ?
 - *Use xref:concurrency.adoc[concurrency]*, either in the form of multithreading or with the async version of the driver.
 This is likely to be more impactful on performance if you parallelize complex and time-consuming queries in your application, but not so much if you run many simple ones.
 
+- xref:result-summary.adoc#_filter_notifications[Filter the category and/or severity of notifications] the server should raise.
+
 // - with SET, specify individual properties one by one instead of using += (too low impact)
 
 
