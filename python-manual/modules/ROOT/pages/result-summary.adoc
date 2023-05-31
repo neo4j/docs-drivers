@@ -133,8 +133,8 @@ print(summary.summary_notifications)
 ### Filtering notifications
 
 By default, the server analyses each query for all categories and severity of notifications.
-Starting from version 5.7, you can use the driver `notifications_min_severity` and/or `notifications_disabled_categories` to restrict the severity or category of notifications that you are interested into.
-You can use the parameters either when creating a `Driver` instance, or when creating a session.
+Starting from version 5.7, you can use the parameters `notifications_min_severity` and/or `notifications_disabled_categories` to restrict the severity or category of notifications that you are interested into.
+You can use those parameters either when creating a `Driver` instance, or when creating a session.
 
 Restricting the amount of notifications the server is allowed to raise can improve performance.
 
