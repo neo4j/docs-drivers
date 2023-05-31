@@ -3,9 +3,9 @@
 After all results coming from a query have been processed, the server ends the transaction by returning a summary of execution.
 It comes as a link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#resultsummary[`ResultSummary`] object, and it contains information among which:
 
-- **Query counters** -- What changes the query triggered on the server
-- **Notifications** -- Extra information raised by the server while running the query
-- **Query plan** -- How the database executed the query
+- xref:_query_counters[**Query counters**] -- What changes the query triggered on the server
+- xref:_query_plan[**Query plan**] -- How the database executed the query
+- xref:_notifications[**Notifications**] -- Extra information raised by the server while running the query
 - Timing information and query request summary
 
 
@@ -23,7 +23,7 @@ records, result_summary, keys = driver.execute_query("""
 ----
 
 If you are using xref:transactions.adoc[transaction functions], or a xref:transformers.adoc#_custom_transformers[custom transformer] with `Driver.execute_query()`, you can retrieve the query execution summary with the method `Result.consume()`.
-**Notice that once you ask for the execution summary, the transaction is closed and the result stream exhausted**.
+**Notice that once you ask for the execution summary, the result stream is exhausted**.
 This means that any record which has not yet been processed is not available any longer.
 
 [source, python]
@@ -66,53 +66,6 @@ There are two additional boolean properties which act as meta-counters:
 - `contains_system_updates` -- whether the query updated the `system` database
 
 
-## Notifications
-
-The property `ResultSummary.summary_notifications` contains a list of link:{neo4j-docs-base-uri}/status-codes/current/notifications[notifications coming from the server], if any were raised by the execution of the query.
-These include recommendations for performance improvements, warnings about the usage of deprecated features, and other hints about sub-optimal usage of Neo4j.
-Each notification comes as a link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.SummaryNotification[`SummaryNotification`] object.
-
-.An unbounded shortest path raises a performance notification
-[source, python, role=nocollapse]
-----
-records, summary, keys = driver.execute_query("""
-    MATCH p=shortestPath((:Person {name: 'Alice'})-[*]->(:Person {name: 'Bob'}))
-    RETURN p
-    """, database_="neo4j"
-)
-print(summary.summary_notifications)
-"""
-[SummaryNotification(
-    title='The provided pattern is unbounded, consider adding an upper limit to the number of node hops.', code='Neo.ClientNotification.Statement.UnboundedVariableLengthPattern',
-    description='Using shortest path with an unbounded pattern will likely result in long execution times. It is recommended to use an upper limit to the number of node hops in your pattern.',
-    severity_level=<NotificationSeverity.INFORMATION: 'INFORMATION'>,
-    category=<NotificationCategory.PERFORMANCE: 'PERFORMANCE'>,
-    raw_severity_level='INFORMATION',
-    raw_category='PERFORMANCE',
-    position=SummaryNotificationPosition(line=1, column=22, offset=21)
-)]
-"""
-----
-
-
-### Filtering notifications
-
-By default, the server analyses each query for all categories and severity of notifications.
-If you are only interested in some of them, or if you want to disable them altogether, you can use the driver parameters `notifications_min_severity` and/or `notifications_disabled_categories` when creating a `Driver` instance in the first place (available from version 5.7).
-
-Restricting the amount of notifications the server is allowed to raise can improve performance.
-
-.Allow only `WARNING` notifications, but not of `HINT` or `GENERIC` category
-[source, python]
-----
-driver = neo4j.GraphDatabase.driver(
-    url, auth=auth,
-    notifications_min_severity='WARNING',
-    notifications_disabled_categories=['HINT', 'GENERIC']
-)
-----
-
-
 ## Query plan
 
 If you prefix your query with the keyword `PROFILE`, the server will return the plan it has used to run the query.
@@ -146,3 +99,58 @@ Total database accesses: 12, total allocated memory: 184
 ----
 
 For more information and examples, see link:{neo4j-docs-base-uri}/cypher-manual/current/query-tuning/basic-example/#_profile_query[Basic query tuning].
+
+
+## Notifications
+
+The property `ResultSummary.summary_notifications` contains a list of link:{neo4j-docs-base-uri}/status-codes/current/notifications[notifications coming from the server], if any were raised by the execution of the query.
+These include recommendations for performance improvements, warnings about the usage of deprecated features, and other hints about sub-optimal usage of Neo4j.
+Each notification comes as a link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.SummaryNotification[`SummaryNotification`] object.
+
+.An unbounded shortest path raises a performance notification
+[source, python, role=nocollapse]
+----
+records, summary, keys = driver.execute_query("""
+    MATCH p=shortestPath((:Person {name: 'Alice'})-[*]->(:Person {name: 'Bob'}))
+    RETURN p
+    """, database_="neo4j"
+)
+print(summary.summary_notifications)
+"""
+[SummaryNotification(
+    title='The provided pattern is unbounded, consider adding an upper limit to the number of node hops.', code='Neo.ClientNotification.Statement.UnboundedVariableLengthPattern',
+    description='Using shortest path with an unbounded pattern will likely result in long execution times. It is recommended to use an upper limit to the number of node hops in your pattern.',
+    severity_level=<NotificationSeverity.INFORMATION: 'INFORMATION'>,
+    category=<NotificationCategory.PERFORMANCE: 'PERFORMANCE'>,
+    raw_severity_level='INFORMATION',
+    raw_category='PERFORMANCE',
+    position=SummaryNotificationPosition(line=1, column=22, offset=21)
+)]
+"""
+----
+
+
+### Filtering notifications
+
+By default, the server analyses each query for all categories and severity of notifications.
+Starting from version 5.7, you can use the driver `notifications_min_severity` and/or `notifications_disabled_categories` to restrict the severity or category of notifications that you are interested into.
+You can use the parameters either when creating a `Driver` instance, or when creating a session.
+
+Restricting the amount of notifications the server is allowed to raise can improve performance.
+
+.Allow only `WARNING` notifications, but not of `HINT` or `GENERIC` category
+[source, python]
+----
+driver = neo4j.GraphDatabase.driver(
+    url, auth=auth,
+    notifications_min_severity='WARNING',
+    notifications_disabled_categories=['HINT', 'GENERIC']
+)
+
+# at session level
+session = driver.session(
+    database="neo4j",
+    notifications_min_severity='INFORMATION',
+    notifications_disabled_categories=['HINT']
+)
+----
