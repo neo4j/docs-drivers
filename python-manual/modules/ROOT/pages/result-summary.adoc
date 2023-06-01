@@ -4,7 +4,7 @@ After all results coming from a query have been processed, the server ends the t
 It comes as a link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#resultsummary[`ResultSummary`] object, and it contains information among which:
 
 - xref:_query_counters[**Query counters**] -- What changes the query triggered on the server
-- xref:_query_plan[**Query plan**] -- How the database executed the query
+- xref:_query_execution_plan[**Query execution plan**] -- How the database would execute (or executed) the query
 - xref:_notifications[**Notifications**] -- Extra information raised by the server while running the query
 - Timing information and query request summary
 
@@ -20,6 +20,7 @@ records, result_summary, keys = driver.execute_query("""
     MERGE (p:Person {name: name})
     """, database_="neo4j",
 )
+# or result_summary = driver.execute_query('<QUERY>').summary
 ----
 
 If you are using xref:transactions.adoc[transaction functions], or a xref:transformers.adoc#_custom_transformers[custom transformer] with `Driver.execute_query()`, you can retrieve the query execution summary with the method `Result.consume()`.
@@ -66,16 +67,46 @@ There are two additional boolean properties which act as meta-counters:
 - `contains_system_updates` -- whether the query updated the `system` database
 
 
-## Query plan
+## Query execution plan
 
-If you prefix your query with the keyword `PROFILE`, the server will return the plan it has used to run the query.
-The plan is then available under the property `ResultSummary.profile`.
-This includes the list of operators that were used and additional information about each intermediate step.
+If you prefix a query with `EXPLAIN`, the server will return the plan it _would_ use to run the query, but will not actually run it.
+The plan is then available under the property `ResultSummary.plan`, and contains the list of link:{neo4j-docs-base-uri}/cypher-manual/current/execution-plans/operators/[Cypher operators] that would be used to retrieve the result set.
 You may use this information to locate potential bottlenecks or room for performance improvements (for example through the creation of indexes).
 
 [source, python, role=nocollapse]
 ----
-_, summary, _ = driver.execute_query("PROFILE MATCH (p {name: $name}) RETURN p", name="Alice")
+_, summary, _ = driver.execute_query("EXPLAIN MATCH (p {name: $name}) RETURN p", name="Alice")
+print(summary.plan['args']['string-representation'])
+
+"""
+Planner COST
+Runtime PIPELINED
+Runtime version 5.0
+Batch size 128
+
++-----------------+----------------+----------------+---------------------+
+| Operator        | Details        | Estimated Rows | Pipeline            |
++-----------------+----------------+----------------+---------------------+
+| +ProduceResults | p              |              1 |                     |
+| |               +----------------+----------------+                     |
+| +Filter         | p.name = $name |              1 |                     |
+| |               +----------------+----------------+                     |
+| +AllNodesScan   | p              |             10 | Fused in Pipeline 0 |
++-----------------+----------------+----------------+---------------------+
+
+Total database accesses: ?
+"""
+----
+
+If you instead prefix a query with the keyword `PROFILE`, the server will return the execution plan it has used to run the query, together with profiler statistics.
+This includes the list of operators that were used and additional profiling information about each intermediate step.
+The plan is available under the property `ResultSummary.profile`.
+You may use this information to locate potential bottlenecks or room for performance improvements.
+Notice that the query is also _run_, so the result object also contains any result records.
+
+[source, python, role=nocollapse]
+----
+records, summary, _ = driver.execute_query("PROFILE MATCH (p {name: $name}) RETURN p", name="Alice")
 print(summary.profile['args']['string-representation'])
 
 """
@@ -118,7 +149,8 @@ records, summary, keys = driver.execute_query("""
 print(summary.summary_notifications)
 """
 [SummaryNotification(
-    title='The provided pattern is unbounded, consider adding an upper limit to the number of node hops.', code='Neo.ClientNotification.Statement.UnboundedVariableLengthPattern',
+    title='The provided pattern is unbounded, consider adding an upper limit to the number of node hops.',
+    code='Neo.ClientNotification.Statement.UnboundedVariableLengthPattern',
     description='Using shortest path with an unbounded pattern will likely result in long execution times. It is recommended to use an upper limit to the number of node hops in your pattern.',
     severity_level=<NotificationSeverity.INFORMATION: 'INFORMATION'>,
     category=<NotificationCategory.PERFORMANCE: 'PERFORMANCE'>,
