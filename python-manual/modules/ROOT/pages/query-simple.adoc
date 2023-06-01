@@ -56,7 +56,7 @@ for record in records:
     print(record.data())  # obtain record as dict
 ----
 
-where `records` contains the actual result as a list, `keys` contains the column names of the returned records (such as `name`), and `summary` is a link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#resultsummary[`ResultSummary`] object, containing a summary of execution from the server.
+where `records` contains the actual result as a list, `keys` contains the column names of the returned records (such as `name`), and `summary` contains the xref:result-summary.adoc[summary of execution] returned by the server.
 
 
 == Update the database

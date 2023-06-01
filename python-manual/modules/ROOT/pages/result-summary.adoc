@@ -1,0 +1,188 @@
+# Explore the query execution summary
+
+After all results coming from a query have been processed, the server ends the transaction by returning a summary of execution.
+It comes as a link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#resultsummary[`ResultSummary`] object, and it contains information among which:
+
+- xref:_query_counters[**Query counters**] -- What changes the query triggered on the server
+- xref:_query_execution_plan[**Query execution plan**] -- How the database would execute (or executed) the query
+- xref:_notifications[**Notifications**] -- Extra information raised by the server while running the query
+- Timing information and query request summary
+
+
+## Retrieve the execution summary
+
+When running queries with xref:query-simple.adoc[`Driver.execute_query()`], the execution summary is part of the default return object, under the `summary` key.
+
+[source, python]
+----
+records, result_summary, keys = driver.execute_query("""
+    UNWIND ["Alice", "Bob"] AS name
+    MERGE (p:Person {name: name})
+    """, database_="neo4j",
+)
+# or result_summary = driver.execute_query('<QUERY>').summary
+----
+
+If you are using xref:transactions.adoc[transaction functions], or a xref:transformers.adoc#_custom_transformers[custom transformer] with `Driver.execute_query()`, you can retrieve the query execution summary with the method `Result.consume()`.
+**Notice that once you ask for the execution summary, the result stream is exhausted**.
+This means that any record which has not yet been processed is not available any longer.
+
+[source, python]
+----
+def create_people(tx):
+    result = tx.run("""
+        UNWIND ["Alice", "Bob"] AS name
+        MERGE (p:Person {name: name})
+    """)
+    return result.consume()
+
+with driver.session(database="neo4j") as session:
+    result_summary = session.execute_write(create_people)
+----
+
+
+## Query counters
+
+The property `ResultSummary.counters` contains counters for the operations that a query triggered (as a link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#summarycounters[`SummaryCounters`] object).
+
+.Insert some data and display the query counters
+[source, python]
+----
+summary = driver.execute_query("""
+    MERGE (p:Person {name: $name})
+    MERGE (p)-[:KNOWS]->(:Person {name: $friend})
+    """, name="Mark", friend="Bob",
+    database_="neo4j",
+).summary
+print(summary.counters)
+"""
+{'_contains_updates': True, 'labels_added': 2, 'relationships_created': 1,
+ 'nodes_created': 2, 'properties_set': 2}
+"""
+----
+
+There are two additional boolean properties which act as meta-counters:
+
+- `contains_updates` -- whether the query triggered any write operation on the database on which it ran
+- `contains_system_updates` -- whether the query updated the `system` database
+
+
+## Query execution plan
+
+If you prefix a query with `EXPLAIN`, the server will return the plan it _would_ use to run the query, but will not actually run it.
+The plan is then available under the property `ResultSummary.plan`, and contains the list of link:{neo4j-docs-base-uri}/cypher-manual/current/execution-plans/operators/[Cypher operators] that would be used to retrieve the result set.
+You may use this information to locate potential bottlenecks or room for performance improvements (for example through the creation of indexes).
+
+[source, python, role=nocollapse]
+----
+_, summary, _ = driver.execute_query("EXPLAIN MATCH (p {name: $name}) RETURN p", name="Alice")
+print(summary.plan['args']['string-representation'])
+
+"""
+Planner COST
+Runtime PIPELINED
+Runtime version 5.0
+Batch size 128
+
++-----------------+----------------+----------------+---------------------+
+| Operator        | Details        | Estimated Rows | Pipeline            |
++-----------------+----------------+----------------+---------------------+
+| +ProduceResults | p              |              1 |                     |
+| |               +----------------+----------------+                     |
+| +Filter         | p.name = $name |              1 |                     |
+| |               +----------------+----------------+                     |
+| +AllNodesScan   | p              |             10 | Fused in Pipeline 0 |
++-----------------+----------------+----------------+---------------------+
+
+Total database accesses: ?
+"""
+----
+
+If you instead prefix a query with the keyword `PROFILE`, the server will return the execution plan it has used to run the query, together with profiler statistics.
+This includes the list of operators that were used and additional profiling information about each intermediate step.
+The plan is available under the property `ResultSummary.profile`.
+You may use this information to locate potential bottlenecks or room for performance improvements.
+Notice that the query is also _run_, so the result object also contains any result records.
+
+[source, python, role=nocollapse]
+----
+records, summary, _ = driver.execute_query("PROFILE MATCH (p {name: $name}) RETURN p", name="Alice")
+print(summary.profile['args']['string-representation'])
+
+"""
+Planner COST
+Runtime PIPELINED
+Runtime version 5.0
+Batch size 128
+
++-----------------+----------------+----------------+------+---------+----------------+------------------------+-----------+---------------------+
+| Operator        | Details        | Estimated Rows | Rows | DB Hits | Memory (Bytes) | Page Cache Hits/Misses | Time (ms) | Pipeline            |
++-----------------+----------------+----------------+------+---------+----------------+------------------------+-----------+---------------------+
+| +ProduceResults | p              |              1 |    1 |       3 |                |                        |           |                     |
+| |               +----------------+----------------+------+---------+----------------+                        |           |                     |
+| +Filter         | p.name = $name |              1 |    1 |       4 |                |                        |           |                     |
+| |               +----------------+----------------+------+---------+----------------+                        |           |                     |
+| +AllNodesScan   | p              |             10 |    4 |       5 |            120 |                 9160/0 |   108.923 | Fused in Pipeline 0 |
++-----------------+----------------+----------------+------+---------+----------------+------------------------+-----------+---------------------+
+
+Total database accesses: 12, total allocated memory: 184
+"""
+----
+
+For more information and examples, see link:{neo4j-docs-base-uri}/cypher-manual/current/query-tuning/basic-example/#_profile_query[Basic query tuning].
+
+
+## Notifications
+
+The property `ResultSummary.summary_notifications` contains a list of link:{neo4j-docs-base-uri}/status-codes/current/notifications[notifications coming from the server], if any were raised by the execution of the query.
+These include recommendations for performance improvements, warnings about the usage of deprecated features, and other hints about sub-optimal usage of Neo4j.
+Each notification comes as a link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.SummaryNotification[`SummaryNotification`] object.
+
+.An unbounded shortest path raises a performance notification
+[source, python, role=nocollapse]
+----
+records, summary, keys = driver.execute_query("""
+    MATCH p=shortestPath((:Person {name: 'Alice'})-[*]->(:Person {name: 'Bob'}))
+    RETURN p
+    """, database_="neo4j"
+)
+print(summary.summary_notifications)
+"""
+[SummaryNotification(
+    title='The provided pattern is unbounded, consider adding an upper limit to the number of node hops.',
+    code='Neo.ClientNotification.Statement.UnboundedVariableLengthPattern',
+    description='Using shortest path with an unbounded pattern will likely result in long execution times. It is recommended to use an upper limit to the number of node hops in your pattern.',
+    severity_level=<NotificationSeverity.INFORMATION: 'INFORMATION'>,
+    category=<NotificationCategory.PERFORMANCE: 'PERFORMANCE'>,
+    raw_severity_level='INFORMATION',
+    raw_category='PERFORMANCE',
+    position=SummaryNotificationPosition(line=1, column=22, offset=21)
+)]
+"""
+----
+
+
+### Filtering notifications
+
+By default, the server analyses each query for all categories and severity of notifications.
+Starting from version 5.7, you can use the parameters `notifications_min_severity` and/or `notifications_disabled_categories` to restrict the severity or category of notifications that you are interested into.
+You can use those parameters either when creating a `Driver` instance, or when creating a session.
+
+Restricting the amount of notifications the server is allowed to raise can improve performance.
+
+.Allow only `WARNING` notifications, but not of `HINT` or `GENERIC` category
+[source, python]
+----
+driver = neo4j.GraphDatabase.driver(
+    url, auth=auth,
+    notifications_min_severity='WARNING',
+    notifications_disabled_categories=['HINT', 'GENERIC']
+)
+
+# at session level
+session = driver.session(
+    database="neo4j",
+    notifications_min_severity='INFORMATION',
+    notifications_disabled_categories=['HINT']
+)
+----
