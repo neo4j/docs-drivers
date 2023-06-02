@@ -11,7 +11,7 @@ It comes as a link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib
 
 ## Retrieve the execution summary
 
-When running queries with xref:query-simple.adoc[`Driver.executeQuery()`], the execution summary is part of the default return object, under the `summary` key.
+When running queries with xref:query-simple.adoc[`Driver.executeQuery()`], the execution summary is part of the default return object, under the `summary` attribute.
 
 [source, javascript]
 ----
