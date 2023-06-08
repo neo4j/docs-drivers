@@ -1,3 +1,6 @@
+The Neo4j JavaScript driver is the official library to interact with a Neo4j instance through a JavaScript application.
+
+
 == Installation
 
 Install the Neo4j Javascript driver with `npm`:
@@ -42,7 +45,7 @@ xref:connect.adoc[More info on connecting to a database ->]
 == Query the database
 
 Execute a <<Cypher>> statement with the method `Driver.executeQuery()`.
-Do not hardcode or concatenate parameters: use placeholders and specify the parameters as keyword arguments.
+Do not hardcode or concatenate parameters: use placeholders and specify the parameters as key-value pairs.
 
 [source, javascript, role=nocollapse]
 ----
@@ -72,7 +75,9 @@ xref:query-simple.adoc[More info on querying the database ->]
 
 == Run your own transactions
 
-For more advanced use-cases, you can take full control over the transaction lifecycle. A transaction is a unit of work that is either committed in its entirety or rolled back on failure. Use the methods `Session.executeRead()` and `Session.executeWrite()` to run managed transactions.
+For more advanced use-cases, you can take control of the transaction lifecycle.
+A transaction is a unit of work that is either committed in its entirety or rolled back on failure.
+Use the methods `Session.executeRead()` and `Session.executeWrite()` to run managed transactions.
 
 [source, javascript, role=nocollapse]
 ----

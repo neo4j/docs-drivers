@@ -1,8 +1,11 @@
+The Neo4j Python driver is the official library to interact with a Neo4j instance through a Python application.
+
+
 == Installation
 
 Install the Neo4j Python driver with `pip`:
 
-[source,bash]
+[source, bash]
 ----
 pip install neo4j
 ----
@@ -60,7 +63,9 @@ xref:query-simple.adoc[More info on querying the database ->]
 
 == Run your own transactions
 
-For more advanced use-cases, you can take full control over the transaction lifecycle. A transaction is a unit of work that is either committed in its entirety or rolled back on failure. Use the methods `Session.execute_read()` and `Session.execute_write()` to run managed transactions.
+For more advanced use-cases, you can take control of the transaction lifecycle.
+A transaction is a unit of work that is either committed in its entirety or rolled back on failure.
+Use the methods `Session.execute_read()` and `Session.execute_write()` to run managed transactions.
 
 [source, python]
 ----
