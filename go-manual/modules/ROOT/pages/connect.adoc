@@ -1,0 +1,65 @@
+= Connection
+
+Once you have xref:install.adoc#install-driver[installed the driver] and have xref:install.adoc#get-an-instance[a running Neo4j instance], you are ready to connect your application to the database.
+
+== Connect to the database
+
+You connect to a database by creating a <<Driver>> object and providing a URL and an authentication token.
+
+[source, go]
+----
+package main
+
+import (
+    "context"
+    "fmt"
+    "github.com/neo4j/neo4j-go-driver/v5/neo4j"
+)
+
+func main() {
+    // URI examples: "neo4j://localhost", "neo4j+s://xxx.databases.neo4j.io"
+    dbUri := "<URI to Neo4j database>"
+    dbUser := "<Username>"
+    dbPassword := "<Password>"
+    driver, err := neo4j.NewDriverWithContext(dbUri, neo4j.BasicAuth(dbUser, dbPassword, ""))
+    if err != nil {
+        panic(err)
+    }
+    // Starting with 5.0, you can control the execution of most driver APIs
+    // To keep things simple, we create here a never-cancelling context
+    // Read https://pkg.go.dev/context to learn more about contexts
+    ctx := context.Background()
+
+    defer driver.Close(ctx)
+}
+----
+
+Creating a `Driver` instance *(1)* only provides information on _how_ to access the database, but does not actually _establish_ a connection.
+Connection is instead deferred to when the first query is executed.
+To verify immediately that the driver can connect to the database (valid credentials, compatible versions, etc), use the `.verify_connectivity()` method *(2)* after initializing the driver.
+
+Both the creation of a `Driver` object and the connection verification can raise a number of different link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#errors[exceptions].
+Since error handling can get quite verbose, and a connection error is a blocker for any subsequent task, the most common choice is to let the program crash should an exception occur during connection.
+
+`Driver` objects are _immutable_, _thread-safe_, and fairly _expensive to create_.
+Share them across threads (but not across processes) and use xref:transactions#impersonation[impersonation] to query the database with a different user.
+If you want to alter a `Driver` configuration, you will need to create a new object.
+
+
+== Close connections
+
+Always close `Driver` objects to free up all allocated resources, even upon unsuccessful connection or runtime errors.
+Either instantiate the `Driver` object using the `with` statement, or call the `Driver.close()` method explicitly.
+
+
+== Further connection parameters
+
+For more `Driver` configuration parameters and further connection settings, see xref:connect-advanced.adoc[Advanced connection information].
+
+ifndef::backend-pdf[]
+[discrete.glossary]
+== Glossary
+
+include::{common-partial}/glossary.adoc[]
+include::../partials/glossary.adoc[]
+endif::[]

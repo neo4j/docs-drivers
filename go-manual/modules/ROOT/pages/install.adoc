@@ -1,0 +1,44 @@
+= Installation
+
+To start creating a Neo4j Go application, you first need to install the Go Driver and get a Neo4j database instance to connect to.
+
+[#install-driver]
+== Install the driver
+
+If you are starting from scratch, the first step is to initialize a Go module.
+You can do so by creating a directory, entering it, and using `go mod init`:
+
+[source, bash]
+----
+mkdir neo4j-app
+cd neo4j-app
+go mod init neo4j-app
+----
+
+From within a module, use `go get` to install the link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/[Neo4j Go Driver]:
+
+[source, bash]
+----
+go get github.com/neo4j/neo4j-go-driver/v5
+----
+
+Always use the latest version of the driver, as it will always work both with the previous Neo4j <<LTS>> release and with the current and next major releases.
+The latest `5.x` driver supports connection to any Neo4j 5 and 4.4 instance, and will also be compatible with Neo4j 6.
+For a detailed list of changes across versions, see the link:https://github.com/neo4j/neo4j-go-driver/wiki/5.x-changelog[driver's changelog].
+
+[NOTE]
+To get the driver on an air-gapped machine, link:https://pypi.org/project/neo4j/#files[download the latest driver] tarball and install it with `pip install neo4j-<version>.tar.gz`.
+
+[NOTE]
+The Neo4j Go Driver is compatible (and requires) any link:https://go.dev/doc/devel/release#policy[officially maintained Go version].
+
+include::{common-partial}/install.adoc[tag=get-an-instance]
+
+
+ifndef::backend-pdf[]
+[discrete.glossary]
+== Glossary
+
+include::{common-partial}/glossary.adoc[]
+include::../partials/glossary.adoc[]
+endif::[]

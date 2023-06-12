@@ -1,0 +1,177 @@
+= Performance recommendations
+
+- *Specify the target database on all queries*, either with the `database_` parameter in xref:query-simple.adoc[`Driver.execute_query()`] or with the `database` parameter when creating new xref:transactions.adoc[sessions].
+If no database is provided, the driver has to send an extra request to the server to figure out what the default database is.
+The overhead is minimal for a single query, but becomes significant over hundreds of queries.
++
+[source, python]
+----
+# Good practice
+driver.execute_query("<QUERY>", database_="<DB NAME>")
+driver.session(database="<DB NAME>")
+----
++
+[source, python]
+----
+# Bad practice
+driver.execute_query("<QUERY>")
+driver.session()
+----
+
+- *Use xref:query-simple#query-parameters[query parameters]* instead of hardcoding or concatenating values into queries.
+This allows to leverage the database's query cache.
++
+[source, python]
+----
+# Good practice
+driver.execute_query("MATCH (p:Person {name: $name}) RETURN p", name="Alice")
+----
++
+[source, python]
+----
+# Bad practice
+driver.execute_query("MATCH (p:Person {name: 'Alice'}) RETURN p")
+driver.execute_query("MATCH (p:Person {name: '" + name + "'}) RETURN p")
+----
+
+- *Specify node labels* in all queries.
+To learn how to combine labels, see link:{neo4j-docs-base-uri}/cypher-manual/current/syntax/expressions/#query-syntax-label[Cypher -- Label expressions].
++
+[source, python]
+----
+# Good practice
+driver.execute_query("MATCH (p:Person|Animal {name: $name}) RETURN p", name="Alice")
+----
++
+[source, python]
+----
+# Bad practice
+driver.execute_query("MATCH (p {name: $name}) RETURN p", name="Alice")
+----
+
+- *Batch queries when creating a lot of records* using the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/with/[`WITH`] and link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/unwind/[`UNWIND`] Cypher clauses.
++
+[source, python]
+----
+# Good practice
+numbers = [{"value": random()} for _ in range(10000)]
+driver.execute_query("""
+    WITH $numbers AS batch
+    UNWIND batch AS node
+    MERGE (n:Number)
+    SET n.value = node.value
+    """, numbers=numbers,
+)
+----
++
+[source, python]
+----
+# Bad practice
+for _ in range(10000):
+    driver.execute_query("MERGE (:Number {value: $value})", value=random())
+----
++
+[TIP]
+The most efficient way of performing a _first import_ of large amounts of data into a new database is the link:{neo4j-docs-base-uri}/operations-manual/current/tutorial/neo4j-admin-import/[`neo4j-admin database import`] command.
+// source:  https://community.neo4j.com/t5/neo4j-graph-platform/improving-data-writing-efficiency-in-python/td-p/39520
+
+- In a cluster, *route read queries to link:{neo4j-docs-base-uri}/operations-manual/current/clustering/introduction/#clustering-secondary-mode[secondary nodes]*. You do this by specifying `routing_="r"` in a xref:query-simple.adoc[`Driver.execute_query()`] call, by using `Session.execute_read()` instead of `Session.execute_write()`, and by setting `default_access_mode=neo4j.READ_ACCESS` when creating a new xref:transactions.adoc[session].
++
+[source, python]
+----
+# Good practice
+driver.execute_query("MATCH (p:Person) RETURN p", routing_="r")
+session.execute_read(read_transaction_func)
+----
++
+[source, python]
+----
+# Bad practice
+driver.execute_query("MATCH (p:Person) RETURN p")  # defaults to routing_="w"
+session.execute_write(read_transaction_func)
+----
+
+- *Create indexes for properties that you often filter against*.
+For example, if you often look up `Person` nodes by the `name` property, it is beneficial to create an index on `Person.name`.
+You can create indexes with the `CREATE INDEX` Cypher function, for both nodes and relationships.
+For more information, see link:{neo4j-docs-base-uri}/cypher-manual/current/indexes-for-search-performance/[Indexes for search performance].
++
+[source, python]
+----
+# Create an index on Person.name
+session.run("CREATE INDEX person_name FOR (n:Person) ON (n.name)")
+----
+
+- link:{neo4j-docs-base-uri}/cypher-manual/current/query-tuning/basic-example/#_profile_query[*Profile your queries*] to locate queries whose performance can be improved.
+You can profile queries by prepending them with `PROFILE`.
+The server output is available in the `profile` property of the link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#resultsummary[`ResultSummary`] object.
++
+[source, python, role=nocollapse]
+----
+_, summary, _ = driver.execute_query("PROFILE MATCH (p {name: $name}) RETURN p", name="Alice")
+print(summary.profile['args']['string-representation'])
+
+"""
+Planner COST
+Runtime PIPELINED
+Runtime version 5.0
+Batch size 128
+
++-----------------+----------------+----------------+------+---------+----------------+------------------------+-----------+---------------------+
+| Operator        | Details        | Estimated Rows | Rows | DB Hits | Memory (Bytes) | Page Cache Hits/Misses | Time (ms) | Pipeline            |
++-----------------+----------------+----------------+------+---------+----------------+------------------------+-----------+---------------------+
+| +ProduceResults | p              |              1 |    1 |       3 |                |                        |           |                     |
+| |               +----------------+----------------+------+---------+----------------+                        |           |                     |
+| +Filter         | p.name = $name |              1 |    1 |       4 |                |                        |           |                     |
+| |               +----------------+----------------+------+---------+----------------+                        |           |                     |
+| +AllNodesScan   | p              |             10 |    4 |       5 |            120 |                 9160/0 |   108.923 | Fused in Pipeline 0 |
++-----------------+----------------+----------------+------+---------+----------------+------------------------+-----------+---------------------+
+
+Total database accesses: 12, total allocated memory: 184
+"""
+----
++
+In case some queries are so slow that you are unable to even run them in reasonable times, you can prepend them with `EXPLAIN` instead of `PROFILE`.
+This will return the _plan_ that the server would use to run the query, but without executing it.
+The server output is available in the `plan` property of the link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#resultsummary[`ResultSummary`] object.
++
+[source, python, role=nocollapse]
+----
+_, summary, _ = driver.execute_query("EXPLAIN MATCH (p {name: $name}) RETURN p", name="Alice")
+print(summary.plan['args']['string-representation'])
+
+"""
+Planner COST
+Runtime PIPELINED
+Runtime version 5.0
+Batch size 128
+
++-----------------+----------------+----------------+---------------------+
+| Operator        | Details        | Estimated Rows | Pipeline            |
++-----------------+----------------+----------------+---------------------+
+| +ProduceResults | p              |              1 |                     |
+| |               +----------------+----------------+                     |
+| +Filter         | p.name = $name |              1 |                     |
+| |               +----------------+----------------+                     |
+| +AllNodesScan   | p              |             10 | Fused in Pipeline 0 |
++-----------------+----------------+----------------+---------------------+
+
+Total database accesses: ?
+"""
+----
+
+- *Use xref:concurrency.adoc[concurrency]*, either in the form of multithreading or with the async version of the driver.
+This is likely to be more impactful on performance if you parallelize complex and time-consuming queries in your application, but not so much if you run many simple ones.
+
+- xref:result-summary.adoc#_filter_notifications[Filter the category and/or severity of notifications] the server should raise.
+
+// - with SET, specify individual properties one by one instead of using += (too low impact)
+
+
+ifndef::backend-pdf[]
+[discrete.glossary]
+== Glossary
+
+include::{common-partial}/glossary.adoc[]
+include::../partials/glossary.adoc[]
+endif::[]
