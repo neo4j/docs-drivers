@@ -1,9 +1,9 @@
 = Query the database
 
-You can run a query against the database using <<Cypher>> and the method `Driver.execute_query()`.
+Once you have xref:connect.adoc[connected to the database], you can run a query against the database using <<Cypher>> and the function link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#ExecuteQuery[`ExecuteQuery()`].
 
 [TIP]
-`Driver.execute_query()` was introduced with the version 5.8 of the driver. +
+`ExecuteQuery()` was introduced with the version 5.8 of the driver. +
 For queries with earlier versions, see xref:transactions.adoc[Run your own transactions].
 
 

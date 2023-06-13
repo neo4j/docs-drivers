@@ -27,9 +27,6 @@ The latest `5.x` driver supports connection to any Neo4j 5 and 4.4 instance, and
 For a detailed list of changes across versions, see the link:https://github.com/neo4j/neo4j-go-driver/wiki/5.x-changelog[driver's changelog].
 
 [NOTE]
-To get the driver on an air-gapped machine, link:https://pypi.org/project/neo4j/#files[download the latest driver] tarball and install it with `pip install neo4j-<version>.tar.gz`.
-
-[NOTE]
 The Neo4j Go Driver is compatible (and requires) any link:https://go.dev/doc/devel/release#policy[officially maintained Go version].
 
 include::{common-partial}/install.adoc[tag=get-an-instance]
