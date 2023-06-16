@@ -1,6 +1,6 @@
 = Query the database
 
-Once you have xref:connect.adoc[connected to the database], you can run a query against the database using <<Cypher>> and the function link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#ExecuteQuery[`ExecuteQuery()`].
+Once you have xref:connect.adoc[connected to the database], you can run queries using <<Cypher>> and the function link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#ExecuteQuery[`ExecuteQuery()`].
 
 [TIP]
 `ExecuteQuery()` was introduced with the version 5.8 of the driver. +
@@ -14,19 +14,24 @@ To create a node representing a person named `Alice`, use the Cypher clause link
 .Create a node representing a person named `Alice`
 [source, python]
 ----
-summary = driver.execute_query(
-    "MERGE (:Person {name: $name})",  # <1>
-    name="Alice",  # <2>
-    database_="neo4j",  # <3>
-).summary
-print("Created {nodes_created} nodes in {time} ms.".format(
-    nodes_created=summary.counters.nodes_created,
-    time=summary.result_available_after
-))
+result, err := neo4j.ExecuteQuery(ctx, driver,
+    "CREATE (p:Person {name: $name}) RETURN p",  // <1>
+    map[string]any{  // <2>
+        "name": "Alice",
+    }, neo4j.EagerResultTransformer,
+    neo4j.ExecuteQueryWithDatabase("neo4j"))  // <3>
+if err != nil {
+    panic(err)
+}
 
+fmt.Printf("Created %+v nodes in %v.\n",
+    result.Summary.Counters().NodesCreated(),
+    result.Summary.ResultAvailableAfter())
 ----
 
-where *(1)* specifies the Cypher query, *(2)* is a _query parameter_, and *(3)* specifies which database the query should be run against.
+<1> specifies the Cypher query
+<2> is a map of _query parameters_
+<3> specifies which database the query should be run against.
 
 [NOTE]
 `MERGE` creates a new node matching the requirements unless one already exists, in which case nothing is done.
