@@ -30,7 +30,7 @@ var neo4j = require('neo4j-driver');
 
   try {
     driver = neo4j.driver(URI,  neo4j.auth.basic(USER, PASSWORD))
-    await driver.verifyConnectivity()
+    const serverInfo = await driver.getServerInfo()
     console.log('Connection estabilished')
     console.log(serverInfo)
   } catch(err) {
