@@ -34,7 +34,7 @@ func main() {
     }
 }
 
-func closeDriver(context.Context ctx, neo4j.DriverWithContext driver) {
+func closeDriver(ctx context.Context, driver neo4j.DriverWithContext) {
     err := driver.Close(ctx)
     if err != nil {
         panic(err)
@@ -50,7 +50,7 @@ Connection is instead deferred to when the first query is executed.
 The safest practice is to `defer` the call to `DriverWithContext.Close(ctx)` after the object is successfully created.
 
 `DriverWithContext` objects are _immutable_, _thread-safe_, and fairly _expensive to create_, so your application should only create one instance.
-If you need to query the database with a different user than the one you created the object with, use xref:transactions#impersonation[impersonation].
+If you need to query the database with a different user than the one you created the object with, use xref:query-simple#impersonation[impersonation].
 If you want to alter a `DriverWithContext` configuration, you will need to create a new object.
 
 
