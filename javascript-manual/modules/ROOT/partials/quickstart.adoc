@@ -16,7 +16,8 @@ xref:install#install-driver[More info on installing the driver ->]
 == Connect to the database
 
 Connect to a database by creating a <<Driver>> object and providing a URL and an authentication token.
-Once you have a `Driver` instance, use the `.verifyConnectivity()` method to ensure that a working connection can be established.
+Once you have a `Driver` instance, use the `.getServerInfo()` method to ensure that a working connection can be established
+by retrieving the server information.
 
 [source, javascript]
 ----
