@@ -465,12 +465,12 @@ All types can be potentially found in the result, although not all types can be 
 | `Float` | {check-mark} | {check-mark}
 | `String` | {check-mark} | {check-mark}
 | `ByteArray` | {check-mark} | {check-mark}
-| `Date` | {check-mark} | {check-mark}
-| `Time` | {check-mark} | {check-mark}
-| `LocalTime` | {check-mark} | {check-mark}
-| `DateTime` | {check-mark} | {check-mark}
-| `LocalDateTime` | {check-mark} | {check-mark}
-| `Duration` | {check-mark} | {check-mark}
+| `DATE` | {check-mark} | {check-mark}
+| `ZONED TIME` | {check-mark} | {check-mark}
+| `LOCAL TIME` | {check-mark} | {check-mark}
+| `ZONED DATETIME` | {check-mark} | {check-mark}
+| `LOCAL DATETIME` | {check-mark} | {check-mark}
+| `DURATION` | {check-mark} | {check-mark}
 | `Point` | {check-mark} | {check-mark}
 | `Node`** | | {check-mark}
 | `Relationship`** | | {check-mark}
@@ -507,12 +507,12 @@ Custom types (those not available in the language or standard library) are highl
 | `Float` | `double`
 | `String` | `string`
 | `ByteArray` | `byte[]`
-| `Date` | *`LocalDate`*
-| `Time` | *`OffsetTime`*
-| `LocalTime` | *`LocalTime`*
-| `DateTime`* | *`ZonedDateTime`*
-| `LocalDateTime` | *`LocalDateTime`*
-| `Duration` | *`Duration`*
+| `DATE` | *`LocalDate`*
+| `ZONED TIME` | *`OffsetTime`*
+| `LOCAL TIME` | *`LocalTime`*
+| `ZONED DATETIME`* | *`ZonedDateTime`*
+| `LOCAL DATETIME` | *`LocalDateTime`*
+| `DURATION` | *`Duration`*
 | `Point` | *`Point`*
 | `Node` | *`INode`*
 | `Relationship` | *`IRelationship`*
@@ -536,12 +536,12 @@ Inbound conversion is carried out using http://cldr.unicode.org/development/deve
 // | Float | `float64`
 // | String | `string`
 // | ByteArray | `[]byte`
-// | Date | *`neo4j.Date`*
-// | Time | *`neo4j.OffsetTime`*
-// | LocalTime | *`neo4j.LocalTime`*
-// | DateTime | *`time.Time`**
-// | LocalDateTime | *`neo4j.LocalDateTime`*
-// | Duration | *`neo4j.Duration`*
+// | DATE | *`neo4j.Date`*
+// | ZONED TIME | *`neo4j.OffsetTime`*
+// | LOCAL TIME | *`neo4j.LocalTime`*
+// | ZONED DATETIME | *`time.Time`**
+// | LOCAL DATETIME | *`neo4j.LocalDateTime`*
+// | DURATION | *`neo4j.Duration`*
 // | Point | *`neo4j.Point`*
 // | Node | *`neo4j.Node`*
 // | Relationship | *`neo4j.Relationship`*
@@ -564,12 +564,12 @@ Inbound conversion is carried out using http://cldr.unicode.org/development/deve
 | Float | `double`
 | String | `String`
 | ByteArray | `byte[]`
-| Date | `LocalDate`
-| Time | `OffsetTime`
-| LocalTime | `LocalTime`
-| DateTime | `ZonedDateTime`
-| LocalDateTime | `LocalDateTime`
-| Duration | *`IsoDuration`**
+| DATE | `LocalDate`
+| ZONED TIME | `OffsetTime`
+| LOCAL TIME | `LocalTime`
+| ZONED DATETIME | `ZonedDateTime`
+| LOCAL DATETIME | `LocalDateTime`
+| DURATION | *`IsoDuration`**
 | Point | *`Point`*
 | Node | *`Node`*
 | Relationship | *`Relationship`*
@@ -592,12 +592,12 @@ Inbound conversion is carried out using http://cldr.unicode.org/development/deve
 | Float | `Number`
 | String | `String`
 | ByteArray | `Int8Array`
-| Date | *`Date`*
-| Time | *`Time`*
-| LocalTime | *`LocalTime`*
-| DateTime | *`DateTime`*
-| LocalDateTime | *`LocalDateTime`*
-| Duration | *`Duration`*
+| DATE | *`Date`*
+| ZONED TIME | *`Time`*
+| LOCAL TIME | *`LocalTime`*
+| ZONED DATETIME | *`DateTime`*
+| LOCAL DATETIME | *`LocalDateTime`*
+| DURATION | *`Duration`*
 | Point | *`Point`*
 | Node | *`Node`*
 | Relationship | *`Relationship`*
@@ -620,12 +620,12 @@ Inbound conversion is carried out using http://cldr.unicode.org/development/deve
 | Float | `float`
 | String | `str`
 | ByteArray | `bytearray`
-| Date | *`neo4j.time.Date`*
-| Time | *`neo4j.time.Time`†*
-| LocalTime | *`neo4j.time.Time`††*
-| DateTime | *`neo4j.time.DateTime`†*
-| LocalDateTime | *`neo4j.time.DateTime`††*
-| Duration | *`neo4j.time.Duration`**
+| DATE | *`neo4j.time.Date`*
+| ZONED TIME | *`neo4j.time.Time`†*
+| LOCAL TIME | *`neo4j.time.Time`††*
+| ZONED DATETIME | *`neo4j.time.DateTime`†*
+| LOCAL DATETIME | *`neo4j.time.DateTime`††*
+| DURATION | *`neo4j.time.Duration`**
 | Point | *`neo4j.spatial.Point`*
 | Node | *`neo4j.graph.Node`*
 | Relationship | *`neo4j.graph.Relationship`*

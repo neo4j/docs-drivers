@@ -109,12 +109,12 @@ include::{common-partial}/cypher-workflow.adoc[tag=type-mapping]
 | `Float` | `double`
 | `String` | `string`
 | `ByteArray` | `byte[]`
-| `Date` | *`LocalDate`*
-| `Time` | *`OffsetTime`*
-| `LocalTime` | *`LocalTime`*
-| `DateTime`* | *`ZonedDateTime`*
-| `LocalDateTime` | *`LocalDateTime`*
-| `Duration` | *`Duration`*
+| `DATE` | *`LocalDate`*
+| `ZONED TIME` | *`OffsetTime`*
+| `LOCAL TIME` | *`LocalTime`*
+| `ZONED DATETIME`* | *`ZonedDateTime`*
+| `LOCAL DATETIME` | *`LocalDateTime`*
+| `DURATION` | *`Duration`*
 | `Point` | *`Point`*
 | `Node` | *`INode`*
 | `Relationship` | *`IRelationship`*
