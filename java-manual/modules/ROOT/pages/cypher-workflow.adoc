@@ -144,18 +144,18 @@ The `Value` interface describes methods to infer and coerce the type of values r
 The type inference methods start with `is`, followed by the name of the type.
 The type coercion methods start with `as`.
 
-The coercion methods, except `asObject()` and `asString()`, throw a `Uncoercible` exception if the value is NULL.
+The coercion methods, except `asObject()` and `asString()`, throw a `Uncoercible` exception if the value is null.
 To avoid this kind exception, the `isNull()` or `asTypeName(TypeName defaultValue)` can be used, depending on the
 need.
 
 // [source, java, indent=0]
 // ----
-// include::{java-examples}/ReadingValuesExample.java[tags=java-driver-reading-values-non-NULL]
+// include::{java-examples}/ReadingValuesExample.java[tags=java-driver-reading-values-non-null]
 // ----
 
 // [source, java, indent=0]
 // ----
-// include::{java-examples}/ReadingValuesExample.java[tags=java-driver-reading-values-NULL]
+// include::{java-examples}/ReadingValuesExample.java[tags=java-driver-reading-values-null]
 // ----
 
 For more information, see link:{neo4j-docs-base-uri}/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Value.html[Java Driver API documentation -> Interface Value].
