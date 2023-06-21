@@ -31,13 +31,13 @@ Some timezones (e.g., `pytz.utc`) work exclusively with the built-in `datetime.d
 
 [options="header"]
 |===
-| Cypher Type   | Python Type
-| Date          | `neo4j.time.Date`
-| Time          | `neo4j.time.Time`†
-| LocalTime     | `neo4j.time.Time`††
-| DateTime      | `neo4j.time.DateTime`†
-| LocalDateTime | `neo4j.time.DateTime`††
-| Duration      | `neo4j.time.Duration`
+| Cypher Type    | Python Type
+| DATE           | `neo4j.time.Date`
+| ZONED TIME     | `neo4j.time.Time`†
+| LOCAL TIME     | `neo4j.time.Time`††
+| ZONED DATETIME | `neo4j.time.DateTime`†
+| LOCAL DATETIME | `neo4j.time.DateTime`††
+| DURATION       | `neo4j.time.Duration`
 |===
 
 † Where `tzinfo` is not `None`. +

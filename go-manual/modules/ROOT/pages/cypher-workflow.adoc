@@ -96,12 +96,12 @@ include::{common-partial}/cypher-workflow.adoc[tag=type-mapping]
 | Float | `float64`
 | String | `string`
 | ByteArray | `[]byte`
-| Date | *`neo4j.Date`*
-| Time | *`neo4j.OffsetTime`*
-| LocalTime | *`neo4j.LocalTime`*
-| DateTime | *`time.Time`**
-| LocalDateTime | *`neo4j.LocalDateTime`*
-| Duration | *`neo4j.Duration`*
+| DATE | *`neo4j.Date`*
+| ZONED TIME | *`neo4j.OffsetTime`*
+| LOCAL TIME | *`neo4j.LocalTime`*
+| ZONED DATETIME | *`time.Time`**
+| LOCAL DATETIME | *`neo4j.LocalDateTime`*
+| DURATION | *`neo4j.Duration`*
 | Point | *`neo4j.Point`*
 | Node | *`neo4j.Node`*
 | Relationship | *`neo4j.Relationship`*

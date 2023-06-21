@@ -34,13 +34,13 @@ To convert between driver and native types, use the methods `.fromStandardDate()
 
 [options="header"]
 |===
-| Cypher Type   | JavaScript Type
-| Date          | xref:_date[`Date`]
-| Time          | xref:_time[`Time`]
-| LocalTime     | xref:_localtime[`LocalTime`]
-| DateTime      | xref:_datetime[`DateTime`]
-| LocalDateTime | xref:_localdatetime[`LocalDateTime`]
-| Duration      | xref:_duration[`Duration`]
+| Cypher Type    | JavaScript Type
+| DATE           | xref:_date[`Date`]
+| ZONED TIME     | xref:_time[`Time`]
+| LOCAL TIME     | xref:_localtime[`LocalTime`]
+| ZONED DATETIME | xref:_datetime[`DateTime`]
+| LOCAL DATETIME | xref:_localdatetime[`LocalDateTime`]
+| DURATION       | xref:_duration[`Duration`]
 |===
 
 .How to use temporal types in queries

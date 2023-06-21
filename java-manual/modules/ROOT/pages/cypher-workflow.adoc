@@ -121,12 +121,12 @@ include::{common-partial}/cypher-workflow.adoc[tag=type-mapping]
 | Float | `double`
 | String | `String`
 | ByteArray | `byte[]`
-| Date | `LocalDate`
-| Time | `OffsetTime`
-| LocalTime | `LocalTime`
-| DateTime | `ZonedDateTime`
-| LocalDateTime | `LocalDateTime`
-| Duration | *`IsoDuration`**
+| DATE | `LocalDate`
+| ZONED TIME | `OffsetTime`
+| LOCAL TIME | `LocalTime`
+| ZONED DATETIME | `ZonedDateTime`
+| LOCAL DATETIME | `LocalDateTime`
+| DURATION | *`IsoDuration`**
 | Point | *`Point`*
 | Node | *`Node`*
 | Relationship | *`Relationship`*
