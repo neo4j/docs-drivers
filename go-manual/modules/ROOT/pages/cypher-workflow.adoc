@@ -88,13 +88,13 @@ include::{common-partial}/cypher-workflow.adoc[tag=type-mapping]
 [options="header", cols="<40m,<60a"]
 |===
 | Neo4j type        | Go type
-| null | `nil`
-| List | `[]interface{}`
-| Map | `map[string]interface{}`
-| Boolean | `bool`
-| Integer | `int64`
-| Float | `float64`
-| String | `string`
+| NULL | `nil`
+| LIST | `[]interface{}`
+| MAP | `map[string]interface{}`
+| BOOLEAN | `bool`
+| INTEGER | `int64`
+| FLOAT | `float64`
+| STRING | `string`
 | ByteArray | `[]byte`
 | DATE | *`neo4j.Date`*
 | ZONED TIME | *`neo4j.OffsetTime`*
@@ -102,10 +102,10 @@ include::{common-partial}/cypher-workflow.adoc[tag=type-mapping]
 | ZONED DATETIME | *`time.Time`**
 | LOCAL DATETIME | *`neo4j.LocalDateTime`*
 | DURATION | *`neo4j.Duration`*
-| Point | *`neo4j.Point`*
-| Node | *`neo4j.Node`*
-| Relationship | *`neo4j.Relationship`*
-| Path | *`neo4j.Path`*
+| POINT | *`neo4j.Point`*
+| NODE | *`neo4j.Node`*
+| RELATIONSHIP | *`neo4j.Relationship`*
+| PATH | *`neo4j.Path`*
 |===
 
 +*+ When a `time.Time` value is sent/received through the driver and its `Zone()` returns a name of `Offset`, the value is stored with its offset value rather than its zone name.

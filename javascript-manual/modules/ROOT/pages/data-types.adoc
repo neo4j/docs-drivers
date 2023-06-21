@@ -7,13 +7,13 @@ The tables in this section show the mapping between Cypher data types and JavaSc
 [options="header"]
 |===
 | Cypher Type | JavaScript Type
-| <<null>>    | `null`
-| List        | `Array`
-| Map         | `Object`
-| Boolean     | `Boolean`
-| Integer     | link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/integer.js~Integer.html[`Integer`]
-| Float       | `Number`
-| String      | `String`
+| <<NULL>>    | `null`
+| LIST        | `Array`
+| MAP         | `Object`
+| BOOLEAN     | `Boolean`
+| INTEGER     | link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/integer.js~Integer.html[`Integer`]
+| FLOAT       | `Number`
+| STRING      | `String`
 | ByteArray   | `Int8Array`
 |===
 
@@ -291,9 +291,9 @@ For full documentation, see link:{neo4j-docs-base-uri}/api/javascript-driver/cur
 [options="header"]
 |===
 | Cypher Type  | JavaScript Type
-| Node         | xref:_node[`neo4j.types.Node`]
-| Relationship | xref:_relationship[`neo4j.types.Relationship`]
-| Path         | xref:_path_pathsegment[`neo4j.types.Path`]
+| NODE         | xref:_node[`neo4j.types.Node`]
+| RELATIONSHIP | xref:_relationship[`neo4j.types.Relationship`]
+| PATH         | xref:_path_pathsegment[`neo4j.types.Path`]
 |              | xref:_path_pathsegment[`neo4j.types.PathSegment`]
 |===
 
