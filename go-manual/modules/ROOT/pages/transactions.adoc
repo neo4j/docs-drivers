@@ -1,8 +1,8 @@
 = Run your own transactions
 
-When xref:query-simple.adoc[querying the database with `execute_query()`], the driver automatically creates a _transaction_. A transaction is a unit of work that is either _committed_ in its entirety or _rolled back_ on failure. You can include multiple Cypher statements in a single query, as for example when using `MATCH` and `MERGE` in sequence to xref:query-simple#_update_the_database[update the database], but you cannot have multiple queries and interleave some client-logic in between them.
+When xref:query-simple.adoc[querying the database with `ExecuteQuery()`], the driver automatically creates a _transaction_. A transaction is a unit of work that is either _committed_ in its entirety or _rolled back_ on failure. You can include multiple Cypher statements in a single query, as for example when using `MATCH` and `MERGE` in sequence to xref:query-simple#_update_the_database[update the database], but you cannot have multiple queries and interleave some client-logic in between them.
 
-For these more advanced use-cases, the driver provides functions to take full control over the transaction lifecycle. These are called _managed transactions_, and you can think of them as a way of unwrapping the flow of `execute_query()` and being able to specify its desired behavior in more places.
+For these more advanced use-cases, the driver provides functions to take full control over the transaction lifecycle. These are called _managed transactions_, and you can think of them as a way of unwrapping the flow of `ExecuteQuery()` and being able to specify its desired behavior in more places.
 
 
 == Obtain a session
@@ -11,19 +11,20 @@ Before running a transaction, you need to obtain a _session_.
 Sessions act as concrete query channels between the driver and the server.
 In particular, sessions borrow connections from the _connection pool_ as needed, and ensure <<causal consistency>> is enforced.
 
-Sessions are created with the method link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#session[`Driver.session()`], with the keyword argument `database` allowing to specify the xref:_database_selection[target database].
-For further parameters, see xref:_session_configuration[Session configuration].
+Sessions are created with the method `DriverWithContext.NewSession()`.
+Use the second argument to specify the xref:_database_selection[target database].
+For further configuration parameters, see xref:_session_configuration[Session configuration].
 
-[source, python]
+[source, go]
 ----
-with driver.session(database="neo4j") as session:
-    ...
+session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+defer session.Close(ctx)
 ----
 
 Session creation is a lightweight operation, so sessions can be created and destroyed without significant cost.
 Always xref:_close_sessions[close sessions] when you are done with them.
 
-*Sessions are _not_ thread safe*: share the main `Driver` object across threads, but make sure each thread creates its own sessions.
+*Sessions are _not_ thread safe*: share the main `DriverWithContext` object across threads, but make sure each routine creates its own sessions.
 
 
 [#managed-transactions]
@@ -33,106 +34,187 @@ A transaction can contain any number of queries.
 As Neo4j is <<ACID>> compliant, *queries within a transaction will either be executed as a whole or not at all*: you cannot get a part of the transaction succeeding and another failing.
 Use transactions to group together related queries which work together to achieve a single _logical_ database operation.
 
-A managed transaction is created with the methods link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Session.execute_read[`Session.execute_read()`] and link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Session.execute_write[`Session.execute_write()`], depending on whether you want to retrieve data from the database or alter it.
-Both methods take a _transaction function_ callback *(1)* and an arbitrary number of positional and keyword arguments *(2)* which are handed down to the transaction function.
-The transaction function *(3)* is responsible for actually carrying out the queries and processing the result.
-Queries are specified with the link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Transaction.run[`Transaction.run()`] method *(4)*, which returns a link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Result[`Result`] object.
-You can then xref:process-result[process the result] *(5)* using any of the `Result` methods.
+A managed transaction is created with the methods link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#SessionWithContext[`SessionWithContext.ExecuteRead()`] and link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#SessionWithContext[`SessionWithContext.ExecuteWrite()`], depending on whether you want to retrieve data from the database or alter it.
+Both methods take a _transaction function_ callback, which is responsible for actually carrying out the queries and processing the result.
 
-.Retrieve people whose name starts with `Al`.
-[source, python]
+.Retrieve people whose name starts with `Al`
+[source, go, role=nocollapse]
 ----
-def match_person_nodes(tx, name_filter): # <3>
-    result = tx.run(""" # <4>
-        MATCH (p:Person) WHERE p.name STARTS WITH $filter
-        RETURN p.name as name ORDER BY name
-        """, filter=name_filter)
-    return list(result)  # return a list of Record objects # <5>
+session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})  // <1>
+defer session.Close(ctx)
+people, err := session.ExecuteRead(ctx,  // <2>
+    func(tx neo4j.ManagedTransaction) (any, error) {  // <3>
+        result, err := tx.Run(ctx, `  // <4>
+            MATCH (p:Person) WHERE p.name STARTS WITH $filter
+            RETURN p.name as name ORDER BY name
+            `, map[string]any{
+                "filter": "Al",
+            })
+        if err != nil {
+            return nil, err
+        }
+        records, err := result.Collect(ctx)  // <5>
+        if err != nil {
+            return nil, err
+        }
+        return records, nil
+    })
+for _, person := range people.([]*neo4j.Record) {
+    fmt.Println(person.AsMap())
+}
+----
 
-with driver.session(database="neo4j") as session:
-    people = session.execute_read(
-        match_person_nodes, # <1>
-        "Al", # <2>
-    )
-    for person in people:
-        print(person.data())  # obtain dict representation
-----
+<1> Create a session. A single session can be the container for multiple queries. Remember to close it when done.
+<2> The `.ExecuteRead()` (or `.ExecuteWrite()`) method is the entry point into a transaction.
+<3> The transaction function callback is responsible of running queries.
+<4> Use the method link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#ManagedTransaction[`ManagedTransaction.Run()`] to run queries. Each query run returns a link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#ResultWithContext[`ResultWithContext`] object.
+<5> xref:process-result[Process the result] using any of the methods on `ResultWithContext`. The method `.Collect()` retrieves all records into a list.
 
 *Do not hardcode or concatenate parameters directly into the query*.
 Use xref:query-simple#query-parameters[query parameters] instead, both for performance and security reasons.
 
-*Transaction functions should never return the `Result` object directly*.
-Instead, always xref:process-result[process the result] in some way; at minimum, cast it to list.
+*Transaction functions should never return the result object directly*.
+Instead, always xref:process-result[process the result] in some way.
 Within a transaction function, a `return` statement results in the transaction being committed, while the transaction is automatically rolled back if an exception is raised.
 
 .A transaction with multiple queries, client logic, and potential roll backs.
-[source, python]
+[source, go]
 ----
-from neo4j import GraphDatabase
+package main
 
+import (
+    "fmt"
+    "context"
+    "strconv"
+    "errors"
+    "github.com/neo4j/neo4j-go-driver/v5/neo4j"
+)
 
-URI = "neo4j://localhost"
-AUTH = ("neo4j", "secret")
-employee_threshold=10
+func main() {
+    ctx := context.Background()
+    var employeeThreshold int64 = 10  // Neo4j's integer map to Go's int64
 
+    // Connection to database
+    dbUri := "neo4j://localhost"
+    dbUser := "neo4j"
+    dbPassword := "verysecret"
+    driver, err := neo4j.NewDriverWithContext(
+        dbUri,
+        neo4j.BasicAuth(dbUser, dbPassword, ""))
+    if err != nil {
+        panic(err)
+    }
+    defer driver.Close(ctx)
+    err = driver.VerifyConnectivity(ctx)
+    if err != nil {
+        panic(err)
+    }
 
-def main():
-    with GraphDatabase.driver(URI, auth=AUTH) as driver:
-        with driver.session(database="neo4j") as session:
-            for i in range(100):
-                name = "Thor"+str(i)
-                org_id = session.execute_write(employ_person_tx, name)
-                print(f"User {name} added to organization {org_id}")
+    session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+    defer session.Close(ctx)
 
+    // Some error handling in query runs omitted for brevity
+    for i := 0; i < 100; i++ {
+        name := "Thor" + strconv.Itoa(i)
+        orgId, _ := session.ExecuteWrite(ctx,
+            func(tx neo4j.ManagedTransaction) (any, error) {
+                var orgId string
 
-def employ_person_tx(tx, name):
-    # Create new Person node with given name, if not existing already
-    result = tx.run("""
-        MERGE (p:Person {name: $name})
-        RETURN p.name AS name
-        """, name=name
-    )
+                // Create new Person node with given name, if not exists already
+                tx.Run(
+                    ctx,
+                    "MERGE (p:Person {name: $name})",
+                    map[string]any{
+                        "name": name,
+                    })
 
-    # Obtain most recent organization ID and the number of people linked to it
-    result = tx.run("""
-        MATCH (o:Organization)
-        RETURN o.id AS id, COUNT{(p:Person)-[r:WORKS_FOR]->(o)} AS employees_n
-        ORDER BY o.created_date DESC
-        LIMIT 1
-    """)
-    org = result.single()
+                // Obtain most recent organization ID and the number of people linked to it
+                result, err := tx.Run(
+                    ctx, `
+                    MATCH (o:Organization)
+                    RETURN o.id AS id, COUNT{(p:Person)-[r:WORKS_FOR]->(o)} AS employeesN
+                    ORDER BY o.createdDate DESC
+                    LIMIT 1
+                    `, nil)
+                org, err := result.Single(ctx)
 
-    if org is not None and org["employees_n"] == 0:
-        raise Exception("Most recent organization is empty.")
-        # Transaction will roll back -> not even Person is created!
+                // If no organization exists, create one and add Person to it
+                if org == nil {
+                    orgId, _ = createOrganization(ctx, tx)
+                    fmt.Println("No orgs available, created", orgId)
+                    err = addPersonToOrganization(ctx, tx, name, orgId)
+                    if err == nil {
+                        return nil, errors.New("Failed to add person to new org")
+                        // Transaction will roll back
+                        // -> not even Person and/or Organization is created!
+                    }
+                } else {
+                    orgId = org.AsMap()["id"].(string)
+                    if employeesN := org.AsMap()["employeesN"].(int64);
+                       employeesN == 0 {
+                        return nil, errors.New("Most recent organization is empty")
+                        // Transaction will roll back
+                        // -> not even Person is created!
+                    }
 
-    # If org does not have too many employees, add this Person to that
-    if org is not None and org.get("employees_n") < employee_threshold:
-        result = tx.run("""
-            MATCH (o:Organization {id: $org_id})
-            MATCH (p:Person {name: $name})
-            MERGE (p)-[r:WORKS_FOR]->(o)
-            RETURN $org_id AS id
-            """, org_id=org["id"], name=name
-        )
+                    // If org does not have too many employees, add this Person to it
+                    if employeesN := org.AsMap()["employeesN"].(int64);
+                       employeesN < employeeThreshold {
+                        err = addPersonToOrganization(ctx, tx, name, orgId)
+                        if err != nil {
+                            return nil, err
+                            // Transaction will roll back
+                            // -> not even Person is created!
+                        }
+                    // Otherwise, create a new Organization and link Person to it
+                    } else {
+                        orgId, err = createOrganization(ctx, tx)
+                        if err != nil {
+                            return nil, err
+                            // Transaction will roll back
+                            // -> not even Person is created!
+                        }
+                        fmt.Println("Latest org is full, created", orgId)
+                        err = addPersonToOrganization(ctx, tx, name, orgId)
+                        if err != nil {
+                            return nil, err
+                            // Transaction will roll back
+                            // -> not even Person and/or Organization is created!
+                        }
+                    }
+                }
+                // Return the Organization ID to which the new Person ends up in
+                return orgId, nil
+            })
+        fmt.Println("User", name, "added to organization", orgId)
+    }
+}
 
-    # Otherwise, create a new Organization and link Person to it
-    else:
-        from neo4j.time import Date
-        result = tx.run("""
-            MATCH (p:Person {name: $name})
-            CREATE (o:Organization {id: randomuuid(), created_date: datetime()})
-            MERGE (p)-[r:WORKS_FOR]->(o)
-            RETURN o.id AS id
-            """, name=name, date=Date.today()
-        )
+func createOrganization(ctx context.Context, tx neo4j.ManagedTransaction) (string, error) {
+    result, _ := tx.Run(
+        ctx, `
+        CREATE (o:Organization {id: randomuuid(), createdDate: datetime()})
+        RETURN o.id AS id
+        `, nil)
+    org, err := result.Single(ctx)
+    orgId, _ := org.AsMap()["id"]
+    return orgId.(string), err
+}
 
-    # Return the Organization ID to which the new Person ends up in
-    return result.single()["id"]
+func addPersonToOrganization(ctx context.Context, tx neo4j.ManagedTransaction, personName string, orgId string) (error) {
+    result, _ := tx.Run(
+        ctx, `
+        MATCH (o:Organization {id: $orgId})
+        MATCH (p:Person {name: $name})
+        MERGE (p)-[:WORKS_FOR]->(o)
+        `, map[string]any{
+            "orgId": orgId,
+            "name": personName,
+        })
+    _, err := result.Consume(ctx)
+    return err
+}
 
-
-if __name__ == "__main__":
-    main()
 ----
 
 Should a transaction fail for a reason that the driver deems transient, it automatically retries to run the transaction function (with an exponentially increasing delay).
@@ -144,32 +226,29 @@ A session can chain multiple transactions, but *only one single transaction can 
 To maintain multiple concurrent transactions, use multiple concurrent sessions.
 
 
-[#unit_of_work-decorator]
 === Transaction function configuration
 
-The decorator link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.unit_of_work[`unit_of_work()`] allows to exert further control on transaction functions.
-It allows to specify:
+You can exert further control on transaction functions providing configuration callbacks to `.ExecuteRead()` and `.ExecuteWrite()`.
+Use them to specify:
 
 - a transaction timeout (in seconds).
 Transactions that run longer will be terminated by the server.
 The default value is set on the server side.
-- a dictionary of metadata that gets attached to the transaction.
+- a map of metadata that gets attached to the transaction.
 These metadata get logged in the server `query.log`, and are visible in the output of the `SHOW TRANSACTIONS` Cypher command.
 Use this to tag transactions.
 
-[source, python]
+[source, go]
 ----
-from neo4j import unit_of_work
-
-@unit_of_work(timeout=5, metadata={"app_name": "people_tracker"})
-def count_people(tx):
-    result = tx.run("MATCH (a:Person) RETURN count(a) AS people")
-    record = result.single()
-    return record["people"]
-
-
-with driver.session(database="neo4j") as session:
-    people_n = session.execute_read(count_people)
+session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+defer session.Close(ctx)
+people, err := session.ExecuteRead(ctx,
+    func(tx neo4j.ManagedTransaction) (any, error) {
+        result, _ := tx.Run(ctx, "MATCH (:Person) RETURN count(*) AS n", nil)
+        return result.Collect(ctx)
+    },
+    neo4j.WithTxTimeout(5*time.Second),  // remember to import time
+    neo4j.WithTxMetadata(map[string]any{"appName": "peopleTracker"}))
 ----
 
 

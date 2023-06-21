@@ -215,7 +215,7 @@ neo4j.ExecuteQuery(ctx, driver,
     "MATCH (p:Person) RETURN p.name",
     nil,
     neo4j.EagerResultTransformer,
-    neo4j.ExecuteQueryWithDatabase("neo4j"))
+    neo4j.ExecuteQueryWithDatabase("neo4j")
     neo4j.ExecuteQueryWithReadersRouting())
 ----
 
