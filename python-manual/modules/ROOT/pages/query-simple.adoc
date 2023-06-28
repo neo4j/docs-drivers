@@ -193,6 +193,8 @@ driver.execute_query(
 )
 ----
 
+Do not rely on the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/use/[`USE`] Cypher clause for database selection with the driver.
+
 
 === Request routing
 
