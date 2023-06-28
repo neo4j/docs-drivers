@@ -441,7 +441,7 @@ people, err := session.ExecuteRead(ctx,
 == Close sessions
 
 Each connection pool has *a finite number of sessions*, so if you open sessions without ever closing them, your application could run out of them.
-It is thus recommended to call `driver.Close()` with the `defer` keyword as soon as you create a new session, to be sure it will be closed in all cases.
+It is thus recommended to call `session.Close()` with the `defer` keyword as soon as you create a new session, to be sure it will be closed in all cases.
 When a session is closed, it is returned to the connection pool to be later reused.
 
 [source, go]

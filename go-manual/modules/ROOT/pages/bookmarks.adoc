@@ -9,29 +9,29 @@ A _bookmark_ is a token that represents some state of the database.
 By passing one or multiple bookmarks along with a query, the server will make sure that the query does not get executed before the represented state(s) have been established.
 
 
-== Bookmarks with `.execute_query()`
+== Bookmarks with `ExecuteQuery()`
 
-When xref:query-simple.adoc[querying the database with `.execute_query()`], the driver manages bookmarks for you by using the driver's default link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Driver.execute_query_bookmark_manager[`execute_query_bookmark_manager`].
+When xref:query-simple.adoc[querying the database with `ExecuteQuery()`], the driver manages bookmarks for you by using the driver's default bookmark manager (retrievable with `DriverWithContext.ExecuteQueryBookmarkManager()`).
 In this case, you have the guarantee that subsequent queries can read previous changes without taking further action.
 
-[source, python]
+[source, go]
 ----
-driver.execute_query("<QUERY 1>")
+neo4j.ExecuteQuery("<QUERY 1>")
 
-# subsequent execute_query calls will be causally chained
+// subsequent ExecuteQuery calls will be causally chained
 
-driver.execute_query("<QUERY 2>") # can read result of <QUERY 1>
-driver.execute_query("<QUERY 3>") # can read result of <QUERY 2>
+neo4j.ExecuteQuery("<QUERY 2>")  // can read result of <QUERY 1>
+neo4j.ExecuteQuery("<QUERY 3>")  // can read result of <QUERY 2>
 ----
 
-To disable bookmark management and causal consistency, set `bookmark_manager_=None` in `.execute_query()` calls.
+To disable bookmark management and causal consistency, use the configuration callback `neo4j.ExecuteQueryWithoutBookmarkManager()` in `ExecuteQuery()` calls.
 
-[source, python]
+[source, go]
 ----
-driver.execute_query(
-    ... ,
-    bookmark_manager_=None,
-)
+neo4j.ExecuteQuery(
+    ctx, driver, query, nil, neo4j.EagerResultTransformer,
+    neo4j.ExecuteQueryWithDatabase("neo4j"),
+    neo4j.ExecuteQueryWithoutBookmarkManager())
 ----
 
 
@@ -39,55 +39,75 @@ driver.execute_query(
 
 Bookmark management happens automatically for queries run within a single session, so that you can trust that queries inside one session are causally chained.
 
-[source,python]
+[source, go]
 ----
-with driver.session() as session:
-    session.execute_write(lambda tx: tx.run("<QUERY 1>"))
-    session.execute_write(lambda tx: tx.run("<QUERY 2>"))  # can read QUERY 1
-    session.execute_write(lambda tx: tx.run("<QUERY 3>"))  # can read QUERY 1,2
-    ...
+session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+defer session.Close(ctx)
+session.ExecuteWrite(/* <QUERY 1> */)
+session.ExecuteWrite(/* <QUERY 2> */)  // can read QUERY 1
+session.ExecuteWrite(/* <QUERY 3> */)  // can read QUERY 1 and 2
 ----
 
 
 == Bookmarks across multiple sessions
 
-If your application uses multiple sessions instead, you may need to ensure that one session has completed all its transactions before another session is allowed to run its queries.
-In those cases, you can collect the bookmarks from some sessions using the method `Session.last_bookmarks()` *(1), (2)*, store them into a `Bookmarks` object, and use them to initialize another session with the `bookmarks` parameter *(3)*.
+If your application uses multiple sessions, you may need to ensure that one session has completed all its transactions before another session is allowed to run its queries.
 
-In the example below, `session_a` and `session_b` are allowed to run concurrently, while `session_c` waits until their results have been propagated.
-This guarantees the `Person` nodes `session_c` wants to act on actually exist.
+In the example below, `sessionA` and `sessionB` are allowed to run concurrently, while `sessionC` waits until their results have been propagated.
+This guarantees the `Person` nodes `sessionC` wants to act on actually exist.
 
 .Coordinate multiple sessions using bookmarks
-[source,python]
+[source, go]
 ----
-from neo4j import GraphDatabase, Bookmarks
+package main
+
+import (
+    "fmt"
+    "context"
+    "github.com/neo4j/neo4j-go-driver/v5/neo4j"
+)
+
+func main() {
+    ctx := context.Background()
+
+    // Connection to database
+    dbUri := "<URI to Neo4j database>"
+    dbUser := "<Username>"
+    dbPassword := "<Password>"
+    driver, err := neo4j.NewDriverWithContext(
+        dbUri,
+        neo4j.BasicAuth(dbUser, dbPassword, ""))
+    if err != nil {
+        panic(err)
+    }
+    defer closeDriver(ctx, driver)
+    err = driver.VerifyConnectivity(ctx)
+    if err != nil {
+        panic(err)
+    }
+
+    createSomeFriends(driver)
+}
 
 
-URI = "<URI for Neo4j database>"
-AUTH = ("<Username>", "<Password>")
-
-def main():
-    with GraphDatabase.driver(URI, auth=AUTH) as driver:
-        create_some_friends(driver)
-
-
-def create_some_friends(driver):
+func create_some_friends(driver neo4j.DriverWithContext):
     saved_bookmarks = Bookmarks()  # To collect the sessions' bookmarks
 
     # Create the first person and employment relationship.
     with driver.session() as session_a:
         session_a.execute_write(create_person, "Alice")
         session_a.execute_write(employ, "Alice", "Wayne Enterprises")
-        saved_bookmarks += session_a.last_bookmarks()
+        saved_bookmarks += session_a.last_bookmarks()  // <1>
 
     # Create the second person and employment relationship.
     with driver.session() as session_b:
         session_b.execute_write(create_person, "Bob")
         session_b.execute_write(employ, "Bob", "LexCorp")
-        saved_bookmarks += session_b.last_bookmarks()
+        saved_bookmarks += session_b.last_bookmarks()  // <1>
 
     # Create a friendship between the two people created above.
-    with driver.session(bookmarks=saved_bookmarks) as session_c:
+    combine  // <2>
+    with driver.session(bookmarks=saved_bookmarks) as session_c:  // <3>
         session_c.execute_write(create_friendship, "Alice", "Bob")
         session_c.execute_read(print_friendships)
 
@@ -129,6 +149,11 @@ if __name__ == "__main__":
     main()
 ----
 
+<1> Collect the bookmarks from some sessions using the method `SessionWithContext.LastBookmarks()`
+<2> Combine bookmarks from different sessions with `neo4j.CombineBookmarks()`
+<3> Use them to initialize another session with the `Bookmarks` config parameter
+
+
 image:{common-image}/driver-passing-bookmarks.svg[]
 
 [TIP]
@@ -136,25 +161,27 @@ The use of bookmarks can negatively impact performance, since all queries are fo
 For simple use-cases, try to group queries within a single transaction, or within a single session.
 
 
-== Mix `.execute_query()` and sessions
+== Mix `ExecuteQuery()` and sessions
 
-To ensure causal consistency among transactions executed partly with `.execute_query()` and partly with sessions, you can use the parameter `bookmark_manager` upon session creation, setting it to `driver.execute_query_bookmark_manager`.
-Since that is the default bookmark manager for `.execute_query()` calls, this will ensure that all work is executed under the same bookmark manager and thus causally consistent.
+To ensure causal consistency among transactions executed partly with `ExecuteQuery()` and partly with sessions, you can use the parameter `BookmarkManager` upon session creation, setting it to `driver.ExecuteQueryBookmarkManager()`.
+Since that is the default bookmark manager for `ExecuteQuery()` calls, this will ensure that all work is executed under the same bookmark manager and thus causally consistent.
 
-[source, python]
+[source, go]
 ----
-driver.execute_query("<QUERY 1>")
+neo4j.ExecuteQuery(/* <QUERY 1> */)
 
-with driver.session(
-    bookmark_manager=driver.execute_query_bookmark_manager
-) as session:
-    # every query inside this session will be causally chained
-    # (i.e., can read what was written by <QUERY 1>)
-    session.execute_write(lambda tx: tx.run("<QUERY 2>"))
+session := driver.NewSession(ctx, neo4j.SessionConfig{
+    DatabaseName: "neo4j",
+    BookmarkManager: driver.ExecuteQueryBookmarkManager(),
+})
+// every query inside this session will be causally chained
+// (i.e., can read what was written by <QUERY 1>)
+session.ExecuteWrite(/* <QUERY 2> */)
+session.Close(ctx)
 
-# subsequent execute_query calls will be causally chained
-# (i.e., can read what was written by <QUERY 2>)
-driver.execute_query("<QUERY 3>")
+// subsequent ExecuteQuery calls will be causally chained
+// (i.e., can read what was written by <QUERY 2>)
+neo4j.ExecuteQuery(/* <QUERY 3>*/)
 ----
 
 

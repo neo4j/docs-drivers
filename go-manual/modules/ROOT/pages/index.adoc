@@ -1,8 +1,8 @@
 ifdef::backend-pdf[]
-= The Neo4j Python Driver Manual v{python-driver-version}
+= The Neo4j Go Driver Manual v{go-driver-version}
 endif::[]
 ifndef::backend-pdf[]
-= Build applications with Neo4j and Python
+= Build applications with Neo4j and Go
 :page-toclevels: 0
 endif::[]
 

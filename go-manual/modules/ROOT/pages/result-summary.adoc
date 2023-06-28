@@ -1,7 +1,7 @@
 # Explore the query execution summary
 
 After all results coming from a query have been processed, the server ends the transaction by returning a summary of execution.
-It comes as a link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#resultsummary[`ResultSummary`] object, and it contains information among which:
+It comes as a link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#ResultSummary[`ResultSummary`] object, and it contains information among which:
 
 - xref:_query_counters[**Query counters**] -- What changes the query triggered on the server
 - xref:_query_execution_plan[**Query execution plan**] -- How the database would execute (or executed) the query
@@ -11,33 +11,37 @@ It comes as a link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#resu
 
 ## Retrieve the execution summary
 
-When running queries with xref:query-simple.adoc[`Driver.execute_query()`], the execution summary is part of the default return object, under the `summary` key.
+When running queries with xref:query-simple.adoc[`ExecuteQuery()`], the execution summary is part of the default return object, under the `Summary` key.
 
-[source, python]
+[source, go]
 ----
-records, result_summary, keys = driver.execute_query("""
+result, _ := neo4j.ExecuteQuery(ctx, driver, `
     UNWIND ["Alice", "Bob"] AS name
     MERGE (p:Person {name: name})
-    """, database_="neo4j",
-)
-# or result_summary = driver.execute_query('<QUERY>').summary
+    `, nil,
+    neo4j.EagerResultTransformer,
+    neo4j.ExecuteQueryWithDatabase("neo4j"))
+
+resultSummary := result.Summary
 ----
 
-If you are using xref:transactions.adoc[transaction functions], or a xref:transformers.adoc#_custom_transformers[custom transformer] with `Driver.execute_query()`, you can retrieve the query execution summary with the method `Result.consume()`.
+If you are using xref:transactions.adoc[transaction functions], you can retrieve the query execution summary with the method `Result.Consume()`.
 **Notice that once you ask for the execution summary, the result stream is exhausted**.
 This means that any record which has not yet been processed is not available any longer.
 
-[source, python]
+[source, go]
 ----
-def create_people(tx):
-    result = tx.run("""
-        UNWIND ["Alice", "Bob"] AS name
-        MERGE (p:Person {name: name})
-    """)
-    return result.consume()
-
-with driver.session(database="neo4j") as session:
-    result_summary = session.execute_write(create_people)
+session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+defer session.Close(ctx)
+resultSummary, _ := session.ExecuteWrite(ctx,
+    func(tx neo4j.ManagedTransaction) (any, error) {
+        result, _ := tx.Run(ctx, `
+            UNWIND ["Alice", "Bob"] AS name
+            MERGE (p:Person {name: name})
+            `, nil)
+        summary, _ := result.Consume(ctx)
+        return summary, nil
+    })
 ----
 
 
@@ -70,15 +74,21 @@ There are two additional boolean properties which act as meta-counters:
 ## Query execution plan
 
 If you prefix a query with `EXPLAIN`, the server will return the plan it _would_ use to run the query, but will not actually run it.
-The plan is then available under the property `ResultSummary.plan`, and contains the list of link:{neo4j-docs-base-uri}/cypher-manual/current/execution-plans/operators/[Cypher operators] that would be used to retrieve the result set.
+The plan is then available under the property `ResultSummary.Plan()`, and contains the list of link:{neo4j-docs-base-uri}/cypher-manual/current/execution-plans/operators/[Cypher operators] that would be used to retrieve the result set.
 You may use this information to locate potential bottlenecks or room for performance improvements (for example through the creation of indexes).
 
-[source, python, role=nocollapse]
+[source, go, role=nocollapse]
 ----
-_, summary, _ = driver.execute_query("EXPLAIN MATCH (p {name: $name}) RETURN p", name="Alice")
-print(summary.plan['args']['string-representation'])
+result, _ := neo4j.ExecuteQuery(ctx, driver,
+    "EXPLAIN MATCH (p {name: $name}) RETURN p",
+    map[string]any{
+        "name": "Alice",
+    },
+    neo4j.EagerResultTransformer,
+    neo4j.ExecuteQueryWithDatabase("neo4j"))
+fmt.Println(result.Summary.Plan().Arguments()["string-representation"])
 
-"""
+/*
 Planner COST
 Runtime PIPELINED
 Runtime version 5.0
@@ -95,21 +105,27 @@ Batch size 128
 +-----------------+----------------+----------------+---------------------+
 
 Total database accesses: ?
-"""
+*/
 ----
 
 If you instead prefix a query with the keyword `PROFILE`, the server will return the execution plan it has used to run the query, together with profiler statistics.
 This includes the list of operators that were used and additional profiling information about each intermediate step.
-The plan is available under the property `ResultSummary.profile`.
+The plan is available under the property `ResultSummary.Profile()`.
 You may use this information to locate potential bottlenecks or room for performance improvements.
 Notice that the query is also _run_, so the result object also contains any result records.
 
-[source, python, role=nocollapse]
+[source, go, role=nocollapse]
 ----
-records, summary, _ = driver.execute_query("PROFILE MATCH (p {name: $name}) RETURN p", name="Alice")
-print(summary.profile['args']['string-representation'])
+result, _ := neo4j.ExecuteQuery(ctx, driver,
+    "PROFILE MATCH (p {name: $name}) RETURN p",
+    map[string]any{
+        "name": "Alice",
+    },
+    neo4j.EagerResultTransformer,
+    neo4j.ExecuteQueryWithDatabase("neo4j"))
+fmt.Println(result.Summary.Profile().Arguments()["string-representation"])
 
-"""
+/*
 Planner COST
 Runtime PIPELINED
 Runtime version 5.0
@@ -126,7 +142,7 @@ Batch size 128
 +-----------------+----------------+----------------+------+---------+----------------+------------------------+-----------+---------------------+
 
 Total database accesses: 12, total allocated memory: 184
-"""
+*/
 ----
 
 For more information and examples, see link:{neo4j-docs-base-uri}/cypher-manual/current/query-tuning/basic-example/#_profile_query[Basic query tuning].
@@ -134,56 +150,70 @@ For more information and examples, see link:{neo4j-docs-base-uri}/cypher-manual/
 
 ## Notifications
 
-The property `ResultSummary.summary_notifications` contains a list of link:{neo4j-docs-base-uri}/status-codes/current/notifications[notifications coming from the server], if any were raised by the execution of the query.
+The property `ResultSummary.Notifications()` contains a list of link:{neo4j-docs-base-uri}/status-codes/current/notifications[notifications coming from the server], if any were raised by the execution of the query.
 These include recommendations for performance improvements, warnings about the usage of deprecated features, and other hints about sub-optimal usage of Neo4j.
-Each notification comes as a link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.SummaryNotification[`SummaryNotification`] object.
+Each notification comes as a link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#Notification[`Notification`] object.
 
 .An unbounded shortest path raises a performance notification
-[source, python, role=nocollapse]
+[source, go, role=nocollapse]
 ----
-records, summary, keys = driver.execute_query("""
+result, _ := neo4j.ExecuteQuery(ctx, driver, `
     MATCH p=shortestPath((:Person {name: 'Alice'})-[*]->(:Person {name: 'Bob'}))
     RETURN p
-    """, database_="neo4j"
-)
-print(summary.summary_notifications)
-"""
-[SummaryNotification(
-    title='The provided pattern is unbounded, consider adding an upper limit to the number of node hops.',
-    code='Neo.ClientNotification.Statement.UnboundedVariableLengthPattern',
-    description='Using shortest path with an unbounded pattern will likely result in long execution times. It is recommended to use an upper limit to the number of node hops in your pattern.',
-    severity_level=<NotificationSeverity.INFORMATION: 'INFORMATION'>,
-    category=<NotificationCategory.PERFORMANCE: 'PERFORMANCE'>,
-    raw_severity_level='INFORMATION',
-    raw_category='PERFORMANCE',
-    position=SummaryNotificationPosition(line=1, column=22, offset=21)
-)]
-"""
+    `, nil,
+    neo4j.EagerResultTransformer,
+    neo4j.ExecuteQueryWithDatabase("neo4j"))
+
+for _, notification := range result.Summary.Notifications() {
+    fmt.Println("Code:", notification.Code())
+    fmt.Println("Title:", notification.Title())
+    fmt.Println("Description:", notification.Description())
+    fmt.Println("Severity:", notification.SeverityLevel())
+    fmt.Println("Category:", notification.Category(), "\n")
+}
+/*
+Code: Neo.ClientNotification.Statement.UnboundedVariableLengthPattern
+Title: The provided pattern is unbounded, consider adding an upper limit to the number of node hops.
+Description: Using shortest path with an unbounded pattern will likely result in long execution times. It is recommended to use an upper limit to the number of node hops in your pattern.
+Severity: INFORMATION
+Category: PERFORMANCE
+*/
 ----
 
 
 ### Filtering notifications
 
 By default, the server analyses each query for all categories and severity of notifications.
-Starting from version 5.7, you can use the parameters `notifications_min_severity` and/or `notifications_disabled_categories` to restrict the severity or category of notifications that you are interested into.
+Starting from version 5.7, you can use the parameters `NotificationsMinSeverity` and/or `NotificationsDisabledCategories` to restrict the severity or category of notifications that you are interested into.
 You may disable notifications altogether by setting the minimum severity to `OFF`.
-You can use those parameters either when creating a `Driver` instance, or when creating a session.
+You can use those parameters either when creating a driver instance, or when creating a session.
 
 Restricting the amount of notifications the server is allowed to raise can improve performance.
 
-.Allow only `WARNING` notifications, but not of `HINT` or `GENERIC` category
-[source, python]
+.Allow only `Warning` notifications, but not of `Hint` or `Generic` category
+[source, go]
 ----
-driver = neo4j.GraphDatabase.driver(
-    url, auth=auth,
-    notifications_min_severity='WARNING',  # or 'OFF' to disable
-    notifications_disabled_categories=['HINT', 'GENERIC']
+/*
+import (
+    "github.com/neo4j/neo4j-go-driver/v5/neo4j/notifications"
+    "github.com/neo4j/neo4j-go-driver/v5/neo4j/config"
 )
+*/
 
-# at session level
-session = driver.session(
-    database="neo4j",
-    notifications_min_severity='INFORMATION',
-    notifications_disabled_categories=['HINT']
-)
+// At driver level
+driver, _ := neo4j.NewDriverWithContext(
+    dbUri,
+    neo4j.BasicAuth(dbUser, dbPassword, ""),
+    func (config *config.Config) {
+        config.NotificationsDisabledCategories = notifications.DisableCategories(notifications.Hint, notifications.Generic)
+        config.NotificationsMinSeverity = notifications.WarningLevel
+    })
+
+
+// At session level
+session, _ = driver.NewSession(ctx, neo4j.SessionConfig{
+    NotificationsMinSeverity: notifications.WarningLevel,
+    NotificationsDisabledCategories: notifications.DisableCategories(notifications.Hint, notifications.Generic),
+    DatabaseName: "neo4j",  // always provide the database name
+})
 ----
