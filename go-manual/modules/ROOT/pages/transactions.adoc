@@ -368,6 +368,8 @@ session := driver.NewSession(ctx, neo4j.SessionConfig{
 })
 ----
 
+Do not rely on the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/use/[`USE`] Cypher clause for database selection with the driver.
+
 
 === Request routing
 
@@ -447,10 +449,9 @@ When a session is closed, it is returned to the connection pool to be later reus
 [source, go]
 ----
 session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+defer session.Close(ctx)
 
 // Session usage
-
-defer session.Close(ctx)
 ----
 
 

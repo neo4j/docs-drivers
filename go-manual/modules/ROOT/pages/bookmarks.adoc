@@ -86,72 +86,95 @@ func main() {
         panic(err)
     }
 
-    createSomeFriends(driver)
+    // Bookmarks holder
+    var savedBookmarks neo4j.Bookmarks
+
+    // Create the first person and employment relationship
+    sessionA := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+    createPerson(ctx, sessionA, "Alice")
+    employ(ctx, sessionA, "Alice", "Wayne Enterprises")
+    savedBookmarks = neo4j.CombineBookmarks(savedBookmarks, sessionA.LastBookmarks())  // <1>
+    sessionA.Close(ctx)
+
+    // Create the second person and employment relationship
+    sessionB := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+    createPerson(ctx, sessionB, "Bob")
+    employ(ctx, sessionB, "Bob", "LexCorp")
+    savedBookmarks = neo4j.CombineBookmarks(savedBookmarks, sessionB.LastBookmarks())  // <1>
+    sessionB.Close(ctx)
+
+    // Create a friendship between the two people created above
+    sessionC := driver.NewSession(ctx, neo4j.SessionConfig{
+        DatabaseName: "neo4j",
+        Bookmarks: savedBookmarks,  // <2>
+    })
+    createFriendship(ctx, sessionC, "Alice", "Bob")
+    printFriendships(ctx, sessionC)
 }
 
 
-func create_some_friends(driver neo4j.DriverWithContext):
-    saved_bookmarks = Bookmarks()  # To collect the sessions' bookmarks
-
-    # Create the first person and employment relationship.
-    with driver.session() as session_a:
-        session_a.execute_write(create_person, "Alice")
-        session_a.execute_write(employ, "Alice", "Wayne Enterprises")
-        saved_bookmarks += session_a.last_bookmarks()  // <1>
-
-    # Create the second person and employment relationship.
-    with driver.session() as session_b:
-        session_b.execute_write(create_person, "Bob")
-        session_b.execute_write(employ, "Bob", "LexCorp")
-        saved_bookmarks += session_b.last_bookmarks()  // <1>
-
-    # Create a friendship between the two people created above.
-    combine  // <2>
-    with driver.session(bookmarks=saved_bookmarks) as session_c:  // <3>
-        session_c.execute_write(create_friendship, "Alice", "Bob")
-        session_c.execute_read(print_friendships)
+// Create a Person node
+func createPerson(ctx context.Context, session neo4j.SessionWithContext, name string) {
+    session.ExecuteWrite(ctx,
+        func(tx neo4j.ManagedTransaction) (any, error) {
+            return tx.Run(ctx, "CREATE (:Person {name: $name})", map[string]any{"name": name})
+        })
+}
 
 
-# Create a person node.
-def create_person(tx, name):
-    tx.run("CREATE (:Person {name: $name})", name=name)
+// Create an employment relationship to a pre-existing company node.
+// This relies on the person first having been created.
+func employ(ctx context.Context, session neo4j.SessionWithContext, personName string, companyName string) {
+    session.ExecuteWrite(ctx,
+        func(tx neo4j.ManagedTransaction) (any, error) {
+            return session.Run(ctx, `
+                MATCH (person:Person {name: $person_name})
+                MATCH (company:Company {name: $company_name})
+                MERGE (person)-[:WORKS_FOR]->(company)
+                `, map[string]any{
+                    "personName": personName,
+                    "companyName": companyName,
+                })
+        })
+}
 
 
-# Create an employment relationship to a pre-existing company node.
-# This relies on the person first having been created.
-def employ(tx, person_name, company_name):
-    tx.run("""
-        MATCH (person:Person {name: $person_name})
-        MATCH (company:Company {name: $company_name})
-        CREATE (person)-[:WORKS_FOR]->(company)
-        """, person_name=person_name, company_name=company_name
-    )
+// Create a friendship between two people
+func createFriendship(ctx context.Context, session neo4j.SessionWithContext, nameA string, nameB string) {
+    session.ExecuteWrite(ctx,
+        func(tx neo4j.ManagedTransaction) (any, error) {
+            return session.Run(ctx, `
+                MATCH (a:Person {name: $nameA})
+                MATCH (b:Person {name: $nameB})
+                MERGE (a)-[:KNOWS]->(b)
+                `, map[string]any{
+                    "nameA": nameA,
+                    "nameB": nameB,
+                })
+        })
+}
 
 
-# Create a friendship between two people.
-def create_friendship(tx, name_a, name_b):
-    tx.run("""
-        MATCH (a:Person {name: $name_a})
-        MATCH (b:Person {name: $name_b})
-        MERGE (a)-[:KNOWS]->(b)
-        """, name_a=name_a, name_b=name_b
-    )
-
-
-# Retrieve and display all friendships.
-def print_friendships(tx):
-    result = tx.run("MATCH (a)-[:KNOWS]->(b) RETURN a.name, b.name")
-    for record in result:
-        print("{} knows {}".format(record["a.name"], record["b.name"]))
-
-
-if __name__ == "__main__":
-    main()
+// Retrieve and display all friendships
+func printFriendships(ctx context.Context, session neo4j.SessionWithContext) {
+    session.ExecuteRead(ctx,
+        func(tx neo4j.ManagedTransaction) (any, error) {
+            result, _ := session.Run(ctx,
+                "MATCH (a)-[:KNOWS]->(b) RETURN a.name, b.name",
+                nil)
+            records, _ := result.Collect(ctx)
+            for _, record := range records {
+                nameA, _ := record.Get("a.name")
+                nameB, _ := record.Get("b.name")
+                fmt.Println(nameA, "knows", nameB)
+            }
+            return nil, nil
+        })
+}
 ----
 
-<1> Collect the bookmarks from some sessions using the method `SessionWithContext.LastBookmarks()`
-<2> Combine bookmarks from different sessions with `neo4j.CombineBookmarks()`
-<3> Use them to initialize another session with the `Bookmarks` config parameter
+<1> Collect and combine bookmarks from different sessions using `SessionWithContext.LastBookmarks()` and `neo4j.CombineBookmarks()`.
+<2> Use them to initialize another session with the `Bookmarks` config parameter.
 
 
 image:{common-image}/driver-passing-bookmarks.svg[]
