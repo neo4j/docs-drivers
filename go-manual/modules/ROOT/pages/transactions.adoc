@@ -414,9 +414,9 @@ session := driver.NewSession(ctx, neo4j.SessionConfig{
 When impersonating a user, the query is run within the complete security context of the impersonated user and not the authenticated user (i.e., home database, permissions, etc.).
 
 
-=== Transaction configuration
+== Transaction configuration
 
-You can exert further control on transactions providing configuration callbacks to `.ExecuteRead()`, `.ExecuteWrite()`, and `.BeginTransaction()`.
+You can exert further control on transactions by providing configuration callbacks to `.ExecuteRead()`, `.ExecuteWrite()`, and `.BeginTransaction()`.
 Use them to specify:
 
 - a transaction timeout (in seconds).

@@ -1,70 +1,172 @@
 = Run concurrent transactions
 
-The driver is compatible with Python's `asyncio`, which allows implementing concurrent workflows.
-To interact with the database in an asynchronous way, create an `AsyncDriver` with `AsyncGraphDatabase.driver()`.
-The workflow is very similar to the synchronous version, except that you must use `await` on all async calls, and define as `async` all functions that should be awaited.
+You may leverage link:https://go.dev/tour/concurrency/1[Goroutines and channels] to run concurrent queries, or to delegate the processing of a query's result to multiple threads.
+The examples below also use the Go link:https://pkg.go.dev/sync[`sync` package] to coordinate different routines.
+
 If you need <<causal_consistency>> across different transactions, use xref:bookmarks.adoc[bookmarks].
 
-.An async driver example with `execute_query`
-[source, python, role=nocollapse]
+
+== Concurrent processing of a query result set (using sessions)
+
+[source, go]
 ----
-import asyncio
-from neo4j import AsyncGraphDatabase
+package main
 
+import (
+    "fmt"
+    "context"
+    "time"
+    "sync"
+    "github.com/neo4j/neo4j-go-driver/v5/neo4j"
+)
 
-URI = "<URI for Neo4j database>"
-AUTH = ("<Username>", "<Password>")
+func main() {
+    ctx := context.Background()
 
+    // Connection to database
+    dbUri := "<URI for Neo4j database>"
+    dbUser := "<Username>"
+    dbPassword := "<Password>"
+    driver, err := neo4j.NewDriverWithContext(
+        dbUri,
+        neo4j.BasicAuth(dbUser, dbPassword, ""))
+    if err != nil {
+        panic(err)
+    }
+    defer driver.Close(ctx)
+    err = driver.VerifyConnectivity(ctx)
+    if err != nil {
+        panic(err)
+    }
 
-async def main():
-    async with AsyncGraphDatabase.driver(URI, auth=AUTH) as driver:
-        records, summary, keys = await driver.execute_query(
-            "MATCH (a:Person) RETURN a.name AS name",
-            database_="neo4j"
-        )
-        names = [record["name"] for record in records]
-        print(names)
+    session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+    defer session.Close(ctx)
 
+    // Run a query and get results in a channel
+    records_c, err := session.ExecuteWrite(ctx,
+        func(tx neo4j.ManagedTransaction) (any, error) {
+            // Neo4j query to create and retrieve some nodes
+            result, err := tx.Run(ctx, `
+                UNWIND range(1,25) AS id
+                MERGE (p:Person {id: id})
+                RETURN p
+                `, nil)
+            if err != nil {
+                return nil, err
+            }
+            records, err := result.Collect(ctx)
+            if err != nil {
+                return nil, err
+            }
 
-if __name__ == "__main__":
-    asyncio.run(main())
+            // Stream records into a channel and return it
+            records_c := make(chan *neo4j.Record, 5)
+            go func() {
+                for _, record := range records {
+                    records_c <- record
+                }
+                close(records_c)
+            }()
+            return records_c, nil
+        })
+    if err != nil {
+        panic(err)
+    }
+
+    // Spawn some consumers that will process records
+    // They communicate back on the result channel just for logging
+    // WaitGroup allows to keep track of progress and close channel when all are done
+    log := make(chan string, 5)
+    wg := &sync.WaitGroup{}
+    for i := 1; i < 10; i++ {  // i starts from 1 because 0th receiver would be too fast
+        wg.Add(1)
+        go receiver(wg, records_c.(chan *neo4j.Record), log, i)
+    }
+    // When all consumers are done, close log channel
+    go func() {
+        wg.Wait()
+        close(log)
+    }()
+    // Print log as it comes
+    for v := range log {
+        fmt.Println(v)
+    }
+}
+
+func receiver(wg *sync.WaitGroup, records <-chan *neo4j.Record, log chan string, n int) {
+    defer wg.Done()
+    for record := range records {
+        log <- fmt.Sprintf("Receiver %v processed %v", n, record)
+        time.Sleep(time.Duration(n) * time.Second)  // proxy for a time-consuming processing
+    }
+}
 ----
 
-.An async driver example with transaction functions
-[source, python, role=nocollapse]
+== Concurrent run of multiple queries (using `ExecuteQuery()`)
+
+[source, go]
 ----
-import asyncio
-from neo4j import AsyncGraphDatabase
+package main
 
+import (
+    "fmt"
+    "context"
+    "sync"
+    "github.com/neo4j/neo4j-go-driver/v5/neo4j"
+)
 
-URI = "<URI for Neo4j database>"
-AUTH = ("<Username>", "<Password>")
+func main() {
+    ctx := context.Background()
 
+    // Connection to database
+    dbUri := "<URI for Neo4j database>"
+    dbUser := "<Username>"
+    dbPassword := "<Password>"
+    driver, err := neo4j.NewDriverWithContext(
+        dbUri,
+        neo4j.BasicAuth(dbUser, dbPassword, ""))
+    if err != nil {
+        panic(err)
+    }
+    defer driver.Close(ctx)
+    err = driver.VerifyConnectivity(ctx)
+    if err != nil {
+        panic(err)
+    }
 
-async def main():
-    async with AsyncGraphDatabase.driver(URI, auth=AUTH) as driver:
-        async with driver.session(database="neo4j") as session:
-            records = await session.read_transaction(get_people)
-            print(records)
+    log := make(chan string, 1)  // buffered channel to receive communication
+    wg := &sync.WaitGroup{}  // to wait for all routines to be done
+    go func() {
+        wg.Wait()
+        close(log)
+    }()
+    // Spawn 10 concurrent queries
+    for i := 0; i < 10; i++ {
+        wg.Add(1)
+        go runQuery(wg, ctx, driver, log)
+    }
+    // Print log
+    for msg := range log {
+        fmt.Println(msg)
+    }
+}
 
+// Run Neo4j query with random sleep time, returning the sleep time in ms
+func runQuery(wg *sync.WaitGroup, ctx context.Context, driver neo4j.DriverWithContext, log chan string) {
+    defer wg.Done()
+    result, err := neo4j.ExecuteQuery(ctx, driver, `
+        WITH round(rand()*2000) AS waitTime
+        CALL apoc.util.sleep(toInteger(waitTime)) RETURN waitTime AS time
+        `, nil, neo4j.EagerResultTransformer)
+    if err != nil {
+        log <- fmt.Sprintf("ERROR: %v", err)
+    } else {
+        neo, _ := result.Records[0].Get("time")
+        log <- fmt.Sprintf("Query returned %v", neo)
+    }
+}
 
-async def get_people(tx):
-    result = await tx.run("MATCH (a:Person) RETURN a.name AS name")
-    records = await result.values()
-    return records
-
-
-if __name__ == "__main__":
-    asyncio.run(main())
 ----
-
-[TIP]
-Async implements a concurrency model, but it is not the only possible one.
-Multithreading is also possible, although `asyncio` is often easier to implement in an application.
-
-[WARNING]
-There is a known issue with Python 3.8 and the async driver where it gradually slows down.
-It is generally recommended to use the latest supported version of Python for the best performance, stability, and security.
 
 
 ifndef::backend-pdf[]

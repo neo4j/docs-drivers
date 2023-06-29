@@ -112,7 +112,6 @@ func main() {
     printFriendships(ctx, sessionC)
 }
 
-
 // Create a Person node
 func createPerson(ctx context.Context, session neo4j.SessionWithContext, name string) {
     session.ExecuteWrite(ctx,
@@ -120,7 +119,6 @@ func createPerson(ctx context.Context, session neo4j.SessionWithContext, name st
             return tx.Run(ctx, "CREATE (:Person {name: $name})", map[string]any{"name": name})
         })
 }
-
 
 // Create an employment relationship to a pre-existing company node.
 // This relies on the person first having been created.
@@ -138,7 +136,6 @@ func employ(ctx context.Context, session neo4j.SessionWithContext, personName st
         })
 }
 
-
 // Create a friendship between two people
 func createFriendship(ctx context.Context, session neo4j.SessionWithContext, nameA string, nameB string) {
     session.ExecuteWrite(ctx,
@@ -153,7 +150,6 @@ func createFriendship(ctx context.Context, session neo4j.SessionWithContext, nam
                 })
         })
 }
-
 
 // Retrieve and display all friendships
 func printFriendships(ctx context.Context, session neo4j.SessionWithContext) {
