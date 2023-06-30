@@ -345,6 +345,13 @@ Calling this method always exhausts the result.
 
 If more (or less) than one record is available, a non-`nil` error is returned.
 
+|`Record() *Record`
+|Return the current record.
+
+|`Next(ctx) bool`
+a|Return `true` if there is a record to be processed after the current one.
+In that case, it also advances the result iterator.
+
 |`Consume(ctx) (ResultSummary, error)`
 |Return the query xref:result-summary.adoc[result summary].
 It exhausts the result, so should only be called when data processing is over.

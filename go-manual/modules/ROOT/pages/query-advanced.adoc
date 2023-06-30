@@ -51,11 +51,11 @@ result, _ := session.Run(
     `, map[string]any{
         "name": name
     })
-fmt.Println(result.Consume().Counters())
+//fmt.Println(result.Consume().Counters())
 ----
 
 [NOTE]
-While `LOAD CSV` can be a convenience, there is nothing _wrong_ in deferring the parsing of the CSV file to your Python application and avoiding `LOAD CSV`.
+While `LOAD CSV` can be a convenience, there is nothing _wrong_ in deferring the parsing of the CSV file to your Go application and avoiding `LOAD CSV`.
 In fact, moving the parsing logic to the application can give you more control over the importing process.
 
 For more information, see link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/load-csv/[Cypher -- Clauses -- Load CSV].
@@ -93,34 +93,41 @@ For those queries, you are forced to use string concatenation.
 To protect against Cypher injections you should enclose the dynamic values in backticks and escape them yourself.
 Notice that Cypher processes Unicode, so take care of the Unicode literal `\u0060` as well.
 
-.Manually escaping dynamic labels before concatenation.
-[source, python]
+.Manually escaping dynamic labels before concatenation
+[source, go]
 ----
-label = "Person\\u0060n"
-# convert \u0060 to literal backtick and then escape backticks
-escaped_label = label.replace("\\u0060", "`").replace("`", "``")
+label := "Person\\u0060n"
+// convert \u0060 to literal backtick and then escape backticks
+//remember to import `strings`
+escapedLabel := strings.ReplaceAll(label, "\\u0060", "`")
+escapedLabel = strings.ReplaceAll(escapedLabel, "`", "``")
 
-driver.execute_query(
-    f"MATCH (p:`{escaped_label}` {{name: $name}}) RETURN p.name",
-    name="Alice",
-    database_="neo4j"
-)
+result, err := neo4j.ExecuteQuery(ctx, driver,
+    "MATCH (p:`" + escapedLabel + "` WHERE p.name = $name) RETURN p.name",
+    map[string]any{
+        "name": "Alice",
+    },
+    neo4j.EagerResultTransformer,
+    neo4j.ExecuteQueryWithDatabase("neo4j"))
 ----
 
 Another workaround, which avoids string concatenation, is using the <<APOC>> procedure link:{neo4j-docs-base-uri}/apoc/current/overview/apoc.merge/apoc.merge.node/[`apoc.merge.node`].
-It supports dynamic labels and property keys, but only for node insertion.
+It supports dynamic labels and property keys, but only for node merging.
 
-.Using `apoc.merge.node` to create a node with dynamic labels/property keys.
-[source, python]
+.Using `apoc.merge.node` to create a node with dynamic labels/property keys
+[source, go]
 ----
-property_key = "name"
-label = "Person"
+propertyKey := "name"
+label := "Person"
 
-driver.execute_query(
+result, err := neo4j.ExecuteQuery(ctx, driver,
     "CALL apoc.merge.node($labels, $properties)",
-    labels=[label], properties={property_key: "Alice"},
-    database_="neo4j"
-)
+    map[string]any{
+        "labels": []string{label},
+        "properties": map[string]any{propertyKey: "Alice"},
+    },
+    neo4j.EagerResultTransformer,
+    neo4j.ExecuteQueryWithDatabase("neo4j"))
 ----
 
 [NOTE]

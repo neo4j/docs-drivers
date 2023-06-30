@@ -160,7 +160,7 @@ Instead, always use placeholders and specify the link:{neo4j-docs-base-uri}/cyph
 This is for:
 
 1. *performance benefits*: Neo4j compiles and caches queries, but can only do so if the query structure is unchanged;
-2. *security reasons*: link:https://neo4j.com/developer/kb/protecting-against-cypher-injection/[protecting against Cypher injection].
+2. *security reasons*: see link:https://neo4j.com/developer/kb/protecting-against-cypher-injection/[Knowledge Base -- Protecting against Cypher Injection].
 
 Query parameters should get grouped into a map and passed as second parameter to `ExecuteQuery()`. If a query has no parameters, you can pass `nil` instead of an empty map.
 
