@@ -3,7 +3,7 @@
 You may leverage link:https://go.dev/tour/concurrency/1[Goroutines and channels] to run concurrent queries, or to delegate the processing of a query's result to multiple threads.
 The examples below also use the Go link:https://pkg.go.dev/sync[`sync` package] to coordinate different routines.
 
-If you need <<causal_consistency>> across different transactions, use xref:bookmarks.adoc[bookmarks].
+If you need causal consistency across different transactions, use xref:bookmarks.adoc[bookmarks].
 
 
 == Concurrent processing of a query result set (using sessions)
@@ -99,7 +99,7 @@ func consumer(wg *sync.WaitGroup, records <-chan *neo4j.Record, log chan string,
 ----
 
 <1> The channel `records_c` is where the query result records will be streamed to.
-`queryToChannel()` writes to it, and the various `consumer`s read from it.
+`queryToChannel()` writes to it, and the various ``consumer``s read from it.
 It is buffered so that the driver does not retrieve records faster than what the consumers can handle.
 <2> A Goroutine runs the query to the Neo4j server with a xref:transactions.adoc[managed transaction].
 Notice that the driver session is created _inside_ the routine, as sessions are not thread-safe.

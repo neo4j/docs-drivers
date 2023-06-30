@@ -1,5 +1,22 @@
 = Advanced connection information
 
+== Connection URI
+
+The driver supports connection to URIs of the form
+
+[source]
+----
+<SCHEME>://<HOST>[:<PORT>[?policy=<POLICY-NAME>]]
+----
+
+- `<SCHEME>` is one among `neo4j`, `neo4j+s`, `neo4j+ssc`, `bolt`, `bolt+s`, `bolt+ssc`.
+- `<HOST>` is the host name where the Neo4j server is located.
+- `<PORT>` is optional, and denotes the port the <<Bolt>> protocol is available at.
+- `<POLICY-NAME>` is an optional _server policy_ name. link:{neo4j-docs-base-uri}/docs/operations-manual/current/clustering/clustering-advanced/multi-data-center-routing/[Server policies] need to be set up prior to usage.
+
+[NOTE]
+Notice that *the driver does not support connection to a nested path*, such as `example.com/neo4j/`.
+The server must be reachable from the domain root.
 
 
 == Connection protocols and security
@@ -29,7 +46,7 @@ The scheme of the server URI determines whether the connection is encrypted and,
 [TIP]
 The driver receives a _routing table_ from the server upon successful connection, regardless of whether the instance is a proper cluster environment or a single-machine environment.
 The driver's routing behavior works in tandem with link:{neo4j-docs-base-uri}/operations-manual/current/clustering/[Neo4j's clustering] by directing read/write transactions to appropriate cluster members.
-If you want to target a _specific_ machine, use a link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#bolt-driver-ref[`BoltDriver`] object and `bolt`, `bolt+s`, or `bolt+ssc` URI schemes instead.
+If you want to target a _specific_ machine, use the `bolt`, `bolt+s`, or `bolt+ssc` URI schemes instead.
 
 The connection scheme to use is not your choice, but is rather determined by the server requirements.
 You must know the right server scheme upfront, as no metadata is exposed prior to connection.
@@ -37,40 +54,38 @@ If you are unsure, ask the database administrator.
 
 == Authentication methods
 
-=== Basic authentication (default)
+=== Basic authentication
 
 The basic authentication scheme relies on traditional username and password.
 These can either be the credentials for your local installation, or the ones provided with an Aura instance.
 
-[source,python]
+[source, go]
 ----
-from neo4j import GraphDatabase
-
-driver = GraphDatabase.driver(uri, auth=(user, password))
+driver, err := neo4j.NewDriverWithContext(
+    dbUri,
+    neo4j.BasicAuth(dbUser, dbPassword, ""))
 ----
 
 [INFO]
 The basic authentication scheme can also be used to authenticate against an LDAP server (Enterprise Edition only).
 
 === Kerberos authentication
+
 The Kerberos authentication scheme requires a base64-encoded ticket.
 It can only be used if the server has the link:{neo4j-docs-base-uri}/kerberos-add-on/current/deployment/[Kerberos Add-on installed].
 
-[source,python]
+[source, go]
 ----
-from neo4j import GraphDatabase, kerberos_auth
-
-driver = GraphDatabase.driver(uri, auth=kerberos_auth(ticket))
+driver, err := neo4j.NewDriverWithContext(dbUri, neo4j.KerberosAuth(ticket))
 ----
 
 === Bearer authentication
+
 The bearer authentication scheme requires a base64-encoded token provided by an Identity Provider through Neo4j's link:{neo4j-docs-base-uri}/operations-manual/current/authentication-authorization/sso-integration[Single Sign-On feature].
 
-[source,python]
+[source, go]
 ----
-from neo4j import GraphDatabase, bearer_auth
-
-driver = GraphDatabase.driver(uri, auth=bearer_auth(token))
+driver, err := neo4j.NewDriverWithContext(dbUri, neo4j.BearerAuth(token))
 ----
 
 [NOTE]
@@ -79,7 +94,7 @@ Once configured, clients can discover Neo4j's configuration through the link:{ne
 
 === Custom authentication
 
-Use the function link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.custom_auth[`custom_auth`] to log into a server having a custom authentication scheme.
+Use the function link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#CustomAuth[`CustomAuth`] to log into a server having a custom authentication scheme.
 
 [NOTE]
 If authentication is disabled on the server, the `auth` parameter can be omitted entirely.
