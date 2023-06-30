@@ -4,7 +4,7 @@ Neo4j 4.4 is LTS, and Neo4j 5 will also have an LTS version.
 [[Aura]]Aura:: link:https://neo4j.com/cloud/platform/aura-graph-database/[Aura] is Neo4j's fully managed cloud service.
 It comes with both free and paid plans.
 Every Neo4j-backed application requires a `Driver` object.
-[[Cypher]]Cypher:: link:{neo4j-docs-base-uri}/cypher-manual/current/introduction/cypher_overview/[Cypher] is Neo4j's graph query language that lets you retrieve data from the graph.
+[[Cypher]]Cypher:: link:{neo4j-docs-base-uri}/cypher-manual/current/introduction/cypher_overview/[Cypher] is Neo4j's graph query language that lets you retrieve data from the database.
 It is like SQL, but for graphs.
 [[APOC]]APOC:: link:{neo4j-docs-base-uri}/apoc/current/[Awesome Procedures On Cypher (APOC)] is a library of (many) functions that can not be easily expressed in Cypher itself.
 [[Bolt]]Bolt:: link:{neo4j-docs-base-uri}/bolt/current/bolt/[Bolt] is the protocol used for interaction between Neo4j instances and drivers.

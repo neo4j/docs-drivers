@@ -101,24 +101,24 @@ include::{common-partial}/cypher-workflow.adoc[tag=type-mapping]
 [options="header", cols="<40m,<60a"]
 |===
 | Neo4j Cypher Type        | .NET Type
-| `null` | `null`
-| `List` | `IList<object>`
-| `Map` | `IDictionary<string, object>`
-| `Boolean` | `bool`
-| `Integer` | `long`
-| `Float` | `double`
-| `String` | `string`
+| `NULL` | `null`
+| `LIST` | `IList<object>`
+| `MAP` | `IDictionary<string, object>`
+| `BOOLEAN` | `bool`
+| `INTEGER` | `long`
+| `FLOAT` | `double`
+| `STRING` | `string`
 | `ByteArray` | `byte[]`
-| `Date` | *`LocalDate`*
-| `Time` | *`OffsetTime`*
-| `LocalTime` | *`LocalTime`*
-| `DateTime`* | *`ZonedDateTime`*
-| `LocalDateTime` | *`LocalDateTime`*
-| `Duration` | *`Duration`*
-| `Point` | *`Point`*
-| `Node` | *`INode`*
-| `Relationship` | *`IRelationship`*
-| `Path` | *`IPath`*
+| `DATE` | *`LocalDate`*
+| `ZONED TIME` | *`OffsetTime`*
+| `LOCAL TIME` | *`LocalTime`*
+| `ZONED DATETIME`* | *`ZonedDateTime`*
+| `LOCAL DATETIME` | *`LocalDateTime`*
+| `DURATION` | *`Duration`*
+| `POINT` | *`Point`*
+| `NODE` | *`INode`*
+| `RELATIONSHIP` | *`IRelationship`*
+| `PATH` | *`IPath`*
 |===
 
 +*+ Time zone names adhere to the https://www.iana.org/time-zones[IANA system], rather than the https://docs.microsoft.com/en-us/windows-hardware/manufacture/desktop/default-time-zones[Windows system].

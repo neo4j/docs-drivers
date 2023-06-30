@@ -1,6 +1,6 @@
 = Query the database
 
-You can run a query against the database using <<Cypher>> and the method `Driver.executeQuery()`.
+Once you have xref:connect.adoc[connected to the database], you can run queries using <<Cypher>> and the method `Driver.executeQuery()`.
 
 [TIP]
 `Driver.executeQuery()` was introduced with the version 5.8 of the driver. +
@@ -179,6 +179,8 @@ driver.executeQuery(
   }
 )
 ----
+
+Do not rely on the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/use/[`USE`] Cypher clause for database selection with the driver.
 
 
 === Request routing

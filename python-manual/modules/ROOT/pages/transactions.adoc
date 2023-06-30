@@ -118,13 +118,12 @@ def employ_person_tx(tx, name):
 
     # Otherwise, create a new Organization and link Person to it
     else:
-        from neo4j.time import Date
         result = tx.run("""
             MATCH (p:Person {name: $name})
             CREATE (o:Organization {id: randomuuid(), created_date: datetime()})
             MERGE (p)-[r:WORKS_FOR]->(o)
             RETURN o.id AS id
-            """, name=name, date=Date.today()
+            """, name=name
         )
 
     # Return the Organization ID to which the new Person ends up in
@@ -323,6 +322,8 @@ with driver.session(
 ) as session:
     ...
 ----
+
+Do not rely on the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/use/[`USE`] Cypher clause for database selection with the driver.
 
 
 === Request routing

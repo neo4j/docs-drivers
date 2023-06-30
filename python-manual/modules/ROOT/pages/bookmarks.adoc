@@ -75,19 +75,21 @@ def create_some_friends(driver):
     saved_bookmarks = Bookmarks()  # To collect the sessions' bookmarks
 
     # Create the first person and employment relationship.
-    with driver.session() as session_a:
+    with driver.session(database="neo4j") as session_a:
         session_a.execute_write(create_person, "Alice")
         session_a.execute_write(employ, "Alice", "Wayne Enterprises")
-        saved_bookmarks += session_a.last_bookmarks()
+        saved_bookmarks += session_a.last_bookmarks()  # <1>
 
     # Create the second person and employment relationship.
-    with driver.session() as session_b:
+    with driver.session(database="neo4j") as session_b:
         session_b.execute_write(create_person, "Bob")
         session_b.execute_write(employ, "Bob", "LexCorp")
-        saved_bookmarks += session_b.last_bookmarks()
+        saved_bookmarks += session_b.last_bookmarks()  # <2>
 
     # Create a friendship between the two people created above.
-    with driver.session(bookmarks=saved_bookmarks) as session_c:
+    with driver.session(
+        database="neo4j", bookmarks=saved_bookmarks
+    ) as session_c:  # <3>
         session_c.execute_write(create_friendship, "Alice", "Bob")
         session_c.execute_read(print_friendships)
 

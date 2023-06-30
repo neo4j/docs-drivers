@@ -457,24 +457,24 @@ All types can be potentially found in the result, although not all types can be 
 [options="header", cols=",,"]
 |===
 | Cypher Type | Parameter | Result
-| `null`* | {check-mark} | {check-mark}
-| `List`  | {check-mark} | {check-mark}
-| `Map`   | {check-mark} | {check-mark}
-| `Boolean` | {check-mark} | {check-mark}
-| `Integer` | {check-mark} | {check-mark}
-| `Float` | {check-mark} | {check-mark}
-| `String` | {check-mark} | {check-mark}
+| `NULL`* | {check-mark} | {check-mark}
+| `LIST`  | {check-mark} | {check-mark}
+| `MAP`   | {check-mark} | {check-mark}
+| `BOOLEAN` | {check-mark} | {check-mark}
+| `INTEGER` | {check-mark} | {check-mark}
+| `FLOAT` | {check-mark} | {check-mark}
+| `STRING` | {check-mark} | {check-mark}
 | `ByteArray` | {check-mark} | {check-mark}
-| `Date` | {check-mark} | {check-mark}
-| `Time` | {check-mark} | {check-mark}
-| `LocalTime` | {check-mark} | {check-mark}
-| `DateTime` | {check-mark} | {check-mark}
-| `LocalDateTime` | {check-mark} | {check-mark}
-| `Duration` | {check-mark} | {check-mark}
-| `Point` | {check-mark} | {check-mark}
-| `Node`** | | {check-mark}
-| `Relationship`** | | {check-mark}
-| `Path`** | | {check-mark}
+| `DATE` | {check-mark} | {check-mark}
+| `ZONED TIME` | {check-mark} | {check-mark}
+| `LOCAL TIME` | {check-mark} | {check-mark}
+| `ZONED DATETIME` | {check-mark} | {check-mark}
+| `LOCAL DATETIME` | {check-mark} | {check-mark}
+| `DURATION` | {check-mark} | {check-mark}
+| `POINT` | {check-mark} | {check-mark}
+| `NODE`** | | {check-mark}
+| `RELATIONSHIP`** | | {check-mark}
+| `PATH`** | | {check-mark}
 |===
 
 +*+ The null marker is not a type but a placeholder for absence of value.
@@ -499,24 +499,24 @@ Custom types (those not available in the language or standard library) are highl
 [options="header", cols=","]
 |===
 | Neo4j Cypher Type        | .NET Type
-| `null` | `null`
-| `List` | `IList<object>`
-| `Map` | `IDictionary<string, object>`
-| `Boolean` | `bool`
-| `Integer` | `long`
-| `Float` | `double`
-| `String` | `string`
+| `NULL` | `null`
+| `LIST` | `IList<object>`
+| `MAP` | `IDictionary<string, object>`
+| `BOOLEAN` | `bool`
+| `INTEGER` | `long`
+| `FLOAT` | `double`
+| `STRING` | `string`
 | `ByteArray` | `byte[]`
-| `Date` | *`LocalDate`*
-| `Time` | *`OffsetTime`*
-| `LocalTime` | *`LocalTime`*
-| `DateTime`* | *`ZonedDateTime`*
-| `LocalDateTime` | *`LocalDateTime`*
-| `Duration` | *`Duration`*
-| `Point` | *`Point`*
-| `Node` | *`INode`*
-| `Relationship` | *`IRelationship`*
-| `Path` | *`IPath`*
+| `DATE` | *`LocalDate`*
+| `ZONED TIME` | *`OffsetTime`*
+| `LOCAL TIME` | *`LocalTime`*
+| `ZONED DATETIME`* | *`ZonedDateTime`*
+| `LOCAL DATETIME` | *`LocalDateTime`*
+| `DURATION` | *`Duration`*
+| `POINT` | *`Point`*
+| `NODE` | *`INode`*
+| `RELATIONSHIP` | *`IRelationship`*
+| `PATH` | *`IPath`*
 |===
 
 +*+ Time zone names adhere to the https://www.iana.org/time-zones[IANA system], rather than the https://docs.microsoft.com/en-us/windows-hardware/manufacture/desktop/default-time-zones[Windows system].
@@ -528,24 +528,24 @@ Inbound conversion is carried out using http://cldr.unicode.org/development/deve
 // [options="header", cols="m,"]
 // |===
 // | Neo4j type        | Go type
-// | null | `nil`
-// | List | `[]interface{}`
-// | Map | `map[string]interface{}`
-// | Boolean | `bool`
-// | Integer | `int64`
-// | Float | `float64`
-// | String | `string`
+// | NULL | `nil`
+// | LIST | `[]interface{}`
+// | MAP | `map[string]interface{}`
+// | BOOLEAN | `bool`
+// | INTEGER | `int64`
+// | FLOAT | `float64`
+// | STRING | `string`
 // | ByteArray | `[]byte`
-// | Date | *`neo4j.Date`*
-// | Time | *`neo4j.OffsetTime`*
-// | LocalTime | *`neo4j.LocalTime`*
-// | DateTime | *`time.Time`**
-// | LocalDateTime | *`neo4j.LocalDateTime`*
-// | Duration | *`neo4j.Duration`*
-// | Point | *`neo4j.Point`*
-// | Node | *`neo4j.Node`*
-// | Relationship | *`neo4j.Relationship`*
-// | Path | *`neo4j.Path`*
+// | DATE | *`neo4j.Date`*
+// | ZONED TIME | *`neo4j.OffsetTime`*
+// | LOCAL TIME | *`neo4j.LocalTime`*
+// | ZONED DATETIME | *`time.Time`**
+// | LOCAL DATETIME | *`neo4j.LocalDateTime`*
+// | DURATION | *`neo4j.Duration`*
+// | POINT | *`neo4j.Point`*
+// | NODE | *`neo4j.Node`*
+// | RELATIONSHIP | *`neo4j.Relationship`*
+// | PATH | *`neo4j.Path`*
 // |===
 //
 // +*+ When a `time.Time` value is sent/received through the driver and its `Zone()` returns a name of `Offset`, the value is stored with its offset value rather than its zone name.
@@ -556,24 +556,24 @@ Inbound conversion is carried out using http://cldr.unicode.org/development/deve
 [options="header", cols="m,"]
 |===
 | Neo4j Cypher Type        | Java Type
-| null | `null`
-| List | `List<Object>`
-| Map | `Map<String, Object>`
-| Boolean | `boolean`
-| Integer | `long`
-| Float | `double`
-| String | `String`
+| NULL | `null`
+| LIST | `List<Object>`
+| MAP | `Map<String, Object>`
+| BOOLEAN | `boolean`
+| INTEGER | `long`
+| FLOAT | `double`
+| STRING | `String`
 | ByteArray | `byte[]`
-| Date | `LocalDate`
-| Time | `OffsetTime`
-| LocalTime | `LocalTime`
-| DateTime | `ZonedDateTime`
-| LocalDateTime | `LocalDateTime`
-| Duration | *`IsoDuration`**
-| Point | *`Point`*
-| Node | *`Node`*
-| Relationship | *`Relationship`*
-| Path | *`Path`*
+| DATE | `LocalDate`
+| ZONED TIME | `OffsetTime`
+| LOCAL TIME | `LocalTime`
+| ZONED DATETIME | `ZonedDateTime`
+| LOCAL DATETIME | `LocalDateTime`
+| DURATION | *`IsoDuration`**
+| POINT | *`Point`*
+| NODE | *`Node`*
+| RELATIONSHIP | *`Relationship`*
+| PATH | *`Path`*
 |===
 
 +*+ A `Duration` or `Period` passed as a parameter will always be implicitly converted to `IsoDuration`.
@@ -584,24 +584,24 @@ Inbound conversion is carried out using http://cldr.unicode.org/development/deve
 [options="header", cols="m,"]
 |===
 | Neo4j Cypher Type        | JavaScript Type
-| null | `null`
-| List | `Array`
-| Map | `Object`
-| Boolean | `Boolean`
-| Integer | *`Integer`**
-| Float | `Number`
-| String | `String`
+| NULL | `null`
+| LIST | `Array`
+| MAP | `Object`
+| BOOLEAN | `Boolean`
+| INTEGER | *`Integer`**
+| FLOAT | `Number`
+| STRING | `String`
 | ByteArray | `Int8Array`
-| Date | *`Date`*
-| Time | *`Time`*
-| LocalTime | *`LocalTime`*
-| DateTime | *`DateTime`*
-| LocalDateTime | *`LocalDateTime`*
-| Duration | *`Duration`*
-| Point | *`Point`*
-| Node | *`Node`*
-| Relationship | *`Relationship`*
-| Path | *`Path`*
+| DATE | *`Date`*
+| ZONED TIME | *`Time`*
+| LOCAL TIME | *`LocalTime`*
+| ZONED DATETIME | *`DateTime`*
+| LOCAL DATETIME | *`LocalDateTime`*
+| DURATION | *`Duration`*
+| POINT | *`Point`*
+| NODE | *`Node`*
+| RELATIONSHIP | *`Relationship`*
+| PATH | *`Path`*
 |===
 
 +*+ JavaScript has *_no native integer type_* so a custom type is provided. For convenience, this can be disabled through configuration so that the *_native Number type_* is used instead. Note that this can lead to a loss of precision.
@@ -612,24 +612,24 @@ Inbound conversion is carried out using http://cldr.unicode.org/development/deve
 [options="header", cols="m,"]
 |===
 | Neo4j Type | Python 3 Type
-| null | `None`
-| List | `list`
-| Map | `dict`
-| Boolean | `bool`
-| Integer | `int`
-| Float | `float`
-| String | `str`
+| NULL | `None`
+| LIST | `list`
+| MAP | `dict`
+| BOOLEAN | `bool`
+| INTEGER | `int`
+| FLOAT | `float`
+| STRING | `str`
 | ByteArray | `bytearray`
-| Date | *`neo4j.time.Date`*
-| Time | *`neo4j.time.Time`†*
-| LocalTime | *`neo4j.time.Time`††*
-| DateTime | *`neo4j.time.DateTime`†*
-| LocalDateTime | *`neo4j.time.DateTime`††*
-| Duration | *`neo4j.time.Duration`**
-| Point | *`neo4j.spatial.Point`*
-| Node | *`neo4j.graph.Node`*
-| Relationship | *`neo4j.graph.Relationship`*
-| Path | *`neo4j.graph.Path`*
+| DATE | *`neo4j.time.Date`*
+| ZONED TIME | *`neo4j.time.Time`†*
+| LOCAL TIME | *`neo4j.time.Time`††*
+| ZONED DATETIME | *`neo4j.time.DateTime`†*
+| LOCAL DATETIME | *`neo4j.time.DateTime`††*
+| DURATION | *`neo4j.time.Duration`**
+| POINT | *`neo4j.spatial.Point`*
+| NODE | *`neo4j.graph.Node`*
+| RELATIONSHIP | *`neo4j.graph.Relationship`*
+| PATH | *`neo4j.graph.Path`*
 |===
 
 +*+ A `datetime.timedelta` object passed as a parameter will always be implicitly converted to `neo4j.time.Duration`

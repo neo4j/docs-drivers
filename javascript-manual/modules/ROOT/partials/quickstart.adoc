@@ -16,7 +16,8 @@ xref:install#install-driver[More info on installing the driver ->]
 == Connect to the database
 
 Connect to a database by creating a <<Driver>> object and providing a URL and an authentication token.
-Once you have a `Driver` instance, use the `.verifyConnectivity()` method to ensure that a working connection can be established.
+Once you have a `Driver` instance, use the `.getServerInfo()` method to ensure that a working connection can be established
+by retrieving the server information.
 
 [source, javascript]
 ----
@@ -30,8 +31,8 @@ var neo4j = require('neo4j-driver');
 
   try {
     driver = neo4j.driver(URI,  neo4j.auth.basic(USER, PASSWORD))
-    await driver.verifyConnectivity()
-    console.log('Connection estabilished')
+    const serverInfo = await driver.getServerInfo()
+    console.log('Connection established')
     console.log(serverInfo)
   } catch(err) {
     console.log(`Connection error\n${err}\nCause: ${err.cause}`)

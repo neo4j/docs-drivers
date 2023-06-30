@@ -113,24 +113,24 @@ include::{common-partial}/cypher-workflow.adoc[tag=type-mapping]
 [options="header", cols="<40m,<60a"]
 |===
 | Neo4j Cypher Type        | Java Type
-| null | `null`
-| List | `List<Object>`
-| Map | `Map<String, Object>`
-| Boolean | `boolean`
-| Integer | `long`
-| Float | `double`
-| String | `String`
+| NULL | `null`
+| LIST | `List<Object>`
+| MAP | `Map<String, Object>`
+| BOOLEAN | `boolean`
+| INTEGER | `long`
+| FLOAT | `double`
+| STRING | `String`
 | ByteArray | `byte[]`
-| Date | `LocalDate`
-| Time | `OffsetTime`
-| LocalTime | `LocalTime`
-| DateTime | `ZonedDateTime`
-| LocalDateTime | `LocalDateTime`
-| Duration | *`IsoDuration`**
-| Point | *`Point`*
-| Node | *`Node`*
-| Relationship | *`Relationship`*
-| Path | *`Path`*
+| DATE | `LocalDate`
+| ZONED TIME | `OffsetTime`
+| LOCAL TIME | `LocalTime`
+| ZONED DATETIME | `ZonedDateTime`
+| LOCAL DATETIME | `LocalDateTime`
+| DURATION | *`IsoDuration`**
+| POINT | *`Point`*
+| NODE | *`Node`*
+| RELATIONSHIP | *`Relationship`*
+| PATH | *`Path`*
 |===
 
 +*+ A `Duration` or `Period` passed as a parameter will always be implicitly converted to `IsoDuration`.

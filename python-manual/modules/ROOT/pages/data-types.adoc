@@ -7,13 +7,13 @@ The tables in this section show the mapping between Cypher data types and Python
 [options="header"]
 |===
 | Cypher Type | Python Type
-| <<null>>    | `None`
-| List        | `list`
-| Map         | `dict`
-| Boolean     | `bool`
-| Integer     | `int`
-| Float       | `float`
-| String      | `str`
+| <<NULL>>    | `None`
+| LIST        | `list`
+| MAP         | `dict`
+| BOOLEAN     | `bool`
+| INTEGER     | `int`
+| FLOAT       | `float`
+| STRING      | `str`
 | ByteArray   | `bytearray`
 |===
 
@@ -31,13 +31,13 @@ Some timezones (e.g., `pytz.utc`) work exclusively with the built-in `datetime.d
 
 [options="header"]
 |===
-| Cypher Type   | Python Type
-| Date          | `neo4j.time.Date`
-| Time          | `neo4j.time.Time`†
-| LocalTime     | `neo4j.time.Time`††
-| DateTime      | `neo4j.time.DateTime`†
-| LocalDateTime | `neo4j.time.DateTime`††
-| Duration      | `neo4j.time.Duration`
+| Cypher Type    | Python Type
+| DATE           | `neo4j.time.Date`
+| ZONED TIME     | `neo4j.time.Time`†
+| LOCAL TIME     | `neo4j.time.Time`††
+| ZONED DATETIME | `neo4j.time.DateTime`†
+| LOCAL DATETIME | `neo4j.time.DateTime`††
+| DURATION       | `neo4j.time.Duration`
 |===
 
 † Where `tzinfo` is not `None`. +
@@ -190,9 +190,9 @@ You can think of it as a unique identifier for each spatial type.
 [options="header"]
 |===
 | Cypher Type       | Python Type
-| Point             | `neo4j.spatial.Point`
-| Point (Cartesian) | `neo4j.spatial.CartesianPoint`
-| Point (WGS-84)    | `neo4j.spatial.WGS84Point`
+| POINT             | `neo4j.spatial.Point`
+| POINT (Cartesian) | `neo4j.spatial.CartesianPoint`
+| POINT (WGS-84)    | `neo4j.spatial.WGS84Point`
 |===
 
 For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/types/spatial.html[API documentation -- Spatial types].
@@ -252,9 +252,9 @@ The section xref:transformers#_transform_to_graph[Manipulate query results -- Tr
 [options="header"]
 |===
 | Cypher Type  | Python Type
-| Node         | `neo4j.graph.Node`
-| Relationship | `neo4j.graph.Relationship`
-| Path         | `neo4j.graph.Path`
+| NODE         | `neo4j.graph.Node`
+| RELATIONSHIP | `neo4j.graph.Relationship`
+| PATH         | `neo4j.graph.Path`
 |===
 
 For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#graph-data-types[API documentation -- Graph types].
