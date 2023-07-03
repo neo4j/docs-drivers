@@ -150,8 +150,8 @@ import (
 driver, err := neo4j.NewDriverWithContext(
     dbUri,
     neo4j.BasicAuth(dbUser, dbPassword, ""),
-    func(config *config.Config) {
-        config.Log = neo4j.ConsoleLogger(neo4j.DEBUG)
+    func(conf *config.Config) {
+        conf.Log = neo4j.ConsoleLogger(neo4j.DEBUG)
     })
 ----
 

@@ -193,20 +193,19 @@ Restricting the amount of notifications the server is allowed to raise can impro
 .Allow only `Warning` notifications, but not of `Hint` or `Generic` category
 [source, go]
 ----
-/*
 import (
+    "github.com/neo4j/neo4j-go-driver/v5/neo4j"
     "github.com/neo4j/neo4j-go-driver/v5/neo4j/notifications"
     "github.com/neo4j/neo4j-go-driver/v5/neo4j/config"
 )
-*/
 
 // At driver level
 driver, _ := neo4j.NewDriverWithContext(
     dbUri,
     neo4j.BasicAuth(dbUser, dbPassword, ""),
-    func (config *config.Config) {
-        config.NotificationsDisabledCategories = notifications.DisableCategories(notifications.Hint, notifications.Generic)
-        config.NotificationsMinSeverity = notifications.WarningLevel
+    func (conf *config.Config) {
+        conf.NotificationsDisabledCategories = notifications.DisableCategories(notifications.Hint, notifications.Generic)
+        conf.NotificationsMinSeverity = notifications.WarningLevel
     })
 
 

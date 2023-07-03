@@ -9,7 +9,7 @@ If you need causal consistency across different transactions, use xref:bookmarks
 
 == Concurrent processing of a query result set (using sessions)
 
-The following example shows how you can stream a query result to a channel, and have its records concurrently processed my several consumers.
+The following example shows how you can stream a query result to a channel, and have its records concurrently processed by several consumers.
 
 [source, go]
 ----
@@ -107,8 +107,8 @@ The transaction function from `ExecuteWrite()` writes to it, and the various ``c
 It is buffered so that the driver does not retrieve records faster than what the consumers can handle.
 <3> Each result record coming from the server is sent over the `records_c` channel.
 The streaming continues so long as there are records to be processed, after which the channel gets closed and the routine exits.
-<4> The channel `log` is where the consumers will comunicate on.
-<5> A `sync.WaitGroup` is needed to know when all consumers will be done, and thus the `log` channel can be closed.
+<4> The channel `log` is where the consumers comunicate on.
+<5> A `sync.WaitGroup` is needed to know when all consumers are done, and thus the `log` channel can be closed.
 <6> A number of ``consumer``s get started in separate Goroutines.
 Each consumer reads and processes records from the `records_c` channel.
 Each consumer simulates a lengthy operation with a sleeping timer.
@@ -183,9 +183,10 @@ func runQuery(wg *sync.WaitGroup, ctx context.Context, driver neo4j.DriverWithCo
 }
 ----
 
-<1> log channel
-<2> sync.WaitGroup
-<3> go runQuery call
+<1> The `log` channel is where all query routine communicate to.
+<2> A `sync.WaitGroup` is needed to know when all query routines are done, and thus the log channel can be closed.
+<3> Ten different queries are run, each in its own Go routine.
+They run independently and concurrently, reporting to the shared `log` channel.
 
 
 ifndef::backend-pdf[]

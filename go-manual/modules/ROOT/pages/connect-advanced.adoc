@@ -102,46 +102,35 @@ If authentication is disabled on the server, the `auth` parameter can be omitted
 
 == Custom address resolver
 
-When creating a `Driver` object, you can specify a _resolver_ function to resolve any addresses the driver receives ahead of DNS resolution.
-Your resolver function is called with an link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Address[`Address`] object and should return an iterable of link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Address[`Address`] objects (or values that can be used to construct `Address` objects)
+When creating a `DriverWithContext` object, you can specify a _resolver_ function to resolve any addresses the driver receives ahead of DNS resolution.
+Your resolver function is called with a link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5@v5.10.0/neo4j/config#ServerAddress[`ServerAddress`] object and should return a list of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5@v5.10.0/neo4j/config#ServerAddress[`ServerAddress`] objects.
 
 In the following example, the connection to `example.com` on port `9999` is resolved to `localhost` on port `7687`:
 
-[source,python]
+[source, go]
 ----
-import neo4j
+import (
+    "github.com/neo4j/neo4j-go-driver/v5/neo4j"
+    "github.com/neo4j/neo4j-go-driver/v5/neo4j/config"
+)
 
-
-def custom_resolver(socket_address):
-    # assert isinstance(socket_address, neo4j.Address)
-    if socket_address != ("example.com", 9999):
-        raise OSError(f"Unexpected socket address {socket_address!r}")
-
-    # You can return any neo4j.Address object
-    yield neo4j.Address(("localhost", 7687))  # IPv4
-    yield neo4j.Address(("::1", 7687, 0, 0))  # IPv6
-    yield neo4j.Address.parse("localhost:7687")
-    yield neo4j.Address.parse("[::1]:7687")
-
-    # or any tuple that can be passed to neo4j.Address(...).
-    # This will initially be interpreted as IPv4, but DNS resolution
-    # will turn it into IPv6 if appropriate.
-    yield "::1", 7687
-    # This will be interpreted as IPv6 directly, but DNS resolution will
-    # still happen.
-    yield "::1", 7687, 0, 0
-    yield "127.0.0.1", 7687
-
-
-driver = neo4j.GraphDatabase.driver("neo4j://example.com:9999",
-                                    auth=(user, password),
-                                    resolver=custom_resolver)
+driver, err := neo4j.NewDriverWithContext(
+    "neo4j://example.com:9999", neo4j.BasicAuth(dbUser, dbPassword, ""),
+    func(conf *config.Config) {
+        conf.AddressResolver = func(address config.ServerAddress) []config.ServerAddress {
+            return []config.ServerAddress{
+                neo4j.NewServerAddress("localhost", "7687")
+            }
+        }
+    })
+defer driver.Close(ctx)
 ----
 
 
 == Further connection parameters
 
-You can find all `Driver` configuration parameters in the link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#driver-configuration[API documentation].
+You can find all `DriverWithContext` configuration parameters in the link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5@v5.10.0/neo4j/config#Config[API documentation -- config package].
+
 
 ifndef::backend-pdf[]
 [discrete.glossary]
