@@ -1,190 +1,165 @@
 = Data types and mapping to Cypher types
 
-The tables in this section show the mapping between Cypher data types and Python types.
+The tables in this section show the mapping between Cypher data types and Go types.
 
 == Core types
 
 [options="header"]
 |===
 | Cypher Type | Python Type
-| <<null>>    | `None`
-| List        | `list`
-| Map         | `dict`
+| <<null>>    | `nil`
+| List        | `[]any`
+| Map         | `map[string]any`
 | Boolean     | `bool`
-| Integer     | `int`
-| Float       | `float`
-| String      | `str`
-| ByteArray   | `bytearray`
+| Integer     | `int64`
+| Float       | `float64`
+| String      | `string`
+| ByteArray   | `[]byte`
 |===
-
-For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#core-data-types[API documentation -- Core data types].
 
 
 == Temporal types
 
-Temporal data types are implemented by the `neo4j.time` module.
-It provides a set of types compliant with ISO-8601 and Cypher, which are similar to those found in Python's native `datetime` module.
-To convert between driver and native types, use the methods `.from_native()` and `.to_native()` (does not apply to `Duration`).
+The driver provides a set of temporal data types compliant with ISO-8601 and Cypher.
+Sub-second values are measured to nanosecond precision.
 
-Sub-second values are measured to nanosecond precision and the types are mostly compatible with link:https://pypi.org/project/pytz/[pytz].
-Some timezones (e.g., `pytz.utc`) work exclusively with the built-in `datetime.datetime`.
+The driver's types rely on Go's link:https://pkg.go.dev/time[`time`] types.
+All temporal types, except `neo4j.Duration`, are in fact `time.Date` objects under the hood.
+This means that:
 
+- if you want to _query_ the database with a temporal type, you instantiate a `time.Date` object and use it as query parameter (i.e. you don't need to care about driver's types)
+- if you _retrieve_ a temporal object that you had previously inserted starting from a `time.Date` object, you will get back a `time.Date` object (i.e. you don't need to care about driver's types)
+- if you receive a temporal object using one of  link:https://neo4j.com/docs/cypher-manual/current/functions/temporal/[_Cypher temporal functions_], you will get back the corresponding _driver type_ as displayed in the table below. You may then use `.Time()` on them to convert them into Go `time` objects.
++
 [options="header"]
 |===
-| Cypher Type   | Python Type
-| Date          | `neo4j.time.Date`
-| Time          | `neo4j.time.Time`†
-| LocalTime     | `neo4j.time.Time`††
-| DateTime      | `neo4j.time.DateTime`†
-| LocalDateTime | `neo4j.time.DateTime`††
-| Duration      | `neo4j.time.Duration`
+| Cypher Type   | Go Type
+| Date          | `neo4j.Date`
+| Time          | `neo4j.OffsetTime`
+| LocalTime     | `neo4j.LocalTime`
+| DateTime      | `neo4j.Time`
+| LocalDateTime | `neo4j.LocalDateTime`
+| Duration      | `neo4j.Duration`
 |===
 
-† Where `tzinfo` is not `None`. +
-†† Where `tzinfo` is `None`.
-
-.How to use temporal types in queries
-[source,python]
+.Using temporal types in queries
+[source, go]
 ----
-from datetime import datetime
-import pytz
-from neo4j import GraphDatabase
-from neo4j.time import DateTime
+package main
 
+import (
+    "fmt"
+    "context"
+    "time"
+    "github.com/neo4j/neo4j-go-driver/v5/neo4j"
+    "reflect"
+)
 
-URI = "neo4j://localhost:7687"
-AUTH = ("neo4j", "secretgraph")
+func main() {
+    ctx := context.Background()
 
+    // Connection to database
+    dbUri := "neo4j://localhost"
+    dbUser := "neo4j"
+    dbPassword := "verysecret"
+    driver, _ := neo4j.NewDriverWithContext(
+        dbUri,
+        neo4j.BasicAuth(dbUser, dbPassword, ""))
+    driver.VerifyConnectivity(ctx)
 
-friends_since = DateTime(year=1999, month=11, day=23,
-                         hour=7, minute=47, nanosecond=4123)
-friends_since = pytz.timezone("US/Eastern").localize(friends_since)
+    // Define a date, with timezone
+    location, _ := time.LoadLocation("Europe/Stockholm")
+    friendsSince := time.Date(2006, time.December, 16, 13, 59, 59, 999999999, location)
 
-# Python's native datetimes work as well.
-# They don't support the full feature-set of Neo4j's type though.
-# py_friends_since = datetime(year=1999, month=11, day=23, hour=7, minute=47)
-# py_friends_since = pytz.timezone("US/Eastern").localize(py_friends_since)
-
-# Create a friendship with the given DateTime, and return the DateTime
-with GraphDatabase.driver(URI, auth=AUTH) as driver:
-    records, summary, keys = driver.execute_query("""
+    result, err := neo4j.ExecuteQuery(ctx, driver, `
         MERGE (a:Person {name: $name})
         MERGE (b:Person {name: $friend})
-        MERGE (a)-[friendship:KNOWS {since: $friends_since}]->(b)
-        RETURN friendship.since
-        """, name="Alice", friend="Bob",
-        friends_since=friends_since  # or friends_since=py_friends_since
-    )
-    out_datetime = records[0]["friendship.since"]
-    print(out_datetime)  # 1999-11-23T07:47:00.000004123-05:00
-
-    # Converting DateTime to native datetime (lossy)
-    py_out_datetime = out_datetime.to_native()  # type: datetime
-    print(py_out_datetime)  # 1999-11-23 07:47:00.000004-05:00
+        MERGE (a)-[friendship:KNOWS {since: $friendsSince}]->(b)
+        RETURN friendship.since AS date
+        `, map[string]any{
+            "name": "Alice",
+            "friend": "Bob",
+            "friendsSince": friendsSince,
+        }, neo4j.EagerResultTransformer,
+        neo4j.ExecuteQueryWithDatabase("neo4j"))
+    if err != nil {
+        panic(err)
+    }
+    date, _ := result.Records[0].Get("date")
+    fmt.Println(reflect.TypeOf(date))  // time.Time
+    fmt.Println(date)  // 2006-12-16 13:59:59.999999999 +0200 EET
 ----
 
-For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#temporal-data-types[API documentation -- Temporal data types].
-
-
-=== `Date`
-
-Represents an instant capturing the date, but not the time, nor the timezone.
-
-[source, python]
+.Using driver's temporal types
+[source, go]
 ----
-from neo4j.time import Date
+package main
 
-d = Date(year=2021, month=11, day=2)
-print(d)  # '2021-11-02'
+import (
+    "fmt"
+    "context"
+    "time"
+    "github.com/neo4j/neo4j-go-driver/v5/neo4j"
+    "reflect"
+)
+
+func main() {
+    ctx := context.Background()
+
+    // Connection to database
+    dbUri := "neo4j://localhost"
+    dbUser := "neo4j"
+    dbPassword := "verysecret"
+    driver, _ := neo4j.NewDriverWithContext(
+        dbUri,
+        neo4j.BasicAuth(dbUser, dbPassword, ""))
+    driver.VerifyConnectivity(ctx)
+
+    // Query and return a neo4j.Time object
+    result, err := neo4j.ExecuteQuery(ctx, driver, `
+        MERGE (a:Person {name: $name})
+        MERGE (b:Person {name: $friend})
+        MERGE (a)-[friendship:KNOWS {since: time()}]->(b)
+        RETURN friendship.since AS time
+        `, map[string]any{
+            "name": "Alice",
+            "friend": "Sofia",
+            "friendsSince": friendsSince,
+        }, neo4j.EagerResultTransformer,
+        neo4j.ExecuteQueryWithDatabase("neo4j"))
+    if err != nil {
+        panic(err)
+    }
+    time, _ := result.Records[0].Get("time")
+    fmt.Println(reflect.TypeOf(time))  // time.Time
+    castDate, _ := date.(neo4j.Time)  // cast from `any` to `neo4j.Time`
+    fmt.Println(castDate.Time())  // -0001-11-30 12:18:08.973 +0000 Offset
 ----
-
-For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/types/temporal.html#date[API documentation -- Temporal data types -- Date].
-
-
-=== `Time`
-
-Represents an instant capturing the time, and the timezone offset in seconds, but not the date.
-
-[source, python]
-----
-from neo4j.time import Time
-
-t = Time(hour=7, minute=47, nanosecond=4123, tzinfo=pytz.FixedOffset(-240))
-print(t)  # '07:47:00.000004123-04:00'
-----
-
-For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/types/temporal.html#time[API documentation -- Temporal data types -- Time].
-
-
-=== `LocalTime`
-
-Represents an instant capturing the time of day, but not the date, nor the timezone.
-
-[source, python, indent=0]
-----
-from neo4j.time import Time
-
-t = Time(hour=7, minute=47, nanosecond=4123)
-print(t)  # '07:47:00.000004123'
-----
-
-For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/types/temporal.html#time[API documentation -- Temporal data types -- Time].
-
-
-=== `DateTime`
-
-Represents an instant capturing the date, the time, and the timezone identifier.
-
-[source, python]
-----
-from neo4j.time import DateTime
-import pytz
-
-dt = DateTime(year=2021, month=11, day=2, hour=7, minute=47, nanosecond=4123)
-dt = pytz.timezone("US/Eastern").localize(dt)  # time zone localization (optional)
-print(dt)  # '2021-11-02T07:47:00.000004123-04:00'
-----
-
-For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/types/temporal.html#datetime[API documentation -- Temporal data types -- DateTime].
-
-
-=== `LocalDateTime`
-
-Represents an instant capturing the date and the time, but not the timezone.
-
-[source, python]
-----
-from neo4j.time import DateTime
-
-dt = DateTime(year=2021, month=11, day=2, hour=7, minute=47, nanosecond=4123)
-print(dt)  # '2021-11-02T07:47:00.000004123'
-----
-
-For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/types/temporal.html#datetime[API documentation -- Temporal data types -- DateTime].
 
 
 === `Duration`
 
 Represents the difference between two points in time.
-A `datetime.timedelta` object passed as a parameter will always be implicitly converted to `neo4j.time.Duration`.
-It is not possible to convert from `neo4j.time.Duration` to `datetime.timedelta` (because `datetime.timedelta` lacks month support).
 
-[source, python]
+[source, go]
 ----
-from neo4j.time import Duration
-
-duration = Duration(years=1, days=2, seconds=3, nanoseconds=4)
-print(duration)  # 'P1Y2DT3.000000004S'
+duration := neo4j.Duration{
+    Months: 1,
+    Days: 2,
+    Seconds: 3,
+    Nanos: 4,
+}
+fmt.Println(duration)  # 'P1Y2DT3.000000004S'
 ----
 
-For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/types/temporal.html#duration[API documentation -- Temporal data types -- Duration].
+For full documentation, see link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/dbtype#Duration[API documentation -- Duration].
 
 
 == Spatial types
 
-Cypher supports spatial values (points), and Neo4j can store these point values as properties on nodes and relationships.
+Cypher supports link:{neo4j-docs-base-uri}/docs/cypher-manual/current/values-and-types/spatial/[spatial values] (points), and Neo4j can store these point values as properties on nodes and relationships.
 
-The object attribute `srid` (short for _Spatial Reference Identifier_) is a number identifying the coordinate system the spatial type is to be interpreted in.
+The object attribute `SpatialRefId` (short for _Spatial Reference Identifier_) is a number identifying the coordinate system the spatial type is to be interpreted in.
 You can think of it as a unique identifier for each spatial type.
 
 [options="header"]
@@ -383,37 +358,6 @@ with GraphDatabase.driver(URI, auth=AUTH) as driver:
 ----
 
 For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.graph.Path[API documentation -- Graph types -- Path].
-
-
-== Extended types
-
-The driver supports more types as query parameters, which get automatically mapped to one of the xref:_core_types[core types]. Because of this conversion, and because the server does not know anything about the extended types, the driver will never return these types in results, but always their corresponding mapping.
-
-[options="header"]
-|===
-| Parameter Type     | Mapped Python Type
-| tuple              | `list`
-| bytearray          | `bytes`
-| numpy `ndarray`    | `list` (nested)
-| pandas `DataFrame` | `dict`
-| pandas `Series`    | `list`
-| pandas `Array`     | `list`
-|===
-
-
-In general, if you are unsure about the type conversion that would happen on a given parameter, you can test it as in the following example:
-
-[source, python]
-----
-import neo4j
-
-with neo4j.GraphDatabase.driver(URI, auth=AUTH) as driver:
-    type_in = ("foo", "bar")
-    records, _, _ = driver.execute_query("RETURN $x AS type_out", x=type_in)
-    type_out = records[0].get("type_out")
-    print(type(type_out))  # <class 'list'>
-    print(type_out)        # ['foo', 'bar']
-----
 
 
 == Exceptions
