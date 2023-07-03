@@ -12,10 +12,10 @@ For queries with earlier versions, see xref:transactions.adoc[Run your own trans
 To create a node representing a person named `Alice`, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/merge/[`MERGE`]:
 
 .Create a node representing a person named `Alice`
-[source, python]
+[source, go]
 ----
 result, err := neo4j.ExecuteQuery(ctx, driver,
-    "CREATE (p:Person {name: $name}) RETURN p",  // <1>
+    "MERGE (p:Person {name: $name}) RETURN p",  // <1>
     map[string]any{  // <2>
         "name": "Alice",
     }, neo4j.EagerResultTransformer,

@@ -137,33 +137,85 @@ See link:https://neo4j.com/labs/apoc/current/installation/#docker[APOC - Install
 
 == Logging
 
-The driver logs messages through the native `logging` library to a logger named `neo4j`.
-To redirect log messages to standard output, use the link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.debug.watch[watch] function:
+The driver splits logging between driver events and Bolt events.
+To enable driver logging, use the `Config.Log` option when instantiating the driver:
 
-[source, python]
+[source, go]
 ----
-import sys
-from neo4j.debug import watch
+import (
+    "github.com/neo4j/neo4j-go-driver/v5/neo4j"
+    "github.com/neo4j/neo4j-go-driver/v5/neo4j/config"
+)
 
-watch("neo4j", out=sys.stdout)
+driver, err := neo4j.NewDriverWithContext(
+    dbUri,
+    neo4j.BasicAuth(dbUser, dbPassword, ""),
+    func(config *config.Config) {
+        config.Log = neo4j.ConsoleLogger(neo4j.DEBUG)
+    })
 ----
 
 .Example of log output upon driver connection
 [source, log]
 ----
-[DEBUG   ] [Thread 139807941394432] [Task None           ] 2023-03-31 09:31:39,616  [#0000]  _: <POOL> created, routing address IPv4Address(('localhost', 7687))
-[DEBUG   ] [Thread 139807941394432] [Task None           ] 2023-03-31 09:31:39,616  [#0000]  _: <POOL> acquire routing connection, access_mode='WRITE', database='neo4j'
-[DEBUG   ] [Thread 139807941394432] [Task None           ] 2023-03-31 09:31:39,616  [#0000]  _: <ROUTING> checking table freshness (readonly=False): table expired=True, has_server_for_mode=False, table routers={IPv4Address(('localhost', 7687))} => False
-[DEBUG   ] [Thread 139807941394432] [Task None           ] 2023-03-31 09:31:39,616  [#0000]  _: <POOL> attempting to update routing table from IPv4Address(('localhost', 7687))
-[DEBUG   ] [Thread 139807941394432] [Task None           ] 2023-03-31 09:31:39,616  [#0000]  _: <RESOLVE> in: localhost:7687
-[DEBUG   ] [Thread 139807941394432] [Task None           ] 2023-03-31 09:31:39,617  [#0000]  _: <RESOLVE> dns resolver out: 127.0.0.1:7687
-[DEBUG   ] [Thread 139807941394432] [Task None           ] 2023-03-31 09:31:39,617  [#0000]  _: <POOL> _acquire router connection, database='neo4j', address=ResolvedIPv4Address(('127.0.0.1', 7687))
-[DEBUG   ] [Thread 139807941394432] [Task None           ] 2023-03-31 09:31:39,617  [#0000]  _: <POOL> trying to hand out new connection
-[DEBUG   ] [Thread 139807941394432] [Task None           ] 2023-03-31 09:31:39,617  [#0000]  C: <OPEN> 127.0.0.1:7687
-[DEBUG   ] [Thread 139807941394432] [Task None           ] 2023-03-31 09:31:39,619  [#AF18]  C: <MAGIC> 0x6060B017
-[DEBUG   ] [Thread 139807941394432] [Task None           ] 2023-03-31 09:31:39,619  [#AF18]  C: <HANDSHAKE> 0x00000005 0x00020404 0x00000104 0x00000003
-[DEBUG   ] [Thread 139807941394432] [Task None           ] 2023-03-31 09:31:39,620  [#AF18]  S: <HANDSHAKE> 0x00000005
-[DEBUG   ] [Thread 139807941394432] [Task None           ] 2023-03-31 09:31:39,620  [#AF18]  C: HELLO {'user_agent': 'neo4j-python/5.6.0 Python/3.10.6-final-0 (linux)', 'routing': {'address': 'localhost:7687'}, 'scheme': 'basic', 'principal': 'neo4j', 'credentials': '*******'}
+2023-07-03 08:07:19.316   INFO  [pool 1] Created
+2023-07-03 08:07:19.316   INFO  [router 1] Created {context: map[address:localhost:7687]}
+2023-07-03 08:07:19.316   INFO  [driver 1] Created { target: localhost:7687 }
+2023-07-03 08:07:19.316  DEBUG  [session 2] Created
+2023-07-03 08:07:19.316   INFO  [router 1] Reading routing table from initial router: localhost:7687
+2023-07-03 08:07:19.316  DEBUG  [pool 1] Trying to borrow connection from [localhost:7687]
+2023-07-03 08:07:19.316   INFO  [pool 1] Connecting to localhost:7687
+2023-07-03 08:07:19.320   INFO  [bolt5 bolt-58@localhost:7687] Connected
+2023-07-03 08:07:19.320   INFO  [bolt5 bolt-58@localhost:7687] Retrieving routing table
+2023-07-03 08:07:19.320  DEBUG  [pool 1] Returning connection to localhost:7687 {alive:true}
+2023-07-03 08:07:19.320  DEBUG  [bolt5 bolt-58@localhost:7687] Resetting connection internal state
+2023-07-03 08:07:19.320  DEBUG  [router 1] New routing table for 'neo4j', TTL 300
+2023-07-03 08:07:19.320  DEBUG  [session 2] Resolved home database, uses db 'neo4j'
+2023-07-03 08:07:19.320  DEBUG  [pool 1] Trying to borrow connection from [localhost:7687]
+2023-07-03 08:07:19.321  DEBUG  [pool 1] Returning connection to localhost:7687 {alive:true}
+2023-07-03 08:07:19.321  DEBUG  [bolt5 bolt-58@localhost:7687] Resetting connection internal state
+2023-07-03 08:07:19.321  DEBUG  [router 1] Cleaning up
+2023-07-03 08:07:19.321  DEBUG  [session 2] Closed
+----
+
+Bolt logging can be enabled either:
+
+- per-query, with the configuration callback `neo4j.ExecuteQueryBoltLogger()`.
+This applies to individual queries run using xref:query-simple.adoc[`ExecuteQuery()`].
+- per-session, with the configuration option `BoltLogger`. This applies to all queries within the session.
+
+[source, go]
+.Enable logging for a query run with `ExecuteQuery`
+----
+result, err := neo4j.ExecuteQuery(ctx, driver,
+    "RETURN 42 AS n", nil, neo4j.EagerResultTransformer,
+    neo4j.ExecuteQueryWithDatabase("neo4j"),
+    neo4j.ExecuteQueryWithBoltLogger(neo4j.ConsoleBoltLogger()))
+----
+
+[source, go]
+.Enable logging for a session
+----
+session := driver.NewSession(ctx, neo4j.SessionConfig{
+    DatabaseName: "neo4j",
+    BoltLogger: neo4j.ConsoleBoltLogger(),
+})
+defer session.Close(ctx)
+session.Run(ctx, "RETURN 42 AS n", nil)
+----
+
+.Example of Bolt logging output
+[source, log]
+----
+2023-07-03 07:57:09.929   BOLT  [bolt-53@localhost:7687] C: BEGIN {"db":"neo4j"}
+2023-07-03 07:57:09.930   BOLT  [bolt-53@localhost:7687] S: SUCCESS {}
+2023-07-03 07:57:09.930   BOLT  [bolt-53@localhost:7687] C: RUN "RETURN 42 AS n" null null
+2023-07-03 07:57:09.930   BOLT  [bolt-53@localhost:7687] C: PULL {"n":1000}
+2023-07-03 07:57:09.936   BOLT  [bolt-53@localhost:7687] S: SUCCESS {"fields":["n"],"t_first":5}
+2023-07-03 07:57:09.937   BOLT  [bolt-53@localhost:7687] S: RECORD [42]
+2023-07-03 07:57:09.937   BOLT  [bolt-53@localhost:7687] S: SUCCESS {"t_first":1,"db":"neo4j"}
+2023-07-03 07:57:09.937   BOLT  [bolt-53@localhost:7687] C: COMMIT
+2023-07-03 07:57:09.938   BOLT  [bolt-53@localhost:7687] S: SUCCESS {"bookmark":"FB:kcwQhRyDJPONRxudy+QyzPSuSAaQ"}
 ----
 
 
