@@ -11,7 +11,7 @@ By passing one or multiple bookmarks along with a query, the server will make su
 
 == Bookmarks with `ExecuteQuery()`
 
-When xref:query-simple.adoc[querying the database with `ExecuteQuery()`], the driver manages bookmarks for you by using the driver's default bookmark manager (retrievable with `DriverWithContext.ExecuteQueryBookmarkManager()`).
+When xref:query-simple.adoc[querying the database with `ExecuteQuery()`], the driver manages bookmarks for you.
 In this case, you have the guarantee that subsequent queries can read previous changes without taking further action.
 
 [source, go]
@@ -80,7 +80,7 @@ func main() {
     if err != nil {
         panic(err)
     }
-    defer closeDriver(ctx, driver)
+    defer driver.Close(ctx)
     err = driver.VerifyConnectivity(ctx)
     if err != nil {
         panic(err)
@@ -88,6 +88,9 @@ func main() {
 
     // Bookmarks holder
     var savedBookmarks neo4j.Bookmarks
+
+    // All function calls below may return errors,
+    // we don't catch them here for simplicity.
 
     // Create the first person and employment relationship
     sessionA := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
@@ -113,17 +116,19 @@ func main() {
 }
 
 // Create a Person node
-func createPerson(ctx context.Context, session neo4j.SessionWithContext, name string) {
-    session.ExecuteWrite(ctx,
+func createPerson(ctx context.Context, session neo4j.SessionWithContext, name string) (any, error) {
+    return session.ExecuteWrite(ctx,
         func(tx neo4j.ManagedTransaction) (any, error) {
-            return tx.Run(ctx, "CREATE (:Person {name: $name})", map[string]any{"name": name})
+            return tx.Run(ctx,
+                "MERGE (:Person {name: $name})",
+                map[string]any{"name": name})
         })
 }
 
-// Create an employment relationship to a pre-existing company node.
-// This relies on the person first having been created.
-func employ(ctx context.Context, session neo4j.SessionWithContext, personName string, companyName string) {
-    session.ExecuteWrite(ctx,
+// Create an employment relationship to a pre-existing company node
+// This relies on the person first having been created
+func employ(ctx context.Context, session neo4j.SessionWithContext, personName string, companyName string) (any, error) {
+    return session.ExecuteWrite(ctx,
         func(tx neo4j.ManagedTransaction) (any, error) {
             return session.Run(ctx, `
                 MATCH (person:Person {name: $person_name})
@@ -137,8 +142,8 @@ func employ(ctx context.Context, session neo4j.SessionWithContext, personName st
 }
 
 // Create a friendship between two people
-func createFriendship(ctx context.Context, session neo4j.SessionWithContext, nameA string, nameB string) {
-    session.ExecuteWrite(ctx,
+func createFriendship(ctx context.Context, session neo4j.SessionWithContext, nameA string, nameB string) (any, error) {
+    return session.ExecuteWrite(ctx,
         func(tx neo4j.ManagedTransaction) (any, error) {
             return session.Run(ctx, `
                 MATCH (a:Person {name: $nameA})
@@ -152,12 +157,15 @@ func createFriendship(ctx context.Context, session neo4j.SessionWithContext, nam
 }
 
 // Retrieve and display all friendships
-func printFriendships(ctx context.Context, session neo4j.SessionWithContext) {
-    session.ExecuteRead(ctx,
+func printFriendships(ctx context.Context, session neo4j.SessionWithContext) (any, error) {
+    return session.ExecuteRead(ctx,
         func(tx neo4j.ManagedTransaction) (any, error) {
-            result, _ := session.Run(ctx,
+            result, err := session.Run(ctx,
                 "MATCH (a)-[:KNOWS]->(b) RETURN a.name, b.name",
                 nil)
+            if err != nil {
+                return nil, err
+            }
             records, _ := result.Collect(ctx)
             for _, record := range records {
                 nameA, _ := record.Get("a.name")
@@ -171,7 +179,6 @@ func printFriendships(ctx context.Context, session neo4j.SessionWithContext) {
 
 <1> Collect and combine bookmarks from different sessions using `SessionWithContext.LastBookmarks()` and `neo4j.CombineBookmarks()`.
 <2> Use them to initialize another session with the `Bookmarks` config parameter.
-
 
 image:{common-image}/driver-passing-bookmarks.svg[]
 

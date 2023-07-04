@@ -2,14 +2,13 @@
 
 When xref:query-simple.adoc[querying the database with `ExecuteQuery()`], the driver automatically creates a _transaction_. A transaction is a unit of work that is either _committed_ in its entirety or _rolled back_ on failure. You can include multiple Cypher statements in a single query, as for example when using `MATCH` and `MERGE` in sequence to xref:query-simple#_update_the_database[update the database], but you cannot have multiple queries and interleave some client-logic in between them.
 
-For these more advanced use-cases, the driver provides functions to take full control over the transaction lifecycle. These are called _managed transactions_, and you can think of them as a way of unwrapping the flow of `ExecuteQuery()` and being able to specify its desired behavior in more places.
+For these more advanced use-cases, the driver provides functions to take full control over the transaction lifecycle.
 
 
 == Create a session
 
 Before running a transaction, you need to obtain a _session_.
-Sessions act as concrete query channels between the driver and the server.
-In particular, sessions borrow connections from the _connection pool_ as needed, and ensure <<causal consistency>> is enforced.
+Sessions act as concrete query channels between the driver and the server, and ensure <<causal consistency>> is enforced.
 
 Sessions are created with the method `DriverWithContext.NewSession()`.
 Use the second argument to alter the session's configuration, among which for example the xref:_database_selection[target database].
@@ -29,6 +28,8 @@ Always xref:_close_sessions[close sessions] when you are done with them.
 
 [#managed-transactions]
 == Run a managed transaction
+
+You can think of managed transactions as a way of unwrapping the flow of `ExecuteQuery()` and being able to specify its desired behavior in more places.
 
 A transaction can contain any number of queries.
 As Neo4j is <<ACID>> compliant, *queries within a transaction will either be executed as a whole or not at all*: you cannot get a part of the transaction succeeding and another failing.
@@ -64,7 +65,7 @@ for _, person := range people.([]*neo4j.Record) {
 }
 ----
 
-<1> Create a session. A single session can be the container for multiple queries. Remember to close it when done.
+<1> Create a session. A single session can be the container for multiple queries. Remember to close it when done (here we `defer` its closure just after opening).
 <2> The `.ExecuteRead()` (or `.ExecuteWrite()`) method is the entry point into a transaction.
 <3> The transaction function callback is responsible of running queries.
 <4> Use the method link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#ManagedTransaction[`ManagedTransaction.Run()`] to run queries. Each query run returns a link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#ResultWithContext[`ResultWithContext`] object.
@@ -77,10 +78,10 @@ Use xref:query-simple#query-parameters[query parameters] instead, both for perfo
 Instead, always xref:process-result[process the result] in some way.
 Within a transaction function, a `return` statement where `error` is `nil` results in the transaction being committed, while the transaction is automatically rolled back if the returned `error` value is not `nil`.
 
-.A transaction with multiple queries, client logic, and potential roll backs.
+.A transaction with multiple queries, client logic, and potential roll backs
 [source, go]
 ----
-package main
+ppackage main
 
 import (
     "fmt"
@@ -92,12 +93,12 @@ import (
 
 func main() {
     ctx := context.Background()
-    var employeeThreshold int64 = 10  // Neo4j's integer map to Go's int64
+    var employeeThreshold int64 = 10  // Neo4j's integer maps to Go's int64
 
     // Connection to database
-    dbUri := "neo4j://localhost"
-    dbUser := "neo4j"
-    dbPassword := "verysecret"
+    dbUri := "<URI to Neo4j database>"
+    dbUser := "<Username>"
+    dbPassword := "<Password>"
     driver, err := neo4j.NewDriverWithContext(
         dbUri,
         neo4j.BasicAuth(dbUser, dbPassword, ""))
@@ -113,20 +114,23 @@ func main() {
     session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
     defer session.Close(ctx)
 
-    // Some error handling in query runs omitted for brevity
+    // Create 100 people and assign them to various organizations
     for i := 0; i < 100; i++ {
         name := "Thor" + strconv.Itoa(i)
-        orgId, _ := session.ExecuteWrite(ctx,
+        orgId, err := session.ExecuteWrite(ctx,
             func(tx neo4j.ManagedTransaction) (any, error) {
                 var orgId string
 
                 // Create new Person node with given name, if not exists already
-                tx.Run(
+                _, err := tx.Run(
                     ctx,
                     "MERGE (p:Person {name: $name})",
                     map[string]any{
                         "name": name,
                     })
+                if err != nil {
+                    return nil, err
+                }
 
                 // Obtain most recent organization ID and the number of people linked to it
                 result, err := tx.Run(
@@ -136,6 +140,9 @@ func main() {
                     ORDER BY o.createdDate DESC
                     LIMIT 1
                     `, nil)
+                if err != nil {
+                    return nil, err
+                }
                 org, err := result.Single(ctx)
 
                 // If no organization exists, create one and add Person to it
@@ -143,7 +150,7 @@ func main() {
                     orgId, _ = createOrganization(ctx, tx)
                     fmt.Println("No orgs available, created", orgId)
                     err = addPersonToOrganization(ctx, tx, name, orgId)
-                    if err == nil {
+                    if err != nil {
                         return nil, errors.New("Failed to add person to new org")
                         // Transaction will roll back
                         // -> not even Person and/or Organization is created!
@@ -186,23 +193,33 @@ func main() {
                 // Return the Organization ID to which the new Person ends up in
                 return orgId, nil
             })
-        fmt.Println("User", name, "added to organization", orgId)
+        if err != nil {
+            fmt.Println(err)
+        } else {
+            fmt.Println("User", name, "added to organization", orgId)
+        }
     }
 }
 
 func createOrganization(ctx context.Context, tx neo4j.ManagedTransaction) (string, error) {
-    result, _ := tx.Run(
+    result, err := tx.Run(
         ctx, `
         CREATE (o:Organization {id: randomuuid(), createdDate: datetime()})
         RETURN o.id AS id
         `, nil)
+    if err != nil {
+        return "", err
+    }
     org, err := result.Single(ctx)
+    if err != nil {
+        return "", err
+    }
     orgId, _ := org.AsMap()["id"]
     return orgId.(string), err
 }
 
 func addPersonToOrganization(ctx context.Context, tx neo4j.ManagedTransaction, personName string, orgId string) (error) {
-    result, _ := tx.Run(
+    _, err := tx.Run(
         ctx, `
         MATCH (o:Organization {id: $orgId})
         MATCH (p:Person {name: $name})
@@ -211,7 +228,6 @@ func addPersonToOrganization(ctx context.Context, tx neo4j.ManagedTransaction, p
             "orgId": orgId,
             "name": personName,
         })
-    _, err := result.Consume(ctx)
     return err
 }
 
@@ -293,14 +309,13 @@ func otherBankTransferApi(ctx context.Context, customerId string, otherBankId st
     // make some API call to other bank
 
 func decreaseCustomerBalance(ctx context.Context, tx neo4j.ExplicitTransaction, customerId string, amount float) (error) {
-    result = tx.Run(ctx, `
+    _, err = tx.Run(ctx, `
         MATCH (c:Customer {id: $id})
         SET c.balance = c.balance - $amount
         `, map[string]any{
             "id": customerId,
             "amount": amount,
         })
-    _, err := result.Consume(ctx)
     return err
 }
 
@@ -380,7 +395,7 @@ Do not rely on the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/use/
 
 === Request routing
 
-In a cluster environment, all sessions are opened in write mode, routing them to the leader.
+In a cluster environment, all sessions are opened in write mode, routing them to a writer.
 You can change this by explicitly setting the configuration parameter `AccessMode` to either `neo4j.AccessModeRead` or `neo4j.AccessModeWrite`.
 Note that `.ExecuteRead()` and `.ExecuteWrite()` automatically override the session's default access mode.
 
@@ -457,9 +472,10 @@ When a session is closed, it is returned to the connection pool to be later reus
 ----
 session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
 defer session.Close(ctx)
-
 // Session usage
 ----
+
+There are corner-cases in which session closure might return an error, so you may want to catch those cases as well.
 
 
 ifndef::backend-pdf[]

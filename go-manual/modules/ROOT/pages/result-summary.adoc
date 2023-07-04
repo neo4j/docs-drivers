@@ -21,8 +21,7 @@ result, _ := neo4j.ExecuteQuery(ctx, driver, `
     `, nil,
     neo4j.EagerResultTransformer,
     neo4j.ExecuteQueryWithDatabase("neo4j"))
-
-resultSummary := result.Summary
+summary := result.Summary
 ----
 
 If you are using xref:transactions.adoc[transaction functions], you can retrieve the query execution summary with the method `Result.Consume()`.
@@ -33,48 +32,51 @@ This means that any record which has not yet been processed is not available any
 ----
 session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
 defer session.Close(ctx)
-resultSummary, _ := session.ExecuteWrite(ctx,
+summary, _ := session.ExecuteWrite(ctx,
     func(tx neo4j.ManagedTransaction) (any, error) {
-        result, _ := tx.Run(ctx, `
+        result, err := tx.Run(ctx, `
             UNWIND ["Alice", "Bob"] AS name
             MERGE (p:Person {name: name})
             `, nil)
         summary, _ := result.Consume(ctx)
-        return summary, nil
+        return summary, err
     })
 ----
 
 
 ## Query counters
 
-The property `ResultSummary.counters` contains counters for the operations that a query triggered (as a link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#summarycounters[`SummaryCounters`] object).
+The method `ResultSummary.Counters()` returns counters for the operations that a query triggered (as a link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#Counters[`Counters`] object).
 
 .Insert some data and display the query counters
 [source, python]
 ----
-summary = driver.execute_query("""
+result, _ := neo4j.ExecuteQuery(ctx, driver, `
     MERGE (p:Person {name: $name})
     MERGE (p)-[:KNOWS]->(:Person {name: $friend})
-    """, name="Mark", friend="Bob",
-    database_="neo4j",
-).summary
-print(summary.counters)
+    `, map[string]any{
+        "name": "Mark",
+        "friend": "Bob",
+    }, neo4j.EagerResultTransformer,
+    neo4j.ExecuteQueryWithDatabase("neo4j"))
+summary := result.Summary
+print(summary.Counters())
 """
 {'_contains_updates': True, 'labels_added': 2, 'relationships_created': 1,
  'nodes_created': 2, 'properties_set': 2}
 """
 ----
 
-There are two additional boolean properties which act as meta-counters:
+There are two additional boolean methods which act as meta-counters:
 
-- `contains_updates` -- whether the query triggered any write operation on the database on which it ran
-- `contains_system_updates` -- whether the query updated the `system` database
+- `.ContainsUpdates()` -- whether the query triggered any write operation on the database on which it ran
+- `.ContainsSystemUpdates()` -- whether the query updated the `system` database
 
 
 ## Query execution plan
 
 If you prefix a query with `EXPLAIN`, the server will return the plan it _would_ use to run the query, but will not actually run it.
-The plan is then available under the property `ResultSummary.Plan()`, and contains the list of link:{neo4j-docs-base-uri}/cypher-manual/current/execution-plans/operators/[Cypher operators] that would be used to retrieve the result set.
+You can retrieve the plan by calling `ResultSummary.Plan()`, which contains the list of link:{neo4j-docs-base-uri}/cypher-manual/current/execution-plans/operators/[Cypher operators] that would be used to retrieve the result set.
 You may use this information to locate potential bottlenecks or room for performance improvements (for example through the creation of indexes).
 
 [source, go, role=nocollapse]
@@ -87,7 +89,6 @@ result, _ := neo4j.ExecuteQuery(ctx, driver,
     neo4j.EagerResultTransformer,
     neo4j.ExecuteQueryWithDatabase("neo4j"))
 fmt.Println(result.Summary.Plan().Arguments()["string-representation"])
-
 /*
 Planner COST
 Runtime PIPELINED
@@ -110,8 +111,7 @@ Total database accesses: ?
 
 If you instead prefix a query with the keyword `PROFILE`, the server will return the execution plan it has used to run the query, together with profiler statistics.
 This includes the list of operators that were used and additional profiling information about each intermediate step.
-The plan is available under the property `ResultSummary.Profile()`.
-You may use this information to locate potential bottlenecks or room for performance improvements.
+You can access the plan by calling `ResultSummary.Profile()`.
 Notice that the query is also _run_, so the result object also contains any result records.
 
 [source, go, role=nocollapse]
@@ -124,7 +124,6 @@ result, _ := neo4j.ExecuteQuery(ctx, driver,
     neo4j.EagerResultTransformer,
     neo4j.ExecuteQueryWithDatabase("neo4j"))
 fmt.Println(result.Summary.Profile().Arguments()["string-representation"])
-
 /*
 Planner COST
 Runtime PIPELINED
@@ -150,7 +149,7 @@ For more information and examples, see link:{neo4j-docs-base-uri}/cypher-manual/
 
 ## Notifications
 
-The property `ResultSummary.Notifications()` contains a list of link:{neo4j-docs-base-uri}/status-codes/current/notifications[notifications coming from the server], if any were raised by the execution of the query.
+The method `ResultSummary.Notifications()` returns a list of link:{neo4j-docs-base-uri}/status-codes/current/notifications[notifications coming from the server], if any were raised by the execution of the query.
 These include recommendations for performance improvements, warnings about the usage of deprecated features, and other hints about sub-optimal usage of Neo4j.
 Each notification comes as a link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#Notification[`Notification`] object.
 
@@ -188,7 +187,7 @@ Starting from version 5.7, you can use the parameters `NotificationsMinSeverity`
 You may disable notifications altogether by setting the minimum severity to `OFF`.
 You can use those parameters either when creating a driver instance, or when creating a session.
 
-Restricting the amount of notifications the server is allowed to raise can improve performance.
+There is a slight performance gain in restricting the amount of notifications the server is allowed to raise.
 
 .Allow only `Warning` notifications, but not of `Hint` or `Generic` category
 [source, go]

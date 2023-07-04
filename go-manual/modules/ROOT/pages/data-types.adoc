@@ -6,7 +6,7 @@ The tables in this section show the mapping between Cypher data types and Go typ
 
 [options="header"]
 |===
-| Cypher Type | Python Type
+| Cypher Type | Go Type
 | <<null>>    | `nil`
 | List        | `[]any`
 | Map         | `map[string]any`
@@ -27,7 +27,7 @@ The driver's types rely on Go's link:https://pkg.go.dev/time[`time`] types.
 All temporal types, except `neo4j.Duration`, are in fact `time.Date` objects under the hood.
 This means that:
 
-- if you want to _query_ the database with a temporal type, you instantiate a `time.Date` object and use it as query parameter (i.e. you don't need to care about driver's types)
+- if you want to _query_ the database with a temporal type, instantiate a `time.Date` object and use it as query parameter (i.e. you don't need to care about driver's types)
 - if you _retrieve_ a temporal object that you had previously inserted starting from a `time.Date` object, you will get back a `time.Date` object (i.e. you don't need to care about driver's types)
 - if you receive a temporal object using one of  link:https://neo4j.com/docs/cypher-manual/current/functions/temporal/[_Cypher temporal functions_], you will get back the corresponding _driver type_ as displayed in the table below. You may then use `.Time()` on them to convert them into Go `time.Date` objects.
 +

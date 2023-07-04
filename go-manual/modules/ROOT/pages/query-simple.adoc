@@ -31,10 +31,11 @@ fmt.Printf("Created %v nodes in %+v.\n",
 
 <1> specifies the Cypher query
 <2> is a map of _query parameters_
-<3> specifies which database the query should be run against.
+<3> specifies which database the query should be run against
 
 [NOTE]
-`MERGE` creates a new node matching the requirements unless one already exists, in which case nothing is done.
+`MERGE` creates a new node matching the requirements unless one already exists.
+If a matching node already exists, it is returned.
 For _strict creation_, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/create/[`CREATE`].
 
 
@@ -56,7 +57,7 @@ if err != nil {
 
 // Loop through results and do something with them
 for _, record := range result.Records {  // <1>
-    name, _ := record.Get("name")  // .Get 2nd return is whether key is present
+    name, _ := record.Get("name")  // .Get() 2nd return is whether key is present
     fmt.Println(name)
     // or
     // fmt.Println(record.AsMap())  // get Record as a map
@@ -69,7 +70,7 @@ fmt.Printf("The query `%v` returned %v records in %+v.\n",
 ----
 
 <1> `result.Records` contains the result as an array of `Record` objects
-<2> `result.Summary` contains the xref:result-summary.adoc[summary of execution] returned by the server.
+<2> `result.Summary` contains the xref:result-summary.adoc[summary of execution] returned by the server
 
 [TIP]
 *When accessing a record's content, all its properties are of type `any`.*
@@ -96,9 +97,7 @@ result, err := neo4j.ExecuteQuery(ctx, driver, `
 if err != nil {
     panic(err)
 }
-
-fmt.Println(
-    "Query updated the database?",
+fmt.Println("Query updated the database?",
     result.Summary.Counters().ContainsUpdates())
 ----
 
@@ -118,9 +117,7 @@ result, err := neo4j.ExecuteQuery(ctx, driver, `
 if err != nil {
     panic(err)
 }
-
-fmt.Println(
-    "Query updated the database?",
+fmt.Println("Query updated the database?",
     result.Summary.Counters().ContainsUpdates())
 ----
 
@@ -151,9 +148,7 @@ result, err := neo4j.ExecuteQuery(ctx, driver, `
 if err != nil {
     panic(err)
 }
-
-fmt.Println(
-    "Query updated the database?",
+fmt.Println("Query updated the database?",
     result.Summary.Counters().ContainsUpdates())
 ----
 
@@ -177,7 +172,7 @@ parameters = map[string]any{
     "age": 42,
 }
 neo4j.ExecuteQuery(ctx, driver,
-    "MERGE (:Person {name: $name})",
+    "MERGE (:Person {name: $name, age: $age})",
     parameters,
     neo4j.EagerResultTransformer,
     neo4j.ExecuteQueryWithDatabase("neo4j"))
@@ -227,7 +222,7 @@ neo4j.ExecuteQuery(ctx, driver,
     neo4j.ExecuteQueryWithReadersRouting())
 ----
 
-Routing a _write_ query to _read_ nodes will likely result in a runtime error, but xref:transactions#access-control-note[do not rely on this for security purposes].
+Even though routing a _write_ query to _read_ nodes will likely result in a runtime error, xref:transactions#access-control-note[do not rely on this for security purposes].
 
 
 [#impersonation]
@@ -268,16 +263,16 @@ func main() {
     ctx := context.Background()
 
     // Connection to database
-    dbUri := "neo4j://localhost"
-    dbUser := "neo4j"
-    dbPassword := "verysecret"
+    dbUri := "<URI to Neo4j database>"
+    dbUser := "<Username>"
+    dbPassword := "<Password>"
     driver, err := neo4j.NewDriverWithContext(
         dbUri,
         neo4j.BasicAuth(dbUser, dbPassword, ""))
     if err != nil {
         panic(err)
     }
-    defer closeDriver(ctx, driver)
+    defer driver.Close(ctx)
     err = driver.VerifyConnectivity(ctx)
     if err != nil {
         panic(err)
@@ -348,13 +343,6 @@ func main() {
     fmt.Printf("\nThe query `%v` returned %v records in %+v.\n",
         result.Summary.Query().Text(), len(result.Records),
         result.Summary.ResultAvailableAfter())
-}
-
-func closeDriver(ctx context.Context, driver neo4j.DriverWithContext) {
-    err := driver.Close(ctx)
-    if err != nil {
-        panic(err)
-    }
 }
 ----
 

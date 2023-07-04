@@ -106,7 +106,11 @@ result, err := neo4j.ExecuteQuery(ctx, driver,
 [source, go]
 ----
 session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
-session.Run(ctx, "MATCH (p:Person|Animal {name: $name}) RETURN p", nil)
+session.Run(ctx,
+    "MATCH (p:Person|Animal {name: $name}) RETURN p",
+    map[string]any{
+        "name": "Alice",
+    })
 ----
 
 [discrete]
@@ -125,7 +129,11 @@ result, err := neo4j.ExecuteQuery(ctx, driver,
 [source, go]
 ----
 session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
-session.Run(ctx, "MATCH (p {name: $name}) RETURN p", nil)
+session.Run(ctx,
+    "MATCH (p {name: $name}) RETURN p",
+    map[string]any{
+        "name": "Alice",
+    })
 ----
 
 
@@ -143,9 +151,9 @@ numbers := make([]int, 10000)
 for i := range numbers { numbers[i] = i }
 result, err := neo4j.ExecuteQuery(ctx, driver, `
     WITH $numbers AS batch
-    UNWIND batch AS node
+    UNWIND batch AS value
     MERGE (n:Number)
-    SET n.value = node.value
+    SET n.value = value
     `, map[string]any{
         "numbers": numbers,
     }, neo4j.EagerResultTransformer,
@@ -177,7 +185,7 @@ The most efficient way of performing a _first import_ of large amounts of data i
 In a cluster, *route read queries to link:{neo4j-docs-base-uri}/operations-manual/current/clustering/introduction/#clustering-secondary-mode[secondary nodes]*. You do this by:
 
 - using the xref:query-simple.adoc#_request_routing[`ExecuteQueryWithReadersRouting()` configuration callback in `ExecuteQuery()`] calls
-- using `.ExecuteRead()` instead of `.ExecuteWrite()` (for managed transactions)
+- using `ExecuteRead()` instead of `ExecuteWrite()` (for managed transactions)
 - setting xref:transactions.adoc#_request_routing[`AccessMode: neo4j.AccessModeRead` when creating a new session] (for explicit transactions).
 
 [discrete]
@@ -193,9 +201,9 @@ result, err := neo4j.ExecuteQuery(ctx, driver,
 
 [source, go]
 ----
-session.ExecuteRead(ctx,
+result, err := session.ExecuteRead(ctx,
     func(tx neo4j.ManagedTransaction) (any, error) {
-        result, err := tx.Run(ctx, "MATCH (p:Person) RETURN p", nil)
+        return tx.Run(ctx, "MATCH (p:Person) RETURN p", nil)
     })
 ----
 
@@ -213,9 +221,9 @@ result, err := neo4j.ExecuteQuery(ctx, driver,
 
 [source, go]
 ----
-session.ExecuteWrite(ctx,  // don't ask to write on a read-only operation
+result, err := session.ExecuteWrite(ctx,  // don't ask to write on a read-only operation
     func(tx neo4j.ManagedTransaction) (any, error) {
-        result, err := tx.Run(ctx, "MATCH (p:Person) RETURN p", nil)
+        return tx.Run(ctx, "MATCH (p:Person) RETURN p", nil)
     })
 ----
 
@@ -241,7 +249,7 @@ result, err := neo4j.ExecuteQuery(ctx, driver,
 
 link:{neo4j-docs-base-uri}/cypher-manual/current/query-tuning/basic-example/#_profile_query[*Profile your queries*] to locate queries whose performance can be improved.
 You can profile queries by prepending them with `PROFILE`.
-The server output is available in the `Profile()` property of the xref:result-summary.adoc[`ResultSummary`] object.
+The server output is available through the `.Profile()` method on the xref:result-summary.adoc[`ResultSummary`] object.
 
 [source, go, role=nocollapse]
 ----
@@ -253,7 +261,6 @@ result, _ := neo4j.ExecuteQuery(ctx, driver,
     neo4j.EagerResultTransformer,
     neo4j.ExecuteQueryWithDatabase("neo4j"))
 fmt.Println(result.Summary.Profile().Arguments()["string-representation"])
-
 /*
 Planner COST
 Runtime PIPELINED
@@ -276,7 +283,7 @@ Total database accesses: 12, total allocated memory: 184
 
 In case some queries are so slow that you are unable to even run them in reasonable times, you can prepend them with `EXPLAIN` instead of `PROFILE`.
 This will return the _plan_ that the server would use to run the query, but without executing it.
-The server output is available in the `Plan()` property of the xref:result-summary.adoc[`ResultSummary`] object.
+The server output is available through the `.Plan()` method on the xref:result-summary.adoc[`ResultSummary`] object.
 
 [source, go, role=nocollapse]
 ----
@@ -288,7 +295,6 @@ result, _ := neo4j.ExecuteQuery(ctx, driver,
     neo4j.EagerResultTransformer,
     neo4j.ExecuteQueryWithDatabase("neo4j"))
 fmt.Println(result.Summary.Plan().Arguments()["string-representation"])
-
 /*
 Planner COST
 Runtime PIPELINED
@@ -319,8 +325,6 @@ This is likely to be more impactful on performance if you parallelize complex an
 == Filter notifications
 
 xref:result-summary.adoc#_filter_notifications[Filter the category and/or severity of notifications] the server should raise.
-
-// - with SET, specify individual properties one by one instead of using += (too low impact)
 
 
 ifndef::backend-pdf[]

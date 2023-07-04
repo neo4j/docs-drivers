@@ -24,7 +24,7 @@ result, err := session.Run(
 
 An implicit transaction gets committed _at the latest_ when the session is destroyed, or before another transaction is executed within the same session.
 Other than that, there is no clear guarantee on when exactly an implicit transaction will be committed during the lifetime of a session.
-To ensure an implicit transaction is committed, you can call the `.Consume()` method on its result.
+To ensure an implicit transaction is committed, you can call the `.Consume(ctx)` method on its result.
 
 Since the driver cannot figure out whether the query in a `SessionWithContext.Run()` call requires a read or write session with the database, it defaults to write. If your implicit transaction contains read queries only, there is a performance gain in xref:transactions#_request_routing[making the driver aware] by setting the session config `AccessMode: neo4j.AccessModeRead` when creating the session.
 
@@ -41,7 +41,7 @@ The most common use case for using `SessionWithContext.Run()` is for importing l
 ----
 session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
 defer session.Close(ctx)
-result, _ := session.Run(
+result, err := session.Run(
     ctx, `
     LOAD CSV FROM 'https://data.neo4j.com/bands/artists.csv' AS line
     CALL {
@@ -182,7 +182,7 @@ Bolt logging can be enabled either:
 
 - per-query, with the configuration callback `neo4j.ExecuteQueryBoltLogger()`.
 This applies to individual queries run using xref:query-simple.adoc[`ExecuteQuery()`].
-- per-session, with the configuration option `BoltLogger`. This applies to all queries within the session.
+- per-session, with the configuration option `BoltLogger`. This applies to all queries within a session.
 
 [source, go]
 .Enable logging for a query run with `ExecuteQuery`
