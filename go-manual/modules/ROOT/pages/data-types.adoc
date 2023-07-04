@@ -29,7 +29,7 @@ This means that:
 
 - if you want to _query_ the database with a temporal type, you instantiate a `time.Date` object and use it as query parameter (i.e. you don't need to care about driver's types)
 - if you _retrieve_ a temporal object that you had previously inserted starting from a `time.Date` object, you will get back a `time.Date` object (i.e. you don't need to care about driver's types)
-- if you receive a temporal object using one of  link:https://neo4j.com/docs/cypher-manual/current/functions/temporal/[_Cypher temporal functions_], you will get back the corresponding _driver type_ as displayed in the table below. You may then use `.Time()` on them to convert them into Go `time` objects.
+- if you receive a temporal object using one of  link:https://neo4j.com/docs/cypher-manual/current/functions/temporal/[_Cypher temporal functions_], you will get back the corresponding _driver type_ as displayed in the table below. You may then use `.Time()` on them to convert them into Go `time.Date` objects.
 +
 [options="header"]
 |===
@@ -164,221 +164,233 @@ You can think of it as a unique identifier for each spatial type.
 
 [options="header"]
 |===
-| Cypher Type       | Python Type
-| Point             | `neo4j.spatial.Point`
-| Point (Cartesian) | `neo4j.spatial.CartesianPoint`
-| Point (WGS-84)    | `neo4j.spatial.WGS84Point`
+| Cypher Type        | Go Type          | SpatialRefId
+| 2D Cartesian Point | `dbtype.Point2D` | 7203
+| 2D WGS-84 Point    | `dbtype.Point2D` | 9157
+| 3D Cartesian Point | `dbtype.Point3D` | 4326
+| 3D WGS-84 Point    | `dbtype.Point2D` | 4979
 |===
 
-For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/types/spatial.html[API documentation -- Spatial types].
+[NOTE]
+Spatial types are implemented in the `dbtype` package, so that the actual types are `dbtype.Point2D/3D`.
+However, they are also imported in the main `neo4j` package, so that they can also be used as `neo4j.Point2D/3D`.
 
-=== `CartesianPoint`
 
-Represents a point in 2D/3D Cartesian space. +
-Exposes properties `x`, `y`, `z` (the latter for 3D points only).
+=== `Point2D`
 
-[source, python]
+The type `Point2D` can be used to represent either a 2D Cartesian point or a 2D World Geodetic System (WGS84) point, depending on the value of `SpatialRefId`.
+
+[source, go]
 ----
-from neo4j.spatial import CartesianPoint
+// A 2D Cartesian Point
+cartesian2d := neo4j.Point2D{
+	X:            1.23,
+	Y:            4.56,
+	SpatialRefId: 7203,
+}
+fmt.Println(cartesian2d)
+// Point{srId=7203, x=1.230000, y=4.560000}
 
-# A 2D CartesianPoint
-point = CartesianPoint((1.23, 4.56))
-print(point.x, point.y, point.srid)
-# 1.23 4.56 7203
-
-# A 3D CartesianPoint
-point = CartesianPoint((1.23, 4.56, 7.89))
-print(point.x, point.y, point.z, point.srid)
-# 1.23 4.56 7.8 9157
-----
-
-For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/types/spatial.html#cartesianpoint[API documentation -- Spatial types -- CartesianPoint].
-
-=== `WGS84Point`
-
-Represents a point in the World Geodetic System (WGS84). +
-Exposes properties `longitude`, `latitude`, `height` (the latter for 3D points only), which are aliases for `x`, `y`, `z`.
-
-[source, python]
-----
-from neo4j.spatial import WGS84Point
-
-# A 2D WGS84Point
-point = WGS84Point((1.23, 4.56))
-print(point.longitude, point.latitude, point.srid)
-# or print(point.x, point.y, point.srid)
-# 1.23 4.56 4326
-
-# A 3D WGS84Point
-point = WGS84Point((1.23, 4.56, 7.89))
-print(point.longitude, point.latitude, point.height, point.srid)
-# or print(point.x, point.y, point.z, point.srid)
-# 1.23 4.56 7.89 4979
+// A 2D WGS84 Point
+wgs842d := neo4j.Point2D{
+	X:            1.23,
+	Y:            4.56,
+	SpatialRefId: 9157,
+}
+fmt.Println(wgs842d)
+// Point{srId=9157, x=1.230000, y=4.560000}
 ----
 
-For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/types/spatial.html#wgs84point[API documentation -- Spatial types -- WSG84Point].
+
+=== `Point3D`
+
+The type `Point3D` can be used to represent either a 3D Cartesian point or a 3D World Geodetic System (WGS84) point, depending on the value of `SpatialRefId`.
+
+[source, go]
+----
+// A 3D Cartesian Point
+cartesian3d := dbtype.Point3D{
+    X:            1.23,
+    Y:            4.56,
+    Z:            7.89,
+    SpatialRefId: 9157,
+}
+fmt.Println(cartesian3d)
+// Point{srId=9157, x=1.230000, y=4.560000, z=7.890000}
+
+// A 3D WGS84 Point
+wgs843d := dbtype.Point3D{
+    X:            1.23,
+    Y:            4.56,
+    Z:            7.89,
+    SpatialRefId: 4979,
+}
+fmt.Println(wgs843d)
+// Point{srId=4979, x=1.230000, y=4.560000, z=7.890000}
+----
 
 
 == Graph types
 
-*Graph types are only passed as results and may not be used as parameters*.
-The section Manipulate query results -- Transform to graph contains an example with graph types.
+*Graph types are only returned as query results and may not be used as parameters*.
 
 [options="header"]
 |===
 | Cypher Type  | Python Type
-| Node         | `neo4j.graph.Node`
-| Relationship | `neo4j.graph.Relationship`
-| Path         | `neo4j.graph.Path`
+| Node         | `dbtype.Node`
+| Relationship | `dbtype.Relationship`
+| Path         | `dbtype.Path`
 |===
-
-For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#graph-data-types[API documentation -- Graph types].
 
 
 === `Node`
 Represents a node in a graph. +
-The property `element_id` provides an identifier for the entity.
+The property `ElementId` contains the database internal identifier for the entity.
 This should be used with care, as no guarantees are given about the mapping between id values and elements outside the scope of a single transaction.
 
-[source, python]
+[source, go]
 ----
-from neo4j import GraphDatabase
+result, err := neo4j.ExecuteQuery(ctx, driver, `
+    MERGE (p:Person {name: $name}) RETURN p AS person, p.name as name
+    `, map[string]any{
+        "name": "Alice",
+    }, neo4j.EagerResultTransformer,
+    neo4j.ExecuteQueryWithDatabase("neo4j"))
+if err != nil {
+    panic(err)
+}
+node, _ := result.Records[0].AsMap()["person"].(neo4j.Node)
+fmt.Println("Node ID:", node.ElementId)
+fmt.Println("Node labels:", node.Labels)
+fmt.Println("Node properties:", node.Props)
 
-
-URI = "neo4j://localhost:7687"
-AUTH = ("neo4j", "secretgraph")
-
-with GraphDatabase.driver(URI, auth=AUTH) as driver:
-    records, _, _ = driver.execute_query(
-        "MERGE (p:Person {name: $name}) RETURN p AS person",
-        name="Alice",
-        database_="neo4j",
-    )
-    for record in records:
-        node = record["person"]
-        print(f"Node ID: {node.element_id}\n"
-              f"Labels: {node.labels}\n"
-              f"Properties: {node.items()}\n"
-        )
-
-# Node ID: 4:73e9a61b-b501-476d-ad6f-8d7edf459251:0
-# Labels: frozenset({'Person'})
-# Properties: dict_items([('name', 'Alice')])
+// Node ID: 4:2691aa68-87cc-467d-9d09-431df9f5c456:0
+// Node labels: [Person]
+// Node properties: map[name:Alice]
 ----
 
-For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.graph.Node[API documentation -- Graph types -- Node].
+For full documentation, see link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/dbtype#Node[API documentation -- Node].
 
 
 === `Relationship`
 
 Represents a relationship in a graph. +
-The property `element_id` provides an identifier for the entity.
+The property `ElementId` contains the database internal identifier for the entity.
 This should be used with care, as no guarantees are given about the mapping between id values and elements outside the scope of a single transaction.
 
-[source, python]
+[source, go]
 ----
-from neo4j import GraphDatabase
+result, err := neo4j.ExecuteQuery(ctx, driver, `
+    MERGE (p:Person {name: $name})
+    MERGE (p)-[r:KNOWS {status: $status, since: date()}]->(friend:Person {name: $friendName})
+    RETURN r AS friendship
+    `, map[string]any{
+        "name": "Alice",
+        "status": "BFF",
+        "friendName": "Bob",
+    }, neo4j.EagerResultTransformer,
+    neo4j.ExecuteQueryWithDatabase("neo4j"))
+if err != nil {
+    panic(err)
+}
+relationship, _ := result.Records[0].AsMap()["friendship"].(neo4j.Relationship)
+fmt.Println("Relationship ID:", relationship.ElementId)
+fmt.Println("Relationship type:", relationship.Type)
+fmt.Println("Relationship properties:", relationship.Props)
+fmt.Println("Relationship start elID:", relationship.StartElementId)
+fmt.Println("Relationship end elID:", relationship.EndElementId)
 
-
-URI = "neo4j://localhost:7687"
-AUTH = ("neo4j", "secretgraph")
-
-with GraphDatabase.driver(URI, auth=AUTH) as driver:
-    records, _, _ = driver.execute_query("""
-        MERGE (p:Person {name: $name})
-        MERGE (p)-[r:KNOWS {status: $status, since: date()}]->(friend:Person {name: $friend_name})
-        RETURN r AS friendship
-        """, name="Alice", status="BFF", friend_name="Bob",
-    )
-    for record in records:
-        relationship = record["friendship"]
-        print(f"Relationship ID: {relationship.element_id}\n"
-              f"Start node: {relationship.start_node}\n"
-              f"End node: {relationship.end_node}\n"
-              f"Type: {relationship.type}\n"
-              f"Friends since: {relationship.get('since')}\n"
-              f"All properties: {relationship.items()}\n"
-        )
-
-# Relationship ID: 5:73e9a61b-b501-476d-ad6f-8d7edf459251:1
-# Start node: <Node element_id='4:73e9a61b-b501-476d-ad6f-8d7edf459251:0' labels=frozenset({'Person'}) properties={'name': 'Alice'}>
-# End node: <Node element_id='4:73e9a61b-b501-476d-ad6f-8d7edf459251:2' labels=frozenset({'Person'}) properties={'name': 'Bob'}>
-# Type: KNOWS
-# Friends since: 2022-11-07
-# All properties: dict_items([('since', neo4j.time.Date(2022, 11, 7)), ('status', 'BFF')])
+// Relationship ID: 5:2691aa68-87cc-467d-9d09-431df9f5c456:0
+// Relationship type: KNOWS
+// Relationship properties: map[since:{0 63824025600 <nil>} status:BFF]
+// Relationship start elID: 4:2691aa68-87cc-467d-9d09-431df9f5c456:0
+// Relationship end elID: 4:2691aa68-87cc-467d-9d09-431df9f5c456:1
 ----
 
-For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.graph.Relationship[API documentation -- Graph types -- Relationship].
+For full documentation, see link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/dbtype#Relationship[API documentation -- Relationship].
 
 
 === `Path`
 
 Represents a path in a graph.
 
-[source, python]
+.Example of path creation, retrieval, and processing
+[source, go]
 ----
-from neo4j import GraphDatabase
-from neo4j.time import Date
+import (
+    "fmt"
+    "context"
+    "github.com/neo4j/neo4j-go-driver/v5/neo4j"
+)
 
+func main() {
+    ctx := context.Background()
 
-URI = "neo4j://localhost:7687"
-AUTH = ("neo4j", "secretgraph")
+    // Connection to database
+    dbUri := "<URI to Neo4j database>"
+    dbUser := "<Username>"
+    dbPassword := "<Password>"
+    driver, _ := neo4j.NewDriverWithContext(
+        dbUri,
+        neo4j.BasicAuth(dbUser, dbPassword, ""))
+    driver.VerifyConnectivity(ctx)
 
-def add_friend(driver, name, status, date, friend_name):
-    driver.execute_query("""
-        MERGE (p:Person {name: $name})
-        MERGE (p)-[r:KNOWS {status: $status, since: $date}]->(friend:Person {name: $friend_name})
-        """, name=name, status=status, date=date, friend_name=friend_name,
-        database_="neo4j",
-    )
+    // Create some :Person nodes linked by :KNOWS relationships
+    addFriend(ctx, driver, "Alice", "BFF", "Bob")
+    addFriend(ctx, driver, "Bob", "Fiends", "Sofia")
+    addFriend(ctx, driver, "Sofia", "Acquaintances", "Sofia")
 
-with GraphDatabase.driver(URI, auth=AUTH) as driver:
-    # Create some :Person nodes linked by :KNOWS relationships
-    add_friend(driver, name="Alice", status="BFF", date=Date.today(), friend_name="Bob")
-    add_friend(driver, name="Bob", status="Fiends", date=Date.today(), friend_name="Sofia")
-    add_friend(driver, name="Sofia", status="Acquaintances", date=Date.today(), friend_name="Sofia")
-
-    # Follow :KNOWS relationships outgoing from Alice three times, return as path
-    records, _, _ = driver.execute_query("""
+    // Follow :KNOWS relationships outgoing from Alice three times, return as path
+    result, err := neo4j.ExecuteQuery(ctx, driver, `
         MATCH path=(:Person {name: $name})-[:KNOWS*3]->(:Person)
-        RETURN path AS friendship_chain
-        """, name="Alice",
-        database_="neo4j",
-    )
-    path = records[0]["friendship_chain"]
+        RETURN path AS friendshipChain
+        `, map[string]any{
+            "name": "Alice",
+        }, neo4j.EagerResultTransformer,
+        neo4j.ExecuteQueryWithDatabase("neo4j"))
+    if err != nil {
+        panic(err)
+    }
+    path := result.Records[0].AsMap()["friendshipChain"].(neo4j.Path)
 
-    print("-- Path breakdown --")
-    for friendship in path:
-        print("{name} is friends with {friend} ({status})".format(
-            name=friendship.start_node.get("name"),
-            friend=friendship.end_node.get("name"),
-            status=friendship.get("status"),
-        ))
+    fmt.Println("-- Path breakdown --")
+    for i := range path.Relationships {
+        name := path.Nodes[i].Props["name"]
+        status := path.Relationships[i].Props["status"]
+        friendName := path.Nodes[i+1].Props["name"]
+        fmt.Printf("%s is friends with %s (%s)\n", name, friendName, status)
+    }
+}
+
+func addFriend(ctx context.Context, driver neo4j.DriverWithContext, name string, status string, friendName string) {
+    _, err := neo4j.ExecuteQuery(ctx, driver, `
+        MERGE (p:Person {name: $name})
+        MERGE (p)-[r:KNOWS {status: $status, since: date()}]->(friend:Person {name: $friendName})
+        `, map[string]any{
+            "name": name,
+            "status": status,
+            "friendName": friendName,
+        }, neo4j.EagerResultTransformer,
+        neo4j.ExecuteQueryWithDatabase("neo4j"))
+    if err != nil {
+        panic(err)
+    }
+}
 
 ----
 
-For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.graph.Path[API documentation -- Graph types -- Path].
+For full documentation, see link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/dbtype#Path[API documentation -- Path].
 
 
 == Exceptions
 
-The driver can raise a number of different exceptions.
-A full list is available in the link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#errors[API documentation].
+For the most part, the driver simply forwards any error the server may raise.
 For a list of errors the server can return, see the link:{neo4j-docs-base-uri}/status-codes/{page-version}[Status code] page.
 
-.Root exception types
-[options="header", cols="<25m,<75a"]
-|===
-| Classification    | Description
-|Neo4jError         | Errors reported by the Neo4j server (e.g., wrong Cypher syntax, bad connection, wrong credentials, ...)
-
-|DriverError        | Errors reported by the driver (e.g., bad usage of parameters or transactions, improper handling of results, ...)
-|===
-
 Some server errors are marked as safe to retry without need to alter the original request.
-Examples of such errors are deadlocks and memory issues.
-All driver's exception types implement the method `.is_retryable()`, which gives insights into whether a further attempt might be successful.
-This is particular useful when running queries in xref:transactions#explicit-transactions[explicit transactions], to know if a failed query should be run again.
+Examples of such errors are deadlocks, memory issues, or connectivity issues.
+When an error is raised, the function link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#IsRetryable[`neo4j.IsRetryable(error)`] gives insights into whether a further attempt might be successful.
+This is particular useful when running queries in xref:transactions#explicit-transactions[explicit transactions], to know if a failed query should be run again. Note that xref:transactions#managed-transactions[managed transactions] already implement a retry mechanism, so you don't need to implement your own.
 
 
 ifndef::backend-pdf[]

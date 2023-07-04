@@ -71,6 +71,12 @@ fmt.Printf("The query `%v` returned %v records in %+v.\n",
 <1> `result.Records` contains the result as an array of `Record` objects
 <2> `result.Summary` contains the xref:result-summary.adoc[summary of execution] returned by the server.
 
+[TIP]
+*When accessing a record's content, all its properties are of type `any`.*
+This means that you have to cast them to the relevant Go type if you want to use methods/features defined on such types.
+For example, if the `name` property coming from the database is a string, doing `record.AsMap()["name"][1]` would result in an _invalid operation_ error at compilation time.
+For it to work, cast the value to string _before_ using it as a string: `name := record.AsMap()["name"].(string)` and then `name[1]`.
+
 
 == Update the database
 
