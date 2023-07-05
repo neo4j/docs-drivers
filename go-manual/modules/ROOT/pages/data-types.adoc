@@ -236,10 +236,10 @@ fmt.Println(wgs843d)
 
 [options="header"]
 |===
-| Cypher Type  | Python Type
-| NODE         | `dbtype.Node`
-| RELATIONSHIP | `dbtype.Relationship`
-| PATH         | `dbtype.Path`
+| Cypher Type    | Python Type
+| `NODE`         | `dbtype.Node`
+| `RELATIONSHIP` | `dbtype.Relationship`
+| `PATH`         | `dbtype.Path`
 |===
 
 
