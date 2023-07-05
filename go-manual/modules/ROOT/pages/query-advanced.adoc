@@ -51,7 +51,6 @@ result, err := session.Run(
     `, map[string]any{
         "name": name
     })
-//fmt.Println(result.Consume().Counters())
 ----
 
 [NOTE]
