@@ -7,13 +7,13 @@ The tables in this section show the mapping between Cypher data types and Go typ
 [options="header"]
 |===
 | Cypher Type | Go Type
-| <<null>>    | `nil`
-| List        | `[]any`
-| Map         | `map[string]any`
-| Boolean     | `bool`
-| Integer     | `int64`
-| Float       | `float64`
-| String      | `string`
+| <<NULL>>    | `nil`
+| LIST        | `[]any`
+| MAP         | `map[string]any`
+| BOOLEAN     | `bool`
+| INTEGER     | `int64`
+| FLOAT       | `float64`
+| STRING      | `string`
 | ByteArray   | `[]byte`
 |===
 
@@ -33,13 +33,13 @@ This means that:
 +
 [options="header"]
 |===
-| Cypher Type   | Go Type
-| Date          | `neo4j.Date`
-| Time          | `neo4j.OffsetTime`
-| LocalTime     | `neo4j.LocalTime`
-| DateTime      | `neo4j.Time`
-| LocalDateTime | `neo4j.LocalDateTime`
-| Duration      | `neo4j.Duration`
+| Cypher Type    | Go Type
+| DATE           | `neo4j.Date`
+| ZONED TIME     | `neo4j.OffsetTime`
+| LOCAL TIME     | `neo4j.LocalTime`
+| ZONED DATETIME | `neo4j.Time`
+| LOCAL DATETIME | `neo4j.LocalDateTime`
+| DURATION       | `neo4j.Duration`
 |===
 
 .Using temporal types in queries
@@ -164,11 +164,11 @@ You can think of it as a unique identifier for each spatial type.
 
 [options="header"]
 |===
-| Cypher Type        | Go Type          | SpatialRefId
-| 2D Cartesian Point | `dbtype.Point2D` | 7203
-| 2D WGS-84 Point    | `dbtype.Point2D` | 9157
-| 3D Cartesian Point | `dbtype.Point3D` | 4326
-| 3D WGS-84 Point    | `dbtype.Point2D` | 4979
+| Cypher Type          | Go Type          | SpatialRefId
+| POINT (2D Cartesian) | `dbtype.Point2D` | 7203
+| POINT (2D WGS-84)    | `dbtype.Point2D` | 9157
+| POINT (3D Cartesian) | `dbtype.Point3D` | 4326
+| POINT (3D WGS-84)    | `dbtype.Point2D` | 4979
 |===
 
 [NOTE]
@@ -237,9 +237,9 @@ fmt.Println(wgs843d)
 [options="header"]
 |===
 | Cypher Type  | Python Type
-| Node         | `dbtype.Node`
-| Relationship | `dbtype.Relationship`
-| Path         | `dbtype.Path`
+| NODE         | `dbtype.Node`
+| RELATIONSHIP | `dbtype.Relationship`
+| PATH         | `dbtype.Path`
 |===
 
 
