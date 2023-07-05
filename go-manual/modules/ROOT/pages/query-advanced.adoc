@@ -48,9 +48,10 @@ result, err := session.Run(
         WITH line
         MERGE (:Artist {name: line[1], age: toInteger(line[2])})
     } IN TRANSACTIONS OF 2 ROWS
-    `, map[string]any{
-        "name": name
-    })
+    `, nil)
+summary, _ := result.Consume(ctx)
+fmt.Println("Query updated the database?",
+    result.Summary.Counters().ContainsUpdates())
 ----
 
 [NOTE]
