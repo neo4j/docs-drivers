@@ -1,0 +1,123 @@
+The Neo4j Go driver is the official library to interact with a Neo4j instance through a Go application.
+
+
+== Installation
+
+From within a module, use `go get` to install the link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/[Neo4j Go Driver]:
+
+[source, bash]
+----
+go get github.com/neo4j/neo4j-go-driver/v5
+----
+
+xref:install#install-driver[More info on installing the driver ->]
+
+
+== Connect to the database
+
+Connect to a database by creating a <<DriverWithContext>> object and providing a URL and an authentication token.
+Once you have a `DriverWithContext` instance, use the `.VerifyConnectivity()` method to ensure that a working connection can be established.
+
+[source, go, role=nocollapse]
+----
+package main
+
+import (
+    "context"
+    "github.com/neo4j/neo4j-go-driver/v5/neo4j"
+)
+
+func main() {
+    ctx := context.Background()
+    // URI examples: "neo4j://localhost", "neo4j+s://xxx.databases.neo4j.io"
+    dbUri := "<URI for Neo4j database>"
+    dbUser := "<Username>"
+    dbPassword := "<Password>"
+    driver, err := neo4j.NewDriverWithContext(
+        dbUri,
+        neo4j.BasicAuth(dbUser, dbPassword, ""))
+    defer driver.Close(ctx)
+
+    err = driver.VerifyConnectivity(ctx)
+    if err != nil {
+        panic(err)
+    }
+}
+----
+
+xref:connect.adoc[More info on connecting to a database ->]
+
+
+== Query the database
+
+Execute a <<Cypher>> statement with the function `ExecuteQuery()`.
+Do not hardcode or concatenate parameters: use placeholders and specify the parameters as keyword arguments.
+
+[source, go]
+----
+// Get the name of all 42 year-olds
+result, _ := neo4j.ExecuteQuery(ctx, driver,
+    "MATCH (p:Person WHERE age = $age) RETURN p.name AS name",
+    map[string]any{
+        "age": "42",
+    }, neo4j.EagerResultTransformer,
+    neo4j.ExecuteQueryWithDatabase("neo4j"))
+
+// Loop through results and do something with them
+for _, record := range result.Records {
+    fmt.Println(record.AsMap())
+}
+
+// Summary information
+fmt.Printf("The query `%v` returned %v records in %+v.\n",
+    result.Summary.Query().Text(), len(result.Records),
+    result.Summary.ResultAvailableAfter())
+----
+
+xref:query-simple.adoc[More info on querying the database ->]
+
+
+== Run your own transactions
+
+For more advanced use-cases, you can take control of the transaction lifecycle.
+A transaction is a unit of work that is either committed in its entirety or rolled back on failure.
+Use the methods `SessionWithContext.ExecuteRead()` and `SessionWithContext.ExecuteWrite()` to run managed transactions.
+
+[source, go, role=nocollapse]
+----
+session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+defer session.Close(ctx)
+people, _ := session.ExecuteRead(ctx,
+    func(tx neo4j.ManagedTransaction) (any, error) {
+        result, _ := tx.Run(ctx, `
+            MATCH (p:Person) WHERE p.name STARTS WITH $filter
+            RETURN p.name as name ORDER BY name
+            `, map[string]any{
+                "filter": "Al",
+            })
+        records, _ := result.Collect(ctx)
+        return records, nil
+    })
+for _, person := range people.([]*neo4j.Record) {
+    fmt.Println(person.AsMap())
+}
+----
+
+xref:transactions.adoc[More info on running transactions ->]
+
+
+== Close connections and sessions
+Call the `.close()` method on all `DriverWithContext` and `SessionWithContext` instances to release any resources still held by them.
+It is recommended to call the methods with the `defer` keyword as soon as you create new objects.
+
+[source, go]
+----
+// Create new DriverWithContext, and then
+defer driver.Close(ctx)
+----
+
+[source, go]
+----
+// Create new SessionWithContext, and then
+defer session.Close(ctx)
+----

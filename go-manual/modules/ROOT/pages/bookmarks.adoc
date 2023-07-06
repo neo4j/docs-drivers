@@ -1,0 +1,229 @@
+= Coordinate parallel transactions
+
+When working with a Neo4j cluster, <<causal_consistency>> is enforced by default in most cases, which guarantees that a query is able to read changes made by previous queries.
+The same does not happen by default for multiple xref:transactions.adoc[transactions] running in parallel though.
+In that case, you can use _bookmarks_ to have one transaction wait for the result of another to be propagated across the cluster before running its own work.
+This is not a requirement, and *you should only use bookmarks if you _need_ casual consistency across different transactions*.
+
+A _bookmark_ is a token that represents some state of the database.
+By passing one or multiple bookmarks along with a query, the server will make sure that the query does not get executed before the represented state(s) have been established.
+
+
+== Bookmarks with `ExecuteQuery()`
+
+When xref:query-simple.adoc[querying the database with `ExecuteQuery()`], the driver manages bookmarks for you.
+In this case, you have the guarantee that subsequent queries can read previous changes without taking further action.
+
+[source, go]
+----
+neo4j.ExecuteQuery("<QUERY 1>")
+
+// subsequent ExecuteQuery calls will be causally chained
+
+neo4j.ExecuteQuery("<QUERY 2>")  // can read result of <QUERY 1>
+neo4j.ExecuteQuery("<QUERY 3>")  // can read result of <QUERY 2>
+----
+
+To disable bookmark management and causal consistency, use the configuration callback `neo4j.ExecuteQueryWithoutBookmarkManager()` in `ExecuteQuery()` calls.
+
+[source, go]
+----
+neo4j.ExecuteQuery(
+    ctx, driver, query, nil, neo4j.EagerResultTransformer,
+    neo4j.ExecuteQueryWithDatabase("neo4j"),
+    neo4j.ExecuteQueryWithoutBookmarkManager())
+----
+
+
+== Bookmarks within a single session
+
+Bookmark management happens automatically for queries run within a single session, so that you can trust that queries inside one session are causally chained.
+
+[source, go]
+----
+session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+defer session.Close(ctx)
+session.ExecuteWrite(/* <QUERY 1> */)
+session.ExecuteWrite(/* <QUERY 2> */)  // can read QUERY 1
+session.ExecuteWrite(/* <QUERY 3> */)  // can read QUERY 1 and 2
+----
+
+
+== Bookmarks across multiple sessions
+
+If your application uses multiple sessions, you may need to ensure that one session has completed all its transactions before another session is allowed to run its queries.
+
+In the example below, `sessionA` and `sessionB` are allowed to run concurrently, while `sessionC` waits until their results have been propagated.
+This guarantees the `Person` nodes `sessionC` wants to act on actually exist.
+
+.Coordinate multiple sessions using bookmarks
+[source, go]
+----
+package main
+
+import (
+    "fmt"
+    "context"
+    "github.com/neo4j/neo4j-go-driver/v5/neo4j"
+)
+
+func main() {
+    ctx := context.Background()
+
+    // Connection to database
+    dbUri := "<URI to Neo4j database>"
+    dbUser := "<Username>"
+    dbPassword := "<Password>"
+    driver, err := neo4j.NewDriverWithContext(
+        dbUri,
+        neo4j.BasicAuth(dbUser, dbPassword, ""))
+    if err != nil {
+        panic(err)
+    }
+    defer driver.Close(ctx)
+    err = driver.VerifyConnectivity(ctx)
+    if err != nil {
+        panic(err)
+    }
+
+    // Bookmarks holder
+    var savedBookmarks neo4j.Bookmarks
+
+    // All function calls below may return errors,
+    // we don't catch them here for simplicity.
+
+    // Create the first person and employment relationship
+    sessionA := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+    createPerson(ctx, sessionA, "Alice")
+    employ(ctx, sessionA, "Alice", "Wayne Enterprises")
+    savedBookmarks = neo4j.CombineBookmarks(savedBookmarks, sessionA.LastBookmarks())  // <1>
+    sessionA.Close(ctx)
+
+    // Create the second person and employment relationship
+    sessionB := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+    createPerson(ctx, sessionB, "Bob")
+    employ(ctx, sessionB, "Bob", "LexCorp")
+    savedBookmarks = neo4j.CombineBookmarks(savedBookmarks, sessionB.LastBookmarks())  // <1>
+    sessionB.Close(ctx)
+
+    // Create a friendship between the two people created above
+    sessionC := driver.NewSession(ctx, neo4j.SessionConfig{
+        DatabaseName: "neo4j",
+        Bookmarks: savedBookmarks,  // <2>
+    })
+    createFriendship(ctx, sessionC, "Alice", "Bob")
+    printFriendships(ctx, sessionC)
+}
+
+// Create a Person node
+func createPerson(ctx context.Context, session neo4j.SessionWithContext, name string) (any, error) {
+    return session.ExecuteWrite(ctx,
+        func(tx neo4j.ManagedTransaction) (any, error) {
+            return tx.Run(ctx,
+                "MERGE (:Person {name: $name})",
+                map[string]any{"name": name})
+        })
+}
+
+// Create an employment relationship to a pre-existing company node
+// This relies on the person first having been created
+func employ(ctx context.Context, session neo4j.SessionWithContext, personName string, companyName string) (any, error) {
+    return session.ExecuteWrite(ctx,
+        func(tx neo4j.ManagedTransaction) (any, error) {
+            return session.Run(ctx, `
+                MATCH (person:Person {name: $person_name})
+                MATCH (company:Company {name: $company_name})
+                MERGE (person)-[:WORKS_FOR]->(company)
+                `, map[string]any{
+                    "personName": personName,
+                    "companyName": companyName,
+                })
+        })
+}
+
+// Create a friendship between two people
+func createFriendship(ctx context.Context, session neo4j.SessionWithContext, nameA string, nameB string) (any, error) {
+    return session.ExecuteWrite(ctx,
+        func(tx neo4j.ManagedTransaction) (any, error) {
+            return session.Run(ctx, `
+                MATCH (a:Person {name: $nameA})
+                MATCH (b:Person {name: $nameB})
+                MERGE (a)-[:KNOWS]->(b)
+                `, map[string]any{
+                    "nameA": nameA,
+                    "nameB": nameB,
+                })
+        })
+}
+
+// Retrieve and display all friendships
+func printFriendships(ctx context.Context, session neo4j.SessionWithContext) (any, error) {
+    return session.ExecuteRead(ctx,
+        func(tx neo4j.ManagedTransaction) (any, error) {
+            result, err := session.Run(ctx,
+                "MATCH (a)-[:KNOWS]->(b) RETURN a.name, b.name",
+                nil)
+            if err != nil {
+                return nil, err
+            }
+            records, _ := result.Collect(ctx)
+            for _, record := range records {
+                nameA, _ := record.Get("a.name")
+                nameB, _ := record.Get("b.name")
+                fmt.Println(nameA, "knows", nameB)
+            }
+            return nil, nil
+        })
+}
+----
+
+<1> Collect and combine bookmarks from different sessions using `SessionWithContext.LastBookmarks()` and `neo4j.CombineBookmarks()`.
+<2> Use them to initialize another session with the `Bookmarks` config parameter.
+
+image:{common-image}/driver-passing-bookmarks.svg[]
+
+[TIP]
+The use of bookmarks can negatively impact performance, since all queries are forced to wait for the latest changes to be propagated across the cluster.
+For simple use-cases, try to group queries within a single transaction, or within a single session.
+
+
+== Mix `ExecuteQuery()` and sessions
+
+To ensure causal consistency among transactions executed partly with `ExecuteQuery()` and partly with sessions, you can use the parameter `BookmarkManager` upon session creation, setting it to `driver.ExecuteQueryBookmarkManager()`.
+Since that is the default bookmark manager for `ExecuteQuery()` calls, this will ensure that all work is executed under the same bookmark manager and thus causally consistent.
+
+[source, go]
+----
+neo4j.ExecuteQuery(/* <QUERY 1> */)
+
+session := driver.NewSession(ctx, neo4j.SessionConfig{
+    DatabaseName: "neo4j",
+    BookmarkManager: driver.ExecuteQueryBookmarkManager(),
+})
+// every query inside this session will be causally chained
+// (i.e., can read what was written by <QUERY 1>)
+session.ExecuteWrite(/* <QUERY 2> */)
+session.Close(ctx)
+
+// subsequent ExecuteQuery calls will be causally chained
+// (i.e., can read what was written by <QUERY 2>)
+neo4j.ExecuteQuery(/* <QUERY 3>*/)
+----
+
+
+== Implement a custom `BookmarkManager`
+
+The _bookmark manager_ is an interface used by the driver for keeping track of the bookmarks and keeping sessions automatically consistent.
+
+You can subclass the link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.api.BookmarkManager[`BookmarkManager`] interface to implement a custom bookmark manager, or use the default implementation provided by the driver through link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.GraphDatabase.bookmark_manager[`GraphDatabase.bookmark_manager()`]. When implementing a bookmark manager, keep in mind that all methods must be concurrency safe.
+
+The details of the interface can be found in the link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.api.BookmarkManager[API documentation].
+
+
+ifndef::backend-pdf[]
+[discrete.glossary]
+== Glossary
+
+include::{common-partial}/glossary.adoc[]
+include::../partials/glossary.adoc[]
+endif::[]

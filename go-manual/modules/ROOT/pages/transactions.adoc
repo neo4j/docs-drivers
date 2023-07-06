@@ -1,0 +1,487 @@
+= Run your own transactions
+
+When xref:query-simple.adoc[querying the database with `ExecuteQuery()`], the driver automatically creates a _transaction_. A transaction is a unit of work that is either _committed_ in its entirety or _rolled back_ on failure. You can include multiple Cypher statements in a single query, as for example when using `MATCH` and `MERGE` in sequence to xref:query-simple#_update_the_database[update the database], but you cannot have multiple queries and interleave some client-logic in between them.
+
+For these more advanced use-cases, the driver provides functions to take full control over the transaction lifecycle.
+
+
+== Create a session
+
+Before running a transaction, you need to obtain a _session_.
+Sessions act as concrete query channels between the driver and the server, and ensure <<causal consistency>> is enforced.
+
+Sessions are created with the method `DriverWithContext.NewSession()`.
+Use the second argument to alter the session's configuration, among which for example the xref:_database_selection[target database].
+For further configuration parameters, see xref:_session_configuration[Session configuration].
+
+[source, go]
+----
+session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+defer session.Close(ctx)
+----
+
+Session creation is a lightweight operation, so sessions can be created and destroyed without significant cost.
+Always xref:_close_sessions[close sessions] when you are done with them.
+
+*Sessions are _not_ thread safe*: share the main `DriverWithContext` object across threads, but make sure each routine creates its own sessions.
+
+
+[#managed-transactions]
+== Run a managed transaction
+
+You can think of managed transactions as a way of unwrapping the flow of `ExecuteQuery()` and being able to specify its desired behavior in more places.
+
+A transaction can contain any number of queries.
+As Neo4j is <<ACID>> compliant, *queries within a transaction will either be executed as a whole or not at all*: you cannot get a part of the transaction succeeding and another failing.
+Use transactions to group together related queries which work together to achieve a single _logical_ database operation.
+
+A managed transaction is created with the methods link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#SessionWithContext[`SessionWithContext.ExecuteRead()`] and link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#SessionWithContext[`SessionWithContext.ExecuteWrite()`], depending on whether you want to retrieve data from the database or alter it.
+Both methods take a _transaction function_ callback, which is responsible for actually carrying out the queries and processing the result.
+
+.Retrieve people whose name starts with `Al`
+[source, go, role=nocollapse]
+----
+session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})  // <1>
+defer session.Close(ctx)
+people, err := session.ExecuteRead(ctx,  // <2>
+    func(tx neo4j.ManagedTransaction) (any, error) {  // <3>
+        result, err := tx.Run(ctx, `  // <4>
+            MATCH (p:Person) WHERE p.name STARTS WITH $filter
+            RETURN p.name as name ORDER BY name
+            `, map[string]any{
+                "filter": "Al",
+            })
+        if err != nil {
+            return nil, err
+        }
+        records, err := result.Collect(ctx)  // <5>
+        if err != nil {
+            return nil, err
+        }
+        return records, nil
+    })
+for _, person := range people.([]*neo4j.Record) {
+    fmt.Println(person.AsMap())
+}
+----
+
+<1> Create a session. A single session can be the container for multiple queries. Remember to close it when done (here we `defer` its closure just after opening).
+<2> The `.ExecuteRead()` (or `.ExecuteWrite()`) method is the entry point into a transaction.
+<3> The transaction function callback is responsible of running queries.
+<4> Use the method link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#ManagedTransaction[`ManagedTransaction.Run()`] to run queries. Each query run returns a link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#ResultWithContext[`ResultWithContext`] object.
+<5> xref:process-result[Process the result] using any of the methods on `ResultWithContext`. The method `.Collect()` retrieves all records into a list.
+
+*Do not hardcode or concatenate parameters directly into the query*.
+Use xref:query-simple#query-parameters[query parameters] instead, both for performance and security reasons.
+
+*Transaction functions should never return the result object directly*.
+Instead, always xref:process-result[process the result] in some way.
+Within a transaction function, a `return` statement where `error` is `nil` results in the transaction being committed, while the transaction is automatically rolled back if the returned `error` value is not `nil`.
+
+.A transaction with multiple queries, client logic, and potential roll backs
+[source, go]
+----
+ppackage main
+
+import (
+    "fmt"
+    "context"
+    "strconv"
+    "errors"
+    "github.com/neo4j/neo4j-go-driver/v5/neo4j"
+)
+
+func main() {
+    ctx := context.Background()
+    var employeeThreshold int64 = 10  // Neo4j's integer maps to Go's int64
+
+    // Connection to database
+    dbUri := "<URI to Neo4j database>"
+    dbUser := "<Username>"
+    dbPassword := "<Password>"
+    driver, err := neo4j.NewDriverWithContext(
+        dbUri,
+        neo4j.BasicAuth(dbUser, dbPassword, ""))
+    if err != nil {
+        panic(err)
+    }
+    defer driver.Close(ctx)
+    err = driver.VerifyConnectivity(ctx)
+    if err != nil {
+        panic(err)
+    }
+
+    session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+    defer session.Close(ctx)
+
+    // Create 100 people and assign them to various organizations
+    for i := 0; i < 100; i++ {
+        name := "Thor" + strconv.Itoa(i)
+        orgId, err := session.ExecuteWrite(ctx,
+            func(tx neo4j.ManagedTransaction) (any, error) {
+                var orgId string
+
+                // Create new Person node with given name, if not exists already
+                _, err := tx.Run(
+                    ctx,
+                    "MERGE (p:Person {name: $name})",
+                    map[string]any{
+                        "name": name,
+                    })
+                if err != nil {
+                    return nil, err
+                }
+
+                // Obtain most recent organization ID and the number of people linked to it
+                result, err := tx.Run(
+                    ctx, `
+                    MATCH (o:Organization)
+                    RETURN o.id AS id, COUNT{(p:Person)-[r:WORKS_FOR]->(o)} AS employeesN
+                    ORDER BY o.createdDate DESC
+                    LIMIT 1
+                    `, nil)
+                if err != nil {
+                    return nil, err
+                }
+                org, err := result.Single(ctx)
+
+                // If no organization exists, create one and add Person to it
+                if org == nil {
+                    orgId, _ = createOrganization(ctx, tx)
+                    fmt.Println("No orgs available, created", orgId)
+                    err = addPersonToOrganization(ctx, tx, name, orgId)
+                    if err != nil {
+                        return nil, errors.New("Failed to add person to new org")
+                        // Transaction will roll back
+                        // -> not even Person and/or Organization is created!
+                    }
+                } else {
+                    orgId = org.AsMap()["id"].(string)
+                    if employeesN := org.AsMap()["employeesN"].(int64);
+                       employeesN == 0 {
+                        return nil, errors.New("Most recent organization is empty")
+                        // Transaction will roll back
+                        // -> not even Person is created!
+                    }
+
+                    // If org does not have too many employees, add this Person to it
+                    if employeesN := org.AsMap()["employeesN"].(int64);
+                       employeesN < employeeThreshold {
+                        err = addPersonToOrganization(ctx, tx, name, orgId)
+                        if err != nil {
+                            return nil, err
+                            // Transaction will roll back
+                            // -> not even Person is created!
+                        }
+                    // Otherwise, create a new Organization and link Person to it
+                    } else {
+                        orgId, err = createOrganization(ctx, tx)
+                        if err != nil {
+                            return nil, err
+                            // Transaction will roll back
+                            // -> not even Person is created!
+                        }
+                        fmt.Println("Latest org is full, created", orgId)
+                        err = addPersonToOrganization(ctx, tx, name, orgId)
+                        if err != nil {
+                            return nil, err
+                            // Transaction will roll back
+                            // -> not even Person and/or Organization is created!
+                        }
+                    }
+                }
+                // Return the Organization ID to which the new Person ends up in
+                return orgId, nil
+            })
+        if err != nil {
+            fmt.Println(err)
+        } else {
+            fmt.Println("User", name, "added to organization", orgId)
+        }
+    }
+}
+
+func createOrganization(ctx context.Context, tx neo4j.ManagedTransaction) (string, error) {
+    result, err := tx.Run(
+        ctx, `
+        CREATE (o:Organization {id: randomuuid(), createdDate: datetime()})
+        RETURN o.id AS id
+        `, nil)
+    if err != nil {
+        return "", err
+    }
+    org, err := result.Single(ctx)
+    if err != nil {
+        return "", err
+    }
+    orgId, _ := org.AsMap()["id"]
+    return orgId.(string), err
+}
+
+func addPersonToOrganization(ctx context.Context, tx neo4j.ManagedTransaction, personName string, orgId string) (error) {
+    _, err := tx.Run(
+        ctx, `
+        MATCH (o:Organization {id: $orgId})
+        MATCH (p:Person {name: $name})
+        MERGE (p)-[:WORKS_FOR]->(o)
+        `, map[string]any{
+            "orgId": orgId,
+            "name": personName,
+        })
+    return err
+}
+
+----
+
+Should a transaction fail for a reason that the driver deems transient, it automatically retries to run the transaction function (with an exponentially increasing delay).
+For this reason, *transaction functions must be _idempotent_* (i.e., they should produce the same effect when run several times), because you do not know upfront how many times they are going to be executed.
+In practice, this means that you should not edit nor rely on globals, for example.
+Note that although transactions functions might be executed multiple times, the queries inside it will always run only once.
+
+A session can chain multiple transactions, but *only one single transaction can be active within a session at any given time*.
+To maintain multiple concurrent transactions, use multiple concurrent sessions.
+
+
+[#explicit-transactions]
+== Run an explicit transaction
+
+You can achieve full control over transactions by manually beginning one with the method link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#SessionWithContext[`SessionWithContext.BeginTransaction()`].
+You run queries inside an explicit transaction with the method link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#ExplicitTransaction[`ExplicitTransaction.Run()`].
+
+[source, go]
+----
+session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+defer session.Close(ctx)
+tx := session.BeginTransaction(ctx)
+    // use tx.Run() to run queries
+    //     tx.Commit() to commit the transaction
+    //     tx.Rollback() to rollback the transaction
+----
+
+Closing an explicit transaction can either happen automatically upon successful return, or can be explicitly controlled through the methods link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#ExplicitTransaction[`ExplicitTransaction.Commit()`] and  link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#ExplicitTransaction[`ExplicitTransaction.Rollback()`].
+
+Explicit transactions are most useful for applications that need to distribute Cypher execution across multiple functions for the same transaction, or for applications that need to run multiple queries within a single transaction but without the automatic retries provided by managed transactions.
+
+.A sketch of an explicit transaction interacting with external APIs
+[source, go]
+----
+func transferToOtherBank(driver neo4j.DriverWithContext, customerId string, otherBankId string, amount float) {
+    ctx := context.Background()
+    session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+    defer session.Close(ctx)
+    tx := session.BeginTransaction(ctx)
+
+    if ! customerBalanceCheck(ctx, tx, customerId, amount) {
+        // give up
+        return nil
+    }
+
+    otherBankTransferApi(ctx, customerId, otherBankId, amount)
+    // Now the money has been transferred => can't rollback anymore
+    // (cannot rollback external services interactions)
+
+    err := decreaseCustomerBalance(ctx, tx, customerId, amount)
+    if err != nil {
+        requestInspection(ctx, customerId, otherBankId, amount, err)
+    }
+    err = tx.Commit(ctx)
+    if err != nil {
+        requestInspection(ctx, customerId, otherBankId, amount, err)
+    }
+}
+
+func customerBalanceCheck(ctx context.Context, tx neo4j.ExplicitTransaction, customerId string, amount float) (bool) {
+    result = tx.Run(ctx, `
+        MATCH (c:Customer {id: $id})
+        RETURN c.balance >= $amount AS sufficient
+        `, map[string]any{
+            "id": customerId,
+            "amount": amount,
+        })
+    record, err := result.Single(ctx)
+    if err != nil {
+        return false
+    }
+    return record.AsMap()["sufficient"]
+
+func otherBankTransferApi(ctx context.Context, customerId string, otherBankId string, amount float):
+    ...
+    // make some API call to other bank
+
+func decreaseCustomerBalance(ctx context.Context, tx neo4j.ExplicitTransaction, customerId string, amount float) (error) {
+    _, err = tx.Run(ctx, `
+        MATCH (c:Customer {id: $id})
+        SET c.balance = c.balance - $amount
+        `, map[string]any{
+            "id": customerId,
+            "amount": amount,
+        })
+    return err
+}
+
+func requestInspection(ctx context.Context, customerId string, otherBankId string, amount float, err error):
+    // manual cleanup required; log this or similar
+    fmt.Println("WARNING: transaction rolled back due to exception:", err)
+    fmt.Println("customerId:", customerId, "otherBankId:", otherBankId, "amount:", amount)
+----
+
+
+[[process-result]]
+== Process query results
+
+The driver's output of a query is a link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#ResultWithContext[`ResultWithContext`] object, which does not directly contain the result records.
+Rather, it encapsulates the Cypher result in a rich data structure that requires some parsing on the client side.
+
+When working with a query result, there are two things to keep in mind:
+
+- *The result records are not immediately and entirely fetched and returned by the server*.
+Instead, results come as a _lazy stream_.
+In particular, when the driver receives some records from the server, they are initially _buffered_ in a background queue.
+Records stay in the buffer until they are _consumed_ by the application, at which point they are _removed from the buffer_.
+When no more records are available, the result is _exhausted_.
+- *The result acts as a _cursor_*.
+This means that there is no way to retrieve a previous record from the stream, unless you saved it in an auxiliary data structure.
+
+**The easiest way of processing a result is by calling `.Collect(ctx)` on it**, which yields an array of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5@v5.9.0/neo4j/db#Record[`Record`] objects.
+Otherwise, a `ResultWithContext` object implements a number of methods for processing records.
+The most commonly needed ones are listed below.
+
+// .An essential list of `ResultWithContext` methods
+[cols="3,4"]
+|===
+|Name |Description
+
+|`Collect(ctx) ([]*Record, error)`
+|Return the remainder of the result as a list.
+
+|`Single(ctx) (*Record, error)`
+a|Return the next and only remaining record, or `nil`.
+Calling this method always exhausts the result.
+
+If more (or less) than one record is available, a non-`nil` error is returned.
+
+|`Record() *Record`
+|Return the current record.
+
+|`Next(ctx) bool`
+a|Return `true` if there is a record to be processed after the current one.
+In that case, it also advances the result iterator.
+
+|`Consume(ctx) (ResultSummary, error)`
+|Return the query xref:result-summary.adoc[result summary].
+It exhausts the result, so should only be called when data processing is over.
+|===
+
+For a complete list of `ResultWithContext` methods, see link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#ResultWithContext[API documentation -- ResultWithContext].
+
+
+== Session configuration
+
+=== Database selection
+
+It is recommended to *always specify the database explicitly* with the configuration parameter `DatabaseName` upon session creation, even on single-database instances.
+This allows the driver to work more efficiently, as it does not have to resolve the home database first.
+If no database is given, the link:{neo4j-docs-base-uri}/operations-manual/current/manage-databases/introduction#manage-databases-default[default database] set in the Neo4j instance settings is used.
+
+[source, go]
+----
+session := driver.NewSession(ctx, neo4j.SessionConfig{
+    DatabaseName: "neo4j",
+})
+----
+
+Do not rely on the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/use/[`USE`] Cypher clause for database selection with the driver.
+
+
+=== Request routing
+
+In a cluster environment, all sessions are opened in write mode, routing them to a writer.
+You can change this by explicitly setting the configuration parameter `AccessMode` to either `neo4j.AccessModeRead` or `neo4j.AccessModeWrite`.
+Note that `.ExecuteRead()` and `.ExecuteWrite()` automatically override the session's default access mode.
+
+[source, go]
+----
+session := driver.NewSession(ctx, neo4j.SessionConfig{
+    DatabaseName: "neo4j",
+    AccessMode: neo4j.AccessModeRead,
+})
+----
+
+[#access-control-note]
+// .Routing ≠ Access control
+[NOTE]
+====
+Although executing a _write_ query in read mode likely results in a runtime error, *you should not rely on this for access control.* The difference between the two modes is that _read_ transactions will be routed to any node of a cluster, whereas _write_ ones will be directed to the leader.
+Still, depending on the server version and settings, the server might allow none, some, or all _write_ statements to be executed even in _read_ transactions.
+
+Similar remarks hold for the `.ExecuteRead()` and `.ExecuteWrite()` methods.
+====
+
+
+[#impersonation]
+=== Run queries as a different user (impersonation)
+
+You can execute a query under the security context of a different user with the configuration parameter `ImpersonatedUser`, specifying the name of the user to impersonate.
+For this to work, the user under which the `DriverWithContext` was created needs to have the link:{neo4j-docs-base-uri}/cypher-manual/current/access-control/dbms-administration#access-control-dbms-administration-impersonation[appropriate permissions].
+Impersonating a user is cheaper than creating a new `DriverWithContext` object.
+
+[source, go]
+----
+session := driver.NewSession(ctx, neo4j.SessionConfig{
+    DatabaseName: "neo4j",
+    ImpersonatedUser: "<somebodyElse>",
+})
+----
+
+When impersonating a user, the query is run within the complete security context of the impersonated user and not the authenticated user (i.e., home database, permissions, etc.).
+
+
+== Transaction configuration
+
+You can exert further control on transactions by providing configuration callbacks to `.ExecuteRead()`, `.ExecuteWrite()`, and `.BeginTransaction()`.
+Use them to specify:
+
+- a transaction timeout (in seconds).
+Transactions that run longer will be terminated by the server.
+The default value is set on the server side.
+- a map of metadata that gets attached to the transaction.
+These metadata get logged in the server `query.log`, and are visible in the output of the `SHOW TRANSACTIONS` Cypher command.
+Use this to tag transactions.
+
+[source, go]
+----
+session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+defer session.Close(ctx)
+people, err := session.ExecuteRead(ctx,
+    func(tx neo4j.ManagedTransaction) (any, error) {
+        result, _ := tx.Run(ctx, "MATCH (:Person) RETURN count(*) AS n", nil)
+        return result.Collect(ctx)
+    },
+    neo4j.WithTxTimeout(5*time.Second),  // remember to import `time`
+    neo4j.WithTxMetadata(map[string]any{"appName": "peopleTracker"}))
+----
+
+
+== Close sessions
+
+Each connection pool has *a finite number of sessions*, so if you open sessions without ever closing them, your application could run out of them.
+It is thus recommended to call `session.Close()` with the `defer` keyword as soon as you create a new session, to be sure it will be closed in all cases.
+When a session is closed, it is returned to the connection pool to be later reused.
+
+[source, go]
+----
+session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+defer session.Close(ctx)
+// Session usage
+----
+
+There are corner-cases in which session closure might return an error, so you may want to catch those cases as well.
+
+
+ifndef::backend-pdf[]
+[discrete.glossary]
+== Glossary
+
+include::{common-partial}/glossary.adoc[]
+include::../partials/glossary.adoc[]
+endif::[]

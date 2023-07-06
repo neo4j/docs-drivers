@@ -1,5 +1,0 @@
-[appendix]
-[[go-driver-terminology]]
-= Driver terminology
-
-include::{common-partial}/terminology.adoc[tag=terminology]

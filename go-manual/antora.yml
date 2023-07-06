@@ -8,6 +8,6 @@ asciidoc:
   attributes:
     go-driver-version: '5.10' # the version of published go api docs
     go-driver-apidoc-release: '5.0' # the github branch or release that contains examples included in docs
-    go-examples: https://raw.githubusercontent.com/neo4j/neo4j-go-driver/{go-driver-apidoc-release}/neo4j/test-integration
+    go-examples: https://raw.githubusercontent.com/neo4j/neo4j-go-driver/{go-driver-apidoc-release}/tests/integration/examples
     common-partial: 5@common-content:ROOT:partial$
     common-image: 5@common-content:ROOT:image$

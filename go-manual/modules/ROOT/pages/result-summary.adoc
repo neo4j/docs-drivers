@@ -1,0 +1,222 @@
+# Explore the query execution summary
+
+After all results coming from a query have been processed, the server ends the transaction by returning a summary of execution.
+It comes as a link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#ResultSummary[`ResultSummary`] object, and it contains information among which:
+
+- xref:_query_counters[**Query counters**] -- What changes the query triggered on the server
+- xref:_query_execution_plan[**Query execution plan**] -- How the database would execute (or executed) the query
+- xref:_notifications[**Notifications**] -- Extra information raised by the server while running the query
+- Timing information and query request summary
+
+
+## Retrieve the execution summary
+
+When running queries with xref:query-simple.adoc[`ExecuteQuery()`], the execution summary is part of the default return object, under the `Summary` key.
+
+[source, go]
+----
+result, _ := neo4j.ExecuteQuery(ctx, driver, `
+    UNWIND ["Alice", "Bob"] AS name
+    MERGE (p:Person {name: name})
+    `, nil,
+    neo4j.EagerResultTransformer,
+    neo4j.ExecuteQueryWithDatabase("neo4j"))
+summary := result.Summary
+----
+
+If you are using xref:transactions.adoc[transaction functions], you can retrieve the query execution summary with the method `Result.Consume()`.
+**Notice that once you ask for the execution summary, the result stream is exhausted**.
+This means that any record which has not yet been processed is not available any longer.
+
+[source, go]
+----
+session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+defer session.Close(ctx)
+summary, _ := session.ExecuteWrite(ctx,
+    func(tx neo4j.ManagedTransaction) (any, error) {
+        result, err := tx.Run(ctx, `
+            UNWIND ["Alice", "Bob"] AS name
+            MERGE (p:Person {name: name})
+            `, nil)
+        summary, _ := result.Consume(ctx)
+        return summary, err
+    })
+----
+
+
+## Query counters
+
+The method `ResultSummary.Counters()` returns counters for the operations that a query triggered (as a link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#Counters[`Counters`] object).
+
+.Insert some data and display the query counters
+[source, go]
+----
+result, _ := neo4j.ExecuteQuery(ctx, driver, `
+    MERGE (p:Person {name: $name})
+    MERGE (p)-[:KNOWS]->(:Person {name: $friend})
+    `, map[string]any{
+        "name": "Mark",
+        "friend": "Bob",
+    }, neo4j.EagerResultTransformer,
+    neo4j.ExecuteQueryWithDatabase("neo4j"))
+summary := result.Summary
+counters := summary.Counters()
+fmt.Println("Nodes created:", counters.NodesCreated())
+fmt.Println("Labels added:", counters.LabelsAdded())
+fmt.Println("Properties set:", counters.PropertiesSet())
+fmt.Println("Relationships created:", counters.RelationshipsCreated())
+
+// Nodes created: 2
+// Labels added: 2
+// Properties set: 2
+// Relationships created: 1
+----
+
+There are two additional boolean methods which act as meta-counters:
+
+- `.ContainsUpdates()` -- whether the query triggered any write operation on the database on which it ran
+- `.ContainsSystemUpdates()` -- whether the query updated the `system` database
+
+
+## Query execution plan
+
+If you prefix a query with `EXPLAIN`, the server will return the plan it _would_ use to run the query, but will not actually run it.
+You can retrieve the plan by calling `ResultSummary.Plan()`, which contains the list of link:{neo4j-docs-base-uri}/cypher-manual/current/execution-plans/operators/[Cypher operators] that would be used to retrieve the result set.
+You may use this information to locate potential bottlenecks or room for performance improvements (for example through the creation of indexes).
+
+[source, go, role=nocollapse]
+----
+result, _ := neo4j.ExecuteQuery(ctx, driver,
+    "EXPLAIN MATCH (p {name: $name}) RETURN p",
+    map[string]any{
+        "name": "Alice",
+    },
+    neo4j.EagerResultTransformer,
+    neo4j.ExecuteQueryWithDatabase("neo4j"))
+fmt.Println(result.Summary.Plan().Arguments()["string-representation"])
+/*
+Planner COST
+Runtime PIPELINED
+Runtime version 5.0
+Batch size 128
+
++-----------------+----------------+----------------+---------------------+
+| Operator        | Details        | Estimated Rows | Pipeline            |
++-----------------+----------------+----------------+---------------------+
+| +ProduceResults | p              |              1 |                     |
+| |               +----------------+----------------+                     |
+| +Filter         | p.name = $name |              1 |                     |
+| |               +----------------+----------------+                     |
+| +AllNodesScan   | p              |             10 | Fused in Pipeline 0 |
++-----------------+----------------+----------------+---------------------+
+
+Total database accesses: ?
+*/
+----
+
+If you instead prefix a query with the keyword `PROFILE`, the server will return the execution plan it has used to run the query, together with profiler statistics.
+This includes the list of operators that were used and additional profiling information about each intermediate step.
+You can access the plan by calling `ResultSummary.Profile()`.
+Notice that the query is also _run_, so the result object also contains any result records.
+
+[source, go, role=nocollapse]
+----
+result, _ := neo4j.ExecuteQuery(ctx, driver,
+    "PROFILE MATCH (p {name: $name}) RETURN p",
+    map[string]any{
+        "name": "Alice",
+    },
+    neo4j.EagerResultTransformer,
+    neo4j.ExecuteQueryWithDatabase("neo4j"))
+fmt.Println(result.Summary.Profile().Arguments()["string-representation"])
+/*
+Planner COST
+Runtime PIPELINED
+Runtime version 5.0
+Batch size 128
+
++-----------------+----------------+----------------+------+---------+----------------+------------------------+-----------+---------------------+
+| Operator        | Details        | Estimated Rows | Rows | DB Hits | Memory (Bytes) | Page Cache Hits/Misses | Time (ms) | Pipeline            |
++-----------------+----------------+----------------+------+---------+----------------+------------------------+-----------+---------------------+
+| +ProduceResults | p              |              1 |    1 |       3 |                |                        |           |                     |
+| |               +----------------+----------------+------+---------+----------------+                        |           |                     |
+| +Filter         | p.name = $name |              1 |    1 |       4 |                |                        |           |                     |
+| |               +----------------+----------------+------+---------+----------------+                        |           |                     |
+| +AllNodesScan   | p              |             10 |    4 |       5 |            120 |                 9160/0 |   108.923 | Fused in Pipeline 0 |
++-----------------+----------------+----------------+------+---------+----------------+------------------------+-----------+---------------------+
+
+Total database accesses: 12, total allocated memory: 184
+*/
+----
+
+For more information and examples, see link:{neo4j-docs-base-uri}/cypher-manual/current/query-tuning/basic-example/#_profile_query[Basic query tuning].
+
+
+## Notifications
+
+The method `ResultSummary.Notifications()` returns a list of link:{neo4j-docs-base-uri}/status-codes/current/notifications[notifications coming from the server], if any were raised by the execution of the query.
+These include recommendations for performance improvements, warnings about the usage of deprecated features, and other hints about sub-optimal usage of Neo4j.
+Each notification comes as a link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#Notification[`Notification`] object.
+
+.An unbounded shortest path raises a performance notification
+[source, go, role=nocollapse]
+----
+result, _ := neo4j.ExecuteQuery(ctx, driver, `
+    MATCH p=shortestPath((:Person {name: 'Alice'})-[*]->(:Person {name: 'Bob'}))
+    RETURN p
+    `, nil,
+    neo4j.EagerResultTransformer,
+    neo4j.ExecuteQueryWithDatabase("neo4j"))
+
+for _, notification := range result.Summary.Notifications() {
+    fmt.Println("Code:", notification.Code())
+    fmt.Println("Title:", notification.Title())
+    fmt.Println("Description:", notification.Description())
+    fmt.Println("Severity:", notification.SeverityLevel())
+    fmt.Println("Category:", notification.Category(), "\n")
+}
+/*
+Code: Neo.ClientNotification.Statement.UnboundedVariableLengthPattern
+Title: The provided pattern is unbounded, consider adding an upper limit to the number of node hops.
+Description: Using shortest path with an unbounded pattern will likely result in long execution times. It is recommended to use an upper limit to the number of node hops in your pattern.
+Severity: INFORMATION
+Category: PERFORMANCE
+*/
+----
+
+
+### Filtering notifications
+
+By default, the server analyses each query for all categories and severity of notifications.
+Starting from version 5.7, you can use the parameters `NotificationsMinSeverity` and/or `NotificationsDisabledCategories` to restrict the severity or category of notifications that you are interested into.
+You may disable notifications altogether by setting the minimum severity to `OFF`.
+You can use those parameters either when creating a driver instance, or when creating a session.
+
+There is a slight performance gain in restricting the amount of notifications the server is allowed to raise.
+
+.Allow only `Warning` notifications, but not of `Hint` or `Generic` category
+[source, go]
+----
+import (
+    "github.com/neo4j/neo4j-go-driver/v5/neo4j"
+    "github.com/neo4j/neo4j-go-driver/v5/neo4j/notifications"
+    "github.com/neo4j/neo4j-go-driver/v5/neo4j/config"
+)
+
+// At driver level
+driver, _ := neo4j.NewDriverWithContext(
+    dbUri,
+    neo4j.BasicAuth(dbUser, dbPassword, ""),
+    func (conf *config.Config) {
+        conf.NotificationsDisabledCategories = notifications.DisableCategories(notifications.Hint, notifications.Generic)
+        conf.NotificationsMinSeverity = notifications.WarningLevel
+    })
+
+
+// At session level
+session, _ = driver.NewSession(ctx, neo4j.SessionConfig{
+    NotificationsMinSeverity: notifications.WarningLevel,
+    NotificationsDisabledCategories: notifications.DisableCategories(notifications.Hint, notifications.Generic),
+    DatabaseName: "neo4j",  // always provide the database name
+})
+----

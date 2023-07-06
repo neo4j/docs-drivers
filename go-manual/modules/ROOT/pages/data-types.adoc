@@ -1,0 +1,402 @@
+= Data types and mapping to Cypher types
+
+The tables in this section show the mapping between Cypher data types and Go types.
+
+== Core types
+
+[options="header"]
+|===
+| Cypher Type   | Go Type
+| <<NULL>>      | `nil`
+| `LIST`        | `[]any`
+| `MAP`         | `map[string]any`
+| `BOOLEAN`     | `bool`
+| `INTEGER`     | `int64`
+| `FLOAT`       | `float64`
+| `STRING`      | `string`
+| `ByteArray`   | `[]byte`
+|===
+
+
+== Temporal types
+
+The driver provides a set of temporal data types compliant with ISO-8601 and Cypher.
+Sub-second values are measured to nanosecond precision.
+
+The driver's types rely on Go's link:https://pkg.go.dev/time[`time`] types.
+All temporal types, except `neo4j.Duration`, are in fact `time.Date` objects under the hood.
+This means that:
+
+- if you want to _query_ the database with a temporal type, instantiate a `time.Date` object and use it as query parameter (i.e. you don't need to care about driver's types)
+- if you _retrieve_ a temporal object that you had previously inserted starting from a `time.Date` object, you will get back a `time.Date` object (i.e. you don't need to care about driver's types)
+- if you receive a temporal object using one of  link:https://neo4j.com/docs/cypher-manual/current/functions/temporal/[_Cypher temporal functions_], you will get back the corresponding _driver type_ as displayed in the table below. You may then use `.Time()` on them to convert them into Go `time.Date` objects.
++
+[options="header"]
+|===
+| Cypher Type      | Go Type
+| `DATE`           | `neo4j.Date`
+| `ZONED TIME`     | `neo4j.OffsetTime`
+| `LOCAL TIME`     | `neo4j.LocalTime`
+| `ZONED DATETIME` | `neo4j.Time`
+| `LOCAL DATETIME` | `neo4j.LocalDateTime`
+| `DURATION`       | `neo4j.Duration`
+|===
+
+.Using temporal types in queries
+[source, go]
+----
+package main
+
+import (
+    "fmt"
+    "context"
+    "time"
+    "github.com/neo4j/neo4j-go-driver/v5/neo4j"
+    "reflect"
+)
+
+func main() {
+    ctx := context.Background()
+
+    // Connection to database
+    dbUri := "neo4j://localhost"
+    dbUser := "neo4j"
+    dbPassword := "verysecret"
+    driver, _ := neo4j.NewDriverWithContext(
+        dbUri,
+        neo4j.BasicAuth(dbUser, dbPassword, ""))
+    driver.VerifyConnectivity(ctx)
+
+    // Define a date, with timezone
+    location, _ := time.LoadLocation("Europe/Stockholm")
+    friendsSince := time.Date(2006, time.December, 16, 13, 59, 59, 999999999, location)
+
+    result, err := neo4j.ExecuteQuery(ctx, driver, `
+        MERGE (a:Person {name: $name})
+        MERGE (b:Person {name: $friend})
+        MERGE (a)-[friendship:KNOWS {since: $friendsSince}]->(b)
+        RETURN friendship.since AS date
+        `, map[string]any{
+            "name": "Alice",
+            "friend": "Bob",
+            "friendsSince": friendsSince,
+        }, neo4j.EagerResultTransformer,
+        neo4j.ExecuteQueryWithDatabase("neo4j"))
+    if err != nil {
+        panic(err)
+    }
+    date, _ := result.Records[0].Get("date")
+    fmt.Println(reflect.TypeOf(date))  // time.Time
+    fmt.Println(date)  // 2006-12-16 13:59:59.999999999 +0200 EET
+----
+
+.Using driver's temporal types
+[source, go]
+----
+package main
+
+import (
+    "fmt"
+    "context"
+    "time"
+    "github.com/neo4j/neo4j-go-driver/v5/neo4j"
+    "reflect"
+)
+
+func main() {
+    ctx := context.Background()
+
+    // Connection to database
+    dbUri := "neo4j://localhost"
+    dbUser := "neo4j"
+    dbPassword := "verysecret"
+    driver, _ := neo4j.NewDriverWithContext(
+        dbUri,
+        neo4j.BasicAuth(dbUser, dbPassword, ""))
+    driver.VerifyConnectivity(ctx)
+
+    // Query and return a neo4j.Time object
+    result, err := neo4j.ExecuteQuery(ctx, driver, `
+        MERGE (a:Person {name: $name})
+        MERGE (b:Person {name: $friend})
+        MERGE (a)-[friendship:KNOWS {since: time()}]->(b)
+        RETURN friendship.since AS time
+        `, map[string]any{
+            "name": "Alice",
+            "friend": "Sofia",
+            "friendsSince": friendsSince,
+        }, neo4j.EagerResultTransformer,
+        neo4j.ExecuteQueryWithDatabase("neo4j"))
+    if err != nil {
+        panic(err)
+    }
+    time, _ := result.Records[0].Get("time")
+    fmt.Println(reflect.TypeOf(time))  // time.Time
+    castDate, _ := date.(neo4j.Time)  // cast from `any` to `neo4j.Time`
+    fmt.Println(castDate.Time())  // -0001-11-30 12:18:08.973 +0000 Offset
+----
+
+
+=== `Duration`
+
+Represents the difference between two points in time.
+
+[source, go]
+----
+duration := neo4j.Duration{
+    Months: 1,
+    Days: 2,
+    Seconds: 3,
+    Nanos: 4,
+}
+fmt.Println(duration)  # 'P1Y2DT3.000000004S'
+----
+
+For full documentation, see link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/dbtype#Duration[API documentation -- Duration].
+
+
+== Spatial types
+
+Cypher supports link:{neo4j-docs-base-uri}/docs/cypher-manual/current/values-and-types/spatial/[spatial values] (points), and Neo4j can store these point values as properties on nodes and relationships.
+
+The object attribute `SpatialRefId` (short for _Spatial Reference Identifier_) is a number identifying the coordinate system the spatial type is to be interpreted in.
+You can think of it as a unique identifier for each spatial type.
+
+[options="header"]
+|===
+| Cypher Type            | Go Type          | SpatialRefId
+| `POINT` (2D Cartesian) | `dbtype.Point2D` | 7203
+| `POINT` (2D WGS-84)    | `dbtype.Point2D` | 9157
+| `POINT` (3D Cartesian) | `dbtype.Point3D` | 4326
+| `POINT` (3D WGS-84)    | `dbtype.Point2D` | 4979
+|===
+
+[NOTE]
+Spatial types are implemented in the `dbtype` package, so that the actual types are `dbtype.Point2D/3D`.
+However, they are also imported in the main `neo4j` package, so that they can also be used as `neo4j.Point2D/3D`.
+
+
+=== `Point2D`
+
+The type `Point2D` can be used to represent either a 2D Cartesian point or a 2D World Geodetic System (WGS84) point, depending on the value of `SpatialRefId`.
+
+[source, go]
+----
+// A 2D Cartesian Point
+cartesian2d := neo4j.Point2D{
+	X:            1.23,
+	Y:            4.56,
+	SpatialRefId: 7203,
+}
+fmt.Println(cartesian2d)
+// Point{srId=7203, x=1.230000, y=4.560000}
+
+// A 2D WGS84 Point
+wgs842d := neo4j.Point2D{
+	X:            1.23,
+	Y:            4.56,
+	SpatialRefId: 9157,
+}
+fmt.Println(wgs842d)
+// Point{srId=9157, x=1.230000, y=4.560000}
+----
+
+
+=== `Point3D`
+
+The type `Point3D` can be used to represent either a 3D Cartesian point or a 3D World Geodetic System (WGS84) point, depending on the value of `SpatialRefId`.
+
+[source, go]
+----
+// A 3D Cartesian Point
+cartesian3d := dbtype.Point3D{
+    X:            1.23,
+    Y:            4.56,
+    Z:            7.89,
+    SpatialRefId: 9157,
+}
+fmt.Println(cartesian3d)
+// Point{srId=9157, x=1.230000, y=4.560000, z=7.890000}
+
+// A 3D WGS84 Point
+wgs843d := dbtype.Point3D{
+    X:            1.23,
+    Y:            4.56,
+    Z:            7.89,
+    SpatialRefId: 4979,
+}
+fmt.Println(wgs843d)
+// Point{srId=4979, x=1.230000, y=4.560000, z=7.890000}
+----
+
+
+== Graph types
+
+*Graph types are only returned as query results and may not be used as parameters*.
+
+[options="header"]
+|===
+| Cypher Type    | Python Type
+| `NODE`         | `dbtype.Node`
+| `RELATIONSHIP` | `dbtype.Relationship`
+| `PATH`         | `dbtype.Path`
+|===
+
+
+=== `Node`
+Represents a node in a graph. +
+The property `ElementId` contains the database internal identifier for the entity.
+This should be used with care, as no guarantees are given about the mapping between id values and elements outside the scope of a single transaction.
+
+[source, go]
+----
+result, err := neo4j.ExecuteQuery(ctx, driver, `
+    MERGE (p:Person {name: $name}) RETURN p AS person, p.name as name
+    `, map[string]any{
+        "name": "Alice",
+    }, neo4j.EagerResultTransformer,
+    neo4j.ExecuteQueryWithDatabase("neo4j"))
+if err != nil {
+    panic(err)
+}
+node, _ := result.Records[0].AsMap()["person"].(neo4j.Node)
+fmt.Println("Node ID:", node.ElementId)
+fmt.Println("Node labels:", node.Labels)
+fmt.Println("Node properties:", node.Props)
+
+// Node ID: 4:2691aa68-87cc-467d-9d09-431df9f5c456:0
+// Node labels: [Person]
+// Node properties: map[name:Alice]
+----
+
+For full documentation, see link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/dbtype#Node[API documentation -- Node].
+
+
+=== `Relationship`
+
+Represents a relationship in a graph. +
+The property `ElementId` contains the database internal identifier for the entity.
+This should be used with care, as no guarantees are given about the mapping between id values and elements outside the scope of a single transaction.
+
+[source, go]
+----
+result, err := neo4j.ExecuteQuery(ctx, driver, `
+    MERGE (p:Person {name: $name})
+    MERGE (p)-[r:KNOWS {status: $status, since: date()}]->(friend:Person {name: $friendName})
+    RETURN r AS friendship
+    `, map[string]any{
+        "name": "Alice",
+        "status": "BFF",
+        "friendName": "Bob",
+    }, neo4j.EagerResultTransformer,
+    neo4j.ExecuteQueryWithDatabase("neo4j"))
+if err != nil {
+    panic(err)
+}
+relationship, _ := result.Records[0].AsMap()["friendship"].(neo4j.Relationship)
+fmt.Println("Relationship ID:", relationship.ElementId)
+fmt.Println("Relationship type:", relationship.Type)
+fmt.Println("Relationship properties:", relationship.Props)
+fmt.Println("Relationship start elID:", relationship.StartElementId)
+fmt.Println("Relationship end elID:", relationship.EndElementId)
+
+// Relationship ID: 5:2691aa68-87cc-467d-9d09-431df9f5c456:0
+// Relationship type: KNOWS
+// Relationship properties: map[since:{0 63824025600 <nil>} status:BFF]
+// Relationship start elID: 4:2691aa68-87cc-467d-9d09-431df9f5c456:0
+// Relationship end elID: 4:2691aa68-87cc-467d-9d09-431df9f5c456:1
+----
+
+For full documentation, see link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/dbtype#Relationship[API documentation -- Relationship].
+
+
+=== `Path`
+
+Represents a path in a graph.
+
+.Example of path creation, retrieval, and processing
+[source, go]
+----
+import (
+    "fmt"
+    "context"
+    "github.com/neo4j/neo4j-go-driver/v5/neo4j"
+)
+
+func main() {
+    ctx := context.Background()
+
+    // Connection to database
+    dbUri := "<URI to Neo4j database>"
+    dbUser := "<Username>"
+    dbPassword := "<Password>"
+    driver, _ := neo4j.NewDriverWithContext(
+        dbUri,
+        neo4j.BasicAuth(dbUser, dbPassword, ""))
+    driver.VerifyConnectivity(ctx)
+
+    // Create some :Person nodes linked by :KNOWS relationships
+    addFriend(ctx, driver, "Alice", "BFF", "Bob")
+    addFriend(ctx, driver, "Bob", "Fiends", "Sofia")
+    addFriend(ctx, driver, "Sofia", "Acquaintances", "Sofia")
+
+    // Follow :KNOWS relationships outgoing from Alice three times, return as path
+    result, err := neo4j.ExecuteQuery(ctx, driver, `
+        MATCH path=(:Person {name: $name})-[:KNOWS*3]->(:Person)
+        RETURN path AS friendshipChain
+        `, map[string]any{
+            "name": "Alice",
+        }, neo4j.EagerResultTransformer,
+        neo4j.ExecuteQueryWithDatabase("neo4j"))
+    if err != nil {
+        panic(err)
+    }
+    path := result.Records[0].AsMap()["friendshipChain"].(neo4j.Path)
+
+    fmt.Println("-- Path breakdown --")
+    for i := range path.Relationships {
+        name := path.Nodes[i].Props["name"]
+        status := path.Relationships[i].Props["status"]
+        friendName := path.Nodes[i+1].Props["name"]
+        fmt.Printf("%s is friends with %s (%s)\n", name, friendName, status)
+    }
+}
+
+func addFriend(ctx context.Context, driver neo4j.DriverWithContext, name string, status string, friendName string) {
+    _, err := neo4j.ExecuteQuery(ctx, driver, `
+        MERGE (p:Person {name: $name})
+        MERGE (p)-[r:KNOWS {status: $status, since: date()}]->(friend:Person {name: $friendName})
+        `, map[string]any{
+            "name": name,
+            "status": status,
+            "friendName": friendName,
+        }, neo4j.EagerResultTransformer,
+        neo4j.ExecuteQueryWithDatabase("neo4j"))
+    if err != nil {
+        panic(err)
+    }
+}
+
+----
+
+For full documentation, see link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/dbtype#Path[API documentation -- Path].
+
+
+== Exceptions
+
+For the most part, the driver simply forwards any error the server may raise.
+For a list of errors the server can return, see the link:{neo4j-docs-base-uri}/status-codes/{page-version}[Status code] page.
+
+Some server errors are marked as safe to retry without need to alter the original request.
+Examples of such errors are deadlocks, memory issues, or connectivity issues.
+When an error is raised, the function link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#IsRetryable[`neo4j.IsRetryable(error)`] gives insights into whether a further attempt might be successful.
+This is particular useful when running queries in xref:transactions#explicit-transactions[explicit transactions], to know if a failed query should be run again. Note that xref:transactions#managed-transactions[managed transactions] already implement a retry mechanism, so you don't need to implement your own.
+
+
+ifndef::backend-pdf[]
+[discrete.glossary]
+== Glossary
+
+include::{common-partial}/glossary.adoc[]
+include::../partials/glossary.adoc[]
+endif::[]

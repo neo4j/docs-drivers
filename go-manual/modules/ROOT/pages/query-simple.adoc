@@ -1,0 +1,358 @@
+= Query the database
+
+Once you have xref:connect.adoc[connected to the database], you can run queries using <<Cypher>> and the function link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#ExecuteQuery[`ExecuteQuery()`].
+
+[TIP]
+`ExecuteQuery()` was introduced with the version 5.8 of the driver. +
+For queries with earlier versions, see xref:transactions.adoc[Run your own transactions].
+
+
+== Write to the database
+
+To create a node representing a person named `Alice`, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/merge/[`MERGE`]:
+
+.Create a node representing a person named `Alice`
+[source, go]
+----
+result, err := neo4j.ExecuteQuery(ctx, driver,
+    "MERGE (p:Person {name: $name}) RETURN p",  // <1>
+    map[string]any{  // <2>
+        "name": "Alice",
+    }, neo4j.EagerResultTransformer,
+    neo4j.ExecuteQueryWithDatabase("neo4j"))  // <3>
+if err != nil {
+    panic(err)
+}
+
+fmt.Printf("Created %v nodes in %+v.\n",
+    result.Summary.Counters().NodesCreated(),
+    result.Summary.ResultAvailableAfter())
+----
+
+<1> specifies the Cypher query
+<2> is a map of _query parameters_
+<3> specifies which database the query should be run against
+
+[NOTE]
+`MERGE` creates a new node matching the requirements unless one already exists.
+If a matching node already exists, it is returned.
+For _strict creation_, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/create/[`CREATE`].
+
+
+== Read from the database
+
+To retrieve information from the database, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/match/[`MATCH`]:
+
+.Retrieve all `Person` nodes
+[source, go, role=nocollapse]
+----
+result, err := neo4j.ExecuteQuery(ctx, driver,
+    "MATCH (p:Person) RETURN p.name AS name",
+    nil,
+    neo4j.EagerResultTransformer,
+    neo4j.ExecuteQueryWithDatabase("neo4j"))
+if err != nil {
+    panic(err)
+}
+
+// Loop through results and do something with them
+for _, record := range result.Records {  // <1>
+    name, _ := record.Get("name")  // .Get() 2nd return is whether key is present
+    fmt.Println(name)
+    // or
+    // fmt.Println(record.AsMap())  // get Record as a map
+}
+
+// Summary information  // <2>
+fmt.Printf("The query `%v` returned %v records in %+v.\n",
+    result.Summary.Query().Text(), len(result.Records),
+    result.Summary.ResultAvailableAfter())
+----
+
+<1> `result.Records` contains the result as an array of `Record` objects
+<2> `result.Summary` contains the xref:result-summary.adoc[summary of execution] returned by the server
+
+[TIP]
+*When accessing a record's content, all its properties are of type `any`.*
+This means that you have to cast them to the relevant Go type if you want to use methods/features defined on such types.
+For example, if the `name` property coming from the database is a string, doing `record.AsMap()["name"][1]` would result in an _invalid operation_ error at compilation time.
+For it to work, cast the value to string _before_ using it as a string: `name := record.AsMap()["name"].(string)` and then `name[1]`.
+
+
+== Update the database
+
+To update a node's information in the database, use the Cypher clauses link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/match/[`MATCH`] and link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/set/[`SET`]:
+
+.Update node `Alice` to add an `age` property
+[source, go]
+----
+result, err := neo4j.ExecuteQuery(ctx, driver, `
+    MATCH (p:Person {name: $name})
+    SET p.age = $age
+    `, map[string]any{
+        "name": "Alice",
+        "age": 42,
+    }, neo4j.EagerResultTransformer,
+    neo4j.ExecuteQueryWithDatabase("neo4j"))
+if err != nil {
+    panic(err)
+}
+fmt.Println("Query updated the database?",
+    result.Summary.Counters().ContainsUpdates())
+----
+
+To create new nodes and relationships linking it to an already existing node, use a combination of the Cypher clauses `MATCH` and `MERGE`:
+
+.Create a relationship `:KNOWS` between `Alice` and `Bob`
+[source, go]
+----
+result, err := neo4j.ExecuteQuery(ctx, driver, `
+    MATCH (p:Person {name: $name})
+    MERGE (p)-[:KNOWS]->(:Person {name: $friend})
+    `, map[string]any{
+        "name": "Alice",
+        "friend": "Bob",
+    }, neo4j.EagerResultTransformer,
+    neo4j.ExecuteQueryWithDatabase("neo4j"))
+if err != nil {
+    panic(err)
+}
+fmt.Println("Query updated the database?",
+    result.Summary.Counters().ContainsUpdates())
+----
+
+[WARNING]
+====
+It might feel tempting to create new relationships with a single `MERGE` clause, such as: +
+`MERGE (:Person {name: "Alice"})-[:KNOWS]->(:Person {name: "Bob"})`. +
+However, this would result in the creation of an _extra_ `Alice` node, so that you would end up with unintended duplicate records.
+To avoid this, always `MATCH` the elements that you want to update, and use the resulting reference in the `MERGE` clause (as shown in the previous example).
+See link:https://neo4j.com/developer/kb/understanding-how-merge-works/[Understanding how MERGE works].
+====
+
+
+== Delete from the database
+To remove a node and any relationship attached to it, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/delete/[`DETACH DELETE`]:
+
+.Remove the `Alice` node
+[source, go]
+----
+// This does not delete _only_ p, but also all its relationships!
+result, err := neo4j.ExecuteQuery(ctx, driver, `
+    MATCH (p:Person {name: $name})
+    DETACH DELETE p
+    `, map[string]any{
+        "name": "Alice",
+    }, neo4j.EagerResultTransformer,
+    neo4j.ExecuteQueryWithDatabase("neo4j"))
+if err != nil {
+    panic(err)
+}
+fmt.Println("Query updated the database?",
+    result.Summary.Counters().ContainsUpdates())
+----
+
+
+[#query-parameters]
+== Query parameters
+
+*Do not hardcode or concatenate parameters directly into queries*.
+Instead, always use placeholders and specify the link:{neo4j-docs-base-uri}/cypher-manual/current/syntax/parameters/[Cypher parameters], as shown in the previous examples.
+This is for:
+
+1. *performance benefits*: Neo4j compiles and caches queries, but can only do so if the query structure is unchanged;
+2. *security reasons*: see link:https://neo4j.com/developer/kb/protecting-against-cypher-injection/[Knowledge Base -- Protecting against Cypher Injection].
+
+Query parameters should get grouped into a map and passed as second parameter to `ExecuteQuery()`. If a query has no parameters, you can pass `nil` instead of an empty map.
+
+[source, go]
+----
+parameters = map[string]any{
+    "name": "Alice",
+    "age": 42,
+}
+neo4j.ExecuteQuery(ctx, driver,
+    "MERGE (:Person {name: $name, age: $age})",
+    parameters,
+    neo4j.EagerResultTransformer,
+    neo4j.ExecuteQueryWithDatabase("neo4j"))
+----
+
+[NOTE]
+There can be circumstances where your query structure prevents the usage of parameters in all its parts.
+For those advanced use cases, see xref:query-advanced#_dynamic_values_in_property_keys_relationship_types_and_labels[Dynamic values in property keys, relationship types, and labels].
+
+
+== Query configuration
+
+You can supply further configuration parameters to alter the default behavior of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#ExecuteQuery[`ExecuteQuery()`].
+These are provided as an arbitrary number of callbacks from the 4th function argument onward.
+
+
+=== Database selection
+
+It is recommended to *always specify the database explicitly* with the `neo4j.ExecuteQueryWithDatabase("<dbName>")` callback, even on single-database instances.
+This allows the driver to work more efficiently, as it does not have to resolve the home database first.
+If no database is given, the link:{neo4j-docs-base-uri}/operations-manual/current/manage-databases/introduction#manage-databases-default[user's home database] is used.
+
+[source, go]
+----
+neo4j.ExecuteQuery(ctx, driver,
+    "MATCH (p:Person) RETURN p.name",
+    nil,
+    neo4j.EagerResultTransformer,
+    neo4j.ExecuteQueryWithDatabase("neo4j"))
+----
+
+Do not rely on the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/use/[`USE`] Cypher clause for database selection with the driver.
+
+
+=== Request routing
+
+In a cluster environment, all queries are directed to the leader node by default.
+To improve performance on read queries, you can use the callback `neo4j.ExecuteQueryWithReadersRouting()` to route a query to the read nodes.
+
+[source, go]
+----
+neo4j.ExecuteQuery(ctx, driver,
+    "MATCH (p:Person) RETURN p.name",
+    nil,
+    neo4j.EagerResultTransformer,
+    neo4j.ExecuteQueryWithDatabase("neo4j")
+    neo4j.ExecuteQueryWithReadersRouting())
+----
+
+Even though routing a _write_ query to _read_ nodes will likely result in a runtime error, xref:transactions#access-control-note[do not rely on this for security purposes].
+
+
+[#impersonation]
+=== Run queries as a different user
+
+You can execute a query under the security context of a different user with the callback `neo4j.ExecuteQueryWithImpersonatedUser("<somebodyElse>")`, specifying the name of the user to impersonate.
+For this to work, the user under which the `DriverWithContext` object
+was created needs to have the link:{neo4j-docs-base-uri}/cypher-manual/current/administration/access-control/dbms-administration#access-control-dbms-administration-impersonation[appropriate permissions].
+Impersonating a user is cheaper than creating a new `DriverWithContext` object.
+
+[source, go]
+----
+neo4j.ExecuteQuery(ctx, driver,
+    "MATCH (p:Person) RETURN p.name",
+    nil,
+    neo4j.EagerResultTransformer,
+    neo4j.ExecuteQueryWithDatabase("neo4j")
+    neo4j.ExecuteQueryWithImpersonatedUser("<somebodyElse>"))
+)
+----
+
+When impersonating a user, the query is run within the complete security context of the impersonated user and not the authenticated user (i.e., home database, permissions, etc.).
+
+
+== A full example
+
+[source, go]
+----
+package main
+
+import (
+    "fmt"
+    "context"
+    "github.com/neo4j/neo4j-go-driver/v5/neo4j"
+)
+
+func main() {
+    ctx := context.Background()
+
+    // Connection to database
+    dbUri := "<URI to Neo4j database>"
+    dbUser := "<Username>"
+    dbPassword := "<Password>"
+    driver, err := neo4j.NewDriverWithContext(
+        dbUri,
+        neo4j.BasicAuth(dbUser, dbPassword, ""))
+    if err != nil {
+        panic(err)
+    }
+    defer driver.Close(ctx)
+    err = driver.VerifyConnectivity(ctx)
+    if err != nil {
+        panic(err)
+    }
+
+    // Prepare data
+    people := []map[string]any {
+       {"name": "Alice", "age": 42, "friends": []string{"Bob", "Peter", "Anna"},},
+       {"name": "Bob", "age": 19,},
+       {"name": "Peter", "age": 50,},
+       {"name": "Anna", "age": 30,},
+    }
+
+    // Create some nodes
+    for _, person := range people {
+        _, err := neo4j.ExecuteQuery(ctx, driver,
+            "MERGE (p:Person {name: $person.name, age: $person.age})",
+            map[string]any{
+                "person": person,
+            }, neo4j.EagerResultTransformer,
+            neo4j.ExecuteQueryWithDatabase("neo4j"))
+        if err != nil {
+            panic(err)
+        }
+    }
+
+    // Create some relationships
+    for _, person := range people {
+        if person["friends"] != "" {
+            _, err := neo4j.ExecuteQuery(ctx, driver, `
+                MATCH (p:Person {name: $person.name})
+                UNWIND $person.friends AS friend_name
+                MATCH (friend:Person {name: friend_name})
+                MERGE (p)-[:KNOWS]->(friend)
+                `, map[string]any{
+                    "person": person,
+                }, neo4j.EagerResultTransformer,
+                neo4j.ExecuteQueryWithDatabase("neo4j"))
+            if err != nil {
+                panic(err)
+            }
+        }
+    }
+
+    // Retrieve Alice's friends who are under 40
+    result, err := neo4j.ExecuteQuery(ctx, driver, `
+        MATCH (p:Person {name: $name})-[:KNOWS]-(friend:Person)
+        WHERE friend.age < $age
+        RETURN friend
+        `, map[string]any{
+            "name": "Alice",
+            "age": 40,
+        }, neo4j.EagerResultTransformer,
+        neo4j.ExecuteQueryWithDatabase("neo4j"))
+    if err != nil {
+        panic(err)
+    }
+
+    // Loop through results and do something with them
+    for _, record := range result.Records {
+        person, _ := record.Get("friend")
+        fmt.Println(person)
+        // or
+        // fmt.Println(record.AsMap())
+    }
+
+    // Summary information
+    fmt.Printf("\nThe query `%v` returned %v records in %+v.\n",
+        result.Summary.Query().Text(), len(result.Records),
+        result.Summary.ResultAvailableAfter())
+}
+----
+
+For more information see link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#ExecuteQuery[API documentation -- ExecuteQuery()].
+
+
+ifndef::backend-pdf[]
+[discrete.glossary]
+== Glossary
+
+include::{common-partial}/glossary.adoc[]
+include::../partials/glossary.adoc[]
+endif::[]

@@ -1,0 +1,228 @@
+= Further query mechanisms
+
+[[implicit-transactions]]
+== Implicit (or auto-commit) transactions
+
+This is the most basic and limited form with which to run a Cypher query.
+The driver will not automatically retry implicit transactions, as it does instead for queries run with xref:query-simple.adoc[`ExecuteQuery()`] and with xref:transactions#managed-transactions[managed transactions].
+Implicit transactions should only be used when the other driver query interfaces do not fit the purpose, or for quick prototyping.
+
+You run an implicit transaction with the method `SessionWithContext.Run()`.
+It returns a `ResultWithContext` object that needs to be xref:transactions#process-result[processed accordingly].
+
+[source, go]
+----
+session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+defer session.Close(ctx)
+result, err := session.Run(
+    ctx,
+    "CREATE (:Person {name: $name})",
+    map[string]any{
+        "name": name
+    })
+----
+
+An implicit transaction gets committed _at the latest_ when the session is destroyed, or before another transaction is executed within the same session.
+Other than that, there is no clear guarantee on when exactly an implicit transaction will be committed during the lifetime of a session.
+To ensure an implicit transaction is committed, you can call the `.Consume(ctx)` method on its result.
+
+Since the driver cannot figure out whether the query in a `SessionWithContext.Run()` call requires a read or write session with the database, it defaults to write. If your implicit transaction contains read queries only, there is a performance gain in xref:transactions#_request_routing[making the driver aware] by setting the session config `AccessMode: neo4j.AccessModeRead` when creating the session.
+
+[TIP]
+*Implicit transactions are the only ones that can be used for link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/call-subquery/#subquery-call-in-transactions[`CALL { ... } IN TRANSACTIONS`] queries*.
+
+
+=== Import CSV files
+
+The most common use case for using `SessionWithContext.Run()` is for importing large CSV files into the database with the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/load-csv[`LOAD CSV`] Cypher clause, and preventing timeout errors due to the size of the transaction.
+
+.Import CSV data into a Neo4j database
+[source, go]
+----
+session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+defer session.Close(ctx)
+result, err := session.Run(
+    ctx, `
+    LOAD CSV FROM 'https://data.neo4j.com/bands/artists.csv' AS line
+    CALL {
+        WITH line
+        MERGE (:Artist {name: line[1], age: toInteger(line[2])})
+    } IN TRANSACTIONS OF 2 ROWS
+    `, nil)
+summary, _ := result.Consume(ctx)
+fmt.Println("Query updated the database?",
+    result.Summary.Counters().ContainsUpdates())
+----
+
+[NOTE]
+While `LOAD CSV` can be a convenience, there is nothing _wrong_ in deferring the parsing of the CSV file to your Go application and avoiding `LOAD CSV`.
+In fact, moving the parsing logic to the application can give you more control over the importing process.
+
+For more information, see link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/load-csv/[Cypher -- Clauses -- Load CSV].
+
+
+=== Transaction configuration
+
+You can exert further control on implicit transactions by providing configuration callbacks after the third argument in `SessionWithContext.Run()` calls.
+The configuration callbacks allow to specify a query timeout and to attach metadata to the transaction.
+For more information, see xref:transactions.adoc#_transaction_configuration[Transactions -- Transaction configuration].
+
+[source, go]
+----
+session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+defer session.Close(ctx)
+people, err := session.Run(ctx,
+    "MATCH (:Person) RETURN count(*) AS n",
+    nil,
+    neo4j.WithTxTimeout(5*time.Second),  // remember to import `time`
+    neo4j.WithTxMetadata(map[string]any{"appName": "peopleTracker"}))
+----
+
+
+== Dynamic values in property keys, relationship types, and labels
+
+In general, you should not concatenate parameters directly into a query, but rather use xref:query-simple#query-parameters[query parameters].
+There can however be circumstances where your query structure prevents the usage of parameters in all its parts.
+In fact, although parameters can be used for literals and expressions as well as node and relationship ids, they cannot be used for the following constructs:
+
+- property keys, so `MATCH (n) WHERE n.$param = 'something'` is invalid;
+- relationship types, so `MATCH (n)-[:$param]->(m)` is invalid;
+- labels, so `MATCH (n:$param)` is invalid.
+
+For those queries, you are forced to use string concatenation.
+To protect against Cypher injections you should enclose the dynamic values in backticks and escape them yourself.
+Notice that Cypher processes Unicode, so take care of the Unicode literal `\u0060` as well.
+
+.Manually escaping dynamic labels before concatenation
+[source, go]
+----
+label := "Person\\u0060n"
+// convert \u0060 to literal backtick and then escape backticks
+//remember to import `strings`
+escapedLabel := strings.ReplaceAll(label, "\\u0060", "`")
+escapedLabel = strings.ReplaceAll(escapedLabel, "`", "``")
+
+result, err := neo4j.ExecuteQuery(ctx, driver,
+    "MATCH (p:`" + escapedLabel + "` WHERE p.name = $name) RETURN p.name",
+    map[string]any{
+        "name": "Alice",
+    },
+    neo4j.EagerResultTransformer,
+    neo4j.ExecuteQueryWithDatabase("neo4j"))
+----
+
+Another workaround, which avoids string concatenation, is using the <<APOC>> procedure link:{neo4j-docs-base-uri}/apoc/current/overview/apoc.merge/apoc.merge.node/[`apoc.merge.node`].
+It supports dynamic labels and property keys, but only for node merging.
+
+.Using `apoc.merge.node` to create a node with dynamic labels/property keys
+[source, go]
+----
+propertyKey := "name"
+label := "Person"
+
+result, err := neo4j.ExecuteQuery(ctx, driver,
+    "CALL apoc.merge.node($labels, $properties)",
+    map[string]any{
+        "labels": []string{label},
+        "properties": map[string]any{propertyKey: "Alice"},
+    },
+    neo4j.EagerResultTransformer,
+    neo4j.ExecuteQueryWithDatabase("neo4j"))
+----
+
+[NOTE]
+If you are running Neo4j in Docker, APOC needs to be enabled when starting the container.
+See link:https://neo4j.com/labs/apoc/current/installation/#docker[APOC - Installation - Docker].
+
+
+== Logging
+
+The driver splits logging between driver events and Bolt events.
+To enable driver logging, use the `Config.Log` option when instantiating the driver:
+
+[source, go]
+----
+import (
+    "github.com/neo4j/neo4j-go-driver/v5/neo4j"
+    "github.com/neo4j/neo4j-go-driver/v5/neo4j/config"
+)
+
+driver, err := neo4j.NewDriverWithContext(
+    dbUri,
+    neo4j.BasicAuth(dbUser, dbPassword, ""),
+    func(conf *config.Config) {
+        conf.Log = neo4j.ConsoleLogger(neo4j.DEBUG)
+    })
+----
+
+.Example of log output upon driver connection
+[source, log]
+----
+2023-07-03 08:07:19.316   INFO  [pool 1] Created
+2023-07-03 08:07:19.316   INFO  [router 1] Created {context: map[address:localhost:7687]}
+2023-07-03 08:07:19.316   INFO  [driver 1] Created { target: localhost:7687 }
+2023-07-03 08:07:19.316  DEBUG  [session 2] Created
+2023-07-03 08:07:19.316   INFO  [router 1] Reading routing table from initial router: localhost:7687
+2023-07-03 08:07:19.316  DEBUG  [pool 1] Trying to borrow connection from [localhost:7687]
+2023-07-03 08:07:19.316   INFO  [pool 1] Connecting to localhost:7687
+2023-07-03 08:07:19.320   INFO  [bolt5 bolt-58@localhost:7687] Connected
+2023-07-03 08:07:19.320   INFO  [bolt5 bolt-58@localhost:7687] Retrieving routing table
+2023-07-03 08:07:19.320  DEBUG  [pool 1] Returning connection to localhost:7687 {alive:true}
+2023-07-03 08:07:19.320  DEBUG  [bolt5 bolt-58@localhost:7687] Resetting connection internal state
+2023-07-03 08:07:19.320  DEBUG  [router 1] New routing table for 'neo4j', TTL 300
+2023-07-03 08:07:19.320  DEBUG  [session 2] Resolved home database, uses db 'neo4j'
+2023-07-03 08:07:19.320  DEBUG  [pool 1] Trying to borrow connection from [localhost:7687]
+2023-07-03 08:07:19.321  DEBUG  [pool 1] Returning connection to localhost:7687 {alive:true}
+2023-07-03 08:07:19.321  DEBUG  [bolt5 bolt-58@localhost:7687] Resetting connection internal state
+2023-07-03 08:07:19.321  DEBUG  [router 1] Cleaning up
+2023-07-03 08:07:19.321  DEBUG  [session 2] Closed
+----
+
+Bolt logging can be enabled either:
+
+- per-query, with the configuration callback `neo4j.ExecuteQueryBoltLogger()`.
+This applies to individual queries run using xref:query-simple.adoc[`ExecuteQuery()`].
+- per-session, with the configuration option `BoltLogger`. This applies to all queries within a session.
+
+[source, go]
+.Enable logging for a query run with `ExecuteQuery`
+----
+result, err := neo4j.ExecuteQuery(ctx, driver,
+    "RETURN 42 AS n", nil, neo4j.EagerResultTransformer,
+    neo4j.ExecuteQueryWithDatabase("neo4j"),
+    neo4j.ExecuteQueryWithBoltLogger(neo4j.ConsoleBoltLogger()))
+----
+
+[source, go]
+.Enable logging for a session
+----
+session := driver.NewSession(ctx, neo4j.SessionConfig{
+    DatabaseName: "neo4j",
+    BoltLogger: neo4j.ConsoleBoltLogger(),
+})
+defer session.Close(ctx)
+session.Run(ctx, "RETURN 42 AS n", nil)
+----
+
+.Example of Bolt logging output
+[source, log]
+----
+2023-07-03 07:57:09.929   BOLT  [bolt-53@localhost:7687] C: BEGIN {"db":"neo4j"}
+2023-07-03 07:57:09.930   BOLT  [bolt-53@localhost:7687] S: SUCCESS {}
+2023-07-03 07:57:09.930   BOLT  [bolt-53@localhost:7687] C: RUN "RETURN 42 AS n" null null
+2023-07-03 07:57:09.930   BOLT  [bolt-53@localhost:7687] C: PULL {"n":1000}
+2023-07-03 07:57:09.936   BOLT  [bolt-53@localhost:7687] S: SUCCESS {"fields":["n"],"t_first":5}
+2023-07-03 07:57:09.937   BOLT  [bolt-53@localhost:7687] S: RECORD [42]
+2023-07-03 07:57:09.937   BOLT  [bolt-53@localhost:7687] S: SUCCESS {"t_first":1,"db":"neo4j"}
+2023-07-03 07:57:09.937   BOLT  [bolt-53@localhost:7687] C: COMMIT
+2023-07-03 07:57:09.938   BOLT  [bolt-53@localhost:7687] S: SUCCESS {"bookmark":"FB:kcwQhRyDJPONRxudy+QyzPSuSAaQ"}
+----
+
+
+ifndef::backend-pdf[]
+[discrete.glossary]
+== Glossary
+
+include::{common-partial}/glossary.adoc[]
+include::../partials/glossary.adoc[]
+endif::[]
