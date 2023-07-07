@@ -47,15 +47,15 @@ records, summary, keys = driver.execute_query(
     database_="neo4j",
 )
 
+# Loop through results and do something with them
+for person in records:
+    print(person)
+
 # Summary information
 print("The query `{query}` returned {records_count} records in {time} ms.".format(
     query=summary.query, records_count=len(records),
     time=summary.result_available_after,
 ))
-
-# Loop through results and do something with them
-for person in records:
-    print(person)
 ----
 
 xref:query-simple.adoc[More info on querying the database ->]

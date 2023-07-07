@@ -97,7 +97,7 @@ driver.execute_query(
 ----
 
 Another workaround, which avoids string concatenation, is using the <<APOC>> procedure link:{neo4j-docs-base-uri}/apoc/current/overview/apoc.merge/apoc.merge.node/[`apoc.merge.node`].
-It supports dynamic labels and property keys, but only for node insertion.
+It supports dynamic labels and property keys, but only for node merging.
 
 .Using `apoc.merge.node` to create a node with dynamic labels/property keys.
 [source, python]

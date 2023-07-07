@@ -1,7 +1,7 @@
 site:
   title: Neo4j Docs
   url: https://neo4j.com/docs
-  start_page: go-manual::index.adoc
+  start_page: python-manual::index.adoc
 
 content:
   sources:

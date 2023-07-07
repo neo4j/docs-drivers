@@ -5,11 +5,10 @@ When xref:query-simple.adoc[querying the database with `execute_query()`], the d
 For these more advanced use-cases, the driver provides functions to take full control over the transaction lifecycle. These are called _managed transactions_, and you can think of them as a way of unwrapping the flow of `execute_query()` and being able to specify its desired behavior in more places.
 
 
-== Obtain a session
+== Create a session
 
 Before running a transaction, you need to obtain a _session_.
-Sessions act as concrete query channels between the driver and the server.
-In particular, sessions borrow connections from the _connection pool_ as needed, and ensure <<causal consistency>> is enforced.
+Sessions act as concrete query channels between the driver and the server, and ensure <<causal consistency>> is enforced.
 
 Sessions are created with the method link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#session[`Driver.session()`], with the keyword argument `database` allowing to specify the xref:_database_selection[target database].
 For further parameters, see xref:_session_configuration[Session configuration].
@@ -34,10 +33,7 @@ As Neo4j is <<ACID>> compliant, *queries within a transaction will either be exe
 Use transactions to group together related queries which work together to achieve a single _logical_ database operation.
 
 A managed transaction is created with the methods link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Session.execute_read[`Session.execute_read()`] and link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Session.execute_write[`Session.execute_write()`], depending on whether you want to retrieve data from the database or alter it.
-Both methods take a _transaction function_ callback *(1)* and an arbitrary number of positional and keyword arguments *(2)* which are handed down to the transaction function.
-The transaction function *(3)* is responsible for actually carrying out the queries and processing the result.
-Queries are specified with the link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Transaction.run[`Transaction.run()`] method *(4)*, which returns a link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Result[`Result`] object.
-You can then xref:process-result[process the result] *(5)* using any of the `Result` methods.
+Both methods take a _transaction function_ callback, which is responsible for actually carrying out the queries and processing the result.
 
 .Retrieve people whose name starts with `Al`.
 [source, python]
@@ -49,14 +45,21 @@ def match_person_nodes(tx, name_filter): # <3>
         """, filter=name_filter)
     return list(result)  # return a list of Record objects # <5>
 
-with driver.session(database="neo4j") as session:
-    people = session.execute_read(
-        match_person_nodes, # <1>
-        "Al", # <2>
+with driver.session(database="neo4j") as session:  # <1>
+    people = session.execute_read(  # <2>
+        match_person_nodes,
+        "Al",
     )
     for person in people:
         print(person.data())  # obtain dict representation
 ----
+
+<1> Create a session. A single session can be the container for multiple queries. Unless created using the `with` construct, remember to close it when done.
+<2> The `.execute_read()` (or `.execute_write()`) method is the entry point into a transaction. It takes a callback to a _transaction function_ and an arbitrary number of positional and keyword arguments which are handed down to the transaction function.
+<3> The transaction function callback is responsible of running queries.
+<4> Use the method link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Transaction.run[`Transaction.run()`] to run queries. Each query run returns a link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Result[`Result`] object.
+<5> xref:process-result[Process the result] using any of the methods on `Result`.
+
 
 *Do not hardcode or concatenate parameters directly into the query*.
 Use xref:query-simple#query-parameters[query parameters] instead, both for performance and security reasons.
@@ -65,7 +68,7 @@ Use xref:query-simple#query-parameters[query parameters] instead, both for perfo
 Instead, always xref:process-result[process the result] in some way; at minimum, cast it to list.
 Within a transaction function, a `return` statement results in the transaction being committed, while the transaction is automatically rolled back if an exception is raised.
 
-.A transaction with multiple queries, client logic, and potential roll backs.
+.A transaction with multiple queries, client logic, and potential roll backs
 [source, python]
 ----
 from neo4j import GraphDatabase
@@ -86,7 +89,7 @@ def main():
 
 
 def employ_person_tx(tx, name):
-    # Create new Person node with given name, if not existing already
+    # Create new Person node with given name, if not exists already
     result = tx.run("""
         MERGE (p:Person {name: $name})
         RETURN p.name AS name

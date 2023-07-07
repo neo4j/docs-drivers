@@ -11,7 +11,7 @@ By passing one or multiple bookmarks along with a query, the server will make su
 
 == Bookmarks with `.execute_query()`
 
-When xref:query-simple.adoc[querying the database with `.execute_query()`], the driver manages bookmarks for you by using the driver's default link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Driver.execute_query_bookmark_manager[`execute_query_bookmark_manager`].
+When xref:query-simple.adoc[querying the database with `.execute_query()`], the driver manages bookmarks for you.
 In this case, you have the guarantee that subsequent queries can read previous changes without taking further action.
 
 [source, python]
@@ -51,8 +51,7 @@ with driver.session() as session:
 
 == Bookmarks across multiple sessions
 
-If your application uses multiple sessions instead, you may need to ensure that one session has completed all its transactions before another session is allowed to run its queries.
-In those cases, you can collect the bookmarks from some sessions using the method `Session.last_bookmarks()` *(1), (2)*, store them into a `Bookmarks` object, and use them to initialize another session with the `bookmarks` parameter *(3)*.
+If your application uses multiple sessions, you may need to ensure that one session has completed all its transactions before another session is allowed to run its queries.
 
 In the example below, `session_a` and `session_b` are allowed to run concurrently, while `session_c` waits until their results have been propagated.
 This guarantees the `Person` nodes `session_c` wants to act on actually exist.
@@ -74,32 +73,32 @@ def main():
 def create_some_friends(driver):
     saved_bookmarks = Bookmarks()  # To collect the sessions' bookmarks
 
-    # Create the first person and employment relationship.
+    # Create the first person and employment relationship
     with driver.session(database="neo4j") as session_a:
         session_a.execute_write(create_person, "Alice")
         session_a.execute_write(employ, "Alice", "Wayne Enterprises")
         saved_bookmarks += session_a.last_bookmarks()  # <1>
 
-    # Create the second person and employment relationship.
+    # Create the second person and employment relationship
     with driver.session(database="neo4j") as session_b:
         session_b.execute_write(create_person, "Bob")
         session_b.execute_write(employ, "Bob", "LexCorp")
-        saved_bookmarks += session_b.last_bookmarks()  # <2>
+        saved_bookmarks += session_b.last_bookmarks()  # <1>
 
-    # Create a friendship between the two people created above.
+    # Create a friendship between the two people created above
     with driver.session(
         database="neo4j", bookmarks=saved_bookmarks
-    ) as session_c:  # <3>
+    ) as session_c:  # <2>
         session_c.execute_write(create_friendship, "Alice", "Bob")
         session_c.execute_read(print_friendships)
 
 
-# Create a person node.
+# Create a person node
 def create_person(tx, name):
-    tx.run("CREATE (:Person {name: $name})", name=name)
+    tx.run("MERGE (:Person {name: $name})", name=name)
 
 
-# Create an employment relationship to a pre-existing company node.
+# Create an employment relationship to a pre-existing company node
 # This relies on the person first having been created.
 def employ(tx, person_name, company_name):
     tx.run("""
@@ -110,7 +109,7 @@ def employ(tx, person_name, company_name):
     )
 
 
-# Create a friendship between two people.
+# Create a friendship between two people
 def create_friendship(tx, name_a, name_b):
     tx.run("""
         MATCH (a:Person {name: $name_a})
@@ -120,7 +119,7 @@ def create_friendship(tx, name_a, name_b):
     )
 
 
-# Retrieve and display all friendships.
+# Retrieve and display all friendships
 def print_friendships(tx):
     result = tx.run("MATCH (a)-[:KNOWS]->(b) RETURN a.name, b.name")
     for record in result:
@@ -130,6 +129,9 @@ def print_friendships(tx):
 if __name__ == "__main__":
     main()
 ----
+
+<1> Collect and combine bookmarks from different sessions using `Session.last_bookmarks()`, storing them in a `Bookmarks` object.
+<2> Use them to initialize another session with the `bookmarks` parameter.
 
 image:{common-image}/driver-passing-bookmarks.svg[]
 

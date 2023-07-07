@@ -26,16 +26,19 @@ print("Created {nodes_created} nodes in {time} ms.".format(
 
 ----
 
-where *(1)* specifies the Cypher query, *(2)* is a _query parameter_, and *(3)* specifies which database the query should be run against.
+<1> specifies the Cypher query
+<2> is a map of _query parameters_
+<3> specifies which database the query should be run against
 
 [NOTE]
-`MERGE` creates a new node matching the requirements unless one already exists, in which case nothing is done.
+`MERGE` creates a new node matching the requirements unless one already exists.
+If a matching node already exists, it is returned.
 For _strict creation_, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/create/[`CREATE`].
 
 
 == Read from the database
 
-To retrieve information from the database, use the  Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/match/[`MATCH`]:
+To retrieve information from the database, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/match/[`MATCH`]:
 
 .Retrieve all `Person` nodes
 [source, python]
@@ -45,18 +48,19 @@ records, summary, keys = driver.execute_query(
     database_="neo4j",
 )
 
-# Summary information
+# Loop through results and do something with them
+for record in records:  # <1>
+    print(record.data())  # obtain record as dict
+
+# Summary information  <2>
 print("The query `{query}` returned {records_count} records in {time} ms.".format(
     query=summary.query, records_count=len(records),
     time=summary.result_available_after
 ))
-
-# Loop through results and do something with them
-for record in records:
-    print(record.data())  # obtain record as dict
 ----
 
-where `records` contains the actual result as a list, `keys` contains the column names of the returned records (such as `name`), and `summary` contains the xref:result-summary.adoc[summary of execution] returned by the server.
+<1> `records` contains the result as an array of `Record` objects
+<2> `summary` contains the xref:result-summary.adoc[summary of execution] returned by the server
 
 
 == Update the database
@@ -123,7 +127,7 @@ Instead, always use placeholders and specify the link:{neo4j-docs-base-uri}/cyph
 This is for:
 
 1. *performance benefits*: Neo4j compiles and caches queries, but can only do so if the query structure is unchanged;
-2. *security reasons*: link:https://neo4j.com/developer/kb/protecting-against-cypher-injection/[protecting against Cypher injection].
+2. *security reasons*: see link:https://neo4j.com/developer/kb/protecting-against-cypher-injection/[protecting against Cypher injection].
 
 Query parameters can be passed either as several keyword arguments, or grouped together in a dictionary as value to the `parameters_` keyword argument. In case of mix, keyword-argument parameters take precedence over dictionary ones.
 
@@ -210,7 +214,7 @@ driver.execute_query(
 )
 ----
 
-Routing a _write_ query to `READ` nodes will likely result in a runtime error, but xref:transactions#access-control-note[do not rely on this for security purposes].
+Even though routing a _write_ query to _read_ nodes will likely result in a runtime error, xref:transactions#access-control-note[do not rely on this for security purposes].
 
 
 [#impersonation]
@@ -286,14 +290,14 @@ with GraphDatabase.driver(URI, auth=AUTH) as driver:
             routing_="r",
             database_="neo4j",
         )
+        # Loop through results and do something with them
+        for record in records:
+            print(record)
         # Summary information
         print("The query `{query}` returned {records_count} records in {time} ms.".format(
             query=summary.query, records_count=len(records),
             time=summary.result_available_after
         ))
-        # Loop through results and do something with them
-        for record in records:
-            print(record)
 
     except Exception as e:
         print(e)

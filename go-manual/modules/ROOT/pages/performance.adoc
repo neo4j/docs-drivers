@@ -41,7 +41,7 @@ session := driver.NewSession(ctx)
 == Use query parameters
 
 *Always use xref:query-simple#query-parameters[query parameters]* instead of hardcoding or concatenating values into queries.
-Besides protecting from Cypher injections, this allows to leverage the database's query cache.
+Besides protecting from Cypher injections, this allows to leverage the database query cache.
 
 [discrete]
 === Good practices
