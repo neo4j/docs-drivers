@@ -211,15 +211,6 @@ neo4j.ExecuteQuery(/* <QUERY 3>*/)
 ----
 
 
-== Implement a custom `BookmarkManager`
-
-The _bookmark manager_ is an interface used by the driver for keeping track of the bookmarks and keeping sessions automatically consistent.
-
-You can subclass the link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.api.BookmarkManager[`BookmarkManager`] interface to implement a custom bookmark manager, or use the default implementation provided by the driver through link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.GraphDatabase.bookmark_manager[`GraphDatabase.bookmark_manager()`]. When implementing a bookmark manager, keep in mind that all methods must be concurrency safe.
-
-The details of the interface can be found in the link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.api.BookmarkManager[API documentation].
-
-
 ifndef::backend-pdf[]
 [discrete.glossary]
 == Glossary
