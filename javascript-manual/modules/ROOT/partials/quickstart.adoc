@@ -84,7 +84,7 @@ Use the methods `Session.executeRead()` and `Session.executeWrite()` to run mana
 ----
 let session = driver.session({ database: 'neo4j' })
 try {
-  const { records, summary } = await session.executeRead(async tx => {
+  const result = await session.executeRead(async tx => {
     return await tx.run(`
       MATCH (p:Person WHERE p.name STARTS WITH $filter)
       RETURN p.name AS name ORDER BY name
