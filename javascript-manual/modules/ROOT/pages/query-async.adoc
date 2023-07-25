@@ -184,7 +184,7 @@ The reactive API is recommended for applications that are already oriented towar
 const rxjs = require('rxjs');
 
 const rxSession = driver.rxSession()  // <1>
-const rxResult = rxSession.executeRead(tx => {
+const rxResult = rxSession.executeWrite(tx => {
   return tx
     .run('MERGE (p:Person {name: $name}) RETURN p.name AS name', {  // <2>
       name: 'Alice'
