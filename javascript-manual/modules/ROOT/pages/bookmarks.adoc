@@ -11,17 +11,17 @@ By passing one or multiple bookmarks along with a query, the server will make su
 
 == Bookmarks with `.executeQuery()`
 
-When xref:query-simple.adoc[querying the database with `.executeQuery()`], the driver manages bookmarks for you by using the driver's default link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/driver.js~Driver.html#instance-get-executeQueryBookmarkManager[`executeQueryBookmarkManager`].
+When xref:query-simple.adoc[querying the database with `.executeQuery()`], the driver manages bookmarks for you.
 In this case, you have the guarantee that subsequent queries can read previous changes without taking further action.
 
 [source, javascript]
 ----
 driver.executeQuery('<QUERY 1>')
 
-# subsequent executeQuery calls will be causally chained
+// subsequent executeQuery calls will be causally chained
 
-driver.executeQuery('<QUERY 2>') # can read result of <QUERY 1>
-driver.executeQuery('<QUERY 3>') # can read result of <QUERY 2>
+driver.executeQuery('<QUERY 2>') // can read result of <QUERY 1>
+driver.executeQuery('<QUERY 3>') // can read result of <QUERY 2>
 ----
 
 To disable bookmark management and causal consistency, set the `bookmarkManager` option to `null` in `.executeQuery()` calls.
@@ -64,7 +64,6 @@ try {
 == Bookmarks across multiple sessions
 
 If your application uses multiple sessions, you may need to ensure that one session has completed all its transactions before another session is allowed to run its queries.
-In those cases, you can collect the bookmarks from some sessions using the method `Session.lastBookmarks()` *(1), (2)*, store them into a list, and use them to initialize another session with the `bookmarks` parameter *(3)*.
 
 In the example below, `sessionA` and `sessionB` are allowed to run concurrently, while `sessionC` waits until their results have been propagated.
 This guarantees the `Person` nodes `sessionC` wants to act on actually exist.
@@ -75,9 +74,9 @@ This guarantees the `Person` nodes `sessionC` wants to act on actually exist.
 const neo4j = require('neo4j-driver');
 
 (async () => {
-  const URI = 'neo4j://localhost'
-  const USER = 'neo4j'
-  const PASSWORD = 'verysecret'
+  const URI = '<URI to Neo4j database>'
+  const USER = '<Username>'
+  const PASSWORD = '<Password>'
   let driver
   try {
     driver = neo4j.driver(URI, neo4j.auth.basic(USER, PASSWORD))
@@ -97,7 +96,7 @@ async function createFriends(driver) {
   try {
     await createPerson(sessionA, 'Alice')
     await employPerson(sessionA, 'Alice', 'Wayne Enterprises')
-    savedBookmarks.concat(sessionA.lastBookmarks())
+    savedBookmarks.concat(sessionA.lastBookmarks())  // <1>
   } finally {
     sessionA.close()
   }
@@ -107,13 +106,16 @@ async function createFriends(driver) {
   try {
     await createPerson(sessionB, 'Bob')
     await employPerson(sessionB, 'Bob', 'LexCorp')
-    savedBookmarks.concat(sessionB.lastBookmarks())
+    savedBookmarks.concat(sessionB.lastBookmarks())  // <1>
   } finally {
     sessionB.close()
   }
 
   // Create (and show) a friendship between the two people created above.
-  const sessionC = driver.session({database: 'neo4j', bookmarks: savedBookmarks})
+  const sessionC = driver.session({
+    database: 'neo4j',
+    bookmarks: savedBookmarks  // <2>
+  })
   try {
     await createFriendship(sessionC, 'Alice', 'Bob')
     await printFriendships(sessionC)
@@ -165,6 +167,9 @@ async function printFriendships(session) {
 }
 ----
 
+<1> Collect and combine bookmarks from different sessions using the method `Session.lastBookmarks()`.
+<2> Use them to initialize another session with the `bookmarks` parameter.
+
 image:{common-image}/driver-passing-bookmarks.svg[]
 
 [TIP]
@@ -196,13 +201,6 @@ try {
 // (i.e., can read what was written by <QUERY 2>)
 driver.executeQuery('<QUERY 3>')
 ----
-
-
-== Implement a custom `BookmarkManager`
-
-The _bookmark manager_ is an interface used by the driver for keeping track of the bookmarks and keeping sessions automatically consistent.
-
-You can create your own bookmark manager by complying with the link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/bookmark-manager.js~BookmarkManager.html[`BookmarkManager`] interface, or use the default implementation provided by the driver by calling the link:{neo4j-docs-base-uri}/api/javascript-driver/current/function/index.html#static-function-bookmarkManager[`bookmarkManager()`] function. When implementing a bookmark manager, keep in mind that all methods must be concurrency safe.
 
 
 ifndef::backend-pdf[]

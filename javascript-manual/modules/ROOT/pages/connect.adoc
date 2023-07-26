@@ -31,24 +31,22 @@ You connect to a database by creating a <<Driver>> object and providing a URL an
 
   // Use the driver to run queries
 
-  await driver.close()
+  await driver.close()  // <3>
 })();
 ----
 
-Creating a `Driver` instance *(1)* only provides information on _how_ to access the database, but does not actually _establish_ a connection.
+<1> Creating a `Driver` instance only provides information on _how_ to access the database, but does not actually _establish_ a connection.
 Connection is instead deferred to when the first query is executed.
-To verify immediately that the driver can connect to the database (valid credentials, compatible versions, etc), use the `.verifyConnectivity()` method *(2)* after initializing the driver.
+<2> To verify immediately that the driver can connect to the database (valid credentials, compatible versions, etc), use the `.getServerInfo()` method after initializing the driver.
+<3> Always close `Driver` objects to free up all allocated resources, even upon unsuccessful connection or runtime errors in subsequent querying.
+
+// in js .verifyConnectivity() is deprecated.
 
 Both the creation of a `Driver` object and the connection verification can raise exceptions, so error catching should include both.
 
 `Driver` objects are _immutable_, _thread-safe_, and fairly _expensive to create_.
 Share them across threads (but not across processes) and use xref:transactions#impersonation[impersonation] to query the database with a different user.
 If you want to alter a `Driver` configuration, you will need to create a new object.
-
-
-== Close connections
-
-Always close `Driver` objects with `driver.close()` to free up all allocated resources, even upon unsuccessful connection or runtime errors.
 
 
 == Further connection parameters

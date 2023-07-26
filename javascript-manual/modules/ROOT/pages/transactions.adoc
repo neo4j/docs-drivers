@@ -2,14 +2,13 @@
 
 When xref:query-simple.adoc[querying the database with `executeQuery()`], the driver automatically creates a _transaction_. A transaction is a unit of work that is either _committed_ in its entirety or _rolled back_ on failure. You can include multiple Cypher statements in a single query, as for example when using `MATCH` and `MERGE` in sequence to xref:query-simple#_update_the_database[update the database], but you cannot have multiple queries and interleave some client-logic in between them.
 
-For these more advanced use-cases, the driver provides functions to take full control over the transaction lifecycle. These are called _managed transactions_, and you can think of them as a way of unwrapping the flow of `executeQuery()` and being able to specify its desired behavior in more places.
+For these more advanced use-cases, the driver provides functions to take full control over the transaction lifecycle.
 
 
-== Obtain a session
+== Create a session
 
 Before running a transaction, you need to obtain a _session_.
-Sessions act as concrete query channels between the driver and the server.
-In particular, sessions borrow connections from the _connection pool_ as needed, and ensure <<causal consistency>> is enforced.
+Sessions act as concrete query channels between the driver and the server, and ensure <<causal consistency>> is enforced.
 
 Sessions are created with the method link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/driver.js~Driver.html#instance-method-session[`Driver.session()`].
 It takes a single (optional) object parameter, with the property `database` allowing to specify the xref:_database_selection[target database].
@@ -29,35 +28,44 @@ Always xref:_close_sessions[close sessions] when you are done with them.
 [#managed-transactions]
 == Run a managed transaction
 
+You can think of managed transactions as a way of unwrapping the flow of `executeQuery()` and being able to specify its desired behavior in more places.
+
 A transaction can contain any number of queries.
 As Neo4j is <<ACID>> compliant, *queries within a transaction will either be executed as a whole or not at all*: you cannot get a part of the transaction succeeding and another failing.
 Use transactions to group together related queries which work together to achieve a single _logical_ database operation.
 
 A managed transaction is created with the methods link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/session.js~Session.html#instance-method-executeRead[`Session.executeRead()`] and link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/session.js~Session.html#instance-method-executeRead[`Session.executeWrite()`], depending on whether you want to _retrieve_ data from the database or _alter_ it.
-Both methods take a <<transaction_function>> callback *(1)*, which is responsible of actually carrying out the queries and processing the result.
-Queries are specified with the link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/transaction.js~Transaction.html#instance-method-run[`Transaction.run()`] method *(2)*, where you provide a Cypher query *(3)* and an object of query parameters *(4)* which returns a link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/result.js~Result.html[`Result`] object.
-You can then process the result records and query summary *(5)*.
+Both methods take a <<transaction_function>> callback, which is responsible of actually carrying out the queries and processing the result.
 
 .Retrieve people whose name starts with `Al`.
 [source, javascript]
 ----
-let session, result
-session = driver.session({ database: 'neo4j' })
-result = await session.executeRead(async tx => { // <1>
-  return await tx.run(`  // <2>
-    MATCH (p:Person) WHERE p.name STARTS WITH $filter  // <3>
-    RETURN p.name as name ORDER BY name
-    `, {filter: 'Al'}  // <4>
+try {
+  let session, result
+  session = driver.session({ database: 'neo4j' })  // <1>
+  result = await session.executeRead(async tx => { // <2>
+    return await tx.run(`  // <3>
+      MATCH (p:Person) WHERE p.name STARTS WITH $filter
+      RETURN p.name as name ORDER BY name
+      `, {filter: 'Al'}
+    )
+  })
+  for(let record in result.records) {  // <4>
+    console.log(record.get('name'))
+  }
+  console.log(
+    `The query \`${result.summary.query.text}\`` +
+    `returned ${result.records.length} nodes.\n`
   )
-})
-console.log(
-  `The query \`${result.summary.query.text}\`` +
-  `returned ${result.records.length} nodes.\n`
-)
-for(let record in result.records) {  // <5>
-  console.log(record.get('name'))
+} finally {
+  session.close()
 }
 ----
+
+<1> Create a session. A single session can be the container for multiple queries. Remember to close it when done.
+<2> The `.executeRead()` (or `.executeWrite()`) method is the entry point into a transaction.
+<3> Use the method link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/transaction.js~Transaction.html#instance-method-run[`Transaction.run()`] to run queries, providing a Cypher query and an object of query parameters. Each query run returns a link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/result.js~Result.html[`Result`] object.
+<4> Process the result records and query summary.
 
 *Do not hardcode or concatenate parameters directly into the query*.
 Use xref:query-simple#query-parameters[query parameters] instead, both for performance and security reasons.
@@ -70,9 +78,9 @@ Within a transaction function, a `return` statement results in the transaction b
 const neo4j = require('neo4j-driver');
 
 (async () => {
-  const URI = 'neo4j://localhost'
-  const USER = 'neo4j'
-  const PASSWORD = 'verysecret'
+  const URI = '<URI to Neo4j database>'
+  const USER = '<Username>'
+  const PASSWORD = '<Password>'
   let driver, session
   let employeeThreshold = 10
 
@@ -152,28 +160,6 @@ Note that although transaction functions might be executed multiple times, the q
 A session can chain multiple transactions, but *only one single transaction can be active within a session at any given time*.
 This means that a query must be completed before the next one can run, and it is the reason why the previous examples all use the `async/await` syntax.
 To maintain multiple concurrent transactions, see xref:query-async.adoc[how to run asynchronous queries].
-
-
-=== Further transaction function configuration
-
-Both `executeRead` and `executeWrite` take a second optional parameter of type link:{neo4j-docs-base-uri}/api/javascript-driver/current/typedef/index.html#static-typedef-TransactionConfig[`TransactionConfig`], which allows to supply further configuration parameters.
-You can specify:
-
-- a transaction timeout (in milliseconds).
-Transactions that run longer will be terminated by the server.
-The default value is set on the server side.
-- an object of metadata that gets attached to the transaction.
-These metadata get logged in the server `query.log`, and are visible in the output of the `SHOW TRANSACTIONS YIELD *` Cypher command.
-Use this to tag transactions.
-
-[source, javascript]
-----
-let session = driver.session({ database: 'neo4j' })
-const people_n = await session.executeRead(
-  async tx => { return await tx.run('MATCH (a:Person) RETURN count(a)') },
-  { timeout: 5000, metadata: {'app_name': 'people'} }  // TransactionConfig
-)
-----
 
 
 [#explicit-transactions]
@@ -318,6 +304,27 @@ const session = driver.session({
 
 When impersonating a user, the query is run within the complete security context of the impersonated user and not the authenticated user (i.e., home database, permissions, etc.).
 
+
+== Transaction configuration
+
+You can exert further control on transactions by providing a second optional parameter of type link:{neo4j-docs-base-uri}/api/javascript-driver/current/typedef/index.html#static-typedef-TransactionConfig[`TransactionConfig`] to `.executeRead()`, `.executeWrite()`, and `.beginTransaction()`.
+You can specify:
+
+- a transaction timeout (in milliseconds).
+Transactions that run longer will be terminated by the server.
+The default value is set on the server side.
+- an object of metadata that gets attached to the transaction.
+These metadata get logged in the server `query.log`, and are visible in the output of the `SHOW TRANSACTIONS YIELD *` Cypher command.
+Use this to tag transactions.
+
+[source, javascript]
+----
+let session = driver.session({ database: 'neo4j' })
+const people_n = await session.executeRead(
+  async tx => { return await tx.run('MATCH (a:Person) RETURN count(a)') },
+  { timeout: 5000, metadata: {'app_name': 'people'} }  // TransactionConfig
+)
+----
 
 == Close sessions
 

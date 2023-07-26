@@ -2,7 +2,7 @@
 
 The tables in this section show the mapping between Cypher data types and JavaScript types.
 
-== Core data types
+== Core types
 
 [options="header"]
 |===

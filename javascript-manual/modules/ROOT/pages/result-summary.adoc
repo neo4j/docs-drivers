@@ -96,7 +96,6 @@ You may use this information to locate potential bottlenecks or room for perform
 ----
 const result = driver.executeQuery('EXPLAIN MATCH (p {name: $name}) RETURN p', { name: 'Alice' })
 console.log(result.summary.plan.arguments['string-representation'])
-
 /*
 Planner COST
 Runtime PIPELINED
@@ -120,14 +119,12 @@ Total database accesses: ?
 If you instead prefix a query with the keyword `PROFILE`, the server will return the execution plan it has used to run the query, together with profiler statistics.
 This includes the list of operators that were used and additional profiling information about each intermediate step.
 The plan is available under the property `ResultSummary.profile`.
-You may use this information to locate potential bottlenecks or room for performance improvements.
 Notice that the query is also _run_, so the result object also contains any result records.
 
 [source, javascript, role=nocollapse]
 ----
 const result = driver.executeQuery('PROFILE MATCH (p {name: $name}) RETURN p', { name: 'Alice' })
 console.log(result.summary.profile.arguments['string-representation'])
-
 /*
 Planner COST
 Runtime PIPELINED
@@ -185,7 +182,7 @@ print(summary.notifications)
 ----
 
 
-### Filtering notifications
+### Filter notifications
 
 By default, the server analyses each query for all categories and severity of notifications.
 Starting from version 5.7, you can use the parameter `notificationsFilter` to restrict the severity or category of notifications that you are interested into. You may disable notifications altogether by setting the minimum severity to `OFF`.

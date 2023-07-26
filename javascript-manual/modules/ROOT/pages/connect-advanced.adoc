@@ -21,7 +21,7 @@ The server must be reachable from the domain root.
 
 == Connection protocols and security
 
-Communication between the driver and the server is mediated by Bolt.
+Communication between the driver and the server is mediated by <<Bolt>>.
 The scheme of the server URI determines whether the connection is encrypted and, if so, what type of certificates are accepted.
 
 [options="header", cols="20,40,40"]
@@ -54,7 +54,7 @@ If you are unsure, ask the database administrator.
 
 == Authentication methods
 
-=== Basic authentication (default)
+=== Basic authentication
 
 The basic authentication scheme relies on traditional username and password.
 These can either be the credentials for your local installation, or the ones provided with an Aura instance.
@@ -68,6 +68,7 @@ const driver = neo4j.driver(uri, neo4j.auth.basic(user, password))
 The basic authentication scheme can also be used to authenticate against an LDAP server (Enterprise Edition only).
 
 === Kerberos authentication
+
 The Kerberos authentication scheme requires a base64-encoded ticket.
 It can only be used if the server has the link:{neo4j-docs-base-uri}/kerberos-add-on/current/deployment/[Kerberos Add-on installed].
 
@@ -77,6 +78,7 @@ const driver = neo4j.driver(uri, neo4j.auth.kerberos(ticket))
 ----
 
 === Bearer authentication
+
 The bearer authentication scheme requires a base64-encoded token provided by an Identity Provider through Neo4j's link:{neo4j-docs-base-uri}/operations-manual/current/authentication-authorization/sso-integration[Single Sign-On feature].
 
 [source, javascript]

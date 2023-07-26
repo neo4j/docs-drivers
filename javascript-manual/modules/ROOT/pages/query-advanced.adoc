@@ -1,9 +1,10 @@
 = Further query mechanisms
 
+[[implicit-transactions]]
 == Implicit (or auto-commit) transactions
 
 This is the most basic and limited form with which to run a Cypher query.
-The driver will not automatically retry implicit transactions, as it does instead for queries run with xref:query-simple.adoc[`execute_query()`] and with xref:transactions#managed-transactions[managed transactions].
+The driver will not automatically retry implicit transactions, as it does instead for queries run with xref:query-simple.adoc[`Driver.executeQuery()`] and with xref:transactions#managed-transactions[managed transactions].
 Implicit transactions should only be used when the other driver query interfaces do not fit the purpose, or for quick prototyping.
 
 You run an implicit transaction with the method link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/session.js~Session.html#instance-method-run[`Session.run()`], which returns a link:{neo4j-docs-base-uri}/api/api/javascript-driver/current/class/lib6/result.js~Result.html[`Result`] object.
@@ -59,10 +60,11 @@ In fact, moving the parsing logic to the application can give you more control o
 For more information, see link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/load-csv/[Cypher -- Clauses -- Load CSV].
 
 
-=== Timeout and metadata configuration
+=== Transaction configuration
 
-`session.run()` takes an optional third parameter of type link:{neo4j-docs-base-uri}/api/javascript-driver/current/typedef/index.html#static-typedef-TransactionConfig[`TransactionConfig`], which allows to specify a query timeout and to attach metadata to the transaction.
-The metadata is visible in the server logs (as described for the xref:transactions#_further_transaction_function_configuration[transaction functions configuration]).
+You can exert further control on implicit transactions by providing an optional third parameter of type link:{neo4j-docs-base-uri}/api/javascript-driver/current/typedef/index.html#static-typedef-TransactionConfig[`TransactionConfig`] to `session.run()`.
+The configuration allows to specify a query timeout and to attach metadata to the transaction.
+For more information, see xref:transactions.adoc#_transaction_configuration[Transactions -- Transaction configuration].
 
 [source, javascript]
 ----
@@ -105,7 +107,7 @@ console.log(`Executed query: ${result.summary.query.text}`)
 ----
 
 Another workaround, which avoids string concatenation, is using the <<APOC>> procedure link:{neo4j-docs-base-uri}/apoc/current/overview/apoc.merge/apoc.merge.node/[`apoc.merge.node`].
-It supports dynamic labels and property keys, but only for node insertion.
+It supports dynamic labels and property keys, but only for node merging.
 
 .Using `apoc.merge.node` to create a node with dynamic labels/property keys
 [source, javascript]

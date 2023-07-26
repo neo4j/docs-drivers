@@ -30,7 +30,9 @@ console.log(
 )
 ----
 
-where *(1)* specifies the Cypher query, *(2)* is an object of _query parameters_, and *(3)* specifies which database the query should be run against.
+<1> specifies the Cypher query.
+<2> is an object of _query parameters_.
+<3> specifies which database the query should be run against.
 
 [NOTE]
 `MERGE` creates a new node matching the requirements unless one already exists, in which case nothing is done.
@@ -49,17 +51,19 @@ const { records, summary } = await driver.executeQuery(
   {},
   { database: 'neo4j' }
 )
-console.log(
-  `The query \`${summary.query.text}\` ` +
-  `returned ${records.length} nodes.\n`
-)
-for(let record of records) {
+for(let record of records) {  // <1>
   console.log(`Person with name: ${record.get('name')}`)
   console.log(`Available properties for this node are: ${record.keys}\n`)
 }
+console.log(  // <2>
+  `The query \`${summary.query.text}\` ` +
+  `returned ${records.length} nodes.\n`
+)
+
 ----
 
-where `result.records` contains the actual result as a list of link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/record.js~Record.html[`Record`] objects, and `result.summary` is a link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/result-summary.js~ResultSummary.html[`ResultSummary`] object, containing a summary of execution from the server.
+<1> `records` contains the actual result as a list of link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/record.js~Record.html[`Record`] objects.
+<2> `summary` contains the xref:result-summary.adoc[summary of execution] returned by the server.
 
 
 == Update the database
@@ -232,9 +236,9 @@ When impersonating a user, the query is run within the complete security context
 const neo4j = require('neo4j-driver');
 
 (async () => {
-  const URI = 'neo4j://localhost'
-  const USER = 'neo4j'
-  const PASSWORD = 'verysecret'
+  const URI = '<URI to Neo4j database>'
+  const USER = '<Username>'
+  const PASSWORD = '<Password>'
   let driver, result
 
   let people = [{name: 'Alice', age: 42, friends: ['Bob', 'Peter', 'Anna']},
