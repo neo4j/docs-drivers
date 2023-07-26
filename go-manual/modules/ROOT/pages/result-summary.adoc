@@ -185,7 +185,7 @@ Category: PERFORMANCE
 ----
 
 
-### Filtering notifications
+### Filter notifications
 
 By default, the server analyses each query for all categories and severity of notifications.
 Starting from version 5.7, you can use the parameters `NotificationsMinSeverity` and/or `NotificationsDisabledCategories` to restrict the severity or category of notifications that you are interested into.

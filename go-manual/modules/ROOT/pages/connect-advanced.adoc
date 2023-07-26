@@ -96,8 +96,14 @@ Once configured, clients can discover Neo4j's configuration through the link:{ne
 
 Use the function link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#CustomAuth[`CustomAuth`] to log into a server having a custom authentication scheme.
 
-[NOTE]
-If authentication is disabled on the server, the `auth` parameter can be omitted entirely.
+=== No authentication
+
+Use the function link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#NoAuth[`NoAuth`] to access a server where authentication is disabled.
+
+[source, go]
+----
+driver, err := neo4j.NewDriverWithContext(dbUri, neo4j.NoAuth())
+----
 
 
 == Custom address resolver

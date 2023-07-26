@@ -23,7 +23,7 @@ defer session.Close(ctx)
 Session creation is a lightweight operation, so sessions can be created and destroyed without significant cost.
 Always xref:_close_sessions[close sessions] when you are done with them.
 
-*Sessions are _not_ thread safe*: share the main `DriverWithContext` object across threads, but make sure each routine creates its own sessions.
+*Sessions are _not_ thread safe*: you can share the main `DriverWithContext` object across threads, but make sure each routine creates its own sessions.
 
 
 [#managed-transactions]
@@ -36,7 +36,7 @@ As Neo4j is <<ACID>> compliant, *queries within a transaction will either be exe
 Use transactions to group together related queries which work together to achieve a single _logical_ database operation.
 
 A managed transaction is created with the methods link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#SessionWithContext[`SessionWithContext.ExecuteRead()`] and link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#SessionWithContext[`SessionWithContext.ExecuteWrite()`], depending on whether you want to retrieve data from the database or alter it.
-Both methods take a _transaction function_ callback, which is responsible for actually carrying out the queries and processing the result.
+Both methods take a <<transaction_function>> callback, which is responsible for actually carrying out the queries and processing the result.
 
 .Retrieve people whose name starts with `Al`
 [source, go, role=nocollapse]
