@@ -98,8 +98,9 @@ Once configured, clients can discover Neo4j's configuration through the link:{ne
 
 Use the function link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.custom_auth[`custom_auth`] to log into a server having a custom authentication scheme.
 
-[NOTE]
-If authentication is disabled on the server, the `auth` parameter can be omitted entirely.
+=== No authentication
+
+If authentication is disabled on the server, the authentication parameter can be omitted entirely.
 
 
 == Custom address resolver

@@ -22,7 +22,7 @@ with driver.session(database="neo4j") as session:
 Session creation is a lightweight operation, so sessions can be created and destroyed without significant cost.
 Always xref:_close_sessions[close sessions] when you are done with them.
 
-*Sessions are _not_ thread safe*: share the main `Driver` object across threads, but make sure each thread creates its own sessions.
+*Sessions are _not_ thread safe*: you can share the main `Driver` object across threads, but make sure each thread creates its own sessions.
 
 
 [#managed-transactions]

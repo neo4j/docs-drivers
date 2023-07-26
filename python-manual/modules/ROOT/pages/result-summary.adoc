@@ -161,7 +161,7 @@ print(summary.summary_notifications)
 ----
 
 
-### Filtering notifications
+### Filter notifications
 
 By default, the server analyses each query for all categories and severity of notifications.
 Starting from version 5.7, you can use the parameters `notifications_min_severity` and/or `notifications_disabled_categories` to restrict the severity or category of notifications that you are interested into.
