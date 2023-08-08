@@ -263,7 +263,7 @@ For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current
 === `Node`
 Represents a node in a graph. +
 The property `element_id` provides an identifier for the entity.
-This should be used with care, as no guarantees are given about the mapping between id values and elements outside the scope of a single transaction.
+This should be used with care, as no guarantees are given about the mapping between id values and elements outside the scope of a single transaction. In other words, using an `element_id` to `MATCH` an element across different transactions is risky.
 
 [source, python]
 ----

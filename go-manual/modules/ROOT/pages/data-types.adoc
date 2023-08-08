@@ -246,7 +246,7 @@ fmt.Println(wgs843d)
 === `Node`
 Represents a node in a graph. +
 The property `ElementId` contains the database internal identifier for the entity.
-This should be used with care, as no guarantees are given about the mapping between id values and elements outside the scope of a single transaction.
+This should be used with care, as no guarantees are given about the mapping between id values and elements outside the scope of a single transaction. In other words, using an `ElementId` to `MATCH` an element across different transactions is risky.
 
 [source, go]
 ----
