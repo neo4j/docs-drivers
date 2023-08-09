@@ -57,7 +57,7 @@ Do not hardcode or concatenate parameters: use placeholders and specify the para
 ----
 // Get the name of all 42 year-olds
 result, _ := neo4j.ExecuteQuery(ctx, driver,
-    "MATCH (p:Person WHERE age = $age) RETURN p.name AS name",
+    "MATCH (p:Person {age: $age}) RETURN p.name AS name",
     map[string]any{
         "age": "42",
     }, neo4j.EagerResultTransformer,

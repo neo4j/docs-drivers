@@ -42,7 +42,7 @@ Do not hardcode or concatenate parameters: use placeholders and specify the para
 ----
 # Get the name of all 42 year-olds
 records, summary, keys = driver.execute_query(
-    "MATCH (p:Person WHERE age = $age) RETURN p.name AS name",
+    "MATCH (p:Person {age: $age}) RETURN p.name AS name",
     age=42,
     database_="neo4j",
 )
