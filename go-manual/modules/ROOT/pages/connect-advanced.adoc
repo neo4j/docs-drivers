@@ -108,7 +108,8 @@ driver, err := neo4j.NewDriverWithContext(dbUri, neo4j.NoAuth())
 
 == Custom address resolver
 
-When creating a `DriverWithContext` object, you can specify a _resolver_ function to resolve any addresses the driver receives ahead of DNS resolution.
+When creating a `DriverWithContext` object, you can specify a _resolver_ function to resolve the connection address the driver is initialized with.
+Note that addresses that the driver receives in routing tables are not resolved with the custom resolver.
 Your resolver function is called with a link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5@v5.10.0/neo4j/config#ServerAddress[`ServerAddress`] object and should return a list of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5@v5.10.0/neo4j/config#ServerAddress[`ServerAddress`] objects.
 
 In the following example, the connection to `example.com` on port `9999` is resolved to `localhost` on port `7687`:

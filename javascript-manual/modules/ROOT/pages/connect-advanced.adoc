@@ -109,7 +109,8 @@ If authentication is disabled on the server, the authentication parameter can be
 
 == Custom address resolver
 
-When creating a `Driver` object, you can specify a _resolver_ function to resolve any addresses the driver receives ahead of DNS resolution.
+When creating a `Driver` object, you can specify a _resolver_ function to resolve the connection address the driver is initialized with.
+Note that addresses that the driver receives in routing tables are not resolved with the custom resolver.
 
 .Expand a single address into multiple ones
 [source, javascript]
