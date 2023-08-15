@@ -17,7 +17,7 @@ records, summary, keys = driver.execute_query(
 )
 for person in records:  # <1>
     print(person)
-    # person.name or person.age are also valid
+    # person["name"] or person["age"] are also valid
 
 # Some summary information  <2>
 print("Query `{query}` returned {records_count} records in {time} ms.".format(
