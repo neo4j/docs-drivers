@@ -155,6 +155,7 @@ It allows to specify:
 - a transaction timeout (in seconds).
 Transactions that run longer will be terminated by the server.
 The default value is set on the server side.
+The minimum value is one millisecond (`0.001`).
 - a dictionary of metadata that gets attached to the transaction.
 These metadata get logged in the server `query.log`, and are visible in the output of the `SHOW TRANSACTIONS` Cypher command.
 Use this to tag transactions.
