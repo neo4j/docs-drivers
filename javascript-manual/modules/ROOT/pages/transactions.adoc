@@ -313,6 +313,7 @@ You can specify:
 - a transaction timeout (in milliseconds).
 Transactions that run longer will be terminated by the server.
 The default value is set on the server side.
+The minimum value is one millisecond.
 - an object of metadata that gets attached to the transaction.
 These metadata get logged in the server `query.log`, and are visible in the output of the `SHOW TRANSACTIONS YIELD *` Cypher command.
 Use this to tag transactions.
