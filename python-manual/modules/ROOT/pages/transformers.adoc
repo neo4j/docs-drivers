@@ -6,8 +6,6 @@ This section shows how to work with a query's result so as to extract data in th
 == Result as a list
 
 By default, xref:query-simple.adoc[`Driver.execute_query()`] returns an link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.EagerResult[`EagerResult`] object.
-It contains the result records as a list, so it is easy to loop through them *(1)*.
-It also contains a xref:result-summary.adoc[summary of execution], with metadata and information about the result *(2)*, and the `keys` available in the returned rows *(3)*.
 
 [source, python]
 ----
@@ -27,6 +25,10 @@ print("Query `{query}` returned {records_count} records in {time} ms.".format(
 
 print(f"Available keys are {keys}")  # ['name', 'age'] <3>
 ----
+
+<1> The result records as a list, so it is easy to loop through them.
+<2> A xref:result-summary.adoc[summary of execution], with metadata and information about the result.
+<3> The `keys` available in the returned rows.
 
 
 == Transform to pandas DataFrame
