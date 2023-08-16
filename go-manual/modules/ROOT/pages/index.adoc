@@ -1,3 +1,5 @@
+:description: The Neo4j Go Driver is the official library to interact with a Neo4j instance through a Go application. Learn how to connect and query your graph database in Go.
+
 ifdef::backend-pdf[]
 = The Neo4j Go Driver Manual v{go-driver-version}
 endif::[]

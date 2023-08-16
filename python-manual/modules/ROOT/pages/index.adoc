@@ -1,3 +1,5 @@
+:description: The Neo4j Python Driver is the official library to interact with a Neo4j instance through a Python application. Learn how to connect and query your graph database in Python.
+
 ifdef::backend-pdf[]
 = The Neo4j Python Driver Manual v{python-driver-version}
 endif::[]
