@@ -32,6 +32,15 @@ driver.executeQuery('<QUERY>')
 driver.session()
 ----
 
+
+== Use `MERGE` for creation only when needed
+
+The Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/merge/[`MERGE`] is convenient for data creation, as it allows to avoid duplicate data when an exact clone of the given pattern exists.
+However, it requires the database to run _two_ queries: it first needs to link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/match/[`MATCH`] the pattern, and only then can it link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/create/[`CREATE`] it.
+
+If you know already that the data you are inserting is new, avoid using `MERGE` and use `CREATE` instead -- this practically halves the number of database queries.
+
+
 == Use query parameters
 
 *Use xref:query-simple#query-parameters[query parameters]* instead of hardcoding or concatenating values into queries.
