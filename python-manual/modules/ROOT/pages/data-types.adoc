@@ -52,8 +52,8 @@ from neo4j import GraphDatabase
 from neo4j.time import DateTime
 
 
-URI = "neo4j://localhost:7687"
-AUTH = ("neo4j", "secretgraph")
+URI = "<URI for Neo4j database>"
+AUTH = ("<Username>", "<Password>")
 
 
 friends_since = DateTime(year=1999, month=11, day=23,
@@ -108,6 +108,7 @@ Represents an instant capturing the time, and the timezone offset in seconds, bu
 [source, python]
 ----
 from neo4j.time import Time
+import pytz
 
 t = Time(hour=7, minute=47, nanosecond=4123, tzinfo=pytz.FixedOffset(-240))
 print(t)  # '07:47:00.000004123-04:00'
@@ -270,8 +271,8 @@ This should be used with care, as no guarantees are given about the mapping betw
 from neo4j import GraphDatabase
 
 
-URI = "neo4j://localhost:7687"
-AUTH = ("neo4j", "secretgraph")
+URI = "<URI for Neo4j database>"
+AUTH = ("<Username>", "<Password>")
 
 with GraphDatabase.driver(URI, auth=AUTH) as driver:
     records, _, _ = driver.execute_query(
@@ -305,8 +306,8 @@ This should be used with care, as no guarantees are given about the mapping betw
 from neo4j import GraphDatabase
 
 
-URI = "neo4j://localhost:7687"
-AUTH = ("neo4j", "secretgraph")
+URI = "<URI for Neo4j database>"
+AUTH = ("<Username>", "<Password>")
 
 with GraphDatabase.driver(URI, auth=AUTH) as driver:
     records, _, _ = driver.execute_query("""
@@ -346,8 +347,8 @@ from neo4j import GraphDatabase
 from neo4j.time import Date
 
 
-URI = "neo4j://localhost:7687"
-AUTH = ("neo4j", "secretgraph")
+URI = "<URI for Neo4j database>"
+AUTH = ("<Username>", "<Password>")
 
 def add_friend(driver, name, status, date, friend_name):
     driver.execute_query("""

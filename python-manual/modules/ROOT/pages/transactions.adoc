@@ -39,7 +39,7 @@ Both methods take a _transaction function_ callback, which is responsible for ac
 [source, python]
 ----
 def match_person_nodes(tx, name_filter): # <3>
-    result = tx.run(""" # <4>
+    result = tx.run(""" // <4>
         MATCH (p:Person) WHERE p.name STARTS WITH $filter
         RETURN p.name as name ORDER BY name
         """, filter=name_filter)
@@ -74,7 +74,7 @@ Within a transaction function, a `return` statement results in the transaction b
 from neo4j import GraphDatabase
 
 
-URI = "<URI to Neo4j database>"
+URI = "<URI for Neo4j database>"
 AUTH = ("<Username>", "<Password>")
 employee_threshold=10
 
@@ -186,6 +186,7 @@ You run queries inside an explicit transaction with the method link:{neo4j-docs-
 ----
 with driver.session(database="neo4j") as session:
     with session.begin_transaction() as tx:
+        ...
         # use tx.run() to run queries
 ----
 

@@ -1,3 +1,5 @@
+:test-skip: true
+
 = Advanced connection information
 
 == Connection URI

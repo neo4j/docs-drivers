@@ -154,10 +154,6 @@ A transformer takes a `Result` object and can output any data structure. The tra
 
 Inside a transformer function you can use xref:transactionn[any of the `Result` methods].
 
-[WARNING]
-A transformer **must not** return the `Result` object itself.
-Doing so is roughly equivalent to returning a _pointer_ to the result buffer, which gets invalidated as soon as the query's transaction is over.
-
 .A custom transformer using `single` and `consume`
 [source, python]
 ----
@@ -169,7 +165,7 @@ def get_single_person(result):
 
 
 record, summary = driver.execute_query(
-    "MATCH (a:Person {name: $name}) RETURN a.name AS name",
+    "MERGE (a:Person {name: $name}) RETURN a.name AS name",
     name="Alice",
     database_="neo4j",
     result_transformer_=get_single_person,
@@ -177,7 +173,6 @@ record, summary = driver.execute_query(
 print("The query `{query}` returned {record} in {time} ms.".format(
       query=summary.query, record=record, time=summary.result_available_after))
 ----
-
 
 .A custom transformer using `fetch` and `peek`
 [source, python]
@@ -194,28 +189,38 @@ def exactly_5(result):
     return records
 
 
-records = driver.execute_query(
-    "MATCH (a:Person) RETURN a.name AS name",
-    database_="neo4j",
+records = driver.execute_query("""
+    UNWIND ['Alice', 'Bob', 'Laura', 'John', 'Patricia'] AS name
+    MERGE (a:Person {name: name}) RETURN a.name AS name
+    """, database_="neo4j",
     result_transformer_=exactly_5,
 )
 ----
 
+[WARNING]
+====
+A transformer **must not** return the `Result` object itself.
+Doing so is roughly equivalent to returning a _pointer_ to the result buffer, which gets invalidated as soon as the query's transaction is over.
 
-////
-[source, python]
+[source, python, role=test-skip]
 ----
 def transformer(result):
     return result
 
-result = driver.execute_query("MATCH (a:Person) RETURN a.name AS name;", result_transformer_=transformer)
+result = driver.execute_query(
+    "MATCH (a:Person) RETURN a.name",
+    result_transformer_=transformer)
 print(result)
 print(result.single())
 ----
-results in
-`neo4j.exceptions.ResultConsumedError: The result is out of scope. The associated transaction has been closed. Results can only be used while the transaction is open.`
-on the second print.
-////
+
+[source, error]
+----
+neo4j.exceptions.ResultConsumedError: The result is out of scope.
+The associated transaction has been closed.
+Results can only be used while the transaction is open.
+----
+====
 
 
 ifndef::backend-pdf[]
