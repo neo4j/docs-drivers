@@ -74,8 +74,8 @@ Within a transaction function, a `return` statement results in the transaction b
 from neo4j import GraphDatabase
 
 
-URI = "neo4j://localhost"
-AUTH = ("neo4j", "secret")
+URI = "<URI to Neo4j database>"
+AUTH = ("<Username>", "<Password>")
 employee_threshold=10
 
 
