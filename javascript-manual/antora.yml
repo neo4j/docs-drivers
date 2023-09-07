@@ -1,5 +1,5 @@
 name: javascript-manual
-title: Neo4j JavaScript Driver Manual
+title: Neo4j JavaScript Driver
 version: '5'
 start_page: ROOT:index.adoc
 nav:
