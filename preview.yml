@@ -12,6 +12,8 @@ content:
     - go-manual
     - javascript-manual
     - python-manual
+    - java-manual
+    - dotnet-manual
     - common-content
     exclude:
     - '!**/_includes/*'
