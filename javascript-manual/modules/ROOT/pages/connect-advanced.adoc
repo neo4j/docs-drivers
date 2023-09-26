@@ -83,7 +83,7 @@ The bearer authentication scheme requires a base64-encoded token provided by an 
 
 [source, javascript]
 ----
-const driver = neo4j.driver(uri, neo4j.bearer(token))
+const driver = neo4j.driver(uri, neo4j.auth.bearer(token))
 ----
 
 [NOTE]
