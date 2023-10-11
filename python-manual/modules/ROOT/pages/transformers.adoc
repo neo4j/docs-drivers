@@ -202,7 +202,7 @@ records = driver.execute_query("""
 A transformer **must not** return the `Result` object itself.
 Doing so is roughly equivalent to returning a _pointer_ to the result buffer, which gets invalidated as soon as the query's transaction is over.
 
-[source, python, role=test-skip]
+[source, python, role=test-fail]
 ----
 def transformer(result):
     return result

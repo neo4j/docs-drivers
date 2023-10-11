@@ -1,4 +1,3 @@
-:test-skip: true
 
 = Advanced connection information
 
@@ -61,35 +60,37 @@ If you are unsure, ask the database administrator.
 The basic authentication scheme relies on traditional username and password.
 These can either be the credentials for your local installation, or the ones provided with an Aura instance.
 
-[source,python]
+[source, python]
 ----
 from neo4j import GraphDatabase
 
-driver = GraphDatabase.driver(uri, auth=(user, password))
+driver = GraphDatabase.driver(URI, auth=(USERNAME, PASSWORD))
 ----
 
 [INFO]
 The basic authentication scheme can also be used to authenticate against an LDAP server (Enterprise Edition only).
 
 === Kerberos authentication
+
 The Kerberos authentication scheme requires a base64-encoded ticket.
 It can only be used if the server has the link:{neo4j-docs-base-uri}/kerberos-add-on/current/deployment/[Kerberos Add-on installed].
 
-[source,python]
+[source, python, role=test-skip]
 ----
 from neo4j import GraphDatabase, kerberos_auth
 
-driver = GraphDatabase.driver(uri, auth=kerberos_auth(ticket))
+driver = GraphDatabase.driver(URI, auth=kerberos_auth(ticket))
 ----
 
 === Bearer authentication
+
 The bearer authentication scheme requires a base64-encoded token provided by an Identity Provider through Neo4j's link:{neo4j-docs-base-uri}/operations-manual/current/authentication-authorization/sso-integration[Single Sign-On feature].
 
-[source,python]
+[source, python, role=test-skip]
 ----
 from neo4j import GraphDatabase, bearer_auth
 
-driver = GraphDatabase.driver(uri, auth=bearer_auth(token))
+driver = GraphDatabase.driver(URI, auth=bearer_auth(token))
 ----
 
 [NOTE]
@@ -128,7 +129,7 @@ def custom_resolver(socket_address):
     yield neo4j.Address.parse("localhost:7687")
     yield neo4j.Address.parse("[::1]:7687")
 
-    # or any tuple that can be passed to neo4j.Address(...).
+    # or any tuple that can be passed to neo4j.Address().
     # This will initially be interpreted as IPv4, but DNS resolution
     # will turn it into IPv6 if appropriate.
     yield "::1", 7687
@@ -139,7 +140,7 @@ def custom_resolver(socket_address):
 
 
 driver = neo4j.GraphDatabase.driver("neo4j://example.com:9999",
-                                    auth=(user, password),
+                                    auth=(USERNAME, PASSWORD),
                                     resolver=custom_resolver)
 ----
 

@@ -122,12 +122,12 @@ See link:https://neo4j.com/labs/apoc/current/installation/#docker[APOC - Install
 The driver logs messages through the native `logging` library to a logger named `neo4j`.
 To redirect log messages to standard output, use the link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.debug.watch[watch] function:
 
-[source, python]
+[source, python, role=test-skip]
 ----
 import sys
 from neo4j.debug import watch
 
-#watch("neo4j", out=sys.stdout)
+watch("neo4j", out=sys.stdout)
 ----
 
 .Example of log output upon driver connection

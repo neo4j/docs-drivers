@@ -199,6 +199,24 @@ Explicit transactions are most useful for applications that need to distribute C
 import neo4j
 
 
+URI = "<URI for Neo4j database>"
+AUTH = ("<Username>", "<Password>")
+
+def main():
+    with neo4j.GraphDatabase.driver(URI, auth=AUTH) as driver:
+        customer_id = create_customer()
+        other_bank_id = 42
+        transfer_to_other_bank(driver, customer_id, other_bank_id, 999)
+
+
+def create_customer():
+    result, _, _ = driver.execute_query("""
+        MERGE (c:Customer {id: rand()})
+        RETURN c.id
+    """, database_ = "neo4j")
+    return result[0]["c.id"]
+
+
 def transfer_to_other_bank(driver, customer_id, other_bank_id, amount):
     with driver.session(database="neo4j") as session:
         tx = session.begin_transaction()
@@ -252,6 +270,9 @@ def request_inspection(customer_id, other_bank_id, amount, e):
     print("customer_id:", customer_id, "other_bank_id:", other_bank_id,
           "amount:", amount)
 
+
+if __name__ == "__main__":
+    main()
 ----
 
 
