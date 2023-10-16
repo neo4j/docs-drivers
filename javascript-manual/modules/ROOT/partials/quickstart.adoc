@@ -121,3 +121,7 @@ The same applies to any open sessions.
 session.close()
 driver.close()
 ----
+
+== API documentation
+
+For in-depth information about driver features, check out the link:https://neo4j.com/docs/api/javascript-driver/current/[API documentation].

@@ -126,3 +126,8 @@ defer driver.Close(ctx)
 // Create new SessionWithContext, and then
 defer session.Close(ctx)
 ----
+
+
+== API documentation
+
+For in-depth information about driver features, check out the link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j[API documentation].

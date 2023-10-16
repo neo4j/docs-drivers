@@ -102,3 +102,8 @@ Unless you created them using the `with` statement, call the `.close()` method o
 session.close()
 driver.close()
 ----
+
+
+== API documentation
+
+For in-depth information about driver features, check out the link:https://neo4j.com/docs/api/python-driver/current/[API documentation].
