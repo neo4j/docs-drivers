@@ -20,7 +20,7 @@
 
 * xref:connect-advanced.adoc[Advanced connection information]
 * xref:data-types.adoc[Data types and mapping to Cypher types]
-* link:https://neo4j.com/docs/api/javascript-driver/current/[API documentation]
+* link:https://neo4j.com/docs/api/javascript-driver/current/[API documentation, window=_blank]
 
 * *GraphAcademy courses*
 
