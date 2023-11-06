@@ -31,6 +31,30 @@ Share them across threads (but not across processes) and use xref:transactions#i
 If you want to alter a `Driver` configuration, you will need to create a new object.
 
 
+== Connect to an Aura instance
+
+When you create an <<Aura>> instance, you may download a text file containing the connection information to the database.
+The file has a name of the form `Neo4j-a0a2fa1d-Created-2023-11-06.txt`.
+
+To connect to such an instance, you may either use the URI, username, and password explicitly in your application, or load the content of the connection file in the environment with `dotenv.load_dotenv()` and populate your local variables with `os.getenv()`.
+This requires the package link:https://pypi.org/project/python-dotenv/[`python-dotenv`] to be installed.
+
+[source,python,role=test-skip]
+----
+import dotenv
+import os
+from neo4j import GraphDatabase
+
+dotenv.load_dotenv('Neo4j-a0a2fa1d-Created-2023-11-06.txt')
+
+URI = os.getenv("NEO4J_URI")
+AUTH = (os.getenv("NEO4J_USERNAME"), os.getenv("NEO4J_PASSWORD"))
+
+with GraphDatabase.driver(URI, auth=AUTH) as driver:
+    driver.verify_connectivity()
+----
+
+
 == Close connections
 
 Always close `Driver` objects to free up all allocated resources, even upon unsuccessful connection or runtime errors.
