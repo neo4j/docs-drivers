@@ -49,6 +49,46 @@ Share them across threads (but not across processes) and use xref:transactions#i
 If you want to alter a `Driver` configuration, you will need to create a new object.
 
 
+== Connect to an Aura instance
+
+When you create an <<Aura>> instance, you may download a text file containing the connection information to the database.
+The file has a name of the form `Neo4j-a0a2fa1d-Created-2023-11-06.txt`.
+
+To connect to such an instance, you may either use the URI, username, and password explicitly in your application, or load the content of the connection file in the environment with `dotenv.config()` and populate your local variables via `process.env.<NAME>`.
+This approach requires the package link:https://www.npmjs.com/package/dotenv[`dotenv`].
+
+[source, javascript, role=nocollapse test-skip]
+----
+(async () => {
+  var neo4j = require('neo4j-driver')
+  require('dotenv').config({
+    path: 'Neo4j-a0a2fa1d-Created-2023-11-06.txt',
+    debug: true  // to raise file/parsing errors
+  })
+
+  const URI = process.env.NEO4J_URI
+  const USER = process.env.NEO4J_USERNAME
+  const PASSWORD = process.env.NEO4J_PASSWORD
+  let driver
+
+  try {
+    driver = neo4j.driver(URI,  neo4j.auth.basic(USER, PASSWORD))
+    const serverInfo = await driver.getServerInfo()
+    console.log('Connection estabilished')
+    console.log(serverInfo)
+  } catch(err) {
+    console.log(`Connection error\n${err}\nCause: ${err.cause}`)
+    await driver.close()
+    return
+  }
+
+  // Use the driver to run queries
+
+  await driver.close()
+})();
+----
+
+
 == Further connection parameters
 
 For more `Driver` configuration parameters and further connection settings, see xref:connect-advanced.adoc[Advanced connection information].

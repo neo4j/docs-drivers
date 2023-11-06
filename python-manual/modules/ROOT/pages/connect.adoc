@@ -6,7 +6,7 @@ Once you have xref:install.adoc#install-driver[installed the driver] and have xr
 
 You connect to a database by creating a <<Driver>> object and providing a URL and an authentication token.
 
-[source,python]
+[source, python]
 ----
 from neo4j import GraphDatabase
 
@@ -36,16 +36,16 @@ If you want to alter a `Driver` configuration, you will need to create a new obj
 When you create an <<Aura>> instance, you may download a text file containing the connection information to the database.
 The file has a name of the form `Neo4j-a0a2fa1d-Created-2023-11-06.txt`.
 
-To connect to such an instance, you may either use the URI, username, and password explicitly in your application, or load the content of the connection file in the environment with `dotenv.load_dotenv()` and populate your local variables with `os.getenv()`.
-This requires the package link:https://pypi.org/project/python-dotenv/[`python-dotenv`] to be installed.
+To connect to such an instance, you may either use the URI, username, and password explicitly in your application, or load the content of the connection file in the environment with `dotenv.load_dotenv()` and populate your local variables via `os.getenv()`.
+This approach requires the package link:https://pypi.org/project/python-dotenv/[`python-dotenv`].
 
-[source,python,role=test-skip]
+[source, python, role=test-skip]
 ----
 import dotenv
 import os
 from neo4j import GraphDatabase
 
-dotenv.load_dotenv('Neo4j-a0a2fa1d-Created-2023-11-06.txt')
+dotenv.load_dotenv("Neo4j-a0a2fa1d-Created-2023-11-06.txt")
 
 URI = os.getenv("NEO4J_URI")
 AUTH = (os.getenv("NEO4J_USERNAME"), os.getenv("NEO4J_PASSWORD"))

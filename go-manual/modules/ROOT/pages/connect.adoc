@@ -12,6 +12,7 @@ package main
 
 import (
     "context"
+    "fmt"
     "github.com/neo4j/neo4j-go-driver/v5/neo4j"
 )
 
@@ -32,6 +33,7 @@ func main() {
     if err != nil {
         panic(err)
     }
+    fmt.Println("Connection established.")
 }
 ----
 
@@ -46,6 +48,52 @@ Note that there are corner cases in which `.Close()` might return an error, so y
 `DriverWithContext` objects are _immutable_, _thread-safe_, and fairly _expensive to create_, so your application should only create one instance.
 If you need to query the database with a different user than the one you created the object with, use xref:query-simple#impersonation[impersonation].
 If you want to alter a `DriverWithContext` configuration, you will need to create a new object.
+
+
+== Connect to an Aura instance
+
+When you create an <<Aura>> instance, you may download a text file containing the connection information to the database.
+The file has a name of the form `Neo4j-a0a2fa1d-Created-2023-11-06.txt`.
+
+To connect to such an instance, you may either use the URI, username, and password explicitly in your application, or load the content of the connection file in the environment with `godotenv.Load()` and populate your local variables via `os.Getenv()`.
+This approach requires the package link:https://pkg.go.dev/github.com/joho/godotenv[`godotenv`].
+
+[source, go, role=test-skip]
+----
+package main
+
+import (
+    "context"
+    "os"
+    "fmt"
+    "github.com/joho/godotenv"
+    "github.com/neo4j/neo4j-go-driver/v5/neo4j"
+)
+
+func main() {
+    ctx := context.Background()
+    err := godotenv.Load("Neo4j-a0a2fa1d-Created-2023-11-06.txt")
+    if err != nil {
+        panic(err)
+    }
+    dbUri := os.Getenv("NEO4J_URI")
+    dbUser := os.Getenv("NEO4J_USERNAME")
+    dbPassword := os.Getenv("NEO4J_PASSWORD")
+    driver, err := neo4j.NewDriverWithContext(
+        dbUri,
+        neo4j.BasicAuth(dbUser, dbPassword, ""))
+    if err != nil {
+        panic(err)
+    }
+    defer driver.Close(ctx)
+
+    err = driver.VerifyConnectivity(ctx)
+    if err != nil {
+        panic(err)
+    }
+    fmt.Println("Connection established.")
+}
+----
 
 
 == Further connection parameters
