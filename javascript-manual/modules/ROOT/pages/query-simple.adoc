@@ -74,7 +74,7 @@ To update a node's information in the database, use the Cypher clauses link:{neo
 [source, javascript]
 ----
 const { _, summary } = await driver.executeQuery(`
-  MATCH (p:Person WHERE p.name = $name)
+  MATCH (p:Person {name: $name})
   SET p.age = $age
   `, { name: 'Alice', age: 42 },
   { database: 'neo4j' }
