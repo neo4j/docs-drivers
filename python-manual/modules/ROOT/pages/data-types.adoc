@@ -121,7 +121,7 @@ For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current
 
 Represents an instant capturing the time of day, but not the date, nor the timezone.
 
-[source, python, indent=0]
+[source, python]
 ----
 from neo4j.time import Time
 

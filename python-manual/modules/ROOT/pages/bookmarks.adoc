@@ -29,7 +29,7 @@ To disable bookmark management and causal consistency, set `bookmark_manager_=No
 [source, python]
 ----
 driver.execute_query(
-    ... ,
+    "<QUERY>",
     bookmark_manager_=None,
 )
 ----
