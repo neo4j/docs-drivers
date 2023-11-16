@@ -13,7 +13,7 @@ You connect to a database by creating a <<Driver>> object and providing a URL an
   var neo4j = require('neo4j-driver')
 
   // URI examples: 'neo4j://localhost', 'neo4j+s://xxx.databases.neo4j.io'
-  const URI = '<URI to Neo4j database>'
+  const URI = '<URI for Neo4j database>'
   const USER = '<Username>'
   const PASSWORD = '<Password>'
   let driver

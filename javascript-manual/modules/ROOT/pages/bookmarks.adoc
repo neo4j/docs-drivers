@@ -16,19 +16,19 @@ In this case, you have the guarantee that subsequent queries can read previous c
 
 [source, javascript]
 ----
-driver.executeQuery('<QUERY 1>')
+await driver.executeQuery('<QUERY 1>')
 
 // subsequent executeQuery calls will be causally chained
 
-driver.executeQuery('<QUERY 2>') // can read result of <QUERY 1>
-driver.executeQuery('<QUERY 3>') // can read result of <QUERY 2>
+await driver.executeQuery('<QUERY 2>') // can read result of <QUERY 1>
+await driver.executeQuery('<QUERY 3>') // can read result of <QUERY 2>
 ----
 
 To disable bookmark management and causal consistency, set the `bookmarkManager` option to `null` in `.executeQuery()` calls.
 
 [source, javascript]
 ----
-driver.executeQuery(
+await driver.executeQuery(
     '<QUERY>',
     {},
     {
@@ -184,7 +184,7 @@ Since that is the default bookmark manager for `.executeQuery()` calls, this wil
 
 [source, javascript]
 ----
-driver.executeQuery('<QUERY 1>')
+await driver.executeQuery('<QUERY 1>')
 
 session = driver.session({
     bookmarkManager: driver.executeQueryBookmarkManager
@@ -192,14 +192,14 @@ session = driver.session({
 try {
   // every query inside this session will be causally chained
   // (i.e., can read what was written by <QUERY 1>)
-  session.executeWrite(async tx => tx.run('<QUERY 2>'))
+  await session.executeWrite(async tx => tx.run('<QUERY 2>'))
 } finally {
-  session.close()
+  await session.close()
 }
 
 // subsequent executeQuery calls will be causally chained
 // (i.e., can read what was written by <QUERY 2>)
-driver.executeQuery('<QUERY 3>')
+await driver.executeQuery('<QUERY 3>')
 ----
 
 

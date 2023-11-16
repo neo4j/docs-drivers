@@ -40,7 +40,7 @@ The most common use case for using `Session.run()` is for importing large CSV fi
 ----
 let session = driver.session({database: 'neo4j'})
 try {
-  const result = await session.run(`
+  let result = await session.run(`
     LOAD CSV FROM 'https://data.neo4j.com/bands/artists.csv' AS line
     CALL {
         WITH line
@@ -69,8 +69,8 @@ For more information, see xref:transactions.adoc#_transaction_configuration[Tran
 [source, javascript]
 ----
 let session = driver.session({database: 'neo4j'})
-const result = await session.run(
-  'MATCH (a:Person) RETURN count(a) AS people'
+let result = await session.run(
+  'MATCH (a:Person) RETURN count(a) AS people',
   {},  // query parameters
   { timeout: 5000, metadata: {'appName': 'peopleTracker'} }  // transactionConfig
 )
@@ -94,11 +94,11 @@ Notice that Cypher processes Unicode, so take care of the Unicode literal `\u006
 .Manually escaping dynamic labels before concatenation
 [source, javascript]
 ----
-const dangerousLabel = 'Special Person\\u0060'
+let dangerousLabel = 'Special Person\\u0060'
 // convert \u0060 to literal backtick, then escape backticks
-const escapedLabel = dangerousLabel.replaceAll('\\u0060', '`').replaceAll('`', '``')
+let escapedLabel = dangerousLabel.replace(/\\u0060/g, '`').replace(/`/g, '``')
 
-const result = await driver.executeQuery(
+let result = await driver.executeQuery(
   'MATCH (p:`' + escapedLabel + '`) RETURN p.name',
   {},
   {database: 'neo4j'}
@@ -112,9 +112,9 @@ It supports dynamic labels and property keys, but only for node merging.
 .Using `apoc.merge.node` to create a node with dynamic labels/property keys
 [source, javascript]
 ----
-const propertyKey = 'name'
-const label = 'Person'
-const result = await driver.executeQuery(
+let propertyKey = 'name'
+let label = 'Person'
+let result = await driver.executeQuery(
   'CALL apoc.merge.node($labels, $properties)',
   {labels: [label], properties: {property_key: 'Alice'}},
   {database: 'neo4j'}
@@ -139,8 +139,8 @@ Enabling one level automatically enables all higher priority ones, and its defau
 [source, javascript]
 ----
 neo4j.driver(
-  uri,
-  neo4j.auth.basic(user, password),
+  URI,
+  neo4j.auth.basic(USER, PASSWORD),
   {  // driver config
     logging: neo4j.logging.console('debug')
   }
@@ -174,8 +174,8 @@ Takes `level, message` as input.
 [source, javascript]
 ----
 neo4j.driver(
-  uri,
-  neo4j.auth.basic(user, password),
+  URI,
+  neo4j.auth.basic(USER, PASSWORD),
   {  // driver config
     logging: {
       level: 'error',

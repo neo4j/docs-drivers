@@ -15,7 +15,7 @@ When running queries with xref:query-simple.adoc[`Driver.executeQuery()`], the e
 
 [source, javascript]
 ----
-const { records, summary } = await driver.executeQuery(`
+let { records, summary } = await driver.executeQuery(`
   UNWIND ['Alice', 'Bob'] AS name
   MERGE (p:Person {name: name})
   `, {},
@@ -28,10 +28,10 @@ If you are using xref:transactions.adoc[transaction functions], you can retrieve
 
 [source, javascript]
 ----
-const session = driver.session({ database: 'neo4j' })
+let session = driver.session({ database: 'neo4j' })
 try {
-  summary = await session.executeWrite(async tx => {
-    result = await tx.run(`
+  let summary = await session.executeWrite(async tx => {
+    let result = await tx.run(`
         UNWIND ['Alice', 'Bob'] AS name
         MERGE (p:Person {name: name})
     `)
@@ -48,10 +48,15 @@ try {
 
 The property `ResultSummary.counters` contains counters for the operations that a query triggered (as a link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/result-summary.js~QueryStatistics.html[`QueryStatistics`] object).
 
+There are two additional methods on `ResultSummary.counters` which act as meta-counters:
+
+- `.containsUpdates()` -- whether the query triggered any write operation on the database on which it ran
+- `.containsSystemUpdates()` -- whether the query updated the `system` database
+
 .Insert some data and display the query counters
 [source, javascript, role=nocollapse]
 ----
-const { records, summary } = await driver.executeQuery(`
+let { records, summary } = await driver.executeQuery(`
   UNWIND ['Alice', 'Bob'] AS name
   MERGE (p:Person {name: name})
   `, {},
@@ -73,18 +78,10 @@ console.log(summary.counters.updates())
   constraintsRemoved: 0
 }
 */
-----
-
-There are two additional methods on `ResultSummary.counters` which act as meta-counters:
-
-- `.containsUpdates()` -- whether the query triggered any write operation on the database on which it ran
-- `.containsSystemUpdates()` -- whether the query updated the `system` database
-
-[source, javascript]
-----
 console.log(summary.counters.containsUpdates())  // true
 console.log(summary.counters.containsSystemUpdates())  // false
 ----
+
 
 ## Query execution plan
 
@@ -94,7 +91,7 @@ You may use this information to locate potential bottlenecks or room for perform
 
 [source, javascript, role=nocollapse]
 ----
-const result = driver.executeQuery('EXPLAIN MATCH (p {name: $name}) RETURN p', { name: 'Alice' })
+let result = await driver.executeQuery('EXPLAIN MATCH (p {name: $name}) RETURN p', { name: 'Alice' })
 console.log(result.summary.plan.arguments['string-representation'])
 /*
 Planner COST
@@ -123,7 +120,7 @@ Notice that the query is also _run_, so the result object also contains any resu
 
 [source, javascript, role=nocollapse]
 ----
-const result = driver.executeQuery('PROFILE MATCH (p {name: $name}) RETURN p', { name: 'Alice' })
+let result = await driver.executeQuery('PROFILE MATCH (p {name: $name}) RETURN p', { name: 'Alice' })
 console.log(result.summary.profile.arguments['string-representation'])
 /*
 Planner COST
@@ -157,14 +154,14 @@ Each notification comes as a link:{neo4j-docs-base-uri}/api/javascript-driver/cu
 .An unbounded shortest path raises a performance notification
 [source, javascript, role=nocollapse]
 ----
-const { records, summary } = await driver.executeQuery(`
+let { records, summary } = await driver.executeQuery(`
   MATCH p=shortestPath((:Person {name: 'Alice'})-[*]->(:Person {name: 'Bob'}))
   RETURN p
   `, {},
   { database: 'neo4j' }
 )
-print(summary.notifications)
-"""
+console.log(summary.notifications)
+/*
 [
   Notification {
     code: 'Neo.ClientNotification.Statement.UnboundedVariableLengthPattern',
@@ -178,7 +175,7 @@ print(summary.notifications)
     rawCategory: 'PERFORMANCE'
   }
 ]
-"""
+*/
 ----
 
 
@@ -193,7 +190,8 @@ Restricting the amount of notifications the server is allowed to raise can impro
 .Allow only `WARNING` notifications, but not of `HINT` or `GENERIC` category
 [source, javascript]
 ----
-driver = neo4j.driver(
+// at driver level
+let driver = neo4j.driver(
   URI,  neo4j.auth.basic(USER, PASSWORD), {
     notificationsFilter: {
       minimumSeverityLevel: 'WARNING',  // or 'OFF' to disable entirely
@@ -202,8 +200,8 @@ driver = neo4j.driver(
   }
 )
 
-# at session level
-session = driver.session({
+// at session level
+let session = driver.session({
     database: 'neo4j',
     notificationsFilter: {
       minimumSeverityLevel: 'WARNING',  // or 'OFF' to disable entirely

@@ -78,7 +78,7 @@ Within a transaction function, a `return` statement results in the transaction b
 const neo4j = require('neo4j-driver');
 
 (async () => {
-  const URI = '<URI to Neo4j database>'
+  const URI = '<URI for Neo4j database>'
   const USER = '<Username>'
   const PASSWORD = '<Password>'
   let driver, session
@@ -188,6 +188,37 @@ Explicit transactions are most useful for applications that need to distribute C
 .Example stub with an explicit transaction involving external APIs
 [source, javascript]
 ----
+const neo4j = require('neo4j-driver');
+const URI = '<URI for Neo4j database>';
+const USER = '<Username>';
+const PASSWORD = '<Password>';
+
+(async () => {
+
+  try {
+    driver = neo4j.driver(URI, neo4j.auth.basic(USER, PASSWORD))
+    await driver.verifyConnectivity()
+  } catch(err) {
+    console.log(`-- Connection error --\n${err}\n-- Cause --\n${err.cause}`)
+    return
+  }
+
+  let customerId = await createCustomer(driver)
+  let otherBankId = 42
+  await transferToOtherBank(driver, customerId, otherBankId, 999)
+  await driver.close()
+})()
+
+async function createCustomer(driver) {
+  let { records } = await driver.executeQuery(`
+      MERGE (c:Customer {id: randomUUID()})
+      RETURN c.id AS id
+    `, {},
+    { database: 'neo4j' }
+  )
+  return records[0].get("id")
+}
+
 async function transferToOtherBank(driver, customerId, otherBankId, amount) {
   const session = driver.session({ database: 'neo4j' })
   const tx = await session.beginTransaction()
@@ -216,13 +247,13 @@ async function checkCustomerBalance(tx, customerId, amount) {
   result = await tx.run(`
     MATCH (c:Customer {id: $id})
     RETURN c.balance >= $amount AS sufficient
-    `, { id: customerId, amount: amount }
+    `, { id: customerId, amount: amount },
+    { database: 'neo4j' }
   )
   return result.records[0].get('sufficient')
 }
 
 async function otherBankTransferApi(customerId, otherBankId, amount) {
-  ...
   // make some API call to other bank
 }
 
@@ -239,6 +270,7 @@ async function requestInspection(customerId, otherBankId, amount, error) {
   console.log('WARNING: transaction rolled back due to exception:')
   console.log(error)
 }
+
 ----
 
 

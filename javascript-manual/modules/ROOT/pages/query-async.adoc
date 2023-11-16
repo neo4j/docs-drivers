@@ -1,5 +1,13 @@
 = Run non-blocking asynchronous queries
 
+////
+Just ensure there is some data in this page, or accumulators will complain later on
+[source, javascript, test-setup]
+----
+await driver.executeQuery('CREATE (p:Person {name: "Piero Calzesporche"})')
+----
+////
+
 The examples in xref:query-simple.adoc[Query the database] use the `async/await` syntax, which forces the driver to work synchronously.
 When using `await` with a query, your application waits for the server to retrieve all query results and transmit them to the driver.
 This is not a problem for most use cases, but for queries that have a long processing time or a large result set, asynchronous handling may speed up your application.

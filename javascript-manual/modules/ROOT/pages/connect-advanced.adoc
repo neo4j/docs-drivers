@@ -61,7 +61,7 @@ These can either be the credentials for your local installation, or the ones pro
 
 [source, javascript]
 ----
-const driver = neo4j.driver(uri, neo4j.auth.basic(user, password))
+const driver = neo4j.driver(URI, neo4j.auth.basic(USER, PASSWORD))
 ----
 
 [INFO]
@@ -72,18 +72,18 @@ The basic authentication scheme can also be used to authenticate against an LDAP
 The Kerberos authentication scheme requires a base64-encoded ticket.
 It can only be used if the server has the link:{neo4j-docs-base-uri}/kerberos-add-on/current/deployment/[Kerberos Add-on installed].
 
-[source, javascript]
+[source, javascript, role=test-skip]
 ----
-const driver = neo4j.driver(uri, neo4j.auth.kerberos(ticket))
+const driver = neo4j.driver(URI, neo4j.auth.kerberos(ticket))
 ----
 
 === Bearer authentication
 
 The bearer authentication scheme requires a base64-encoded token provided by an Identity Provider through Neo4j's link:{neo4j-docs-base-uri}/operations-manual/current/authentication-authorization/sso-integration[Single Sign-On feature].
 
-[source, javascript]
+[source, javascript, role=test-skip]
 ----
-const driver = neo4j.driver(uri, neo4j.auth.bearer(token))
+const driver = neo4j.driver(URI, neo4j.auth.bearer(token))
 ----
 
 [NOTE]
@@ -94,10 +94,10 @@ Once configured, clients can discover Neo4j's configuration through the link:{ne
 
 If the server is equipped with a custom authentication scheme, use `neo4j.auth.custom`.
 
-[source, javascript]
+[source, javascript, role=test-skip]
 ----
 const driver = neo4j.driver(
-  uri,
+  URI,
   neo4j.auth.custom(principal, credentials, realm, scheme, parameters)
 )
 ----
@@ -121,7 +121,7 @@ addresses = [
   'b.example.com:7676',
   'c.example.com:8787'
 ]
-driver = neo4j.driver(uri, neo4j.auth.basic(user, password), {
+driver = neo4j.driver(URI, neo4j.auth.basic(USER, PASSWORD), {
   resolver: address => addresses
 })
 ----
