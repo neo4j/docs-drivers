@@ -113,15 +113,15 @@ When creating a `Driver` object, you can specify a _resolver_ function to resolv
 Note that addresses that the driver receives in routing tables are not resolved with the custom resolver.
 
 .Expand a single address into multiple ones
-[source, javascript]
+[source, javascript, test-skip]
 ----
-uri = 'neo4j://example.com'
-addresses = [
+let URI = 'neo4j://example.com'
+let addresses = [
   'a.example.com:7575',
   'b.example.com:7676',
   'c.example.com:8787'
 ]
-driver = neo4j.driver(URI, neo4j.auth.basic(USER, PASSWORD), {
+let driver = neo4j.driver(URI, neo4j.auth.basic(USER, PASSWORD), {
   resolver: address => addresses
 })
 ----
