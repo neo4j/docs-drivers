@@ -89,6 +89,7 @@ const neo4j = require('neo4j-driver');
     await driver.verifyConnectivity()
   } catch(err) {
     console.log(`-- Connection error --\n${err}\n-- Cause --\n${err.cause}`)
+    await driver.close()
     return
   }
 
@@ -200,6 +201,7 @@ const PASSWORD = '<Password>';
     await driver.verifyConnectivity()
   } catch(err) {
     console.log(`-- Connection error --\n${err}\n-- Cause --\n${err.cause}`)
+    await driver.close()
     return
   }
 

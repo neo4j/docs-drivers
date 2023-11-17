@@ -214,7 +214,7 @@ You can execute a query under the security context of a different user with the 
 For this to work, the user under which the `Driver` was created needs to have the link:{neo4j-docs-base-uri}/cypher-manual/current/administration/access-control/dbms-administration#access-control-dbms-administration-impersonation[appropriate permissions].
 Impersonating a user is cheaper than creating a new `Driver` object.
 
-[source, javascript, role=test-skip]
+[source, javascript, test-skip]
 ----
 await driver.executeQuery(
   'MATCH (p:Person) RETURN p.name',
@@ -236,7 +236,7 @@ When impersonating a user, the query is run within the complete security context
 const neo4j = require('neo4j-driver');
 
 (async () => {
-  const URI = '<URI to Neo4j database>'
+  const URI = '<URI for Neo4j database>'
   const USER = '<Username>'
   const PASSWORD = '<Password>'
   let driver, result
@@ -251,8 +251,9 @@ const neo4j = require('neo4j-driver');
     driver = neo4j.driver(URI,  neo4j.auth.basic(USER, PASSWORD))
     await driver.verifyConnectivity()
   } catch(err) {
-    return
     console.log(`Connection error\n${err}\nCause: ${err.cause}`)
+    await driver.close()
+    return
   }
 
   // Create some nodes
