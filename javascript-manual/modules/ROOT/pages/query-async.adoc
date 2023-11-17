@@ -38,7 +38,7 @@ With async iterators, you get the guarantee that your application does not recei
 ----
 const session = driver.session()
 try {
-  const peopleNames = session.executeWrite(async tx => {
+  const peopleNames = await session.executeWrite(async tx => {
     const result = tx.run(  // <1>
       'MERGE (p:Person {name: $name}) RETURN p.name AS name',
       { name: 'Alice' }
@@ -192,7 +192,7 @@ The reactive API is recommended for applications that are already oriented towar
 const rxjs = require('rxjs');
 
 const rxSession = driver.rxSession()  // <1>
-const rxResult = rxSession.executeWrite(tx => {
+const rxResult = await rxSession.executeWrite(tx => {
   return tx
     .run('MERGE (p:Person {name: $name}) RETURN p.name AS name', {  // <2>
       name: 'Alice'
@@ -204,7 +204,8 @@ const rxResult = rxSession.executeWrite(tx => {
       rxjs.toArray()
     )
   })
-rxResult.subscribe((name) => console.log(name))
+const people = await rxResult.toPromise()
+console.log(people)
 ----
 <1> Obtain a reactive session
 <2> Run a query
