@@ -29,6 +29,8 @@ To convert between driver and native types, use the methods `.from_native()` and
 Sub-second values are measured to nanosecond precision and the types are mostly compatible with link:https://pypi.org/project/pytz/[pytz].
 Some timezones (e.g., `pytz.utc`) work exclusively with the built-in `datetime.datetime`.
 
+For a list of time zone abbreviations, see link:https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List[List of tz database time zones].
+
 [options="header"]
 |===
 | Cypher Type      | Python Type
