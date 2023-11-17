@@ -81,7 +81,7 @@ Within a transaction function, a `return` statement where `error` is `nil` resul
 .A transaction with multiple queries, client logic, and potential roll backs
 [source, go]
 ----
-ppackage main
+package main
 
 import (
     "fmt"
@@ -96,7 +96,7 @@ func main() {
     var employeeThreshold int64 = 10  // Neo4j's integer maps to Go's int64
 
     // Connection to database
-    dbUri := "<URI to Neo4j database>"
+    dbUri := "<URI for Neo4j database>"
     dbUser := "<Username>"
     dbPassword := "<Password>"
     driver, err := neo4j.NewDriverWithContext(
@@ -252,7 +252,10 @@ You run queries inside an explicit transaction with the method link:https://pkg.
 ----
 session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
 defer session.Close(ctx)
-tx := session.BeginTransaction(ctx)
+tx, err := session.BeginTransaction(ctx)
+if err != nil {
+    panic(err)
+}
     // use tx.Run() to run queries
     //     tx.Commit() to commit the transaction
     //     tx.Rollback() to rollback the transaction
@@ -265,22 +268,72 @@ Explicit transactions are most useful for applications that need to distribute C
 .A sketch of an explicit transaction interacting with external APIs
 [source, go]
 ----
-func transferToOtherBank(driver neo4j.DriverWithContext, customerId string, otherBankId string, amount float) {
+package main
+
+import (
+    "fmt"
+    "context"
+    "github.com/neo4j/neo4j-go-driver/v5/neo4j"
+)
+
+func main() {
     ctx := context.Background()
+
+    // Connection to database
+    dbUri := "<URI for Neo4j database>"
+    dbUser := "<Username>"
+    dbPassword := "<Password>"
+    driver, err := neo4j.NewDriverWithContext(
+        dbUri,
+        neo4j.BasicAuth(dbUser, dbPassword, ""))
+    if err != nil {
+        panic(err)
+    }
+    defer driver.Close(ctx)
+    err = driver.VerifyConnectivity(ctx)
+    if err != nil {
+        panic(err)
+    }
+    customerId, err := createCustomer(ctx, driver)
+    if err != nil {
+        panic(err)
+    }
+    otherBankId := 42
+    transferToOtherBank(ctx, driver, customerId, otherBankId, 999)
+}
+
+func createCustomer(ctx context.Context, driver neo4j.DriverWithContext) (string, error) {
+    result, err := neo4j.ExecuteQuery(ctx, driver, `
+    MERGE (c:Customer {id: randomUUID()})
+    RETURN c.id AS id
+    `, nil,
+    neo4j.EagerResultTransformer,
+    neo4j.ExecuteQueryWithDatabase("neo4j"))
+    if err != nil {
+        return "", err
+    }
+    customerId, _ := result.Records[0].Get("id")
+    return customerId.(string), err
+}
+
+func transferToOtherBank(ctx context.Context, driver neo4j.DriverWithContext, customerId string, otherBankId int, amount float32) {
     session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
     defer session.Close(ctx)
-    tx := session.BeginTransaction(ctx)
+    tx, err := session.BeginTransaction(ctx)
+    if err != nil {
+        panic(err)
+    }
 
     if ! customerBalanceCheck(ctx, tx, customerId, amount) {
         // give up
-        return nil
+        return
     }
 
     otherBankTransferApi(ctx, customerId, otherBankId, amount)
     // Now the money has been transferred => can't rollback anymore
     // (cannot rollback external services interactions)
 
-    err := decreaseCustomerBalance(ctx, tx, customerId, amount)
+    err = decreaseCustomerBalance(ctx, tx, customerId, amount)
     if err != nil {
         requestInspection(ctx, customerId, otherBankId, amount, err)
     }
@@ -290,26 +343,31 @@ func transferToOtherBank(driver neo4j.DriverWithContext, customerId string, othe
     }
 }
 
-func customerBalanceCheck(ctx context.Context, tx neo4j.ExplicitTransaction, customerId string, amount float) (bool) {
-    result = tx.Run(ctx, `
+func customerBalanceCheck(ctx context.Context, tx neo4j.ExplicitTransaction, customerId string, amount float32) (bool) {
+    result, err := tx.Run(ctx, `
         MATCH (c:Customer {id: $id})
         RETURN c.balance >= $amount AS sufficient
         `, map[string]any{
             "id": customerId,
             "amount": amount,
         })
-    record, err := result.Single(ctx)
-    if err != nil {
+    if err == nil {
         return false
     }
-    return record.AsMap()["sufficient"]
+    record, err := result.Single(ctx)
+    if err == nil {
+        return false
+    }
+    sufficient := record.AsMap()["sufficient"]
+    return sufficient.(bool)
+}
 
-func otherBankTransferApi(ctx context.Context, customerId string, otherBankId string, amount float):
-    ...
+func otherBankTransferApi(ctx context.Context, customerId string, otherBankId int, amount float32) {
     // make some API call to other bank
+}
 
-func decreaseCustomerBalance(ctx context.Context, tx neo4j.ExplicitTransaction, customerId string, amount float) (error) {
-    _, err = tx.Run(ctx, `
+func decreaseCustomerBalance(ctx context.Context, tx neo4j.ExplicitTransaction, customerId string, amount float32) (error) {
+    _, err := tx.Run(ctx, `
         MATCH (c:Customer {id: $id})
         SET c.balance = c.balance - $amount
         `, map[string]any{
@@ -319,10 +377,11 @@ func decreaseCustomerBalance(ctx context.Context, tx neo4j.ExplicitTransaction, 
     return err
 }
 
-func requestInspection(ctx context.Context, customerId string, otherBankId string, amount float, err error):
+func requestInspection(ctx context.Context, customerId string, otherBankId int, amount float32, err error) {
     // manual cleanup required; log this or similar
     fmt.Println("WARNING: transaction rolled back due to exception:", err)
     fmt.Println("customerId:", customerId, "otherBankId:", otherBankId, "amount:", amount)
+}
 ----
 
 
