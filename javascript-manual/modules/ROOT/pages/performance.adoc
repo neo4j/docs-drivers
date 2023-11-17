@@ -11,7 +11,7 @@ The overhead is minimal for a single query, but becomes significant over hundred
 
 [source, javascript]
 ----
-driver.executeQuery('<QUERY>', {}, {database: '<DB NAME>'})
+await driver.executeQuery('<QUERY>', {}, {database: '<DB NAME>'})
 ----
 
 [source, javascript]
@@ -24,7 +24,7 @@ driver.session({database: '<DB NAME>'})
 
 [source, javascript]
 ----
-driver.executeQuery('<QUERY>')
+await driver.executeQuery('<QUERY>')
 ----
 
 [source, javascript]
@@ -51,7 +51,7 @@ This allows to leverage the database's query cache.
 
 [source, javascript]
 ----
-driver.executeQuery(
+await driver.executeQuery(
   'MATCH (p:Person {name: $name}) RETURN p',
   { name: 'Alice' }  // query parameters
 )
@@ -60,7 +60,7 @@ driver.executeQuery(
 [source, javascript]
 ----
 let session = driver.session({database: '<DB NAME>'})
-session.run(
+await session.run(
   'MATCH (p:Person {name: $name}) RETURN p',
   { name: 'Alice' }  // query parameters
 )
@@ -71,14 +71,16 @@ session.run(
 
 [source, javascript]
 ----
-driver.executeQuery('MATCH (p:Person {name: "Alice"}) RETURN p')
-driver.executeQuery('MATCH (p:Person {name: ' + name + '}) RETURN p')
+await driver.executeQuery('MATCH (p:Person {name: "Alice"}) RETURN p')
+
+let name = "Alice"
+await driver.executeQuery('MATCH (p:Person {name: "' + name + '"}) RETURN p')
 ----
 
 [source, javascript]
 ----
 let session = driver.session({database: '<DB NAME>'})
-session.run(
+await session.run(
   'MATCH (p:Person {name: "Alice"}) RETURN p',
   // or 'MATCH (p:Person {name: ' + name + '}) RETURN p'
   {}
@@ -96,7 +98,7 @@ To learn how to combine labels, see link:{neo4j-docs-base-uri}/cypher-manual/cur
 
 [source, javascript]
 ----
-driver.executeQuery(
+await driver.executeQuery(
   'MATCH (p:Person|Animal {name: $name}) RETURN p',
   { name: 'Alice' }
 )
@@ -105,7 +107,7 @@ driver.executeQuery(
 [source, javascript]
 ----
 let session = driver.session({database: '<DB NAME>'})
-session.run(
+await session.run(
   'MATCH (p:Person|Animal {name: $name}) RETURN p',
   { name: 'Alice' }
 )
@@ -116,7 +118,7 @@ session.run(
 
 [source, javascript]
 ----
-driver.executeQuery(
+await driver.executeQuery(
   'MATCH (p {name: $name}) RETURN p',
   { name: 'Alice' }
 )
@@ -125,7 +127,7 @@ driver.executeQuery(
 [source, javascript]
 ----
 let session = driver.session({database: '<DB NAME>'})
-session.run(
+await session.run(
   'MATCH (p {name: $name}) RETURN p',
   { name: 'Alice' }
 )
@@ -145,7 +147,7 @@ numbers = []
 for(let i=0; i<10000; i++) {
   numbers.push({value: Math.random()})
 }
-driver.executeQuery(`
+await driver.executeQuery(`
     WITH $numbers AS batch
     UNWIND batch AS node
     MERGE (n:Number {value: node.value})
@@ -158,9 +160,11 @@ driver.executeQuery(`
 
 [source, javascript]
 ----
-// Bad practice
 for(let i=0; i<10000; i++) {
-  driver.executeQuery('MERGE (:Number {value: $value})', { value: Math.random() })
+  await driver.executeQuery(
+    'MERGE (:Number {value: $value})',
+    { value: Math.random() }
+  )
 }
 ----
 
@@ -182,7 +186,7 @@ In a cluster, *route read queries to link:{neo4j-docs-base-uri}/operations-manua
 
 [source, javascript]
 ----
-driver.executeQuery(
+await driver.executeQuery(
   'MATCH (p:Person) RETURN p.name',
   {},
   {
@@ -206,7 +210,7 @@ await session.executeRead(async tx => {
 
 [source, javascript]
 ----
-driver.executeQuery(
+await driver.executeQuery(
   'MATCH (p:Person) RETURN p.name',
   {},
   {
@@ -236,7 +240,7 @@ For more information, see link:{neo4j-docs-base-uri}/cypher-manual/current/index
 [source, javascript]
 ----
 // Create an index on Person.name
-driver.executeQuery('CREATE INDEX personName FOR (n:Person) ON (n.name)')
+await driver.executeQuery('CREATE INDEX personName FOR (n:Person) ON (n.name)')
 ----
 
 
@@ -248,7 +252,7 @@ The server output is available in the `profile` property of the xref:result-summ
 
 [source, javascript, role=nocollapse]
 ----
-const result = driver.executeQuery('PROFILE MATCH (p {name: $name}) RETURN p', { name: 'Alice' })
+const result = await driver.executeQuery('PROFILE MATCH (p {name: $name}) RETURN p', { name: 'Alice' })
 console.log(result.summary.profile.arguments['string-representation'])
 /*
 Planner COST
@@ -276,7 +280,7 @@ The server output is available in the `plan` property of the xref:result-summary
 
 [source, javascript, role=nocollapse]
 ----
-const result = driver.executeQuery('EXPLAIN MATCH (p {name: $name}) RETURN p', { name: 'Alice' })
+const result = await driver.executeQuery('EXPLAIN MATCH (p {name: $name}) RETURN p', { name: 'Alice' })
 console.log(result.summary.plan.arguments['string-representation'])
 /*
 Planner COST

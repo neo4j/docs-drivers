@@ -37,7 +37,7 @@ You have to take extra steps to ensure that no unauthorized access is allowed.
 Starting from version 5.4, the browser version is also exported as an ECMA Script Module.
 You can import it using one of the following statements:
 
-[source, javascript]
+[source, javascript, role=test-skip]
 ----
 // Direct reference
 import neo4j from 'lib/browser/neo4j-web.esm.min.js'

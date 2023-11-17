@@ -19,7 +19,7 @@ To create a node representing a person named `Alice`, use the Cypher clause link
 .Create a node representing a `Person` named `Alice`
 [source, javascript]
 ----
-const { records, summary } = await driver.executeQuery(
+let { records, summary } = await driver.executeQuery(
   'MERGE (p:Person {name: $name})',  // <1>
    { name: 'Alice' },  // <2>
    { database: 'neo4j' }  // <3>
@@ -46,7 +46,7 @@ To retrieve information from the database, use the Cypher clause link:{neo4j-doc
 .Retrieve all `Person` nodes
 [source, javascript]
 ----
-const { records, summary } = await driver.executeQuery(
+let { records, summary } = await driver.executeQuery(
   'MATCH (p:Person) RETURN p.name AS name',
   {},
   { database: 'neo4j' }
@@ -73,7 +73,7 @@ To update a node's information in the database, use the Cypher clauses link:{neo
 .Update node `Alice` to add an `age` property
 [source, javascript]
 ----
-const { _, summary } = await driver.executeQuery(`
+let { _, summary } = await driver.executeQuery(`
   MATCH (p:Person {name: $name})
   SET p.age = $age
   `, { name: 'Alice', age: 42 },
@@ -88,7 +88,7 @@ To create new nodes and relationships linking it to an already existing node, us
 .Create a relationship `KNOWS` between `Alice` and `Bob`
 [source, javascript]
 ----
-const { records, summary } = await driver.executeQuery(`
+let { records, summary } = await driver.executeQuery(`
   MATCH (p:Person WHERE p.name = $name)
   MERGE (friend:Person {name: $friendName})
   MERGE (p)-[:KNOWS]->(friend)
@@ -115,7 +115,7 @@ To remove a node and any relationship attached to it, use the Cypher clause link
 .Remove the `Alice` node
 [source, javascript]
 ----
-const { _, summary } = await session.executeQuery(`
+let { _, summary } = await driver.executeQuery(`
   MATCH (p:Person WHERE p.name = $name)
   DETACH DELETE p
   `, { name: 'Alice' },
@@ -150,9 +150,9 @@ Here below an example with a `try/catch/finally` block.
 [source, javascript]
 ----
 try {
-  const result = await session.executeQuery('MATCH (p:Person) RETURN p')
+  let result = await driver.executeQuery('MATCH (p:Person) RETURN p')
 } catch(err) {
-  console.log(`Error in query\n${error}`)
+  console.log(`Error in query\n${err}`)
 } finally {
   await session.close()
 }
@@ -175,7 +175,7 @@ If no database is given, the link:{neo4j-docs-base-uri}/operations-manual/curren
 
 [source, javascript]
 ----
-driver.executeQuery(
+await driver.executeQuery(
   'MATCH (p:Person) RETURN p.name',
   {},
   {
@@ -194,7 +194,7 @@ To improve performance on read queries, you can use the configuration `routing: 
 
 [source, javascript]
 ----
-driver.executeQuery(
+await driver.executeQuery(
   'MATCH (p:Person) RETURN p.name',
   {},
   {
@@ -214,9 +214,9 @@ You can execute a query under the security context of a different user with the 
 For this to work, the user under which the `Driver` was created needs to have the link:{neo4j-docs-base-uri}/cypher-manual/current/administration/access-control/dbms-administration#access-control-dbms-administration-impersonation[appropriate permissions].
 Impersonating a user is cheaper than creating a new `Driver` object.
 
-[source, javascript]
+[source, javascript, test-skip]
 ----
-driver.executeQuery(
+await driver.executeQuery(
   'MATCH (p:Person) RETURN p.name',
   {},
   {
@@ -236,7 +236,7 @@ When impersonating a user, the query is run within the complete security context
 const neo4j = require('neo4j-driver');
 
 (async () => {
-  const URI = '<URI to Neo4j database>'
+  const URI = '<URI for Neo4j database>'
   const USER = '<Username>'
   const PASSWORD = '<Password>'
   let driver, result
@@ -251,8 +251,9 @@ const neo4j = require('neo4j-driver');
     driver = neo4j.driver(URI,  neo4j.auth.basic(USER, PASSWORD))
     await driver.verifyConnectivity()
   } catch(err) {
-    return
     console.log(`Connection error\n${err}\nCause: ${err.cause}`)
+    await driver.close()
+    return
   }
 
   // Create some nodes

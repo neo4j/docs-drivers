@@ -32,6 +32,8 @@ Temporal objects are immutable.
 Sub-second values are measured to nanosecond precision.
 To convert between driver and native types, use the methods `.fromStandardDate()` and `.toStandardDate()` (does not apply to `Duration`). Since JavaScript date types do not support nanoseconds, `.fromStandardDate()` allows a nanoseconds argument (optional), and `.toStandardDate()` drops the nanoseconds.
 
+For a list of time zone abbreviations, see link:https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List[List of tz database time zones].
+
 [options="header"]
 |===
 | Cypher Type    | JavaScript Type
@@ -54,7 +56,7 @@ const PASSWORD = 'verysecret';
 (async () => {
   const driver = neo4j.driver(URI, neo4j.auth.basic(USER, PASSWORD))
 
-  const friendsSince = new neo4j.types.DateTime(1999, 11, 23, 7, 47, 0, 4123, -4*3600, 'US/Eastern')
+  const friendsSince = new neo4j.types.DateTime(1999, 11, 23, 7, 47, 0, 4123, -4*3600, 'Europe/Berlin')
 
   // JS native types work as well.
   // They don't support the full feature-set of Neo4j's type though.
@@ -85,7 +87,7 @@ const PASSWORD = 'verysecret';
     second: Integer { low: 0, high: 0 },
     nanosecond: Integer { low: 4123, high: 0 },
     timeZoneOffsetSeconds: Integer { low: -18000, high: -1 },
-    timeZoneId: 'US/Eastern'
+    timeZoneId: 'Europe/Berlin'
   }
  */
 
@@ -156,7 +158,7 @@ Timezone parameters (offset and identifier) are optional.
 
 [source, javascript]
 ----
-d = new neo4j.DateTime(2021, 11, 2, 7, 47, 0, 4123, -4*3600, 'US/Eastern')
+d = new neo4j.DateTime(2021, 11, 2, 7, 47, 0, 4123, -4*3600, 'Europe/Berlin')
 /*
 DateTime {
   year: 2021,
@@ -167,7 +169,7 @@ DateTime {
   second: 0,
   nanosecond: 4123,
   timeZoneOffsetSeconds: -14400,
-  timeZoneId: 'US/Eastern'
+  timeZoneId: 'Europe/Berlin'
 }
 */
 d.toString() // '2021-11-02T07:47:00.000004123-04:00[US/Eastern]'
