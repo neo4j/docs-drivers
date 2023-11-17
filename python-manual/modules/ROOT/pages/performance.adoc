@@ -66,6 +66,8 @@ with driver.session(database="<DB NAME>") as session:
 [source, python]
 ----
 driver.execute_query("MATCH (p:Person {name: 'Alice'}) RETURN p")
+# or
+name = "Alice"
 driver.execute_query("MATCH (p:Person {name: '" + name + "'}) RETURN p")
 ----
 
@@ -73,6 +75,8 @@ driver.execute_query("MATCH (p:Person {name: '" + name + "'}) RETURN p")
 ----
 with driver.session(database="<DB NAME>") as session:
     session.run("MATCH (p:Person {name: 'Alice'}) RETURN p")
+    # or
+    name = "Alice"
     session.run("MATCH (p:Person {name: '" + name + "'}) RETURN p")
 ----
 
@@ -123,7 +127,7 @@ with driver.session(database="<DB NAME>") as session:
 
 [source, python]
 ----
-numbers = [{"value": random()} for _ in range(10000)]
+numbers = [{"value": random()} for _ in range(1000)]
 driver.execute_query("""
     WITH $numbers AS batch
     UNWIND batch AS node
@@ -138,7 +142,7 @@ driver.execute_query("""
 
 [source, python]
 ----
-for _ in range(10000):
+for _ in range(1000):
     driver.execute_query("MERGE (:Number {value: $value})", value=random())
 ----
 

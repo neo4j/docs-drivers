@@ -23,7 +23,6 @@ print("Created {nodes_created} nodes in {time} ms.".format(
     nodes_created=summary.counters.nodes_created,
     time=summary.result_available_after
 ))
-
 ----
 
 <1> specifies the Cypher query
@@ -224,7 +223,7 @@ You can execute a query under the security context of a different user with the 
 For this to work, the user under which the `Driver` was created needs to have the link:{neo4j-docs-base-uri}/cypher-manual/current/administration/access-control/dbms-administration#access-control-dbms-administration-impersonation[appropriate permissions].
 Impersonating a user is cheaper than creating a new `Driver` object.
 
-[source, python]
+[source, python, role=test-skip]
 ----
 driver.execute_query(
     "MATCH (p:Person) RETURN p.name",
@@ -251,7 +250,7 @@ For more information, see xref:transformers.adoc[Manipulate query results].
 from neo4j import GraphDatabase
 
 
-URI = "<URI to Neo4j database>"
+URI = "<URI for Neo4j database>"
 AUTH = ("<Username>", "<Password>")
 
 people = [{"name": "Alice", "age": 42, "friends": ["Bob", "Peter", "Anna"]},

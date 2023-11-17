@@ -44,7 +44,7 @@ AUTH = ("<Username>", "<Password>")
 async def main():
     async with AsyncGraphDatabase.driver(URI, auth=AUTH) as driver:
         async with driver.session(database="neo4j") as session:
-            records = await session.read_transaction(get_people)
+            records = await session.execute_read(get_people)
             print(records)
 
 

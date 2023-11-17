@@ -13,7 +13,7 @@ It returns a `Result` object that needs to be xref:transactions#process-result[p
 [source, python]
 ----
 with driver.session(database="neo4j") as session:
-    session.run("CREATE (a:Person {name: $name})", name=name)
+    session.run("CREATE (a:Person {name: $name})", name="Licia")
 ----
 
 An implicit transaction gets committed _at the latest_ when the session is destroyed, or before another transaction is executed within the same session.
@@ -64,7 +64,7 @@ with driver.session(database="neo4j") as session:
     query = Query("CREATE (a:Person {name: $name})",
                   timeout=1.0,
                   metadata={"app_name": "people"})
-    result = session.run(query, name=name)
+    result = session.run(query, name="John")
 ----
 
 

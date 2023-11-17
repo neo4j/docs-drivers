@@ -39,7 +39,7 @@ Both methods take a _transaction function_ callback, which is responsible for ac
 [source, python]
 ----
 def match_person_nodes(tx, name_filter): # <3>
-    result = tx.run(""" # <4>
+    result = tx.run(""" // <4>
         MATCH (p:Person) WHERE p.name STARTS WITH $filter
         RETURN p.name as name ORDER BY name
         """, filter=name_filter)
@@ -74,7 +74,7 @@ Within a transaction function, a `return` statement results in the transaction b
 from neo4j import GraphDatabase
 
 
-URI = "<URI to Neo4j database>"
+URI = "<URI for Neo4j database>"
 AUTH = ("<Username>", "<Password>")
 employee_threshold=10
 
@@ -187,6 +187,8 @@ You run queries inside an explicit transaction with the method link:{neo4j-docs-
 with driver.session(database="neo4j") as session:
     with session.begin_transaction() as tx:
         # use tx.run() to run queries
+        tx.run("<QUERY 1>")
+        tx.run("<QUERY 2>")
 ----
 
 Closing an explicit transaction can either happen automatically at the end of a `with` block, or can be explicitly controlled through the methods link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Transaction.commit[`Transaction.commit()`], link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Transaction.rollback[`Transaction.rollback()`], or link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Transaction.close[`Transaction.close()`].
@@ -196,6 +198,25 @@ Explicit transactions are most useful for applications that need to distribute C
 [source, python]
 ----
 import neo4j
+
+
+URI = "<URI for Neo4j database>"
+AUTH = ("<Username>", "<Password>")
+
+
+def main():
+    with neo4j.GraphDatabase.driver(URI, auth=AUTH) as driver:
+        customer_id = create_customer(driver)
+        other_bank_id = 42
+        transfer_to_other_bank(driver, customer_id, other_bank_id, 999)
+
+
+def create_customer(driver):
+    result, _, _ = driver.execute_query("""
+        MERGE (c:Customer {id: rand()})
+        RETURN c.id AS id
+    """, database_ = "neo4j")
+    return result[0]["id"]
 
 
 def transfer_to_other_bank(driver, customer_id, other_bank_id, amount):
@@ -232,8 +253,8 @@ def customer_balance_check(tx, customer_id, amount):
 
 
 def other_bank_transfer_api(customer_id, other_bank_id, amount):
-    ...
     # make some API call to other bank
+    pass
 
 
 def decrease_customer_balance(tx, customer_id, amount):
@@ -251,6 +272,9 @@ def request_inspection(customer_id, other_bank_id, amount, e):
     print("customer_id:", customer_id, "other_bank_id:", other_bank_id,
           "amount:", amount)
 
+
+if __name__ == "__main__":
+    main()
 ----
 
 

@@ -174,7 +174,7 @@ There is a slight performance gain in restricting the amount of notifications th
 [source, python]
 ----
 driver = neo4j.GraphDatabase.driver(
-    url, auth=auth,
+    URI, auth=AUTH,
     notifications_min_severity='WARNING',  # or 'OFF' to disable
     notifications_disabled_categories=['HINT', 'GENERIC']
 )
