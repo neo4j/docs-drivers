@@ -167,7 +167,7 @@ Query parameters should get grouped into a map and passed as second parameter to
 
 [source, go]
 ----
-parameters = map[string]any{
+parameters := map[string]any{
     "name": "Alice",
     "age": 42,
 }
@@ -218,7 +218,7 @@ neo4j.ExecuteQuery(ctx, driver,
     "MATCH (p:Person) RETURN p.name",
     nil,
     neo4j.EagerResultTransformer,
-    neo4j.ExecuteQueryWithDatabase("neo4j")
+    neo4j.ExecuteQueryWithDatabase("neo4j"),
     neo4j.ExecuteQueryWithReadersRouting())
 ----
 
@@ -239,9 +239,8 @@ neo4j.ExecuteQuery(ctx, driver,
     "MATCH (p:Person) RETURN p.name",
     nil,
     neo4j.EagerResultTransformer,
-    neo4j.ExecuteQueryWithDatabase("neo4j")
+    neo4j.ExecuteQueryWithDatabase("neo4j"),
     neo4j.ExecuteQueryWithImpersonatedUser("<somebodyElse>"))
-)
 ----
 
 When impersonating a user, the query is run within the complete security context of the impersonated user and not the authenticated user (i.e., home database, permissions, etc.).
@@ -263,7 +262,7 @@ func main() {
     ctx := context.Background()
 
     // Connection to database
-    dbUri := "<URI to Neo4j database>"
+    dbUri := "<URI for Neo4j database>"
     dbUser := "<Username>"
     dbPassword := "<Password>"
     driver, err := neo4j.NewDriverWithContext(

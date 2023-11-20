@@ -16,9 +16,9 @@ session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
 defer session.Close(ctx)
 result, err := session.Run(
     ctx,
-    "CREATE (:Person {name: $name})",
+    "CREATE (p:Person {name: $name}) RETURN p",
     map[string]any{
-        "name": name
+        "name": "Lucia",
     })
 ----
 
@@ -51,7 +51,7 @@ result, err := session.Run(
     `, nil)
 summary, _ := result.Consume(ctx)
 fmt.Println("Query updated the database?",
-    result.Summary.Counters().ContainsUpdates())
+    summary.Counters().ContainsUpdates())
 ----
 
 [NOTE]
@@ -97,7 +97,7 @@ To link:https://neo4j.com/developer/kb/protecting-against-cypher-injection/[prot
 ----
 dangerousLabel := "Person\\u0060n"
 // convert \u0060 to literal backtick and then escape backticks
-//remember to import `strings`
+// remember to import `strings`
 escapedLabel := strings.ReplaceAll(dangerousLabel, "\\u0060", "`")
 escapedLabel = strings.ReplaceAll(escapedLabel, "`", "``")
 
@@ -141,10 +141,7 @@ To enable driver logging, use the `Config.Log` option when instantiating the dri
 
 [source, go]
 ----
-import (
-    "github.com/neo4j/neo4j-go-driver/v5/neo4j"
-    "github.com/neo4j/neo4j-go-driver/v5/neo4j/config"
-)
+// import "github.com/neo4j/neo4j-go-driver/v5/neo4j/config"
 
 driver, err := neo4j.NewDriverWithContext(
     dbUri,

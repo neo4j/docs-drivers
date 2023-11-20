@@ -16,12 +16,18 @@ In this case, you have the guarantee that subsequent queries can read previous c
 
 [source, go]
 ----
-neo4j.ExecuteQuery("<QUERY 1>")
+neo4j.ExecuteQuery(ctx, driver, "<QUERY 1>", nil,
+    neo4j.EagerResultTransformer,
+    neo4j.ExecuteQueryWithDatabase("neo4j"))
 
 // subsequent ExecuteQuery calls will be causally chained
 
-neo4j.ExecuteQuery("<QUERY 2>")  // can read result of <QUERY 1>
-neo4j.ExecuteQuery("<QUERY 3>")  // can read result of <QUERY 2>
+neo4j.ExecuteQuery(ctx, driver, "<QUERY 2>", nil,  // can read result of <QUERY 1>
+    neo4j.EagerResultTransformer,
+    neo4j.ExecuteQueryWithDatabase("neo4j"))
+neo4j.ExecuteQuery(ctx, driver, "<QUERY 3>", nil,  // can read result of <QUERY 2>
+    neo4j.EagerResultTransformer,
+    neo4j.ExecuteQueryWithDatabase("neo4j"))
 ----
 
 To disable bookmark management and causal consistency, use the configuration callback `neo4j.ExecuteQueryWithoutBookmarkManager()` in `ExecuteQuery()` calls.
@@ -29,7 +35,7 @@ To disable bookmark management and causal consistency, use the configuration cal
 [source, go]
 ----
 neo4j.ExecuteQuery(
-    ctx, driver, query, nil, neo4j.EagerResultTransformer,
+    ctx, driver, "<QUERY>", nil, neo4j.EagerResultTransformer,
     neo4j.ExecuteQueryWithDatabase("neo4j"),
     neo4j.ExecuteQueryWithoutBookmarkManager())
 ----
@@ -43,9 +49,18 @@ Bookmark management happens automatically for queries run within a single sessio
 ----
 session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
 defer session.Close(ctx)
-session.ExecuteWrite(/* <QUERY 1> */)
-session.ExecuteWrite(/* <QUERY 2> */)  // can read QUERY 1
-session.ExecuteWrite(/* <QUERY 3> */)  // can read QUERY 1 and 2
+session.ExecuteWrite(ctx,
+    func(tx neo4j.ManagedTransaction) (any, error) {
+        return tx.Run(ctx, "<QUERY 1>", nil)
+})
+session.ExecuteWrite(ctx,
+    func(tx neo4j.ManagedTransaction) (any, error) {
+        return tx.Run(ctx, "<QUERY 2>", nil)  // can read QUERY 1
+})
+session.ExecuteWrite(ctx,
+    func(tx neo4j.ManagedTransaction) (any, error) {
+        return tx.Run(ctx, "<QUERY 3>", nil)  // can read QUERY 1 and 2
+})
 ----
 
 
@@ -71,7 +86,7 @@ func main() {
     ctx := context.Background()
 
     // Connection to database
-    dbUri := "<URI to Neo4j database>"
+    dbUri := "<URI for Neo4j database>"
     dbUser := "<Username>"
     dbPassword := "<Password>"
     driver, err := neo4j.NewDriverWithContext(
@@ -194,7 +209,9 @@ Since that is the default bookmark manager for `ExecuteQuery()` calls, this will
 
 [source, go]
 ----
-neo4j.ExecuteQuery(/* <QUERY 1> */)
+neo4j.ExecuteQuery(ctx, driver, "<QUERY 1>", nil,
+    neo4j.EagerResultTransformer,
+    neo4j.ExecuteQueryWithDatabase("neo4j"))
 
 session := driver.NewSession(ctx, neo4j.SessionConfig{
     DatabaseName: "neo4j",
@@ -202,12 +219,17 @@ session := driver.NewSession(ctx, neo4j.SessionConfig{
 })
 // every query inside this session will be causally chained
 // (i.e., can read what was written by <QUERY 1>)
-session.ExecuteWrite(/* <QUERY 2> */)
+session.ExecuteWrite(ctx,
+    func(tx neo4j.ManagedTransaction) (any, error) {
+        return tx.Run(ctx, "<QUERY 2>", nil)
+})
 session.Close(ctx)
 
 // subsequent ExecuteQuery calls will be causally chained
 // (i.e., can read what was written by <QUERY 2>)
-neo4j.ExecuteQuery(/* <QUERY 3>*/)
+neo4j.ExecuteQuery(ctx, driver, "<QUERY 3>", nil,
+    neo4j.EagerResultTransformer,
+    neo4j.ExecuteQueryWithDatabase("neo4j"))
 ----
 
 
