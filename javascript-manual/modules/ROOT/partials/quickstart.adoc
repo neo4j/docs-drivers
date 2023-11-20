@@ -35,7 +35,7 @@ var neo4j = require('neo4j-driver');
   let driver
 
   try {
-    driver = neo4j.driver(URI,  neo4j.auth.basic(USER, PASSWORD))
+    driver = neo4j.driver(URI, neo4j.auth.basic(USER, PASSWORD))
     const serverInfo = await driver.getServerInfo()
     console.log('Connection established')
     console.log(serverInfo)
@@ -118,6 +118,11 @@ The same applies to any open sessions.
 
 [source, javascript]
 ----
+const driver = neo4j.driver(URI, neo4j.auth.basic(USER, PASSWORD))
+let session = driver.session({ database: 'neo4j' })
+
+// session/driver usage
+
 session.close()
 driver.close()
 ----
