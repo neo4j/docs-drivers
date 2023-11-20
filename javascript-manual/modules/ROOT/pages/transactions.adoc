@@ -40,10 +40,9 @@ Both methods take a <<transaction_function>> callback, which is responsible of a
 .Retrieve people whose name starts with `Al`.
 [source, javascript]
 ----
+let session = driver.session({ database: 'neo4j' })  // <1>
 try {
-  let session, result
-  session = driver.session({ database: 'neo4j' })  // <1>
-  result = await session.executeRead(async tx => { // <2>
+  let result = await session.executeRead(async tx => { // <2>
     return await tx.run(`  // <3>
       MATCH (p:Person) WHERE p.name STARTS WITH $filter
       RETURN p.name as name ORDER BY name

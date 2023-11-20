@@ -145,7 +145,7 @@ For those advanced use cases, see xref:query-advanced#_dynamic_values_in_propert
 
 To avoid an error in one query crashing your application, you can wrap queries into `try/catch` blocks.
 We avoid proper error handling throughout this manual to make examples lighter to parse, and because appropriate error handling depends on the application.
-Here below an example with a `try/catch/finally` block.
+Here below an example with a `try/catch` block.
 
 [source, javascript]
 ----
@@ -153,8 +153,6 @@ try {
   let result = await driver.executeQuery('MATCH (p:Person) RETURN p')
 } catch(err) {
   console.log(`Error in query\n${err}`)
-} finally {
-  await session.close()
 }
 ----
 
