@@ -122,7 +122,9 @@ driver, err := neo4j.NewDriverWithContext(
     "neo4j://example.com:9999", neo4j.BasicAuth(dbUser, dbPassword, ""),
     func(conf *config.Config) {
         conf.AddressResolver = func(address config.ServerAddress) []config.ServerAddress {
-            return []config.ServerAddress{ neo4j.NewServerAddress("localhost", "7687") }
+            return []config.ServerAddress{
+                neo4j.NewServerAddress("localhost", "7687"),
+            }
         }
 })
 defer driver.Close(ctx)
