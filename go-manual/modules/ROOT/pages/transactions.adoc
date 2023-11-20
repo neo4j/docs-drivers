@@ -401,7 +401,7 @@ When no more records are available, the result is _exhausted_.
 - *The result acts as a _cursor_*.
 This means that there is no way to retrieve a previous record from the stream, unless you saved it in an auxiliary data structure.
 
-**The easiest way of processing a result is by calling `.Collect(ctx)` on it**, which yields an array of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5@v5.9.0/neo4j/db#Record[`Record`] objects.
+**The easiest way of processing a result is by calling `.Collect(ctx)` on it**, which yields an array of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/db#Record[`Record`] objects.
 Otherwise, a `ResultWithContext` object implements a number of methods for processing records.
 The most commonly needed ones are listed below.
 
