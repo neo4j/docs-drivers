@@ -197,14 +197,13 @@ There is a slight performance gain in restricting the amount of notifications th
 .Allow only `Warning` notifications, but not of `Hint` or `Generic` category
 [source, go]
 ----
-import (
-    "github.com/neo4j/neo4j-go-driver/v5/neo4j"
-    "github.com/neo4j/neo4j-go-driver/v5/neo4j/notifications"
-    "github.com/neo4j/neo4j-go-driver/v5/neo4j/config"
-)
+// import (
+//     "github.com/neo4j/neo4j-go-driver/v5/neo4j/notifications"
+//     "github.com/neo4j/neo4j-go-driver/v5/neo4j/config"
+// )
 
 // At driver level
-driver, _ := neo4j.NewDriverWithContext(
+driverNot, _ := neo4j.NewDriverWithContext(
     dbUri,
     neo4j.BasicAuth(dbUser, dbPassword, ""),
     func (conf *config.Config) {
@@ -214,7 +213,7 @@ driver, _ := neo4j.NewDriverWithContext(
 
 
 // At session level
-session, _ = driver.NewSession(ctx, neo4j.SessionConfig{
+sessionNot := driver.NewSession(ctx, neo4j.SessionConfig{
     NotificationsMinSeverity: notifications.WarningLevel,
     NotificationsDisabledCategories: notifications.DisableCategories(notifications.Hint, notifications.Generic),
     DatabaseName: "neo4j",  // always provide the database name

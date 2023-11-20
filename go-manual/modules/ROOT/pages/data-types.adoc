@@ -59,9 +59,9 @@ func main() {
     ctx := context.Background()
 
     // Connection to database
-    dbUri := "neo4j://localhost"
-    dbUser := "neo4j"
-    dbPassword := "verysecret"
+    dbUri := "<URI for Neo4j database>"
+    dbUser := "<Username>"
+    dbPassword := "<Password>"
     driver, _ := neo4j.NewDriverWithContext(
         dbUri,
         neo4j.BasicAuth(dbUser, dbPassword, ""))
@@ -88,6 +88,7 @@ func main() {
     date, _ := result.Records[0].Get("date")
     fmt.Println(reflect.TypeOf(date))  // time.Time
     fmt.Println(date)  // 2006-12-16 13:59:59.999999999 +0200 EET
+}
 ----
 
 .Using driver's temporal types
@@ -107,9 +108,9 @@ func main() {
     ctx := context.Background()
 
     // Connection to database
-    dbUri := "neo4j://localhost"
-    dbUser := "neo4j"
-    dbPassword := "verysecret"
+    dbUri := "<URI for Neo4j database>"
+    dbUser := "<Username>"
+    dbPassword := "<Password>"
     driver, _ := neo4j.NewDriverWithContext(
         dbUri,
         neo4j.BasicAuth(dbUser, dbPassword, ""))
@@ -124,7 +125,6 @@ func main() {
         `, map[string]any{
             "name": "Alice",
             "friend": "Sofia",
-            "friendsSince": friendsSince,
         }, neo4j.EagerResultTransformer,
         neo4j.ExecuteQueryWithDatabase("neo4j"))
     if err != nil {
@@ -132,8 +132,9 @@ func main() {
     }
     time, _ := result.Records[0].Get("time")
     fmt.Println(reflect.TypeOf(time))  // time.Time
-    castDate, _ := date.(neo4j.Time)  // cast from `any` to `neo4j.Time`
+    castDate, _ := time.(neo4j.Time)  // cast from `any` to `neo4j.Time`
     fmt.Println(castDate.Time())  // -0001-11-30 12:18:08.973 +0000 Offset
+}
 ----
 
 
@@ -149,7 +150,7 @@ duration := neo4j.Duration{
     Seconds: 3,
     Nanos: 4,
 }
-fmt.Println(duration)  # 'P1Y2DT3.000000004S'
+fmt.Println(duration)  // 'P1Y2DT3.000000004S'
 ----
 
 For full documentation, see link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/dbtype#Duration[API documentation -- Duration].
@@ -165,10 +166,10 @@ You can think of it as a unique identifier for each spatial type.
 [options="header"]
 |===
 | Cypher Type            | Go Type          | SpatialRefId
-| `POINT` (2D Cartesian) | `dbtype.Point2D` | 7203
-| `POINT` (2D WGS-84)    | `dbtype.Point2D` | 9157
-| `POINT` (3D Cartesian) | `dbtype.Point3D` | 4326
-| `POINT` (3D WGS-84)    | `dbtype.Point2D` | 4979
+| `POINT` (2D Cartesian) | `neo4j.Point2D` | 7203
+| `POINT` (2D WGS-84)    | `neo4j.Point2D` | 9157
+| `POINT` (3D Cartesian) | `neo4j.Point3D` | 4326
+| `POINT` (3D WGS-84)    | `neo4j.Point2D` | 4979
 |===
 
 [NOTE]
@@ -209,7 +210,7 @@ The type `Point3D` can be used to represent either a 3D Cartesian point or a 3D 
 [source, go]
 ----
 // A 3D Cartesian Point
-cartesian3d := dbtype.Point3D{
+cartesian3d := neo4j.Point3D{
     X:            1.23,
     Y:            4.56,
     Z:            7.89,
@@ -219,7 +220,7 @@ fmt.Println(cartesian3d)
 // Point{srId=9157, x=1.230000, y=4.560000, z=7.890000}
 
 // A 3D WGS84 Point
-wgs843d := dbtype.Point3D{
+wgs843d := neo4j.Point3D{
     X:            1.23,
     Y:            4.56,
     Z:            7.89,
@@ -317,6 +318,8 @@ Represents a path in a graph.
 .Example of path creation, retrieval, and processing
 [source, go]
 ----
+package main
+
 import (
     "fmt"
     "context"
@@ -327,7 +330,7 @@ func main() {
     ctx := context.Background()
 
     // Connection to database
-    dbUri := "<URI to Neo4j database>"
+    dbUri := "<URI for Neo4j database>"
     dbUser := "<Username>"
     dbPassword := "<Password>"
     driver, _ := neo4j.NewDriverWithContext(

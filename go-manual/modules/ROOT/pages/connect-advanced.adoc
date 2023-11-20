@@ -74,7 +74,7 @@ The basic authentication scheme can also be used to authenticate against an LDAP
 The Kerberos authentication scheme requires a base64-encoded ticket.
 It can only be used if the server has the link:{neo4j-docs-base-uri}/kerberos-add-on/current/deployment/[Kerberos Add-on installed].
 
-[source, go]
+[source, go, test-skip]
 ----
 driver, err := neo4j.NewDriverWithContext(dbUri, neo4j.KerberosAuth(ticket))
 ----
@@ -83,7 +83,7 @@ driver, err := neo4j.NewDriverWithContext(dbUri, neo4j.KerberosAuth(ticket))
 
 The bearer authentication scheme requires a base64-encoded token provided by an Identity Provider through Neo4j's link:{neo4j-docs-base-uri}/operations-manual/current/authentication-authorization/sso-integration[Single Sign-On feature].
 
-[source, go]
+[source, go, test-skip]
 ----
 driver, err := neo4j.NewDriverWithContext(dbUri, neo4j.BearerAuth(token))
 ----
@@ -100,7 +100,7 @@ Use the function link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo
 
 Use the function link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#NoAuth[`NoAuth`] to access a server where authentication is disabled.
 
-[source, go]
+[source, go, test-skip]
 ----
 driver, err := neo4j.NewDriverWithContext(dbUri, neo4j.NoAuth())
 ----
@@ -116,20 +116,15 @@ In the following example, the connection to `example.com` on port `9999` is reso
 
 [source, go]
 ----
-import (
-    "github.com/neo4j/neo4j-go-driver/v5/neo4j"
-    "github.com/neo4j/neo4j-go-driver/v5/neo4j/config"
-)
+// import "github.com/neo4j/neo4j-go-driver/v5/neo4j/config"
 
 driver, err := neo4j.NewDriverWithContext(
     "neo4j://example.com:9999", neo4j.BasicAuth(dbUser, dbPassword, ""),
     func(conf *config.Config) {
         conf.AddressResolver = func(address config.ServerAddress) []config.ServerAddress {
-            return []config.ServerAddress{
-                neo4j.NewServerAddress("localhost", "7687")
-            }
+            return []config.ServerAddress{ neo4j.NewServerAddress("localhost", "7687") }
         }
-    })
+})
 defer driver.Close(ctx)
 ----
 

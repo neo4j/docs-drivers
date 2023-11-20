@@ -19,7 +19,7 @@ result, err := neo4j.ExecuteQuery(ctx, driver, "<QUERY>", nil,
 [source, go]
 ----
 session := driver.NewSession(ctx, neo4j.SessionConfig{
-    DatabaseName: "neo4j"
+    DatabaseName: "neo4j",
 })
 ----
 
@@ -34,7 +34,7 @@ result, err := neo4j.ExecuteQuery(ctx, driver, "<QUERY>", nil,
 
 [source, go]
 ----
-session := driver.NewSession(ctx)
+session := driver.NewSession(ctx, neo4j.SessionConfig{})
 ----
 
 
@@ -114,7 +114,7 @@ result, err := neo4j.ExecuteQuery(ctx, driver,
 [source, go]
 ----
 session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
-session.Run(ctx,
+result, err := session.Run(ctx,
     "MATCH (p:Person|Animal {name: $name}) RETURN p",
     map[string]any{
         "name": "Alice",
@@ -137,7 +137,7 @@ result, err := neo4j.ExecuteQuery(ctx, driver,
 [source, go]
 ----
 session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
-session.Run(ctx,
+result, err := session.Run(ctx,
     "MATCH (p {name: $name}) RETURN p",
     map[string]any{
         "name": "Alice",
@@ -157,7 +157,7 @@ session.Run(ctx,
 ----
 numbers := make([]int, 10000)
 for i := range numbers { numbers[i] = i }
-result, err := neo4j.ExecuteQuery(ctx, driver, `
+neo4j.ExecuteQuery(ctx, driver, `
     WITH $numbers AS batch
     UNWIND batch AS value
     MERGE (n:Number)
@@ -174,7 +174,7 @@ result, err := neo4j.ExecuteQuery(ctx, driver, `
 [source, go]
 ----
 for i := 0; i < 10000; i++ {
-    result, err := neo4j.ExecuteQuery(ctx, driver,
+    neo4j.ExecuteQuery(ctx, driver,
         "MERGE (:Number {value: $value})",
         map[string]any{
             "value": i,
@@ -209,6 +209,7 @@ result, err := neo4j.ExecuteQuery(ctx, driver,
 
 [source, go]
 ----
+session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
 result, err := session.ExecuteRead(ctx,
     func(tx neo4j.ManagedTransaction) (any, error) {
         return tx.Run(ctx, "MATCH (p:Person) RETURN p", nil)
@@ -229,6 +230,7 @@ result, err := neo4j.ExecuteQuery(ctx, driver,
 
 [source, go]
 ----
+session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
 result, err := session.ExecuteWrite(ctx,  // don't ask to write on a read-only operation
     func(tx neo4j.ManagedTransaction) (any, error) {
         return tx.Run(ctx, "MATCH (p:Person) RETURN p", nil)
@@ -246,7 +248,7 @@ For more information, see link:{neo4j-docs-base-uri}/cypher-manual/current/index
 [source, go]
 ----
 // Create an index on Person.name
-result, err := neo4j.ExecuteQuery(ctx, driver,
+neo4j.ExecuteQuery(ctx, driver,
     "CREATE INDEX personName FOR (n:Person) ON (n.name)",
     nil, neo4j.EagerResultTransformer,
     neo4j.ExecuteQueryWithDatabase("neo4j"))
