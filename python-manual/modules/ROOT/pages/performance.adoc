@@ -127,7 +127,7 @@ with driver.session(database="<DB NAME>") as session:
 
 [source, python]
 ----
-numbers = [{"value": random()} for _ in range(1000)]
+numbers = [{"value": random()} for _ in range(10000)]
 driver.execute_query("""
     WITH $numbers AS batch
     UNWIND batch AS node
@@ -142,7 +142,7 @@ driver.execute_query("""
 
 [source, python]
 ----
-for _ in range(1000):
+for _ in range(10000):
     driver.execute_query("MERGE (:Number {value: $value})", value=random())
 ----
 
