@@ -21,13 +21,18 @@ You can include it in an HTML page using one of the following tags:
 
 Including the driver in the page makes a global `neo4j` object available, through which you may then xref:connect.adoc[connect] and xref:query-simple.adoc[query] a Neo4j database, in the same way as you would do for a local application.
 
-.Connection example
+.Driver usage example
 [source, javascript]
 ----
-var driver = neo4j.driver(
-  'neo4j://localhost',
-  neo4j.auth.basic('neo4j', 'password')
-)
+const URI = '<URI for Neo4j database>'
+const USER = '<Username>'
+const PASSWORD = '<Password>'
+const driver = neo4j.driver(URI, neo4j.auth.basic(USER, PASSWORD))
+const serverInfo = await driver.getServerInfo()
+
+// use driver to run queries
+
+await driver.close()
 ----
 
 [WARNING]
@@ -37,7 +42,7 @@ You have to take extra steps to ensure that no unauthorized access is allowed.
 Starting from version 5.4, the browser version is also exported as an ECMA Script Module.
 You can import it using one of the following statements:
 
-[source, javascript, role=test-skip]
+[source, javascript, test-skip]
 ----
 // Direct reference
 import neo4j from 'lib/browser/neo4j-web.esm.min.js'
