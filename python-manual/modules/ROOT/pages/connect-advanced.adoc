@@ -75,7 +75,7 @@ The basic authentication scheme can also be used to authenticate against an LDAP
 The Kerberos authentication scheme requires a base64-encoded ticket.
 It can only be used if the server has the link:{neo4j-docs-base-uri}/kerberos-add-on/current/deployment/[Kerberos Add-on installed].
 
-[source, python, role=test-skip]
+[source, python, test-skip]
 ----
 from neo4j import GraphDatabase, kerberos_auth
 
@@ -86,7 +86,7 @@ driver = GraphDatabase.driver(URI, auth=kerberos_auth(ticket))
 
 The bearer authentication scheme requires a base64-encoded token provided by an Identity Provider through Neo4j's link:{neo4j-docs-base-uri}/operations-manual/current/authentication-authorization/sso-integration[Single Sign-On feature].
 
-[source, python, role=test-skip]
+[source, python, test-skip]
 ----
 from neo4j import GraphDatabase, bearer_auth
 
@@ -111,9 +111,8 @@ If authentication is disabled on the server, the authentication parameter can be
 When creating a `Driver` object, you can specify a _resolver_ function to resolve any addresses the driver receives ahead of DNS resolution.
 Your resolver function is called with an link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Address[`Address`] object and should return an iterable of link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Address[`Address`] objects (or values that can be used to construct `Address` objects)
 
-In the following example, the connection to `example.com` on port `9999` is resolved to `localhost` on port `7687`:
-
-[source,python]
+.Connection to `example.com` on port `9999` is resolved to `localhost` on port `7687`
+[source, python]
 ----
 import neo4j
 

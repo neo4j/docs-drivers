@@ -57,7 +57,7 @@ The file has a name of the form `Neo4j-a0a2fa1d-Created-2023-11-06.txt`.
 To connect to such an instance, you may either use the URI, username, and password explicitly in your application, or load the content of the connection file in the environment with `dotenv.config()` and populate your local variables via `process.env.<NAME>`.
 This approach requires the package link:https://www.npmjs.com/package/dotenv[`dotenv`].
 
-[source, javascript, role=nocollapse test-skip]
+[source, javascript, role=nocollapse]
 ----
 (async () => {
   var neo4j = require('neo4j-driver')

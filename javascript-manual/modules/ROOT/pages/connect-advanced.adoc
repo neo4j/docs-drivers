@@ -72,7 +72,7 @@ The basic authentication scheme can also be used to authenticate against an LDAP
 The Kerberos authentication scheme requires a base64-encoded ticket.
 It can only be used if the server has the link:{neo4j-docs-base-uri}/kerberos-add-on/current/deployment/[Kerberos Add-on installed].
 
-[source, javascript, role=test-skip]
+[source, javascript, test-skip]
 ----
 const driver = neo4j.driver(URI, neo4j.auth.kerberos(ticket))
 ----
@@ -81,7 +81,7 @@ const driver = neo4j.driver(URI, neo4j.auth.kerberos(ticket))
 
 The bearer authentication scheme requires a base64-encoded token provided by an Identity Provider through Neo4j's link:{neo4j-docs-base-uri}/operations-manual/current/authentication-authorization/sso-integration[Single Sign-On feature].
 
-[source, javascript, role=test-skip]
+[source, javascript, test-skip]
 ----
 const driver = neo4j.driver(URI, neo4j.auth.bearer(token))
 ----
@@ -94,7 +94,7 @@ Once configured, clients can discover Neo4j's configuration through the link:{ne
 
 If the server is equipped with a custom authentication scheme, use `neo4j.auth.custom`.
 
-[source, javascript, role=test-skip]
+[source, javascript, test-skip]
 ----
 const driver = neo4j.driver(
   URI,
@@ -112,14 +112,12 @@ If authentication is disabled on the server, the authentication parameter can be
 When creating a `Driver` object, you can specify a _resolver_ function to resolve the connection address the driver is initialized with.
 Note that addresses that the driver receives in routing tables are not resolved with the custom resolver.
 
-.Expand a single address into multiple ones
-[source, javascript, test-skip]
+.Connection to `example.com` on port `9999` is resolved to `localhost` on port `7687`
+[source, javascript]
 ----
-let URI = 'neo4j://example.com'
+let URI = 'neo4j://example.com:9999'
 let addresses = [
-  'a.example.com:7575',
-  'b.example.com:7676',
-  'c.example.com:8787'
+  'localhost:7687'
 ]
 let driver = neo4j.driver(URI, neo4j.auth.basic(USER, PASSWORD), {
   resolver: address => addresses

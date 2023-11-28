@@ -223,7 +223,7 @@ You can execute a query under the security context of a different user with the 
 For this to work, the user under which the `Driver` was created needs to have the link:{neo4j-docs-base-uri}/cypher-manual/current/administration/access-control/dbms-administration#access-control-dbms-administration-impersonation[appropriate permissions].
 Impersonating a user is cheaper than creating a new `Driver` object.
 
-[source, python, role=test-skip]
+[source, python, test-skip]
 ----
 driver.execute_query(
     "MATCH (p:Person) RETURN p.name",

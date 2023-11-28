@@ -58,7 +58,7 @@ The file has a name of the form `Neo4j-a0a2fa1d-Created-2023-11-06.txt`.
 To connect to such an instance, you may either use the URI, username, and password explicitly in your application, or load the content of the connection file in the environment with `godotenv.Load()` and populate your local variables via `os.Getenv()`.
 This approach requires the package link:https://pkg.go.dev/github.com/joho/godotenv[`godotenv`].
 
-[source, go, role=test-skip]
+[source, go]
 ----
 package main
 
