@@ -41,7 +41,7 @@ Both methods take a _transaction function_ callback, which is responsible for ac
 def match_person_nodes(tx, name_filter): # <3>
     result = tx.run(""" // <4>
         MATCH (p:Person) WHERE p.name STARTS WITH $filter
-        RETURN p.name as name ORDER BY name
+        RETURN p.name AS name ORDER BY name
         """, filter=name_filter)
     return list(result)  # return a list of Record objects # <5>
 
@@ -83,7 +83,7 @@ def main():
     with GraphDatabase.driver(URI, auth=AUTH) as driver:
         with driver.session(database="neo4j") as session:
             for i in range(100):
-                name = "Thor"+str(i)
+                name = f"Thor{i}"
                 org_id = session.execute_write(employ_person_tx, name)
                 print(f"User {name} added to organization {org_id}")
 

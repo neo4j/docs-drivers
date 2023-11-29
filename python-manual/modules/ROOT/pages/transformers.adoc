@@ -43,7 +43,7 @@ This method is only available if the `pandas` library is installed.
 import neo4j
 
 pandas_df = driver.execute_query(
-    "UNWIND range(1, 10) AS n RETURN n, n+1 as m",
+    "UNWIND range(1, 10) AS n RETURN n, n+1 AS m",
     database_="neo4j",
     result_transformer_=neo4j.Result.to_df
 )
