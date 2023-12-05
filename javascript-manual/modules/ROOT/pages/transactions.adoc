@@ -45,7 +45,7 @@ try {
   let result = await session.executeRead(async tx => { // <2>
     return await tx.run(`  // <3>
       MATCH (p:Person) WHERE p.name STARTS WITH $filter
-      RETURN p.name as name ORDER BY name
+      RETURN p.name AS name ORDER BY name
       `, {filter: 'Al'}
     )
   })

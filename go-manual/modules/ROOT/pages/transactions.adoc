@@ -47,7 +47,7 @@ people, err := session.ExecuteRead(ctx,  // <2>
     func(tx neo4j.ManagedTransaction) (any, error) {  // <3>
         result, err := tx.Run(ctx, `  // <4>
             MATCH (p:Person) WHERE p.name STARTS WITH $filter
-            RETURN p.name as name ORDER BY name
+            RETURN p.name AS name ORDER BY name
             `, map[string]any{
                 "filter": "Al",
             })
