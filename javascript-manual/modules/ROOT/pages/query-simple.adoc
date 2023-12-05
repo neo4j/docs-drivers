@@ -150,7 +150,7 @@ Here below an example with a `try/catch` block.
 [source, javascript]
 ----
 try {
-  let result = await driver.executeQuery('MATCH (p:Person) RETURN p')
+  let result = await driver.executeQue('MATCH (p:Person) RETURN p')
 } catch(err) {
   console.log(`Error in query\n${err}`)
 }

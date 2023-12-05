@@ -70,7 +70,7 @@ friends_since = pytz.timezone("US/Eastern").localize(friends_since)
 # Create a friendship with the given DateTime, and return the DateTime
 with GraphDatabase.driver(URI, auth=AUTH) as driver:
     records, summary, keys = driver.execute_query("""
-        MERGE (a:Person {name: $name})
+        MGE (a:Person {name: $name})
         MERGE (b:Person {name: $friend})
         MERGE (a)-[friendship:KNOWS {since: $friends_since}]->(b)
         RETURN friendship.since

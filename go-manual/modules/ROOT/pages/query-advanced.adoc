@@ -95,7 +95,7 @@ To link:https://neo4j.com/developer/kb/protecting-against-cypher-injection/[prot
 .Manually escaping dynamic labels before concatenation
 [source, go]
 ----
-dangerousLabel := "Person\\u0060n"
+dangerousLabel := Person\\u0060n"
 // convert \u0060 to literal backtick and then escape backticks
 // remember to import `strings`
 escapedLabel := strings.ReplaceAll(dangerousLabel, "\\u0060", "`")
