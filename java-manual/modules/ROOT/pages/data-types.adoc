@@ -1,0 +1,449 @@
+= Data types and mapping to Cypher types
+
+The tables in this section show the mapping between Cypher data types and Python types.
+
+== Core types
+
+[options="header"]
+|===
+| Cypher Type   | Python Type
+| <<NULL>>      | `None`
+| `LIST`        | `list`
+| `MAP`         | `dict`
+| `BOOLEAN`     | `bool`
+| `INTEGER`     | `int`
+| `FLOAT`       | `float`
+| `STRING`      | `str`
+| `ByteArray`   | `bytearray`
+|===
+
+For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#core-data-types[API documentation -- Core data types].
+
+
+== Temporal types
+
+Temporal data types are implemented by the `neo4j.time` module.
+It provides a set of types compliant with ISO-8601 and Cypher, which are similar to those found in Python's native `datetime` module.
+To convert between driver and native types, use the methods `.from_native()` and `.to_native()` (does not apply to `Duration`).
+
+Sub-second values are measured to nanosecond precision and the types are mostly compatible with link:https://pypi.org/project/pytz/[pytz].
+Some timezones (e.g., `pytz.utc`) work exclusively with the built-in `datetime.datetime`.
+
+For a list of time zone abbreviations, see link:https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List[List of tz database time zones].
+
+[options="header"]
+|===
+| Cypher Type      | Python Type
+| `DATE`           | `neo4j.time.Date`
+| `ZONED TIME`     | `neo4j.time.Time`†
+| `LOCAL TIME`     | `neo4j.time.Time`††
+| `ZONED DATETIME` | `neo4j.time.DateTime`†
+| `LOCAL DATETIME` | `neo4j.time.DateTime`††
+| `DURATION`       | `neo4j.time.Duration`
+|===
+
+† Where `tzinfo` is not `None`. +
+†† Where `tzinfo` is `None`.
+
+.How to use temporal types in queries
+[source, python]
+----
+from datetime import datetime
+import pytz
+from neo4j import GraphDatabase
+from neo4j.time import DateTime
+
+
+URI = "<URI for Neo4j database>"
+AUTH = ("<Username>", "<Password>")
+
+
+friends_since = DateTime(year=1999, month=11, day=23,
+                         hour=7, minute=47, nanosecond=4123)
+friends_since = pytz.timezone("US/Eastern").localize(friends_since)
+
+# Python's native datetimes work as well.
+# They don't support the full feature-set of Neo4j's type though.
+# py_friends_since = datetime(year=1999, month=11, day=23, hour=7, minute=47)
+# py_friends_since = pytz.timezone("US/Eastern").localize(py_friends_since)
+
+# Create a friendship with the given DateTime, and return the DateTime
+with GraphDatabase.driver(URI, auth=AUTH) as driver:
+    records, summary, keys = driver.execute_query("""
+        MERGE (a:Person {name: $name})
+        MERGE (b:Person {name: $friend})
+        MERGE (a)-[friendship:KNOWS {since: $friends_since}]->(b)
+        RETURN friendship.since
+        """, name="Alice", friend="Bob",
+        friends_since=friends_since  # or friends_since=py_friends_since
+    )
+    out_datetime = records[0]["friendship.since"]
+    print(out_datetime)  # 1999-11-23T07:47:00.000004123-05:00
+
+    # Converting DateTime to native datetime (lossy)
+    py_out_datetime = out_datetime.to_native()  # type: datetime
+    print(py_out_datetime)  # 1999-11-23 07:47:00.000004-05:00
+----
+
+For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#temporal-data-types[API documentation -- Temporal data types].
+
+
+=== `Date`
+
+Represents an instant capturing the date, but not the time, nor the timezone.
+
+[source, python]
+----
+from neo4j.time import Date
+
+d = Date(year=2021, month=11, day=2)
+print(d)  # '2021-11-02'
+----
+
+For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/types/temporal.html#date[API documentation -- Temporal data types -- Date].
+
+
+=== `Time`
+
+Represents an instant capturing the time, and the timezone offset in seconds, but not the date.
+
+[source, python]
+----
+from neo4j.time import Time
+import pytz
+
+t = Time(hour=7, minute=47, nanosecond=4123, tzinfo=pytz.FixedOffset(-240))
+print(t)  # '07:47:00.000004123-04:00'
+----
+
+For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/types/temporal.html#time[API documentation -- Temporal data types -- Time].
+
+
+=== `LocalTime`
+
+Represents an instant capturing the time of day, but not the date, nor the timezone.
+
+[source, python]
+----
+from neo4j.time import Time
+
+t = Time(hour=7, minute=47, nanosecond=4123)
+print(t)  # '07:47:00.000004123'
+----
+
+For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/types/temporal.html#time[API documentation -- Temporal data types -- Time].
+
+
+=== `DateTime`
+
+Represents an instant capturing the date, the time, and the timezone identifier.
+
+[source, python]
+----
+from neo4j.time import DateTime
+import pytz
+
+dt = DateTime(year=2021, month=11, day=2, hour=7, minute=47, nanosecond=4123)
+dt = pytz.timezone("US/Eastern").localize(dt)  # time zone localization (optional)
+print(dt)  # '2021-11-02T07:47:00.000004123-04:00'
+----
+
+For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/types/temporal.html#datetime[API documentation -- Temporal data types -- DateTime].
+
+
+=== `LocalDateTime`
+
+Represents an instant capturing the date and the time, but not the timezone.
+
+[source, python]
+----
+from neo4j.time import DateTime
+
+dt = DateTime(year=2021, month=11, day=2, hour=7, minute=47, nanosecond=4123)
+print(dt)  # '2021-11-02T07:47:00.000004123'
+----
+
+For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/types/temporal.html#datetime[API documentation -- Temporal data types -- DateTime].
+
+
+=== `Duration`
+
+Represents the difference between two points in time.
+A `datetime.timedelta` object passed as a parameter will always be implicitly converted to `neo4j.time.Duration`.
+It is not possible to convert from `neo4j.time.Duration` to `datetime.timedelta` (because `datetime.timedelta` lacks month support).
+
+[source, python]
+----
+from neo4j.time import Duration
+
+duration = Duration(years=1, days=2, seconds=3, nanoseconds=4)
+print(duration)  # 'P1Y2DT3.000000004S'
+----
+
+For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/types/temporal.html#duration[API documentation -- Temporal data types -- Duration].
+
+
+== Spatial types
+
+Cypher supports spatial values (points), and Neo4j can store these point values as properties on nodes and relationships.
+
+The object attribute `srid` (short for _Spatial Reference Identifier_) is a number identifying the coordinate system the spatial type is to be interpreted in.
+You can think of it as a unique identifier for each spatial type.
+
+[options="header"]
+|===
+| Cypher Type         | Python Type
+| `POINT`             | `neo4j.spatial.Point`
+| `POINT (Cartesian)` | `neo4j.spatial.CartesianPoint`
+| `POINT (WGS-84)`    | `neo4j.spatial.WGS84Point`
+|===
+
+For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/types/spatial.html[API documentation -- Spatial types].
+
+=== `CartesianPoint`
+
+Represents a point in 2D/3D Cartesian space. +
+Exposes properties `x`, `y`, `z` (the latter for 3D points only).
+
+[source, python]
+----
+from neo4j.spatial import CartesianPoint
+
+# A 2D CartesianPoint
+point = CartesianPoint((1.23, 4.56))
+print(point.x, point.y, point.srid)
+# 1.23 4.56 7203
+
+# A 3D CartesianPoint
+point = CartesianPoint((1.23, 4.56, 7.89))
+print(point.x, point.y, point.z, point.srid)
+# 1.23 4.56 7.8 9157
+----
+
+For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/types/spatial.html#cartesianpoint[API documentation -- Spatial types -- CartesianPoint].
+
+=== `WGS84Point`
+
+Represents a point in the World Geodetic System (WGS84). +
+Exposes properties `longitude`, `latitude`, `height` (the latter for 3D points only), which are aliases for `x`, `y`, `z`.
+
+[source, python]
+----
+from neo4j.spatial import WGS84Point
+
+# A 2D WGS84Point
+point = WGS84Point((1.23, 4.56))
+print(point.longitude, point.latitude, point.srid)
+# or print(point.x, point.y, point.srid)
+# 1.23 4.56 4326
+
+# A 3D WGS84Point
+point = WGS84Point((1.23, 4.56, 7.89))
+print(point.longitude, point.latitude, point.height, point.srid)
+# or print(point.x, point.y, point.z, point.srid)
+# 1.23 4.56 7.89 4979
+----
+
+For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/types/spatial.html#wgs84point[API documentation -- Spatial types -- WSG84Point].
+
+
+== Graph types
+
+*Graph types are only passed as results and may not be used as parameters*.
+The section xref:transformers#_transform_to_graph[Manipulate query results -- Transform to graph] contains an example with graph types.
+
+[options="header"]
+|===
+| Cypher Type    | Python Type
+| `NODE`         | `neo4j.graph.Node`
+| `RELATIONSHIP` | `neo4j.graph.Relationship`
+| `PATH`         | `neo4j.graph.Path`
+|===
+
+For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#graph-data-types[API documentation -- Graph types].
+
+
+=== `Node`
+Represents a node in a graph. +
+The property `element_id` provides an identifier for the entity.
+This should be used with care, as no guarantees are given about the mapping between id values and elements outside the scope of a single transaction. In other words, using an `element_id` to `MATCH` an element across different transactions is risky.
+
+[source, python]
+----
+from neo4j import GraphDatabase
+
+
+URI = "<URI for Neo4j database>"
+AUTH = ("<Username>", "<Password>")
+
+with GraphDatabase.driver(URI, auth=AUTH) as driver:
+    records, _, _ = driver.execute_query(
+        "MERGE (p:Person {name: $name}) RETURN p AS person",
+        name="Alice",
+        database_="neo4j",
+    )
+    for record in records:
+        node = record["person"]
+        print(f"Node ID: {node.element_id}\n"
+              f"Labels: {node.labels}\n"
+              f"Properties: {node.items()}\n"
+        )
+
+# Node ID: 4:73e9a61b-b501-476d-ad6f-8d7edf459251:0
+# Labels: frozenset({'Person'})
+# Properties: dict_items([('name', 'Alice')])
+----
+
+For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.graph.Node[API documentation -- Graph types -- Node].
+
+
+=== `Relationship`
+
+Represents a relationship in a graph. +
+The property `element_id` provides an identifier for the entity.
+This should be used with care, as no guarantees are given about the mapping between id values and elements outside the scope of a single transaction.
+
+[source, python]
+----
+from neo4j import GraphDatabase
+
+
+URI = "<URI for Neo4j database>"
+AUTH = ("<Username>", "<Password>")
+
+with GraphDatabase.driver(URI, auth=AUTH) as driver:
+    records, _, _ = driver.execute_query("""
+        MERGE (p:Person {name: $name})
+        MERGE (p)-[r:KNOWS {status: $status, since: date()}]->(friend:Person {name: $friend_name})
+        RETURN r AS friendship
+        """, name="Alice", status="BFF", friend_name="Bob",
+    )
+    for record in records:
+        relationship = record["friendship"]
+        print(f"Relationship ID: {relationship.element_id}\n"
+              f"Start node: {relationship.start_node}\n"
+              f"End node: {relationship.end_node}\n"
+              f"Type: {relationship.type}\n"
+              f"Friends since: {relationship.get('since')}\n"
+              f"All properties: {relationship.items()}\n"
+        )
+
+# Relationship ID: 5:73e9a61b-b501-476d-ad6f-8d7edf459251:1
+# Start node: <Node element_id='4:73e9a61b-b501-476d-ad6f-8d7edf459251:0' labels=frozenset({'Person'}) properties={'name': 'Alice'}>
+# End node: <Node element_id='4:73e9a61b-b501-476d-ad6f-8d7edf459251:2' labels=frozenset({'Person'}) properties={'name': 'Bob'}>
+# Type: KNOWS
+# Friends since: 2022-11-07
+# All properties: dict_items([('since', neo4j.time.Date(2022, 11, 7)), ('status', 'BFF')])
+----
+
+For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.graph.Relationship[API documentation -- Graph types -- Relationship].
+
+
+=== `Path`
+
+Represents a path in a graph.
+
+[source, python]
+----
+from neo4j import GraphDatabase
+from neo4j.time import Date
+
+
+URI = "<URI for Neo4j database>"
+AUTH = ("<Username>", "<Password>")
+
+def add_friend(driver, name, status, date, friend_name):
+    driver.execute_query("""
+        MERGE (p:Person {name: $name})
+        MERGE (p)-[r:KNOWS {status: $status, since: $date}]->(friend:Person {name: $friend_name})
+        """, name=name, status=status, date=date, friend_name=friend_name,
+        database_="neo4j",
+    )
+
+with GraphDatabase.driver(URI, auth=AUTH) as driver:
+    # Create some :Person nodes linked by :KNOWS relationships
+    add_friend(driver, name="Alice", status="BFF", date=Date.today(), friend_name="Bob")
+    add_friend(driver, name="Bob", status="Fiends", date=Date.today(), friend_name="Sofia")
+    add_friend(driver, name="Sofia", status="Acquaintances", date=Date.today(), friend_name="Sofia")
+
+    # Follow :KNOWS relationships outgoing from Alice three times, return as path
+    records, _, _ = driver.execute_query("""
+        MATCH path=(:Person {name: $name})-[:KNOWS*3]->(:Person)
+        RETURN path AS friendship_chain
+        """, name="Alice",
+        database_="neo4j",
+    )
+    path = records[0]["friendship_chain"]
+
+    print("-- Path breakdown --")
+    for friendship in path:
+        print("{name} is friends with {friend} ({status})".format(
+            name=friendship.start_node.get("name"),
+            friend=friendship.end_node.get("name"),
+            status=friendship.get("status"),
+        ))
+
+----
+
+For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.graph.Path[API documentation -- Graph types -- Path].
+
+
+== Extended types
+
+The driver supports more types as query parameters, which get automatically mapped to one of the xref:_core_types[core types]. Because of this conversion, and because the server does not know anything about the extended types, the driver will never return these types in results, but always their corresponding mapping.
+
+[options="header"]
+|===
+| Parameter Type     | Mapped Python Type
+| tuple              | `list`
+| bytearray          | `bytes`
+| numpy `ndarray`    | `list` (nested)
+| pandas `DataFrame` | `dict`
+| pandas `Series`    | `list`
+| pandas `Array`     | `list`
+|===
+
+
+In general, if you are unsure about the type conversion that would happen on a given parameter, you can test it as in the following example:
+
+[source, python]
+----
+import neo4j
+
+with neo4j.GraphDatabase.driver(URI, auth=AUTH) as driver:
+    type_in = ("foo", "bar")
+    records, _, _ = driver.execute_query("RETURN $x AS type_out", x=type_in)
+    type_out = records[0].get("type_out")
+    print(type(type_out))  # <class 'list'>
+    print(type_out)        # ['foo', 'bar']
+----
+
+
+== Exceptions
+
+The driver can raise a number of different exceptions.
+A full list is available in the link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#errors[API documentation].
+For a list of errors the server can return, see the link:{neo4j-docs-base-uri}/status-codes/{page-version}[Status code] page.
+
+.Root exception types
+[options="header", cols="<25m,<75a"]
+|===
+| Classification    | Description
+|Neo4jError         | Errors reported by the Neo4j server (e.g., wrong Cypher syntax, bad connection, wrong credentials, ...)
+
+|DriverError        | Errors reported by the driver (e.g., bad usage of parameters or transactions, improper handling of results, ...)
+|===
+
+Some server errors are marked as safe to retry without need to alter the original request.
+Examples of such errors are deadlocks and memory issues.
+All driver's exception types implement the method `.is_retryable()`, which gives insights into whether a further attempt might be successful.
+This is particular useful when running queries in xref:transactions#explicit-transactions[explicit transactions], to know if a failed query should be run again.
+
+
+ifndef::backend-pdf[]
+[discrete.glossary]
+== Glossary
+
+include::{common-partial}/glossary.adoc[]
+include::../partials/glossary.adoc[]
+endif::[]

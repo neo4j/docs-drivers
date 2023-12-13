@@ -1,0 +1,2 @@
+[[transaction_function]]transaction function:: A transaction function is a callback executed by an `executeRead` or `executeWrite` call. The driver automatically re-executes the callback in case of server failure.
+[[Driver]]Driver:: A link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Driver.html[`Driver`] object holds the details required to establish connections with a Neo4j database.

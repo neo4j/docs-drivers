@@ -1,10 +1,29 @@
-* xref:index.adoc[]
-* xref:get-started.adoc[]
-* xref:client-applications.adoc[]
-* xref:cypher-workflow.adoc[]
-* xref:session-api.adoc[]
-// ** xref:session-api/simple.adoc[Simple sessions]
-// ** xref:session-api/asynchronous.adoc[Asynchronous sessions]
-// ** xref:session-api/reactive.adoc[Reactive sessions]
-// ** xref:session-api/configuration.adoc[Session configuration]
-* xref:terminology.adoc[]
+* xref:index.adoc[Quickstart]
+
+* *Basic workflow*
+
+* xref:install.adoc[Installation]
+* xref:connect.adoc[Connect to the database]
+* xref:query-simple.adoc[Query the database]
+* xref:transformers.adoc[Manipulate query results]
+
+* *Advanced usage*
+
+* xref:transactions.adoc[Run your own transactions]
+* xref:result-summary.adoc[Explore the query execution summary]
+* xref:bookmarks.adoc[Coordinate parallel transactions]
+* xref:concurrency.adoc[Run concurrent transactions]
+* xref:query-advanced.adoc[Further query mechanisms]
+* xref:performance.adoc[Performance recommendations]
+
+* *Reference*
+
+* xref:connect-advanced.adoc[Advanced connection information]
+* xref:data-types.adoc[Data types and mapping to Cypher types]
+* link:https://neo4j.com/docs/api/python-driver/current/[API documentation, window=_blank]
+
+* *GraphAcademy courses*
+
+* link:https://graphacademy.neo4j.com/courses/modeling-fundamentals/?ref=docs-python[Graph Data Modeling Fundamentals]
+* link:https://graphacademy.neo4j.com/courses/cypher-intermediate-queries/?ref=docs-python[Intermediate Cypher Queries]
+* link:https://graphacademy.neo4j.com/courses/app-python/?ref=docs-python[Building Neo4j Applications with Python]
