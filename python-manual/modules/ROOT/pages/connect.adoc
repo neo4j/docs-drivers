@@ -21,7 +21,7 @@ with GraphDatabase.driver(URI, auth=AUTH) as driver: # <1>
 
 <1> Creating a `Driver` instance only provides information on _how_ to access the database, but does not actually _establish_ a connection.
 Connection is instead deferred to when the first query is executed.
-<2> To verify immediately that the driver can connect to the database (valid credentials, compatible versions, etc), use the `.VerifyConnectivity(ctx)` method after initializing the driver.
+<2> To verify immediately that the driver can connect to the database (valid credentials, compatible versions, etc), use the `.verify_connectivity()` method after initializing the driver.
 
 Both the creation of a `Driver` object and the connection verification can raise a number of different link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#errors[exceptions].
 Since error handling can get quite verbose, and a connection error is a blocker for any subsequent task, the most common choice is to let the program crash should an exception occur during connection.
