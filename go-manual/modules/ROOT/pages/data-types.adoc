@@ -158,7 +158,7 @@ For full documentation, see link:https://pkg.go.dev/github.com/neo4j/neo4j-go-dr
 
 == Spatial types
 
-Cypher supports link:{neo4j-docs-base-uri}/docs/cypher-manual/current/values-and-types/spatial/[spatial values] (points), and Neo4j can store these point values as properties on nodes and relationships.
+Cypher supports link:{neo4j-docs-base-uri}/cypher-manual/current/values-and-types/spatial/[spatial values] (points), and Neo4j can store these point values as properties on nodes and relationships.
 
 The object attribute `SpatialRefId` (short for _Spatial Reference Identifier_) is a number identifying the coordinate system the spatial type is to be interpreted in.
 You can think of it as a unique identifier for each spatial type.
