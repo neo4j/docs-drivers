@@ -250,7 +250,7 @@ For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current
 == Graph types
 
 *Graph types are only passed as results and may not be used as parameters*.
-The section xref:transformers#_transform_to_graph[Manipulate query results -- Transform to graph] contains an example with graph types.
+The section Manipulate query results -- Transform to graph contains an example with graph types.
 
 [options="header"]
 |===
