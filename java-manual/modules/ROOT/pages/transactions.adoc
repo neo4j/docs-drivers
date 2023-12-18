@@ -1,8 +1,8 @@
 = Run your own transactions
 
-When xref:query-simple.adoc[querying the database with `execute_query()`], the driver automatically creates a _transaction_. A transaction is a unit of work that is either _committed_ in its entirety or _rolled back_ on failure. You can include multiple Cypher statements in a single query, as for example when using `MATCH` and `MERGE` in sequence to xref:query-simple#_update_the_database[update the database], but you cannot have multiple queries and interleave some client-logic in between them.
+When xref:query-simple.adoc[querying the database with `executableQuery()`], the driver automatically creates a _transaction_. A transaction is a unit of work that is either _committed_ in its entirety or _rolled back_ on failure. You can include multiple Cypher statements in a single query, as for example when using `MATCH` and `MERGE` in sequence to xref:query-simple#_update_the_database[update the database], but you cannot have multiple queries and interleave some client-logic in between them.
 
-For these more advanced use-cases, the driver provides functions to take full control over the transaction lifecycle. These are called _managed transactions_, and you can think of them as a way of unwrapping the flow of `execute_query()` and being able to specify its desired behavior in more places.
+For these more advanced use-cases, the driver provides functions to take full control over the transaction lifecycle. These are called _managed transactions_, and you can think of them as a way of unwrapping the flow of `executableQuery()` and being able to specify its desired behavior in more places.
 
 
 == Create a session
@@ -10,12 +10,15 @@ For these more advanced use-cases, the driver provides functions to take full co
 Before running a transaction, you need to obtain a _session_.
 Sessions act as concrete query channels between the driver and the server, and ensure <<causal consistency>> is enforced.
 
-Sessions are created with the method link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#session[`Driver.session()`], with the keyword argument `database` allowing to specify the xref:_database_selection[target database].
-For further parameters, see xref:_session_configuration[Session configuration].
+Sessions are created with the method link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Driver.html#session()[`Driver.session()`].
+Use the optional argument to alter the session's configuration, among which for example the xref:_database_selection[target database].
+For further configuration parameters, see xref:_session_configuration[Session configuration].
 
-[source, python]
+[source, java]
 ----
-with driver.session(database="neo4j") as session:
+// import org.neo4j.driver.SessionConfig
+
+try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
     ...
 ----
 
@@ -32,109 +35,148 @@ A transaction can contain any number of queries.
 As Neo4j is <<ACID>> compliant, *queries within a transaction will either be executed as a whole or not at all*: you cannot get a part of the transaction succeeding and another failing.
 Use transactions to group together related queries which work together to achieve a single _logical_ database operation.
 
-A managed transaction is created with the methods link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Session.execute_read[`Session.execute_read()`] and link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Session.execute_write[`Session.execute_write()`], depending on whether you want to retrieve data from the database or alter it.
+A managed transaction is created with the methods `Session.executeRead()` and `Session.executeWrite()`, depending on whether you want to retrieve data from the database or alter it.
 Both methods take a _transaction function_ callback, which is responsible for actually carrying out the queries and processing the result.
 
 .Retrieve people whose name starts with `Al`.
-[source, python]
+[source, java]
 ----
-def match_person_nodes(tx, name_filter): # <3>
-    result = tx.run(""" // <4>
-        MATCH (p:Person) WHERE p.name STARTS WITH $filter
+// import java.util.Map
+// import org.neo4j.driver.SessionConfig
+
+try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {  // <1>
+    var people = session.executeRead(tx -> {  // <2>
+        var result = tx.run("""
+        MATCH (p:Person) WHERE p.name STARTS WITH $filter  // <3>
         RETURN p.name AS name ORDER BY name
-        """, filter=name_filter)
-    return list(result)  # return a list of Record objects # <5>
-
-with driver.session(database="neo4j") as session:  # <1>
-    people = session.execute_read(  # <2>
-        match_person_nodes,
-        "Al",
-    )
-    for person in people:
-        print(person.data())  # obtain dict representation
+        """, Map.of("filter", "Al"));
+        return result.list();  // return a list of Record objects # <4>
+    });
+    people.forEach(person -> {
+        System.out.println(person);
+    });
+}
 ----
 
-<1> Create a session. A single session can be the container for multiple queries. Unless created using the `with` construct, remember to close it when done.
-<2> The `.execute_read()` (or `.execute_write()`) method is the entry point into a transaction. It takes a callback to a _transaction function_ and an arbitrary number of positional and keyword arguments which are handed down to the transaction function.
-<3> The transaction function callback is responsible of running queries.
-<4> Use the method link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Transaction.run[`Transaction.run()`] to run queries. Each query run returns a link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Result[`Result`] object.
-<5> xref:process-result[Process the result] using any of the methods on `Result`.
-
+<1> Create a session. A single session can be the container for multiple queries. Unless created as a resource using the `try` construct, remember to close it when done.
+<2> The `.executeRead()` (or `.executeWrite()`) method is the entry point into a transaction. It takes a callback to a _transaction function_, which is responsible of running queries.
+<3> Use the method link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/SimpleQueryRunner.html#run(java.lang.String,java.util.Map)[`tx.run()`] to execute queries. You can provide a map of query parameters as second argument. Each query run returns a link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Result.html[`Result`] object.
+<4> xref:process-result[Process the result] using any of the methods on `Result`. The method `.list()` retrieves all records into a list.
 
 *Do not hardcode or concatenate parameters directly into the query*.
 Use xref:query-simple#query-parameters[query parameters] instead, both for performance and security reasons.
 
 *Transaction functions should never return the `Result` object directly*.
-Instead, always xref:process-result[process the result] in some way; at minimum, cast it to list.
+Instead, always xref:process-result[process the result] in some way.
 Within a transaction function, a `return` statement results in the transaction being committed, while the transaction is automatically rolled back if an exception is raised.
 
 .A transaction with multiple queries, client logic, and potential roll backs
-[source, python]
+[source, java]
 ----
-from neo4j import GraphDatabase
+package demo;
 
+import java.util.Map;
+import java.util.List;
+import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
 
-URI = "<URI for Neo4j database>"
-AUTH = ("<Username>", "<Password>")
-employee_threshold=10
+import org.neo4j.driver.AuthTokens;
+import org.neo4j.driver.GraphDatabase;
+import org.neo4j.driver.QueryConfig;
+import org.neo4j.driver.Record;
+import org.neo4j.driver.RoutingControl;
+import org.neo4j.driver.SessionConfig;
+import org.neo4j.driver.TransactionContext;
+import org.neo4j.driver.exceptions.NoSuchRecordException;
 
+public class App {
 
-def main():
-    with GraphDatabase.driver(URI, auth=AUTH) as driver:
-        with driver.session(database="neo4j") as session:
-            for i in range(100):
-                name = f"Thor{i}"
-                org_id = session.execute_write(employ_person_tx, name)
-                print(f"User {name} added to organization {org_id}")
+    private static final String URI = "neo4j://localhost";
+    private static final String USER = "neo4j";
+    private static final String PASSWORD = "verysecret";
+    private static final int employeeThreshold = 10;
 
+    // Create & employ 100 people to 10 different organizations
+    public static void main(String... args) {
+        try (var driver = GraphDatabase.driver(URI, AuthTokens.basic(USER, PASSWORD))) {
+            try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
+                for (int i=0; i<100; i++) {
+                    String name = String.format("Thor%d", i);
 
-def employ_person_tx(tx, name):
-    # Create new Person node with given name, if not exists already
-    result = tx.run("""
-        MERGE (p:Person {name: $name})
-        RETURN p.name AS name
-        """, name=name
-    )
+                    try {
+                        String orgId = session.executeWrite(tx -> employPersonTx(tx, name));
+                        System.out.printf("User %s added to organization %s.\n", name, orgId);
+                    } catch (Exception e) {
+                        System.out.println(e.getMessage());
+                    }
+                }
+            }
+        }
+    }
 
-    # Obtain most recent organization ID and the number of people linked to it
-    result = tx.run("""
-        MATCH (o:Organization)
-        RETURN o.id AS id, COUNT{(p:Person)-[r:WORKS_FOR]->(o)} AS employees_n
-        ORDER BY o.created_date DESC
-        LIMIT 1
-    """)
-    org = result.single()
+    static String employPersonTx(TransactionContext tx, String name) {
+        // Create new Person node with given name, if not exists already
+        tx.run("MERGE (p:Person {name: $name})", Map.of("name", name));
 
-    if org is not None and org["employees_n"] == 0:
-        raise Exception("Most recent organization is empty.")
-        # Transaction will roll back -> not even Person is created!
+        // Obtain most recent organization ID and the number of people linked to it
+        var result = tx.run("""
+            MATCH (o:Organization)
+            RETURN o.id AS id, COUNT{(p:Person)-[r:WORKS_FOR]->(o)} AS employeesN
+            ORDER BY o.createdDate DESC
+            LIMIT 1
+            """);
 
-    # If org does not have too many employees, add this Person to that
-    if org is not None and org.get("employees_n") < employee_threshold:
-        result = tx.run("""
-            MATCH (o:Organization {id: $org_id})
-            MATCH (p:Person {name: $name})
-            MERGE (p)-[r:WORKS_FOR]->(o)
-            RETURN $org_id AS id
-            """, org_id=org["id"], name=name
-        )
+        Record org = null;
+        String orgId = null;
+        int employeesN = 0;
+        try {
+            org = result.single();
+            orgId = org.get("id").asString();
+            employeesN = org.get("employeesN").asInt();
+        } catch (NoSuchRecordException e) {
+            // The query is guaranteed to return <= 1 results, so if.single() throws, it means there's none.
+            // If no organization exists, create one and add Person to it
+            orgId = createOrganization(tx);
+            System.out.printf("No orgs available, created %s.\n", orgId);
+        }
 
-    # Otherwise, create a new Organization and link Person to it
-    else:
-        result = tx.run("""
-            MATCH (p:Person {name: $name})
-            CREATE (o:Organization {id: randomuuid(), created_date: datetime()})
-            MERGE (p)-[r:WORKS_FOR]->(o)
+        // If org does not have too many employees, add this Person to it
+        if (employeesN < employeeThreshold) {
+            addPersonToOrganization(tx, name, orgId);
+            // If the above throws, the transaction will roll back
+            // -> not even Person is created!
+
+        // Otherwise, create a new Organization and link Person to it
+        } else {
+            orgId = createOrganization(tx);
+            System.out.printf("Latest org is full, created %s.\n", orgId);
+            addPersonToOrganization(tx, name, orgId);
+            // If any of the above throws, the transaction will roll back
+            // -> not even Person is created!
+        }
+
+        return orgId;  // Organization ID to which the new Person ends up in
+    }
+
+    static String createOrganization(TransactionContext tx) {
+        var result = tx.run("""
+            CREATE (o:Organization {id: randomuuid(), createdDate: datetime()})
             RETURN o.id AS id
-            """, name=name
-        )
+        """);
+        var org = result.single();
+        var orgId = org.get("id").asString();
+        return orgId;
+    }
 
-    # Return the Organization ID to which the new Person ends up in
-    return result.single()["id"]
-
-
-if __name__ == "__main__":
-    main()
+    static void addPersonToOrganization(TransactionContext tx, String personName, String orgId) {
+        tx.run("""
+            MATCH (o:Organization {id: $orgId})
+            MATCH (p:Person {name: $name})
+            MERGE (p)-[:WORKS_FOR]->(o)
+            """, Map.of("orgId", orgId, "name", personName)
+        );
+    }
+}
 ----
 
 Should a transaction fail for a reason that the driver deems transient, it automatically retries to run the transaction function (with an exponentially increasing delay).
@@ -146,143 +188,131 @@ A session can chain multiple transactions, but *only one single transaction can 
 To maintain multiple concurrent transactions, use multiple concurrent sessions.
 
 
-[#unit_of_work-decorator]
-=== Transaction function configuration
-
-The decorator link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.unit_of_work[`unit_of_work()`] allows to exert further control on transaction functions.
-It allows to specify:
-
-- a transaction timeout (in seconds).
-Transactions that run longer will be terminated by the server.
-The default value is set on the server side.
-The minimum value is one millisecond (`0.001`).
-- a dictionary of metadata that gets attached to the transaction.
-These metadata get logged in the server `query.log`, and are visible in the output of the `SHOW TRANSACTIONS` Cypher command.
-Use this to tag transactions.
-
-[source, python]
-----
-from neo4j import unit_of_work
-
-@unit_of_work(timeout=5, metadata={"app_name": "people_tracker"})
-def count_people(tx):
-    result = tx.run("MATCH (a:Person) RETURN count(a) AS people")
-    record = result.single()
-    return record["people"]
-
-
-with driver.session(database="neo4j") as session:
-    people_n = session.execute_read(count_people)
-----
-
-
 [#explicit-transactions]
 == Run an explicit transaction
 
-You can achieve full control over transactions by manually beginning one with the method link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Session.begin_transaction[`Session.begin_transaction()`].
-You run queries inside an explicit transaction with the method link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Transaction.run[`Transaction.run()`].
+You can achieve full control over transactions by manually beginning one with the method `Session.beginTransaction()`, which returns a link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Transaction.html[`Transaction`] object.
+You may then run queries inside an explicit transaction with the method `Transaction.run()`.
 
-[source, python]
+[source, java]
 ----
-with driver.session(database="neo4j") as session:
-    with session.begin_transaction() as tx:
-        # use tx.run() to run queries
-        tx.run("<QUERY 1>")
-        tx.run("<QUERY 2>")
+try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
+    try (Transaction tx = session.beginTransaction()) {
+        // use tx.run() to run queries
+        //     tx.commit() to commit the transaction
+        //     tx.rollback() to rollback the transaction
+    }
+}
 ----
 
-Closing an explicit transaction can either happen automatically at the end of a `with` block, or can be explicitly controlled through the methods link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Transaction.commit[`Transaction.commit()`], link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Transaction.rollback[`Transaction.rollback()`], or link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Transaction.close[`Transaction.close()`].
+An explicit transaction behaves as follows:
+
+- it gets committed automatically upon successful return, or manually through the method  link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Transaction.html#commit()[`Transaction.commit()`]
+- it gets rolled back automatically should an exception be raised, or manually through the method  link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Transaction.html#rollback[`Transaction.rollback()`].
 
 Explicit transactions are most useful for applications that need to distribute Cypher execution across multiple functions for the same transaction, or for applications that need to run multiple queries within a single transaction but without the automatic retries provided by managed transactions.
 
-[source, python]
+.An explicit transaction example involving an external API
+[source, java]
 ----
-import neo4j
+package demo;
 
+import java.util.Map;
+import java.util.List;
+import java.util.Arrays;
 
-URI = "<URI for Neo4j database>"
-AUTH = ("<Username>", "<Password>")
+import org.neo4j.driver.AuthTokens;
+import org.neo4j.driver.Driver;
+import org.neo4j.driver.GraphDatabase;
+import org.neo4j.driver.QueryConfig;
+import org.neo4j.driver.Record;
+import org.neo4j.driver.SessionConfig;
+import org.neo4j.driver.Transaction;
 
+public class App {
 
-def main():
-    with neo4j.GraphDatabase.driver(URI, auth=AUTH) as driver:
-        customer_id = create_customer(driver)
-        other_bank_id = 42
-        transfer_to_other_bank(driver, customer_id, other_bank_id, 999)
+    private static final String URI = "neo4j://localhost";
+    private static final String USER = "neo4j";
+    private static final String PASSWORD = "verysecret";
 
+    public static void main(String... args) {
+        try (var driver = GraphDatabase.driver(URI, AuthTokens.basic(USER, PASSWORD))) {
+            String customerId = createCustomer(driver);
+            int otherBankId = 42;
+            transferToOtherBank(driver, customerId, otherBankId, 999);
+        }
+    }
 
-def create_customer(driver):
-    result, _, _ = driver.execute_query("""
-        MERGE (c:Customer {id: rand()})
-        RETURN c.id AS id
-    """, database_ = "neo4j")
-    return result[0]["id"]
+    static String createCustomer(Driver driver) {
+        var result = driver.executableQuery("""
+            MERGE (c:Customer {id: randomUUID(), balance: 1000})
+            RETURN c.id AS id
+            """)
+            .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+            .execute();
+        return result.records().get(0).get("id").asString();
+    }
 
+    static void transferToOtherBank(Driver driver, String customerId, int otherBankId, float amount) {
+        try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
+            try (var tx = session.beginTransaction()) {
+                if (! customerBalanceCheck(tx, customerId, amount)) {
+                    System.out.printf("Customer %s doesn't have enough funds.\n", customerId);
+                    return;  // give up
+                }
 
-def transfer_to_other_bank(driver, customer_id, other_bank_id, amount):
-    with driver.session(database="neo4j") as session:
-        tx = session.begin_transaction()
-        # or just use a `with` context on `tx` instead of try/finally
-        try:
-            if not customer_balance_check(tx, customer_id, amount):
-                # give up
-                return
+                otherBankTransferApi(customerId, otherBankId, amount);
+                // Now the money has been transferred => can't rollback anymore
+                // (cannot rollback external services interactions)
 
-            other_bank_transfer_api(customer_id, other_bank_id, amount)
-            # Now the money has been transferred => can't rollback anymore
-            # (cannot rollback external services interactions)
+                try {
+                    decreaseCustomerBalance(tx, customerId, amount);
+                    tx.commit();
+                    System.out.printf("Transferred %f to %s.\n", amount, customerId);
+                } catch (Exception e) {
+                    requestInspection(customerId, otherBankId, amount, e);
+                    throw new RuntimeException(e.getMessage());
+                } finally {
+                    tx.close();  // rolls back if not yet committed
+                    // when?
+                }
+            }
+        }
+    }
 
-            try:
-                decrease_customer_balance(tx, customer_id, amount)
-                tx.commit()
-            except Exception as e:
-                request_inspection(customer_id, other_bank_id, amount, e)
-                raise  # roll back
-        finally:
-            tx.close()  # rolls back if not yet committed
+    static boolean customerBalanceCheck(Transaction tx, String customerId, float amount) {
+        var result = tx.run("""
+            MATCH (c:Customer {id: $id})
+            RETURN c.balance >= $amount AS sufficient
+            """, Map.of("id", customerId, "amount", amount));
+        var record = result.single();
+        return record.get("sufficient").asBoolean();
+    }
 
+    static void otherBankTransferApi(String customerId, int otherBankId, float amount) {
+        // make some API call to other bank
+    }
 
-def customer_balance_check(tx, customer_id, amount):
-    query = ("""
-        MATCH (c:Customer {id: $id})
-        RETURN c.balance >= $amount AS sufficient
-    """)
-    result = tx.run(query, id=customer_id, amount=amount)
-    record = result.single(strict=True)
-    return record["sufficient"]
+    static void decreaseCustomerBalance(Transaction tx, String customerId, float amount) {
+        tx.run("""
+            MATCH (c:Customer {id: $id})
+            SET c.balance = c.balance - $amount
+            """, Map.of("id", customerId, "amount", amount));
+    }
 
-
-def other_bank_transfer_api(customer_id, other_bank_id, amount):
-    # make some API call to other bank
-    pass
-
-
-def decrease_customer_balance(tx, customer_id, amount):
-    query = ("""
-        MATCH (c:Customer {id: $id})
-        SET c.balance = c.balance - $amount
-    """)
-    result = tx.run(query, id=customer_id, amount=amount)
-    result.consume()
-
-
-def request_inspection(customer_id, other_bank_id, amount, e):
-    # manual cleanup required; log this or similar
-    print("WARNING: transaction rolled back due to exception:", repr(e))
-    print("customer_id:", customer_id, "other_bank_id:", other_bank_id,
-          "amount:", amount)
-
-
-if __name__ == "__main__":
-    main()
+    static void requestInspection(String customerId, int otherBankId, float amount, Exception e) {
+        // manual cleanup required; log this or similar
+        System.out.printf("WARNING: transaction rolled back due to exception: %s", e.getMessage());
+        System.out.printf("customerId: %s, otherBankId: %d, amount: %f.", customerId, otherBankId, amount);
+    }
+}
 ----
 
 
 [[process-result]]
 == Process query results
 
-The driver's output of a query is a link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Result[`Result`] object, which does not directly contain the result records.
-Rather, it encapsulates the Cypher result in a rich data structure that requires some parsing on the client side.
+The driver's output of a query is a link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Result.html[`Result`] object, which encapsulates the Cypher result in a rich data structure that requires some parsing on the client side.
 
 When working with a `Result` object, there are two things to keep in mind:
 
@@ -294,61 +324,55 @@ When no more records are available, the result is _exhausted_.
 - *The result acts as a _cursor_*.
 This means that there is no way to retrieve a previous record from the stream, unless you saved it in an auxiliary data structure.
 
-**The easiest way of processing a result is by casting it to list**, which yields a list of link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Record[`Record`] objects.
+**The easiest way of processing a result is by calling `.list()` on it**, which yields a list of link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Record.html[`Record`] objects.
 Otherwise, a `Result` object implements a number of methods for processing records.
 The most commonly needed ones are listed below.
 
 // .An essential list of `Result` methods
 [cols="2,3"]
 |===
-|Name |Description
+|Method |Description
 
-|`value(key=0, default=None)`
+|`list() List<Record>`
 |Return the remainder of the result as a list.
-If `key` is specified, only the given property is included, while `default` allows to specify a value for nodes lacking that property.
 
-|`fetch(n)`
-|Return up to `n` records from the result.
-
-|`single(strict=False)`
-a|Return the next and only remaining record, or `None`.
+|`single() Record`
+a|Return the next and only remaining record.
 Calling this method always exhausts the result.
+If more (or less) than one record is available, a `NoSuchRecordException` is raised.
 
-If more (or less) than one record is available,
+|`next() Record`
+a|Return the next record in the result. Throws `NoSuchRecordException` if no further records are available.
 
-- `strict==False` -- a warning is generated and the first of these is returned (if any);
-- `strict==True` -- a `ResultNotSingleError` is raised.
+|`hasNext() boolean`
+|Whether the result iterator has a next record to move to.
 
-|`peek()`
-|Return the next record from the result without consuming it.
+|`peek() Record`
+|Return the next record from the result _without consuming it_.
 This leaves the record in the buffer for further processing.
 
-|`data(*keys)`
-|Return a JSON-like dump of the raw result.
-Only use it for debugging/prototyping purposes.
-
-|`consume()`
+|`consume() ResultSummary`
 |Return the query xref:result-summary.adoc[result summary].
 It exhausts the result, so should only be called when data processing is over.
 |===
 
-For a complete list of `Result` methods, see link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#result[API documentation -- Result].
+For a complete list of `Result` methods, see link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Result.html[API documentation -- Result].
 
 
 == Session configuration
 
 === Database selection
 
-It is recommended to *always specify the database explicitly* with the `database` parameter, even on single-database instances.
-This allows the driver to work more efficiently, as it does not have to resolve the home database first.
+It is recommended to *always specify the database explicitly* through the `.withDatabase("<dbName>")` method, even on single-database instances.
+This allows the driver to work more efficiently, as it saves a network round-trip to the server to resolve the home database.
 If no database is given, the link:{neo4j-docs-base-uri}/operations-manual/current/manage-databases/introduction#manage-databases-default[default database] set in the Neo4j instance settings is used.
 
-[source, python]
+[source, java]
 ----
-with driver.session(
-    database="neo4j"
-) as session:
-    ...
+// import org.neo4j.driver.SessionConfig;
+
+var session = driver.session(SessionConfig.builder()
+    .withDatabase("neo4j").build());  // mark-line
 ----
 
 Do not rely on the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/use/[`USE`] Cypher clause for database selection with the driver.
@@ -357,18 +381,18 @@ Do not rely on the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/use/
 === Request routing
 
 In a cluster environment, all sessions are opened in write mode, routing them to the leader.
-You can change this by explicitly setting the `default_access_mode` parameter to either `neo4j.READ_ACCESS` or `neo4j.WRITE_ACCESS`.
-Note that `.execute_read()` and `.execute_write()` automatically override the session's default access mode.
+You can change this by calling the method `.withRouting(RoutingControl.READ)`.
+Note that `.executeRead()` and `.executeWrite()` automatically override the session's default access mode.
 
-[source, python]
+[source, java]
 ----
-import neo4j
+// import org.neo4j.driver.SessionConfig;
+// import org.neo4j.driver.RoutingControl;
 
-with driver.session(
-    database="neo4j",
-    default_access_mode=neo4j.READ_ACCESS
-) as session:
-    ...
+var session = driver.session(SessionConfig.builder()
+    .withDatabase("neo4j")
+    .withRouting(RoutingControl.READ)  // mark-line
+    .build());
 ----
 
 [#access-control-note]
@@ -378,27 +402,62 @@ with driver.session(
 Although executing a _write_ query in read mode likely results in a runtime error, *you should not rely on this for access control.* The difference between the two modes is that _read_ transactions will be routed to any node of a cluster, whereas _write_ ones will be directed to the leader.
 Still, depending on the server version and settings, the server might allow none, some, or all _write_ statements to be executed even in _read_ transactions.
 
-Similar remarks hold for the `.execute_read()` and `.execute_write()` methods.
+Similar remarks hold for the `.executeRead()` and `.executeWrite()` methods.
 ====
 
 
 [#impersonation]
 === Run queries as a different user (impersonation)
 
-You can execute a query under the security context of a different user with the parameter `impersonated_user`, specifying the name of the user to impersonate.
+You can execute a query under the security context of a different user with the method `.withImpersonatedUser("<username>")`, specifying the name of the user to impersonate.
 For this to work, the user under which the `Driver` was created needs to have the link:{neo4j-docs-base-uri}/cypher-manual/current/access-control/dbms-administration#access-control-dbms-administration-impersonation[appropriate permissions].
 Impersonating a user is cheaper than creating a new `Driver` object.
 
-[source, python]
+[source, java]
 ----
-with driver.session(
-    database="neo4j",
-    impersonated_user="somebody_else"
-) as session:
-    ...
+// import org.neo4j.driver.SessionConfig;
+// import org.neo4j.driver.RoutingControl;
+
+var session = driver.session(SessionConfig.builder()
+    .withDatabase("neo4j")
+    .withImpersonatedUser("somebodyElse")  // mark-line
+    .build());
 ----
 
 When impersonating a user, the query is run within the complete security context of the impersonated user and not the authenticated user (i.e., home database, permissions, etc.).
+
+
+== Transaction configuration
+
+You can exert further control on transactions by providing a  link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/TransactionConfig.html[`TransactionConfig`] object as second parameter to `.executeRead()`, `.executeWrite()`, and `.beginTransaction()`.
+Use it to specify:
+
+- a transaction timeout (in seconds).
+Transactions that run longer will be terminated by the server.
+The default value is set on the server side.
+The minimum value is one millisecond.
+- a map of metadata that gets attached to the transaction.
+These metadata get logged in the server `query.log`, and are visible in the output of the `SHOW TRANSACTIONS` Cypher command.
+Use this to tag transactions.
+
+[source, java]
+----
+// import java.time.Duration.ofSeconds
+// import org.neo4j.driver.SessionConfig
+// import org.neo4j.driver.TransactionConfig
+
+try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
+    var people = session.executeRead(tx -> {
+        var result = tx.run("MATCH (:Person) RETURN count(*) AS n");
+        return result.list();  // return a list of Record objects
+    }, TransactionConfig.builder()
+        .withTimeout(ofSeconds(5))  // mark-line
+        .withMetadata(Map.of("appName", "peopleTracker"))  // mark-line
+        .build()
+    );
+    people.forEach(person -> System.out.println(person));
+}
+----
 
 
 == Close sessions
@@ -407,16 +466,17 @@ Each connection pool has *a finite number of sessions*, so if you open sessions 
 It is thus recommended to create sessions using the `with` statement, which automatically closes them when the application is done with them.
 When a session is closed, it is returned to the connection pool to be later reused.
 
-If you do not use `with`, remember to call the `.close()` method when you have finished using a session.
+If you do not open sessions as resources with `try`, remember to call the `.close()` method when you have finished using them.
 
-[source, python]
+[source, java]
 ----
-session = driver.session(database="neo4j")
+var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build());
 
-# session usage
+// session usage
 
 session.close()
 ----
+
 
 ifndef::backend-pdf[]
 [discrete.glossary]

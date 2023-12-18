@@ -9,29 +9,28 @@ A _bookmark_ is a token that represents some state of the database.
 By passing one or multiple bookmarks along with a query, the server will make sure that the query does not get executed before the represented state(s) have been established.
 
 
-== Bookmarks with `.execute_query()`
+== Bookmarks with `.executableQuery()`
 
-When xref:query-simple.adoc[querying the database with `.execute_query()`], the driver manages bookmarks for you.
+When xref:query-simple.adoc[querying the database with `.executableQuery()`], the driver manages bookmarks for you.
 In this case, you have the guarantee that subsequent queries can read previous changes without taking further action.
 
-[source, python]
+[source, java]
 ----
-driver.execute_query("<QUERY 1>")
+driver.executableQuery("<QUERY 1>").execute()
 
-# subsequent execute_query calls will be causally chained
+// subsequent execute_query calls will be causally chained
 
-driver.execute_query("<QUERY 2>") # can read result of <QUERY 1>
-driver.execute_query("<QUERY 3>") # can read result of <QUERY 2>
+driver.executableQuery("<QUERY 2>").execute() // can read result of <QUERY 1>
+driver.executableQuery("<QUERY 3>").execute() // can read result of <QUERY 2>
 ----
 
 To disable bookmark management and causal consistency, set `bookmark_manager_=None` in `.execute_query()` calls.
 
-[source, python]
+[source, java]
 ----
-driver.execute_query(
-    "<QUERY>",
-    bookmark_manager_=None,
-)
+driver.executableQuery("<QUERY>")
+    .withConfig(QueryConfig.builder().withBookmarkManager(null).build())
+    .execute();
 ----
 
 
