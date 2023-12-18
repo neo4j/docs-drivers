@@ -13,7 +13,7 @@ The driver supports connection to URIs of the form
 - `<SCHEME>` is one among `neo4j`, `neo4j+s`, `neo4j+ssc`, `bolt`, `bolt+s`, `bolt+ssc`.
 - `<HOST>` is the host name where the Neo4j server is located.
 - `<PORT>` is optional, and denotes the port the <<Bolt>> protocol is available at.
-- `<POLICY-NAME>` is an optional _server policy_ name. link:{neo4j-docs-base-uri}/docs/operations-manual/current/clustering/clustering-advanced/multi-data-center-routing/[Server policies] need to be set up prior to usage.
+- `<POLICY-NAME>` is an optional _server policy_ name. link:{neo4j-docs-base-uri}/operations-manual/current/clustering/clustering-advanced/multi-data-center-routing/[Server policies] need to be set up prior to usage.
 
 [NOTE]
 Notice that *the driver does not support connection to a nested path*, such as `example.com/neo4j/`.
