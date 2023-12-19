@@ -41,7 +41,7 @@ For _strict creation_, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-m
 To retrieve information from the database, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/match/[`MATCH`]:
 
 .Retrieve all `Person` nodes
-[source, java]
+[source, java, role=nocollapse]
 ----
 // import org.neo4j.driver.QueryConfig;
 
@@ -52,7 +52,7 @@ var result = driver.executableQuery("MATCH (p:Person) RETURN p.name AS name")
 // Loop through results and do something with them
 var records = result.records()  // <1>
 records.forEach(r -> {
-    System.out.println(r);  // or r.get("name")
+    System.out.println(r);  // or r.get("name").asString()
 });
 
 // Summary information
@@ -66,11 +66,9 @@ System.out.printf("The query %s returned %d records in %d ms.\n",
 <2> `summary` contains the xref:result-summary.adoc[summary of execution] returned by the server
 
 [TIP]
-TODO
-*When accessing a record's content, all its properties are of type `any`.*
-This means that you have to cast them to the relevant Go type if you want to use methods/features defined on such types.
-For example, if the `name` property coming from the database is a string, doing `record.AsMap()["name"][1]` would result in an _invalid operation_ error at compilation time.
-For it to work, cast the value to string _before_ using it as a string: `name := record.AsMap()["name"].(string)` and then `name[1]`.
+Properties inside a link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Record.html[`Record`] object are embedded within link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Value.html[`Value`] objects.
+To extract and cast them to the relevant Java types, use .`as<type>()` (eg. `.asString()`, `asInt()`, etc).
+For example, if the `name` property coming from the database is a string, doing `record.get("name").asString()` will yield the property value.
 
 
 == Update the database
@@ -164,9 +162,6 @@ var result = driver.executableQuery("MATCH (p:Person {name: $name})")
     .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
     .execute();
 ----
-
-TODO
-Or also as a Values list!
 
 [NOTE]
 There can be circumstances where your query structure prevents the usage of parameters in all its parts.

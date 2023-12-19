@@ -178,7 +178,7 @@ System.out.println(notifications);
 ----
 
 
-### Filter notifications label:new[Introduced in 5.7]
+### Filter notifications
 
 By default, the server analyses each query for all categories and severity of notifications.
 Starting from version 5.7, you can use the configuration method `.withNotificationConfig(link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/NotificationConfig.html[NotificationConfig])` to restrict the severity or category of notifications that you are interested into, or disable them altogether. There is a slight performance gain in restricting the amount of notifications the server is allowed to raise.
