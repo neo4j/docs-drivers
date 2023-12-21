@@ -177,7 +177,7 @@ let transaction = await session.beginTransaction()
 // await transaction.run('<QUERY 2>')
 // ...
 
-await transaction.close()
+await transaction.commit()
 await session.close()
 ----
 
@@ -239,7 +239,6 @@ async function transferToOtherBank(driver, customerId, otherBankId, amount) {
     // Now the money has been transferred => can't rollback anymore
     // (cannot rollback external services interactions)
   } finally {
-    await tx.close()  // rolls back if not yet committed
     await session.close()
   }
 }
