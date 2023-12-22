@@ -12,7 +12,7 @@ jobs:
 
   #  Generate HTML
   docs-build-pr:
-    uses: neo4j/docs-tools/.github/workflows/reusable-docs-build.yml@dev
+    uses: neo4j/docs-tools/.github/workflows/reusable-docs-build.yml@main
     with:
       deploy-id: ${{ github.event.number }}
       retain-artifacts: 14
