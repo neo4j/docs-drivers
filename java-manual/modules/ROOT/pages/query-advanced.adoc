@@ -4,23 +4,27 @@
 == Implicit (or auto-commit) transactions
 
 This is the most basic and limited form with which to run a Cypher query.
-The driver will not automatically retry implicit transactions, as it does instead for queries run with xref:query-simple.adoc[`execute_query()`] and with xref:transactions#managed-transactions[managed transactions].
+The driver will not automatically retry implicit transactions, as it does instead for queries run with xref:query-simple.adoc[`.executableQuery()`] and with xref:transactions#managed-transactions[managed transactions].
 Implicit transactions should only be used when the other driver query interfaces do not fit the purpose, or for quick prototyping.
 
 You run an implicit transaction with the method link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Session.run[`Session.run()`].
-It returns a `Result` object that needs to be xref:transactions#process-result[processed accordingly].
+It returns a link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Result.html[`Result`] object that needs to be xref:transactions#process-result[processed accordingly].
 
-[source, python]
+[source, java]
 ----
-with driver.session(database="neo4j") as session:
-    session.run("CREATE (a:Person {name: $name})", name="Licia")
+// import java.util.Map
+// import org.neo4j.driver.SessionConfig
+
+try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
+    session.run("CREATE (a:Person {name: $name})", Map.of("name", "Licia"));
+}
 ----
 
 An implicit transaction gets committed _at the latest_ when the session is destroyed, or before another transaction is executed within the same session.
 Other than that, there is no clear guarantee on when exactly an implicit transaction will be committed during the lifetime of a session.
 To ensure an implicit transaction is committed, you can call the `.consume()` method on its result.
 
-Since the driver cannot figure out whether the query in a `session.run()` call requires a read or write session with the database, it defaults to write. If your implicit transaction contains read queries only, there is a performance gain in xref:transactions#_request_routing[making the driver aware] by setting the keyword argument `default_access_mode=neo4j.READ_ACCESS` when creating the session.
+Since the driver cannot figure out whether the query in a `Session.run()` call requires a read or write session with the database, it defaults to write. If your implicit transaction contains read queries only, there is a performance gain in xref:transactions#_request_routing[making the driver aware] through the config method `.withRouting(RoutingControl.READ)` when creating the session.
 
 [TIP]
 *Implicit transactions are the only ones that can be used for link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/call-subquery/#subquery-call-in-transactions[`CALL { ... } IN TRANSACTIONS`] queries*.
@@ -31,21 +35,26 @@ Since the driver cannot figure out whether the query in a `session.run()` call r
 The most common use case for using `Session.run()` is for importing large CSV files into the database with the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/load-csv[`LOAD CSV`] Cypher clause, and preventing timeout errors due to the size of the transaction.
 
 .Import CSV data into a Neo4j database
-[source, python]
+[source, java]
 ----
-with driver.session(database="neo4j") as session:
-    result = session.run("""
+// import java.util.Map
+// import org.neo4j.driver.SessionConfig
+
+try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
+    var result = session.run("""
         LOAD CSV FROM 'https://data.neo4j.com/bands/artists.csv' AS line
         CALL {
             WITH line
             MERGE (:Artist {name: line[1], age: toInteger(line[2])})
         } IN TRANSACTIONS OF 2 ROWS
-    """)
-    print(result.consume().counters)
+    """);
+    var summary = result.consume();
+    System.out.println(summary.counters());
+}
 ----
 
 [NOTE]
-While `LOAD CSV` can be a convenience, there is nothing _wrong_ in deferring the parsing of the CSV file to your Python application and avoiding `LOAD CSV`.
+While `LOAD CSV` can be a convenience, there is nothing _wrong_ in deferring the parsing of the CSV file to your Java application and avoiding `LOAD CSV`.
 In fact, moving the parsing logic to the application can give you more control over the importing process.
 
 For more information, see link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/load-csv/[Cypher -- Clauses -- Load CSV].
@@ -53,18 +62,24 @@ For more information, see link:{neo4j-docs-base-uri}/cypher-manual/current/claus
 
 === Transaction configuration
 
-The link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Query[`Query`] object allows to specify a query timeout and to attach metadata to the transaction.
-The metadata is visible in the server logs (as described for the xref:transactions#unit_of_work-decorator[`unit_of_work`] decorator).
+You can exert further control on implicit transactions by providing a link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/TransactionConfig.html[`TransactionConfig`] object as last parameter in `Session.run()` calls.
+The configuration callbacks allow to specify a query timeout and to attach metadata to the transaction.
+For more information, see xref:transactions.adoc#_transaction_configuration[Transactions -- Transaction configuration].
 
-[source, python]
+[source, java]
 ----
-from neo4j import Query
+// import java.util.Map
+// import org.neo4j.driver.SessionConfig
+// import org.neo4j.driver.TransactionConfig
 
-with driver.session(database="neo4j") as session:
-    query = Query("CREATE (a:Person {name: $name})",
-                  timeout=1.0,
-                  metadata={"app_name": "people"})
-    result = session.run(query, name="John")
+try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
+    var result = session.run("CREATE (a:Person {name: $name})", Map.of("name", "John"),
+        TransactionConfig.builder()  // mark-line
+            .withTimeout(ofSeconds(5))
+            .withMetadata(Map.of("appName", "peopleTracker"))
+            .build()
+    );
+}
 ----
 
 
@@ -83,69 +98,127 @@ To protect against Cypher injections you should enclose the dynamic values in ba
 Notice that Cypher processes Unicode, so take care of the Unicode literal `\u0060` as well.
 
 .Manually escaping dynamic labels before concatenation.
-[source, python]
+[source, java]
 ----
-label = "Person\\u0060n"
-# convert \u0060 to literal backtick and then escape backticks
-escaped_label = label.replace("\\u0060", "`").replace("`", "``")
+// import org.neo4j.driver.QueryConfig;
 
-driver.execute_query(
-    f"MATCH (p:`{escaped_label}` {{name: $name}}) RETURN p.name",
-    name="Alice",
-    database_="neo4j"
-)
+var label = "Person\\u0060n"
+// convert \u0060 to literal backtick and then escape backticks
+var escapedLabel = label.replace("\\u0060", "`").replace("`", "``")
+
+var result = driver.executableQuery("MATCH (p:`{escapedLabel}` {{name: $name}}) RETURN p.name")
+    .withParameters(Map.of("name", "Alice"))
+    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+    .execute();
 ----
 
 Another workaround, which avoids string concatenation, is using the <<APOC>> procedure link:{neo4j-docs-base-uri}/apoc/current/overview/apoc.merge/apoc.merge.node/[`apoc.merge.node`].
 It supports dynamic labels and property keys, but only for node merging.
 
 .Using `apoc.merge.node` to create a node with dynamic labels/property keys.
-[source, python]
+[source, java]
 ----
-property_key = "name"
-label = "Person"
+// import org.neo4j.driver.QueryConfig;
 
-driver.execute_query(
-    "CALL apoc.merge.node($labels, $properties)",
-    labels=[label], properties={property_key: "Alice"},
-    database_="neo4j"
-)
+String propertyKey = "name";
+String label = "Person";
+
+var result = driver.executableQuery("CALL apoc.merge.node($labels, $properties)")
+    .withParameters(Map.of("labels", List.of(label), "properties", Map.of(propertyKey, "Alice")))
+    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+    .execute();
 ----
 
 [NOTE]
 If you are running Neo4j in Docker, APOC needs to be enabled when starting the container.
-See link:https://neo4j.com/labs/apoc/current/installation/#docker[APOC - Installation - Docker].
+See link:https://neo4j.com/labs/apoc/current/installation/#docker[APOC -- Installation -- Docker].
 
 
 == Logging
 
-The driver logs messages through the native `logging` library to a logger named `neo4j`.
-To redirect log messages to standard output, use the link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.debug.watch[watch] function:
+By default, the driver logs `INFO` messages through the Java logging framework `java.util.logging`.
+To change the driver's logging behavior, use the link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Config.ConfigBuilder.html#withLogging(org.neo4j.driver.Logging)[`.withLogging()`] method when creating a `Driver` object.
 
-[source, python]
+[source, java]
 ----
-import sys
-from neo4j.debug import watch
+// import java.util.logging.Level;
+// import org.neo4j.driver.Config;
+// import org.neo4j.driver.GraphDatabase;
+// import org.neo4j.driver.Logging;
 
-watch("neo4j", out=sys.stdout)
+try (var driver = GraphDatabase.driver(uri, AuthTokens.basic(user, password),
+    Config.builder().withLogging(Logging.console(Level.FINE)).build())) {
+    driver.verifyConnectivity();
+}
 ----
 
 .Example of log output upon driver connection
 [source, log]
 ----
-[DEBUG   ] [Thread 139807941394432] [Task None           ] 2023-03-31 09:31:39,616  [#0000]  _: <POOL> created, routing address IPv4Address(('localhost', 7687))
-[DEBUG   ] [Thread 139807941394432] [Task None           ] 2023-03-31 09:31:39,616  [#0000]  _: <POOL> acquire routing connection, access_mode='WRITE', database='neo4j'
-[DEBUG   ] [Thread 139807941394432] [Task None           ] 2023-03-31 09:31:39,616  [#0000]  _: <ROUTING> checking table freshness (readonly=False): table expired=True, has_server_for_mode=False, table routers={IPv4Address(('localhost', 7687))} => False
-[DEBUG   ] [Thread 139807941394432] [Task None           ] 2023-03-31 09:31:39,616  [#0000]  _: <POOL> attempting to update routing table from IPv4Address(('localhost', 7687))
-[DEBUG   ] [Thread 139807941394432] [Task None           ] 2023-03-31 09:31:39,616  [#0000]  _: <RESOLVE> in: localhost:7687
-[DEBUG   ] [Thread 139807941394432] [Task None           ] 2023-03-31 09:31:39,617  [#0000]  _: <RESOLVE> dns resolver out: 127.0.0.1:7687
-[DEBUG   ] [Thread 139807941394432] [Task None           ] 2023-03-31 09:31:39,617  [#0000]  _: <POOL> _acquire router connection, database='neo4j', address=ResolvedIPv4Address(('127.0.0.1', 7687))
-[DEBUG   ] [Thread 139807941394432] [Task None           ] 2023-03-31 09:31:39,617  [#0000]  _: <POOL> trying to hand out new connection
-[DEBUG   ] [Thread 139807941394432] [Task None           ] 2023-03-31 09:31:39,617  [#0000]  C: <OPEN> 127.0.0.1:7687
-[DEBUG   ] [Thread 139807941394432] [Task None           ] 2023-03-31 09:31:39,619  [#AF18]  C: <MAGIC> 0x6060B017
-[DEBUG   ] [Thread 139807941394432] [Task None           ] 2023-03-31 09:31:39,619  [#AF18]  C: <HANDSHAKE> 0x00000005 0x00020404 0x00000104 0x00000003
-[DEBUG   ] [Thread 139807941394432] [Task None           ] 2023-03-31 09:31:39,620  [#AF18]  S: <HANDSHAKE> 0x00000005
-[DEBUG   ] [Thread 139807941394432] [Task None           ] 2023-03-31 09:31:39,620  [#AF18]  C: HELLO {'user_agent': 'neo4j-python/5.6.0 Python/3.10.6-final-0 (linux)', 'routing': {'address': 'localhost:7687'}, 'scheme': 'basic', 'principal': 'neo4j', 'credentials': '*******'}
+2023-12-22T10:36:39.997882867 INFO org.neo4j.driver.internal.DriverFactory - Routing driver instance 1651855867 created for server address localhost:7687
+2023-12-22T10:36:40.03430944 FINE io.netty.channel.DefaultChannelId - -Dio.netty.processId: 23665 (auto-detected)
+2023-12-22T10:36:40.036871656 FINE io.netty.util.NetUtil - -Djava.net.preferIPv4Stack: false
+2023-12-22T10:36:40.037023871 FINE io.netty.util.NetUtil - -Djava.net.preferIPv6Addresses: false
+2023-12-22T10:36:40.03827624 FINE io.netty.util.NetUtilInitializations - Loopback interface: lo (lo, 0:0:0:0:0:0:0:1%lo)
+2023-12-22T10:36:40.038877108 FINE io.netty.util.NetUtil - /proc/sys/net/core/somaxconn: 4096
+2023-12-22T10:36:40.03958947 FINE io.netty.channel.DefaultChannelId - -Dio.netty.machineId: 04:cf:4b:ff:fe:0e:ee:99 (auto-detected)
+2023-12-22T10:36:40.04531968 FINE io.netty.util.ResourceLeakDetector - -Dio.netty.leakDetection.level: simple
+2023-12-22T10:36:40.045471749 FINE io.netty.util.ResourceLeakDetector - -Dio.netty.leakDetection.targetRecords: 4
+2023-12-22T10:36:40.059848221 FINE io.netty.buffer.PooledByteBufAllocator - -Dio.netty.allocator.numHeapArenas: 40
+2023-12-22T10:36:40.060000842 FINE io.netty.buffer.PooledByteBufAllocator - -Dio.netty.allocator.numDirectArenas: 40
+2023-12-22T10:36:40.060113675 FINE io.netty.buffer.PooledByteBufAllocator - -Dio.netty.allocator.pageSize: 8192
+2023-12-22T10:36:40.060219802 FINE io.netty.buffer.PooledByteBufAllocator - -Dio.netty.allocator.maxOrder: 9
+2023-12-22T10:36:40.060324679 FINE io.netty.buffer.PooledByteBufAllocator - -Dio.netty.allocator.chunkSize: 4194304
+2023-12-22T10:36:40.060442554 FINE io.netty.buffer.PooledByteBufAllocator - -Dio.netty.allocator.smallCacheSize: 256
+2023-12-22T10:36:40.060547232 FINE io.netty.buffer.PooledByteBufAllocator - -Dio.netty.allocator.normalCacheSize: 64
+2023-12-22T10:36:40.060648929 FINE io.netty.buffer.PooledByteBufAllocator - -Dio.netty.allocator.maxCachedBufferCapacity: 32768
+2023-12-22T10:36:40.060750268 FINE io.netty.buffer.PooledByteBufAllocator - -Dio.netty.allocator.cacheTrimInterval: 8192
+2023-12-22T10:36:40.060858214 FINE io.netty.buffer.PooledByteBufAllocator - -Dio.netty.allocator.cacheTrimIntervalMillis: 0
+2023-12-22T10:36:40.060965492 FINE io.netty.buffer.PooledByteBufAllocator - -Dio.netty.allocator.useCacheForAllThreads: false
+2023-12-22T10:36:40.061068878 FINE io.netty.buffer.PooledByteBufAllocator - -Dio.netty.allocator.maxCachedByteBuffersPerChunk: 1023
+2023-12-22T10:36:40.069792775 FINE io.netty.buffer.ByteBufUtil - -Dio.netty.allocator.type: pooled
+2023-12-22T10:36:40.069957048 FINE io.netty.buffer.ByteBufUtil - -Dio.netty.threadLocalDirectBufferSize: 0
+2023-12-22T10:36:40.070070891 FINE io.netty.buffer.ByteBufUtil - -Dio.netty.maxThreadLocalCharBufferSize: 16384
+2023-12-22T10:36:40.102235419 FINE io.netty.buffer.AbstractByteBuf - -Dio.netty.buffer.checkAccessible: true
+2023-12-22T10:36:40.102408774 FINE io.netty.buffer.AbstractByteBuf - -Dio.netty.buffer.checkBounds: true
+2023-12-22T10:36:40.103026138 FINE io.netty.util.ResourceLeakDetectorFactory - Loaded default ResourceLeakDetector: io.netty.util.ResourceLeakDetector@1a67b908
+2023-12-22T10:36:40.104721387 FINE org.neo4j.driver.internal.async.connection.ChannelConnectedListener - [0xb354eed2][localhost(127.0.0.1):7687][] C: [Bolt Handshake] [0x6060b017, 263173, 132100, 260, 3]
+2023-12-22T10:36:40.106645202 FINE io.netty.util.Recycler - -Dio.netty.recycler.maxCapacityPerThread: 4096
+2023-12-22T10:36:40.106785483 FINE io.netty.util.Recycler - -Dio.netty.recycler.ratio: 8
+2023-12-22T10:36:40.106887674 FINE io.netty.util.Recycler - -Dio.netty.recycler.chunkSize: 32
+2023-12-22T10:36:40.106993748 FINE io.netty.util.Recycler - -Dio.netty.recycler.blocking: false
+2023-12-22T10:36:40.107096042 FINE io.netty.util.Recycler - -Dio.netty.recycler.batchFastThreadLocalOnly: true
+2023-12-22T10:36:40.11603651 FINE org.neo4j.driver.internal.async.connection.HandshakeHandler - [0xb354eed2][localhost(127.0.0.1):7687][] S: [Bolt Handshake] 5.4
+2023-12-22T10:36:40.128082306 FINE org.neo4j.driver.internal.async.outbound.OutboundMessageHandler - [0xb354eed2][localhost(127.0.0.1):7687][] C: HELLO {routing={address: "localhost:7687"}, bolt_agent={product: "neo4j-java/dev", language: "Java/17.0.9", language_details: "Optional[Eclipse Adoptium; OpenJDK 64-Bit Server VM; 17.0.9+9]", platform: "Linux; 5.15.0-91-generic; amd64"}, user_agent="neo4j-java/dev"}
+2023-12-22T10:36:40.130350166 FINE org.neo4j.driver.internal.async.pool.NettyChannelTracker - Channel [0xb354eed2] created. Local address: /127.0.0.1:32794, remote address: /127.0.0.1:7687
+2023-12-22T10:36:40.130746872 FINE org.neo4j.driver.internal.async.pool.NettyChannelTracker - Channel [0xb354eed2] acquired from the pool. Local address: /127.0.0.1:32794, remote address: /127.0.0.1:7687
+2023-12-22T10:36:40.133652153 FINE org.neo4j.driver.internal.async.outbound.OutboundMessageHandler - [0xb354eed2][localhost(127.0.0.1):7687][] C: LOGON {principal="neo4j", scheme="basic", credentials="******"}
+2023-12-22T10:36:40.140017819 FINE org.neo4j.driver.internal.async.inbound.InboundMessageDispatcher - [0xb354eed2][localhost(127.0.0.1):7687][] S: SUCCESS {server="Neo4j/5.16.0", connection_id="bolt-5", hints={connection.recv_timeout_seconds: 120}}
+2023-12-22T10:36:40.142229689 FINE org.neo4j.driver.internal.async.inbound.InboundMessageDispatcher - [0xb354eed2][localhost(127.0.0.1):7687][bolt-5] S: SUCCESS {}
+2023-12-22T10:36:40.14568667 FINE org.neo4j.driver.internal.async.outbound.OutboundMessageHandler - [0xb354eed2][localhost(127.0.0.1):7687][bolt-5] C: RESET
+2023-12-22T10:36:40.146897982 FINE org.neo4j.driver.internal.async.NetworkConnection - Added ConnectionReadTimeoutHandler
+2023-12-22T10:36:40.14753571 FINE org.neo4j.driver.internal.async.inbound.InboundMessageDispatcher - [0xb354eed2][localhost(127.0.0.1):7687][bolt-5] S: SUCCESS {}
+2023-12-22T10:36:40.147813446 FINE org.neo4j.driver.internal.async.NetworkConnection - Removed ConnectionReadTimeoutHandler
+2023-12-22T10:36:40.14895232 FINE org.neo4j.driver.internal.async.pool.NettyChannelTracker - Channel [0xb354eed2] released back to the pool
+2023-12-22T10:36:40.15199869 FINE org.neo4j.driver.internal.cluster.RoutingTableRegistryImpl - Routing table handler for database 'system' is added.
+2023-12-22T10:36:40.152613749 FINE org.neo4j.driver.internal.cluster.RoutingTableHandlerImpl - Routing table for database 'system' is stale. Ttl 1703237800150, currentTime 1703237800152, routers [], writers [], readers [], database 'system'
+2023-12-22T10:36:40.159510973 FINE org.neo4j.driver.internal.async.pool.NettyChannelTracker - Channel [0xb354eed2] acquired from the pool. Local address: /127.0.0.1:32794, remote address: /127.0.0.1:7687
+2023-12-22T10:36:40.165704119 FINE org.neo4j.driver.internal.async.outbound.OutboundMessageHandler - [0xb354eed2][localhost(127.0.0.1):7687][bolt-5] C: ROUTE {address="localhost:7687"} [] system null
+2023-12-22T10:36:40.168929698 FINE org.neo4j.driver.internal.async.NetworkConnection - Added ConnectionReadTimeoutHandler
+2023-12-22T10:36:40.171700427 FINE org.neo4j.driver.internal.async.inbound.InboundMessageDispatcher - [0xb354eed2][localhost(127.0.0.1):7687][bolt-5] S: SUCCESS {rt={servers: [{addresses: ["localhost:7687"], role: "WRITE"}, {addresses: ["localhost:7687"], role: "READ"}, {addresses: ["localhost:7687"], role: "ROUTE"}], ttl: 300, db: "system"}}
+2023-12-22T10:36:40.17187084 FINE org.neo4j.driver.internal.async.NetworkConnection - Removed ConnectionReadTimeoutHandler
+2023-12-22T10:36:40.173921853 FINE org.neo4j.driver.internal.async.outbound.OutboundMessageHandler - [0xb354eed2][localhost(127.0.0.1):7687][bolt-5] C: RESET
+2023-12-22T10:36:40.174473474 FINE org.neo4j.driver.internal.async.NetworkConnection - Added ConnectionReadTimeoutHandler
+2023-12-22T10:36:40.175516332 FINE org.neo4j.driver.internal.async.inbound.InboundMessageDispatcher - [0xb354eed2][localhost(127.0.0.1):7687][bolt-5] S: SUCCESS {}
+2023-12-22T10:36:40.175679271 FINE org.neo4j.driver.internal.async.NetworkConnection - Removed ConnectionReadTimeoutHandler
+2023-12-22T10:36:40.175849144 FINE org.neo4j.driver.internal.async.pool.NettyChannelTracker - Channel [0xb354eed2] released back to the pool
+2023-12-22T10:36:40.182085603 FINE org.neo4j.driver.internal.cluster.RoutingTableHandlerImpl - Fetched cluster composition for database 'system'. ClusterComposition{readers=[localhost:7687], writers=[localhost:7687], routers=[localhost:7687], expirationTimestamp=1703238100176, databaseName=system}
+2023-12-22T10:36:40.185015699 FINE org.neo4j.driver.internal.cluster.RoutingTableHandlerImpl - Updated routing table for database 'system'. Ttl 1703238100176, currentTime 1703237800184, routers [localhost:7687], writers [localhost:7687], readers [localhost:7687], database 'system'
+2023-12-22T10:36:40.18530819 INFO org.neo4j.driver.internal.InternalDriver - Closing driver instance 1651855867
+2023-12-22T10:36:40.186508052 FINE org.neo4j.driver.internal.async.outbound.OutboundMessageHandler - [0xb354eed2][localhost(127.0.0.1):7687][bolt-5] C: GOODBYE
+2023-12-22T10:36:40.187291369 INFO org.neo4j.driver.internal.async.pool.ConnectionPoolImpl - Closing connection pool towards localhost(127.0.0.1):7687
+2023-12-22T10:36:40.189599992 FINE org.neo4j.driver.internal.async.inbound.ChannelErrorHandler - [0xb354eed2][localhost(127.0.0.1):7687][bolt-5] Channel is inactive
+2023-12-22T10:36:40.395356347 FINE io.netty.buffer.PoolThreadCache - Freed 6 thread-local buffer(s) from thread: Neo4jDriverIO-2-2
 ----
 
 
