@@ -2,34 +2,37 @@
 
 == Always specify the target database
 
-*Specify the target database on all queries*, either with the xref:query-simple.adoc#_database_selection[`database_` parameter in `Driver.execute_query()`] or with the xref:transactions.adoc#_database_selection[`database` parameter when creating new sessions].
+*Specify the target database on all queries* with the `.withDatabase()` method, either in xref:query-simple.adoc#_database_selection[`Driver.executableQuery()`] calls or xref:transactions.adoc#_database_selection[when creating new sessions].
 If no database is provided, the driver has to send an extra request to the server to figure out what the default database is.
 The overhead is minimal for a single query, but becomes significant over hundreds of queries.
 
 [discrete]
 === Good practices
 
-[source, python]
+[source, java]
 ----
-driver.execute_query("<QUERY>", database_="<DB NAME>")
+driver.executableQuery("<QUERY>")
+    .withConfig(QueryConfig.builder().withDatabase("<DB NAME>").build())
+    .execute();
 ----
 
-[source, python]
+[source, java]
 ----
-driver.session(database="<DB NAME>")
+driver.session(SessionConfig.builder().withDatabase("<DB NAME>").build());
 ----
 
 [discrete]
 === Bad practices
 
-[source, python]
+[source, java]
 ----
-driver.execute_query("<QUERY>")
+driver.executableQuery("<QUERY>")
+    .execute();
 ----
 
-[source, python]
+[source, java]
 ----
-driver.session()
+driver.session();
 ----
 
 
@@ -44,40 +47,49 @@ If you know already that the data you are inserting is new, avoid using `MERGE` 
 == Use query parameters
 
 *Always use xref:query-simple#query-parameters[query parameters]* instead of hardcoding or concatenating values into queries.
-Besides protecting from Cypher injections, this allows to leverage the database query cache.
+Besides protecting from Cypher injections, this allows to better leverage the database query cache.
 
 [discrete]
 === Good practices
 
-[source, python]
+[source, java]
 ----
-driver.execute_query("MATCH (p:Person {name: $name}) RETURN p", name="Alice")
+driver.executableQuery("MATCH (p:Person {name: $name}) RETURN p")
+    .withParameters(Map.of("name", "Alice"))
+    .withConfig(QueryConfig.builder().withDatabase("<DB NAME>").build())
+    .execute();
 ----
 
-[source, python]
+[source, java]
 ----
-with driver.session(database="<DB NAME>") as session:
-    session.run("MATCH (p:Person {name: $name}) RETURN p", name="Alice")
+try (var session = driver.session(SessionConfig.builder().withDatabase("<DB NAME>").build())) {
+    session.run("MATCH (p:Person {name: $name}) RETURN p", Map.of("name", "Alice"));
+}
 ----
 
 [discrete]
 === Bad practices
 
-[source, python]
+[source, java]
 ----
-driver.execute_query("MATCH (p:Person {name: 'Alice'}) RETURN p")
-# or
-name = "Alice"
-driver.execute_query("MATCH (p:Person {name: '" + name + "'}) RETURN p")
+driver.executableQuery("MATCH (p:Person {name: 'Alice'}) RETURN p")
+    .withConfig(QueryConfig.builder().withDatabase("<DB NAME>").build())
+    .execute();
+// or
+String name = "Alice";
+driver.executableQuery("MATCH (p:Person {name: '" + name + "'}) RETURN p")
+    .withConfig(QueryConfig.builder().withDatabase("<DB NAME>").build())
+    .execute();
 ----
 
-[source, python]
+[source, java]
 ----
-with driver.session(database="<DB NAME>") as session:
-    session.run("MATCH (p:Person {name: 'Alice'}) RETURN p")
-    # or
-    name = "Alice"
-    session.run("MATCH (p:Person {name: '" + name + "'}) RETURN p")
+try (var session = driver.session(SessionConfig.builder().withDatabase("<DB NAME>").build())) {
+    session.run("MATCH (p:Person {name: 'Alice'}) RETURN p");
+    // or
+    String name = "Alice";
+    session.run("MATCH (p:Person {name: '" + name + "'}) RETURN p");
+}
 ----
 
 
@@ -90,30 +102,38 @@ To learn how to combine labels, see link:{neo4j-docs-base-uri}/cypher-manual/cur
 [discrete]
 === Good practices
 
-[source, python]
+[source, java]
 ----
-driver.execute_query("MATCH (p:Person|Animal {name: $name}) RETURN p", name="Alice")
+driver.executableQuery("MATCH (p:Person|Animal {name: $name}) RETURN p")
+    .withParameters(Map.of("name", "Alice"))
+    .withConfig(QueryConfig.builder().withDatabase("<DB NAME>").build())
+    .execute();
 ----
 
-[source, python]
+[source, java]
 ----
-with driver.session(database="<DB NAME>") as session:
-    session.run("MATCH (p:Person|Animal {name: $name}) RETURN p", name="Alice")
+try (var session = driver.session(SessionConfig.builder().withDatabase("<DB NAME>").build())) {
+    session.run("MATCH (p:Person|Animal {name: $name}) RETURN p", Map.of("name", "Alice"));
+}
 ----
 
 
 [discrete]
 === Bad practices
 
-[source, python]
+[source, java]
 ----
-driver.execute_query("MATCH (p {name: $name}) RETURN p", name="Alice")
+driver.executableQuery("MATCH (p {name: $name}) RETURN p")
+    .withParameters(Map.of("name", "Alice"))
+    .withConfig(QueryConfig.builder().withDatabase("<DB NAME>").build())
+    .execute();
 ----
 
-[source, python]
+[source, java]
 ----
-with driver.session(database="<DB NAME>") as session:
-    session.run("MATCH (p {name: $name}) RETURN p", name="Alice")
+try (var session = driver.session(SessionConfig.builder().withDatabase("<DB NAME>").build())) {
+    session.run("MATCH (p {name: $name}) RETURN p", Map.of("name", "Alice"));
+}
 ----
 
 

@@ -1,0 +1,44 @@
+= Run non-blocking asynchronous queries
+
+
+[source, java]
+----
+public Flux<ResultSummary> printAllProducts() {
+    var query = new Query("MATCH (p:Product) WHERE p.id = $id RETURN p.title", Collections.singletonMap("id", 0));
+
+    return Flux.usingWhen(
+            Mono.fromSupplier(() -> driver.session(ReactiveSession.class)),
+            session -> flowPublisherToFlux(session.executeRead(tx -> {
+                var resultRef = new AtomicReference<ReactiveResult>();
+                var flux = flowPublisherToFlux(tx.run(query))
+                        .doOnNext(resultRef::set)
+                        .flatMap(result -> flowPublisherToFlux(result.records()))
+                        .doOnNext(record -> System.out.println(record.get(0).asString()))
+                        .then(Mono.defer(() -> Mono.from(flowPublisherToFlux(resultRef.get().consume()))));
+                return publisherToFlowPublisher(flux);
+            })),
+            session -> flowPublisherToFlux(session.close()));
+}
+----
+
+[source, java]
+----
+public Flux<String> readProductTitles() {
+    var query = new Query("MATCH (p:Product) WHERE p.id = $id RETURN p.title", Collections.singletonMap("id", 0));
+    return Flux.usingWhen(
+            Mono.fromSupplier(() -> driver.session(ReactiveSession.class)),
+            session -> flowPublisherToFlux(session.run(query))
+                    .flatMap(result -> flowPublisherToFlux(result.records()))
+                    .map(record -> record.get(0).asString()),
+            session -> flowPublisherToFlux(session.close()));
+}
+----
+
+
+ifndef::backend-pdf[]
+[discrete.glossary]
+== Glossary
+
+include::{common-partial}/glossary.adoc[]
+include::../partials/glossary.adoc[]
+endif::[]
