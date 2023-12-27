@@ -223,9 +223,7 @@ def create_customer(driver):
 
 def transfer_to_other_bank(driver, customer_id, other_bank_id, amount):
     with driver.session(database="neo4j") as session:
-        tx = session.begin_transaction()
-        # or just use a `with` context on `tx` instead of try/finally
-        try:
+        with session.begin_transaction() as tx:
             if not customer_balance_check(tx, customer_id, amount):
                 # give up
                 return
