@@ -1,6 +1,6 @@
 = Query the database
 
-Once you have xref:connect.adoc[connected to the database], you can run queries using <<Cypher>> and the method `Driver.executableQuery()`.
+Once you have xref:connect.adoc[connected to the database], you can execute <<Cypher>> queries through the method `Driver.executableQuery()`.
 
 [TIP]
 `Driver.executableQuery()` was introduced with the version 5.8 of the driver. +
@@ -9,19 +9,20 @@ For queries with earlier versions, see xref:transactions.adoc[Run your own trans
 
 == Write to the database
 
-To create a node representing a person named `Alice`, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/merge/[`MERGE`]:
+To create a node representing a person named `Alice`, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/create/[`CREATE`]:
 
 .Create a node representing a person named `Alice`
 [source, java]
 ----
+// import java.util.Map;
 // import org.neo4j.driver.QueryConfig;
 
-var result = driver.executableQuery("MERGE (:Person {name: $name})")  // <1>
+var result = driver.executableQuery("CREATE (:Person {name: $name})")  // <1>
     .withParameters(Map.of("name", "Alice"))  // <2>
     .withConfig(QueryConfig.builder().withDatabase("neo4j").build())  // clunky  <3>
     .execute();
 var summary = result.summary();
-System.out.printf("Created %s nodes in %d ms.\n",
+System.out.printf("Created %d records in %d ms.%n",
     summary.counters().nodesCreated(),
     summary.resultAvailableAfter(TimeUnit.MILLISECONDS)); // can't default??
 ----
@@ -29,11 +30,6 @@ System.out.printf("Created %s nodes in %d ms.\n",
 <1> specifies the Cypher query
 <2> is a map of _query parameters_
 <3> specifies which database the query should be run against
-
-[NOTE]
-`MERGE` creates a new node matching the requirements unless one already exists.
-If a matching node already exists, it is returned.
-For _strict creation_, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/create/[`CREATE`].
 
 
 == Read from the database
@@ -57,7 +53,7 @@ records.forEach(r -> {
 
 // Summary information
 var summary = result.summary();  // <2>
-System.out.printf("The query %s returned %d records in %d ms.\n",
+System.out.printf("The query %s returned %d records in %d ms.%n",
     summary.query(), records.length,
     summary.resultAvailableAfter(TimeUnit.MILLISECONDS));
 ----
@@ -78,6 +74,7 @@ To update a node's information in the database, use the Cypher clauses link:{neo
 .Update node `Alice` to add an `age` property
 [source, java]
 ----
+// import java.util.Map;
 // import org.neo4j.driver.QueryConfig;
 
 var result = driver.executableQuery("""
@@ -92,16 +89,17 @@ System.out.println("Query updated the database?");
 System.out.println(summary.counters().containsUpdates());
 ----
 
-To create new nodes and relationships linking it to an already existing node, use a combination of the Cypher clauses `MATCH` and `MERGE`:
+To create new nodes and relationships linking it to an already existing node, use a combination of the Cypher clauses `MATCH` and `CREATE`:
 
 .Create a relationship `:KNOWS` between `Alice` and `Bob`
 [source, java]
 ----
+// import java.util.Map;
 // import org.neo4j.driver.QueryConfig;
 
 var result = driver.executableQuery("""
     MATCH (p:Person {name: $name})
-    MERGE (p)-[:KNOWS]->(:Person {name: $friend})
+    CREATE (p)-[:KNOWS]->(:Person {name: $friend})
     """)
     .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
     .withParameters(Map.of("name", "Alice", "friend", "Bob"))
@@ -113,10 +111,10 @@ System.out.println(summary.counters().containsUpdates());
 
 [WARNING]
 ====
-It might feel tempting to create new relationships with a single `MERGE` clause, such as: +
-`MERGE (:Person {name: "Alice"})-[:KNOWS]->(:Person {name: "Bob"})`. +
+It might feel tempting to create new relationships with a single `CREATE` clause, such as: +
+`CREATE (:Person {name: "Alice"})-[:KNOWS]->(:Person {name: "Bob"})`. +
 However, this would result in the creation of an _extra_ `Alice` node, so that you would end up with unintended duplicate records.
-To avoid this, always `MATCH` the elements that you want to update, and use the resulting reference in the `MERGE` clause (as shown in the previous example).
+To avoid this, always `MATCH` the elements that you want to update, and use the resulting reference in the `CREATE` clause (as shown in the previous example).
 See link:https://neo4j.com/developer/kb/understanding-how-merge-works/[Understanding how MERGE works].
 ====
 
@@ -127,6 +125,7 @@ To remove a node and any relationship attached to it, use the Cypher clause link
 .Remove the `Alice` node
 [source, java]
 ----
+// import java.util.Map;
 // import org.neo4j.driver.QueryConfig;
 
 // This does not delete _only_ p, but also all its relationships!
@@ -268,7 +267,6 @@ package demo;
 
 import java.util.Map;
 import java.util.List;
-import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 import org.neo4j.driver.AuthTokens;
@@ -287,7 +285,7 @@ public class App {
 
         try (var driver = GraphDatabase.driver(URI, AuthTokens.basic(USER, PASSWORD))) {
 
-            List<Map> people = Arrays.asList(
+            List<Map> people = List.of(
                 Map.of("name", "Alice", "age", 42, "friends", Arrays.asList("Bob", "Peter", "Anna")),
                 Map.of("name", "Bob", "age", 19),
                 Map.of("name", "Peter", "age", 50),
@@ -298,7 +296,7 @@ public class App {
 
                 //Create some nodes
                 people.forEach(person -> {
-                    var result = driver.executableQuery("MEGE (p:Person {name: $person.name, age: $person.age})")
+                    var result = driver.executableQuery("CREATE (p:Person {name: $person.name, age: $person.age})")
                         .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
                         .withParameters(Map.of("person", person))
                         .execute();
@@ -311,7 +309,7 @@ public class App {
                             MATCH (p:Person {name: $person.name})
                             UNWIND $person.friends AS friend_name
                             MATCH (friend:Person {name: friend_name})
-                            MERGE (p)-[:KNOWS]->(friend)
+                            CREATE (p)-[:KNOWS]->(friend)
                              """)
                             .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
                             .withParameters(Map.of("person", person))
@@ -339,7 +337,7 @@ public class App {
                 });
 
                 // Summary information
-                System.out.printf("The query %s returned %d records in %d ms.",
+                System.out.printf("The query %s returned %d records in %d ms.%n",
                     result.summary().query(), result.records().size(),
                     result.summary().resultAvailableAfter(TimeUnit.MILLISECONDS));
 

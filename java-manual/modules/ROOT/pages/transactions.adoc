@@ -105,7 +105,7 @@ public class App {
 
                     try {
                         String orgId = session.executeWrite(tx -> employPersonTx(tx, name));
-                        System.out.printf("User %s added to organization %s.\n", name, orgId);
+                        System.out.printf("User %s added to organization %s.%n", name, orgId);
                     } catch (Exception e) {
                         System.out.println(e.getMessage());
                     }
@@ -137,7 +137,7 @@ public class App {
             // The query is guaranteed to return <= 1 results, so if.single() throws, it means there's none.
             // If no organization exists, create one and add Person to it
             orgId = createOrganization(tx);
-            System.out.printf("No orgs available, created %s.\n", orgId);
+            System.out.printf("No orgs available, created %s.%n", orgId);
         }
 
         // If org does not have too many employees, add this Person to it
@@ -149,7 +149,7 @@ public class App {
         // Otherwise, create a new Organization and link Person to it
         } else {
             orgId = createOrganization(tx);
-            System.out.printf("Latest org is full, created %s.\n", orgId);
+            System.out.printf("Latest org is full, created %s.%n", orgId);
             addPersonToOrganization(tx, name, orgId);
             // If any of the above throws, the transaction will roll back
             // -> not even Person is created!
@@ -257,7 +257,7 @@ public class App {
         try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
             try (var tx = session.beginTransaction()) {
                 if (! customerBalanceCheck(tx, customerId, amount)) {
-                    System.out.printf("Customer %s doesn't have enough funds.\n", customerId);
+                    System.out.printf("Customer %s doesn't have enough funds.%n", customerId);
                     return;  // give up
                 }
 
@@ -268,7 +268,7 @@ public class App {
                 try {
                     decreaseCustomerBalance(tx, customerId, amount);
                     tx.commit();
-                    System.out.printf("Transferred %f to %s.\n", amount, customerId);
+                    System.out.printf("Transferred %f to %s.%n", amount, customerId);
                 } catch (Exception e) {
                     requestInspection(customerId, otherBankId, amount, e);
                     throw new RuntimeException(e.getMessage());
@@ -302,8 +302,8 @@ public class App {
 
     static void requestInspection(String customerId, int otherBankId, float amount, Exception e) {
         // manual cleanup required; log this or similar
-        System.out.printf("WARNING: transaction rolled back due to exception: %s", e.getMessage());
-        System.out.printf("customerId: %s, otherBankId: %d, amount: %f.", customerId, otherBankId, amount);
+        System.out.printf("WARNING: transaction rolled back due to exception: %s.%n", e.getMessage());
+        System.out.printf("customerId: %s, otherBankId: %d, amount: %f.%n", customerId, otherBankId, amount);
     }
 }
 ----
