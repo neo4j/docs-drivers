@@ -448,7 +448,7 @@ Use this to tag transactions.
 
 try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
     var people = session.executeRead(tx -> {
-        var result = tx.run("MATCH (:Person) RETURN count(*) AS n");
+        var result = tx.run("MATCH (p:Person) RETURN p");
         return result.list();  // return a list of Record objects
     }, TransactionConfig.builder()
         .withTimeout(ofSeconds(5))  // mark-line

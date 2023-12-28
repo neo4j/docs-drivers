@@ -103,7 +103,7 @@ Batch size 128
 +-----------------+----------------+----------------+---------------------+
 
 Total database accesses: ?
-"""
+*/
 ----
 
 If you instead prefix a query with the keyword `PROFILE`, the server will return the execution plan it has used to run the query, together with profiler statistics.
