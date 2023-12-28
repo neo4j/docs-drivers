@@ -189,6 +189,8 @@ with driver.session(database="neo4j") as session:
         # use tx.run() to run queries
         tx.run("<QUERY 1>")
         tx.run("<QUERY 2>")
+
+        tx.commit()
 ----
 
 Closing an explicit transaction can either happen automatically at the end of a `with` block, or can be explicitly controlled through the methods link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Transaction.commit[`Transaction.commit()`], link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Transaction.rollback[`Transaction.rollback()`], or link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Transaction.close[`Transaction.close()`].
@@ -221,9 +223,7 @@ def create_customer(driver):
 
 def transfer_to_other_bank(driver, customer_id, other_bank_id, amount):
     with driver.session(database="neo4j") as session:
-        tx = session.begin_transaction()
-        # or just use a `with` context on `tx` instead of try/finally
-        try:
+        with session.begin_transaction() as tx:
             if not customer_balance_check(tx, customer_id, amount):
                 # give up
                 return
@@ -238,8 +238,6 @@ def transfer_to_other_bank(driver, customer_id, other_bank_id, amount):
             except Exception as e:
                 request_inspection(customer_id, other_bank_id, amount, e)
                 raise  # roll back
-        finally:
-            tx.close()  # rolls back if not yet committed
 
 
 def customer_balance_check(tx, customer_id, amount):

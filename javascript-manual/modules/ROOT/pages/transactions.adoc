@@ -34,7 +34,7 @@ A transaction can contain any number of queries.
 As Neo4j is <<ACID>> compliant, *queries within a transaction will either be executed as a whole or not at all*: you cannot get a part of the transaction succeeding and another failing.
 Use transactions to group together related queries which work together to achieve a single _logical_ database operation.
 
-A managed transaction is created with the methods link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/session.js~Session.html#instance-method-executeRead[`Session.executeRead()`] and link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/session.js~Session.html#instance-method-executeRead[`Session.executeWrite()`], depending on whether you want to _retrieve_ data from the database or _alter_ it.
+A managed transaction is created with the methods link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/session.js~Session.html#instance-method-executeRead[`Session.executeRead()`] and link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/session.js~Session.html#instance-method-executeWrite[`Session.executeWrite()`], depending on whether you want to _retrieve_ data from the database or _alter_ it.
 Both methods take a <<transaction_function>> callback, which is responsible of actually carrying out the queries and processing the result.
 
 .Retrieve people whose name starts with `Al`.
@@ -177,7 +177,7 @@ let transaction = await session.beginTransaction()
 // await transaction.run('<QUERY 2>')
 // ...
 
-await transaction.close()
+await transaction.commit()
 await session.close()
 ----
 
@@ -239,7 +239,6 @@ async function transferToOtherBank(driver, customerId, otherBankId, amount) {
     // Now the money has been transferred => can't rollback anymore
     // (cannot rollback external services interactions)
   } finally {
-    await tx.close()  // rolls back if not yet committed
     await session.close()
   }
 }
