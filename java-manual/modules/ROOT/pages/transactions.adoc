@@ -272,9 +272,6 @@ public class App {
                 } catch (Exception e) {
                     requestInspection(customerId, otherBankId, amount, e);
                     throw new RuntimeException(e.getMessage());
-                } finally {
-                    tx.close();  // rolls back if not yet committed
-                    // when?
                 }
             }
         }

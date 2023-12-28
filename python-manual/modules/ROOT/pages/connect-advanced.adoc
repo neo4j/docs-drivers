@@ -1,57 +1,9 @@
-
 = Advanced connection information
 
-== Connection URI
+include::{common-partial}/connect-advanced.adoc[tag=connection-uri]
 
-The driver supports connection to URIs of the form
+include::{common-partial}/connect-advanced.adoc[tag=connection-protocols]
 
-[source]
-----
-<SCHEME>://<HOST>[:<PORT>[?policy=<POLICY-NAME>]]
-----
-
-- `<SCHEME>` is one among `neo4j`, `neo4j+s`, `neo4j+ssc`, `bolt`, `bolt+s`, `bolt+ssc`.
-- `<HOST>` is the host name where the Neo4j server is located.
-- `<PORT>` is optional, and denotes the port the <<Bolt>> protocol is available at.
-- `<POLICY-NAME>` is an optional _server policy_ name. link:{neo4j-docs-base-uri}/docs/operations-manual/current/clustering/clustering-advanced/multi-data-center-routing/[Server policies] need to be set up prior to usage.
-
-[NOTE]
-Notice that *the driver does not support connection to a nested path*, such as `example.com/neo4j/`.
-The server must be reachable from the domain root.
-
-
-== Connection protocols and security
-
-Communication between the driver and the server is mediated by Bolt.
-The scheme of the server URI determines whether the connection is encrypted and, if so, what type of certificates are accepted.
-
-[options="header", cols="20,40,40"]
-|===
-|URL scheme
-|Encryption
-|Comment
-
-|neo4j
-|{cross-mark}
-|Default for local setups
-
-|neo4j+s
-|{check-mark} (only CA-signed certificates)
-|Default for Aura
-
-|neo4j+ssc
-|{check-mark} (CA- and self-signed certificates)
-|
-|===
-
-[TIP]
-The driver receives a _routing table_ from the server upon successful connection, regardless of whether the instance is a proper cluster environment or a single-machine environment.
-The driver's routing behavior works in tandem with link:{neo4j-docs-base-uri}/operations-manual/current/clustering/[Neo4j's clustering] by directing read/write transactions to appropriate cluster members.
-If you want to target a _specific_ machine, use a link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#bolt-driver-ref[`BoltDriver`] object and `bolt`, `bolt+s`, or `bolt+ssc` URI schemes instead.
-
-The connection scheme to use is not your choice, but is rather determined by the server requirements.
-You must know the right server scheme upfront, as no metadata is exposed prior to connection.
-If you are unsure, ask the database administrator.
 
 == Authentication methods
 
