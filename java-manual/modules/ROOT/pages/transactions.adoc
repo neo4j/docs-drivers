@@ -205,10 +205,7 @@ try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").
 }
 ----
 
-An explicit transaction behaves as follows:
-
-- it gets committed automatically upon successful return, or manually through the method  link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Transaction.html#commit()[`Transaction.commit()`]
-- it gets rolled back automatically should an exception be raised, or manually through the method  link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Transaction.html#rollback[`Transaction.rollback()`].
+An explicit transaction can be committed with  link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Transaction.html#commit()[`Transaction.commit()`] or rolled back with  link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Transaction.html#rollback[`Transaction.rollback()`]. If no explicit action is taken, the driver will automatically roll back the transaction at the end of its lifetime.
 
 Explicit transactions are most useful for applications that need to distribute Cypher execution across multiple functions for the same transaction, or for applications that need to run multiple queries within a single transaction but without the automatic retries provided by managed transactions.
 
@@ -460,7 +457,7 @@ try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").
 == Close sessions
 
 Each connection pool has *a finite number of sessions*, so if you open sessions without ever closing them, your application could run out of them.
-It is thus recommended to create sessions using the `with` statement, which automatically closes them when the application is done with them.
+It is thus recommended to create sessions using the `try-with-resources` statement, which automatically closes them when the application is done with them.
 When a session is closed, it is returned to the connection pool to be later reused.
 
 If you do not open sessions as resources with `try`, remember to call the `.close()` method when you have finished using them.

@@ -88,7 +88,7 @@ When interacting with a Neo4j database through the driver, it doesn't make a dif
 == Close connections
 
 Always close `Driver` objects to free up all allocated resources, even upon unsuccessful connection or runtime errors.
-Either create the `Driver` object as a resource using the `try-with-resources` statement, or call the `Driver.close()` method explicitly.
+Either create the `Driver` object using the `try-with-resources` statement, or call the `Driver.close()` method explicitly.
 
 
 == Further connection parameters
