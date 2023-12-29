@@ -79,6 +79,7 @@ To change the driver's logging behavior, use the link:https://neo4j.com/docs/api
 [source, java]
 ----
 // import java.util.logging.Level;
+// import org.neo4j.driver.AuthTokens;
 // import org.neo4j.driver.Config;
 // import org.neo4j.driver.GraphDatabase;
 // import org.neo4j.driver.Logging;
@@ -161,59 +162,31 @@ try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPasswor
 
 == Custom address resolver
 
-When creating a `Driver` object, you can specify a _resolver_ function to resolve any addresses the driver receives ahead of DNS resolution.
-Your resolver function is called with an link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Address[`Address`] object and should return an iterable of link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Address[`Address`] objects (or values that can be used to construct `Address` objects)
+When creating a `Driver` object, you can specify a _resolver_ function to resolve the connection address the driver is initialized with.
+Note that addresses that the driver receives in routing tables are not resolved with the custom resolver.
+
+You specify a resolver through the link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Config.ConfigBuilder.html#withResolver(org.neo4j.driver.net.ServerAddressResolver)[`.withResolver()`] config method, which works with link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/net/ServerAddress.html[`ServerAddress`] objects.
 
 .Connection to `example.com` on port `9999` is resolved to `localhost` on port `7687`
-[source, python]
+[source, java]
 ----
-public void addExampleNode() {
-    var addresses = Set.of(
-            ServerAddress.of("a.example.com", 7676),
-            ServerAddress.of("b.example.com", 8787),
-            ServerAddress.of("c.example.com", 9898)
-    );
-    addNode("neo4j://x.example.com", AuthTokens.basic("neo4j", "some password"), addresses, UUID.randomUUID().toString());
+// import java.util.Set;
+// import org.neo4j.driver.AuthTokens;
+// import org.neo4j.driver.Config;
+// import org.neo4j.driver.GraphDatabase;
+// import org.neo4j.driver.ServerAddress;
+
+var addresses = Set.of(
+    ServerAddress.of("neo4j://localhost", 7687)
+);
+var config = Config.builder()
+    .withResolver(address -> addresses)
+    .build();
+try (var driver = GraphDatabase.driver(
+    "neo4j://example.com:9999", AuthTokens.basic(dbUser, dbPassword), config
+)) {
+    driver.verifyConnectivity();
 }
-
-public void addNode(String virtualUri, AuthToken authToken, Set<ServerAddress> addresses, String id) {
-    var config = Config.builder()
-            .withResolver(address -> addresses)
-            .build();
-    try (var driver = GraphDatabase.driver(virtualUri, authToken, config)) {
-        driver.executableQuery("CREATE ({id: $id})")
-                .withParameters(Map.of("id", id))
-                .execute();
-    }
-}
-
-import neo4j
-
-
-def custom_resolver(socket_address):
-    # assert isinstance(socket_address, neo4j.Address)
-    if socket_address != ("example.com", 9999):
-        raise OSError(f"Unexpected socket address {socket_address!r}")
-
-    # You can return any neo4j.Address object
-    yield neo4j.Address(("localhost", 7687))  # IPv4
-    yield neo4j.Address(("::1", 7687, 0, 0))  # IPv6
-    yield neo4j.Address.parse("localhost:7687")
-    yield neo4j.Address.parse("[::1]:7687")
-
-    # or any tuple that can be passed to neo4j.Address().
-    # This will initially be interpreted as IPv4, but DNS resolution
-    # will turn it into IPv6 if appropriate.
-    yield "::1", 7687
-    # This will be interpreted as IPv6 directly, but DNS resolution will
-    # still happen.
-    yield "::1", 7687, 0, 0
-    yield "127.0.0.1", 7687
-
-
-driver = neo4j.GraphDatabase.driver("neo4j://example.com:9999",
-                                    auth=(USERNAME, PASSWORD),
-                                    resolver=custom_resolver)
 ----
 
 
