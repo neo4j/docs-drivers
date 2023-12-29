@@ -1,4 +1,3 @@
-
 = Advanced connection information
 
 include::{common-partial}/connect-advanced.adoc[tag=connection-uri]
@@ -23,6 +22,7 @@ GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword))
 
 [INFO]
 The basic authentication scheme can also be used to authenticate against an LDAP server (Enterprise Edition only).
+
 
 === Kerberos authentication
 
@@ -52,6 +52,7 @@ GraphDatabase.driver(dbUri, AuthTokens.bearer(ticket))
 [NOTE]
 The bearer authentication scheme requires link:{neo4j-docs-base-uri}/operations-manual/current/authentication-authorization/sso-integration[configuring Single Sign-On on the server].
 Once configured, clients can discover Neo4j's configuration through the link:{neo4j-docs-base-uri}/http-api/current/discovery/[Discovery API].
+
 
 === Custom authentication
 
@@ -193,6 +194,7 @@ try (var driver = GraphDatabase.driver(
 == Further connection parameters
 
 You can find all `Driver` configuration parameters in the link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/GraphDatabase.html[API documentation -- driver.GraphDatabase].
+
 
 ifndef::backend-pdf[]
 [discrete.glossary]

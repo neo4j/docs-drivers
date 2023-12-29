@@ -3,54 +3,54 @@
 
 [source, java]
 ----
-package ac.simons.neo4j.migrations.core;
+package demo;
 
+import java.util.Map;
+import java.util.concurrent.CompletionStage;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
+import org.neo4j.driver.async.AsyncSession;
 import org.neo4j.driver.AuthTokens;
 import org.neo4j.driver.Driver;
 import org.neo4j.driver.GraphDatabase;
-import org.neo4j.driver.async.AsyncSession;
 import org.neo4j.driver.summary.ResultSummary;
+import org.neo4j.driver.SessionConfig;
 
 public class App {
 
+    public static void main(String... args) throws ExecutionException, InterruptedException {
+        final String dbUri = "neo4j://localhost";
+        final String dbUser = "neo4j";
+        final String dbPassword = "verysecret";
 
-	private App() {
-	}
+        try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword))) {  // <1>
+            driver.verifyConnectivity();
+            var summary = printAllProducts(driver);
+            // Block as long as necessary
+            System.out.println(summary.get());  // <7>
+        }
+    }
 
-	private static final String URI = "neo4j://localhost";
-	private static final String USER = "neo4j";
-	private static final String PASSWORD = "verysecret";
-
-	public static void main(String... args) throws ExecutionException, InterruptedException {
-		try (var driver = GraphDatabase.driver(URI, AuthTokens.basic(USER, PASSWORD))) {
-			driver.verifyConnectivity();
-			var rs = printAllProducts(driver);
-			// Block as long as necessary
-			System.out.println(rs.get());
-		}
-	}
-
-	public static CompletableFuture<ResultSummary> printAllProducts(Driver driver) {
-		var query = "MERGE (p:Person {name: 'Stefano'}) RETURN p.name";
-		var session = driver.session(AsyncSession.class);
-		return session.executeReadAsync(tx -> tx.runAsync(query)
-				.thenCompose(cursor -> cursor.forEachAsync(record -> {
-					System.out.println(record.get(0).asString());
-				})))
-			.whenComplete((rs, e) -> {
-				System.out.println("closed" + e);
-				session.closeAsync().exceptionally(e2 -> {
-					System.out.println("Could not close session");
-					return null;
-				});
-			})
-			.toCompletableFuture();
-	}
+    public static CompletableFuture<ResultSummary> printAllProducts(Driver driver) {
+        var query = "MERGE (p:Person {name: $name}) RETURN p.name";
+        var session = driver.session(AsyncSession.class, SessionConfig.builder().withDatabase("neo4j").build());  // <2>
+        var summary = session.executeWriteAsync(tx -> tx.runAsync(query, Map.of("name", "Olivia")) // <3>
+                .thenCompose(resCursor -> resCursor.forEachAsync(record -> {  // <4>
+                    System.out.println(record.get(0).asString());
+                })))
+            .whenComplete((result, error) -> {  // <5>
+                session.closeAsync();
+            })
+            .toCompletableFuture();  // <6>
+        return summary;
+    }
 }
 ----
+
+<1> l
+<1> l
+<1> l
 
 
 ifndef::backend-pdf[]
