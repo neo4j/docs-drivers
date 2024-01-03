@@ -167,7 +167,7 @@ Therefore, the only way to execute these queries from a driver is to use auto-co
 
 Please refer to the following for more details:
 
-* link:{neo4j-docs-base-uri}/cypher-manual/{page-version}/clauses/call-subquery#subquery-call-in-transactions[Cypher Manual -> `CALL {} IN TRANSACTIONS`]
+* link:{neo4j-docs-base-uri}/cypher-manual/{page-version}/subqueries/subqueries-in-transactions/[Cypher Manual -> CALL subqueries in transactions]
 ====
 
 # end::simple-autocommit-transactions[]
