@@ -29,7 +29,7 @@ To ensure an implicit transaction is committed, you can call the `.Consume(ctx)`
 Since the driver cannot figure out whether the query in a `SessionWithContext.Run()` call requires a read or write session with the database, it defaults to write. If your implicit transaction contains read queries only, there is a performance gain in xref:transactions#_request_routing[making the driver aware] by setting the session config `AccessMode: neo4j.AccessModeRead` when creating the session.
 
 [TIP]
-*Implicit transactions are the only ones that can be used for link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/call-subquery/#subquery-call-in-transactions[`CALL { ... } IN TRANSACTIONS`] queries*.
+*Implicit transactions are the only ones that can be used for link:{neo4j-docs-base-uri}/cypher-manual/{page-version}/subqueries/subqueries-in-transactions[`CALL { ... } IN TRANSACTIONS`] queries*.
 
 
 === Import CSV files
