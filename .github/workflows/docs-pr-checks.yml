@@ -39,7 +39,7 @@ jobs:
     steps:
       - name: Get file changes
         id: get-file-changes
-        uses: tj-actions/changed-files@v37
+        uses: tj-actions/changed-files@v41
         with:
           separator: ','
           files_yaml: |
