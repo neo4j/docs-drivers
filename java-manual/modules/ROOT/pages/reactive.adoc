@@ -1,4 +1,7 @@
-= Run non-blocking asynchronous queries
+= Control results flow with reactive streams
+
+Typical of reactive programming, in a reactive flow consumers control the rate at which they consume records from queries, and the driver in turn manages the rate at which records are requested from the server.
+The reactive API ensures that the receiving side is not forced to buffer arbitrary amounts of data.
 
 
 [source, java]

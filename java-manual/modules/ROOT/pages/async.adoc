@@ -1,10 +1,10 @@
 = Run non-blocking asynchronous queries
 
-The examples in xref:query-simple.adoc[Query the database] and xref:transactions.adoc[Run your own transactions] use the driver in a synchronous way. 
-This means that, when running a query against the database, your application waits for the server to retrieve all the results and transmit them to the driver. 
+The examples in xref:query-simple.adoc[Query the database] and xref:transactions.adoc[Run your own transactions] use the driver in its synchronous form.
+This means that, when running a query against the database, your application waits for the server to retrieve all the results and transmit them to the driver.
 This is not a problem for most use cases, but for queries that have a long processing time or a large result set, asynchronous handling may speed up your application.
 
-You may run an asynchronous transaction through an link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/async/AsyncSession.html[`AsyncSession`]. 
+You may run an asynchronous transaction through an link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/async/AsyncSession.html[`AsyncSession`].
 The flow is similar to that of regular xref:transactions.adoc[transactions], except that transaction functions return a link:https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/CompletionStage.html[`CompletionStage`] object (which may be further converted into link:https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/CompletableFuture.html[`CompletableFuture`]).
 
 
@@ -33,19 +33,21 @@ public class App {
 
         try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword))) {  // <1>
             driver.verifyConnectivity();
-            var summary = printAllProducts(driver);
+            var summary = printAllPeople(driver);
             // Block as long as necessary
             System.out.println(summary.get());  // <8>
         }
     }
 
-    public static CompletableFuture<ResultSummary> printAllProducts(Driver driver) {
+    public static CompletableFuture<ResultSummary> printAllPeople(Driver driver) {
         var session = driver.session(AsyncSession.class, SessionConfig.builder().withDatabase("neo4j").build());  // <2>
-        
-        var query = "MERGE (p:Person {name: $name}) RETURN p.name";
-        var parameters = Map.of("name", "Olivia");
+
+        var query = """
+        UNWIND ['Alice', 'Bob', 'Sofia', 'Charles'] AS name
+        MERGE (p:Person {name: $name}) RETURN p.name
+        """;
         var summary = session.executeWriteAsync(tx -> {
-            tx.runAsync(query, parameters) // <3>
+            tx.runAsync(query) // <3>
             .thenCompose(resCursor -> resCursor.forEachAsync(record -> {  // <4>
                 System.out.println(record.get(0).asString());
             }))
@@ -62,8 +64,8 @@ public class App {
 
 <1> Driver creation is the same in the synchronous and asynchronous versions.
 <2> An asynchronous session is created by providing `AsyncSession.class` as first parameter to link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Driver.html#session(java.lang.Class,org.neo4j.driver.SessionConfig)[`Driver.session()`].
-<3> As for regular transactions, `.executeWriteAsync()` (and `executeReadAsync()`) take a transaction function callback. 
-Inside the transaction function, run queries with link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/async/AsyncQueryRunner.html#runAsync(org.neo4j.driver.Query)[`.runAsync()`]. 
+<3> As for regular transactions, `.executeWriteAsync()` (and `executeReadAsync()`) take a transaction function callback.
+Inside the transaction function, run queries with link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/async/AsyncQueryRunner.html#runAsync(org.neo4j.driver.Query)[`.runAsync()`].
 Each query run returns a link:https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/CompletionStage.html[`CompletionStage`].
 <4> Optionally use methods on `CompletionStage` to process the result in the asynchronous runner.
 The query's result set is available as an link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/cursor/AsyncResultCursor.html[`AsyncResultCursor`], which implements a similar set of methods for processing the result to those of synchronous transactions (see xref:transactions.adoc#process-result[Transactions -- Process query results]). +

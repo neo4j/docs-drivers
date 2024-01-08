@@ -10,10 +10,10 @@
 
 * xref:transactions.adoc[Run your own transactions]
 * xref:result-summary.adoc[Explore the query execution summary]
-* xref:async.adoc[Asynchronous queries]
+* xref:async.adoc[Run asynchronous queries]
 * xref:bookmarks.adoc[Coordinate parallel transactions]
 * xref:query-advanced.adoc[Further query mechanisms]
-* xref:reactive.adoc[Reactive queries]
+* xref:reactive.adoc[Control results flow with reactive streams]
 * xref:performance.adoc[Performance recommendations]
 
 * *Reference*

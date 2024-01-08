@@ -1,6 +1,6 @@
 = Data types and mapping to Cypher types
 
-The tables in this section show the mapping between Cypher data types and Python types.
+The tables in this section show the mapping between Cypher data types and Java types.
 
 == Core types
 
