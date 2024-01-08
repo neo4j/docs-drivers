@@ -187,6 +187,17 @@ Note that although transactions functions might be executed multiple times, the 
 A session can chain multiple transactions, but *only one single transaction can be active within a session at any given time*.
 To maintain multiple concurrent transactions, use multiple concurrent sessions.
 
+[#executeWriteWithoutResult]
+[TIP]
+====
+The transaction functions callback passed to `.executeRead()` and `.executeWrite()` may return anything, as the return type is a Java Generic.
+**That also means they may not return `void`**, as that is not an instance of `Object`. +
+If you are not interested in returning anything out of a transaction function, you may either
+
+1. use `.executeWriteWithoutResult()`, which supports returning `void` (and `void` only);
+2. use `.executeRead()`/`.executeWrite()` and return `null` in the transaction function.
+====
+
 
 [#explicit-transactions]
 == Run an explicit transaction
