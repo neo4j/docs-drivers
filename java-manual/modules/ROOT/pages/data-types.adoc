@@ -26,7 +26,7 @@ The driver provides a set of temporal data types compliant with ISO-8601 and Cyp
 Sub-second values are measured to nanosecond precision.
 
 The driver's types rely on Java's link:https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/package-summary.html[`time`] types.
-All temporal types, except link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/types/IsoDuration.html[`IsoDuration`], are in fact `java.time` objects under the hood.
+All temporal types, except link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/DurationValue.html[`DurationValue`], are in fact `java.time` objects under the hood.
 This means that:
 
 - if you want to _query_ the database with a temporal type, instantiate a `java.time` object and use it as query parameter (i.e. you don't need to care about driver's types).
@@ -81,108 +81,27 @@ public class App {
                 .execute();
             var date = result.records().get(0).get("date");
             System.out.println(date.getClass().getName());  // org.neo4j.driver.internal.value.DateTimeValue
+            System.out.println(date.asZonedDateTime().getClass().getName());  // java.time.ZonedDateTime
             System.out.println(date);  // 2016-12-16T13:59:59.009999999+01:00[Europe/Stockholm]
         }
     }
 }
 ----
 
-For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#temporal-data-types[API documentation -- Temporal data types].
 
+=== `DurationValue`
 
-=== `Date`
+Represents the difference between two points in time (expressed in months, days, seconds, nanoseconds).
 
-Represents an instant capturing the date, but not the time, nor the timezone.
-
-[source, python]
+[source, java]
 ----
-from neo4j.time import Date
+// import org.neo4j.driver.Values;
 
-d = Date(year=2021, month=11, day=2)
-print(d)  # '2021-11-02'
+var duration = Values.isoDuration(1, 2, 3, 4);  // months, days, seconds, nanoseconds
+System.out.println(duration);  // P1M2DT3.000000004S
 ----
 
-For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/types/temporal.html#date[API documentation -- Temporal data types -- Date].
-
-
-=== `Time`
-
-Represents an instant capturing the time, and the timezone offset in seconds, but not the date.
-
-[source, python]
-----
-from neo4j.time import Time
-import pytz
-
-t = Time(hour=7, minute=47, nanosecond=4123, tzinfo=pytz.FixedOffset(-240))
-print(t)  # '07:47:00.000004123-04:00'
-----
-
-For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/types/temporal.html#time[API documentation -- Temporal data types -- Time].
-
-
-=== `LocalTime`
-
-Represents an instant capturing the time of day, but not the date, nor the timezone.
-
-[source, python]
-----
-from neo4j.time import Time
-
-t = Time(hour=7, minute=47, nanosecond=4123)
-print(t)  # '07:47:00.000004123'
-----
-
-For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/types/temporal.html#time[API documentation -- Temporal data types -- Time].
-
-
-=== `DateTime`
-
-Represents an instant capturing the date, the time, and the timezone identifier.
-
-[source, python]
-----
-from neo4j.time import DateTime
-import pytz
-
-dt = DateTime(year=2021, month=11, day=2, hour=7, minute=47, nanosecond=4123)
-dt = pytz.timezone("US/Eastern").localize(dt)  # time zone localization (optional)
-print(dt)  # '2021-11-02T07:47:00.000004123-04:00'
-----
-
-For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/types/temporal.html#datetime[API documentation -- Temporal data types -- DateTime].
-
-
-=== `LocalDateTime`
-
-Represents an instant capturing the date and the time, but not the timezone.
-
-[source, python]
-----
-from neo4j.time import DateTime
-
-dt = DateTime(year=2021, month=11, day=2, hour=7, minute=47, nanosecond=4123)
-print(dt)  # '2021-11-02T07:47:00.000004123'
-----
-
-For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/types/temporal.html#datetime[API documentation -- Temporal data types -- DateTime].
-
-
-=== `Duration`
-
-Represents the difference between two points in time.
-A `datetime.timedelta` object passed as a parameter will always be implicitly converted to `neo4j.time.Duration`.
-It is not possible to convert from `neo4j.time.Duration` to `datetime.timedelta` (because `datetime.timedelta` lacks month support).
-
-[source, python]
-----
-from neo4j.time import Duration
-
-duration = Duration(years=1, days=2, seconds=3, nanoseconds=4)
-print(duration)  # 'P1Y2DT3.000000004S'
-----
-
-For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/types/temporal.html#duration[API documentation -- Temporal data types -- Duration].
+For full documentation, see link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/DurationValue.html[API documentation -- DurationValue].
 
 
 == Spatial types
@@ -390,56 +309,16 @@ with GraphDatabase.driver(URI, auth=AUTH) as driver:
 For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.graph.Path[API documentation -- Graph types -- Path].
 
 
-== Extended types
-
-The driver supports more types as query parameters, which get automatically mapped to one of the xref:_core_types[core types]. Because of this conversion, and because the server does not know anything about the extended types, the driver will never return these types in results, but always their corresponding mapping.
-
-[options="header"]
-|===
-| Parameter Type     | Mapped Python Type
-| tuple              | `list`
-| bytearray          | `bytes`
-| numpy `ndarray`    | `list` (nested)
-| pandas `DataFrame` | `dict`
-| pandas `Series`    | `list`
-| pandas `Array`     | `list`
-|===
-
-
-In general, if you are unsure about the type conversion that would happen on a given parameter, you can test it as in the following example:
-
-[source, python]
-----
-import neo4j
-
-with neo4j.GraphDatabase.driver(URI, auth=AUTH) as driver:
-    type_in = ("foo", "bar")
-    records, _, _ = driver.execute_query("RETURN $x AS type_out", x=type_in)
-    type_out = records[0].get("type_out")
-    print(type(type_out))  # <class 'list'>
-    print(type_out)        # ['foo', 'bar']
-----
-
-
 == Exceptions
 
 The driver can raise a number of different exceptions.
-A full list is available in the link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#errors[API documentation].
-For a list of errors the server can return, see the link:{neo4j-docs-base-uri}/status-codes/{page-version}[Status code] page.
-
-.Root exception types
-[options="header", cols="<25m,<75a"]
-|===
-| Classification    | Description
-|Neo4jError         | Errors reported by the Neo4j server (e.g., wrong Cypher syntax, bad connection, wrong credentials, ...)
-
-|DriverError        | Errors reported by the driver (e.g., bad usage of parameters or transactions, improper handling of results, ...)
-|===
+A full list is available in the link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/exceptions/package-summary.html[API documentation].
+For a list of errors the server can return, see link:{neo4j-docs-base-uri}/status-codes/{page-version}[Status codes].
 
 Some server errors are marked as safe to retry without need to alter the original request.
-Examples of such errors are deadlocks and memory issues.
-All driver's exception types implement the method `.is_retryable()`, which gives insights into whether a further attempt might be successful.
-This is particular useful when running queries in xref:transactions#explicit-transactions[explicit transactions], to know if a failed query should be run again.
+Examples of such errors are deadlocks, memory issues, or connectivity issues.
+Driver's exceptions implementing link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/exceptions/RetryableException.html[`RetryableException`] are such that a further attempt at the operation that caused it might be successful.
+This is particular useful when running queries in xref:transactions#explicit-transactions[explicit transactions], to know if a failed query is worth re-running.
 
 
 ifndef::backend-pdf[]
