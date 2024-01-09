@@ -6,83 +6,85 @@ The tables in this section show the mapping between Cypher data types and Java t
 
 [options="header"]
 |===
-| Cypher Type   | Python Type
+| Cypher type   | Java type
 | <<NULL>>      | `None`
-| `LIST`        | `list`
-| `MAP`         | `dict`
-| `BOOLEAN`     | `bool`
-| `INTEGER`     | `int`
-| `FLOAT`       | `float`
-| `STRING`      | `str`
-| `ByteArray`   | `bytearray`
+| `LIST`        | `List<Object>`
+| `MAP`         | `Map<String, Object>`
+| `BOOLEAN`     | `boolean`
+| `INTEGER`     | `long`
+| `FLOAT`       | `double`
+| `STRING`      | `String`
+| `ByteArray`   | `byte[]`
 |===
 
-For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#core-data-types[API documentation -- Core data types].
+See https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/package-summary.html
 
 
 == Temporal types
 
-Temporal data types are implemented by the `neo4j.time` module.
-It provides a set of types compliant with ISO-8601 and Cypher, which are similar to those found in Python's native `datetime` module.
-To convert between driver and native types, use the methods `.from_native()` and `.to_native()` (does not apply to `Duration`).
+The driver provides a set of temporal data types compliant with ISO-8601 and Cypher.
+Sub-second values are measured to nanosecond precision.
 
-Sub-second values are measured to nanosecond precision and the types are mostly compatible with link:https://pypi.org/project/pytz/[pytz].
-Some timezones (e.g., `pytz.utc`) work exclusively with the built-in `datetime.datetime`.
+The driver's types rely on Java's link:https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/package-summary.html[`time`] types.
+All temporal types, except link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/types/IsoDuration.html[`IsoDuration`], are in fact `java.time` objects under the hood.
+This means that:
 
-For a list of time zone abbreviations, see link:https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List[List of tz database time zones].
+- if you want to _query_ the database with a temporal type, instantiate a `java.time` object and use it as query parameter (i.e. you don't need to care about driver's types).
+- if you _retrieve_ a temporal object from the database (including through one of link:https://neo4j.com/docs/cypher-manual/current/functions/temporal/[_Cypher temporal functions_]), you will get back the corresponding _driver type_ as displayed in the table below. The driver implements methods to convert driver time types into Java ones (ex. `.asZonedDateTime()`, `.asOffsetTime()`, etc).
 
 [options="header"]
 |===
-| Cypher Type      | Python Type
-| `DATE`           | `neo4j.time.Date`
-| `ZONED TIME`     | `neo4j.time.Time`†
-| `LOCAL TIME`     | `neo4j.time.Time`††
-| `ZONED DATETIME` | `neo4j.time.DateTime`†
-| `LOCAL DATETIME` | `neo4j.time.DateTime`††
-| `DURATION`       | `neo4j.time.Duration`
+| Cypher type      | Java driver type
+| `DATE`           | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/DateValue.html[`DateValue`]
+| `ZONED TIME`     | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/TimeValue.html[`TimeValue`]
+| `LOCAL TIME`     | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/LocalTimeValue.html[`LocalTimeValue`]
+| `ZONED DATETIME` | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/DateTimeValue.html[`DateTimeValue`]
+| `LOCAL DATETIME` | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/LocalDateTimeValue.html[`LocalDateTimeValue`]
+| `DURATION`       | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/DurationValue.html[`DurationValue`]
 |===
 
-† Where `tzinfo` is not `None`. +
-†† Where `tzinfo` is `None`.
 
 .How to use temporal types in queries
-[source, python]
+[source, java]
 ----
-from datetime import datetime
-import pytz
-from neo4j import GraphDatabase
-from neo4j.time import DateTime
+package demo;
 
+import java.util.Map;
+import java.time.ZonedDateTime;
+import java.time.ZoneId;
 
-URI = "<URI for Neo4j database>"
-AUTH = ("<Username>", "<Password>")
+import org.neo4j.driver.AuthTokens;
+import org.neo4j.driver.Driver;
+import org.neo4j.driver.GraphDatabase;
+import org.neo4j.driver.QueryConfig;
 
+public class App {
 
-friends_since = DateTime(year=1999, month=11, day=23,
-                         hour=7, minute=47, nanosecond=4123)
-friends_since = pytz.timezone("US/Eastern").localize(friends_since)
+    public static void main(String... args) {
+        final String dbUri = "neo4j://localhost";
+        final String dbUser = "neo4j";
+        final String dbPassword = "verysecret";
 
-# Python's native datetimes work as well.
-# They don't support the full feature-set of Neo4j's type though.
-# py_friends_since = datetime(year=1999, month=11, day=23, hour=7, minute=47)
-# py_friends_since = pytz.timezone("US/Eastern").localize(py_friends_since)
+        try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword))) {
+            driver.verifyConnectivity();
 
-# Create a friendship with the given DateTime, and return the DateTime
-with GraphDatabase.driver(URI, auth=AUTH) as driver:
-    records, summary, keys = driver.execute_query("""
-        MERGE (a:Person {name: $name})
-        MERGE (b:Person {name: $friend})
-        MERGE (a)-[friendship:KNOWS {since: $friends_since}]->(b)
-        RETURN friendship.since
-        """, name="Alice", friend="Bob",
-        friends_since=friends_since  # or friends_since=py_friends_since
-    )
-    out_datetime = records[0]["friendship.since"]
-    print(out_datetime)  # 1999-11-23T07:47:00.000004123-05:00
-
-    # Converting DateTime to native datetime (lossy)
-    py_out_datetime = out_datetime.to_native()  # type: datetime
-    print(py_out_datetime)  # 1999-11-23 07:47:00.000004-05:00
+            // Define a date, with timezone, and use it to set a relationship property
+            var friendsSince = ZonedDateTime.of(2016, 12, 16, 13, 59, 59, 9999999, ZoneId.of("Europe/Stockholm"));
+            var result = driver.executableQuery("""
+                MERGE (a:Person {name: $name})
+                MERGE (b:Person {name: $friend})
+                MERGE (a)-[friendship:KNOWS {since: $friendsSince}]->(b)
+                RETURN friendship.since AS date
+                """)
+                .withParameters(Map.of("name", "Alice", "friend", "Bob", "friendsSince", friendsSince))
+                .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+                .execute();
+            var date = result.records().get(0).get("date");
+            System.out.println(date.getClass().getName());  // org.neo4j.driver.internal.value.DateTimeValue
+            System.out.println(date);  // 2016-12-16T13:59:59.009999999+01:00[Europe/Stockholm]
+        }
+    }
+}
 ----
 
 For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#temporal-data-types[API documentation -- Temporal data types].
@@ -193,7 +195,7 @@ You can think of it as a unique identifier for each spatial type.
 [options="header"]
 |===
 | Cypher Type         | Python Type
-| `POINT`             | `neo4j.spatial.Point`
+| `POINT`             | `Point`
 | `POINT (Cartesian)` | `neo4j.spatial.CartesianPoint`
 | `POINT (WGS-84)`    | `neo4j.spatial.WGS84Point`
 |===
