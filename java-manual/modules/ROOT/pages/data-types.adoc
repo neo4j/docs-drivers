@@ -2,22 +2,28 @@
 
 The tables in this section show the mapping between Cypher data types and Java types.
 
+When providing
+
+Regardless of their type, all values in query results are embedded within link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Value.html[`Value`] objects.
+To extract and cast them to the corresponding Java types, use .`as<type>()` (eg. `.asString()`, `asInt()`, etc).
+For example, if the `name` property coming from the database is a string, doing `record.get("name").asString()` will yield the property value as a `String` object. +
+
+For a complete list of the value types the driver serializes data into, see the link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/package-summary.html[API documentation].
+
 == Core types
 
 [options="header"]
 |===
-| Cypher type   | Java type
-| <<NULL>>      | `None`
-| `LIST`        | `List<Object>`
-| `MAP`         | `Map<String, Object>`
-| `BOOLEAN`     | `boolean`
-| `INTEGER`     | `long`
-| `FLOAT`       | `double`
-| `STRING`      | `String`
-| `ByteArray`   | `byte[]`
+| Cypher type   | Java driver type
+| <<NULL>>      | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/NullValue.html[`NullValue`]
+| `LIST`        | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/ListValue.html[`ListValue`]
+| `MAP`         | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/MapValue.html[`MapValue`]
+| `BOOLEAN`     | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/BooleanValue.html[`BooleanValue`]
+| `INTEGER`     | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/IntegerValue.html[`IntegerValue`]
+| `FLOAT`       | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/FloatValue.html[`FloatValue`]
+| `STRING`      | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/StringValue.html[`StringValue`]
+| `ByteArray`   | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/BytesValue.html[`BytesValue`]
 |===
-
-See https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/package-summary.html
 
 
 == Temporal types
@@ -30,7 +36,7 @@ All temporal types, except link:https://neo4j.com/docs/api/java-driver/current/o
 This means that:
 
 - if you want to _query_ the database with a temporal type, instantiate a `java.time` object and use it as query parameter (i.e. you don't need to care about driver's types).
-- if you _retrieve_ a temporal object from the database (including through one of link:https://neo4j.com/docs/cypher-manual/current/functions/temporal/[_Cypher temporal functions_]), you will get back the corresponding _driver type_ as displayed in the table below. The driver implements methods to convert driver time types into Java ones (ex. `.asZonedDateTime()`, `.asOffsetTime()`, etc).
+- if you _retrieve_ a temporal object from the database (including through one of link:https://neo4j.com/docs/cypher-manual/current/functions/temporal/[Cypher temporal functions]), you will get back the corresponding _driver type_ as displayed in the table below. The driver implements methods to convert driver time types into Java ones (ex. `.asZonedDateTime()`, `.asOffsetTime()`, etc).
 
 [options="header"]
 |===
@@ -79,10 +85,13 @@ public class App {
                 .withParameters(Map.of("name", "Alice", "friend", "Bob", "friendsSince", friendsSince))
                 .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
                 .execute();
+
             var date = result.records().get(0).get("date");
             System.out.println(date.getClass().getName());  // org.neo4j.driver.internal.value.DateTimeValue
-            System.out.println(date.asZonedDateTime().getClass().getName());  // java.time.ZonedDateTime
             System.out.println(date);  // 2016-12-16T13:59:59.009999999+01:00[Europe/Stockholm]
+
+            var nativeDate = date.asZonedDateTime();
+            System.out.println(nativeDate.getClass().getName());  // java.time.ZonedDateTime
         }
     }
 }
@@ -108,64 +117,90 @@ For full documentation, see link:https://neo4j.com/docs/api/java-driver/current/
 
 Cypher supports spatial values (points), and Neo4j can store these point values as properties on nodes and relationships.
 
-The object attribute `srid` (short for _Spatial Reference Identifier_) is a number identifying the coordinate system the spatial type is to be interpreted in.
+The attribute `SRID` (short for _Spatial Reference Identifier_) is a number identifying the coordinate system the spatial type is to be interpreted in.
 You can think of it as a unique identifier for each spatial type.
 
 [options="header"]
 |===
-| Cypher Type         | Python Type
-| `POINT`             | `Point`
-| `POINT (Cartesian)` | `neo4j.spatial.CartesianPoint`
-| `POINT (WGS-84)`    | `neo4j.spatial.WGS84Point`
+| Cypher type            | Java driver type | SRID
+| `POINT` (2D Cartesian) | `PointValue`     | 7203
+| `POINT` (2D WGS-84)    | `PointValue`     | 4326
+| `POINT` (3D Cartesian) | `PointValue`     | 9157
+| `POINT` (3D WGS-84)    | `PointValue`     | 4979
 |===
 
-For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/types/spatial.html[API documentation -- Spatial types].
+You create a point value through link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Values.html#point(int,double,double)[`Values.point(srid, x, y[, z\])`] (the third coordinate is optional).
+Points returned from database queries are of type link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/PointValue.html[`PointValue`], and can be converted to link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/types/Point.html[`Point`] objects through the method `.asPoint()`.
 
-=== `CartesianPoint`
-
-Represents a point in 2D/3D Cartesian space. +
-Exposes properties `x`, `y`, `z` (the latter for 3D points only).
-
-[source, python]
+.Receive a `Point` value from the database
+[source, java]
 ----
-from neo4j.spatial import CartesianPoint
+package demo;
 
-# A 2D CartesianPoint
-point = CartesianPoint((1.23, 4.56))
-print(point.x, point.y, point.srid)
-# 1.23 4.56 7203
+import java.util.Map;
 
-# A 3D CartesianPoint
-point = CartesianPoint((1.23, 4.56, 7.89))
-print(point.x, point.y, point.z, point.srid)
-# 1.23 4.56 7.8 9157
-----
+import org.neo4j.driver.AuthTokens;
+import org.neo4j.driver.Driver;
+import org.neo4j.driver.GraphDatabase;
+import org.neo4j.driver.QueryConfig;
+import org.neo4j.driver.Values;
 
-For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/types/spatial.html#cartesianpoint[API documentation -- Spatial types -- CartesianPoint].
+public class App {
 
-=== `WGS84Point`
+    public static void main(String... args) {
+        final String dbUri = "neo4j://localhost";
+        final String dbUser = "neo4j";
+        final String dbPassword = "verysecret";
 
-Represents a point in the World Geodetic System (WGS84). +
-Exposes properties `longitude`, `latitude`, `height` (the latter for 3D points only), which are aliases for `x`, `y`, `z`.
+        try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword))) {
+            driver.verifyConnectivity();
 
-[source, python]
-----
-from neo4j.spatial import WGS84Point
-
-# A 2D WGS84Point
-point = WGS84Point((1.23, 4.56))
-print(point.longitude, point.latitude, point.srid)
-# or print(point.x, point.y, point.srid)
-# 1.23 4.56 4326
-
-# A 3D WGS84Point
-point = WGS84Point((1.23, 4.56, 7.89))
-print(point.longitude, point.latitude, point.height, point.srid)
-# or print(point.x, point.y, point.z, point.srid)
-# 1.23 4.56 7.89 4979
+            var result = driver.executableQuery("RETURN point({x: 2.3, y: 4.5, z: 2}) AS point")
+                .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+                .execute();
+            var point = result.records().get(0).get("point");
+            System.out.println(point);  // Point{srid=9157, x=2.3, y=4.5, z=2.0}
+            System.out.println(point.asPoint().x());  // 2.3
+        }
+    }
+}
 ----
 
-For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/types/spatial.html#wgs84point[API documentation -- Spatial types -- WSG84Point].
+.Create a `Point` value and use it as property value
+[source, java]
+----
+package demo;
+
+import java.util.Map;
+
+import org.neo4j.driver.AuthTokens;
+import org.neo4j.driver.Driver;
+import org.neo4j.driver.GraphDatabase;
+import org.neo4j.driver.QueryConfig;
+import org.neo4j.driver.Values;
+
+public class App {
+
+    public static void main(String... args) {
+        final String dbUri = "neo4j://localhost";
+        final String dbUser = "neo4j";
+        final String dbPassword = "verysecret";
+
+        try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword))) {
+            driver.verifyConnectivity();
+
+            var location = Values.point(4326, 67.28775180193841, 17.734163823312397);  // 4326 = 2D geodetic point
+            var result = driver.executableQuery("CREATE (p:PlaceOfInterest {location: $location}) RETURN p")
+                .withParameters(Map.of("location", location))
+                .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+                .execute();
+            var place = result.records().get(0).get("p").get("location");
+            System.out.println(place);  // Point{srid=4326, x=67.28775180193841, y=17.734163823312397}
+            System.out.println(point.asPoint().y());  // 17.734163823312397
+        }
+    }
+}
+----
 
 
 == Graph types

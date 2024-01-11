@@ -63,8 +63,8 @@ System.out.printf("The query %s returned %d records in %d ms.%n",
 
 [TIP]
 Properties inside a link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Record.html[`Record`] object are embedded within link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Value.html[`Value`] objects.
-To extract and cast them to the relevant Java types, use .`as<type>()` (eg. `.asString()`, `asInt()`, etc).
-For example, if the `name` property coming from the database is a string, doing `record.get("name").asString()` will yield the property value.
+To extract and cast them to the corresponding Java types, use .`as<type>()` (eg. `.asString()`, `asInt()`, etc).
+For example, if the `name` property coming from the database is a string, doing `record.get("name").asString()` will yield the property value as a `String` object.
 
 
 == Update the database
