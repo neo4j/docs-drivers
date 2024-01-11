@@ -169,7 +169,7 @@ You can think of it as a unique identifier for each spatial type.
 | `POINT` (2D Cartesian) | `neo4j.Point2D` | 7203
 | `POINT` (2D WGS-84)    | `neo4j.Point2D` | 9157
 | `POINT` (3D Cartesian) | `neo4j.Point3D` | 4326
-| `POINT` (3D WGS-84)    | `neo4j.Point2D` | 4979
+| `POINT` (3D WGS-84)    | `neo4j.Point3D` | 4979
 |===
 
 [NOTE]
