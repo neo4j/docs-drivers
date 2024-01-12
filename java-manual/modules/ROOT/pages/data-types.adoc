@@ -2,19 +2,20 @@
 
 The tables in this section show the mapping between Cypher data types and Java types.
 
-When
-
 Regardless of their type, all values in query results are embedded within link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Value.html[`Value`] objects.
-To extract and cast them to the corresponding Java types, use .`as<type>()` (eg. `.asString()`, `asInt()`, etc).
-For example, if the `name` property coming from the database is a string, doing `record.get("name").asString()` will yield the property value as a `String` object. +
+To extract and cast them to the corresponding Java types, use `.as<type>()` (eg. `.asString()`, `asInt()`, etc).
+For example, if the `name` property coming from the database is a string, `record.get("name").asString()` will yield the property value as a `String` object.
+
+On the other hand, you don't need to use the driver types when submitting query parameters.
+The driver will automatically serialize objects of native Java types passed as parameters.
 
 For a complete list of the value types the driver serializes data into, see the link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/package-summary.html[API documentation].
 
 == Core types
 
-[options="header"]
 |===
-| Cypher type   | Java driver type
+| Cypher type   | Driver type
+
 | <<NULL>>      | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/NullValue.html[`NullValue`]
 | `LIST`        | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/ListValue.html[`ListValue`]
 | `MAP`         | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/MapValue.html[`MapValue`]
@@ -38,9 +39,9 @@ This means that:
 - if you want to _query_ the database with a temporal type, instantiate a `java.time` object and use it as query parameter (i.e. you don't need to care about driver's types).
 - if you _retrieve_ a temporal object from the database (including through one of link:https://neo4j.com/docs/cypher-manual/current/functions/temporal/[Cypher temporal functions]), you will get back the corresponding _driver type_ as displayed in the table below. The driver implements methods to convert driver time types into Java ones (ex. `.asZonedDateTime()`, `.asOffsetTime()`, etc).
 
-[options="header"]
 |===
-| Cypher type      | Java driver type
+| Cypher type      | Driver type
+
 | `DATE`           | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/DateValue.html[`DateValue`]
 | `ZONED TIME`     | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/TimeValue.html[`TimeValue`]
 | `LOCAL TIME`     | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/LocalTimeValue.html[`LocalTimeValue`]
@@ -120,9 +121,9 @@ Cypher supports spatial values (points), and Neo4j can store these point values 
 The attribute `SRID` (short for _Spatial Reference Identifier_) is a number identifying the coordinate system the spatial type is to be interpreted in.
 You can think of it as a unique identifier for each spatial type.
 
-[options="header"]
 |===
-| Cypher type            | Java driver type | SRID
+| Cypher type            | Driver type | SRID
+
 | `POINT` (2D Cartesian) | `PointValue`     | 7203
 | `POINT` (2D WGS-84)    | `PointValue`     | 4326
 | `POINT` (3D Cartesian) | `PointValue`     | 9157
@@ -210,7 +211,7 @@ public class App {
 
 [options="header"]
 |===
-| Cypher Type    | Java driver type
+| Cypher Type    | Driver type
 | `NODE`         | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/NodeValue.html[`NodeValue`]
 | `RELATIONSHIP` | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/RelationshipValue.html[`RelationshipValue`]
 | `PATH`         | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/NodeValue.html[`PathValue`]

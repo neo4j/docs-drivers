@@ -6,10 +6,42 @@ The reactive API ensures that the receiving side is not forced to buffer arbitra
 
 [source, java]
 ----
-public Flux<ResultSummary> printAllProducts() {
-    var query = new Query("MATCH (p:Product) WHERE p.id = $id RETURN p.title", Collections.singletonMap("id", 0));
+package demo;
 
-    return Flux.usingWhen(
+import java.util.Map;
+import java.util.concurrent.CompletionStage;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+
+import org.neo4j.driver.async.AsyncSession;
+import org.neo4j.driver.AuthTokens;
+import org.neo4j.driver.Driver;
+import org.neo4j.driver.GraphDatabase;
+import org.neo4j.driver.summary.ResultSummary;
+import org.neo4j.driver.SessionConfig;
+
+public class App {
+
+    public static void main(String... args) throws ExecutionException, InterruptedException {
+        final String dbUri = "neo4j://localhost";
+        final String dbUser = "neo4j";
+        final String dbPassword = "verysecret";
+
+        try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword))) {
+            driver.verifyConnectivity();
+            var summary = printAllPeople(driver);
+            // Block as long as necessary
+            System.out.println(summary.get());
+        }
+    }
+
+    public Flux<ResultSummary> printAllPeople() {
+        var query = """
+        UNWIND ['Alice', 'Bob', 'Sofia', 'Charles'] AS name
+        MERGE (p:Person {name: $name}) RETURN p.name
+        """;
+
+        return Flux.usingWhen(
             Mono.fromSupplier(() -> driver.session(ReactiveSession.class)),
             session -> flowPublisherToFlux(session.executeRead(tx -> {
                 var resultRef = new AtomicReference<ReactiveResult>();
@@ -21,7 +53,10 @@ public Flux<ResultSummary> printAllProducts() {
                 return publisherToFlowPublisher(flux);
             })),
             session -> flowPublisherToFlux(session.close()));
+    }
 }
+
+
 ----
 
 [source, java]
