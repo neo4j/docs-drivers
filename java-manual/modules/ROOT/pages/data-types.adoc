@@ -2,7 +2,7 @@
 
 The tables in this section show the mapping between Cypher data types and Java types.
 
-When providing
+When
 
 Regardless of their type, all values in query results are embedded within link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Value.html[`Value`] objects.
 To extract and cast them to the corresponding Java types, use .`as<type>()` (eg. `.asString()`, `asInt()`, etc).
@@ -110,7 +110,7 @@ var duration = Values.isoDuration(1, 2, 3, 4);  // months, days, seconds, nanose
 System.out.println(duration);  // P1M2DT3.000000004S
 ----
 
-For full documentation, see link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/DurationValue.html[API documentation -- DurationValue].
+For full documentation, see link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/DurationValue.html[API documentation -> DurationValue].
 
 
 == Spatial types
@@ -206,142 +206,257 @@ public class App {
 == Graph types
 
 *Graph types are only passed as results and may not be used as parameters*.
-The section Manipulate query results -- Transform to graph contains an example with graph types.
+
 
 [options="header"]
 |===
-| Cypher Type    | Python Type
-| `NODE`         | `neo4j.graph.Node`
-| `RELATIONSHIP` | `neo4j.graph.Relationship`
-| `PATH`         | `neo4j.graph.Path`
+| Cypher Type    | Java driver type
+| `NODE`         | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/NodeValue.html[`NodeValue`]
+| `RELATIONSHIP` | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/RelationshipValue.html[`RelationshipValue`]
+| `PATH`         | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/NodeValue.html[`PathValue`]
 |===
 
-For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#graph-data-types[API documentation -- Graph types].
 
+=== `NodeValue`
+Represents a node in a graph.
 
-=== `Node`
-Represents a node in a graph. +
-The property `element_id` provides an identifier for the entity.
-This should be used with care, as no guarantees are given about the mapping between id values and elements outside the scope of a single transaction. In other words, using an `element_id` to `MATCH` an element across different transactions is risky.
+.Essential methods on node objects
+[cols="1m,2"]
+|===
+|Method |Return
 
-[source, python]
+|.labels()
+|Node labels, as a list.
+
+|.asMap()
+|Node properties, as a map.
+
+|.get("<propertyName>")
+|Value for the given property.
+
+|.elementId()
+|String identifier for the relationship.
+This should be used with care, as no guarantees are given about the mapping between id values and elements outside the scope of a single transaction. In other words, using an `elementId` to `MATCH` an element across different transactions is risky.
+
+|===
+
+.Retrieve a node and display its details
+[source, java]
 ----
-from neo4j import GraphDatabase
+package demo;
 
+import java.util.Map;
 
-URI = "<URI for Neo4j database>"
-AUTH = ("<Username>", "<Password>")
+import org.neo4j.driver.AuthTokens;
+import org.neo4j.driver.Driver;
+import org.neo4j.driver.GraphDatabase;
+import org.neo4j.driver.QueryConfig;
 
-with GraphDatabase.driver(URI, auth=AUTH) as driver:
-    records, _, _ = driver.execute_query(
-        "MERGE (p:Person {name: $name}) RETURN p AS person",
-        name="Alice",
-        database_="neo4j",
-    )
-    for record in records:
-        node = record["person"]
-        print(f"Node ID: {node.element_id}\n"
-              f"Labels: {node.labels}\n"
-              f"Properties: {node.items()}\n"
-        )
+public class App {
 
-# Node ID: 4:73e9a61b-b501-476d-ad6f-8d7edf459251:0
-# Labels: frozenset({'Person'})
-# Properties: dict_items([('name', 'Alice')])
-----
+    public static void main(String... args) {
+        final String dbUri = "neo4j://localhost";
+        final String dbUser = "neo4j";
+        final String dbPassword = "verysecret";
 
-For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.graph.Node[API documentation -- Graph types -- Node].
+        try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword))) {
+            driver.verifyConnectivity();
 
+            // Get a node from the database
+            var result = driver.executableQuery("MERGE (p:Person:Actor {name: $name, age: 59}) RETURN p")
+                .withParameters(Map.of("name", "Alice"))
+                .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+                .execute();
 
-=== `Relationship`
+            // Extract node from result
+            var nodeVal = result.records().get(0).get("p");
+            var node = nodeVal.asNode();  // .asNode() -> type org.neo4j.driver.types.Node
 
-Represents a relationship in a graph. +
-The property `element_id` provides an identifier for the entity.
-This should be used with care, as no guarantees are given about the mapping between id values and elements outside the scope of a single transaction.
-
-[source, python]
-----
-from neo4j import GraphDatabase
-
-
-URI = "<URI for Neo4j database>"
-AUTH = ("<Username>", "<Password>")
-
-with GraphDatabase.driver(URI, auth=AUTH) as driver:
-    records, _, _ = driver.execute_query("""
-        MERGE (p:Person {name: $name})
-        MERGE (p)-[r:KNOWS {status: $status, since: date()}]->(friend:Person {name: $friend_name})
-        RETURN r AS friendship
-        """, name="Alice", status="BFF", friend_name="Bob",
-    )
-    for record in records:
-        relationship = record["friendship"]
-        print(f"Relationship ID: {relationship.element_id}\n"
-              f"Start node: {relationship.start_node}\n"
-              f"End node: {relationship.end_node}\n"
-              f"Type: {relationship.type}\n"
-              f"Friends since: {relationship.get('since')}\n"
-              f"All properties: {relationship.items()}\n"
-        )
-
-# Relationship ID: 5:73e9a61b-b501-476d-ad6f-8d7edf459251:1
-# Start node: <Node element_id='4:73e9a61b-b501-476d-ad6f-8d7edf459251:0' labels=frozenset({'Person'}) properties={'name': 'Alice'}>
-# End node: <Node element_id='4:73e9a61b-b501-476d-ad6f-8d7edf459251:2' labels=frozenset({'Person'}) properties={'name': 'Bob'}>
-# Type: KNOWS
-# Friends since: 2022-11-07
-# All properties: dict_items([('since', neo4j.time.Date(2022, 11, 7)), ('status', 'BFF')])
+            System.out.printf("Labels: %s %n", node.labels());
+            System.out.printf("Properties: %s %n", node.asMap());
+            System.out.printf("Name property: %s %n", node.get("name"));
+            System.out.printf("Element ID: %s %n", node.elementId());
+            /*
+            Labels: [Person, Actor]
+            Properties: {name=Alice, age=59}
+            Name property: "Alice"
+            Element ID: 4:549a0567-2015-4bb6-a40c-8536bf7227b0:5
+            */
+        }
+    }
+}
 ----
 
-For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.graph.Relationship[API documentation -- Graph types -- Relationship].
+For full documentation, see link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/NodeValue.html[API documentation -> NodeValue].
 
 
-=== `Path`
+=== `RelationshipValue`
+
+Represents a relationship in a graph.
+
+.Essential methods on relationsip objects
+[cols="1m,2"]
+|===
+|Method |Return
+
+|.type()
+|Relationship type.
+
+|.asMap()
+|Relationship properties, as a map.
+
+|.get("<propertyName>")
+|Value for the given property.
+
+|.startNodeElementId()
+|`elementId` of starting node.
+
+|.endNodeElementId()
+| `elementId` of ending node.
+
+|.elementId()
+|String identifier for the relationship.
+This should be used with care, as no guarantees are given about the mapping between id values and elements outside the scope of a single transaction. In other words, using an `elementId` to `MATCH` an element across different transactions is risky.
+
+|===
+
+.Retrieve a relationship and display its details
+[source, java]
+----
+package demo;
+
+import java.util.Map;
+
+import org.neo4j.driver.AuthTokens;
+import org.neo4j.driver.Driver;
+import org.neo4j.driver.GraphDatabase;
+import org.neo4j.driver.QueryConfig;
+
+public class App {
+
+    public static void main(String... args) {
+        final String dbUri = "neo4j://localhost";
+        final String dbUser = "neo4j";
+        final String dbPassword = "verysecret";
+
+        try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword))) {
+            driver.verifyConnectivity();
+
+            // Get a relationship from the database
+            var result = driver.executableQuery("""
+                MERGE (p:Person {name: $name})
+                MERGE (p)-[r:KNOWS {status: $status, since: date()}]->(friend:Person {name: $friendName})
+                RETURN r AS friendship
+                """)
+                .withParameters(Map.of("name", "Alice", "status", "BFF", "friendName", "Bob"))
+                .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+                .execute();
+
+            // Extract relationship from result
+            var relationshipVal = result.records().get(0).get("friendship");
+            var relationship = relationshipVal.asRelationship();  // .asRelationship() -> type org.neo4j.driver.types.Relationship
+
+            System.out.printf("Type: %s %n", relationship.type());
+            System.out.printf("Properties: %s %n", relationship.asMap());
+            System.out.printf("Status property: %s %n", relationship.get("status"));
+            System.out.printf("Start node: %s %n", relationship.startNodeElementId());
+            System.out.printf("End node: %s %n", relationship.endNodeElementId());
+            System.out.printf("Element ID: %s %n", relationship.elementId());
+            /*
+            Type: KNOWS
+            Properties: {since=2024-01-12, status=BFF}
+            Status property: "BFF"
+            Start node: 4:549a0567-2015-4bb6-a40c-8536bf7227b0:0
+            End node: 4:549a0567-2015-4bb6-a40c-8536bf7227b0:6
+            Element ID: 5:549a0567-2015-4bb6-a40c-8536bf7227b0:1
+            */
+        }
+    }
+}
+----
+
+For full documentation, see link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/RelationshipValue.html[API documentation -> RelationshipValue].
+
+
+=== `PathValue`
 
 Represents a path in a graph.
 
-[source, python]
+The driver breaks paths into (iterable) _segments_, consisting of a start node, one relationship, and an end node.
+Segments entities may be retrieved, in order, via the methods `.start()`, `.relationship()`, and `.end()`.
+
+.Retrieve a path and _walk_ it, listing nodes and relationship
+[source, java]
 ----
-from neo4j import GraphDatabase
-from neo4j.time import Date
+package demo;
 
+import java.util.Map;
 
-URI = "<URI for Neo4j database>"
-AUTH = ("<Username>", "<Password>")
+import org.neo4j.driver.AuthTokens;
+import org.neo4j.driver.Driver;
+import org.neo4j.driver.GraphDatabase;
+import org.neo4j.driver.types.Path;
+import org.neo4j.driver.QueryConfig;
 
-def add_friend(driver, name, status, date, friend_name):
-    driver.execute_query("""
-        MERGE (p:Person {name: $name})
-        MERGE (p)-[r:KNOWS {status: $status, since: $date}]->(friend:Person {name: $friend_name})
-        """, name=name, status=status, date=date, friend_name=friend_name,
-        database_="neo4j",
-    )
+public class App {
 
-with GraphDatabase.driver(URI, auth=AUTH) as driver:
-    # Create some :Person nodes linked by :KNOWS relationships
-    add_friend(driver, name="Alice", status="BFF", date=Date.today(), friend_name="Bob")
-    add_friend(driver, name="Bob", status="Fiends", date=Date.today(), friend_name="Sofia")
-    add_friend(driver, name="Sofia", status="Acquaintances", date=Date.today(), friend_name="Sofia")
+    public static void main(String... args) {
+        final String dbUri = "neo4j://localhost";
+        final String dbUser = "neo4j";
+        final String dbPassword = "verysecret";
 
-    # Follow :KNOWS relationships outgoing from Alice three times, return as path
-    records, _, _ = driver.execute_query("""
-        MATCH path=(:Person {name: $name})-[:KNOWS*3]->(:Person)
-        RETURN path AS friendship_chain
-        """, name="Alice",
-        database_="neo4j",
-    )
-    path = records[0]["friendship_chain"]
+        try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword))) {
+            driver.verifyConnectivity();
 
-    print("-- Path breakdown --")
-    for friendship in path:
-        print("{name} is friends with {friend} ({status})".format(
-            name=friendship.start_node.get("name"),
-            friend=friendship.end_node.get("name"),
-            status=friendship.get("status"),
-        ))
+            // Create some :Person nodes linked by :KNOWS relationships
+            addFriend(driver, "Alice", "BFF", "Bob");
+            addFriend(driver, "Bob", "Fiends", "Sofia");
+            addFriend(driver, "Sofia", "Acquaintances", "Sofia");
+
+            // Follow :KNOWS relationships outgoing from Alice three times, return as path
+            var result = driver.executableQuery("""
+                MATCH path=(:Person {name: $name})-[:KNOWS*3]->(:Person)
+                RETURN path AS friendshipChain
+                """)
+                .withParameters(Map.of("name", "Alice"))
+                .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+                .execute();
+
+            // Extract path from result
+            var pathVal = result.records().get(0).get("friendshipChain");
+            var path = pathVal.asPath();  // .asPath() -> type org.neo4j.driver.types.Path
+
+            System.out.println("-- Path breakdown --");
+            for (Path.Segment segment : path) {
+                System.out.printf(
+                    "%s is friends with %s (%s).%n",
+                    segment.start().get("name").asString(),
+                    segment.end().get("name").asString(),
+                    segment.relationship().get("status").asString());
+            }
+            /*
+            -- Path breakdown --
+            Alice is friends with Bob (BFF).
+            Bob is friends with Sofia (Fiends).
+            Sofia is friends with Sofia (Acquaintances).
+            */
+        }
+    }
+
+    public static void addFriend(Driver driver, String name, String status, String friendName) {
+        driver.executableQuery("""
+            MERGE (p:Person {name: $name})
+            MERGE (p)-[r:KNOWS {status: $status, since: date()}]->(friend:Person {name: $friendName})
+            """)
+            .withParameters(Map.of("name", name, "status", status, "friendName", friendName))
+            .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+            .execute();
+    }
+}
 
 ----
 
-For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.graph.Path[API documentation -- Graph types -- Path].
+For full documentation, see link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/PathValue.html[API documentation -> PathValue].
 
 
 == Exceptions
