@@ -11,6 +11,7 @@ The driver will automatically serialize objects of native Java types passed as p
 
 For a complete list of the value types the driver serializes data into, see the link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/package-summary.html[API documentation].
 
+
 == Core types
 
 |===
@@ -48,8 +49,8 @@ This means that:
 | `ZONED DATETIME` | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/DateTimeValue.html[`DateTimeValue`]
 | `LOCAL DATETIME` | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/LocalDateTimeValue.html[`LocalDateTimeValue`]
 | `DURATION`       | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/DurationValue.html[`DurationValue`]
-|===
 
+|===
 
 .How to use temporal types in queries
 [source, java]
@@ -128,6 +129,7 @@ You can think of it as a unique identifier for each spatial type.
 | `POINT` (2D WGS-84)    | `PointValue`     | 4326
 | `POINT` (3D Cartesian) | `PointValue`     | 9157
 | `POINT` (3D WGS-84)    | `PointValue`     | 4979
+
 |===
 
 You create a point value through link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Values.html#point(int,double,double)[`Values.point(srid, x, y[, z\])`] (the third coordinate is optional).
@@ -208,13 +210,13 @@ public class App {
 
 *Graph types are only passed as results and may not be used as parameters*.
 
-
-[options="header"]
 |===
 | Cypher Type    | Driver type
+
 | `NODE`         | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/NodeValue.html[`NodeValue`]
 | `RELATIONSHIP` | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/RelationshipValue.html[`RelationshipValue`]
 | `PATH`         | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/NodeValue.html[`PathValue`]
+
 |===
 
 

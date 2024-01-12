@@ -4,8 +4,8 @@ The examples in xref:query-simple.adoc[Query the database] and xref:transactions
 This means that, when running a query against the database, your application waits for the server to retrieve all the results and transmit them to the driver.
 This is not a problem for most use cases, but for queries that have a long processing time or a large result set, asynchronous handling may speed up your application.
 
-You may run an asynchronous transaction through an link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/async/AsyncSession.html[`AsyncSession`].
-The flow is similar to that of regular xref:transactions.adoc[transactions], except that transaction functions return a link:https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/CompletionStage.html[`CompletionStage`] object (which may be further converted into link:https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/CompletableFuture.html[`CompletableFuture`]).
+You run an asynchronous transaction through an link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/async/AsyncSession.html[`AsyncSession`].
+The flow is similar to that of xref:transactions.adoc[regular transactions], except that async transaction functions return a link:https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/CompletionStage.html[`CompletionStage`] object (which may be further converted into link:https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/CompletableFuture.html[`CompletableFuture`]).
 
 
 [source, java]
