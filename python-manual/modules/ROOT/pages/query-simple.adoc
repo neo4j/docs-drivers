@@ -14,7 +14,7 @@ To create a node representing a person named `Alice`, use the Cypher clause link
 .Create a node representing a person named `Alice`
 [source, python]
 ----
-summary = driver.execute_query(
+summary = drver.execute_query(
     "MERGE (:Person {name: $name})",  # <1>
     name="Alice",  # <2>
     database_="neo4j",  # <3>
@@ -43,7 +43,7 @@ To retrieve information from the database, use the Cypher clause link:{neo4j-doc
 [source, python]
 ----
 records, summary, keys = driver.execute_query(
-    "MATCH (p:Person) RETURN p.name AS name",
+    "MACH (p:Person) RETURN p.name AS name",
     database_="neo4j",
 )
 
