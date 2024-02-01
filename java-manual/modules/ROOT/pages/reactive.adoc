@@ -22,54 +22,47 @@ import org.neo4j.driver.SessionConfig;
 
 public class App {
 
-    public static void main(String... args) throws ExecutionException, InterruptedException {
-        final String dbUri = "neo4j://localhost";
-        final String dbUser = "neo4j";
-        final String dbPassword = "verysecret";
+    @Test
+    void demoSessionRun() {
+        var config = Config.builder()
+                .withLogging(Logging.console(Level.FINE))
+                .build();
+        var driver = GraphDatabase.driver(neo4j.uri(), neo4j.authTokenManager(), config);
 
-        try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword))) {
-            driver.verifyConnectivity();
-            var summary = printAllPeople(driver);
-            // Block as long as necessary
-            System.out.println(summary.get());
-        }
+        var records = Flux.usingWhen(
+                Mono.just(driver.session(ReactiveSession.class)),
+                reactiveSession -> Mono.fromDirect(reactiveSession.run("UNWIND range (1, 5) AS x RETURN x")).flatMapMany(ReactiveResult::records),
+                ReactiveSession::close);
+
+        // block for demonstration purposes
+        var values = records.map(record -> record.get("x")).collectList().block();
+        System.out.println(values);
+
+        driver.close();
     }
 
-    public Flux<ResultSummary> printAllPeople() {
-        var query = """
-        UNWIND ['Alice', 'Bob', 'Sofia', 'Charles'] AS name
-        MERGE (p:Person {name: $name}) RETURN p.name
-        """;
+    @Test
+    void demoSessionExecuteRead() {
+        var config = Config.builder()
+                .withLogging(Logging.console(Level.FINE))
+                .build();
+        var driver = GraphDatabase.driver(neo4j.uri(), neo4j.authTokenManager(), config);
 
-        return Flux.usingWhen(
-            Mono.fromSupplier(() -> driver.session(ReactiveSession.class)),
-            session -> flowPublisherToFlux(session.executeRead(tx -> {
-                var resultRef = new AtomicReference<ReactiveResult>();
-                var flux = flowPublisherToFlux(tx.run(query))
-                        .doOnNext(resultRef::set)
-                        .flatMap(result -> flowPublisherToFlux(result.records()))
-                        .doOnNext(record -> System.out.println(record.get(0).asString()))
-                        .then(Mono.defer(() -> Mono.from(flowPublisherToFlux(resultRef.get().consume()))));
-                return publisherToFlowPublisher(flux);
-            })),
-            session -> flowPublisherToFlux(session.close()));
+        var records = Flux.usingWhen(
+                Mono.just(driver.session(ReactiveSession.class)),
+                reactiveSession -> Mono.fromDirect(reactiveSession.executeRead(tx -> Mono.fromDirect(tx.run("UNWIND range (1, 5) AS x RETURN x")).flatMapMany(ReactiveResult::records))),
+                ReactiveSession::close);
+
+        // block for demonstration purposes
+        var values = records.map(record -> record.get("x")).collectList().block();
+        System.out.println(values);
+
+        driver.close();
     }
+
 }
 
 
-----
-
-[source, java]
-----
-public Flux<String> readProductTitles() {
-    var query = new Query("MATCH (p:Product) WHERE p.id = $id RETURN p.title", Collections.singletonMap("id", 0));
-    return Flux.usingWhen(
-            Mono.fromSupplier(() -> driver.session(ReactiveSession.class)),
-            session -> flowPublisherToFlux(session.run(query))
-                    .flatMap(result -> flowPublisherToFlux(result.records()))
-                    .map(record -> record.get(0).asString()),
-            session -> flowPublisherToFlux(session.close()));
-}
 ----
 
 
