@@ -250,14 +250,6 @@ var result = driver.executableQuery("MATCH (p:Person) RETURN p.name")
 
 When impersonating a user, the query is run within the complete security context of the impersonated user and not the authenticated user (i.e., home database, permissions, etc.).
 
-////
-=== Transform query result
-
-You can transform a query's result into a different data structure using the `result_transformer_` argument.
-The driver provides built-in methods to transform the result into a pandas dataframe or into a graph, but you can also craft your own transformer.
-
-For more information, see xref:transformers.adoc[Manipulate query results].
-////
 
 == A full example
 
@@ -286,7 +278,7 @@ public class App {
         try (var driver = GraphDatabase.driver(URI, AuthTokens.basic(USER, PASSWORD))) {
 
             List<Map> people = List.of(
-                Map.of("name", "Alice", "age", 42, "friends", Arrays.asList("Bob", "Peter", "Anna")),
+                Map.of("name", "Alice", "age", 42, "friends", List.of("Bob", "Peter", "Anna")),
                 Map.of("name", "Bob", "age", 19),
                 Map.of("name", "Peter", "age", 50),
                 Map.of("name", "Anna", "age", 30)
@@ -343,6 +335,7 @@ public class App {
 
             } catch (Exception e) {
                 System.out.println(e.getMessage());
+                System.exit(1);
             }
         }
     }
