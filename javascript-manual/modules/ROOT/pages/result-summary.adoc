@@ -86,7 +86,7 @@ console.log(summary.counters.containsSystemUpdates())  // false
 ## Query execution plan
 
 If you prefix a query with `EXPLAIN`, the server will return the plan it _would_ use to run the query, but will not actually run it.
-The plan is then available as a link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/result-summary.js~Plan.html[`Plan`] object under the property `ResultSummary.plan`, and contains the list of link:{neo4j-docs-base-uri}/cypher-manual/current/execution-plans/operators/[Cypher operators] that would be used to retrieve the result set.
+The plan is then available as a link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/result-summary.js~Plan.html[`Plan`] object under the property `ResultSummary.plan`, and contains the list of link:{neo4j-docs-base-uri}/cypher-manual/current/planning-and-tuning/operators/[Cypher operators] that would be used to retrieve the result set.
 You may use this information to locate potential bottlenecks or room for performance improvements (for example through the creation of indexes).
 
 [source, javascript, role=nocollapse]
