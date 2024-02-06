@@ -14,3 +14,6 @@ updates:
         dependency-type: "production"
       dev-dependencies:
         dependency-type: "development"
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-minor", "version-update:semver-patch"]
