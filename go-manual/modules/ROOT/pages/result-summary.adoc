@@ -81,7 +81,7 @@ There are two additional boolean methods which act as meta-counters:
 ## Query execution plan
 
 If you prefix a query with `EXPLAIN`, the server will return the plan it _would_ use to run the query, but will not actually run it.
-You can retrieve the plan by calling `ResultSummary.Plan()`, which contains the list of link:{neo4j-docs-base-uri}/cypher-manual/current/execution-plans/operators/[Cypher operators] that would be used to retrieve the result set.
+You can retrieve the plan by calling `ResultSummary.Plan()`, which contains the list of link:{neo4j-docs-base-uri}/cypher-manual/current/planning-and-tuning/operators/[Cypher operators] that would be used to retrieve the result set.
 You may use this information to locate potential bottlenecks or room for performance improvements (for example through the creation of indexes).
 
 [source, go, role=nocollapse]
