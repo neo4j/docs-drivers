@@ -65,7 +65,7 @@ If you need to pass parameters to `to_df`, use `lambda` functions: +
 The driver can transform the result into a collection of graph objects.
 To achieve this, use the `.execute_query()` keyword argument `result_transformer_` and set it to `neo4j.Result.graph`.
 To make the most out of this method, your query should return a graph-like result instead of a single column.
-The graph transformer exposes the properties `nodes` and `relationships`, which are set views into xref:data-types#_node[`Node`] and xref:data-types#_relationship[`Relationship`] objects.
+The graph transformer returns a link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.graph.Graph[`Graph`] object exposing the properties `nodes` and `relationships`, which are set views into xref:data-types#_node[`Node`] and xref:data-types#_relationship[`Relationship`] objects.
 
 You can use the graph format for further processing or to visualize the query result.
 An example implementation that uses the `pyvis` library to draw the graph is below.
