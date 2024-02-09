@@ -1,18 +1,22 @@
-The Neo4j Python driver is the official library to interact with a Neo4j instance through a Python application.
+The Neo4j Java driver is the official library to interact with a Neo4j instance through a Java application.
 
 At the hearth of Neo4j lies <<Cypher>>, the query language you use to interact with a Neo4j database.
-While this guide does not _require_ you to be a seasoned Cypher querier, it is going to be easier to focus on the Python-specific bits if you already know some Cypher.
+While this guide does not _require_ you to be a seasoned Cypher querier, it is going to be easier to focus on the Java-specific bits if you already know some Cypher.
 For this reason, although this guide does _also_ provide a gentle introduction to Cypher along the way, consider checking out link:{neo4j-docs-base-uri}/getting-started/cypher-intro/[Getting started -> Cypher] for a more detailed walkthrough of graph databases modelling and querying if this is your first approach.
-You may then apply that knowledge while following this guide to develop your Python application.
+You may then apply that knowledge while following this guide to develop your Java application.
 
 
 == Installation
 
-Install the Neo4j Python driver with `pip`:
+Add the Neo4j Java driver to the list of dependencies in the `pom.xml` of your Maven project:
 
-[source, bash]
+[source, xml, subs="attributes+"]
 ----
-pip install neo4j
+<dependency>
+    <groupId>org.neo4j.driver</groupId>
+    <artifactId>neo4j-java-driver</artifactId>
+    <version>{java-driver-version}</version>
+</dependency>
 ----
 
 xref:install#install-driver[More info on installing the driver ->]
@@ -21,18 +25,29 @@ xref:install#install-driver[More info on installing the driver ->]
 == Connect to the database
 
 Connect to a database by creating a <<Driver>> object and providing a URL and an authentication token.
-Once you have a `Driver` instance, use the `.verify_connectivity()` method to ensure that a working connection can be established.
+Once you have a `Driver` instance, use the `.verifyConnectivity()` method to ensure that a working connection can be established.
 
-[source, python]
+[source, java, role=nocollapse]
 ----
-from neo4j import GraphDatabase
+package main;
 
-# URI examples: "neo4j://localhost", "neo4j+s://xxx.databases.neo4j.io"
-URI = "<URI for Neo4j database>"
-AUTH = ("<Username>", "<Password>")
+import org.neo4j.driver.AuthTokens;
+import org.neo4j.driver.GraphDatabase;
 
-with GraphDatabase.driver(URI, auth=AUTH) as driver:
-    driver.verify_connectivity()
+public class App {
+
+    public static void main(String... args) {
+
+        // URI examples: "neo4j://localhost", "neo4j+s://xxx.databases.neo4j.io"
+        final String dbUri = "<URI for Neo4j database>";
+        final String dbUser = "<Username>";
+        final String dbPassword = "<Password>";
+
+        try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword))) {
+            driver.verifyConnectivity();
+        }
+    }
+}
 ----
 
 xref:connect.adoc[More info on connecting to a database ->]
@@ -40,27 +55,31 @@ xref:connect.adoc[More info on connecting to a database ->]
 
 == Query the database
 
-Execute a Cypher statement with the method `Driver.execute_query()`.
-Do not hardcode or concatenate parameters: use placeholders and specify the parameters as keyword arguments.
+Execute a Cypher statement with the method `Driver.executableQuery()`.
+Do not hardcode or concatenate parameters: use placeholders and specify the parameters as a map through the `.withParameters()` method.
 
-[source, python]
+[source, java, role=nocollapse]
 ----
-# Get the name of all 42 year-olds
-records, summary, keys = driver.execute_query(
-    "MATCH (p:Person {age: $age}) RETURN p.name AS name",
-    age=42,
-    database_="neo4j",
-)
+// import java.util.Map;
+// import org.neo4j.driver.QueryConfig;
 
-# Loop through results and do something with them
-for person in records:
-    print(person)
+// Get all 42-year-olds
+var result = driver.executableQuery("MATCH (p:Person {age: $age}) RETURN p.name AS name")
+    .withParameters(Map.of("age", 42))
+    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+    .execute();
 
-# Summary information
-print("The query `{query}` returned {records_count} records in {time} ms.".format(
-    query=summary.query, records_count=len(records),
-    time=summary.result_available_after,
-))
+// Loop through results and do something with them
+var records = result.records()
+records.forEach(r -> {
+    System.out.println(r);  // or r.get("name").asString()
+});
+
+// Summary information
+var summary = result.summary();
+System.out.printf("The query %s returned %d records in %d ms.%n",
+    summary.query(), records.length,
+    summary.resultAvailableAfter(TimeUnit.MILLISECONDS));
 ----
 
 xref:query-simple.adoc[More info on querying the database ->]
@@ -70,7 +89,7 @@ xref:query-simple.adoc[More info on querying the database ->]
 
 For more advanced use-cases, you can take control of the transaction lifecycle.
 A transaction is a unit of work that is either committed in its entirety or rolled back on failure.
-Use the methods `Session.execute_read()` and `Session.execute_write()` to run managed transactions.
+Use the methods `Session.executeRead()` and `Session.executeWrite()` to run managed transactions.
 
 [source, python]
 ----
@@ -95,9 +114,9 @@ xref:transactions.adoc[More info on running transactions ->]
 
 == Close connections and sessions
 
-Unless you created them using the `with` statement, call the `.close()` method on all `Driver` and `Session` instances to release any resources still held by them.
+Unless you created them using the `try-with-resources` statement, call the `.close()` method on all `Driver` and `Session` instances to release any resources still held by them.
 
-[source, python]
+[source, java]
 ----
 session.close()
 driver.close()
@@ -106,4 +125,4 @@ driver.close()
 
 == API documentation
 
-For in-depth information about driver features, check out the link:https://neo4j.com/docs/api/python-driver/current/[API documentation].
+For in-depth information about driver features, check out the link:https://neo4j.com/docs/api/java-driver/current/[API documentation].
