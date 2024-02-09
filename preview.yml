@@ -13,7 +13,7 @@ content:
     - javascript-manual
     - python-manual
     - java-manual
-    #- dotnet-manual
+    - dotnet-manual
     - common-content
     exclude:
     - '!**/_includes/*'
@@ -21,7 +21,7 @@ content:
     - '!**/README.adoc'
 ui:
   bundle:
-    url: ui-bundle.zip
+    url: https://static-content.neo4j.com/build/ui-bundle-latest.zip
     snapshot: true
   output_dir: /assets
 
