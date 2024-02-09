@@ -70,6 +70,9 @@ Use xref:query-simple#query-parameters[query parameters] instead, both for perfo
 Instead, always xref:process-result[process the result] in some way.
 Within a transaction function, a `return` statement results in the transaction being committed, while the transaction is automatically rolled back if an exception is raised.
 
+[CAUTION]
+The methods `.executeRead()` and `.executeWrite()` have replaced `.readTransaction()` and `.writeTransaction()`, which are deprecated in version 5.x and will be removed in version 6.0.
+
 .A transaction with multiple queries, client logic, and potential roll backs
 [source, java]
 ----

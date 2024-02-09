@@ -4,6 +4,8 @@ The examples in xref:query-simple.adoc[Query the database] and xref:transactions
 This means that, when running a query against the database, your application waits for the server to retrieve all the results and transmit them to the driver.
 This is not a problem for most use cases, but for queries that have a long processing time or a large result set, asynchronous handling may speed up your application.
 
+== Asynchronous managed transactions
+
 You run an asynchronous transaction through an link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/async/AsyncSession.html[`AsyncSession`].
 The flow is similar to that of xref:transactions.adoc[regular transactions], except that async transaction functions return a link:https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/CompletionStage.html[`CompletionStage`] object (which may be further converted into link:https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/CompletableFuture.html[`CompletableFuture`]).
 
@@ -75,6 +77,42 @@ Inner object types are the same as the synchronous case (i.e. `Record`, `ResultS
 <7> Contrary to synchronous transactions, `.executeWriteAsync()` and `executeReadAsync()` return the xref:result-summary.adoc[result summary] only.
 **Result processing and handling must be done inside the asynchronous runner.**
 <8> link:https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/CompletableFuture.html#get()[`.get()`] waits as long as necessary for the future to complete, and then returns its result.
+
+[CAUTION]
+The methods `.executeReadAsync()` and `.executeWriteAsync()` have replaced `.readTransactionAsync()` and `.writeTransactionAsync()`, which are deprecated in version 5.x and will be removed in version 6.0.
+
+
+== Combining asynchronous transactions
+
+The driver provides an idiomatic way to combine multiple transactions within a single asynchronous session.
+
+[source, java]
+----
+public CompletionStage<Integer> addEmployees(final String companyName) {
+    var session = driver.session(AsyncSession.class);
+    return session.executeReadAsync(AsyncRunMultipleTransactionExample::matchPersonNodes)
+            .thenCompose(personNames -> session.executeWriteAsync(tx -> createNodes(tx, companyName, personNames)));
+}
+
+private static CompletionStage<List<String>> matchPersonNodes(AsyncTransactionContext tx) {
+    return tx.runAsync("MATCH (a:Person) RETURN a.name AS name")
+            .thenCompose(cursor -> cursor.listAsync(record -> record.get("name").asString()));
+}
+
+private static CompletionStage<Integer> createNodes(AsyncTransactionContext tx, String companyName, List<String> personNames) {
+    return personNames.stream()
+            .map(personName -> createNode(tx, companyName, personName))
+            .reduce(CompletableFuture.completedFuture(0), (stage1, stage2) -> stage1.thenCombine(stage2, Integer::sum));
+}
+
+private static CompletionStage<Integer> createNode(AsyncTransactionContext tx, String companyName, String personName) {
+    return tx.runAsync("MATCH (emp:Person {name: $person_name}) MERGE (com:Company {name: $company_name}) MERGE (emp)-[:WORKS_FOR]->(com)",
+                    parameters("person_name", personName, "company_name", companyName))
+            .thenCompose(ResultCursor::consumeAsync)
+            .thenApply(ResultSummary::counters)
+            .thenApply(SummaryCounters::nodesCreated);
+}
+----
 
 
 ifndef::backend-pdf[]
