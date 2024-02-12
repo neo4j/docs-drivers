@@ -199,7 +199,7 @@ You can call `.withNotificationConfig()` both on a `Config` object when creating
 
 // at `Driver` level
 var driver = GraphDatabase.driver(
-    URI, AuthTokens.basic(USER, PASSWORD),
+    dbUri, AuthTokens.basic(dbUser, dbPassword),
     Config.builder()
     .withNotificationConfig(NotificationConfig  // mark-line
         .enableMinimumSeverity(NotificationSeverity.WARNING)  // mark-line
@@ -227,7 +227,7 @@ var session = driver.session(
 
 // at `Driver` level
 var driver = GraphDatabase.driver(
-    URI, AuthTokens.basic(USER, PASSWORD),
+    dbUri, AuthTokens.basic(dbUser, dbPassword),
     Config.builder()
     .withNotificationConfig(NotificationConfig.disableAllConfig())  // mark-line
     .build()
