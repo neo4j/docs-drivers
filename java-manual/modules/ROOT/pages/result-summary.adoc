@@ -204,7 +204,7 @@ var driver = GraphDatabase.driver(
     .withNotificationConfig(NotificationConfig  // mark-line
         .enableMinimumSeverity(NotificationSeverity.WARNING)  // mark-line
         .disableCategories(Set.of(NotificationCategory.HINT, NotificationCategory.GENERIC))  // mark-line
-    ).build())
+    ).build()
 );
 
 // at `Session` level
@@ -230,7 +230,7 @@ var driver = GraphDatabase.driver(
     URI, AuthTokens.basic(USER, PASSWORD),
     Config.builder()
     .withNotificationConfig(NotificationConfig.disableAllConfig())  // mark-line
-    .build())
+    .build()
 );
 
 // at `Session` level

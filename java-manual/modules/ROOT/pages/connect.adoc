@@ -9,7 +9,7 @@ You connect to a database by creating a <<Driver>> object and providing a URL an
 
 [source, java, role=nocollapse]
 ----
-package main;
+package demo;
 
 import org.neo4j.driver.AuthTokens;
 import org.neo4j.driver.GraphDatabase;
@@ -53,7 +53,7 @@ We recommend the module link:https://github.com/cdimascio/dotenv-java/[`dotenv-j
 .Using `dotenv-java` to extract credentials from a Dotenv file
 [source, java]
 ----
-package main;
+package demo;
 
 import io.github.cdimascio.dotenv.Dotenv;
 

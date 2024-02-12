@@ -17,7 +17,7 @@ These can either be the credentials for your local installation, or the ones pro
 // import org.neo4j.driver.AuthTokens;
 // import org.neo4j.driver.GraphDatabase;
 
-GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword))
+GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword));
 ----
 
 [INFO]
@@ -34,7 +34,7 @@ It can only be used if the server has the link:{neo4j-docs-base-uri}/kerberos-ad
 // import org.neo4j.driver.AuthTokens;
 // import org.neo4j.driver.GraphDatabase;
 
-GraphDatabase.driver(dbUri, AuthTokens.kerberos(ticket))
+GraphDatabase.driver(dbUri, AuthTokens.kerberos(ticket));
 ----
 
 === Bearer authentication
@@ -46,7 +46,7 @@ The bearer authentication scheme requires a base64-encoded token provided by an 
 // import org.neo4j.driver.AuthTokens;
 // import org.neo4j.driver.GraphDatabase;
 
-GraphDatabase.driver(dbUri, AuthTokens.bearer(ticket))
+GraphDatabase.driver(dbUri, AuthTokens.bearer(ticket));
 ----
 
 [NOTE]
@@ -175,7 +175,7 @@ You specify a resolver through the link:https://neo4j.com/docs/api/java-driver/c
 // import org.neo4j.driver.AuthTokens;
 // import org.neo4j.driver.Config;
 // import org.neo4j.driver.GraphDatabase;
-// import org.neo4j.driver.ServerAddress;
+// import org.neo4j.driver.net.ServerAddress;
 
 var addresses = Set.of(
     ServerAddress.of("neo4j://localhost", 7687)

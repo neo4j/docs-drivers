@@ -15,6 +15,7 @@ To create a node representing a person named `Alice`, use the Cypher clause link
 [source, java]
 ----
 // import java.util.Map;
+// import java.util.concurrent.TimeUnit;
 // import org.neo4j.driver.QueryConfig;
 
 var result = driver.executableQuery("CREATE (:Person {name: $name})")  // <1>
@@ -40,6 +41,7 @@ To retrieve information from the database, use the Cypher clause link:{neo4j-doc
 .Retrieve all `Person` nodes
 [source, java, role=nocollapse]
 ----
+// import java.util.concurrent.TimeUnit;
 // import org.neo4j.driver.QueryConfig;
 
 var result = driver.executableQuery("MATCH (p:Person) RETURN p.name AS name")
@@ -47,7 +49,7 @@ var result = driver.executableQuery("MATCH (p:Person) RETURN p.name AS name")
     .execute();
 
 // Loop through results and do something with them
-var records = result.records()  // <1>
+var records = result.records();  // <1>
 records.forEach(r -> {
     System.out.println(r);  // or r.get("name").asString()
 });
@@ -55,7 +57,7 @@ records.forEach(r -> {
 // Summary information
 var summary = result.summary();  // <2>
 System.out.printf("The query %s returned %d records in %d ms.%n",
-    summary.query(), records.length,
+    summary.query(), records.size(),
     summary.resultAvailableAfter(TimeUnit.MILLISECONDS));
 ----
 
@@ -155,7 +157,7 @@ You may provide query parameters as a map through the `.withParameters()` method
 
 [source, java]
 ----
-var result = driver.executableQuery("MATCH (p:Person {name: $name})")
+var result = driver.executableQuery("MATCH (p:Person {name: $name}) RETURN p")
     .withParameters(Map.of("name", "Alice"))  // mark-line
     .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
     .execute();

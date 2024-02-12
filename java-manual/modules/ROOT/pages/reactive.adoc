@@ -67,6 +67,7 @@ import org.neo4j.driver.Driver;
 import org.neo4j.driver.GraphDatabase;
 import org.neo4j.driver.Record;
 import org.neo4j.driver.SessionConfig;
+import org.neo4j.driver.Value;
 import org.neo4j.driver.reactivestreams.ReactiveResult;
 import org.neo4j.driver.reactivestreams.ReactiveSession;
 
@@ -94,7 +95,7 @@ public class App {
             );
 
             // block for demonstration purposes
-            List<Record> values = records.map(record -> record.get("x")).collectList().block();  // <8>
+            List<Value> values = records.map(record -> record.get("x")).collectList().block();  // <8>
             System.out.println(values);
         }
     }
@@ -135,6 +136,7 @@ import org.neo4j.driver.Driver;
 import org.neo4j.driver.GraphDatabase;
 import org.neo4j.driver.Record;
 import org.neo4j.driver.SessionConfig;
+import org.neo4j.driver.Value;
 import org.neo4j.driver.reactivestreams.ReactiveResult;
 import org.neo4j.driver.reactivestreams.ReactiveSession;
 
@@ -155,13 +157,12 @@ public class App {
                 )),
                 rxSession -> Mono
                     .fromDirect(rxSession.run("UNWIND range (1, 5) AS x RETURN x"))
-                    .flatMapMany(ReactiveResult::records)
-                )),
+                    .flatMapMany(ReactiveResult::records),
                 ReactiveSession::close
             );
 
             // block for demonstration purposes
-            List<Record> values = records.map(record -> record.get("x")).collectList().block();
+            List<Value> values = records.map(record -> record.get("x")).collectList().block();
             System.out.println(values);
         }
     }

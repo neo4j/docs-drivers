@@ -29,7 +29,7 @@ Once you have a `Driver` instance, use the `.verifyConnectivity()` method to ens
 
 [source, java, role=nocollapse]
 ----
-package main;
+package demo;
 
 import org.neo4j.driver.AuthTokens;
 import org.neo4j.driver.GraphDatabase;
@@ -70,7 +70,7 @@ var result = driver.executableQuery("MATCH (p:Person {age: $age}) RETURN p.name 
     .execute();
 
 // Loop through results and do something with them
-var records = result.records()
+var records = result.records();
 records.forEach(r -> {
     System.out.println(r);  // or r.get("name").asString()
 });
@@ -78,7 +78,7 @@ records.forEach(r -> {
 // Summary information
 var summary = result.summary();
 System.out.printf("The query %s returned %d records in %d ms.%n",
-    summary.query(), records.length,
+    summary.query(), records.size(),
     summary.resultAvailableAfter(TimeUnit.MILLISECONDS));
 ----
 
@@ -206,10 +206,10 @@ xref:transactions.adoc[More info on running transactions ->]
 
 Unless you created them with `try-with-resources` statements, call the `.close()` method on all `Driver` and `Session` instances to release any resources still held by them.
 
-[source, java]
+[source, java, test-skip]
 ----
-session.close()
-driver.close()
+session.close();
+driver.close();
 ----
 
 

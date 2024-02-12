@@ -19,7 +19,8 @@ For further configuration parameters, see xref:_session_configuration[Session co
 // import org.neo4j.driver.SessionConfig
 
 try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
-    ...
+    // session usage
+}
 ----
 
 Session creation is a lightweight operation, so sessions can be created and destroyed without significant cost.
@@ -101,7 +102,6 @@ public class App {
         final String dbUri = "<URI for Neo4j database>";
         final String dbUser = "<Username>";
         final String dbPassword = "<Password>";
-        final int employeeThreshold = 10;
 
         try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword))) {
             try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
@@ -120,6 +120,8 @@ public class App {
     }
 
     static String employPersonTx(TransactionContext tx, String name) {
+        final int employeeThreshold = 10;
+
         // Create new Person node with given name, if not exists already
         tx.run("MERGE (p:Person {name: $name})", Map.of("name", name));
 
@@ -250,6 +252,8 @@ public class App {
         final String dbPassword = "<Password>";
 
         try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword))) {
+            driver.verifyConnectivity();
+
             String customerId = createCustomer(driver);
             int otherBankId = 42;
             transferToOtherBank(driver, customerId, otherBankId, 999);
@@ -465,7 +469,7 @@ Use this to tag transactions.
 
 [source, java]
 ----
-// import java.time.Duration.ofSeconds
+// import java.time.Duration
 // import org.neo4j.driver.SessionConfig
 // import org.neo4j.driver.TransactionConfig
 
@@ -474,7 +478,7 @@ try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").
         var result = tx.run("MATCH (p:Person) RETURN p");
         return result.list();  // return a list of Record objects
     }, TransactionConfig.builder()
-        .withTimeout(ofSeconds(5))  // mark-line
+        .withTimeout(Duration.ofSeconds(5))  // mark-line
         .withMetadata(Map.of("appName", "peopleTracker"))  // mark-line
         .build()
     );
@@ -497,7 +501,7 @@ var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build
 
 // session usage
 
-session.close()
+session.close();
 ----
 
 

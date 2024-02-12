@@ -199,7 +199,7 @@ public class App {
                 .execute();
             var place = result.records().get(0).get("p").get("location");
             System.out.println(place);  // Point{srid=4326, x=67.28775180193841, y=17.734163823312397}
-            System.out.println(point.asPoint().y());  // 17.734163823312397
+            System.out.println(place.asPoint().y());  // 17.734163823312397
         }
     }
 }

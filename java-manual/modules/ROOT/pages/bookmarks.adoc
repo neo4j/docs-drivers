@@ -16,12 +16,12 @@ In this case, you have the guarantee that subsequent queries can read previous c
 
 [source, java]
 ----
-driver.executableQuery("<QUERY 1>").execute()
+driver.executableQuery("<QUERY 1>").execute();
 
 // subsequent .executableQuery() calls will be causally chained
 
-driver.executableQuery("<QUERY 2>").execute()  // can read result of <QUERY 1>
-driver.executableQuery("<QUERY 3>").execute()  // can read result of <QUERY 2>
+driver.executableQuery("<QUERY 2>").execute();  // can read result of <QUERY 1>
+driver.executableQuery("<QUERY 3>").execute();  // can read result of <QUERY 2>
 ----
 
 To disable bookmark management and causal consistency, use `.withBookmarkManager(null)` in the query configuration.
@@ -41,9 +41,9 @@ Bookmark management happens automatically for queries run within a single sessio
 [source, java]
 ----
 try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
-    session.executeWrite(tx -> tx.run("<QUERY 1>"));
-    session.executeWrite(tx -> tx.run("<QUERY 2>"));  // can read QUERY 1
-    session.executeWrite(tx -> tx.run("<QUERY 3>"));  // can read QUERY 1,2
+    session.executeWriteWithoutResult(tx -> tx.run("<QUERY 1>"));
+    session.executeWriteWithoutResult(tx -> tx.run("<QUERY 2>"));  // can read QUERY 1
+    session.executeWriteWithoutResult(tx -> tx.run("<QUERY 3>"));  // can read QUERY 1,2
 }
 ----
 
@@ -174,11 +174,12 @@ driver.executableQuery("<QUERY 1>").execute();
 
 try (var session = driver.session(SessionConfig.builder(
     .withBookmarkManager(Driver.executableQueryBookmarkManager())  // mark-line
-    .build())) {
+    .build()))) {
 
     // every query inside this session will be causally chained
     // (i.e., can read what was written by <QUERY 1>)
     session.executeWriteWithoutResult(tx -> tx.run("<QUERY 2>"));
+}
 
 // subsequent executableQuery calls will also be causally chained
 // (i.e., can read what was written by <QUERY 2>)

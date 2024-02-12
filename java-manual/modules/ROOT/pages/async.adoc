@@ -54,7 +54,7 @@ public class App {
             tx.runAsync(query) // <3>
             .thenCompose(resCursor -> resCursor.forEachAsync(record -> {  // <4>
                 System.out.println(record.get(0).asString());
-            }))
+            }));
         })
         .whenComplete((result, error) -> {  // <5>
             session.closeAsync();
