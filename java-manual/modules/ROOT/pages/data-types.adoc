@@ -69,9 +69,9 @@ import org.neo4j.driver.QueryConfig;
 public class App {
 
     public static void main(String... args) {
-        final String dbUri = "neo4j://localhost";
-        final String dbUser = "neo4j";
-        final String dbPassword = "verysecret";
+        final String dbUri = "<URI for Neo4j database>";
+        final String dbUser = "<Username>";
+        final String dbPassword = "<Password>";
 
         try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword))) {
             driver.verifyConnectivity();
@@ -151,9 +151,9 @@ import org.neo4j.driver.Values;
 public class App {
 
     public static void main(String... args) {
-        final String dbUri = "neo4j://localhost";
-        final String dbUser = "neo4j";
-        final String dbPassword = "verysecret";
+        final String dbUri = "<URI for Neo4j database>";
+        final String dbUser = "<Username>";
+        final String dbPassword = "<Password>";
 
         try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword))) {
             driver.verifyConnectivity();
@@ -185,9 +185,9 @@ import org.neo4j.driver.Values;
 public class App {
 
     public static void main(String... args) {
-        final String dbUri = "neo4j://localhost";
-        final String dbUser = "neo4j";
-        final String dbPassword = "verysecret";
+        final String dbUri = "<URI for Neo4j database>";
+        final String dbUser = "<Username>";
+        final String dbPassword = "<Password>";
 
         try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword))) {
             driver.verifyConnectivity();
@@ -258,9 +258,9 @@ import org.neo4j.driver.QueryConfig;
 public class App {
 
     public static void main(String... args) {
-        final String dbUri = "neo4j://localhost";
-        final String dbUser = "neo4j";
-        final String dbPassword = "verysecret";
+        final String dbUri = "<URI for Neo4j database>";
+        final String dbUser = "<Username>";
+        final String dbPassword = "<Password>";
 
         try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword))) {
             driver.verifyConnectivity();
@@ -338,9 +338,9 @@ import org.neo4j.driver.QueryConfig;
 public class App {
 
     public static void main(String... args) {
-        final String dbUri = "neo4j://localhost";
-        final String dbUser = "neo4j";
-        final String dbPassword = "verysecret";
+        final String dbUri = "<URI for Neo4j database>";
+        final String dbUser = "<Username>";
+        final String dbPassword = "<Password>";
 
         try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword))) {
             driver.verifyConnectivity();
@@ -404,9 +404,9 @@ import org.neo4j.driver.QueryConfig;
 public class App {
 
     public static void main(String... args) {
-        final String dbUri = "neo4j://localhost";
-        final String dbUser = "neo4j";
-        final String dbPassword = "verysecret";
+        final String dbUri = "<URI for Neo4j database>";
+        final String dbUser = "<Username>";
+        final String dbPassword = "<Password>";
 
         try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword))) {
             driver.verifyConnectivity();
@@ -456,7 +456,6 @@ public class App {
             .execute();
     }
 }
-
 ----
 
 For full documentation, see link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/PathValue.html[API documentation -> PathValue].
@@ -464,8 +463,7 @@ For full documentation, see link:https://neo4j.com/docs/api/java-driver/current/
 
 == Exceptions
 
-The driver can raise a number of different exceptions.
-A full list is available in the link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/exceptions/package-summary.html[API documentation].
+The driver can raise a number of different exceptions, see link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/exceptions/package-summary.html[API documentation -> Exceptions].
 For a list of errors the server can return, see link:{neo4j-docs-base-uri}/status-codes/{page-version}[Status codes].
 
 Some server errors are marked as safe to retry without need to alter the original request.

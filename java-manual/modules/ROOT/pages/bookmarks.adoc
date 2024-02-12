@@ -3,7 +3,7 @@
 When working with a Neo4j cluster, <<causal_consistency>> is enforced by default in most cases, which guarantees that a query is able to read changes made by previous queries.
 The same does not happen by default for multiple xref:transactions.adoc[transactions] running in parallel though.
 In that case, you can use _bookmarks_ to have one transaction wait for the result of another to be propagated across the cluster before running its own work.
-This is not a requirement, and *you should only use bookmarks if you _need_ casual consistency across different transactions*.
+This is not a requirement, and *you should only use bookmarks if you _need_ casual consistency across different transactions*, as waiting for bookmarks can have a negative performance impact.
 
 A _bookmark_ is a token that represents some state of the database.
 By passing one or multiple bookmarks along with a query, the server will make sure that the query does not get executed before the represented state(s) have been established.
@@ -12,16 +12,16 @@ By passing one or multiple bookmarks along with a query, the server will make su
 == Bookmarks with `.executableQuery()`
 
 When xref:query-simple.adoc[querying the database with `.executableQuery()`], the driver manages bookmarks for you.
-In this case, you have the guarantee that subsequent queries can read previous changes without taking further action.
+In this case, you have the guarantee that subsequent queries can read previous changes with no further action.
 
 [source, java]
 ----
 driver.executableQuery("<QUERY 1>").execute()
 
-// subsequent executableQuery calls will be causally chained
+// subsequent .executableQuery() calls will be causally chained
 
-driver.executableQuery("<QUERY 2>").execute() // can read result of <QUERY 1>
-driver.executableQuery("<QUERY 3>").execute() // can read result of <QUERY 2>
+driver.executableQuery("<QUERY 2>").execute()  // can read result of <QUERY 1>
+driver.executableQuery("<QUERY 3>").execute()  // can read result of <QUERY 2>
 ----
 
 To disable bookmark management and causal consistency, use `.withBookmarkManager(null)` in the query configuration.
@@ -73,13 +73,14 @@ import org.neo4j.driver.TransactionContext;
 
 public class App {
 
-    private static final String URI = "neo4j://localhost";
-    private static final String USER = "neo4j";
-    private static final String PASSWORD = "verysecret";
     private static final int employeeThreshold = 10;
 
     public static void main(String... args) {
-        try (var driver = GraphDatabase.driver(URI, AuthTokens.basic(USER, PASSWORD))) {
+        final String dbUri = "<URI for Neo4j database>";
+        final String dbUser = "<Username>";
+        final String dbPassword = "<Password>";
+
+        try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword))) {
             createSomeFriends(driver);
         }
     }
@@ -141,7 +142,7 @@ public class App {
     static void printFriendships(TransactionContext tx) {
         var result = tx.run("MATCH (a)-[:KNOWS]->(b) RETURN a.name, b.name");
         while (result.hasNext()) {
-			var record = result.next();
+            var record = result.next();
             System.out.println(record.get("a.name").asString() + " knows " + record.get("b.name").asString());
         }
     }

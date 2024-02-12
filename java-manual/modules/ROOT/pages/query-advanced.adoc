@@ -57,14 +57,14 @@ try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").
 While `LOAD CSV` can be a convenience, there is nothing _wrong_ in deferring the parsing of the CSV file to your Java application and avoiding `LOAD CSV`.
 In fact, moving the parsing logic to the application can give you more control over the importing process.
 
-For more information, see link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/load-csv/[Cypher -- Clauses -- Load CSV].
+For more information, see link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/load-csv/[Cypher -> Clauses -> LOAD CSV].
 
 
 === Transaction configuration
 
-You can exert further control on implicit transactions by providing a link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/TransactionConfig.html[`TransactionConfig`] object as last parameter in `Session.run()` calls.
+You can exert further control on implicit transactions by providing a link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/TransactionConfig.html[`TransactionConfig`] object as optional last parameter to `Session.run()` calls.
 The configuration callbacks allow to specify a query timeout and to attach metadata to the transaction.
-For more information, see xref:transactions.adoc#_transaction_configuration[Transactions -- Transaction configuration].
+For more information, see xref:transactions.adoc#_transaction_configuration[Transactions -> Transaction configuration].
 
 [source, java]
 ----
@@ -112,8 +112,7 @@ var result = driver.executableQuery("MATCH (p:`{escapedLabel}` {{name: $name}}) 
     .execute();
 ----
 
-Another workaround, which avoids string concatenation, is using the <<APOC>> procedure link:{neo4j-docs-base-uri}/apoc/current/overview/apoc.merge/apoc.merge.node/[`apoc.merge.node`].
-It supports dynamic labels and property keys, but only for node merging.
+Another workaround, which avoids string concatenation, is using <<APOC>> procedures, such as link:{neo4j-docs-base-uri}/apoc/current/overview/apoc.merge/apoc.merge.node/[`apoc.merge.node`], which supports dynamic labels and property keys.
 
 .Using `apoc.merge.node` to create a node with dynamic labels/property keys.
 [source, java]

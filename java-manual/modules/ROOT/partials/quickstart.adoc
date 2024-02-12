@@ -1,6 +1,6 @@
 The Neo4j Java driver is the official library to interact with a Neo4j instance through a Java application.
 
-At the hearth of Neo4j lies <<Cypher>>, the query language you use to interact with a Neo4j database.
+At the hearth of Neo4j lies <<Cypher>>, the query language to interact with a Neo4j database.
 While this guide does not _require_ you to be a seasoned Cypher querier, it is going to be easier to focus on the Java-specific bits if you already know some Cypher.
 For this reason, although this guide does _also_ provide a gentle introduction to Cypher along the way, consider checking out link:{neo4j-docs-base-uri}/getting-started/cypher-intro/[Getting started -> Cypher] for a more detailed walkthrough of graph databases modelling and querying if this is your first approach.
 You may then apply that knowledge while following this guide to develop your Java application.
@@ -87,26 +87,116 @@ xref:query-simple.adoc[More info on querying the database ->]
 
 == Run your own transactions
 
-For more advanced use-cases, you can take control of the transaction lifecycle.
-A transaction is a unit of work that is either committed in its entirety or rolled back on failure.
+For more advanced use-cases, you can run <<transaction,transactions>>.
 Use the methods `Session.executeRead()` and `Session.executeWrite()` to run managed transactions.
 
-[source, python]
+.A transaction with multiple queries, client logic, and potential roll backs
+[source, java]
 ----
-def match_person_nodes(tx, name_filter):
-    result = tx.run("""
-        MATCH (p:Person) WHERE p.name STARTS WITH $filter
-        RETURN p.name AS name ORDER BY name
-        """, filter=name_filter)
-    return list(result)  # return a list of Record objects
+package demo;
 
-with driver.session(database="neo4j") as session:
-    people = session.execute_read(
-        match_person_nodes,
-        "Al"
-    )
-    for person in people:
-        print(person.data())  # obtain dict representation
+import java.util.Map;
+import java.util.List;
+import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
+
+import org.neo4j.driver.AuthTokens;
+import org.neo4j.driver.GraphDatabase;
+import org.neo4j.driver.QueryConfig;
+import org.neo4j.driver.Record;
+import org.neo4j.driver.RoutingControl;
+import org.neo4j.driver.SessionConfig;
+import org.neo4j.driver.TransactionContext;
+import org.neo4j.driver.exceptions.NoSuchRecordException;
+
+public class App {
+
+    private static final String URI = "neo4j://localhost";
+    private static final String USER = "neo4j";
+    private static final String PASSWORD = "verysecret";
+    private static final int employeeThreshold = 10;
+
+    // Create & employ 100 people to 10 different organizations
+    public static void main(String... args) {
+        try (var driver = GraphDatabase.driver(URI, AuthTokens.basic(USER, PASSWORD))) {
+            try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
+                for (int i=0; i<100; i++) {
+                    String name = String.format("Thor%d", i);
+
+                    try {
+                        String orgId = session.executeWrite(tx -> employPersonTx(tx, name));
+                        System.out.printf("User %s added to organization %s.%n", name, orgId);
+                    } catch (Exception e) {
+                        System.out.println(e.getMessage());
+                    }
+                }
+            }
+        }
+    }
+
+    static String employPersonTx(TransactionContext tx, String name) {
+        // Create new Person node with given name, if not exists already
+        tx.run("MERGE (p:Person {name: $name})", Map.of("name", name));
+
+        // Obtain most recent organization ID and the number of people linked to it
+        var result = tx.run("""
+            MATCH (o:Organization)
+            RETURN o.id AS id, COUNT{(p:Person)-[r:WORKS_FOR]->(o)} AS employeesN
+            ORDER BY o.createdDate DESC
+            LIMIT 1
+            """);
+
+        Record org = null;
+        String orgId = null;
+        int employeesN = 0;
+        try {
+            org = result.single();
+            orgId = org.get("id").asString();
+            employeesN = org.get("employeesN").asInt();
+        } catch (NoSuchRecordException e) {
+            // The query is guaranteed to return <= 1 results, so if.single() throws, it means there's none.
+            // If no organization exists, create one and add Person to it
+            orgId = createOrganization(tx);
+            System.out.printf("No orgs available, created %s.%n", orgId);
+        }
+
+        // If org does not have too many employees, add this Person to it
+        if (employeesN < employeeThreshold) {
+            addPersonToOrganization(tx, name, orgId);
+            // If the above throws, the transaction will roll back
+            // -> not even Person is created!
+
+        // Otherwise, create a new Organization and link Person to it
+        } else {
+            orgId = createOrganization(tx);
+            System.out.printf("Latest org is full, created %s.%n", orgId);
+            addPersonToOrganization(tx, name, orgId);
+            // If any of the above throws, the transaction will roll back
+            // -> not even Person is created!
+        }
+
+        return orgId;  // Organization ID to which the new Person ends up in
+    }
+
+    static String createOrganization(TransactionContext tx) {
+        var result = tx.run("""
+            CREATE (o:Organization {id: randomuuid(), createdDate: datetime()})
+            RETURN o.id AS id
+        """);
+        var org = result.single();
+        var orgId = org.get("id").asString();
+        return orgId;
+    }
+
+    static void addPersonToOrganization(TransactionContext tx, String personName, String orgId) {
+        tx.run("""
+            MATCH (o:Organization {id: $orgId})
+            MATCH (p:Person {name: $name})
+            MERGE (p)-[:WORKS_FOR]->(o)
+            """, Map.of("orgId", orgId, "name", personName)
+        );
+    }
+}
 ----
 
 xref:transactions.adoc[More info on running transactions ->]
@@ -114,7 +204,7 @@ xref:transactions.adoc[More info on running transactions ->]
 
 == Close connections and sessions
 
-Unless you created them using the `try-with-resources` statement, call the `.close()` method on all `Driver` and `Session` instances to release any resources still held by them.
+Unless you created them with `try-with-resources` statements, call the `.close()` method on all `Driver` and `Session` instances to release any resources still held by them.
 
 [source, java]
 ----

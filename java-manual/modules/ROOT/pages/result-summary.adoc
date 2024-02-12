@@ -21,12 +21,12 @@ var result = driver.executableQuery("""
     """)
     .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
     .execute();
-var resultSummary = result.summary();  //mark-line
+var resultSummary = result.summary();  // mark-line
 ----
 
 If you are using xref:transactions.adoc[transaction functions], you can retrieve the query execution summary with the method `Result.consume()`.
 **Notice that once you ask for the execution summary, the result stream is exhausted**.
-This means that any record which has not yet been processed is not available any longer.
+This means that any record which has not yet been processed is discarded.
 
 [source, java]
 ----
@@ -36,7 +36,7 @@ try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").
         UNWIND ['Alice', 'Bob'] AS name
         MERGE (p:Person {name: name})
         """);
-        return result.consume();  //mark-line
+        return result.consume();  // mark-line
     });
 }
 ----
@@ -67,8 +67,8 @@ constraintsRemoved=0, systemUpdates=0}
 
 There are two additional boolean methods which act as meta-counters:
 
-- `.containsUpdates()` -- whether the query triggered any write operation on the database on which it ran
-- `.containsSystemUpdates()` -- whether the query updated the `system` database
+- `.containsUpdates()` -- Whether the query triggered any write operation on the database on which it ran
+- `.containsSystemUpdates()` -- Whether the query updated the `system` database
 
 
 ## Query execution plan

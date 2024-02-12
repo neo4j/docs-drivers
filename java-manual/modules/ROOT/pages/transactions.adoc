@@ -35,7 +35,7 @@ A transaction can contain any number of queries.
 As Neo4j is <<ACID>> compliant, *queries within a transaction will either be executed as a whole or not at all*: you cannot get a part of the transaction succeeding and another failing.
 Use transactions to group together related queries which work together to achieve a single _logical_ database operation.
 
-A managed transaction is created with the methods `Session.executeRead()` and `Session.executeWrite()`, depending on whether you want to retrieve data from the database or alter it.
+A managed transaction is created with the methods link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Session.html#executeRead(org.neo4j.driver.TransactionCallback,org.neo4j.driver.TransactionConfig)[`Session.executeRead()`] and link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Session.html#executeWrite(org.neo4j.driver.TransactionCallback,org.neo4j.driver.TransactionConfig)[`Session.executeWrite()`], depending on whether you want to retrieve data from the database or alter it.
 Both methods take a _transaction function_ callback, which is responsible for actually carrying out the queries and processing the result.
 
 .Retrieve people whose name starts with `Al`.
@@ -55,6 +55,7 @@ try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").
     people.forEach(person -> {
         System.out.println(person);
     });
+    // further tx.run() calls will execute within the same transaction
 }
 ----
 
@@ -94,14 +95,15 @@ import org.neo4j.driver.exceptions.NoSuchRecordException;
 
 public class App {
 
-    private static final String URI = "neo4j://localhost";
-    private static final String USER = "neo4j";
-    private static final String PASSWORD = "verysecret";
-    private static final int employeeThreshold = 10;
-
     // Create & employ 100 people to 10 different organizations
     public static void main(String... args) {
-        try (var driver = GraphDatabase.driver(URI, AuthTokens.basic(USER, PASSWORD))) {
+
+        final String dbUri = "<URI for Neo4j database>";
+        final String dbUser = "<Username>";
+        final String dbPassword = "<Password>";
+        final int employeeThreshold = 10;
+
+        try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword))) {
             try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
                 for (int i=0; i<100; i++) {
                     String name = String.format("Thor%d", i);
@@ -195,7 +197,7 @@ To maintain multiple concurrent transactions, use multiple concurrent sessions.
 ====
 The transaction functions callback passed to `.executeRead()` and `.executeWrite()` may return anything, as the return type is a Java Generic.
 **That also means they may not return `void`**, as that is not an instance of `Object`. +
-If you are not interested in returning anything out of a transaction function, you may either
+If you are not interested in returning anything out of a transaction function, you may either:
 
 1. use `.executeWriteWithoutResult()`, which supports returning `void` (and `void` only);
 2. use `.executeRead()`/`.executeWrite()` and return `null` in the transaction function.
@@ -205,7 +207,7 @@ If you are not interested in returning anything out of a transaction function, y
 [#explicit-transactions]
 == Run an explicit transaction
 
-You can achieve full control over transactions by manually beginning one with the method `Session.beginTransaction()`, which returns a link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Transaction.html[`Transaction`] object.
+You can achieve full control over transactions by manually beginning one with the method link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Session.html#beginTransaction(org.neo4j.driver.TransactionConfig)[`Session.beginTransaction()`], which returns a link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Transaction.html[`Transaction`] object.
 You may then run queries inside an explicit transaction with the method `Transaction.run()`.
 
 [source, java]
@@ -242,12 +244,12 @@ import org.neo4j.driver.Transaction;
 
 public class App {
 
-    private static final String URI = "neo4j://localhost";
-    private static final String USER = "neo4j";
-    private static final String PASSWORD = "verysecret";
-
     public static void main(String... args) {
-        try (var driver = GraphDatabase.driver(URI, AuthTokens.basic(USER, PASSWORD))) {
+        final String dbUri = "<URI for Neo4j database>";
+        final String dbUser = "<Username>";
+        final String dbPassword = "<Password>";
+
+        try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword))) {
             String customerId = createCustomer(driver);
             int otherBankId = 42;
             transferToOtherBank(driver, customerId, otherBankId, 999);
@@ -332,6 +334,10 @@ When no more records are available, the result is _exhausted_.
 - *The result acts as a _cursor_*.
 This means that there is no way to retrieve a previous record from the stream, unless you saved it in an auxiliary data structure.
 
+The animation below showcases how the result streaming and processing works in broad strokes.
+
+video::neo4j-driver-result-animation.mp4[]
+
 **The easiest way of processing a result is by calling `.list()` on it**, which yields a list of link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Record.html[`Record`] objects.
 Otherwise, a `Result` object implements a number of methods for processing records.
 The most commonly needed ones are listed below.
@@ -364,12 +370,16 @@ This leaves the record in the buffer for further processing.
 It exhausts the result, so should only be called when data processing is over.
 |===
 
-For a complete list of `Result` methods, see link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Result.html[API documentation -- Result].
+For a complete list of `Result` methods, see link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Result.html[API documentation -> Result].
 
 [TIP]
+====
 Properties inside a link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Record.html[`Record`] object are embedded within link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Value.html[`Value`] objects.
 To extract and cast them to the corresponding Java types, use `.as<type>()` (eg. `.asString()`, `asInt()`, etc).
 For example, if the `name` property coming from the database is a string, `record.get("name").asString()` will yield the property value as a `String` object.
+
+For more information, see xref:data-types.adoc[].
+====
 
 
 == Session configuration
@@ -413,7 +423,7 @@ var session = driver.session(SessionConfig.builder()
 [NOTE]
 ====
 Although executing a _write_ query in read mode likely results in a runtime error, *you should not rely on this for access control.* The difference between the two modes is that _read_ transactions will be routed to any node of a cluster, whereas _write_ ones will be directed to the leader.
-Still, depending on the server version and settings, the server might allow none, some, or all _write_ statements to be executed even in _read_ transactions.
+In other words, there is no guarantee that a write query submitted in read mode will be rejected.
 
 Similar remarks hold for the `.executeRead()` and `.executeWrite()` methods.
 ====
@@ -437,19 +447,19 @@ var session = driver.session(SessionConfig.builder()
     .build());
 ----
 
-When impersonating a user, the query is run within the complete security context of the impersonated user and not the authenticated user (i.e., home database, permissions, etc.).
+When impersonating a user, the query is run within the complete security context of the impersonated user and not the authenticated user (i.e. home database, permissions, etc.).
 
 
 == Transaction configuration
 
-You can exert further control on transactions by providing a  link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/TransactionConfig.html[`TransactionConfig`] object as second parameter to `.executeRead()`, `.executeWrite()`, and `.beginTransaction()`.
+You can exert further control on transactions by providing a  link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/TransactionConfig.html[`TransactionConfig`] object as (optional) second parameter to `.executeRead()`, `.executeWrite()`, and `.beginTransaction()`.
 Use it to specify:
 
-- a transaction timeout (in seconds).
+- A transaction timeout.
 Transactions that run longer will be terminated by the server.
 The default value is set on the server side.
 The minimum value is one millisecond.
-- a map of metadata that gets attached to the transaction.
+- A map of metadata that gets attached to the transaction.
 These metadata get logged in the server `query.log`, and are visible in the output of the `SHOW TRANSACTIONS` Cypher command.
 Use this to tag transactions.
 

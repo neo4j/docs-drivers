@@ -21,15 +21,16 @@ var result = driver.executableQuery("CREATE (:Person {name: $name})")  // <1>
     .withParameters(Map.of("name", "Alice"))  // <2>
     .withConfig(QueryConfig.builder().withDatabase("neo4j").build())  // clunky  <3>
     .execute();
-var summary = result.summary();
+var summary = result.summary();  // <4>
 System.out.printf("Created %d records in %d ms.%n",
     summary.counters().nodesCreated(),
     summary.resultAvailableAfter(TimeUnit.MILLISECONDS)); // can't default??
 ----
 
-<1> specifies the Cypher query
-<2> is a map of _query parameters_
-<3> specifies which database the query should be run against
+<1> The Cypher query
+<2> A map of _query parameters_
+<3> Which database the query should be run against
+<4> The xref:result-summary.adoc[summary of execution] returned by the server
 
 
 == Read from the database
@@ -62,9 +63,13 @@ System.out.printf("The query %s returned %d records in %d ms.%n",
 <2> `summary` contains the xref:result-summary.adoc[summary of execution] returned by the server
 
 [TIP]
+====
 Properties inside a link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Record.html[`Record`] object are embedded within link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Value.html[`Value`] objects.
 To extract and cast them to the corresponding Java types, use `.as<type>()` (eg. `.asString()`, `asInt()`, etc).
 For example, if the `name` property coming from the database is a string, `record.get("name").asString()` will yield the property value as a `String` object.
+
+For more information, see xref:data-types.adoc[].
+====
 
 
 == Update the database
@@ -98,8 +103,8 @@ To create new nodes and relationships linking it to an already existing node, us
 // import org.neo4j.driver.QueryConfig;
 
 var result = driver.executableQuery("""
-    MATCH (p:Person {name: $name})
-    CREATE (p)-[:KNOWS]->(:Person {name: $friend})
+    MATCH (alice:Person {name: $name})  // <1>
+    CREATE (alice)-[:KNOWS]->(:Person {name: $friend})  // <2>
     """)
     .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
     .withParameters(Map.of("name", "Alice", "friend", "Bob"))
@@ -109,20 +114,14 @@ System.out.println("Query updated the database?");
 System.out.println(summary.counters().containsUpdates());
 ----
 
-[WARNING]
-====
-It might feel tempting to create new relationships with a single `CREATE` clause, such as: +
-`CREATE (:Person {name: "Alice"})-[:KNOWS]->(:Person {name: "Bob"})`. +
-However, this would result in the creation of an _extra_ `Alice` node, so that you would end up with unintended duplicate records.
-To avoid this, always `MATCH` the elements that you want to update, and use the resulting reference in the `CREATE` clause (as shown in the previous example).
-See link:https://neo4j.com/developer/kb/understanding-how-merge-works/[Understanding how MERGE works].
-====
+<1> Retrieve the person node named `Alice` and bind it to a variable `alice`
+<2> Create a new `:KNOWS` relationship outgoing from the node bound to `alice` and attach to it a new `Person` node named `Bob`
 
 
 == Delete from the database
 To remove a node and any relationship attached to it, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/delete/[`DETACH DELETE`]:
 
-.Remove the `Alice` node
+.Remove the `Alice` node and all its relationships
 [source, java]
 ----
 // import java.util.Map;
@@ -164,24 +163,17 @@ var result = driver.executableQuery("MATCH (p:Person {name: $name})")
 
 [NOTE]
 There can be circumstances where your query structure prevents the usage of parameters in all its parts.
-For those advanced use cases, see xref:query-advanced#_dynamic_values_in_property_keys_relationship_types_and_labels[Dynamic values in property keys, relationship types, and labels].
+For those rare use cases, see xref:query-advanced#_dynamic_values_in_property_keys_relationship_types_and_labels[Dynamic values in property keys, relationship types, and labels].
 
 
 == Error handling
 
-Because `.executableQuery()` can potentially raise a number of different link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/exceptions/package-summary.html[exceptions], the best way to handle errors is to catch all exceptions in a single `try/catch` block:
+A query run may fail for a number of reasons, with different link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/exceptions/package-summary.html[exceptions] being raised.
+Some of them are due to Cypher syntax errors, permission issues, or other forms of misconfigurations/misusage.
+The choice of how to handle those exceptions is up to your application: whether you want to be defensive (for example check if there are records to process to avoid link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/exceptions/NoSuchRecordException.html[NoSuchRecordException]), or whether you want to catch and handle the exceptions as they arise.
 
-[source, java]
-----
-try {
-    driver.executableQuery(...).execute()
-} catch (Exception as e) {
-    ...  // handle exception
-}
-----
-
-[TIP]
-The driver automatically retries to run a failed query, if the failure is deemed to be transient (for example due to temporary server unavailability).
+For failures deemed to be transient (for example due to temporary server unavailability),the driver automatically retries to run a failed query.
+An exception will be raised if the operation keeps failing after a number of attempts.
 
 
 == Query configuration
@@ -194,7 +186,7 @@ You do so through the method `.withConfig()`, which takes a link:https://neo4j.c
 
 It is recommended to *always specify the database explicitly* with the `.withDatabase("<dbName>")` method, even on single-database instances.
 This allows the driver to work more efficiently, as it saves a network round-trip to the server to resolve the home database.
-If no database is given, the link:{neo4j-docs-base-uri}/operations-manual/current/manage-databases/introduction#manage-databases-default[user's home database] is used.
+If no database is given, the link:https://neo4j.com/docs/operations-manual/current/database-administration/#manage-databases-default[user's home database] is used.
 
 [source, java]
 ----
@@ -226,7 +218,11 @@ var result = driver.executableQuery("MATCH (p:Person) RETURN p.name")
     .execute();
 ----
 
-Even though routing a _write_ query to _read_ nodes will likely result in a runtime error, xref:transactions#access-control-note[do not rely on this for security purposes].
+[NOTE]
+====
+Although executing a _write_ query in read mode likely results in a runtime error, *you should not rely on this for access control.* The difference between the two modes is that _read_ transactions will be routed to any node of a cluster, whereas _write_ ones will be directed to the leader.
+In other words, there is no guarantee that a write query submitted in read mode will be rejected.
+====
 
 
 [#impersonation]
@@ -248,7 +244,7 @@ var result = driver.executableQuery("MATCH (p:Person) RETURN p.name")
     .execute();
 ----
 
-When impersonating a user, the query is run within the complete security context of the impersonated user and not the authenticated user (i.e., home database, permissions, etc.).
+When impersonating a user, the query is run within the complete security context of the impersonated user and not the authenticated user (i.e. home database, permissions, etc.).
 
 
 == A full example
@@ -269,13 +265,12 @@ import org.neo4j.driver.RoutingControl;
 
 public class App {
 
-    private static final String URI = "<URI for Neo4j database>";
-    private static final String USER = "<Username>";
-    private static final String PASSWORD = "<Password>";
-
     public static void main(String... args) {
+        final String dbUri = "<URI for Neo4j database>";
+        final String dbUser = "<Username>";
+        final String dbPassword = "<Password>";
 
-        try (var driver = GraphDatabase.driver(URI, AuthTokens.basic(USER, PASSWORD))) {
+        try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword))) {
 
             List<Map> people = List.of(
                 Map.of("name", "Alice", "age", 42, "friends", List.of("Bob", "Peter", "Anna")),

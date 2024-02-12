@@ -36,161 +36,41 @@ driver.session();
 ----
 
 
-== Use `MERGE` for creation only when needed
+== Be aware of the cost of transactions
 
-The Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/merge/[`MERGE`] is convenient for data creation, as it allows to avoid duplicate data when an exact clone of the given pattern exists.
-However, it requires the database to run _two_ queries: it first needs to link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/match/[`MATCH`] the pattern, and only then can it link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/create/[`CREATE`] it (if needed).
+When submitting queries through xref:query-simple.adoc[`.executableQuery()`] or through xref:transactions.adoc#managed-transactions[`.executeRead/Write()`], the server automatically wraps them into a <<transaction>>.
+This behavior ensures that the database always ends up in a consistent state, regardless of what happens during the execution of a transaction (power outages, software crashes, etc).
 
-If you know already that the data you are inserting is new, avoid using `MERGE` and use `CREATE` directly instead -- this practically halves the number of database queries.
+Creating a safe execution context around a number of queries obviously yields an overhead that is not present if the driver just shoots queries at the server and hopes they will get through.
+The overhead is small, but can pile up as the number of queries increases.
+For this reason, if your use case values throughput more than data integrity, you may extract further performance by running all queries within a single (auto-commit) transaction.
+You do this by creating a session and using `session.run()` to run as many queries as needed.
 
-
-== Use query parameters
-
-*Always use xref:query-simple#query-parameters[query parameters]* instead of hardcoding or concatenating values into queries.
-Besides protecting from Cypher injections, this allows to better leverage the database query cache.
-
-[discrete]
-=== Good practices
-
-[source, java]
-----
-driver.executableQuery("MATCH (p:Person {name: $name}) RETURN p")
-    .withParameters(Map.of("name", "Alice"))
-    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
-    .execute();
-----
-
+.Privilege throughput over data integrity
 [source, java]
 ----
 try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
-    session.run("MATCH (p:Person {name: $name}) RETURN p", Map.of("name", "Alice"));
+    for (int i=0; i<1000; i++) {
+        session.run("<QUERY>");
+    }
 }
 ----
 
-[discrete]
-=== Bad practices
-
+.Privilege data integrity over throughput
 [source, java]
 ----
-driver.executableQuery("MATCH (p:Person {name: 'Alice'}) RETURN p")
-    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
-    .execute();
-// or
-String name = "Alice";
-driver.executableQuery("MATCH (p:Person {name: '" + name + "'}) RETURN p")
-    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
-    .execute();
-----
-
-[source, java]
-----
-try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
-    session.run("MATCH (p:Person {name: 'Alice'}) RETURN p");
-    // or
-    String name = "Alice";
-    session.run("MATCH (p:Person {name: '" + name + "'}) RETURN p");
+for (int i=0; i<1000; i++) {
+    driver.executableQuery("<QUERY>").execute();
+    // or session.executeRead/Write() calls
 }
 ----
-
-
-== Specify node labels
-
-*Specify node labels* in all queries.
-This allows the query planner to work much more efficiently, and to leverage indexes where available.
-To learn how to combine labels, see link:{neo4j-docs-base-uri}/cypher-manual/current/syntax/expressions/#query-syntax-label[Cypher -- Label expressions].
-
-[discrete]
-=== Good practices
-
-[source, java]
-----
-driver.executableQuery("MATCH (p:Person|Animal {name: $name}) RETURN p")
-    .withParameters(Map.of("name", "Alice"))
-    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
-    .execute();
-----
-
-[source, java]
-----
-try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
-    session.run("MATCH (p:Person|Animal {name: $name}) RETURN p", Map.of("name", "Alice"));
-}
-----
-
-
-[discrete]
-=== Bad practices
-
-[source, java]
-----
-driver.executableQuery("MATCH (p {name: $name}) RETURN p")
-    .withParameters(Map.of("name", "Alice"))
-    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
-    .execute();
-----
-
-[source, java]
-----
-try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
-    session.run("MATCH (p {name: $name}) RETURN p", Map.of("name", "Alice"));
-}
-----
-
-
-== Batch data creation
-
-*Batch queries when creating a lot of records* using the  link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/unwind/[`UNWIND`] Cypher clause.
-
-
-[discrete]
-=== Good practice
-
-[source, java]
-----
-// send one single queries with all values inside
-var numbers = makeSequence(1, 10000);
-driver.executableQuery("""
-    UNWIND $numbers AS node
-    CREATE (:Number {value: node.value})
-    """)
-    .withParameters(Map.of("numbers", numbers))
-    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
-    .execute();
-
-
-public static List<Map> makeSequence(int begin, int end) {
-  List<Map> ret = new ArrayList<>(end - begin + 1);
-  for (int i=begin; i<=end; i++) {
-    ret.add(Map.of("value", i));
-  }
-  return ret;
-}
-----
-
-[discrete]
-=== Bad practice
-
-[source, java]
-----
-// send a lot of single queries, one for each value
-for (int i=1; i<=10000; i++) {
-driver.executableQuery("CREATE (:Number {value: $value})")
-    .withParameters(Map.of("value", i))
-    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
-    .execute();
-}
-----
-
-[TIP]
-The most efficient way of performing a _first import_ of large amounts of data into a new database is the link:{neo4j-docs-base-uri}/operations-manual/current/tutorial/neo4j-admin-import/[`neo4j-admin database import`] command.
-// source:  https://community.neo4j.com/t5/neo4j-graph-platform/improving-data-writing-efficiency-in-python/td-p/39520
 
 
 == Route read queries to cluster readers
 
 In a cluster, *route read queries to link:{neo4j-docs-base-uri}/operations-manual/current/clustering/introduction/#clustering-secondary-mode[secondary nodes]*. You do this by:
 
-- using the method `.withRouting(RoutingControl.READ)` in xref:query-simple.adoc#_request_routing[`Driver.execute_query()`] calls
+- using the method `.withRouting(RoutingControl.READ)` in xref:query-simple.adoc#_request_routing[`Driver.executableQuery()`] calls
 - using `Session.executeRead()` instead of `Session.executeWrite()` (for xref:transactions.adoc#managed-transactions[managed transactions])
 - using the method xref:transactions.adoc#_request_routing[`.withRouting(RoutingControl.READ)` when creating a new session] (for explicit transactions).
 
@@ -199,17 +79,19 @@ In a cluster, *route read queries to link:{neo4j-docs-base-uri}/operations-manua
 
 [source, java]
 ----
+// import org.neo4j.driver.RoutingControl;
+
 driver.executableQuery("MATCH (p:Person) RETURN p")
     .withConfig(QueryConfig.builder()
         .withDatabase("neo4j")
-        .withRouting(RoutingControl.READ)  // import org.neo4j.driver.RoutingControl  // mark-line
+        .withRouting(RoutingControl.READ)  // mark-line
         .build())
     .execute();
 ----
 
 [source, java]
 ----
-session.executeRead(tx -> {
+session.executeRead(tx -> {  // mark-line
     var result = tx.run("MATCH (p:Person) RETURN p");
     return result.list();
 });
@@ -245,9 +127,9 @@ session.executeWrite(tx -> {
 For example, if you often look up `Person` nodes by the `name` property, it is beneficial to create an index on `Person.name`.
 You can create indexes with the `CREATE INDEX` Cypher clause, for both nodes and relationships.
 
+.Create an index on Person.name
 [source, java]
 ----
-// Create an index on Person.name
 driver.executableQuery("CREATE INDEX person_name FOR (n:Person) ON (n.name)").execute();
 ----
 
@@ -323,45 +205,165 @@ Total database accesses: ?
 ----
 
 
+== Specify node labels
+
+*Specify node labels* in all queries.
+This allows the query planner to work much more efficiently, and to leverage indexes where available.
+To learn how to combine labels, see link:{neo4j-docs-base-uri}/cypher-manual/current/syntax/expressions/#query-syntax-label[Cypher -> Label expressions].
+
+[discrete]
+=== Good practices
+
+[source, java]
+----
+driver.executableQuery("MATCH (p:Person|Animal {name: $name}) RETURN p")
+    .withParameters(Map.of("name", "Alice"))
+    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+    .execute();
+----
+
+[source, java]
+----
+try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
+    session.run("MATCH (p:Person|Animal {name: $name}) RETURN p", Map.of("name", "Alice"));
+}
+----
+
+
+[discrete]
+=== Bad practices
+
+[source, java]
+----
+driver.executableQuery("MATCH (p {name: $name}) RETURN p")
+    .withParameters(Map.of("name", "Alice"))
+    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+    .execute();
+----
+
+[source, java]
+----
+try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
+    session.run("MATCH (p {name: $name}) RETURN p", Map.of("name", "Alice"));
+}
+----
+
+
+== Batch data creation
+
+*Batch queries when creating a lot of records* using the  link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/unwind/[`UNWIND`] Cypher clause.
+
+
+[discrete]
+=== Good practice
+
+.Submit one single queries with all values inside
+[source, java]
+----
+var numbers = makeSequence(1, 10000);
+driver.executableQuery("""
+    UNWIND $numbers AS node
+    CREATE (:Number {value: node.value})
+    """)
+    .withParameters(Map.of("numbers", numbers))
+    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+    .execute();
+
+
+public static List<Map> makeSequence(int begin, int end) {
+  List<Map> ret = new ArrayList<>(end - begin + 1);
+  for (int i=begin; i<=end; i++) {
+    ret.add(Map.of("value", i));
+  }
+  return ret;
+}
+----
+
+[discrete]
+=== Bad practice
+
+.Submit a lot of single queries, one for each value
+[source, java]
+----
+for (int i=1; i<=10000; i++) {
+driver.executableQuery("CREATE (:Number {value: $value})")
+    .withParameters(Map.of("value", i))
+    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+    .execute();
+}
+----
+
+[TIP]
+The most efficient way of performing a _first import_ of large amounts of data into a new database is the link:{neo4j-docs-base-uri}/operations-manual/current/tutorial/neo4j-admin-import/[`neo4j-admin database import`] command.
+// source:  https://community.neo4j.com/t5/neo4j-graph-platform/improving-data-writing-efficiency-in-python/td-p/39520
+
+
+== Use query parameters
+
+*Always use xref:query-simple#query-parameters[query parameters]* instead of hardcoding or concatenating values into queries.
+Besides protecting from Cypher injections, this allows to better leverage the database query cache.
+
+[discrete]
+=== Good practices
+
+[source, java]
+----
+driver.executableQuery("MATCH (p:Person {name: $name}) RETURN p")
+    .withParameters(Map.of("name", "Alice"))
+    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+    .execute();
+----
+
+[source, java]
+----
+try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
+    session.run("MATCH (p:Person {name: $name}) RETURN p", Map.of("name", "Alice"));
+}
+----
+
+[discrete]
+=== Bad practices
+
+[source, java]
+----
+driver.executableQuery("MATCH (p:Person {name: 'Alice'}) RETURN p")
+    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+    .execute();
+// or
+String name = "Alice";
+driver.executableQuery("MATCH (p:Person {name: '" + name + "'}) RETURN p")
+    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+    .execute();
+----
+
+[source, java]
+----
+try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
+    session.run("MATCH (p:Person {name: 'Alice'}) RETURN p");
+    // or
+    String name = "Alice";
+    session.run("MATCH (p:Person {name: '" + name + "'}) RETURN p");
+}
+----
+
+
 == Concurrency
 
 **Use xref:async.adoc[asynchronous querying]**.
 This is likely to be more impactful on performance if you parallelize complex and time-consuming queries in your application, but not so much if you run many simple ones.
 
 
+== Use `MERGE` for creation only when needed
+
+The Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/merge/[`MERGE`] is convenient for data creation, as it allows to avoid duplicate data when an exact clone of the given pattern exists.
+However, it requires the database to run _two_ queries: it first needs to link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/match/[`MATCH`] the pattern, and only then can it link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/create/[`CREATE`] it (if needed).
+
+If you know already that the data you are inserting is new, avoid using `MERGE` and use `CREATE` directly instead -- this practically halves the number of database queries.
+
+
 == Filter notifications
 
 xref:result-summary.adoc#_filter_notifications[Filter the category and/or severity of notifications] the server should raise.
-
-
-== Be aware of the cost of transactions
-
-When submitting queries through xref:query-simple.adoc[.executableQuery()] or through xref:transactions.adoc#managed-transactions[.executeRead/Write()], the server automatically wraps them into a <<transaction>>.
-This behavior ensures that the database always ends up in a consistent state, regardless of what happens during the execution of a transaction (power outages, software crashes, etc).
-
-Creating a safe execution context around a number of queries obviously yields an overhead that is not present if the driver just shoots queries at the server and hopes they will get through.
-The overhead is small, but can pile up as the number of queries increases.
-For this reason, if your use case values throughput more than data integrity, you may extract further performance by running all queries within a single (auto-commit) transaction.
-You do this by creating a session and using `session.run()` to run as many queries as needed.
-
-.Privilege throughput over data integrity
-[source, java]
-----
-try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
-    for (int i=0; i<1000; i++) {
-        session.run("<QUERY>");
-    }
-}
-----
-
-.Privilege data integrity over throughput
-[source, java]
-----
-for (int i=0; i<1000; i++) {
-    driver.executableQuery("<QUERY>").execute();
-    // or session.executeRead/Write() calls
-}
-----
 
 
 ifndef::backend-pdf[]
