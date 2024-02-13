@@ -201,7 +201,7 @@ You can call `.withNotificationConfig()` both on a `Config` object when creating
 var driver = GraphDatabase.driver(
     dbUri, AuthTokens.basic(dbUser, dbPassword),
     Config.builder()
-    .withNotificationConfig(NotificationConfig  // mark-line
+    .withNotificationConfig(NotificationConfig.defaultConfig()  // mark-line
         .enableMinimumSeverity(NotificationSeverity.WARNING)  // mark-line
         .disableCategories(Set.of(NotificationCategory.HINT, NotificationCategory.GENERIC))  // mark-line
     ).build()
@@ -211,7 +211,7 @@ var driver = GraphDatabase.driver(
 var session = driver.session(
     SessionConfig.builder()
     .withDatabase("neo4j")
-    .withNotificationConfig(NotificationConfig  // mark-line
+    .withNotificationConfig(NotificationConfig.defaultConfig()  // mark-line
         .enableMinimumSeverity(NotificationSeverity.WARNING)  // mark-line
         .disableCategories(Set.of(NotificationCategory.HINT, NotificationCategory.GENERIC))  // mark-line
     ).build()

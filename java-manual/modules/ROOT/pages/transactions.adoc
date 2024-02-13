@@ -338,7 +338,7 @@ When no more records are available, the result is _exhausted_.
 - *The result acts as a _cursor_*.
 This means that there is no way to retrieve a previous record from the stream, unless you saved it in an auxiliary data structure.
 
-The animation below showcases how the result streaming and processing works in broad strokes.
+The animation below showcases how the result streaming and processing works in broad strokes (currently in draft).
 
 video::neo4j-driver-result-animation.mp4[]
 
@@ -414,11 +414,11 @@ Note that `.executeRead()` and `.executeWrite()` automatically override the sess
 [source, java]
 ----
 // import org.neo4j.driver.SessionConfig;
-// import org.neo4j.driver.RoutingControl;
+// import org.neo4j.driver.AccessMode;
 
 var session = driver.session(SessionConfig.builder()
     .withDatabase("neo4j")
-    .withRouting(RoutingControl.READ)  // mark-line
+    .withDefaultAccessMode(AccessMode.READ)  // mark-line
     .build());
 ----
 

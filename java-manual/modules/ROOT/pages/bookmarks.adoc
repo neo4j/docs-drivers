@@ -162,7 +162,7 @@ For simple use-cases, try to group queries within a single transaction, or withi
 
 == Mix `.executableQuery()` and sessions
 
-To ensure causal consistency among transactions executed partly with `.executableQuery()` and partly with sessions, you can retrieve the default bookmark manager for `ExecutableQuery` instances through `Driver.executableQueryBookmarkManager()` and pass it to new sessions through the `.withBookmarkManager()` config method.
+To ensure causal consistency among transactions executed partly with `.executableQuery()` and partly with sessions, you can retrieve the default bookmark manager for `ExecutableQuery` instances through `driver.executableQueryBookmarkManager()` and pass it to new sessions through the `.withBookmarkManager()` config method.
 This will ensure that all work is executed under the same bookmark manager and thus causally consistent.
 
 [source, java]
@@ -172,9 +172,9 @@ This will ensure that all work is executed under the same bookmark manager and t
 
 driver.executableQuery("<QUERY 1>").execute();
 
-try (var session = driver.session(SessionConfig.builder(
-    .withBookmarkManager(Driver.executableQueryBookmarkManager())  // mark-line
-    .build()))) {
+try (var session = driver.session(SessionConfig.builder()
+    .withBookmarkManager(driver.executableQueryBookmarkManager())  // mark-line
+    .build())) {
 
     // every query inside this session will be causally chained
     // (i.e., can read what was written by <QUERY 1>)

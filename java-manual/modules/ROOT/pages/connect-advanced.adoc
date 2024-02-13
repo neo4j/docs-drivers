@@ -178,7 +178,7 @@ You specify a resolver through the link:https://neo4j.com/docs/api/java-driver/c
 // import org.neo4j.driver.net.ServerAddress;
 
 var addresses = Set.of(
-    ServerAddress.of("neo4j://localhost", 7687)
+    ServerAddress.of("localhost", 7687)  // omit the scheme; provide only host
 );
 var config = Config.builder()
     .withResolver(address -> addresses)

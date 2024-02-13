@@ -91,10 +91,12 @@ driver.executableQuery("MATCH (p:Person) RETURN p")
 
 [source, java]
 ----
-session.executeRead(tx -> {  // mark-line
-    var result = tx.run("MATCH (p:Person) RETURN p");
-    return result.list();
-});
+try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
+    session.executeRead(tx -> {  // mark-line
+        var result = tx.run("MATCH (p:Person) RETURN p");
+        return result.list();
+    });
+}
 ----
 
 
@@ -114,10 +116,12 @@ driver.executableQuery("MATCH (p:Person) RETURN p")
 [source, java]
 ----
 // don't ask to write on a read-only operation
-session.executeWrite(tx -> {
-    var result = tx.run("MATCH (p:Person) RETURN p");
-    return result.list();
-});
+try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
+    session.executeWrite(tx -> {
+        var result = tx.run("MATCH (p:Person) RETURN p");
+        return result.list();
+    });
+}
 ----
 
 
@@ -260,7 +264,14 @@ try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").
 .Submit one single queries with all values inside
 [source, java]
 ----
-var numbers = makeSequence(1, 10000);
+// Generate a sequence of numbers
+int start = 1;
+int end = 10000;
+List<Map> numbers = new ArrayList<>(end - start + 1);
+for (int i=start; i<=end; i++) {
+    numbers.add(Map.of("value", i));
+}
+
 driver.executableQuery("""
     UNWIND $numbers AS node
     CREATE (:Number {value: node.value})
@@ -268,15 +279,6 @@ driver.executableQuery("""
     .withParameters(Map.of("numbers", numbers))
     .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
     .execute();
-
-
-public static List<Map> makeSequence(int begin, int end) {
-  List<Map> ret = new ArrayList<>(end - begin + 1);
-  for (int i=begin; i<=end; i++) {
-    ret.add(Map.of("value", i));
-  }
-  return ret;
-}
 ----
 
 [discrete]

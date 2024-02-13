@@ -48,18 +48,16 @@ public class App {
 
         var query = """
         UNWIND ['Alice', 'Bob', 'Sofia', 'Charles'] AS name
-        MERGE (p:Person {name: $name}) RETURN p.name
+        MERGE (p:Person {name: name}) RETURN p.name
         """;
-        var summary = session.executeWriteAsync(tx -> {
-            tx.runAsync(query) // <3>
-            .thenCompose(resCursor -> resCursor.forEachAsync(record -> {  // <4>
-                System.out.println(record.get(0).asString());
-            }));
-        })
-        .whenComplete((result, error) -> {  // <5>
-            session.closeAsync();
-        })
-        .toCompletableFuture();  // <6>
+        var summary = session.executeWriteAsync(tx -> tx.runAsync(query)  // <3>
+                .thenCompose(resCursor -> resCursor.forEachAsync(record -> {  // <4>
+                    System.out.println(record.get(0).asString());
+                })))
+            .whenComplete((result, error) -> {  // <5>
+                session.closeAsync();
+            })
+            .toCompletableFuture();  // <6>
 
         return summary;  // <7>
     }
