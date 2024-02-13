@@ -117,7 +117,7 @@ public class App {
 
     // Create & employ 100 people to 10 different organizations
     public static void main(String... args) {
-        try (var driver = GraphDatabase.driver(URI, AuthTokens.basic(USER, PASSWORD))) {
+        try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword))) {
             try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
                 for (int i=0; i<100; i++) {
                     String name = String.format("Thor%d", i);
