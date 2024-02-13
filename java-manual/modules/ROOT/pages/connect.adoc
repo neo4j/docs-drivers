@@ -65,7 +65,7 @@ public class App {
     public static void main(String... args) {
 
         var dotenv = Dotenv.configure()
-            .directory("/path/to/env/file")
+            //.directory("/path/to/env/file")
             .filename("Neo4j-a0a2fa1d-Created-2023-11-06.txt")
             .load();
 
