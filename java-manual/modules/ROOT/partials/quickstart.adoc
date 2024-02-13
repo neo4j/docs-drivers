@@ -110,10 +110,9 @@ import org.neo4j.driver.TransactionContext;
 import org.neo4j.driver.exceptions.NoSuchRecordException;
 
 public class App {
-
-    private static final String URI = "neo4j://localhost";
-    private static final String USER = "neo4j";
-    private static final String PASSWORD = "verysecret";
+    final String dbUri = "<URI for Neo4j database>";
+    final String dbUser = "<Username>";
+    final String dbPassword = "<Password>";
     private static final int employeeThreshold = 10;
 
     // Create & employ 100 people to 10 different organizations

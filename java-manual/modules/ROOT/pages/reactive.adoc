@@ -143,9 +143,9 @@ import org.neo4j.driver.reactivestreams.ReactiveSession;
 public class App {
 
     public static void main(String... args) {
-        final String dbUri = "neo4j://localhost";
-        final String dbUser = "neo4j";
-        final String dbPassword = "verysecret";
+        final String dbUri = "<URI for Neo4j database>";
+        final String dbUser = "<Username>";
+        final String dbPassword = "<Password>";
 
         try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword))) {
             driver.verifyConnectivity();

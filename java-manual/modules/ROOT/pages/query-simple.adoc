@@ -20,12 +20,12 @@ To create a node representing a person named `Alice`, use the Cypher clause link
 
 var result = driver.executableQuery("CREATE (:Person {name: $name})")  // <1>
     .withParameters(Map.of("name", "Alice"))  // <2>
-    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())  // clunky  <3>
+    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())  // <3>
     .execute();
 var summary = result.summary();  // <4>
 System.out.printf("Created %d records in %d ms.%n",
     summary.counters().nodesCreated(),
-    summary.resultAvailableAfter(TimeUnit.MILLISECONDS)); // can't default??
+    summary.resultAvailableAfter(TimeUnit.MILLISECONDS));
 ----
 
 <1> The Cypher query
@@ -171,10 +171,10 @@ For those rare use cases, see xref:query-advanced#_dynamic_values_in_property_ke
 == Error handling
 
 A query run may fail for a number of reasons, with different link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/exceptions/package-summary.html[exceptions] being raised.
-Some of them are due to Cypher syntax errors, permission issues, or other forms of misconfigurations/misusage.
+Some of them are due to Cypher syntax errors, permission issues, or other forms of misconfiguration/misusage.
 The choice of how to handle those exceptions is up to your application: whether you want to be defensive (for example check if there are records to process to avoid link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/exceptions/NoSuchRecordException.html[NoSuchRecordException]), or whether you want to catch and handle the exceptions as they arise.
 
-For failures deemed to be transient (for example due to temporary server unavailability),the driver automatically retries to run a failed query.
+If a query fails for a reason deemed to be transient (for example due to temporary server unavailability), the driver automatically retries to run it.
 An exception will be raised if the operation keeps failing after a number of attempts.
 
 
@@ -321,8 +321,7 @@ public class App {
 
                 // Loop through results and do something with them
                 result.records().forEach(r -> {
-                    System.out.println(r);  // doesn't unwrap properties, Record<{friend: node<4>}>, nor .fields() does
-                    // python shows <Record friend=<Node element_id='4:5bad7cf2-d17e-4d07-9266-b88c8720ebd2:4' labels=frozenset({'Person'}) properties={'name': 'Bob', 'age': 19}>>
+                    System.out.println(r);
                 });
 
                 // Summary information
@@ -339,7 +338,7 @@ public class App {
 }
 ----
 
-For more information see link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/ExecutableQuery.html[API documentation -- Driver.executableQuery()].
+For more information see link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/ExecutableQuery.html[API documentation -> Driver.executableQuery()].
 
 
 ifndef::backend-pdf[]
