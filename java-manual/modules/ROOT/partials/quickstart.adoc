@@ -110,13 +110,14 @@ import org.neo4j.driver.TransactionContext;
 import org.neo4j.driver.exceptions.NoSuchRecordException;
 
 public class App {
-    final String dbUri = "<URI for Neo4j database>";
-    final String dbUser = "<Username>";
-    final String dbPassword = "<Password>";
-    private static final int employeeThreshold = 10;
 
     // Create & employ 100 people to 10 different organizations
     public static void main(String... args) {
+
+        final String dbUri = "<URI for Neo4j database>";
+        final String dbUser = "<Username>";
+        final String dbPassword = "<Password>";
+
         try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword))) {
             try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
                 for (int i=0; i<100; i++) {
@@ -134,6 +135,8 @@ public class App {
     }
 
     static String employPersonTx(TransactionContext tx, String name) {
+        final int employeeThreshold = 10;
+
         // Create new Person node with given name, if not exists already
         tx.run("MERGE (p:Person {name: $name})", Map.of("name", name));
 
