@@ -6,6 +6,6 @@ nav:
 - modules/ROOT/content-nav.adoc
 asciidoc:
   attributes:
-    java-driver-version: '5.15' # the version of the api docs published at https://neo4j.com/docs/api/java-driver/
+    java-driver-version: '5.17' # the version of the api docs published at https://neo4j.com/docs/api/java-driver/
     common-partial: 5@common-content:ROOT:partial$
     common-image: 5@common-content:ROOT:image$
