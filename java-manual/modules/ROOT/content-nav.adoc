@@ -21,6 +21,7 @@
 * xref:connect-advanced.adoc[Advanced connection information]
 * xref:data-types.adoc[Data types and mapping to Cypher types]
 * link:https://neo4j.com/docs/api/java-driver/current/[API documentation, window=_blank]
+* xref:related-projects.adoc[Related projects]
 
 * *GraphAcademy courses*
 

@@ -1,0 +1,11 @@
+= Related projects
+
+True to its name (the `j` stands for `java`), Neo4j has a wide Java-ecosystem surrounding it.
+This page lists the other officially supported Java projects that help you work with a Neo4j database.
+
+- link:https://neo4j.com/docs/ogm-manual/current/[Neo4j OGM] -- An Object Graph Mapping (OGM) library abstracts the database and provides a convenient way to query it without having to use low level drivers directly.
+- link:https://docs.spring.io/spring-data/neo4j/reference/[Spring Data Neo4j (SDN)] -- An Object Graph Mapping (OGM) library, as a Spring Data module.
+- link:https://docs.spring.io/spring-boot/docs/current/reference/html/data.html#data.nosql.neo4j[Spring Boot integration] -- Spring Boot offers several conveniences for working with Neo4j, including the `spring-boot-starter-data-neo4j` "Starter".
+- link:https://docs.quarkiverse.io/quarkus-neo4j/dev/index.html[Quarkus Neo4j] -- The Quarkus Neo4j extension provides an instance of the Neo4j driver configured for usage in a Quarkus application.
+- link:https://github.com/michael-simons/neo4j-migrations[Neo4j-Migrations] -- A database migration and refactoring tool that allows running Cypher scripts and programmatic refactorings in a controlled and repeatable fashion against one or more Neo4j databases.
+- link:http://neo4j-contrib.github.io/cypher-dsl[Cypher-DSL] -- A Cypher generator, to dynamically create Cypher queries without doing string concatenation.

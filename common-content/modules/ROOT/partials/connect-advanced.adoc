@@ -15,7 +15,7 @@ The driver supports connection to URIs of the form
 - `<POLICY-NAME>` is an optional _server policy_ name. link:{neo4j-docs-base-uri}/docs/operations-manual/current/clustering/clustering-advanced/multi-data-center-routing/[Server policies] need to be set up prior to usage.
 
 [NOTE]
-Notice that *the driver does not support connection to a nested path*, such as `example.com/neo4j/`.
+The driver does not support connection to a nested path, such as `example.com/neo4j/`.
 The server must be reachable from the domain root.
 
 # end::connection-uri[]

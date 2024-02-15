@@ -4,7 +4,7 @@ Once you have xref:connect.adoc[connected to the database], you can execute <<Cy
 
 [TIP]
 `Driver.executableQuery()` was introduced with the version 5.8 of the driver. +
-For queries with earlier versions, see xref:transactions.adoc[Run your own transactions].
+For queries with earlier versions, use xref:transactions.adoc[sessions and transactions].
 
 
 == Write to the database
@@ -199,7 +199,10 @@ var result = driver.executableQuery("MATCH (p:Person) RETURN p.name")
     .execute();
 ----
 
-Do not rely on the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/use/[`USE`] Cypher clause for database selection with the driver.
+[TIP]
+Specifying the database through the configuration method is preferred over the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/use/[`USE`] Cypher clause.
+If the server runs on a cluster, queries with `USE` require server-side routing to be enabled.
+Queries may also take longer to execute as they may not reach the right cluster member at the first attempt, and need to be routed to one containing the requested database.
 
 
 === Request routing

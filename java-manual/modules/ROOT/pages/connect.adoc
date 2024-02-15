@@ -38,7 +38,8 @@ Both the creation of a `Driver` object and the connection verification can raise
 Since a connection error is a blocker for any subsequent task, the most common choice is to let the program crash should an exception occur while estabilishing a connection.
 
 `Driver` objects are _immutable_, _thread-safe_, and fairly _expensive to create_.
-Share them across threads (but not across processes) and use xref:query-simple#impersonation[impersonation] to query the database with a different user.
+You may share them across threads.
+If you need to query the database through several different users, use xref:query-simple#impersonation[impersonation] without creating a new `Driver` instance.
 If you want to alter a `Driver` configuration, you will need to create a new object.
 
 
