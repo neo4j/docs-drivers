@@ -189,6 +189,40 @@ try (var driver = GraphDatabase.driver("neo4j://example.com:9999", AuthTokens.ba
 ----
 
 
+== OCSP stapling
+
+If link:https://en.wikipedia.org/wiki/OCSP_stapling[OCSP stapling] is link:https://neo4j.com/docs/operations-manual/4.2/reference/configuration-settings/#config_dbms.connector.bolt.ocsp_stapling_enabled[enabled on the server], the driver can be configured to check for certificate revocations during SSL handshakes.
+OCSP stapling improves both security and performance when using CA-signed certificates.
+
+There are two methods implementing this feature:
+
+- link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Config.TrustStrategy.html#withStrictRevocationChecks()[`.withVerifyIfPresentRevocationChecks()`] -- validate a certificate's stapling if available, but don't fail verification if no stapling is found.
+- link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Config.TrustStrategy.html#withStrictRevocationChecks()[`.withStrictRevocationChecks()`] -- validate a certificate's stapling, and fail verification if no stapling is found.
+
+Both methods act on a `Config.TrustStrategy` object, so you have to be explicit about what certificates you want to trust and cannot rely on the driver to infer it from the xref:_connection_uri[connection URI] scheme.
+This means that you have to chain these methods to `Config.TrustStrategy.trustSystemCertificates()`.
+To avoid configuration clashes, the connection URI scheme must also be set to `neo4j` (i.e. not `neo4j+s` nor `neo4j+ssc`).
+
+.Validate certificate stapling, but don't fail if no stapling is found
+[source, java, test-skip]
+----
+// import org.neo4j.driver.Config;
+
+Config config = Config.builder()
+    .withEncryption()
+    .withTrustStrategy(Config.TrustStrategy
+        .trustSystemCertificates()
+        .withVerifyIfPresentRevocationChecks())  // mark-line
+    .build();
+try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword), config)) {
+    driver.verifyConnectivity();
+}
+----
+
+// withStrictRevocationChecks fails with
+// Caused by: javax.net.ssl.SSLHandshakeException: PKIX path validation failed: java.security.cert.CertPathValidatorException: Could not determine revocation status
+
+
 == Further connection parameters
 
 You can find all `Driver` configuration parameters in the link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/GraphDatabase.html[API documentation -> driver.GraphDatabase].
