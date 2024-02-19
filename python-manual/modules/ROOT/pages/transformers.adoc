@@ -152,7 +152,7 @@ image::{common-image}/pyvis-example.png[]
 For more advanded scenarios, you can use the parameter `result_transformer_` to provide a custom function that further manipulates the link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Result[`Result`] object resulting from your query.
 A transformer takes a `Result` object and can output any data structure. The transformer's return value is in turn returned by `.execute_query()`.
 
-Inside a transformer function you can use xref:transactionn[any of the `Result` methods].
+Inside a transformer function you can use xref:transactions.adoc[any of the `Result` methods].
 
 .A custom transformer using `single` and `consume`
 [source, python]

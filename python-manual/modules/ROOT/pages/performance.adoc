@@ -2,7 +2,7 @@
 
 == Always specify the target database
 
-*Specify the target database on all queries*, either with the xref:query-simple.adoc#_database_selection[`database_` parameter in `Driver.execute_query()`] or with the xref:transactions.adoc#_database_selection[`database` parameter when creating new sessions].
+*Specify the target database on all queries*, either with the xref:query-simple.adoc#_database_selection[`+database_+` parameter in `Driver.execute_query()`] or with the xref:transactions.adoc#_database_selection[`database` parameter when creating new sessions].
 If no database is provided, the driver has to send an extra request to the server to figure out what the default database is.
 The overhead is minimal for a single query, but becomes significant over hundreds of queries.
 
