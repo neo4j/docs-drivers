@@ -1,0 +1,377 @@
+= Performance recommendations
+
+== Always specify the target database
+
+*Specify the target database on all queries* with the `.withDatabase()` method, either in xref:query-simple.adoc#_database_selection[`Driver.executableQuery()`] calls or xref:transactions.adoc#_database_selection[when creating new sessions].
+If no database is provided, the driver has to send an extra request to the server to figure out what the default database is.
+The overhead is minimal for a single query, but becomes significant over hundreds of queries.
+
+[discrete]
+=== Good practices
+
+[source, java]
+----
+driver.executableQuery("<QUERY>")
+    .withConfig(QueryConfig.builder().withDatabase("<DB NAME>").build())
+    .execute();
+----
+
+[source, java]
+----
+driver.session(SessionConfig.builder().withDatabase("<DB NAME>").build());
+----
+
+[discrete]
+=== Bad practices
+
+[source, java]
+----
+driver.executableQuery("<QUERY>")
+    .execute();
+----
+
+[source, java]
+----
+driver.session();
+----
+
+
+== Be aware of the cost of transactions
+
+When submitting queries through xref:query-simple.adoc[`.executableQuery()`] or through xref:transactions.adoc#managed-transactions[`.executeRead/Write()`], the server automatically wraps them into a <<transaction>>.
+This behavior ensures that the database always ends up in a consistent state, regardless of what happens during the execution of a transaction (power outages, software crashes, etc).
+
+Creating a safe execution context around a number of queries obviously yields an overhead that is not present if the driver just shoots queries at the server and hopes they will get through.
+The overhead is small, but can pile up as the number of queries increases.
+For this reason, if your use case values throughput more than data integrity, you may extract further performance by running all queries within a single (auto-commit) transaction.
+You do this by creating a session and using `session.run()` to run as many queries as needed.
+
+.Privilege throughput over data integrity
+[source, java]
+----
+try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
+    for (int i=0; i<1000; i++) {
+        session.run("<QUERY>");
+    }
+}
+----
+
+.Privilege data integrity over throughput
+[source, java]
+----
+for (int i=0; i<1000; i++) {
+    driver.executableQuery("<QUERY>").execute();
+    // or session.executeRead/Write() calls
+}
+----
+
+
+== Route read queries to cluster readers
+
+In a cluster, *route read queries to link:{neo4j-docs-base-uri}/operations-manual/current/clustering/introduction/#clustering-secondary-mode[secondary nodes]*. You do this by:
+
+- using the method `.withRouting(RoutingControl.READ)` in xref:query-simple.adoc#_request_routing[`Driver.executableQuery()`] calls
+- using `Session.executeRead()` instead of `Session.executeWrite()` (for xref:transactions.adoc#managed-transactions[managed transactions])
+- using the method xref:transactions.adoc#_request_routing[`.withRouting(RoutingControl.READ)` when creating a new session] (for explicit transactions).
+
+[discrete]
+=== Good practices
+
+[source, java]
+----
+// import org.neo4j.driver.RoutingControl;
+
+driver.executableQuery("MATCH (p:Person) RETURN p")
+    .withConfig(QueryConfig.builder()
+        .withDatabase("neo4j")
+        .withRouting(RoutingControl.READ)  // mark-line
+        .build())
+    .execute();
+----
+
+[source, java]
+----
+try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
+    session.executeRead(tx -> {  // mark-line
+        var result = tx.run("MATCH (p:Person) RETURN p");
+        return result.list();
+    });
+}
+----
+
+
+[discrete]
+=== Bad practices
+
+[source, java]
+----
+// defaults to routing = writers
+driver.executableQuery("MATCH (p:Person) RETURN p")
+    .withConfig(QueryConfig.builder()
+        .withDatabase("neo4j")
+        .build())
+    .execute();
+----
+
+[source, java]
+----
+// don't ask to write on a read-only operation
+try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
+    session.executeWrite(tx -> {
+        var result = tx.run("MATCH (p:Person) RETURN p");
+        return result.list();
+    });
+}
+----
+
+
+== Create indexes
+
+*Create indexes for properties that you often filter against*.
+For example, if you often look up `Person` nodes by the `name` property, it is beneficial to create an index on `Person.name`.
+You can create indexes with the `CREATE INDEX` Cypher clause, for both nodes and relationships.
+
+.Create an index on Person.name
+[source, java]
+----
+driver.executableQuery("CREATE INDEX person_name FOR (n:Person) ON (n.name)").execute();
+----
+
+For more information, see link:{neo4j-docs-base-uri}/cypher-manual/current/indexes-for-search-performance/[Indexes for search performance].
+
+
+== Profile queries
+
+link:{neo4j-docs-base-uri}/cypher-manual/current/query-tuning/basic-example/#_profile_query[*Profile your queries*] to locate queries whose performance can be improved.
+You can profile queries by prepending them with `PROFILE`.
+The server output is available through the `.profile()` method of the xref:result-summary.adoc[`ResultSummary`] object.
+
+[source, java]
+----
+var result = driver.executableQuery("PROFILE MATCH (p {name: $name}) RETURN p")  // mark-line
+    .withParameters(Map.of("name", "Alice"))
+    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+    .execute();
+var queryPlan = result.summary().profile().arguments().get("string-representation");  // mark-line
+System.out.println(queryPlan);
+
+/*
+Planner COST
+Runtime PIPELINED
+Runtime version 5.0
+Batch size 128
+
++-----------------+----------------+----------------+------+---------+----------------+------------------------+-----------+---------------------+
+| Operator        | Details        | Estimated Rows | Rows | DB Hits | Memory (Bytes) | Page Cache Hits/Misses | Time (ms) | Pipeline            |
++-----------------+----------------+----------------+------+---------+----------------+------------------------+-----------+---------------------+
+| +ProduceResults | p              |              1 |    1 |       3 |                |                        |           |                     |
+| |               +----------------+----------------+------+---------+----------------+                        |           |                     |
+| +Filter         | p.name = $name |              1 |    1 |       4 |                |                        |           |                     |
+| |               +----------------+----------------+------+---------+----------------+                        |           |                     |
+| +AllNodesScan   | p              |             10 |    4 |       5 |            120 |                 9160/0 |   108.923 | Fused in Pipeline 0 |
++-----------------+----------------+----------------+------+---------+----------------+------------------------+-----------+---------------------+
+
+Total database accesses: 12, total allocated memory: 184
+*/
+----
+
+In case some queries are so slow that you are unable to even run them in reasonable times, you can prepend them with `EXPLAIN` instead of `PROFILE`.
+This will return the _plan_ that the server would use to run the query, but without executing it.
+The server output is available through the `.plan()` method of the xref:result-summary.adoc[`ResultSummary`] object.
+
+[source, java]
+----
+var result = driver.executableQuery("EXPLAIN MATCH (p {name: $name}) RETURN p")  // mark-line
+    .withParameters(Map.of("name", "Alice"))
+    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+    .execute();
+var queryPlan = result.summary().plan().arguments().get("string-representation");  // mark-line
+System.out.println(queryPlan);
+
+/*
+Planner COST
+Runtime PIPELINED
+Runtime version 5.0
+Batch size 128
+
++-----------------+----------------+----------------+---------------------+
+| Operator        | Details        | Estimated Rows | Pipeline            |
++-----------------+----------------+----------------+---------------------+
+| +ProduceResults | p              |              1 |                     |
+| |               +----------------+----------------+                     |
+| +Filter         | p.name = $name |              1 |                     |
+| |               +----------------+----------------+                     |
+| +AllNodesScan   | p              |             10 | Fused in Pipeline 0 |
++-----------------+----------------+----------------+---------------------+
+
+Total database accesses: ?
+*/
+----
+
+
+== Specify node labels
+
+*Specify node labels* in all queries.
+This allows the query planner to work much more efficiently, and to leverage indexes where available.
+To learn how to combine labels, see link:{neo4j-docs-base-uri}/cypher-manual/current/syntax/expressions/#query-syntax-label[Cypher -> Label expressions].
+
+[discrete]
+=== Good practices
+
+[source, java]
+----
+driver.executableQuery("MATCH (p:Person|Animal {name: $name}) RETURN p")
+    .withParameters(Map.of("name", "Alice"))
+    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+    .execute();
+----
+
+[source, java]
+----
+try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
+    session.run("MATCH (p:Person|Animal {name: $name}) RETURN p", Map.of("name", "Alice"));
+}
+----
+
+
+[discrete]
+=== Bad practices
+
+[source, java]
+----
+driver.executableQuery("MATCH (p {name: $name}) RETURN p")
+    .withParameters(Map.of("name", "Alice"))
+    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+    .execute();
+----
+
+[source, java]
+----
+try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
+    session.run("MATCH (p {name: $name}) RETURN p", Map.of("name", "Alice"));
+}
+----
+
+
+== Batch data creation
+
+*Batch queries when creating a lot of records* using the  link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/unwind/[`UNWIND`] Cypher clause.
+
+
+[discrete]
+=== Good practice
+
+.Submit one single queries with all values inside
+[source, java]
+----
+// Generate a sequence of numbers
+int start = 1;
+int end = 10000;
+List<Map> numbers = new ArrayList<>(end - start + 1);
+for (int i=start; i<=end; i++) {
+    numbers.add(Map.of("value", i));
+}
+
+driver.executableQuery("""
+    UNWIND $numbers AS node
+    CREATE (:Number {value: node.value})
+    """)
+    .withParameters(Map.of("numbers", numbers))
+    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+    .execute();
+----
+
+[discrete]
+=== Bad practice
+
+.Submit a lot of single queries, one for each value
+[source, java]
+----
+for (int i=1; i<=10000; i++) {
+driver.executableQuery("CREATE (:Number {value: $value})")
+    .withParameters(Map.of("value", i))
+    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+    .execute();
+}
+----
+
+[TIP]
+The most efficient way of performing a _first import_ of large amounts of data into a new database is the link:{neo4j-docs-base-uri}/operations-manual/current/tutorial/neo4j-admin-import/[`neo4j-admin database import`] command.
+// source:  https://community.neo4j.com/t5/neo4j-graph-platform/improving-data-writing-efficiency-in-python/td-p/39520
+
+
+== Use query parameters
+
+*Always use xref:query-simple#query-parameters[query parameters]* instead of hardcoding or concatenating values into queries.
+Besides protecting from Cypher injections, this allows to better leverage the database query cache.
+
+[discrete]
+=== Good practices
+
+[source, java]
+----
+driver.executableQuery("MATCH (p:Person {name: $name}) RETURN p")
+    .withParameters(Map.of("name", "Alice"))
+    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+    .execute();
+----
+
+[source, java]
+----
+try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
+    session.run("MATCH (p:Person {name: $name}) RETURN p", Map.of("name", "Alice"));
+}
+----
+
+[discrete]
+=== Bad practices
+
+[source, java]
+----
+driver.executableQuery("MATCH (p:Person {name: 'Alice'}) RETURN p")
+    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+    .execute();
+// or
+String name = "Alice";
+driver.executableQuery("MATCH (p:Person {name: '" + name + "'}) RETURN p")
+    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+    .execute();
+----
+
+[source, java]
+----
+try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
+    session.run("MATCH (p:Person {name: 'Alice'}) RETURN p");
+    // or
+    String name = "Alice";
+    session.run("MATCH (p:Person {name: '" + name + "'}) RETURN p");
+}
+----
+
+
+== Concurrency
+
+**Use xref:async.adoc[asynchronous querying]**.
+This is likely to be more impactful on performance if you parallelize complex and time-consuming queries in your application, but not so much if you run many simple ones.
+
+
+== Use `MERGE` for creation only when needed
+
+The Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/merge/[`MERGE`] is convenient for data creation, as it allows to avoid duplicate data when an exact clone of the given pattern exists.
+However, it requires the database to run _two_ queries: it first needs to link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/match/[`MATCH`] the pattern, and only then can it link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/create/[`CREATE`] it (if needed).
+
+If you know already that the data you are inserting is new, avoid using `MERGE` and use `CREATE` directly instead -- this practically halves the number of database queries.
+
+
+== Filter notifications
+
+xref:result-summary.adoc#_filter_notifications[Filter the category and/or severity of notifications] the server should raise.
+
+
+ifndef::backend-pdf[]
+[discrete.glossary]
+== Glossary
+
+include::{common-partial}/glossary.adoc[]
+include::../partials/glossary.adoc[]
+endif::[]

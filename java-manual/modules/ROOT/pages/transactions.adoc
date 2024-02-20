@@ -1,0 +1,517 @@
+= Run your own transactions
+
+When xref:query-simple.adoc[querying the database with `executableQuery()`], the driver automatically creates a _transaction_. A transaction is a unit of work that is either _committed_ in its entirety or _rolled back_ on failure. You can include multiple Cypher statements in a single query, as for example when using `MATCH` and `MERGE` in sequence to xref:query-simple#_update_the_database[update the database], but you cannot have multiple queries and interleave some client-logic in between them.
+
+For these more advanced use-cases, the driver provides functions to take full control over the transaction lifecycle. These are called _managed transactions_, and you can think of them as a way of unwrapping the flow of `executableQuery()` and being able to specify its desired behavior in more places.
+
+
+== Create a session
+
+Before running a transaction, you need to obtain a _session_.
+Sessions act as concrete query channels between the driver and the server, and ensure <<causal consistency>> is enforced.
+
+Sessions are created with the method link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Driver.html#session()[`Driver.session()`].
+Use the optional argument to alter the session's configuration, among which for example the xref:_database_selection[target database].
+For further configuration parameters, see xref:_session_configuration[Session configuration].
+
+[source, java]
+----
+// import org.neo4j.driver.SessionConfig
+
+try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
+    // session usage
+}
+----
+
+Session creation is a lightweight operation, so sessions can be created and destroyed without significant cost.
+Always xref:_close_sessions[close sessions] when you are done with them.
+
+*Sessions are _not_ thread safe*: you can share the main `Driver` object across threads, but make sure each thread creates its own sessions.
+
+
+[#managed-transactions]
+== Run a managed transaction
+
+A transaction can contain any number of queries.
+As Neo4j is <<ACID>> compliant, *queries within a transaction will either be executed as a whole or not at all*: you cannot get a part of the transaction succeeding and another failing.
+Use transactions to group together related queries which work together to achieve a single _logical_ database operation.
+
+A managed transaction is created with the methods link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Session.html#executeRead(org.neo4j.driver.TransactionCallback,org.neo4j.driver.TransactionConfig)[`Session.executeRead()`] and link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Session.html#executeWrite(org.neo4j.driver.TransactionCallback,org.neo4j.driver.TransactionConfig)[`Session.executeWrite()`], depending on whether you want to retrieve data from the database or alter it.
+Both methods take a _transaction function_ callback, which is responsible for actually carrying out the queries and processing the result.
+
+.Retrieve people whose name starts with `Al`.
+[source, java]
+----
+// import java.util.Map
+// import org.neo4j.driver.SessionConfig
+
+try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {  // <1>
+    var people = session.executeRead(tx -> {  // <2>
+        var result = tx.run("""
+        MATCH (p:Person) WHERE p.name STARTS WITH $filter  // <3>
+        RETURN p.name AS name ORDER BY name
+        """, Map.of("filter", "Al"));
+        return result.list();  // return a list of Record objects # <4>
+    });
+    people.forEach(person -> {
+        System.out.println(person);
+    });
+    // further tx.run() calls will execute within the same transaction
+}
+----
+
+<1> Create a session. A single session can be the container for multiple queries. Unless created as a resource using the `try` construct, remember to close it when done.
+<2> The `.executeRead()` (or `.executeWrite()`) method is the entry point into a transaction. It takes a callback to a _transaction function_, which is responsible of running queries.
+<3> Use the method link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/SimpleQueryRunner.html#run(java.lang.String,java.util.Map)[`tx.run()`] to execute queries. You can provide a map of query parameters as second argument. Each query run returns a link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Result.html[`Result`] object.
+<4> xref:process-result[Process the result] using any of the methods on `Result`. The method `.list()` retrieves all records into a list.
+
+*Do not hardcode or concatenate parameters directly into the query*.
+Use xref:query-simple#query-parameters[query parameters] instead, both for performance and security reasons.
+
+*Transaction functions should never return the `Result` object directly*.
+Instead, always xref:process-result[process the result] in some way.
+Within a transaction function, a `return` statement results in the transaction being committed, while the transaction is automatically rolled back if an exception is raised.
+
+[CAUTION]
+The methods `.executeRead()` and `.executeWrite()` have replaced `.readTransaction()` and `.writeTransaction()`, which are deprecated in version 5.x and will be removed in version 6.0.
+
+.A transaction with multiple queries, client logic, and potential roll backs
+[source, java]
+----
+package demo;
+
+import java.util.Map;
+import java.util.List;
+import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
+
+import org.neo4j.driver.AuthTokens;
+import org.neo4j.driver.GraphDatabase;
+import org.neo4j.driver.QueryConfig;
+import org.neo4j.driver.Record;
+import org.neo4j.driver.RoutingControl;
+import org.neo4j.driver.SessionConfig;
+import org.neo4j.driver.TransactionContext;
+import org.neo4j.driver.exceptions.NoSuchRecordException;
+
+public class App {
+
+    // Create & employ 100 people to 10 different organizations
+    public static void main(String... args) {
+
+        final String dbUri = "<URI for Neo4j database>";
+        final String dbUser = "<Username>";
+        final String dbPassword = "<Password>";
+
+        try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword))) {
+            try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
+                for (int i=0; i<100; i++) {
+                    String name = String.format("Thor%d", i);
+
+                    try {
+                        String orgId = session.executeWrite(tx -> employPersonTx(tx, name));
+                        System.out.printf("User %s added to organization %s.%n", name, orgId);
+                    } catch (Exception e) {
+                        System.out.println(e.getMessage());
+                    }
+                }
+            }
+        }
+    }
+
+    static String employPersonTx(TransactionContext tx, String name) {
+        final int employeeThreshold = 10;
+
+        // Create new Person node with given name, if not exists already
+        tx.run("MERGE (p:Person {name: $name})", Map.of("name", name));
+
+        // Obtain most recent organization ID and the number of people linked to it
+        var result = tx.run("""
+            MATCH (o:Organization)
+            RETURN o.id AS id, COUNT{(p:Person)-[r:WORKS_FOR]->(o)} AS employeesN
+            ORDER BY o.createdDate DESC
+            LIMIT 1
+            """);
+
+        Record org = null;
+        String orgId = null;
+        int employeesN = 0;
+        try {
+            org = result.single();
+            orgId = org.get("id").asString();
+            employeesN = org.get("employeesN").asInt();
+        } catch (NoSuchRecordException e) {
+            // The query is guaranteed to return <= 1 results, so if.single() throws, it means there's none.
+            // If no organization exists, create one and add Person to it
+            orgId = createOrganization(tx);
+            System.out.printf("No orgs available, created %s.%n", orgId);
+        }
+
+        // If org does not have too many employees, add this Person to it
+        if (employeesN < employeeThreshold) {
+            addPersonToOrganization(tx, name, orgId);
+            // If the above throws, the transaction will roll back
+            // -> not even Person is created!
+
+        // Otherwise, create a new Organization and link Person to it
+        } else {
+            orgId = createOrganization(tx);
+            System.out.printf("Latest org is full, created %s.%n", orgId);
+            addPersonToOrganization(tx, name, orgId);
+            // If any of the above throws, the transaction will roll back
+            // -> not even Person is created!
+        }
+
+        return orgId;  // Organization ID to which the new Person ends up in
+    }
+
+    static String createOrganization(TransactionContext tx) {
+        var result = tx.run("""
+            CREATE (o:Organization {id: randomuuid(), createdDate: datetime()})
+            RETURN o.id AS id
+        """);
+        var org = result.single();
+        var orgId = org.get("id").asString();
+        return orgId;
+    }
+
+    static void addPersonToOrganization(TransactionContext tx, String personName, String orgId) {
+        tx.run("""
+            MATCH (o:Organization {id: $orgId})
+            MATCH (p:Person {name: $name})
+            MERGE (p)-[:WORKS_FOR]->(o)
+            """, Map.of("orgId", orgId, "name", personName)
+        );
+    }
+}
+----
+
+Should a transaction fail for a reason that the driver deems transient, it automatically retries to run the transaction function (with an exponentially increasing delay).
+For this reason, *transaction functions must be _idempotent_* (i.e., they should produce the same effect when run several times), because you do not know upfront how many times they are going to be executed.
+In practice, this means that you should not edit nor rely on globals, for example.
+Note that although transactions functions might be executed multiple times, the queries inside it will always run only once.
+
+A session can chain multiple transactions, but *only one single transaction can be active within a session at any given time*.
+To maintain multiple concurrent transactions, use multiple concurrent sessions.
+
+[#executeWriteWithoutResult]
+[TIP]
+====
+The transaction functions callback passed to `.executeRead()` and `.executeWrite()` may return anything, as the return type is a Java Generic.
+**That also means they may not return `void`**, as that is not an instance of `Object`. +
+If you are not interested in returning anything out of a transaction function, you may either:
+
+1. use `.executeWriteWithoutResult()`, which supports returning `void` (and `void` only);
+2. use `.executeRead()`/`.executeWrite()` and return `null` in the transaction function.
+====
+
+
+[#explicit-transactions]
+== Run an explicit transaction
+
+You can achieve full control over transactions by manually beginning one with the method link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Session.html#beginTransaction(org.neo4j.driver.TransactionConfig)[`Session.beginTransaction()`], which returns a link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Transaction.html[`Transaction`] object.
+You may then run queries inside an explicit transaction with the method `Transaction.run()`.
+
+[source, java]
+----
+try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
+    try (Transaction tx = session.beginTransaction()) {
+        // use tx.run() to run queries
+        //     tx.commit() to commit the transaction
+        //     tx.rollback() to rollback the transaction
+    }
+}
+----
+
+An explicit transaction can be committed with  link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Transaction.html#commit()[`Transaction.commit()`] or rolled back with  link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Transaction.html#rollback[`Transaction.rollback()`]. If no explicit action is taken, the driver will automatically roll back the transaction at the end of its lifetime.
+
+Explicit transactions are most useful for applications that need to distribute Cypher execution across multiple functions for the same transaction, or for applications that need to run multiple queries within a single transaction but without the automatic retries provided by managed transactions.
+
+.An explicit transaction example involving an external API
+[source, java]
+----
+package demo;
+
+import java.util.Map;
+import java.util.List;
+import java.util.Arrays;
+
+import org.neo4j.driver.AuthTokens;
+import org.neo4j.driver.Driver;
+import org.neo4j.driver.GraphDatabase;
+import org.neo4j.driver.QueryConfig;
+import org.neo4j.driver.Record;
+import org.neo4j.driver.SessionConfig;
+import org.neo4j.driver.Transaction;
+
+public class App {
+
+    public static void main(String... args) {
+        final String dbUri = "<URI for Neo4j database>";
+        final String dbUser = "<Username>";
+        final String dbPassword = "<Password>";
+
+        try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword))) {
+            driver.verifyConnectivity();
+
+            String customerId = createCustomer(driver);
+            int otherBankId = 42;
+            transferToOtherBank(driver, customerId, otherBankId, 999);
+        }
+    }
+
+    static String createCustomer(Driver driver) {
+        var result = driver.executableQuery("""
+            MERGE (c:Customer {id: randomUUID(), balance: 1000})
+            RETURN c.id AS id
+            """)
+            .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+            .execute();
+        return result.records().get(0).get("id").asString();
+    }
+
+    static void transferToOtherBank(Driver driver, String customerId, int otherBankId, float amount) {
+        try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
+            try (var tx = session.beginTransaction()) {
+                if (! customerBalanceCheck(tx, customerId, amount)) {
+                    System.out.printf("Customer %s doesn't have enough funds.%n", customerId);
+                    return;  // give up
+                }
+
+                otherBankTransferApi(customerId, otherBankId, amount);
+                // Now the money has been transferred => can't rollback anymore
+                // (cannot rollback external services interactions)
+
+                try {
+                    decreaseCustomerBalance(tx, customerId, amount);
+                    tx.commit();
+                    System.out.printf("Transferred %f to %s.%n", amount, customerId);
+                } catch (Exception e) {
+                    requestInspection(customerId, otherBankId, amount, e);
+                    throw new RuntimeException(e.getMessage());
+                }
+            }
+        }
+    }
+
+    static boolean customerBalanceCheck(Transaction tx, String customerId, float amount) {
+        var result = tx.run("""
+            MATCH (c:Customer {id: $id})
+            RETURN c.balance >= $amount AS sufficient
+            """, Map.of("id", customerId, "amount", amount));
+        var record = result.single();
+        return record.get("sufficient").asBoolean();
+    }
+
+    static void otherBankTransferApi(String customerId, int otherBankId, float amount) {
+        // make some API call to other bank
+    }
+
+    static void decreaseCustomerBalance(Transaction tx, String customerId, float amount) {
+        tx.run("""
+            MATCH (c:Customer {id: $id})
+            SET c.balance = c.balance - $amount
+            """, Map.of("id", customerId, "amount", amount));
+    }
+
+    static void requestInspection(String customerId, int otherBankId, float amount, Exception e) {
+        // manual cleanup required; log this or similar
+        System.out.printf("WARNING: transaction rolled back due to exception: %s.%n", e.getMessage());
+        System.out.printf("customerId: %s, otherBankId: %d, amount: %f.%n", customerId, otherBankId, amount);
+    }
+}
+----
+
+
+[[process-result]]
+== Process query results
+
+The driver's output of a query is a link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Result.html[`Result`] object, which encapsulates the Cypher result in a rich data structure that requires some parsing on the client side.
+
+When working with a `Result` object, there are two things to keep in mind:
+
+- *The result records are not immediately and entirely fetched and returned by the server*.
+Instead, results come as a _lazy stream_.
+In particular, when the driver receives some records from the server, they are initially _buffered_ in a background queue.
+Records stay in the buffer until they are _consumed_ by the application, at which point they are _removed from the buffer_.
+When no more records are available, the result is _exhausted_.
+- *The result acts as a _cursor_*.
+This means that there is no way to retrieve a previous record from the stream, unless you saved it in an auxiliary data structure.
+
+// The animation below showcases how the result streaming and processing works in broad strokes (currently in draft).
+
+// video::neo4j-driver-result-animation.mp4[]
+
+**The easiest way of processing a result is by calling `.list()` on it**, which yields a list of link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Record.html[`Record`] objects.
+Otherwise, a `Result` object implements a number of methods for processing records.
+The most commonly needed ones are listed below.
+
+// .An essential list of `Result` methods
+[cols="2,3"]
+|===
+|Method |Description
+
+|`list() List<Record>`
+|Return the remainder of the result as a list.
+
+|`single() Record`
+a|Return the next and only remaining record.
+Calling this method always exhausts the result.
+If more (or less) than one record is available, a `NoSuchRecordException` is raised.
+
+|`next() Record`
+a|Return the next record in the result. Throws `NoSuchRecordException` if no further records are available.
+
+|`hasNext() boolean`
+|Whether the result iterator has a next record to move to.
+
+|`peek() Record`
+|Return the next record from the result _without consuming it_.
+This leaves the record in the buffer for further processing.
+
+|`consume() ResultSummary`
+|Return the query xref:result-summary.adoc[result summary].
+It exhausts the result, so should only be called when data processing is over.
+|===
+
+For a complete list of `Result` methods, see link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Result.html[API documentation -> Result].
+
+[TIP]
+====
+Properties inside a link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Record.html[`Record`] object are embedded within link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Value.html[`Value`] objects.
+To extract and cast them to the corresponding Java types, use `.as<type>()` (eg. `.asString()`, `asInt()`, etc).
+For example, if the `name` property coming from the database is a string, `record.get("name").asString()` will yield the property value as a `String` object.
+
+For more information, see xref:data-types.adoc[].
+====
+
+
+== Session configuration
+
+=== Database selection
+
+It is recommended to *always specify the database explicitly* through the `.withDatabase("<dbName>")` method, even on single-database instances.
+This allows the driver to work more efficiently, as it saves a network round-trip to the server to resolve the home database.
+If no database is given, the link:{neo4j-docs-base-uri}/operations-manual/current/manage-databases/introduction#manage-databases-default[default database] set in the Neo4j instance settings is used.
+
+[source, java]
+----
+// import org.neo4j.driver.SessionConfig;
+
+var session = driver.session(SessionConfig.builder()
+    .withDatabase("neo4j").build());  // mark-line
+----
+
+[TIP]
+Specifying the database through the configuration method is preferred over the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/use/[`USE`] Cypher clause.
+If the server runs on a cluster, queries with `USE` require server-side routing to be enabled.
+Queries may also take longer to execute as they may not reach the right cluster member at the first attempt, and need to be routed to one containing the requested database.
+
+
+=== Request routing
+
+In a cluster environment, all sessions are opened in write mode, routing them to the leader.
+You can change this by calling the method `.withRouting(RoutingControl.READ)`.
+Note that `.executeRead()` and `.executeWrite()` automatically override the session's default access mode.
+
+[source, java]
+----
+// import org.neo4j.driver.SessionConfig;
+// import org.neo4j.driver.AccessMode;
+
+var session = driver.session(SessionConfig.builder()
+    .withDatabase("neo4j")
+    .withDefaultAccessMode(AccessMode.READ)  // mark-line
+    .build());
+----
+
+[#access-control-note]
+// .Routing ≠ Access control
+[NOTE]
+====
+Although executing a _write_ query in read mode likely results in a runtime error, *you should not rely on this for access control.* The difference between the two modes is that _read_ transactions will be routed to any node of a cluster, whereas _write_ ones will be directed to the leader.
+In other words, there is no guarantee that a write query submitted in read mode will be rejected.
+
+Similar remarks hold for the `.executeRead()` and `.executeWrite()` methods.
+====
+
+
+[#impersonation]
+=== Run queries as a different user (impersonation)
+
+You can execute a query under the security context of a different user with the method `.withImpersonatedUser("<username>")`, specifying the name of the user to impersonate.
+For this to work, the user under which the `Driver` was created needs to have the link:{neo4j-docs-base-uri}/cypher-manual/current/access-control/dbms-administration#access-control-dbms-administration-impersonation[appropriate permissions].
+Impersonating a user is cheaper than creating a new `Driver` object.
+
+[source, java]
+----
+// import org.neo4j.driver.SessionConfig;
+// import org.neo4j.driver.RoutingControl;
+
+var session = driver.session(SessionConfig.builder()
+    .withDatabase("neo4j")
+    .withImpersonatedUser("somebodyElse")  // mark-line
+    .build());
+----
+
+When impersonating a user, the query is run within the complete security context of the impersonated user and not the authenticated user (i.e. home database, permissions, etc.).
+
+
+== Transaction configuration
+
+You can exert further control on transactions by providing a  link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/TransactionConfig.html[`TransactionConfig`] object as (optional) second parameter to `.executeRead()`, `.executeWrite()`, and `.beginTransaction()`.
+Use it to specify:
+
+- A transaction timeout.
+Transactions that run longer will be terminated by the server.
+The default value is set on the server side.
+The minimum value is one millisecond.
+- A map of metadata that gets attached to the transaction.
+These metadata get logged in the server `query.log`, and are visible in the output of the `SHOW TRANSACTIONS` Cypher command.
+Use this to tag transactions.
+
+[source, java]
+----
+// import java.time.Duration
+// import org.neo4j.driver.SessionConfig
+// import org.neo4j.driver.TransactionConfig
+
+try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
+    var people = session.executeRead(tx -> {
+        var result = tx.run("MATCH (p:Person) RETURN p");
+        return result.list();  // return a list of Record objects
+    }, TransactionConfig.builder()
+        .withTimeout(Duration.ofSeconds(5))  // mark-line
+        .withMetadata(Map.of("appName", "peopleTracker"))  // mark-line
+        .build()
+    );
+    people.forEach(person -> System.out.println(person));
+}
+----
+
+
+== Close sessions
+
+Each connection pool has *a finite number of sessions*, so if you open sessions without ever closing them, your application could run out of them.
+It is thus recommended to create sessions using the `try-with-resources` statement, which automatically closes them when the application is done with them.
+When a session is closed, it is returned to the connection pool to be later reused.
+
+If you do not open sessions as resources with `try`, remember to call the `.close()` method when you have finished using them.
+
+[source, java]
+----
+var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build());
+
+// session usage
+
+session.close();
+----
+
+
+ifndef::backend-pdf[]
+[discrete.glossary]
+== Glossary
+
+include::{common-partial}/glossary.adoc[]
+include::../partials/glossary.adoc[]
+endif::[]

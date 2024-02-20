@@ -6,8 +6,6 @@ nav:
 - modules/ROOT/content-nav.adoc
 asciidoc:
   attributes:
-    java-driver-version: '5.12.0' # the version of the api docs published at https://neo4j.com/docs/api/java-driver/
-    java-driver-apidoc-release: '5.0' # the github branch or release that contains examples included in docs
-    java-examples: https://raw.githubusercontent.com/neo4j/neo4j-java-driver/{java-driver-apidoc-release}/examples/src/main/java/org/neo4j/docs/driver
+    java-driver-version: '5.17.0' # the version of the package published at https://central.sonatype.com/artifact/org.neo4j.driver/neo4j-java-driver
     common-partial: 5@common-content:ROOT:partial$
     common-image: 5@common-content:ROOT:image$

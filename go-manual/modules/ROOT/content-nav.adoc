@@ -23,6 +23,6 @@
 
 * *GraphAcademy courses*
 
-* link:https://graphacademy.neo4j.com/courses/modeling-fundamentals/?ref=docs-python[Graph Data Modeling Fundamentals]
-* link:https://graphacademy.neo4j.com/courses/cypher-intermediate-queries/?ref=docs-python[Intermediate Cypher Queries]
+* link:https://graphacademy.neo4j.com/courses/modeling-fundamentals/?ref=docs-go[Graph Data Modeling Fundamentals]
+* link:https://graphacademy.neo4j.com/courses/cypher-intermediate-queries/?ref=docs-go[Intermediate Cypher Queries]
 * link:https://graphacademy.neo4j.com/courses/app-go/?ref=docs-go[Building Neo4j Applications with Go]

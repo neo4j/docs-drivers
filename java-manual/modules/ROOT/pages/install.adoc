@@ -1,0 +1,54 @@
+= Installation
+
+To start creating a Neo4j Java application, you first need to install the Java driver and get a Neo4j database instance to connect to.
+
+[NOTE]
+The driver requires Java 17 or higher.
+
+
+[#install-driver]
+== Install the driver
+
+If you already have a Maven project, you may add the driver as a dependency in your `pom.xml` file:
+
+[source, xml, subs="attributes+"]
+----
+<dependency>
+    <groupId>org.neo4j.driver</groupId>
+    <artifactId>neo4j-java-driver</artifactId>
+    <version>{java-driver-version}</version>
+</dependency>
+----
+
+.How to create a Maven project for a Neo4j Java application?
+[%collapsible]
+====
+If you are new to Maven, you may download the xref:attachment$neo4j-demo-app.zip[Neo4j demo app example project] and use it as a base to experiment with the driver and build your application.
+
+The file `App.java` provides a skeleton application.
+You may compile and run the project with the commands:
+
+[source, bash]
+----
+mvn install
+java -jar target/neo4j-demo-app-1.0-SNAPSHOT-jar-with-dependencies.jar
+----
+====
+
+For other dependency management systems, refer to the link:https://central.sonatype.com/artifact/org.neo4j.driver/neo4j-java-driver[driver's package page].
+
+Always use the latest version of the driver, as it will always work both with the previous Neo4j <<LTS>> release and with the current and next major releases.
+The latest `5.x` driver supports connection to any Neo4j 5 and 4.4 instance, and will also be compatible with Neo4j 6.
+For a detailed list of changes across versions, see the link:https://github.com/neo4j/neo4j-java-driver/wiki/5.x-changelog[driver's changelog].
+
+
+include::{common-partial}/install.adoc[tag=get-an-instance]
+
+
+ifndef::backend-pdf[]
+[discrete.glossary]
+== Glossary
+
+include::{common-partial}/glossary.adoc[]
+include::../partials/glossary.adoc[]
+endif::[]

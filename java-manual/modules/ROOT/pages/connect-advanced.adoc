@@ -1,0 +1,237 @@
+= Advanced connection information
+
+include::{common-partial}/connect-advanced.adoc[tag=connection-uri]
+
+include::{common-partial}/connect-advanced.adoc[tag=connection-protocols]
+
+
+== Authentication methods
+
+=== Basic authentication (default)
+
+The basic authentication scheme relies on traditional username and password.
+These can either be the credentials for your local installation, or the ones provided with an Aura instance.
+
+[source, java]
+----
+// import org.neo4j.driver.AuthTokens;
+// import org.neo4j.driver.GraphDatabase;
+
+GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword));
+----
+
+[INFO]
+The basic authentication scheme can also be used to authenticate against an LDAP server (Enterprise Edition only).
+
+
+=== Kerberos authentication
+
+The Kerberos authentication scheme requires a base64-encoded ticket.
+It can only be used if the server has the link:{neo4j-docs-base-uri}/kerberos-add-on/current/deployment/[Kerberos Add-on installed].
+
+[source, java, test-skip]
+----
+// import org.neo4j.driver.AuthTokens;
+// import org.neo4j.driver.GraphDatabase;
+
+GraphDatabase.driver(dbUri, AuthTokens.kerberos(ticket));
+----
+
+=== Bearer authentication
+
+The bearer authentication scheme requires a base64-encoded token provided by an Identity Provider through Neo4j's link:{neo4j-docs-base-uri}/operations-manual/current/authentication-authorization/sso-integration[Single Sign-On feature].
+
+[source, java, test-skip]
+----
+// import org.neo4j.driver.AuthTokens;
+// import org.neo4j.driver.GraphDatabase;
+
+GraphDatabase.driver(dbUri, AuthTokens.bearer(ticket));
+----
+
+[NOTE]
+The bearer authentication scheme requires link:{neo4j-docs-base-uri}/operations-manual/current/authentication-authorization/sso-integration[configuring Single Sign-On on the server].
+Once configured, clients can discover Neo4j's configuration through the link:https://neo4j.com/docs/http-api/current/endpoints/#discovery-api[Discovery API].
+
+
+=== Custom authentication
+
+Use link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/AuthTokens.html#custom(java.lang.String,java.lang.String,java.lang.String,java.lang.String,java.util.Map)[`AuthTokens.custom()`] to log into a server having a custom authentication scheme.
+
+[source, java, test-skip]
+----
+// import org.neo4j.driver.AuthTokens;
+// import org.neo4j.driver.GraphDatabase;
+
+GraphDatabase.driver(dbUri, AuthTokens.custom(principal, credentials, realm, scheme, parameters));
+----
+
+
+=== No authentication
+
+If authentication is disabled on the server, the authentication parameter can be omitted entirely.
+
+
+== Logging
+
+By default, the driver logs `INFO` messages through the Java logging framework `java.util.logging`.
+To change the driver's logging behavior, use the link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Config.ConfigBuilder.html#withLogging(org.neo4j.driver.Logging)[`.withLogging()`] method when creating a `Driver` object.
+
+[source, java]
+----
+// import java.util.logging.Level;
+// import org.neo4j.driver.AuthTokens;
+// import org.neo4j.driver.Config;
+// import org.neo4j.driver.GraphDatabase;
+// import org.neo4j.driver.Logging;
+
+try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword),
+    Config.builder().withLogging(Logging.console(Level.FINE)).build())) {
+    driver.verifyConnectivity();
+}
+----
+
+.Example of log output upon driver connection
+[source, log]
+----
+2023-12-22T10:36:39.997882867 INFO org.neo4j.driver.internal.DriverFactory - Routing driver instance 1651855867 created for server address localhost:7687
+2023-12-22T10:36:40.03430944 FINE io.netty.channel.DefaultChannelId - -Dio.netty.processId: 23665 (auto-detected)
+2023-12-22T10:36:40.036871656 FINE io.netty.util.NetUtil - -Djava.net.preferIPv4Stack: false
+2023-12-22T10:36:40.037023871 FINE io.netty.util.NetUtil - -Djava.net.preferIPv6Addresses: false
+2023-12-22T10:36:40.03827624 FINE io.netty.util.NetUtilInitializations - Loopback interface: lo (lo, 0:0:0:0:0:0:0:1%lo)
+2023-12-22T10:36:40.038877108 FINE io.netty.util.NetUtil - /proc/sys/net/core/somaxconn: 4096
+2023-12-22T10:36:40.03958947 FINE io.netty.channel.DefaultChannelId - -Dio.netty.machineId: 04:cf:4b:ff:fe:0e:ee:99 (auto-detected)
+2023-12-22T10:36:40.04531968 FINE io.netty.util.ResourceLeakDetector - -Dio.netty.leakDetection.level: simple
+2023-12-22T10:36:40.045471749 FINE io.netty.util.ResourceLeakDetector - -Dio.netty.leakDetection.targetRecords: 4
+2023-12-22T10:36:40.059848221 FINE io.netty.buffer.PooledByteBufAllocator - -Dio.netty.allocator.numHeapArenas: 40
+2023-12-22T10:36:40.060000842 FINE io.netty.buffer.PooledByteBufAllocator - -Dio.netty.allocator.numDirectArenas: 40
+2023-12-22T10:36:40.060113675 FINE io.netty.buffer.PooledByteBufAllocator - -Dio.netty.allocator.pageSize: 8192
+2023-12-22T10:36:40.060219802 FINE io.netty.buffer.PooledByteBufAllocator - -Dio.netty.allocator.maxOrder: 9
+2023-12-22T10:36:40.060324679 FINE io.netty.buffer.PooledByteBufAllocator - -Dio.netty.allocator.chunkSize: 4194304
+2023-12-22T10:36:40.060442554 FINE io.netty.buffer.PooledByteBufAllocator - -Dio.netty.allocator.smallCacheSize: 256
+2023-12-22T10:36:40.060547232 FINE io.netty.buffer.PooledByteBufAllocator - -Dio.netty.allocator.normalCacheSize: 64
+2023-12-22T10:36:40.060648929 FINE io.netty.buffer.PooledByteBufAllocator - -Dio.netty.allocator.maxCachedBufferCapacity: 32768
+2023-12-22T10:36:40.060750268 FINE io.netty.buffer.PooledByteBufAllocator - -Dio.netty.allocator.cacheTrimInterval: 8192
+2023-12-22T10:36:40.060858214 FINE io.netty.buffer.PooledByteBufAllocator - -Dio.netty.allocator.cacheTrimIntervalMillis: 0
+2023-12-22T10:36:40.060965492 FINE io.netty.buffer.PooledByteBufAllocator - -Dio.netty.allocator.useCacheForAllThreads: false
+2023-12-22T10:36:40.061068878 FINE io.netty.buffer.PooledByteBufAllocator - -Dio.netty.allocator.maxCachedByteBuffersPerChunk: 1023
+2023-12-22T10:36:40.069792775 FINE io.netty.buffer.ByteBufUtil - -Dio.netty.allocator.type: pooled
+2023-12-22T10:36:40.069957048 FINE io.netty.buffer.ByteBufUtil - -Dio.netty.threadLocalDirectBufferSize: 0
+2023-12-22T10:36:40.070070891 FINE io.netty.buffer.ByteBufUtil - -Dio.netty.maxThreadLocalCharBufferSize: 16384
+2023-12-22T10:36:40.102235419 FINE io.netty.buffer.AbstractByteBuf - -Dio.netty.buffer.checkAccessible: true
+2023-12-22T10:36:40.102408774 FINE io.netty.buffer.AbstractByteBuf - -Dio.netty.buffer.checkBounds: true
+2023-12-22T10:36:40.103026138 FINE io.netty.util.ResourceLeakDetectorFactory - Loaded default ResourceLeakDetector: io.netty.util.ResourceLeakDetector@1a67b908
+2023-12-22T10:36:40.104721387 FINE org.neo4j.driver.internal.async.connection.ChannelConnectedListener - [0xb354eed2][localhost(127.0.0.1):7687][] C: [Bolt Handshake] [0x6060b017, 263173, 132100, 260, 3]
+2023-12-22T10:36:40.106645202 FINE io.netty.util.Recycler - -Dio.netty.recycler.maxCapacityPerThread: 4096
+2023-12-22T10:36:40.106785483 FINE io.netty.util.Recycler - -Dio.netty.recycler.ratio: 8
+2023-12-22T10:36:40.106887674 FINE io.netty.util.Recycler - -Dio.netty.recycler.chunkSize: 32
+2023-12-22T10:36:40.106993748 FINE io.netty.util.Recycler - -Dio.netty.recycler.blocking: false
+2023-12-22T10:36:40.107096042 FINE io.netty.util.Recycler - -Dio.netty.recycler.batchFastThreadLocalOnly: true
+2023-12-22T10:36:40.11603651 FINE org.neo4j.driver.internal.async.connection.HandshakeHandler - [0xb354eed2][localhost(127.0.0.1):7687][] S: [Bolt Handshake] 5.4
+2023-12-22T10:36:40.128082306 FINE org.neo4j.driver.internal.async.outbound.OutboundMessageHandler - [0xb354eed2][localhost(127.0.0.1):7687][] C: HELLO {routing={address: "localhost:7687"}, bolt_agent={product: "neo4j-java/dev", language: "Java/17.0.9", language_details: "Optional[Eclipse Adoptium; OpenJDK 64-Bit Server VM; 17.0.9+9]", platform: "Linux; 5.15.0-91-generic; amd64"}, user_agent="neo4j-java/dev"}
+2023-12-22T10:36:40.130350166 FINE org.neo4j.driver.internal.async.pool.NettyChannelTracker - Channel [0xb354eed2] created. Local address: /127.0.0.1:32794, remote address: /127.0.0.1:7687
+2023-12-22T10:36:40.130746872 FINE org.neo4j.driver.internal.async.pool.NettyChannelTracker - Channel [0xb354eed2] acquired from the pool. Local address: /127.0.0.1:32794, remote address: /127.0.0.1:7687
+2023-12-22T10:36:40.133652153 FINE org.neo4j.driver.internal.async.outbound.OutboundMessageHandler - [0xb354eed2][localhost(127.0.0.1):7687][] C: LOGON {principal="neo4j", scheme="basic", credentials="******"}
+2023-12-22T10:36:40.140017819 FINE org.neo4j.driver.internal.async.inbound.InboundMessageDispatcher - [0xb354eed2][localhost(127.0.0.1):7687][] S: SUCCESS {server="Neo4j/5.16.0", connection_id="bolt-5", hints={connection.recv_timeout_seconds: 120}}
+2023-12-22T10:36:40.142229689 FINE org.neo4j.driver.internal.async.inbound.InboundMessageDispatcher - [0xb354eed2][localhost(127.0.0.1):7687][bolt-5] S: SUCCESS {}
+2023-12-22T10:36:40.14568667 FINE org.neo4j.driver.internal.async.outbound.OutboundMessageHandler - [0xb354eed2][localhost(127.0.0.1):7687][bolt-5] C: RESET
+2023-12-22T10:36:40.146897982 FINE org.neo4j.driver.internal.async.NetworkConnection - Added ConnectionReadTimeoutHandler
+2023-12-22T10:36:40.14753571 FINE org.neo4j.driver.internal.async.inbound.InboundMessageDispatcher - [0xb354eed2][localhost(127.0.0.1):7687][bolt-5] S: SUCCESS {}
+2023-12-22T10:36:40.147813446 FINE org.neo4j.driver.internal.async.NetworkConnection - Removed ConnectionReadTimeoutHandler
+2023-12-22T10:36:40.14895232 FINE org.neo4j.driver.internal.async.pool.NettyChannelTracker - Channel [0xb354eed2] released back to the pool
+2023-12-22T10:36:40.15199869 FINE org.neo4j.driver.internal.cluster.RoutingTableRegistryImpl - Routing table handler for database 'system' is added.
+2023-12-22T10:36:40.152613749 FINE org.neo4j.driver.internal.cluster.RoutingTableHandlerImpl - Routing table for database 'system' is stale. Ttl 1703237800150, currentTime 1703237800152, routers [], writers [], readers [], database 'system'
+2023-12-22T10:36:40.159510973 FINE org.neo4j.driver.internal.async.pool.NettyChannelTracker - Channel [0xb354eed2] acquired from the pool. Local address: /127.0.0.1:32794, remote address: /127.0.0.1:7687
+2023-12-22T10:36:40.165704119 FINE org.neo4j.driver.internal.async.outbound.OutboundMessageHandler - [0xb354eed2][localhost(127.0.0.1):7687][bolt-5] C: ROUTE {address="localhost:7687"} [] system null
+2023-12-22T10:36:40.168929698 FINE org.neo4j.driver.internal.async.NetworkConnection - Added ConnectionReadTimeoutHandler
+2023-12-22T10:36:40.171700427 FINE org.neo4j.driver.internal.async.inbound.InboundMessageDispatcher - [0xb354eed2][localhost(127.0.0.1):7687][bolt-5] S: SUCCESS {rt={servers: [{addresses: ["localhost:7687"], role: "WRITE"}, {addresses: ["localhost:7687"], role: "READ"}, {addresses: ["localhost:7687"], role: "ROUTE"}], ttl: 300, db: "system"}}
+2023-12-22T10:36:40.17187084 FINE org.neo4j.driver.internal.async.NetworkConnection - Removed ConnectionReadTimeoutHandler
+2023-12-22T10:36:40.173921853 FINE org.neo4j.driver.internal.async.outbound.OutboundMessageHandler - [0xb354eed2][localhost(127.0.0.1):7687][bolt-5] C: RESET
+2023-12-22T10:36:40.174473474 FINE org.neo4j.driver.internal.async.NetworkConnection - Added ConnectionReadTimeoutHandler
+2023-12-22T10:36:40.175516332 FINE org.neo4j.driver.internal.async.inbound.InboundMessageDispatcher - [0xb354eed2][localhost(127.0.0.1):7687][bolt-5] S: SUCCESS {}
+2023-12-22T10:36:40.175679271 FINE org.neo4j.driver.internal.async.NetworkConnection - Removed ConnectionReadTimeoutHandler
+2023-12-22T10:36:40.175849144 FINE org.neo4j.driver.internal.async.pool.NettyChannelTracker - Channel [0xb354eed2] released back to the pool
+2023-12-22T10:36:40.182085603 FINE org.neo4j.driver.internal.cluster.RoutingTableHandlerImpl - Fetched cluster composition for database 'system'. ClusterComposition{readers=[localhost:7687], writers=[localhost:7687], routers=[localhost:7687], expirationTimestamp=1703238100176, databaseName=system}
+2023-12-22T10:36:40.185015699 FINE org.neo4j.driver.internal.cluster.RoutingTableHandlerImpl - Updated routing table for database 'system'. Ttl 1703238100176, currentTime 1703237800184, routers [localhost:7687], writers [localhost:7687], readers [localhost:7687], database 'system'
+2023-12-22T10:36:40.18530819 INFO org.neo4j.driver.internal.InternalDriver - Closing driver instance 1651855867
+2023-12-22T10:36:40.186508052 FINE org.neo4j.driver.internal.async.outbound.OutboundMessageHandler - [0xb354eed2][localhost(127.0.0.1):7687][bolt-5] C: GOODBYE
+2023-12-22T10:36:40.187291369 INFO org.neo4j.driver.internal.async.pool.ConnectionPoolImpl - Closing connection pool towards localhost(127.0.0.1):7687
+2023-12-22T10:36:40.189599992 FINE org.neo4j.driver.internal.async.inbound.ChannelErrorHandler - [0xb354eed2][localhost(127.0.0.1):7687][bolt-5] Channel is inactive
+2023-12-22T10:36:40.395356347 FINE io.netty.buffer.PoolThreadCache - Freed 6 thread-local buffer(s) from thread: Neo4jDriverIO-2-2
+----
+
+
+== Custom address resolver
+
+When creating a `Driver` object, you can specify a _resolver_ function to resolve the connection address the driver is initialized with.
+Note that addresses that the driver receives in routing tables are not resolved with the custom resolver.
+
+You specify a resolver through the link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Config.ConfigBuilder.html#withResolver(org.neo4j.driver.net.ServerAddressResolver)[`.withResolver()`] config method, which works with link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/net/ServerAddress.html[`ServerAddress`] objects.
+
+.Connection to `example.com` on port `9999` is resolved to `localhost` on port `7687`
+[source, java]
+----
+// import java.util.Set;
+// import org.neo4j.driver.AuthTokens;
+// import org.neo4j.driver.Config;
+// import org.neo4j.driver.GraphDatabase;
+// import org.neo4j.driver.net.ServerAddress;
+
+var addresses = Set.of(
+    ServerAddress.of("localhost", 7687)  // omit the scheme; provide only host
+);
+var config = Config.builder()
+    .withResolver(address -> addresses)
+    .build();
+try (var driver = GraphDatabase.driver("neo4j://example.com:9999", AuthTokens.basic(dbUser, dbPassword), config)) {
+    driver.verifyConnectivity();
+}
+----
+
+
+== OCSP stapling
+
+If link:https://en.wikipedia.org/wiki/OCSP_stapling[OCSP stapling] is link:https://neo4j.com/docs/operations-manual/4.2/reference/configuration-settings/#config_dbms.connector.bolt.ocsp_stapling_enabled[enabled on the server], the driver can be configured to check for certificate revocations during SSL handshakes.
+OCSP stapling improves both security and performance when using CA-signed certificates.
+
+There are two methods implementing this feature:
+
+- link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Config.TrustStrategy.html#withStrictRevocationChecks()[`.withVerifyIfPresentRevocationChecks()`] -- validate a certificate's stapling if available, but don't fail verification if no stapling is found.
+- link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Config.TrustStrategy.html#withStrictRevocationChecks()[`.withStrictRevocationChecks()`] -- validate a certificate's stapling, and fail verification if no stapling is found.
+
+Both methods act on a `Config.TrustStrategy` object, so you have to be explicit about what certificates you want to trust and cannot rely on the driver to infer it from the xref:_connection_uri[connection URI] scheme.
+This means that you have to chain these methods to `Config.TrustStrategy.trustSystemCertificates()`.
+To avoid configuration clashes, the connection URI scheme must also be set to `neo4j` (i.e. not `neo4j+s` nor `neo4j+ssc`).
+
+.Validate certificate stapling, but don't fail if no stapling is found
+[source, java, test-skip]
+----
+// import org.neo4j.driver.Config;
+
+Config config = Config.builder()
+    .withEncryption()
+    .withTrustStrategy(Config.TrustStrategy
+        .trustSystemCertificates()
+        .withVerifyIfPresentRevocationChecks())  // mark-line
+    .build();
+try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword), config)) {
+    driver.verifyConnectivity();
+}
+----
+
+// withStrictRevocationChecks fails with
+// Caused by: javax.net.ssl.SSLHandshakeException: PKIX path validation failed: java.security.cert.CertPathValidatorException: Could not determine revocation status
+
+
+== Further connection parameters
+
+You can find all `Driver` configuration parameters in the link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/GraphDatabase.html[API documentation -> driver.GraphDatabase].
+
+
+ifndef::backend-pdf[]
+[discrete.glossary]
+== Glossary
+
+include::{common-partial}/glossary.adoc[]
+include::../partials/glossary.adoc[]
+endif::[]

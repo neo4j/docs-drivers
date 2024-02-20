@@ -1,0 +1,481 @@
+= Data types and mapping to Cypher types
+
+The tables in this section show the mapping between Cypher data types and Java types.
+
+Regardless of their type, all values in query results are embedded within link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Value.html[`Value`] objects.
+To extract and cast them to the corresponding Java types, use `.as<type>()` (eg. `.asString()`, `asInt()`, etc).
+For example, if the `name` property coming from the database is a string, `record.get("name").asString()` will yield the property value as a `String` object.
+
+On the other hand, you don't need to use the driver types when submitting query parameters.
+The driver will automatically serialize objects of native Java types passed as parameters.
+
+For a complete list of the value types the driver serializes data into, see the link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/package-summary.html[API documentation].
+
+
+== Core types
+
+|===
+| Cypher type   | Driver type
+
+| <<NULL>>      | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/NullValue.html[`NullValue`]
+| `LIST`        | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/ListValue.html[`ListValue`]
+| `MAP`         | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/MapValue.html[`MapValue`]
+| `BOOLEAN`     | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/BooleanValue.html[`BooleanValue`]
+| `INTEGER`     | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/IntegerValue.html[`IntegerValue`]
+| `FLOAT`       | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/FloatValue.html[`FloatValue`]
+| `STRING`      | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/StringValue.html[`StringValue`]
+| `ByteArray`   | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/BytesValue.html[`BytesValue`]
+|===
+
+
+== Temporal types
+
+The driver provides a set of temporal data types compliant with ISO-8601 and Cypher.
+Sub-second values are measured to nanosecond precision.
+
+The driver's types rely on Java's link:https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/package-summary.html[`time`] types.
+All temporal types, except link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/DurationValue.html[`DurationValue`], are in fact `java.time` objects under the hood.
+This means that:
+
+- if you want to _query_ the database with a temporal type, instantiate a `java.time` object and use it as query parameter (i.e. you don't need to care about driver's types).
+- if you _retrieve_ a temporal object from the database (including through one of link:https://neo4j.com/docs/cypher-manual/current/functions/temporal/[Cypher temporal functions]), you will get back the corresponding _driver type_ as displayed in the table below. The driver implements methods to convert driver time types into Java ones (ex. `.asZonedDateTime()`, `.asOffsetTime()`, etc).
+
+|===
+| Cypher type      | Driver type
+
+| `DATE`           | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/DateValue.html[`DateValue`]
+| `ZONED TIME`     | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/TimeValue.html[`TimeValue`]
+| `LOCAL TIME`     | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/LocalTimeValue.html[`LocalTimeValue`]
+| `ZONED DATETIME` | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/DateTimeValue.html[`DateTimeValue`]
+| `LOCAL DATETIME` | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/LocalDateTimeValue.html[`LocalDateTimeValue`]
+| `DURATION`       | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/DurationValue.html[`DurationValue`]
+
+|===
+
+.How to use temporal types in queries
+[source, java]
+----
+package demo;
+
+import java.util.Map;
+import java.time.ZonedDateTime;
+import java.time.ZoneId;
+
+import org.neo4j.driver.AuthTokens;
+import org.neo4j.driver.Driver;
+import org.neo4j.driver.GraphDatabase;
+import org.neo4j.driver.QueryConfig;
+
+public class App {
+
+    public static void main(String... args) {
+        final String dbUri = "<URI for Neo4j database>";
+        final String dbUser = "<Username>";
+        final String dbPassword = "<Password>";
+
+        try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword))) {
+            driver.verifyConnectivity();
+
+            // Define a date, with timezone, and use it to set a relationship property
+            var friendsSince = ZonedDateTime.of(2016, 12, 16, 13, 59, 59, 9999999, ZoneId.of("Europe/Stockholm"));
+            var result = driver.executableQuery("""
+                MERGE (a:Person {name: $name})
+                MERGE (b:Person {name: $friend})
+                MERGE (a)-[friendship:KNOWS {since: $friendsSince}]->(b)
+                RETURN friendship.since AS date
+                """)
+                .withParameters(Map.of("name", "Alice", "friend", "Bob", "friendsSince", friendsSince))
+                .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+                .execute();
+
+            var date = result.records().get(0).get("date");
+            System.out.println(date.getClass().getName());  // org.neo4j.driver.internal.value.DateTimeValue
+            System.out.println(date);  // 2016-12-16T13:59:59.009999999+01:00[Europe/Stockholm]
+
+            var nativeDate = date.asZonedDateTime();
+            System.out.println(nativeDate.getClass().getName());  // java.time.ZonedDateTime
+        }
+    }
+}
+----
+
+
+=== `DurationValue`
+
+Represents the difference between two points in time (expressed in months, days, seconds, nanoseconds).
+
+[source, java]
+----
+// import org.neo4j.driver.Values;
+
+var duration = Values.isoDuration(1, 2, 3, 4);  // months, days, seconds, nanoseconds
+System.out.println(duration);  // P1M2DT3.000000004S
+----
+
+For full documentation, see link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/DurationValue.html[API documentation -> DurationValue].
+
+
+== Spatial types
+
+Cypher supports spatial values (points), and Neo4j can store these point values as properties on nodes and relationships.
+
+The attribute `SRID` (short for _Spatial Reference Identifier_) is a number identifying the coordinate system the spatial type is to be interpreted in.
+You can think of it as a unique identifier for each spatial type.
+
+|===
+| Cypher type            | Driver type | SRID
+
+| `POINT` (2D Cartesian) | `PointValue`     | 7203
+| `POINT` (2D WGS-84)    | `PointValue`     | 4326
+| `POINT` (3D Cartesian) | `PointValue`     | 9157
+| `POINT` (3D WGS-84)    | `PointValue`     | 4979
+
+|===
+
+You create a point value through link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Values.html#point(int,double,double)[`Values.point(srid, x, y[, z\])`] (the third coordinate is optional).
+Points returned from database queries are of type link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/PointValue.html[`PointValue`], and can be converted to link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/types/Point.html[`Point`] objects through the method `.asPoint()`.
+
+.Receive a `Point` value from the database
+[source, java]
+----
+package demo;
+
+import java.util.Map;
+
+import org.neo4j.driver.AuthTokens;
+import org.neo4j.driver.Driver;
+import org.neo4j.driver.GraphDatabase;
+import org.neo4j.driver.QueryConfig;
+import org.neo4j.driver.Values;
+
+public class App {
+
+    public static void main(String... args) {
+        final String dbUri = "<URI for Neo4j database>";
+        final String dbUser = "<Username>";
+        final String dbPassword = "<Password>";
+
+        try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword))) {
+            driver.verifyConnectivity();
+
+            var result = driver.executableQuery("RETURN point({x: 2.3, y: 4.5, z: 2}) AS point")
+                .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+                .execute();
+            var point = result.records().get(0).get("point");
+            System.out.println(point);  // Point{srid=9157, x=2.3, y=4.5, z=2.0}
+            System.out.println(point.asPoint().x());  // 2.3
+        }
+    }
+}
+----
+
+.Create a `Point` value and use it as property value
+[source, java]
+----
+package demo;
+
+import java.util.Map;
+
+import org.neo4j.driver.AuthTokens;
+import org.neo4j.driver.Driver;
+import org.neo4j.driver.GraphDatabase;
+import org.neo4j.driver.QueryConfig;
+import org.neo4j.driver.Values;
+
+public class App {
+
+    public static void main(String... args) {
+        final String dbUri = "<URI for Neo4j database>";
+        final String dbUser = "<Username>";
+        final String dbPassword = "<Password>";
+
+        try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword))) {
+            driver.verifyConnectivity();
+
+            var location = Values.point(4326, 67.28775180193841, 17.734163823312397);  // 4326 = 2D geodetic point
+            var result = driver.executableQuery("CREATE (p:PlaceOfInterest {location: $location}) RETURN p")
+                .withParameters(Map.of("location", location))
+                .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+                .execute();
+            var place = result.records().get(0).get("p").get("location");
+            System.out.println(place);  // Point{srid=4326, x=67.28775180193841, y=17.734163823312397}
+            System.out.println(place.asPoint().y());  // 17.734163823312397
+        }
+    }
+}
+----
+
+
+== Graph types
+
+*Graph types are only passed as results and may not be used as parameters*.
+
+|===
+| Cypher Type    | Driver type
+
+| `NODE`         | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/NodeValue.html[`NodeValue`]
+| `RELATIONSHIP` | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/RelationshipValue.html[`RelationshipValue`]
+| `PATH`         | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/NodeValue.html[`PathValue`]
+
+|===
+
+
+=== `NodeValue`
+Represents a node in a graph.
+
+.Essential methods on node objects
+[cols="1m,2"]
+|===
+|Method |Return
+
+|.labels()
+|Node labels, as a list.
+
+|.asMap()
+|Node properties, as a map.
+
+|.get("<propertyName>")
+|Value for the given property.
+
+|.elementId()
+|String identifier for the relationship.
+This should be used with care, as no guarantees are given about the mapping between id values and elements outside the scope of a single transaction. In other words, using an `elementId` to `MATCH` an element across different transactions is risky.
+
+|===
+
+.Retrieve a node and display its details
+[source, java]
+----
+package demo;
+
+import java.util.Map;
+
+import org.neo4j.driver.AuthTokens;
+import org.neo4j.driver.Driver;
+import org.neo4j.driver.GraphDatabase;
+import org.neo4j.driver.QueryConfig;
+
+public class App {
+
+    public static void main(String... args) {
+        final String dbUri = "<URI for Neo4j database>";
+        final String dbUser = "<Username>";
+        final String dbPassword = "<Password>";
+
+        try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword))) {
+            driver.verifyConnectivity();
+
+            // Get a node from the database
+            var result = driver.executableQuery("MERGE (p:Person:Actor {name: $name, age: 59}) RETURN p")
+                .withParameters(Map.of("name", "Alice"))
+                .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+                .execute();
+
+            // Extract node from result
+            var nodeVal = result.records().get(0).get("p");
+            var node = nodeVal.asNode();  // .asNode() -> type org.neo4j.driver.types.Node
+
+            System.out.printf("Labels: %s %n", node.labels());
+            System.out.printf("Properties: %s %n", node.asMap());
+            System.out.printf("Name property: %s %n", node.get("name"));
+            System.out.printf("Element ID: %s %n", node.elementId());
+            /*
+            Labels: [Person, Actor]
+            Properties: {name=Alice, age=59}
+            Name property: "Alice"
+            Element ID: 4:549a0567-2015-4bb6-a40c-8536bf7227b0:5
+            */
+        }
+    }
+}
+----
+
+For full documentation, see link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/NodeValue.html[API documentation -> NodeValue].
+
+
+=== `RelationshipValue`
+
+Represents a relationship in a graph.
+
+.Essential methods on relationsip objects
+[cols="1m,2"]
+|===
+|Method |Return
+
+|.type()
+|Relationship type.
+
+|.asMap()
+|Relationship properties, as a map.
+
+|.get("<propertyName>")
+|Value for the given property.
+
+|.startNodeElementId()
+|`elementId` of starting node.
+
+|.endNodeElementId()
+| `elementId` of ending node.
+
+|.elementId()
+|String identifier for the relationship.
+This should be used with care, as no guarantees are given about the mapping between id values and elements outside the scope of a single transaction. In other words, using an `elementId` to `MATCH` an element across different transactions is risky.
+
+|===
+
+.Retrieve a relationship and display its details
+[source, java]
+----
+package demo;
+
+import java.util.Map;
+
+import org.neo4j.driver.AuthTokens;
+import org.neo4j.driver.Driver;
+import org.neo4j.driver.GraphDatabase;
+import org.neo4j.driver.QueryConfig;
+
+public class App {
+
+    public static void main(String... args) {
+        final String dbUri = "<URI for Neo4j database>";
+        final String dbUser = "<Username>";
+        final String dbPassword = "<Password>";
+
+        try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword))) {
+            driver.verifyConnectivity();
+
+            // Get a relationship from the database
+            var result = driver.executableQuery("""
+                MERGE (p:Person {name: $name})
+                MERGE (p)-[r:KNOWS {status: $status, since: date()}]->(friend:Person {name: $friendName})
+                RETURN r AS friendship
+                """)
+                .withParameters(Map.of("name", "Alice", "status", "BFF", "friendName", "Bob"))
+                .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+                .execute();
+
+            // Extract relationship from result
+            var relationshipVal = result.records().get(0).get("friendship");
+            var relationship = relationshipVal.asRelationship();  // .asRelationship() -> type org.neo4j.driver.types.Relationship
+
+            System.out.printf("Type: %s %n", relationship.type());
+            System.out.printf("Properties: %s %n", relationship.asMap());
+            System.out.printf("Status property: %s %n", relationship.get("status"));
+            System.out.printf("Start node: %s %n", relationship.startNodeElementId());
+            System.out.printf("End node: %s %n", relationship.endNodeElementId());
+            System.out.printf("Element ID: %s %n", relationship.elementId());
+            /*
+            Type: KNOWS
+            Properties: {since=2024-01-12, status=BFF}
+            Status property: "BFF"
+            Start node: 4:549a0567-2015-4bb6-a40c-8536bf7227b0:0
+            End node: 4:549a0567-2015-4bb6-a40c-8536bf7227b0:6
+            Element ID: 5:549a0567-2015-4bb6-a40c-8536bf7227b0:1
+            */
+        }
+    }
+}
+----
+
+For full documentation, see link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/RelationshipValue.html[API documentation -> RelationshipValue].
+
+
+=== `PathValue`
+
+Represents a path in a graph.
+
+The driver breaks paths into (iterable) _segments_, consisting of a start node, one relationship, and an end node.
+Segments entities may be retrieved, in order, via the methods `.start()`, `.relationship()`, and `.end()`.
+
+.Retrieve a path and _walk_ it, listing nodes and relationship
+[source, java]
+----
+package demo;
+
+import java.util.Map;
+
+import org.neo4j.driver.AuthTokens;
+import org.neo4j.driver.Driver;
+import org.neo4j.driver.GraphDatabase;
+import org.neo4j.driver.types.Path;
+import org.neo4j.driver.QueryConfig;
+
+public class App {
+
+    public static void main(String... args) {
+        final String dbUri = "<URI for Neo4j database>";
+        final String dbUser = "<Username>";
+        final String dbPassword = "<Password>";
+
+        try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword))) {
+            driver.verifyConnectivity();
+
+            // Create some :Person nodes linked by :KNOWS relationships
+            addFriend(driver, "Alice", "BFF", "Bob");
+            addFriend(driver, "Bob", "Fiends", "Sofia");
+            addFriend(driver, "Sofia", "Acquaintances", "Sofia");
+
+            // Follow :KNOWS relationships outgoing from Alice three times, return as path
+            var result = driver.executableQuery("""
+                MATCH path=(:Person {name: $name})-[:KNOWS*3]->(:Person)
+                RETURN path AS friendshipChain
+                """)
+                .withParameters(Map.of("name", "Alice"))
+                .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+                .execute();
+
+            // Extract path from result
+            var pathVal = result.records().get(0).get("friendshipChain");
+            var path = pathVal.asPath();  // .asPath() -> type org.neo4j.driver.types.Path
+
+            System.out.println("-- Path breakdown --");
+            for (Path.Segment segment : path) {
+                System.out.printf(
+                    "%s is friends with %s (%s).%n",
+                    segment.start().get("name").asString(),
+                    segment.end().get("name").asString(),
+                    segment.relationship().get("status").asString());
+            }
+            /*
+            -- Path breakdown --
+            Alice is friends with Bob (BFF).
+            Bob is friends with Sofia (Fiends).
+            Sofia is friends with Sofia (Acquaintances).
+            */
+        }
+    }
+
+    public static void addFriend(Driver driver, String name, String status, String friendName) {
+        driver.executableQuery("""
+            MERGE (p:Person {name: $name})
+            MERGE (p)-[r:KNOWS {status: $status, since: date()}]->(friend:Person {name: $friendName})
+            """)
+            .withParameters(Map.of("name", name, "status", status, "friendName", friendName))
+            .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+            .execute();
+    }
+}
+----
+
+For full documentation, see link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/PathValue.html[API documentation -> PathValue].
+
+
+== Exceptions
+
+The driver can raise a number of different exceptions, see link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/exceptions/package-summary.html[API documentation -> Exceptions].
+For a list of errors the server can return, see link:{neo4j-docs-base-uri}/status-codes/{page-version}[Status codes].
+
+Some server errors are marked as safe to retry without need to alter the original request.
+Examples of such errors are deadlocks, memory issues, or connectivity issues.
+Driver's exceptions implementing link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/exceptions/RetryableException.html[`RetryableException`] are such that a further attempt at the operation that caused it might be successful.
+This is particular useful when running queries in xref:transactions#explicit-transactions[explicit transactions], to know if a failed query is worth re-running.
+
+
+ifndef::backend-pdf[]
+[discrete.glossary]
+== Glossary
+
+include::{common-partial}/glossary.adoc[]
+include::../partials/glossary.adoc[]
+endif::[]
