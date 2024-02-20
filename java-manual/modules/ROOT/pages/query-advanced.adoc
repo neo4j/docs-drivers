@@ -56,6 +56,7 @@ try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").
 [NOTE]
 While `LOAD CSV` can be a convenience, there is nothing _wrong_ in deferring the parsing of the CSV file to your Java application and avoiding `LOAD CSV`.
 In fact, moving the parsing logic to the application can give you more control over the importing process.
+For efficient bulk data insertion, see xref:performance.adoc#_batch_data_creation[Performance -> Batch data creation].
 
 For more information, see link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/load-csv/[Cypher -> Clauses -> LOAD CSV].
 
