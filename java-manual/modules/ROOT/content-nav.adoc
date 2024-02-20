@@ -1,6 +1,6 @@
 * xref:index.adoc[Quickstart]
 
-* *Basic workflow*
+* *Regular workflow*
 
 * xref:install.adoc[Installation]
 * xref:connect.adoc[Connect to the database]
