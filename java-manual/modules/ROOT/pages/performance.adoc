@@ -255,7 +255,7 @@ try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").
 
 == Batch data creation
 
-*Batch queries when creating a lot of records* using the  link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/unwind/[`UNWIND`] Cypher clause.
+*Batch queries when creating a lot of records* using the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/with/[`WITH`] and link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/unwind/[`UNWIND`] Cypher clauses.
 
 
 [discrete]

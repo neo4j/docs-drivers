@@ -4,18 +4,18 @@ Once you have xref:connect.adoc[connected to the database], you can run queries 
 
 [TIP]
 `Driver.execute_query()` was introduced with the version 5.8 of the driver. +
-For queries with earlier versions, see xref:transactions.adoc[Run your own transactions].
+For queries with earlier versions, use xref:transactions.adoc[sessions and transactions].
 
 
 == Write to the database
 
-To create a node representing a person named `Alice`, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/merge/[`MERGE`]:
+To create a node representing a person named `Alice`, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/create/[`CREATE`]:
 
 .Create a node representing a person named `Alice`
 [source, python]
 ----
 summary = driver.execute_query(
-    "MERGE (:Person {name: $name})",  # <1>
+    "CREATE (:Person {name: $name})",  # <1>
     name="Alice",  # <2>
     database_="neo4j",  # <3>
 ).summary
@@ -25,14 +25,9 @@ print("Created {nodes_created} nodes in {time} ms.".format(
 ))
 ----
 
-<1> specifies the Cypher query
-<2> is a map of _query parameters_
-<3> specifies which database the query should be run against
-
-[NOTE]
-`MERGE` creates a new node matching the requirements unless one already exists.
-If a matching node already exists, it is returned.
-For _strict creation_, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/create/[`CREATE`].
+<1> The Cypher query
+<2> A map of _query parameters_
+<3> Which database the query should be run against
 
 
 == Read from the database
@@ -78,28 +73,22 @@ records, summary, keys = driver.execute_query("""
 print(f"Query counters: {summary.counters}.")
 ----
 
-To create new nodes and relationships linking it to an already existing node, use a combination of the Cypher clauses `MATCH` and `MERGE`:
+To create new nodes and relationships linking it to an already existing node, use a combination of the Cypher clauses `MATCH` and `CREATE`:
 
 .Create a relationship `:KNOWS` between `Alice` and `Bob`
 [source, python]
 ----
 records, summary, keys = driver.execute_query("""
-    MATCH (p:Person {name: $name})
-    MERGE (p)-[:KNOWS]->(:Person {name: $friend})
+    MATCH (p:Person {name: $name})  // <1>
+    CREATE (p)-[:KNOWS]->(:Person {name: $friend})  // <2>
     """, name="Alice", friend="Bob",
     database_="neo4j",
 )
 print(f"Query counters: {summary.counters}.")
 ----
 
-[WARNING]
-====
-It might feel tempting to create new relationships with a single `MERGE` clause, such as: +
-`MERGE (:Person {name: "Alice"})-[:KNOWS]->(:Person {name: "Bob"})`. +
-However, this would result in the creation of an _extra_ `Alice` node, so that you would end up with unintended duplicate records.
-To avoid this, always `MATCH` the elements that you want to update, and use the resulting reference in the `MERGE` clause (as shown in the previous example).
-See link:https://neo4j.com/developer/kb/understanding-how-merge-works/[Understanding how MERGE works].
-====
+<1> Retrieve the person node named `Alice` and bind it to a variable `alice`
+<2> Create a new `:KNOWS` relationship outgoing from the node bound to `alice` and attach to it a new `Person` node named `Bob`
 
 
 == Delete from the database
@@ -158,7 +147,7 @@ driver.execute_query(
 
 [NOTE]
 There can be circumstances where your query structure prevents the usage of parameters in all its parts.
-For those advanced use cases, see xref:query-advanced#_dynamic_values_in_property_keys_relationship_types_and_labels[Dynamic values in property keys, relationship types, and labels].
+For those rare use cases, see xref:query-advanced#_dynamic_values_in_property_keys_relationship_types_and_labels[Dynamic values in property keys, relationship types, and labels].
 
 
 == Error handling
@@ -185,18 +174,21 @@ Configuration parameters are suffixed with `_`.
 === Database selection
 
 It is recommended to *always specify the database explicitly* with the `database_` parameter, even on single-database instances.
-This allows the driver to work more efficiently, as it does not have to resolve the home database first.
+This allows the driver to work more efficiently, as it saves a network round-trip to the server to resolve the home database.
 If no database is given, the link:{neo4j-docs-base-uri}/operations-manual/current/database-administration/#manage-databases-default[user's home database] is used.
 
 [source, python]
 ----
 driver.execute_query(
     "MATCH (p:Person) RETURN p.name",
-    database_="neo4j",
+    database_="neo4j",  # mark-line
 )
 ----
 
-Do not rely on the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/use/[`USE`] Cypher clause for database selection with the driver.
+[TIP]
+Specifying the database through the configuration method is preferred over the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/use/[`USE`] Cypher clause.
+If the server runs on a cluster, queries with `USE` require server-side routing to be enabled.
+Queries may also take longer to execute as they may not reach the right cluster member at the first attempt, and need to be routed to one containing the requested database.
 
 
 === Request routing
@@ -208,12 +200,16 @@ To improve performance on read queries, you can use the argument `routing_="r"` 
 ----
 driver.execute_query(
     "MATCH (p:Person) RETURN p.name",
-    routing_="r",  # short for neo4j.RoutingControl.READ
+    routing_="r",  # short for neo4j.RoutingControl.READ  # mark-line
     database_="neo4j",
 )
 ----
 
-Even though routing a _write_ query to _read_ nodes will likely result in a runtime error, xref:transactions#access-control-note[do not rely on this for security purposes].
+[NOTE]
+====
+Although executing a _write_ query in read mode likely results in a runtime error, *you should not rely on this for access control.* The difference between the two modes is that _read_ transactions will be routed to any node of a cluster, whereas _write_ ones will be directed to the leader.
+In other words, there is no guarantee that a write query submitted in read mode will be rejected.
+====
 
 
 [#impersonation]
@@ -227,12 +223,12 @@ Impersonating a user is cheaper than creating a new `Driver` object.
 ----
 driver.execute_query(
     "MATCH (p:Person) RETURN p.name",
-    impersonated_user_="somebody_else",
+    impersonated_user_="somebody_else",  # mark-line
     database_="neo4j",
 )
 ----
 
-When impersonating a user, the query is run within the complete security context of the impersonated user and not the authenticated user (i.e., home database, permissions, etc.).
+When impersonating a user, the query is run within the complete security context of the impersonated user and not the authenticated user (i.e. home database, permissions, etc.).
 
 
 === Transform query result
@@ -303,7 +299,7 @@ with GraphDatabase.driver(URI, auth=AUTH) as driver:
         # further logging/processing
 ----
 
-For more information see link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Driver.execute_query[API documentation -- Driver.execute_query()].
+For more information see link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Driver.execute_query[API documentation -> Driver.execute_query()].
 
 
 ifndef::backend-pdf[]
