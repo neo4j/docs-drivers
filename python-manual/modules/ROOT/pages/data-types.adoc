@@ -435,9 +435,9 @@ For a list of errors the server can return, see the link:{neo4j-docs-base-uri}/s
 |===
 
 Some server errors are marked as safe to retry without need to alter the original request.
-Examples of such errors are deadlocks and memory issues.
+Examples of such errors are deadlocks, memory issues, or connectivity issues.
 All driver's exception types implement the method `.is_retryable()`, which gives insights into whether a further attempt might be successful.
-This is particular useful when running queries in xref:transactions#explicit-transactions[explicit transactions], to know if a failed query should be run again.
+This is particular useful when running queries in xref:transactions#explicit-transactions[explicit transactions], to know if a failed query is worth re-running.
 
 
 ifndef::backend-pdf[]

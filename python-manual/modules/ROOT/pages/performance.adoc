@@ -33,122 +33,34 @@ driver.session()
 ----
 
 
-== Use `MERGE` for creation only when needed
+== Be aware of the cost of transactions
 
-The Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/merge/[`MERGE`] is convenient for data creation, as it allows to avoid duplicate data when an exact clone of the given pattern exists.
-However, it requires the database to run _two_ queries: it first needs to link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/match/[`MATCH`] the pattern, and only then can it link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/create/[`CREATE`] it.
+When submitting queries through xref:query-simple.adoc[`.execute_query()`] or through xref:transactions.adoc#managed-transactions[`.execute_read/write()`], the server automatically wraps them into a <<transaction>>.
+This behavior ensures that the database always ends up in a consistent state, regardless of what happens during the execution of a transaction (power outages, software crashes, etc).
 
-If you know already that the data you are inserting is new, avoid using `MERGE` and use `CREATE` instead -- this practically halves the number of database queries.
+Creating a safe execution context around a number of queries obviously yields an overhead that is not present if the driver just shoots queries at the server and hopes they will get through.
+The overhead is small, but can pile up as the number of queries increases.
+For this reason, if your use case values throughput more than data integrity, you may extract further performance by running all queries within a single (auto-commit) transaction.
+You do this by creating a session and using `session.run()` to run as many queries as needed.
 
-
-== Use query parameters
-
-*Always use xref:query-simple#query-parameters[query parameters]* instead of hardcoding or concatenating values into queries.
-Besides protecting from Cypher injections, this allows to leverage the database query cache.
-
-[discrete]
-=== Good practices
-
-[source, python]
+.Privilege throughput over data integrity
+[source, java]
 ----
-driver.execute_query("MATCH (p:Person {name: $name}) RETURN p", name="Alice")
-----
-
-[source, python]
-----
-with driver.session(database="<DB NAME>") as session:
-    session.run("MATCH (p:Person {name: $name}) RETURN p", name="Alice")
+try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
+    for (int i=0; i<1000; i++) {
+        session.run("<QUERY>");
+    }
+}
 ----
 
-[discrete]
-=== Bad practices
-
-[source, python]
+.Privilege data integrity over throughput
+[source, java]
 ----
-driver.execute_query("MATCH (p:Person {name: 'Alice'}) RETURN p")
-# or
-name = "Alice"
-driver.execute_query("MATCH (p:Person {name: '" + name + "'}) RETURN p")
+for (int i=0; i<1000; i++) {
+    driver.executableQuery("<QUERY>").execute();
+    // or session.executeRead/Write() calls
+}
 ----
-
-[source, python]
-----
-with driver.session(database="<DB NAME>") as session:
-    session.run("MATCH (p:Person {name: 'Alice'}) RETURN p")
-    # or
-    name = "Alice"
-    session.run("MATCH (p:Person {name: '" + name + "'}) RETURN p")
-----
-
-
-== Specify node labels
-
-*Specify node labels* in all queries.
-This allows the query planner to work much more efficiently, and to leverage indexes where available.
-To learn how to combine labels, see link:{neo4j-docs-base-uri}/cypher-manual/current/syntax/expressions/#query-syntax-label[Cypher -- Label expressions].
-
-[discrete]
-=== Good practices
-
-[source, python]
-----
-driver.execute_query("MATCH (p:Person|Animal {name: $name}) RETURN p", name="Alice")
-----
-
-[source, python]
-----
-with driver.session(database="<DB NAME>") as session:
-    session.run("MATCH (p:Person|Animal {name: $name}) RETURN p", name="Alice")
-----
-
-
-[discrete]
-=== Bad practices
-
-[source, python]
-----
-driver.execute_query("MATCH (p {name: $name}) RETURN p", name="Alice")
-----
-
-[source, python]
-----
-with driver.session(database="<DB NAME>") as session:
-    session.run("MATCH (p {name: $name}) RETURN p", name="Alice")
-----
-
-
-== Batch data creation
-
-*Batch queries when creating a lot of records* using the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/with/[`WITH`] and link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/unwind/[`UNWIND`] Cypher clauses.
-
-
-[discrete]
-=== Good practice
-
-[source, python]
-----
-numbers = [{"value": random()} for _ in range(10000)]
-driver.execute_query("""
-    WITH $numbers AS batch
-    UNWIND batch AS node
-    MERGE (n:Number)
-    SET n.value = node.value
-    """, numbers=numbers,
-)
-----
-
-[discrete]
-=== Bad practice
-
-[source, python]
-----
-for _ in range(10000):
-    driver.execute_query("MERGE (:Number {value: $value})", value=random())
-----
-
-[TIP]
-The most efficient way of performing a _first import_ of large amounts of data into a new database is the link:{neo4j-docs-base-uri}/operations-manual/current/tutorial/neo4j-admin-import/[`neo4j-admin database import`] command.
-// source:  https://community.neo4j.com/t5/neo4j-graph-platform/improving-data-writing-efficiency-in-python/td-p/39520
 
 
 == Route read queries to cluster readers
@@ -194,13 +106,14 @@ session.execute_write(lambda tx: tx.run("MATCH (p:Person) RETURN p"))
 *Create indexes for properties that you often filter against*.
 For example, if you often look up `Person` nodes by the `name` property, it is beneficial to create an index on `Person.name`.
 You can create indexes with the `CREATE INDEX` Cypher clause, for both nodes and relationships.
-For more information, see link:{neo4j-docs-base-uri}/cypher-manual/current/indexes-for-search-performance/[Indexes for search performance].
 
 [source, python]
 ----
 # Create an index on Person.name
 driver.execute_query("CREATE INDEX person_name FOR (n:Person) ON (n.name)")
 ----
+
+For more information, see link:{neo4j-docs-base-uri}/cypher-manual/current/indexes-for-search-performance/[Indexes for search performance].
 
 
 == Profile queries
@@ -262,10 +175,130 @@ Total database accesses: ?
 ----
 
 
+== Specify node labels
+
+*Specify node labels* in all queries.
+This allows the query planner to work much more efficiently, and to leverage indexes where available.
+To learn how to combine labels, see link:{neo4j-docs-base-uri}/cypher-manual/current/syntax/expressions/#query-syntax-label[Cypher -> Label expressions].
+
+[discrete]
+=== Good practices
+
+[source, python]
+----
+driver.execute_query("MATCH (p:Person|Animal {name: $name}) RETURN p", name="Alice")
+----
+
+[source, python]
+----
+with driver.session(database="<DB NAME>") as session:
+    session.run("MATCH (p:Person|Animal {name: $name}) RETURN p", name="Alice")
+----
+
+
+[discrete]
+=== Bad practices
+
+[source, python]
+----
+driver.execute_query("MATCH (p {name: $name}) RETURN p", name="Alice")
+----
+
+[source, python]
+----
+with driver.session(database="<DB NAME>") as session:
+    session.run("MATCH (p {name: $name}) RETURN p", name="Alice")
+----
+
+
+== Batch data creation
+
+*Batch queries when creating a lot of records* using the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/with/[`WITH`] and link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/unwind/[`UNWIND`] Cypher clauses.
+
+
+[discrete]
+=== Good practice
+
+.Submit one single queries with all values inside
+[source, python]
+----
+numbers = [{"value": random()} for _ in range(10000)]
+driver.execute_query("""
+    WITH $numbers AS batch
+    UNWIND batch AS node
+    MERGE (n:Number)
+    SET n.value = node.value
+    """, numbers=numbers,
+)
+----
+
+[discrete]
+=== Bad practice
+
+.Submit a lot of single queries, one for each value
+[source, python]
+----
+for _ in range(10000):
+    driver.execute_query("MERGE (:Number {value: $value})", value=random())
+----
+
+[TIP]
+The most efficient way of performing a _first import_ of large amounts of data into a new database is the link:{neo4j-docs-base-uri}/operations-manual/current/tutorial/neo4j-admin-import/[`neo4j-admin database import`] command.
+// source:  https://community.neo4j.com/t5/neo4j-graph-platform/improving-data-writing-efficiency-in-python/td-p/39520
+
+
+== Use query parameters
+
+*Always use xref:query-simple#query-parameters[query parameters]* instead of hardcoding or concatenating values into queries.
+Besides protecting from Cypher injections, this allows to better leverage the database query cache.
+
+[discrete]
+=== Good practices
+
+[source, python]
+----
+driver.execute_query("MATCH (p:Person {name: $name}) RETURN p", name="Alice")
+----
+
+[source, python]
+----
+with driver.session(database="<DB NAME>") as session:
+    session.run("MATCH (p:Person {name: $name}) RETURN p", name="Alice")
+----
+
+[discrete]
+=== Bad practices
+
+[source, python]
+----
+driver.execute_query("MATCH (p:Person {name: 'Alice'}) RETURN p")
+# or
+name = "Alice"
+driver.execute_query("MATCH (p:Person {name: '" + name + "'}) RETURN p")
+----
+
+[source, python]
+----
+with driver.session(database="<DB NAME>") as session:
+    session.run("MATCH (p:Person {name: 'Alice'}) RETURN p")
+    # or
+    name = "Alice"
+    session.run("MATCH (p:Person {name: '" + name + "'}) RETURN p")
+----
+
+
 == Concurrency
 
 *Use xref:concurrency.adoc[concurrency]*, either in the form of multithreading or with the async version of the driver.
 This is likely to be more impactful on performance if you parallelize complex and time-consuming queries in your application, but not so much if you run many simple ones.
+
+
+== Use `MERGE` for creation only when needed
+
+The Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/merge/[`MERGE`] is convenient for data creation, as it allows to avoid duplicate data when an exact clone of the given pattern exists.
+However, it requires the database to run _two_ queries: it first needs to link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/match/[`MATCH`] the pattern, and only then can it link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/create/[`CREATE`] it (if needed).
+
+If you know already that the data you are inserting is new, avoid using `MERGE` and use `CREATE` directly instead -- this practically halves the number of database queries.
 
 
 == Filter notifications

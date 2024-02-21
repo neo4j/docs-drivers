@@ -1,6 +1,6 @@
 = Run your own transactions
 
-When xref:query-simple.adoc[querying the database with `executableQuery()`], the driver automatically creates a _transaction_. A transaction is a unit of work that is either _committed_ in its entirety or _rolled back_ on failure. You can include multiple Cypher statements in a single query, as for example when using `MATCH` and `MERGE` in sequence to xref:query-simple#_update_the_database[update the database], but you cannot have multiple queries and interleave some client-logic in between them.
+When xref:query-simple.adoc[querying the database with `executableQuery()`], the driver automatically creates a _transaction_. A transaction is a unit of work that is either _committed_ in its entirety or _rolled back_ on failure. You can include multiple Cypher statements in a single query, as for example when using `MATCH` and `CREATE` in sequence to xref:query-simple#_update_the_database[update the database], but you cannot have multiple queries and interleave some client-logic in between them.
 
 For these more advanced use-cases, the driver provides functions to take full control over the transaction lifecycle. These are called _managed transactions_, and you can think of them as a way of unwrapping the flow of `executableQuery()` and being able to specify its desired behavior in more places.
 
@@ -223,7 +223,8 @@ try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").
 }
 ----
 
-An explicit transaction can be committed with  link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Transaction.html#commit()[`Transaction.commit()`] or rolled back with  link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Transaction.html#rollback[`Transaction.rollback()`]. If no explicit action is taken, the driver will automatically roll back the transaction at the end of its lifetime.
+An explicit transaction can be committed with  link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Transaction.html#commit()[`Transaction.commit()`] or rolled back with  link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Transaction.html#rollback[`Transaction.rollback()`].
+If no explicit action is taken, the driver will automatically roll back the transaction at the end of its lifetime.
 
 Explicit transactions are most useful for applications that need to distribute Cypher execution across multiple functions for the same transaction, or for applications that need to run multiple queries within a single transaction but without the automatic retries provided by managed transactions.
 

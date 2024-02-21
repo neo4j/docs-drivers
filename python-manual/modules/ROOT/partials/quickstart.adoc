@@ -1,6 +1,6 @@
 The Neo4j Python driver is the official library to interact with a Neo4j instance through a Python application.
 
-At the hearth of Neo4j lies <<Cypher>>, the query language you use to interact with a Neo4j database.
+At the hearth of Neo4j lies <<Cypher>>, the query language to interact with a Neo4j database.
 While this guide does not _require_ you to be a seasoned Cypher querier, it is going to be easier to focus on the Python-specific bits if you already know some Cypher.
 For this reason, although this guide does _also_ provide a gentle introduction to Cypher along the way, consider checking out link:{neo4j-docs-base-uri}/getting-started/cypher-intro/[Getting started -> Cypher] for a more detailed walkthrough of graph databases modelling and querying if this is your first approach.
 You may then apply that knowledge while following this guide to develop your Python application.
@@ -68,26 +68,76 @@ xref:query-simple.adoc[More info on querying the database ->]
 
 == Run your own transactions
 
-For more advanced use-cases, you can take control of the transaction lifecycle.
-A transaction is a unit of work that is either committed in its entirety or rolled back on failure.
+For more advanced use-cases, you can run <<transaction,transactions>>.
 Use the methods `Session.execute_read()` and `Session.execute_write()` to run managed transactions.
 
+.A transaction with multiple queries, client logic, and potential roll backs
 [source, python]
 ----
-def match_person_nodes(tx, name_filter):
-    result = tx.run("""
-        MATCH (p:Person) WHERE p.name STARTS WITH $filter
-        RETURN p.name AS name ORDER BY name
-        """, filter=name_filter)
-    return list(result)  # return a list of Record objects
+from neo4j import GraphDatabase
 
-with driver.session(database="neo4j") as session:
-    people = session.execute_read(
-        match_person_nodes,
-        "Al"
+
+URI = "<URI for Neo4j database>"
+AUTH = ("<Username>", "<Password>")
+employee_threshold=10
+
+
+def main():
+    with GraphDatabase.driver(URI, auth=AUTH) as driver:
+        with driver.session(database="neo4j") as session:
+            for i in range(100):
+                name = f"Thor{i}"
+                org_id = session.execute_write(employ_person_tx, name)
+                print(f"User {name} added to organization {org_id}")
+
+
+def employ_person_tx(tx, name):
+    # Create new Person node with given name, if not exists already
+    result = tx.run("""
+        MERGE (p:Person {name: $name})
+        RETURN p.name AS name
+        """, name=name
     )
-    for person in people:
-        print(person.data())  # obtain dict representation
+
+    # Obtain most recent organization ID and the number of people linked to it
+    result = tx.run("""
+        MATCH (o:Organization)
+        RETURN o.id AS id, COUNT{(p:Person)-[r:WORKS_FOR]->(o)} AS employees_n
+        ORDER BY o.created_date DESC
+        LIMIT 1
+    """)
+    org = result.single()
+
+    if org is not None and org["employees_n"] == 0:
+        raise Exception("Most recent organization is empty.")
+        # Transaction will roll back -> not even Person is created!
+
+    # If org does not have too many employees, add this Person to that
+    if org is not None and org.get("employees_n") < employee_threshold:
+        result = tx.run("""
+            MATCH (o:Organization {id: $org_id})
+            MATCH (p:Person {name: $name})
+            MERGE (p)-[r:WORKS_FOR]->(o)
+            RETURN $org_id AS id
+            """, org_id=org["id"], name=name
+        )
+
+    # Otherwise, create a new Organization and link Person to it
+    else:
+        result = tx.run("""
+            MATCH (p:Person {name: $name})
+            CREATE (o:Organization {id: randomuuid(), created_date: datetime()})
+            MERGE (p)-[r:WORKS_FOR]->(o)
+            RETURN o.id AS id
+            """, name=name
+        )
+
+    # Return the Organization ID to which the new Person ends up in
+    return result.single()["id"]
+
+
+if __name__ == "__main__":
+    main()
 ----
 
 xref:transactions.adoc[More info on running transactions ->]
