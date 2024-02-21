@@ -7,6 +7,7 @@ include::{common-partial}/connect-advanced.adoc[tag=connection-protocols]
 
 == Authentication methods
 
+
 === Basic authentication
 
 The basic authentication scheme relies on traditional username and password.
@@ -20,6 +21,7 @@ const driver = neo4j.driver(URI, neo4j.auth.basic(USER, PASSWORD))
 [INFO]
 The basic authentication scheme can also be used to authenticate against an LDAP server (Enterprise Edition only).
 
+
 === Kerberos authentication
 
 The Kerberos authentication scheme requires a base64-encoded ticket.
@@ -29,6 +31,7 @@ It can only be used if the server has the link:{neo4j-docs-base-uri}/kerberos-ad
 ----
 const driver = neo4j.driver(URI, neo4j.auth.kerberos(ticket))
 ----
+
 
 === Bearer authentication
 
@@ -41,7 +44,8 @@ const driver = neo4j.driver(URI, neo4j.auth.bearer(token))
 
 [NOTE]
 The bearer authentication scheme requires link:{neo4j-docs-base-uri}/operations-manual/current/authentication-authorization/sso-integration[configuring Single Sign-On on the server].
-Once configured, clients can discover Neo4j's configuration through the link:{neo4j-docs-base-uri}/http-api/current/discovery/[Discovery API].
+Once configured, clients can discover Neo4j's configuration through the link:https://neo4j.com/docs/http-api/current/endpoints/#discovery-api[Discovery API].
+
 
 === Custom authentication
 
@@ -54,6 +58,7 @@ const driver = neo4j.driver(
   neo4j.auth.custom(principal, credentials, realm, scheme, parameters)
 )
 ----
+
 
 === No authentication
 
