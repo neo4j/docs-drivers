@@ -38,7 +38,7 @@ jobs:
           surge teardown $DEPLOY_URL --token "$SURGE_TOKEN"
 
       - name: Comment on PR
-        uses: marocchino/sticky-pull-request-comment@v2
+        uses: marocchino/sticky-pull-request-comment@efaaab3fd41a9c3de579aba759d2552635e590fd # v2.8.0
         with:
           number: ${{ github.event.pull_request.number }}
           header: docs-pr-changes
