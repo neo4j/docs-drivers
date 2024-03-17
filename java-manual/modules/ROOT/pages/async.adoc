@@ -66,6 +66,7 @@ public class App {
 
 <1> Driver creation is the same in the synchronous and asynchronous versions.
 <2> An asynchronous session is created by providing `AsyncSession.class` as first parameter to link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Driver.html#session(java.lang.Class,org.neo4j.driver.SessionConfig)[`Driver.session()`], which returns an link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/async/AsyncSession.html[`AsyncSession`] object.
+Note that async sessions may not be opened as resources with `try` statements, as the driver couldn't not when it is safe to close them.
 <3> As for regular transactions, `.executeWriteAsync()` (and `executeReadAsync()`) take a transaction function callback.
 Inside the transaction function, run queries with link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/async/AsyncQueryRunner.html#runAsync(org.neo4j.driver.Query)[`.runAsync()`].
 Each query run returns a link:https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/CompletionStage.html[`CompletionStage`].
