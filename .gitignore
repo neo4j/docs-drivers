@@ -36,6 +36,7 @@ target/
 # docs project
 .env
 node_modules/
+.package-lock.json
 
 # use worktrees for clones of content from other branches so Antora can access it
 worktrees/
