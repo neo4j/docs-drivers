@@ -6,7 +6,7 @@ site:
 content:
   sources:
   - url : ./
-    branches: ['dev','4.4','4.3','4.2']
+    branches: ['HEAD','4.4','4.3','4.2']
     edit_url: https://github.com/neo4j/docs-drivers/tree/{refname}/{path}
     worktrees: true
     start_paths:
