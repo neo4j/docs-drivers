@@ -6,6 +6,6 @@ nav:
 - modules/ROOT/content-nav.adoc
 asciidoc:
   attributes:
-    java-driver-version: '5.18.0' # the version of the package published at https://central.sonatype.com/artifact/org.neo4j.driver/neo4j-java-driver
+    java-driver-version: '5.19.0' # the version of the package published at https://central.sonatype.com/artifact/org.neo4j.driver/neo4j-java-driver
     common-partial: 5@common-content:ROOT:partial$
     common-image: 5@common-content:ROOT:image$
