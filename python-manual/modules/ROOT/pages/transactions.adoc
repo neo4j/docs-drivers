@@ -285,7 +285,7 @@ if __name__ == "__main__":
 == Process query results
 
 The driver's output of a query is a link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Result[`Result`] object, which encapsulates the Cypher result in a rich data structure that requires some parsing on the client side.
-There are two main things to be aware of:
+There are two main points to be aware of:
 
 - *The result records are not immediately and entirely fetched and returned by the server*.
 Instead, results come as a _lazy stream_.
@@ -295,9 +295,16 @@ When no more records are available, the result is _exhausted_.
 - *The result acts as a _cursor_*.
 This means that there is no way to retrieve a previous record from the stream, unless you saved it in an auxiliary data structure.
 
-The animation below follows the path of a single query and helps clarifying how the driver works with result records and how the application should handle a result.
+The animation below follows the path of a single query: it shows how the driver works with result records and how the application should handle results.
 
-video::{common-image}/result.mp4[width=640]
+++++
+<video
+  controls
+  width="100%"
+  src="../../../common-content/5/_images/result.mp4"
+  poster="../../../common-content/5/_images/result-poster.jpg"
+  type="video/mp4"></video>
+++++
 
 **The easiest way of processing a result is by casting it to list**, which yields a list of link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Record[`Record`] objects.
 Otherwise, a `Result` object implements a number of methods for processing records.
