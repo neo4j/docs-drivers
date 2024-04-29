@@ -44,22 +44,19 @@ For this reason, if your use case values throughput more than data integrity, yo
 You do this by creating a session and using `session.run()` to run as many queries as needed.
 
 .Privilege throughput over data integrity
-[source, java]
+[source, python]
 ----
-try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
-    for (int i=0; i<1000; i++) {
+with driver.session(database="neo4j") as session:
+    for i in range(1000):
         session.run("<QUERY>");
-    }
-}
 ----
 
 .Privilege data integrity over throughput
-[source, java]
+[source, python]
 ----
-for (int i=0; i<1000; i++) {
-    driver.executableQuery("<QUERY>").execute();
-    // or session.executeRead/Write() calls
-}
+for i in range(1000):
+    driver.execute_query("<QUERY>");
+    # or session.execute_read/write() calls
 ----
 
 
