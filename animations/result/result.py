@@ -187,7 +187,7 @@ class Result(Scene):
         ))
 
         # 2ND BATCH OF RECORDS FROM SERVER TO DRIVER
-        self.describe(Text("When there's no more records in the driver buffer, the driver fetches more from the server."))
+        self.describe(Text("When there are no more records in the driver buffer, the driver fetches more from the server."))
         self.play(
             LaggedStart(
                 Succession(*records_anims),
