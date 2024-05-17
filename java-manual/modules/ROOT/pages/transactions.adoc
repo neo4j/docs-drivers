@@ -342,6 +342,7 @@ The animation below follows the path of a single query: it shows how the driver 
 
 ++++
 <video
+  class="rounded-corners"
   controls
   width="100%"
   src="../../../common-content/5/_images/result.mp4"
