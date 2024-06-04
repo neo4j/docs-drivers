@@ -16,6 +16,11 @@ Always use the latest version of the driver, as it will always work both with th
 The latest `5.x` driver supports connection to any Neo4j 5 and 4.4 instance, and will also be compatible with Neo4j 6.
 For a detailed list of changes across versions, see the link:https://github.com/neo4j/neo4j-python-driver/wiki/5.x-changelog[driver's changelog].
 
+[TIP]
+The link:https://github.com/neo4j-drivers/neo4j-python-driver-rust-ext[Rust extension to the Python driver] is an alternative driver package that yields a 3x to 10x speedup compared to the regular driver.
+You can install it with `pip install neo4j-rust-ext`, either alongside the `neo4j` package or as a replacement to it.
+Usage-wise, the drivers are identical: everything in this guide applies to both packages.
+
 [NOTE]
 To get the driver on an air-gapped machine, link:https://pypi.org/project/neo4j/#files[download the latest driver] tarball and install it with `pip install neo4j-<version>.tar.gz`.
 
