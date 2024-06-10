@@ -79,16 +79,16 @@ To create new nodes and relationships linking it to an already existing node, us
 [source, python]
 ----
 records, summary, keys = driver.execute_query("""
-    MATCH (p:Person {name: $name})  // <1>
-    CREATE (p)-[:KNOWS]->(:Person {name: $friend})  // <2>
+    MATCH (alice:Person {name: $name})  // <1>
+    CREATE (alice)-[:KNOWS]->(:Person {name: $friend})  // <2>
     """, name="Alice", friend="Bob",
     database_="neo4j",
 )
 print(f"Query counters: {summary.counters}.")
 ----
 
-<1> Retrieve the person node named `Alice` and bind it to a variable `alice`
-<2> Create a new `:KNOWS` relationship outgoing from the node bound to `alice` and attach to it a new `Person` node named `Bob`
+<1> Retrieve the person node named `Alice` and bind it to a variable `alice`.
+<2> Create a new `:KNOWS` relationship outgoing from the node bound to `alice` and attach to it a new `Person` node named `Bob`.
 
 
 == Delete from the database

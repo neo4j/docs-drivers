@@ -1,6 +1,6 @@
 The Neo4j JavaScript driver is the official library to interact with a Neo4j instance through a JavaScript application.
 
-At the hearth of Neo4j lies <<Cypher>>, the query language you use to interact with a Neo4j database.
+At the hearth of Neo4j lies <<Cypher>>, the query language to interact with a Neo4j database.
 While this guide does not _require_ you to be a seasoned Cypher querier, it is going to be easier to focus on the JavaScript-specific bits if you already know some Cypher.
 For this reason, although this guide does _also_ provide a gentle introduction to Cypher along the way, consider checking out link:{neo4j-docs-base-uri}/getting-started/cypher-intro/[Getting started -> Cypher] for a more detailed walkthrough of graph databases modelling and querying if this is your first approach.
 You may then apply that knowledge while following this guide to develop your JavaScript application.
@@ -21,8 +21,7 @@ xref:install#install-driver[More info on installing the driver ->]
 == Connect to the database
 
 Connect to a database by creating a <<Driver>> object and providing a URL and an authentication token.
-Once you have a `Driver` instance, use the `.getServerInfo()` method to ensure that a working connection can be established
-by retrieving the server information.
+Once you have a `Driver` instance, use the `.getServerInfo()` method to ensure that a working connection can be established by retrieving the server information.
 
 [source, javascript]
 ----
@@ -81,31 +80,88 @@ xref:query-simple.adoc[More info on querying the database ->]
 
 == Run your own transactions
 
-For more advanced use-cases, you can take control of the transaction lifecycle.
-A transaction is a unit of work that is either committed in its entirety or rolled back on failure.
+For more advanced use-cases, you can run <<transaction,transactions>>.
 Use the methods `Session.executeRead()` and `Session.executeWrite()` to run managed transactions.
 
-[source, javascript, role=nocollapse]
+.A transaction with multiple queries, client logic, and potential roll backs
+[source, javascript]
 ----
-let session = driver.session({ database: 'neo4j' })
-try {
-  const result = await session.executeRead(async tx => {
-    return await tx.run(`
-      MATCH (p:Person WHERE p.name STARTS WITH $filter)
-      RETURN p.name AS name ORDER BY name
-      `, { filter: 'Al'}
-    )
-  })
-  console.log(
-    `The query ${result.summary.query.text} returned ${result.records.length} nodes.`
-  )
-  for(let record of result.records) {
-    console.log(`Person with name: ${record.get('name')}`)
-    console.log(`Available properties for this node are: ${record.keys}\n`)
+const neo4j = require('neo4j-driver');
+
+(async () => {
+  const URI = '<URI for Neo4j database>'
+  const USER = '<Username>'
+  const PASSWORD = '<Password>'
+  let driver, session
+  let employeeThreshold = 10
+
+  try {
+    driver = neo4j.driver(URI, neo4j.auth.basic(USER, PASSWORD))
+    await driver.verifyConnectivity()
+  } catch(err) {
+    console.log(`-- Connection error --\n${err}\n-- Cause --\n${err.cause}`)
+    await driver.close()
+    return
   }
-} finally {
+
+  session = driver.session({ database: 'neo4j' })
+  for(let i=0; i<100; i++) {
+    const name = `Neo-${i.toString()}`
+    const orgId = await session.executeWrite(async tx => {
+      let result, orgInfo
+
+      // Create new Person node with given name, if not already existing
+      await tx.run(`
+        MERGE (p:Person {name: $name})
+        RETURN p.name AS name
+        `, { name: name }
+      )
+
+      // Obtain most recent organization ID and number of people linked to it
+      result = await tx.run(`
+        MATCH (o:Organization)
+        RETURN o.id AS id, COUNT{(p:Person)-[r:WORKS_FOR]->(o)} AS employeesN
+        ORDER BY o.createdDate DESC
+        LIMIT 1
+      `)
+      if(result.records.length > 0) {
+        orgInfo = result.records[0]
+      }
+
+      if(orgInfo != undefined && orgInfo['employeesN'] == 0) {
+        throw new Error('Most recent organization is empty.')
+        // Transaction will roll back -> not even Person is created!
+      }
+
+      // If org does not have too many employees, add this Person to that
+      if(orgInfo != undefined && orgInfo['employeesN'] < employeeThreshold) {
+        result = await tx.run(`
+          MATCH (o:Organization {id: $orgId})
+          MATCH (p:Person {name: $name})
+          MERGE (p)-[r:WORKS_FOR]->(o)
+          RETURN $orgId AS id
+          `, { orgId: orgInfo['id'], name: name }
+        )
+
+      // Otherwise, create a new Organization and link Person to it
+      } else {
+        result = await tx.run(`
+          MATCH (p:Person {name: $name})
+          CREATE (o:Organization {id: randomuuid(), createdDate: datetime()})
+          MERGE (p)-[r:WORKS_FOR]->(o)
+          RETURN o.id AS id
+          `, { name: name }
+        )
+      }
+
+      // Return the Organization ID to which the new Person ends up in
+      return result.records[0].get('id')
+    })
+    console.log(`User ${name} added to organization ${orgId}`)
+  }
   await session.close()
-}
+  await driver.close()
+})()
 ----
 
 xref:transactions.adoc[More info on running transactions ->]

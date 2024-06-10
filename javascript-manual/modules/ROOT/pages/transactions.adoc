@@ -1,8 +1,11 @@
 = Run your own transactions
 
-When xref:query-simple.adoc[querying the database with `executeQuery()`], the driver automatically creates a _transaction_. A transaction is a unit of work that is either _committed_ in its entirety or _rolled back_ on failure. You can include multiple Cypher statements in a single query, as for example when using `MATCH` and `MERGE` in sequence to xref:query-simple#_update_the_database[update the database], but you cannot have multiple queries and interleave some client-logic in between them.
+When xref:query-simple.adoc[querying the database with `executeQuery()`], the driver automatically creates a _transaction_.
+A transaction is a unit of work that is either _committed_ in its entirety or _rolled back_ on failure.
+You can include multiple Cypher statements in a single query, as for example when using `MATCH` and `CREATE` in sequence to xref:query-simple#_update_the_database[update the database], but you cannot have multiple queries and interleave some client-logic in between them.
 
 For these more advanced use-cases, the driver provides functions to take full control over the transaction lifecycle.
+These are called _managed transactions_, and you can think of them as a way of unwrapping the flow of `execute_query()` and being able to specify its desired behavior in more places.
 
 
 == Create a session
@@ -27,8 +30,6 @@ Always xref:_close_sessions[close sessions] when you are done with them.
 
 [#managed-transactions]
 == Run a managed transaction
-
-You can think of managed transactions as a way of unwrapping the flow of `executeQuery()` and being able to specify its desired behavior in more places.
 
 A transaction can contain any number of queries.
 As Neo4j is <<ACID>> compliant, *queries within a transaction will either be executed as a whole or not at all*: you cannot get a part of the transaction succeeding and another failing.
@@ -69,7 +70,13 @@ try {
 *Do not hardcode or concatenate parameters directly into the query*.
 Use xref:query-simple#query-parameters[query parameters] instead, both for performance and security reasons.
 
+*Transaction functions should never return the `Result` object directly*.
+Instead, always xref:process-result[process the result] in some way; at minimum, cast it to list.
 Within a transaction function, a `return` statement results in the transaction being committed, while the transaction is automatically rolled back if an exception is raised.
+
+[CAUTION]
+The methods `.executeRead()` and `.executeWrite()` have replaced `.readTransaction()` and `.writeTransaction()`, which are deprecated in version 5.x and will be removed in version 6.0.
+
 
 .A transaction with multiple queries, client logic, and potential roll backs
 [source, javascript]
@@ -292,7 +299,10 @@ const session = driver.session({
 })
 ----
 
-Do not rely on the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/use/[`USE`] Cypher clause for database selection with the driver.
+[TIP]
+Specifying the database through the configuration method is preferred over the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/use/[`USE`] Cypher clause.
+If the server runs on a cluster, queries with `USE` require server-side routing to be enabled.
+Queries may also take longer to execute as they may not reach the right cluster member at the first attempt, and need to be routed to one containing the requested database.
 
 
 === Request routing
@@ -312,8 +322,9 @@ const session = driver.session({
 [#access-control-note]
 [NOTE]
 ====
-Although executing a _write_ query in read mode likely results in a runtime error, *you should not rely on this for access control.* The difference between the two modes is that _read_ transactions are routed to any node of a cluster, whereas _write_ ones are directed to the leader.
-Still, depending on the server version and settings, the server might allow none, some, or all _write_ statements to be executed even in _read_ transactions.
+Although executing a _write_ query in read mode likely results in a runtime error, *you should not rely on this for access control.*
+The difference between the two modes is that _read_ transactions are routed to any node of a cluster, whereas _write_ ones are directed to the leader.
+In other words, there is no guarantee that a write query submitted in read mode will be rejected.
 
 Similar remarks hold for the `.executeRead()` and `.executeWrite()` methods.
 ====

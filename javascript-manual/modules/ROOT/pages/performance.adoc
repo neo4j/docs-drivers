@@ -1,5 +1,6 @@
 = Performance recommendations
 
+[[target-database]]
 == Always specify the target database
 
 *Specify the target database on all queries* using the `database` parameter, both in xref:query-simple.adoc[`Driver.executeQuery()`] calls and when creating new xref:transactions.adoc[sessions].
@@ -33,144 +34,34 @@ driver.session()
 ----
 
 
-== Use `MERGE` for creation only when needed
+[[transactions-cost]]
+== Be aware of the cost of transactions
 
-The Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/merge/[`MERGE`] is convenient for data creation, as it allows to avoid duplicate data when an exact clone of the given pattern exists.
-However, it requires the database to run _two_ queries: it first needs to link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/match/[`MATCH`] the pattern, and only then can it link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/create/[`CREATE`] it.
+When submitting queries through xref:query-simple.adoc[`.executeQuery()`] or through xref:transactions.adoc#managed-transactions[`.executeRead/Qrite()`], the server automatically wraps them into a <<transaction>>.
+This behavior ensures that the database always ends up in a consistent state, regardless of what happens during the execution of a transaction (power outages, software crashes, etc).
 
-If you know already that the data you are inserting is new, avoid using `MERGE` and use `CREATE` instead -- this practically halves the number of database queries.
+Creating a safe execution context around a number of queries yields an overhead that is not present if the driver just shoots queries at the server and hopes they will get through.
+The overhead is small, but can add up as the number of queries increases.
+For this reason, if your use case values throughput more than data integrity, you may extract further performance by running all queries within a single (auto-commit) transaction.
+You do this by creating a session and using `session.run()` to run as many queries as needed.
 
-
-== Use query parameters
-
-*Use xref:query-simple#query-parameters[query parameters]* instead of hardcoding or concatenating values into queries.
-This allows to leverage the database's query cache.
-
-[discrete]
-=== Good practices
-
-[source, javascript]
-----
-await driver.executeQuery(
-  'MATCH (p:Person {name: $name}) RETURN p',
-  { name: 'Alice' }  // query parameters
-)
-----
-
+.Privilege throughput over data integrity
 [source, javascript]
 ----
 let session = driver.session({database: '<DB NAME>'})
-await session.run(
-  'MATCH (p:Person {name: $name}) RETURN p',
-  { name: 'Alice' }  // query parameters
-)
-----
-
-[discrete]
-=== Bad practices
-
-[source, javascript]
-----
-await driver.executeQuery('MATCH (p:Person {name: "Alice"}) RETURN p')
-
-let name = "Alice"
-await driver.executeQuery('MATCH (p:Person {name: "' + name + '"}) RETURN p')
-----
-
-[source, javascript]
-----
-let session = driver.session({database: '<DB NAME>'})
-await session.run(
-  'MATCH (p:Person {name: "Alice"}) RETURN p',
-  // or 'MATCH (p:Person {name: ' + name + '}) RETURN p'
-  {}
-)
-----
-
-
-== Specify node labels
-
-*Specify node labels* in all queries.
-To learn how to combine labels, see link:{neo4j-docs-base-uri}/cypher-manual/current/syntax/expressions/#query-syntax-label[Cypher -- Label expressions].
-
-[discrete]
-=== Good practices
-
-[source, javascript]
-----
-await driver.executeQuery(
-  'MATCH (p:Person|Animal {name: $name}) RETURN p',
-  { name: 'Alice' }
-)
-----
-
-[source, javascript]
-----
-let session = driver.session({database: '<DB NAME>'})
-await session.run(
-  'MATCH (p:Person|Animal {name: $name}) RETURN p',
-  { name: 'Alice' }
-)
-----
-
-[discrete]
-=== Bad practices
-
-[source, javascript]
-----
-await driver.executeQuery(
-  'MATCH (p {name: $name}) RETURN p',
-  { name: 'Alice' }
-)
-----
-
-[source, javascript]
-----
-let session = driver.session({database: '<DB NAME>'})
-await session.run(
-  'MATCH (p {name: $name}) RETURN p',
-  { name: 'Alice' }
-)
-----
-
-
-== Batch data creation
-
-*Batch queries when creating a lot of records* using the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/with/[`WITH`] and link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/unwind/[`UNWIND`] Cypher clauses.
-
-[discrete]
-=== Good practice
-
-[source, javascript]
-----
-numbers = []
-for(let i=0; i<10000; i++) {
-  numbers.push({value: Math.random()})
+for(let i=0; i<1000; i++) {
+    session.run("<QUERY>")
 }
-await driver.executeQuery(`
-    WITH $numbers AS batch
-    UNWIND batch AS node
-    MERGE (n:Number {value: node.value})
-    `, { numbers: numbers }
-)
+session.close()
 ----
 
-[discrete]
-=== Bad practice
-
+.Privilege data integrity over throughput
 [source, javascript]
 ----
-for(let i=0; i<10000; i++) {
-  await driver.executeQuery(
-    'MERGE (:Number {value: $value})',
-    { value: Math.random() }
-  )
-}
+for(let i=0; i<1000; i++) {
+    driver.executeQuery("<QUERY>", {}, {database: '<DB NAME>'})
+    # or session.executeRead/Write() calls
 ----
-
-[TIP]
-The most efficient way of performing a _first import_ of large amounts of data into a new database is the link:{neo4j-docs-base-uri}/operations-manual/current/tutorial/neo4j-admin-import/[`neo4j-admin database import`] command.
-// source:  https://community.neo4j.com/t5/neo4j-graph-platform/improving-data-writing-efficiency-in-python/td-p/39520
 
 
 == Route read queries to cluster readers
@@ -274,7 +165,7 @@ Total database accesses: 12, total allocated memory: 184
 */
 ----
 
-If your query is so slow that you are unable to even run it in a reasonable time, you can prepend it with `EXPLAIN` instead of `PROFILE`.
+In case some queries are so slow that you are unable to even run them in reasonable times, you can prepend them with `EXPLAIN` instead of `PROFILE`.
 This will return the _plan_ that the server would use to run the query, but without executing it.
 The server output is available in the `plan` property of the xref:result-summary.adoc[`ResultSummary`] object.
 
@@ -303,10 +194,150 @@ Total database accesses: ?
 ----
 
 
+== Specify node labels
+
+*Specify node labels* in all queries.
+To learn how to combine labels, see link:{neo4j-docs-base-uri}/cypher-manual/current/syntax/expressions/#query-syntax-label[Cypher -- Label expressions].
+
+[discrete]
+=== Good practices
+
+[source, javascript]
+----
+await driver.executeQuery(
+  'MATCH (p:Person|Animal {name: $name}) RETURN p',
+  { name: 'Alice' }
+)
+----
+
+[source, javascript]
+----
+let session = driver.session({database: '<DB NAME>'})
+await session.run(
+  'MATCH (p:Person|Animal {name: $name}) RETURN p',
+  { name: 'Alice' }
+)
+----
+
+[discrete]
+=== Bad practices
+
+[source, javascript]
+----
+await driver.executeQuery(
+  'MATCH (p {name: $name}) RETURN p',
+  { name: 'Alice' }
+)
+----
+
+[source, javascript]
+----
+let session = driver.session({database: '<DB NAME>'})
+await session.run(
+  'MATCH (p {name: $name}) RETURN p',
+  { name: 'Alice' }
+)
+----
+
+
+== Batch data creation
+
+*Batch queries when creating a lot of records* using the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/with/[`WITH`] and link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/unwind/[`UNWIND`] Cypher clauses.
+
+[discrete]
+=== Good practice
+
+[source, javascript]
+----
+numbers = []
+for(let i=0; i<10000; i++) {
+  numbers.push({value: Math.random()})
+}
+await driver.executeQuery(`
+    WITH $numbers AS batch
+    UNWIND batch AS node
+    MERGE (n:Number {value: node.value})
+    `, { numbers: numbers }
+)
+----
+
+[discrete]
+=== Bad practice
+
+[source, javascript]
+----
+for(let i=0; i<10000; i++) {
+  await driver.executeQuery(
+    'MERGE (:Number {value: $value})',
+    { value: Math.random() }
+  )
+}
+----
+
+[TIP]
+The most efficient way of performing a _first import_ of large amounts of data into a new database is the link:{neo4j-docs-base-uri}/operations-manual/current/tutorial/neo4j-admin-import/[`neo4j-admin database import`] command.
+// source:  https://community.neo4j.com/t5/neo4j-graph-platform/improving-data-writing-efficiency-in-python/td-p/39520
+
+
+== Use query parameters
+
+*Use xref:query-simple#query-parameters[query parameters]* instead of hardcoding or concatenating values into queries.
+This allows to leverage the database's query cache.
+
+[discrete]
+=== Good practices
+
+[source, javascript]
+----
+await driver.executeQuery(
+  'MATCH (p:Person {name: $name}) RETURN p',
+  { name: 'Alice' }  // query parameters
+)
+----
+
+[source, javascript]
+----
+let session = driver.session({database: '<DB NAME>'})
+await session.run(
+  'MATCH (p:Person {name: $name}) RETURN p',
+  { name: 'Alice' }  // query parameters
+)
+----
+
+[discrete]
+=== Bad practices
+
+[source, javascript]
+----
+await driver.executeQuery('MATCH (p:Person {name: "Alice"}) RETURN p')
+
+let name = "Alice"
+await driver.executeQuery('MATCH (p:Person {name: "' + name + '"}) RETURN p')
+----
+
+[source, javascript]
+----
+let session = driver.session({database: '<DB NAME>'})
+await session.run(
+  'MATCH (p:Person {name: "Alice"}) RETURN p',
+  // or 'MATCH (p:Person {name: ' + name + '}) RETURN p'
+  {}
+)
+----
+
+
 == Concurrency
 
 *Use xref:query-async.adoc[asynchronous querying]*.
 This is likely to be more impactful on performance if you parallelize complex and time-consuming queries in your application, but not so much if you run many simple ones.
+
+
+== Use `MERGE` for creation only when needed
+
+The Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/merge/[`MERGE`] is convenient for data creation, as it allows to avoid duplicate data when an exact clone of the given pattern exists.
+However, it requires the database to run _two_ queries: it first needs to link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/match/[`MATCH`] the pattern, and only then can it link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/create/[`CREATE`] it.
+
+If you know already that the data you are inserting is new, avoid using `MERGE` and use `CREATE` directly instead -- this practically halves the number of database queries.
 
 
 == Filter notifications
