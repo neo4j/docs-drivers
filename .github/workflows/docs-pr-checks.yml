@@ -44,9 +44,9 @@ jobs:
           separator: ','
           files_yaml: |
             pages:
-            - */modules/**/pages/**/*.adoc
+            - '*/modules/**/pages/**/*.adoc'
             asciidoc:
-            - */modules/**/*.adoc
+            - '*/modules/**/*.adoc'
 
   # Generate a PR comment if the docs are using the pageList extension
   # The extension maps asciidoc source files to their HTML output paths
