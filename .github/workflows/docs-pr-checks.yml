@@ -39,14 +39,14 @@ jobs:
     steps:
       - name: Get file changes
         id: get-file-changes
-        uses: tj-actions/changed-files@cbda684547adc8c052d50711417fa61b428a9f88 # v41.1.2
+        uses: tj-actions/changed-files@d6babd6899969df1a11d14c368283ea4436bca78 # v44.5.2
         with:
           separator: ','
           files_yaml: |
             pages:
-            - modules/**/pages/**/*.adoc
+            - '*/modules/**/pages/**/*.adoc'
             asciidoc:
-            - modules/**/*.adoc
+            - '*/modules/**/*.adoc'
 
   # Generate a PR comment if the docs are using the pageList extension
   # The extension maps asciidoc source files to their HTML output paths
