@@ -277,7 +277,6 @@ async function requestInspection(customerId, otherBankId, amount, error) {
   console.log('WARNING: transaction rolled back due to exception:')
   console.log(error)
 }
-
 ----
 
 

@@ -44,7 +44,7 @@ Connection is instead deferred to when the first query is executed.
 
 Both the creation of a `Driver` object and the connection verification can raise exceptions, so error catching should include both.
 
-**`Driver` objects are immutable, thread-safe, and expensive to create.**
+**`Driver` objects are immutable, thread-safe, and expensive to create,** , so your application should create only one instance.
 You may share them across threads.
 If you need to query the database through several different users, use xref:query-simple#impersonation[impersonation] without creating a new `Driver` instance.
 If you want to alter a `Driver` configuration, you need to create a new object.
@@ -88,6 +88,10 @@ We recommend the package link:https://www.npmjs.com/package/dotenv/[`dotenv`] fo
   await driver.close()
 })();
 ----
+
+[TIP]
+An Aura instance is not conceptually different from any other Neo4j instance, as Aura is simply a _deployment mode_ for Neo4j.
+When interacting with a Neo4j database through the driver, it doesn't make a difference whether it is an Aura instance it is working with or a different deployment.
 
 
 == Further connection parameters

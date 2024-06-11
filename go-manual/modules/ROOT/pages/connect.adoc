@@ -2,6 +2,7 @@
 
 Once you have xref:install.adoc#install-driver[installed the driver] and have xref:install.adoc#get-an-instance[a running Neo4j instance], you are ready to connect your application to the database.
 
+
 == Connect to the database
 
 You connect to a Neo4j database by creating a <<DriverWithContext>> object and providing a URL and an authentication token.
@@ -45,9 +46,9 @@ Connection is instead deferred to when the first query is executed.
 The safest practice is to `defer` the call to `DriverWithContext.Close(ctx)` after the object is successfully created.
 Note that there are corner cases in which `.Close()` might return an error, so you may want to catch that as well.
 
-`DriverWithContext` objects are _immutable_, _thread-safe_, and fairly _expensive to create_, so your application should only create one instance.
+**`DriverWithContext` objects are immutable, thread-safe, and expensive to create**, so your application should create only one instance.
 If you need to query the database with a different user than the one you created the object with, use xref:query-simple#impersonation[impersonation].
-If you want to alter a `DriverWithContext` configuration, you will need to create a new object.
+If you want to alter a `DriverWithContext` configuration, you need to create a new object.
 
 
 == Connect to an Aura instance
@@ -94,6 +95,10 @@ func main() {
     fmt.Println("Connection established.")
 }
 ----
+
+[TIP]
+An Aura instance is not conceptually different from any other Neo4j instance, as Aura is simply a _deployment mode_ for Neo4j.
+When interacting with a Neo4j database through the driver, it doesn't make a difference whether it is an Aura instance it is working with or a different deployment.
 
 
 == Further connection parameters

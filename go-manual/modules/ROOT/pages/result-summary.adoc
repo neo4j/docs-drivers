@@ -1,4 +1,4 @@
-# Explore the query execution summary
+= Explore the query execution summary
 
 After all results coming from a query have been processed, the server ends the transaction by returning a summary of execution.
 It comes as a link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#ResultSummary[`ResultSummary`] object, and it contains information among which:
@@ -9,7 +9,7 @@ It comes as a link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#
 - Timing information and query request summary
 
 
-## Retrieve the execution summary
+== Retrieve the execution summary
 
 When running queries with xref:query-simple.adoc[`ExecuteQuery()`], the execution summary is part of the default return object, under the `Summary` key.
 
@@ -26,7 +26,7 @@ summary := result.Summary
 
 If you are using xref:transactions.adoc[transaction functions], you can retrieve the query execution summary with the method `Result.Consume()`.
 **Notice that once you ask for the execution summary, the result stream is exhausted**.
-This means that any record which has not yet been processed is not available any longer.
+This means that any record which has not yet been processed is discarded.
 
 [source, go]
 ----
@@ -44,7 +44,7 @@ summary, _ := session.ExecuteWrite(ctx,
 ----
 
 
-## Query counters
+== Query counters
 
 The method `ResultSummary.Counters()` returns counters for the operations that a query triggered (as a link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#Counters[`Counters`] object).
 
@@ -78,7 +78,7 @@ There are two additional boolean methods which act as meta-counters:
 - `.ContainsSystemUpdates()` -- whether the query updated the `system` database
 
 
-## Query execution plan
+== Query execution plan
 
 If you prefix a query with `EXPLAIN`, the server will return the plan it _would_ use to run the query, but will not actually run it.
 You can retrieve the plan by calling `ResultSummary.Plan()`, which contains the list of link:{neo4j-docs-base-uri}/cypher-manual/current/planning-and-tuning/operators/[Cypher operators] that would be used to retrieve the result set.
@@ -152,7 +152,7 @@ Total database accesses: 12, total allocated memory: 184
 For more information and examples, see link:{neo4j-docs-base-uri}/cypher-manual/current/query-tuning/basic-example/#_profile_query[Basic query tuning].
 
 
-## Notifications
+== Notifications
 
 The method `ResultSummary.Notifications()` returns a list of link:{neo4j-docs-base-uri}/status-codes/current/notifications[notifications coming from the server], if any were raised by the execution of the query.
 These include recommendations for performance improvements, warnings about the usage of deprecated features, and other hints about sub-optimal usage of Neo4j.
@@ -185,7 +185,7 @@ Category: PERFORMANCE
 ----
 
 
-### Filter notifications
+=== Filter notifications
 
 By default, the server analyses each query for all categories and severity of notifications.
 Starting from version 5.7, you can use the parameters `NotificationsMinSeverity` and/or `NotificationsDisabledCategories` to restrict the severity or category of notifications that you are interested into.
