@@ -20,7 +20,7 @@ endif::[]
 ifndef::backend-pdf[]
 include::partial$/quickstart.adoc[]
 
-include::https://raw.githubusercontent.com/neo4j-graphacademy/courses/main/asciidoc/courses/app-python/promo.adoc[]
+include::{ga-courses-uri}/{ga-course}/promo.adoc[]
 endif::[]
 
 

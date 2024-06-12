@@ -9,3 +9,11 @@ asciidoc:
     java-driver-version: '5.21.0' # the version of the package published at https://central.sonatype.com/artifact/org.neo4j.driver/neo4j-java-driver
     common-partial: 5@common-content:ROOT:partial$
     common-image: 5@common-content:ROOT:image$
+    ga-courses-uri: https://raw.githubusercontent.com/neo4j-graphacademy/courses/main/asciidoc/courses
+    ga-course: app-java
+    page-ad-icon: mortarboard
+    page-ad-title: Building Neo4j Applications with Java
+    page-ad-description: Enroll for free to learn how to build a Neo4j application with Java.
+    page-ad-link: https://graphacademy.neo4j.com/courses/app-java/?ref=docs-ad-java
+    page-ad-underline-role: button
+    page-ad-underline: Enroll now

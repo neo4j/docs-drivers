@@ -11,3 +11,10 @@ asciidoc:
     go-examples: https://raw.githubusercontent.com/neo4j/neo4j-go-driver/{go-driver-apidoc-release}/tests/integration/examples
     common-partial: 5@common-content:ROOT:partial$
     common-image: 5@common-content:ROOT:image$
+    ga-courses-uri: https://raw.githubusercontent.com/neo4j-graphacademy/courses/main/asciidoc/courses
+    ga-course: app-go
+    page-ad-title: Building Neo4j Applications with Go
+    page-ad-description: Learn how to build a movie recommendation website using the Neo4j Go Driver.
+    page-ad-link: https://graphacademy.neo4j.com/courses/app-go/?ref=docs-ad-go
+    page-ad-underline-role: button
+    page-ad-underline: Enroll for free

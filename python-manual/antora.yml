@@ -11,6 +11,8 @@ asciidoc:
     python-examples: https://raw.githubusercontent.com/neo4j/neo4j-python-driver/{python-driver-apidoc-release}/tests/integration/examples
     common-partial: 5@common-content:ROOT:partial$
     common-image: 5@common-content:ROOT:image$
+    ga-courses-uri: https://raw.githubusercontent.com/neo4j-graphacademy/courses/main/asciidoc/courses
+    ga-course: app-python
     page-ad-icon: mortarboard
     page-ad-title: Building Neo4j Applications with Python
     page-ad-description: Enroll for free to learn how to build a Neo4j application with Python.
