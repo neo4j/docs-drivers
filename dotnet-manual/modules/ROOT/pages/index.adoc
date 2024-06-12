@@ -35,9 +35,5 @@ _Who should read this?_
 
 This manual is written for .NET developers building a Neo4j client application.
 
-[.discrete.ad]
-== link:https://graphacademy.neo4j.com/?ref=guides[Learn with GraphAcademy^]
-
-image::https://graphacademy.neo4j.com/courses/app-dotnet/badge/[float=left]
 
 include::{ga-courses-uri}/{ga-course}/promo.adoc[]
