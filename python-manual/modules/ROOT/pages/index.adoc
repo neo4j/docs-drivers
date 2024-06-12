@@ -1,4 +1,5 @@
 :description: The Neo4j Python Driver is the official library to interact with a Neo4j instance through a Python application. Learn how to connect and query your graph database in Python.
+include::https://raw.githubusercontent.com/neo4j-graphacademy/courses/main/asciidoc/courses/app-python/ad.adoc[]
 
 ifdef::backend-pdf[]
 = The Neo4j Python Driver Manual v{python-driver-version}
@@ -18,6 +19,8 @@ endif::[]
 // If we are building HTML, just include the content of the quickstart partial as-is
 ifndef::backend-pdf[]
 include::partial$/quickstart.adoc[]
+
+include::https://raw.githubusercontent.com/neo4j-graphacademy/courses/main/asciidoc/courses/app-python/promo.adoc[]
 endif::[]
 
 
