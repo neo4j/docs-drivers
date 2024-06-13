@@ -1,5 +1,6 @@
 = Performance recommendations
 
+[[target-database]]
 == Always specify the target database
 
 *Specify the target database on all queries*, either with the xref:query-simple.adoc#_database_selection[`+database_+` parameter in `Driver.execute_query()`] or with the xref:transactions.adoc#_database_selection[`database` parameter when creating new sessions].
@@ -33,6 +34,7 @@ driver.session()
 ----
 
 
+[[transactions-cost]]
 == Be aware of the cost of transactions
 
 When submitting queries through xref:query-simple.adoc[`.execute_query()`] or through xref:transactions.adoc#managed-transactions[`.execute_read/write()`], the server automatically wraps them into a <<transaction>>.
@@ -48,14 +50,14 @@ You do this by creating a session and using `session.run()` to run as many queri
 ----
 with driver.session(database="neo4j") as session:
     for i in range(1000):
-        session.run("<QUERY>");
+        session.run("<QUERY>")
 ----
 
 .Privilege data integrity over throughput
 [source, python]
 ----
 for i in range(1000):
-    driver.execute_query("<QUERY>");
+    driver.execute_query("<QUERY>")
     # or session.execute_read/write() calls
 ----
 
@@ -214,6 +216,7 @@ With lazy loading, the client could also stop requesting records after some cond
 ====
 
 
+[[read-mode]]
 == Route read queries to cluster readers
 
 In a cluster, *route read queries to link:{neo4j-docs-base-uri}/operations-manual/current/clustering/introduction/#clustering-secondary-mode[secondary nodes]*. You do this by:
@@ -252,6 +255,7 @@ session.execute_write(lambda tx: tx.run("MATCH (p:Person) RETURN p"))
 ----
 
 
+[[indexes]]
 == Create indexes
 
 *Create indexes for properties that you often filter against*.
@@ -267,6 +271,7 @@ driver.execute_query("CREATE INDEX person_name FOR (n:Person) ON (n.name)")
 For more information, see link:{neo4j-docs-base-uri}/cypher-manual/current/indexes-for-search-performance/[Indexes for search performance].
 
 
+[[profile-queries]]
 == Profile queries
 
 link:{neo4j-docs-base-uri}/cypher-manual/current/query-tuning/basic-example/#_profile_query[*Profile your queries*] to locate queries whose performance can be improved.
@@ -326,6 +331,7 @@ Total database accesses: ?
 ----
 
 
+[[node-labels]]
 == Specify node labels
 
 *Specify node labels* in all queries.
@@ -362,6 +368,7 @@ with driver.session(database="<DB NAME>") as session:
 ----
 
 
+[[batch-data-creation]]
 == Batch data creation
 
 *Batch queries when creating a lot of records* using the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/with/[`WITH`] and link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/unwind/[`UNWIND`] Cypher clauses.
@@ -398,6 +405,7 @@ The most efficient way of performing a _first import_ of large amounts of data i
 // source:  https://community.neo4j.com/t5/neo4j-graph-platform/improving-data-writing-efficiency-in-python/td-p/39520
 
 
+[[query-parameters]]
 == Use query parameters
 
 *Always use xref:query-simple#query-parameters[query parameters]* instead of hardcoding or concatenating values into queries.
@@ -438,12 +446,15 @@ with driver.session(database="<DB NAME>") as session:
 ----
 
 
+[[concurrency]]
 == Concurrency
 
 *Use xref:concurrency.adoc[concurrency]*, either in the form of multithreading or with the async version of the driver.
 This is likely to be more impactful on performance if you parallelize complex and time-consuming queries in your application, but not so much if you run many simple ones.
 
 
+
+[[merge]]
 == Use `MERGE` for creation only when needed
 
 The Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/merge/[`MERGE`] is convenient for data creation, as it allows to avoid duplicate data when an exact clone of the given pattern exists.
@@ -452,6 +463,7 @@ However, it requires the database to run _two_ queries: it first needs to link:{
 If you know already that the data you are inserting is new, avoid using `MERGE` and use `CREATE` directly instead -- this practically halves the number of database queries.
 
 
+[[filter-notifications]]
 == Filter notifications
 
 xref:result-summary.adoc#_filter_notifications[Filter the category and/or severity of notifications] the server should raise.
