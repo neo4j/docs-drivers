@@ -63,8 +63,8 @@ for i in range(1000):
 [[lazy-eager-loading]]
 == Don't fetch large result sets all at once
 
-When submitting queries that may result in a lot of result records, don't retrieve all records at once.
-The Neo4j server can retrieve records in batches, and the driver can receive one batch and _wait_ until it has been processed by the application before receiving another one from the server.
+When submitting queries that may result in a lot of records, don't retrieve them all at once.
+The Neo4j server can retrieve records in batches, and the driver can receive one batch and _wait_ until it has been processed by the application before receiving another batch from the server.
 Lazy-loading a result spreads out network traffic and memory usage.
 
 For convenience, xref:query-simple.adoc[`.execute_query()`] always retrieves all result records at once (it is what the `Eager` in `EagerResult` stands for).
@@ -81,11 +81,11 @@ Consider a query that results in 250 result records, and that the driver's link:
 |
 - The server has to read all 250 records from the storage before it can send even the first one the driver (i.e. it takes more time for the client to receive the first record).
 - Before any record is available to the application, the driver has to receive all 250 records.
-- The client has to hold in memory all of 250 records.
+- The client has to hold in memory all 250 records.
 
 |
 - The server reads the first 100 records and sends them to the driver.
-- The application can process records as soon as the first batch of 100 is transferred.
+- The application can process records as soon as the first batch is transferred.
 - When the first batch has been processed, the server reads another batch and delivers it to the driver.
 Further records are delivered in further batches.
 - Waiting time and resource consumption (both client- and server-side) for the remaining records is deferred to when the application requests more records.
@@ -204,8 +204,8 @@ if __name__ == '__main__':
 ----
 
 <1> With lazy loading, the first record is available ~10 seconds after the query is submitted (i.e. as soon as the server has retrieved the first batch of 100 records).
-<2> It takes about the same time to receive the second batch as the first batch (similar for subsequent batches).
-<3> With eager loading, the first record is available ~25 seconds after the query is submitted (i.e. after the server has retrieved all 250 records).
+<2> It takes about the same time to receive the second batch as it took for the first batch (similar for subsequent batches).
+<3> With eager loading, the first record is available ~25 seconds after the query has been submitted submitted (i.e. after the server has retrieved all 250 records).
 <4> There's no delay in between batches: the processing time between any two records is the same.
 <5> Memory usage is larger with eager loading than with lazy loading, because the application materializes a list of 250 records (while in lazy loading it's never more than 100).
 <6> The total running time is practically the same, but lazy loading spreads that out across batches whereas eager loading has one longer waiting period.
