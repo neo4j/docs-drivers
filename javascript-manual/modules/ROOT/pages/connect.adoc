@@ -93,6 +93,11 @@ An Aura instance is not conceptually different from any other Neo4j instance, as
 When interacting with a Neo4j database through the driver, it doesn't make a difference whether it is an Aura instance it is working with or a different deployment.
 
 
+== Close connections
+
+Always close `Driver` objects via `Driver.close()` to free up all allocated resources, even upon unsuccessful connection or runtime errors.
+
+
 == Further connection parameters
 
 For more `Driver` configuration parameters and further connection settings, see xref:connect-advanced.adoc[Advanced connection information].

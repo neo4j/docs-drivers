@@ -1,6 +1,6 @@
 = Query the database
 
-Once you have xref:connect.adoc[connected to the database], you can run queries using <<Cypher>> and the method `Driver.executeQuery()`.
+Once you have xref:connect.adoc[connected to the database], you can run <<Cypher>> queries through the method `Driver.executeQuery()`.
 
 [TIP]
 `Driver.executeQuery()` was introduced with the version 5.8 of the driver. +
@@ -133,7 +133,7 @@ This is for:
 
 [NOTE]
 There can be circumstances where your query structure prevents the usage of parameters in all its parts.
-For those advanced use cases, see xref:query-advanced#_dynamic_values_in_property_keys_relationship_types_and_labels[Dynamic values in property keys, relationship types, and labels].
+For those rare use cases, see xref:query-advanced#_dynamic_values_in_property_keys_relationship_types_and_labels[Dynamic values in property keys, relationship types, and labels].
 
 
 == Error handling
@@ -153,6 +153,7 @@ try {
 
 [TIP]
 The driver automatically retries to run a failed query, if the failure is deemed to be transient (for example due to temporary server unavailability).
+An exception will be raised if the operation keeps failing after a number of attempts.
 
 
 == Query configuration
@@ -227,7 +228,7 @@ await driver.executeQuery(
 )
 ----
 
-When impersonating a user, the query is run within the complete security context of the impersonated user and not the authenticated user (i.e., home database, permissions, etc.).
+When impersonating a user, the query is run within the complete security context of the impersonated user and not the authenticated user (i.e. home database, permissions, etc.).
 
 
 == A full example

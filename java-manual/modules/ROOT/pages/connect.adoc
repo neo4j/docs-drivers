@@ -48,7 +48,7 @@ If you want to alter a `Driver` configuration, you need to create a new object.
 When you create an <<Aura>> instance, you may download a text file (a so-called _Dotenv file_) containing the connection information to the database in the form of environment variables.
 The file has a name of the form `Neo4j-a0a2fa1d-Created-2023-11-06.txt`.
 
-You can either  manually extract the URI and the credentials from that file, or use a third party-module to load them.
+You can either manually extract the URI and the credentials from that file, or use a third party-module to load them.
 We recommend the module link:https://github.com/cdimascio/dotenv-java/[`dotenv-java`] for that purpose.
 
 .Using `dotenv-java` to extract credentials from a Dotenv file

@@ -166,6 +166,7 @@ except Exception as e:
 
 [TIP]
 The driver automatically retries to run a failed query, if the failure is deemed to be transient (for example due to temporary server unavailability).
+An exception will be raised if the operation keeps failing after a number of attempts.
 
 
 == Query configuration

@@ -27,7 +27,7 @@ let { records, summary } = await driver.executeQuery(`
 If you are using xref:transactions.adoc[transaction functions], you can retrieve the query execution summary with the attribute `Result.summary` if you used `await` to resolve the result promise, or with the method `Result.summary()` if you consumed the result as a promise.
 
 **Notice that once you ask for the execution summary, the result stream is exhausted**.
-This means that any record which has not yet been processed is not available any longer.
+This means that any record which has not yet been processed is discarded.
 
 
 [source, javascript]

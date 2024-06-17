@@ -77,7 +77,6 @@ Within a transaction function, a `return` statement results in the transaction b
 [CAUTION]
 The methods `.executeRead()` and `.executeWrite()` have replaced `.readTransaction()` and `.writeTransaction()`, which are deprecated in version 5.x and will be removed in version 6.0.
 
-
 .A transaction with multiple queries, client logic, and potential roll backs
 [source, javascript]
 ----
@@ -180,15 +179,16 @@ You run queries inside an explicit transaction with the method link:{neo4j-docs-
 let session = driver.session({ database: 'neo4j' })
 let transaction = await session.beginTransaction()
 
-// await transaction.run('<QUERY 1>')
-// await transaction.run('<QUERY 2>')
-// ...
+// use tx.run() to run queries
+//     tx.commit() to commit the transaction
+//     tx.rollback() to rollback the transaction
 
 await transaction.commit()
 await session.close()
 ----
 
-The behavior and lifetime of an explicit transaction is controlled through the methods link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/transaction.js~Transaction.html#instance-method-commit[`Transaction.commit()`], link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/transaction.js~Transaction.html#instance-method-rollback[`Transaction.rollback()`], or link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/transaction.js~Transaction.html#instance-method-close[`Transaction.close()`].
+An explicit transaction can be committed with link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/transaction.js~Transaction.html#instance-method-commit[`Transaction.commit()`] or rolled back with link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/transaction.js~Transaction.html#instance-method-rollback[`Transaction.rollback()`].
+If no explicit action is taken, the driver will automatically roll back the transaction at the end of its lifetime.
 
 Explicit transactions are most useful for applications that need to distribute Cypher execution across multiple functions for the same transaction, or for applications that need to run multiple queries within a single transaction but without the automatic retries provided by managed transactions.
 
@@ -288,7 +288,7 @@ When creating a session, you can provide an optional parameter of type  link:{ne
 === Database selection
 
 You should *always specify the database explicitly* with the `database` parameter, even on single-database instances.
-This allows the driver to work more efficiently, as it does not have to resolve the home database first.
+This allows the driver to work more efficiently, as it saves a network round-trip to the server to resolve the home database.
 If no database is given, the link:{neo4j-docs-base-uri}/operations-manual/current/database-administration/#manage-databases-default[user's home database] set in the Neo4j instance settings is used.
 
 [source, javascript]
@@ -352,11 +352,11 @@ When impersonating a user, the query is run within the complete security context
 You can exert further control on transactions by providing a second optional parameter of type link:{neo4j-docs-base-uri}/api/javascript-driver/current/typedef/index.html#static-typedef-TransactionConfig[`TransactionConfig`] to `.executeRead()`, `.executeWrite()`, and `.beginTransaction()`.
 You can specify:
 
-- a transaction timeout (in milliseconds).
+- A transaction timeout (in milliseconds).
 Transactions that run longer will be terminated by the server.
 The default value is set on the server side.
 The minimum value is one millisecond.
-- an object of metadata that gets attached to the transaction.
+- An object of metadata that gets attached to the transaction.
 These metadata get logged in the server `query.log`, and are visible in the output of the `SHOW TRANSACTIONS YIELD *` Cypher command.
 Use this to tag transactions.
 
@@ -372,7 +372,7 @@ const people_n = await session.executeRead(
 == Close sessions
 
 Each connection pool has *a finite number of sessions*, so if you open sessions without ever closing them, your application could run out of them.
-It is thus important to be adamant in always closing sessions when you are done with them, so that they can be returned to the connection pool to be later reused.
+It is thus important to always close sessions when you are done with them, so that they can be returned to the connection pool to be later reused.
 The best way is to wrap session usage in a `try/finally` block, calling `session.close()` in the `finally` clause.
 
 [source, javascript]

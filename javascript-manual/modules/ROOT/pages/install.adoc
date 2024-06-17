@@ -33,7 +33,7 @@ const neo4j = require('neo4j-driver')
 ----
 
 
-include::{common-partial}/install.adoc[tag=get-an-instance,opts=bla]
+include::{common-partial}/install.adoc[tag=get-an-instance]
 
 
 ifndef::backend-pdf[]
