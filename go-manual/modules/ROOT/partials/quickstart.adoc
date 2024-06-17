@@ -252,7 +252,7 @@ The best practice is to call the methods with the `defer` keyword as soon as you
 
 [source, go]
 ----
-driver, _ := neo4j.NewDriverWithContext(dbUri, neo4j.BasicAuth(dbUser, dbPassword, ""))
+driver, err := neo4j.NewDriverWithContext(dbUri, neo4j.BasicAuth(dbUser, dbPassword, ""))
 defer driver.Close(ctx)
 ----
 

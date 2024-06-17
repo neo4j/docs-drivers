@@ -90,7 +90,7 @@ To create a new relationship, linking it to two already existing node, use a com
 ----
 let { records, summary } = await driver.executeQuery(`
   MATCH (alice:Person {name: $name})  // <1>
-  MATCH (bob:Person {name: $friend})  // <2>
+  MATCH (bob:Person {name: $friendName})  // <2>
   CREATE (alice)-[:KNOWS]->(bob)  // <3>
   `, { name: 'Alice', friendName: 'Bob' },
   { database: 'neo4j' }
