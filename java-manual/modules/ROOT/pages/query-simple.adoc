@@ -96,7 +96,7 @@ System.out.println("Query updated the database?");
 System.out.println(summary.counters().containsUpdates());
 ----
 
-To create new nodes and relationships linking it to an already existing node, use a combination of the Cypher clauses `MATCH` and `CREATE`:
+To create a new relationship, linking it to two already existing node, use a combination of the Cypher clauses `MATCH` and `CREATE`:
 
 .Create a relationship `:KNOWS` between `Alice` and `Bob`
 [source, java]
@@ -106,7 +106,8 @@ To create new nodes and relationships linking it to an already existing node, us
 
 var result = driver.executableQuery("""
     MATCH (alice:Person {name: $name})  // <1>
-    CREATE (alice)-[:KNOWS]->(:Person {name: $friend})  // <2>
+    MATCH (bob:Person {name: $friend})  // <2>
+    CREATE (alice)-[:KNOWS]->(bob})  // <3>
     """)
     .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
     .withParameters(Map.of("name", "Alice", "friend", "Bob"))
@@ -117,7 +118,8 @@ System.out.println(summary.counters().containsUpdates());
 ----
 
 <1> Retrieve the person node named `Alice` and bind it to a variable `alice`
-<2> Create a new `:KNOWS` relationship outgoing from the node bound to `alice` and attach to it a new `Person` node named `Bob`
+<2> Retrieve the person node named `Bob` and bind it to a variable `bob`
+<3> Create a new `:KNOWS` relationship outgoing from the node bound to `alice` and attach to it the `Person` node named `Bob`
 
 
 == Delete from the database

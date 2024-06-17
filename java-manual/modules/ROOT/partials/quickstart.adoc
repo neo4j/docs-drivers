@@ -45,6 +45,7 @@ public class App {
 
         try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword))) {
             driver.verifyConnectivity();
+            System.out.println("Connection estabilished.");
         }
     }
 }

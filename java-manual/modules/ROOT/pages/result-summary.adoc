@@ -1,4 +1,4 @@
-# Explore the query execution summary
+= Explore the query execution summary
 
 After all results coming from a query have been processed, the server ends the transaction by returning a summary of execution.
 It comes as a link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/summary/ResultSummary.html[`ResultSummary`] object, and it contains information among which:
@@ -9,7 +9,7 @@ It comes as a link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driv
 - Timing information and query request summary
 
 
-## Retrieve the execution summary
+== Retrieve the execution summary
 
 When running queries with xref:query-simple.adoc[`Driver.executableQuery()`], the execution summary is part of the default return object, retrievable through the `.summary()` method.
 
@@ -42,7 +42,7 @@ try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").
 ----
 
 
-## Query counters
+== Query counters
 
 The method `ResultSummary.counters()` returns counters for the operations that a query triggered (as a link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/summary/SummaryCounters.html[`SummaryCounters`] object).
 
@@ -71,7 +71,7 @@ There are two additional boolean methods which act as meta-counters:
 - `.containsSystemUpdates()` -- Whether the query updated the `system` database
 
 
-## Query execution plan
+== Query execution plan
 
 If you prefix a query with `EXPLAIN`, the server will return the plan it _would_ use to run the query, but will not actually run it.
 The plan is then available as a link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/summary/Plan.html[`Plan`] object through the method `ResultSummary.plan()`, and contains the list of link:{neo4j-docs-base-uri}/cypher-manual/current/execution-plans/operators/[Cypher operators] that would be used to retrieve the result set.
@@ -143,7 +143,7 @@ Total database accesses: 12, total allocated memory: 184
 For more information and examples, see link:{neo4j-docs-base-uri}/cypher-manual/current/query-tuning/basic-example/#_profile_query[Basic query tuning].
 
 
-## Notifications
+== Notifications
 
 The method `ResultSummary.notifications()` returns a list of link:{neo4j-docs-base-uri}/status-codes/current/notifications[notifications coming from the server], if any were raised by the execution of the query.
 These include recommendations for performance improvements, warnings about the usage of deprecated features, and other hints about sub-optimal usage of Neo4j.
@@ -178,7 +178,7 @@ System.out.println(notifications);
 ----
 
 
-### Filter notifications
+=== Filter notifications
 
 By default, the server analyses each query for all categories and severity of notifications.
 Starting from version 5.7, you can use the configuration method `.withNotificationConfig(link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/NotificationConfig.html[NotificationConfig])` to restrict the severity or category of notifications that you are interested into, or disable them altogether. There is a slight performance gain in restricting the amount of notifications the server is allowed to raise.

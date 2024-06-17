@@ -2,6 +2,13 @@
 
 The tables in this section show the mapping between Cypher data types and Go types.
 
+[TIP]
+*When accessing a record's content, all its properties are of type `any`.*
+This means that you have to cast them to the relevant Go type if you want to use methods/features defined on such types.
+For example, if the `name` property coming from the database is a string, `record.AsMap()["name"][1]` would result in an _invalid operation_ error at compilation time.
+For it to work, cast the value to string _before_ using it as a string: `name := record.AsMap()["name"].(string)` and then `name[1]`.
+
+
 == Core types
 
 [options="header"]
@@ -153,7 +160,7 @@ duration := neo4j.Duration{
 fmt.Println(duration)  // 'P1Y2DT3.000000004S'
 ----
 
-For full documentation, see link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/dbtype#Duration[API documentation -- Duration].
+For full documentation, see link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/dbtype#Duration[API documentation -> Duration].
 
 
 == Spatial types
@@ -270,7 +277,7 @@ fmt.Println("Node properties:", node.Props)
 // Node properties: map[name:Alice]
 ----
 
-For full documentation, see link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/dbtype#Node[API documentation -- Node].
+For full documentation, see link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/dbtype#Node[API documentation -> Node].
 
 
 === `Relationship`
@@ -308,7 +315,7 @@ fmt.Println("Relationship end elID:", relationship.EndElementId)
 // Relationship end elID: 4:2691aa68-87cc-467d-9d09-431df9f5c456:1
 ----
 
-For full documentation, see link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/dbtype#Relationship[API documentation -- Relationship].
+For full documentation, see link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/dbtype#Relationship[API documentation -> Relationship].
 
 
 === `Path`
@@ -382,7 +389,7 @@ func addFriend(ctx context.Context, driver neo4j.DriverWithContext, name string,
 
 ----
 
-For full documentation, see link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/dbtype#Path[API documentation -- Path].
+For full documentation, see link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/dbtype#Path[API documentation -> Path].
 
 
 == Exceptions

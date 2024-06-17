@@ -4,7 +4,7 @@ Once you have xref:connect.adoc[connected to the database], you can run queries 
 
 [TIP]
 `Driver.executeQuery()` was introduced with the version 5.8 of the driver. +
-For queries with earlier versions, see xref:transactions.adoc[Run your own transactions].
+For queries with earlier versions, use xref:transactions.adoc[sessions and transactions].
 
 [NOTE]
 ====
@@ -83,14 +83,15 @@ console.log('Query counters:')
 console.log(summary.counters.updates())
 ----
 
-To create new nodes and relationships linking it to an already existing node, use a combination of the Cypher clauses `MATCH` and `CREATE`:
+To create a new relationship, linking it to two already existing node, use a combination of the Cypher clauses `MATCH` and `CREATE`:
 
 .Create a relationship `:KNOWS` between `Alice` and `Bob`
 [source, javascript]
 ----
 let { records, summary } = await driver.executeQuery(`
-  MATCH (alice:Person WHERE p.name = $name)  // <1>
-  CREATE (alice)-[:KNOWS]->(:Person {name: $friend})  // <2>
+  MATCH (alice:Person {name: $name})  // <1>
+  MATCH (bob:Person {name: $friend})  // <2>
+  CREATE (alice)-[:KNOWS]->(bob})  // <3>
   `, { name: 'Alice', friendName: 'Bob' },
   { database: 'neo4j' }
 )
@@ -98,8 +99,9 @@ console.log('Query counters:')
 console.log(summary.counters.updates())
 ----
 
-<1> Retrieve the person node named `Alice` and bind it to a variable `alice`.
-<2> Create a new `:KNOWS` relationship outgoing from the node bound to `alice` and attach to it a new `Person` node named `Bob`.
+<1> Retrieve the person node named `Alice` and bind it to a variable `alice`
+<2> Retrieve the person node named `Bob` and bind it to a variable `bob`
+<3> Create a new `:KNOWS` relationship outgoing from the node bound to `alice` and attach to it the `Person` node named `Bob`
 
 
 == Delete from the database

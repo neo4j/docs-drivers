@@ -133,7 +133,7 @@ result, err := neo4j.ExecuteQuery(ctx, driver,
 
 [NOTE]
 If you are running Neo4j in Docker, APOC needs to be enabled when starting the container.
-See link:https://neo4j.com/labs/apoc/current/installation/#docker[APOC -> Installation -> Docker].
+See link:https://neo4j.com/docs/apoc/current/installation/#docker[APOC -> Installation -> Docker].
 
 
 == Logging

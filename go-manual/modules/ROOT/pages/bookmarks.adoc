@@ -192,7 +192,7 @@ func printFriendships(ctx context.Context, session neo4j.SessionWithContext) (an
 }
 ----
 
-<1> Collect and combine bookmarks from different sessions using `SessionWithContext.LastBookmarks()` and `neo4j.CombineBookmarks()`.
+<1> Collect and combine bookmarks from different sessions using `SessionWithContext.LastBookmarks()` and `neo4j.CombineBookmarks()`, storing them in a link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#Bookmarks[`Bookmarks`] object.
 <2> Use them to initialize another session with the `Bookmarks` config parameter.
 
 image:{common-image}/driver-passing-bookmarks.svg[]

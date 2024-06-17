@@ -90,7 +90,7 @@ defer driver.Close(ctx)
 
 == Further connection parameters
 
-You can find all `DriverWithContext` configuration parameters in the link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/config#Config[API documentation -- config package].
+You can find all `DriverWithContext` configuration parameters in the link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/config#Config[API documentation -> config package].
 
 
 ifndef::backend-pdf[]

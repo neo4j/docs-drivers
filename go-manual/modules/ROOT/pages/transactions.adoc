@@ -1,8 +1,9 @@
 = Run your own transactions
 
-When xref:query-simple.adoc[querying the database with `ExecuteQuery()`], the driver automatically creates a _transaction_. A transaction is a unit of work that is either _committed_ in its entirety or _rolled back_ on failure. You can include multiple Cypher statements in a single query, as for example when using `MATCH` and `MERGE` in sequence to xref:query-simple#_update_the_database[update the database], but you cannot have multiple queries and interleave some client-logic in between them.
+When xref:query-simple.adoc[querying the database with `ExecuteQuery()`], the driver automatically creates a _transaction_. A transaction is a unit of work that is either _committed_ in its entirety or _rolled back_ on failure. You can include multiple Cypher statements in a single query, as for example when using `MATCH` and `CREATE` in sequence to xref:query-simple#_update_the_database[update the database], but you cannot have multiple queries and interleave some client-logic in between them.
 
 For these more advanced use-cases, the driver provides functions to take full control over the transaction lifecycle.
+These are called _managed transactions_, and you can think of them as a way of unwrapping the flow of `executableQuery()` and being able to specify its desired behavior in more places.
 
 
 == Create a session
@@ -28,8 +29,6 @@ Always xref:_close_sessions[close sessions] when you are done with them.
 
 [#managed-transactions]
 == Run a managed transaction
-
-You can think of managed transactions as a way of unwrapping the flow of `ExecuteQuery()` and being able to specify its desired behavior in more places.
 
 A transaction can contain any number of queries.
 As Neo4j is <<ACID>> compliant, *queries within a transaction will either be executed as a whole or not at all*: you cannot get a part of the transaction succeeding and another failing.
@@ -77,6 +76,9 @@ Use xref:query-simple#query-parameters[query parameters] instead, both for perfo
 *Transaction functions should never return the result object directly*.
 Instead, always xref:process-result[process the result] in some way.
 Within a transaction function, a `return` statement where `error` is `nil` results in the transaction being committed, while the transaction is automatically rolled back if the returned `error` value is not `nil`.
+
+[CAUTION]
+The methods `.ExecuteRead()` and `.ExecuteWrite()` have replaced `.ReadTransaction()` and `.WriteTransaction()`, which are deprecated in version 5.x and will be removed in version 6.0.
 
 .A transaction with multiple queries, client logic, and potential roll backs
 [source, go]
@@ -230,7 +232,6 @@ func addPersonToOrganization(ctx context.Context, tx neo4j.ManagedTransaction, p
         })
     return err
 }
-
 ----
 
 Should a transaction fail for a reason that the driver deems transient, it automatically retries to run the transaction function (with an exponentially increasing delay).
@@ -261,7 +262,8 @@ if err != nil {
     //     tx.Rollback() to rollback the transaction
 ----
 
-Closing an explicit transaction can either happen automatically upon successful return, or can be explicitly controlled through the methods link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#ExplicitTransaction[`ExplicitTransaction.Commit()`] and  link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#ExplicitTransaction[`ExplicitTransaction.Rollback()`].
+An explicit transaction can be committed with link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#ExplicitTransaction[`ExplicitTransaction.Commit()`] or rolled back with link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#ExplicitTransaction[`ExplicitTransaction.Rollback()`].
+If no explicit action is taken, the driver automatically rolls back the transaction at the end of its lifetime.
 
 Explicit transactions are most useful for applications that need to distribute Cypher execution across multiple functions for the same transaction, or for applications that need to run multiple queries within a single transaction but without the automatic retries provided by managed transactions.
 
@@ -442,7 +444,7 @@ In that case, it also advances the result iterator.
 It exhausts the result, so should only be called when data processing is over.
 |===
 
-For a complete list of `ResultWithContext` methods, see link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#ResultWithContext[API documentation -- ResultWithContext].
+For a complete list of `ResultWithContext` methods, see link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#ResultWithContext[API documentation -> ResultWithContext].
 
 
 == Session configuration
@@ -450,7 +452,7 @@ For a complete list of `ResultWithContext` methods, see link:https://pkg.go.dev/
 === Database selection
 
 It is recommended to *always specify the database explicitly* with the configuration parameter `DatabaseName` upon session creation, even on single-database instances.
-This allows the driver to work more efficiently, as it does not have to resolve the home database first.
+This allows the driver to work more efficiently, as it saves a network round-trip to the server to resolve the home database.
 If no database is given, the link:{neo4j-docs-base-uri}/operations-manual/current/database-administration/#manage-databases-default[default database] set in the Neo4j instance settings is used.
 
 [source, go]
@@ -465,7 +467,7 @@ Do not rely on the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/use/
 
 === Request routing
 
-In a cluster environment, all sessions are opened in write mode, routing them to a writer.
+In a cluster environment, all sessions are opened in write mode, routing them to the leader.
 You can change this by explicitly setting the configuration parameter `AccessMode` to either `neo4j.AccessModeRead` or `neo4j.AccessModeWrite`.
 Note that `.ExecuteRead()` and `.ExecuteWrite()` automatically override the session's default access mode.
 
@@ -482,7 +484,7 @@ session := driver.NewSession(ctx, neo4j.SessionConfig{
 [NOTE]
 ====
 Although executing a _write_ query in read mode likely results in a runtime error, *you should not rely on this for access control.* The difference between the two modes is that _read_ transactions will be routed to any node of a cluster, whereas _write_ ones will be directed to the leader.
-Still, depending on the server version and settings, the server might allow none, some, or all _write_ statements to be executed even in _read_ transactions.
+In other words, there is no guarantee that a write query submitted in read mode will be rejected.
 
 Similar remarks hold for the `.ExecuteRead()` and `.ExecuteWrite()` methods.
 ====
@@ -503,7 +505,7 @@ session := driver.NewSession(ctx, neo4j.SessionConfig{
 })
 ----
 
-When impersonating a user, the query is run within the complete security context of the impersonated user and not the authenticated user (i.e., home database, permissions, etc.).
+When impersonating a user, the query is run within the complete security context of the impersonated user and not the authenticated user (i.e. home database, permissions, etc.).
 
 
 == Transaction configuration
@@ -511,11 +513,11 @@ When impersonating a user, the query is run within the complete security context
 You can exert further control on transactions by providing configuration callbacks to `.ExecuteRead()`, `.ExecuteWrite()`, and `.BeginTransaction()`.
 Use them to specify:
 
-- a transaction timeout (in seconds).
+- A transaction timeout (in seconds).
 Transactions that run longer will be terminated by the server.
 The default value is set on the server side.
 The minimum value is one millisecond.
-- a map of metadata that gets attached to the transaction.
+- A map of metadata that gets attached to the transaction.
 These metadata get logged in the server `query.log`, and are visible in the output of the `SHOW TRANSACTIONS` Cypher command.
 Use this to tag transactions.
 
@@ -543,7 +545,7 @@ When a session is closed, it is returned to the connection pool to be later reus
 ----
 session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
 defer session.Close(ctx)
-// Session usage
+// session usage
 ----
 
 There are corner-cases in which session closure might return an error, so you may want to catch those cases as well.

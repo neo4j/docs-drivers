@@ -25,6 +25,7 @@ public class App {
 
         try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword))) {  // <1>
             driver.verifyConnectivity();  // <2>
+            System.out.println("Connection estabilished.");
         }
     }
 }
@@ -37,10 +38,9 @@ Connection is instead deferred to when the first query is executed.
 Both the creation of a `Driver` object and the connection verification can raise a number of different link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/exceptions/package-summary.html[exceptions].
 Since a connection error is a blocker for any subsequent task, the most common choice is to let the program crash should an exception occur while estabilishing a connection.
 
-**`Driver` objects are immutable, thread-safe, and fairly expensive to create**, so your application should create only one instance.
-You may share them across threads.
+**`Driver` objects are immutable, thread-safe, and expensive to create**, so your application should create only one instance and pass it around (you may share `Driver` instances across threads).
 If you need to query the database through several different users, use xref:query-simple#impersonation[impersonation] without creating a new `Driver` instance.
-If you want to alter a `Driver` configuration, you will need to create a new object.
+If you want to alter a `Driver` configuration, you need to create a new object.
 
 
 == Connect to an Aura instance
@@ -76,6 +76,7 @@ public class App {
 
         try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword))) {
             driver.verifyConnectivity();
+             System.out.println("Connection estabilished.");
         }
     }
 }
