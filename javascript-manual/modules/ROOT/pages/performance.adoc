@@ -50,7 +50,7 @@ You do this by creating a session and using `session.run()` to run as many queri
 ----
 let session = driver.session({database: '<DB NAME>'})
 for(let i=0; i<1000; i++) {
-    session.run("<QUERY>")
+    await session.run("<QUERY>")
 }
 session.close()
 ----
@@ -59,7 +59,7 @@ session.close()
 [source, javascript]
 ----
 for(let i=0; i<1000; i++) {
-    driver.executeQuery("<QUERY>", {}, {database: '<DB NAME>'})
+    await driver.executeQuery("<QUERY>", {}, {database: '<DB NAME>'})
     // or session.executeRead/Write() calls
 }
 ----
