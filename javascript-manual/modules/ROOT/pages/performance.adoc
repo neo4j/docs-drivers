@@ -60,7 +60,7 @@ session.close()
 ----
 for(let i=0; i<1000; i++) {
     driver.executeQuery("<QUERY>", {}, {database: '<DB NAME>'})
-    # or session.executeRead/Write() calls
+    // or session.executeRead/Write() calls
 ----
 
 

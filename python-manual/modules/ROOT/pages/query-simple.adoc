@@ -81,7 +81,7 @@ To create a new relationship, linking it to two already existing node, use a com
 records, summary, keys = driver.execute_query("""
     MATCH (alice:Person {name: $name})  // <1>
     MATCH (bob:Person {name: $friend})  // <2>
-    CREATE (alice)-[:KNOWS]->(bob})  // <3>
+    CREATE (alice)-[:KNOWS]->(bob)  // <3>
     """, name="Alice", friend="Bob",
     database_="neo4j",
 )

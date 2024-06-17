@@ -64,8 +64,7 @@ for i := 0; i < 10000; i++ {
 [source, go]
 ----
 for i := 0; i < 10000; i++ {
-    result, err := neo4j.ExecuteQuery(ctx, driver, "<QUERY>", nil,
-    neo4j.EagerResultTransformer)
+    neo4j.ExecuteQuery(ctx, driver, "<QUERY>", nil, neo4j.EagerResultTransformer)
     // or session.executeRead/Write() calls
 }
 ----

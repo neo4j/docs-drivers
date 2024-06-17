@@ -106,7 +106,7 @@ To create a new relationship, linking it to two already existing node, use a com
 result, err := neo4j.ExecuteQuery(ctx, driver, `
     MATCH (alice:Person {name: $name})  // <1>
     MATCH (bob:Person {name: $friend})  // <2>
-    CREATE (alice)-[:KNOWS]->(bob})  // <3>
+    CREATE (alice)-[:KNOWS]->(bob)  // <3>
     `, map[string]any{
         "name": "Alice",
         "friend": "Bob",

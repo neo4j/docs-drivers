@@ -107,7 +107,7 @@ To create a new relationship, linking it to two already existing node, use a com
 var result = driver.executableQuery("""
     MATCH (alice:Person {name: $name})  // <1>
     MATCH (bob:Person {name: $friend})  // <2>
-    CREATE (alice)-[:KNOWS]->(bob})  // <3>
+    CREATE (alice)-[:KNOWS]->(bob)  // <3>
     """)
     .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
     .withParameters(Map.of("name", "Alice", "friend", "Bob"))
