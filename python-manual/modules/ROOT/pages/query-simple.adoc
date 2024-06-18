@@ -73,14 +73,15 @@ records, summary, keys = driver.execute_query("""
 print(f"Query counters: {summary.counters}.")
 ----
 
-To create new nodes and relationships linking it to an already existing node, use a combination of the Cypher clauses `MATCH` and `CREATE`:
+To create a new relationship, linking it to two already existing node, use a combination of the Cypher clauses `MATCH` and `CREATE`:
 
 .Create a relationship `:KNOWS` between `Alice` and `Bob`
 [source, python]
 ----
 records, summary, keys = driver.execute_query("""
-    MATCH (p:Person {name: $name})  // <1>
-    CREATE (p)-[:KNOWS]->(:Person {name: $friend})  // <2>
+    MATCH (alice:Person {name: $name})  // <1>
+    MATCH (bob:Person {name: $friend})  // <2>
+    CREATE (alice)-[:KNOWS]->(bob)  // <3>
     """, name="Alice", friend="Bob",
     database_="neo4j",
 )
@@ -88,7 +89,8 @@ print(f"Query counters: {summary.counters}.")
 ----
 
 <1> Retrieve the person node named `Alice` and bind it to a variable `alice`
-<2> Create a new `:KNOWS` relationship outgoing from the node bound to `alice` and attach to it a new `Person` node named `Bob`
+<2> Retrieve the person node named `Bob` and bind it to a variable `bob`
+<3> Create a new `:KNOWS` relationship outgoing from the node bound to `alice` and attach to it the `Person` node named `Bob`
 
 
 == Delete from the database
@@ -164,6 +166,7 @@ except Exception as e:
 
 [TIP]
 The driver automatically retries to run a failed query, if the failure is deemed to be transient (for example due to temporary server unavailability).
+An exception will be raised if the operation keeps failing after a number of attempts.
 
 
 == Query configuration

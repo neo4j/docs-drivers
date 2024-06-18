@@ -2,7 +2,8 @@
 
 When xref:query-simple.adoc[querying the database with `executableQuery()`], the driver automatically creates a _transaction_. A transaction is a unit of work that is either _committed_ in its entirety or _rolled back_ on failure. You can include multiple Cypher statements in a single query, as for example when using `MATCH` and `CREATE` in sequence to xref:query-simple#_update_the_database[update the database], but you cannot have multiple queries and interleave some client-logic in between them.
 
-For these more advanced use-cases, the driver provides functions to take full control over the transaction lifecycle. These are called _managed transactions_, and you can think of them as a way of unwrapping the flow of `executableQuery()` and being able to specify its desired behavior in more places.
+For these more advanced use-cases, the driver provides functions to take full control over the transaction lifecycle.
+These are called _managed transactions_, and you can think of them as a way of unwrapping the flow of `executableQuery()` and being able to specify its desired behavior in more places.
 
 
 == Create a session
@@ -37,7 +38,7 @@ As Neo4j is <<ACID>> compliant, *queries within a transaction will either be exe
 Use transactions to group together related queries which work together to achieve a single _logical_ database operation.
 
 A managed transaction is created with the methods link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Session.html#executeRead(org.neo4j.driver.TransactionCallback,org.neo4j.driver.TransactionConfig)[`Session.executeRead()`] and link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Session.html#executeWrite(org.neo4j.driver.TransactionCallback,org.neo4j.driver.TransactionConfig)[`Session.executeWrite()`], depending on whether you want to retrieve data from the database or alter it.
-Both methods take a _transaction function_ callback, which is responsible for actually carrying out the queries and processing the result.
+Both methods take a <<transaction_function>> callback, which is responsible for actually carrying out the queries and processing the result.
 
 .Retrieve people whose name starts with `Al`.
 [source, java]
@@ -437,7 +438,8 @@ var session = driver.session(SessionConfig.builder()
 // .Routing ≠ Access control
 [NOTE]
 ====
-Although executing a _write_ query in read mode likely results in a runtime error, *you should not rely on this for access control.* The difference between the two modes is that _read_ transactions will be routed to any node of a cluster, whereas _write_ ones will be directed to the leader.
+Although executing a _write_ query in read mode likely results in a runtime error, *you should not rely on this for access control.*
+The difference between the two modes is that _read_ transactions are routed to any node of a cluster, whereas _write_ ones are directed to the leader.
 In other words, there is no guarantee that a write query submitted in read mode will be rejected.
 
 Similar remarks hold for the `.executeRead()` and `.executeWrite()` methods.

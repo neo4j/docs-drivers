@@ -96,7 +96,7 @@ In fact, although parameters can be used for literals and expressions as well as
 - labels, so `MATCH (n:$param)` is invalid.
 
 For those queries, you are forced to use string concatenation.
-To protect against Cypher injections you should enclose the dynamic values in backticks and escape them yourself.
+To protect against link:https://neo4j.com/developer/kb/protecting-against-cypher-injection/[Cypher injections], you should enclose the dynamic values in backticks and escape them yourself.
 Notice that Cypher processes Unicode, so take care of the Unicode literal `\u0060` as well.
 
 .Manually escaping dynamic labels before concatenation.

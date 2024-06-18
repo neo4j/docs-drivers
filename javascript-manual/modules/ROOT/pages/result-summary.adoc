@@ -1,4 +1,4 @@
-# Explore the query execution summary
+= Explore the query execution summary
 
 After all results coming from a query have been processed, the server ends the transaction by returning a summary of execution.
 It comes as a link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/result-summary.js~ResultSummary.html[`ResultSummary`] object, and it contains information among which:
@@ -9,7 +9,7 @@ It comes as a link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib
 - Timing information and query request summary
 
 
-## Retrieve the execution summary
+== Retrieve the execution summary
 
 When running queries with xref:query-simple.adoc[`Driver.executeQuery()`], the execution summary is part of the default return object, under the `summary` attribute.
 
@@ -25,6 +25,10 @@ let { records, summary } = await driver.executeQuery(`
 ----
 
 If you are using xref:transactions.adoc[transaction functions], you can retrieve the query execution summary with the attribute `Result.summary` if you used `await` to resolve the result promise, or with the method `Result.summary()` if you consumed the result as a promise.
+
+**Notice that once you ask for the execution summary, the result stream is exhausted**.
+This means that any record which has not yet been processed is discarded.
+
 
 [source, javascript]
 ----
@@ -44,14 +48,9 @@ try {
 ----
 
 
-## Query counters
+== Query counters
 
 The property `ResultSummary.counters` contains counters for the operations that a query triggered (as a link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/result-summary.js~QueryStatistics.html[`QueryStatistics`] object).
-
-There are two additional methods on `ResultSummary.counters` which act as meta-counters:
-
-- `.containsUpdates()` -- whether the query triggered any write operation on the database on which it ran
-- `.containsSystemUpdates()` -- whether the query updated the `system` database
 
 .Insert some data and display the query counters
 [source, javascript, role=nocollapse]
@@ -82,8 +81,13 @@ console.log(summary.counters.containsUpdates())  // true
 console.log(summary.counters.containsSystemUpdates())  // false
 ----
 
+There are two additional methods on `ResultSummary.counters` which act as meta-counters:
 
-## Query execution plan
+- `.containsUpdates()` -- whether the query triggered any write operation on the database on which it ran
+- `.containsSystemUpdates()` -- whether the query updated the `system` database
+
+
+== Query execution plan
 
 If you prefix a query with `EXPLAIN`, the server will return the plan it _would_ use to run the query, but will not actually run it.
 The plan is then available as a link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/result-summary.js~Plan.html[`Plan`] object under the property `ResultSummary.plan`, and contains the list of link:{neo4j-docs-base-uri}/cypher-manual/current/planning-and-tuning/operators/[Cypher operators] that would be used to retrieve the result set.
@@ -145,7 +149,7 @@ Total database accesses: 12, total allocated memory: 184
 For more information and examples, see link:{neo4j-docs-base-uri}/cypher-manual/current/query-tuning/basic-example/#_profile_query[Basic query tuning].
 
 
-## Notifications
+== Notifications
 
 The property `ResultSummary.notifications` contains a list of link:{neo4j-docs-base-uri}/status-codes/current/notifications[notifications coming from the server], if any were raised by the execution of the query.
 These include recommendations for performance improvements, warnings about the usage of deprecated features, and other hints about sub-optimal usage of Neo4j.
@@ -179,13 +183,13 @@ console.log(summary.notifications)
 ----
 
 
-### Filter notifications
+=== Filter notifications
 
 By default, the server analyses each query for all categories and severity of notifications.
 Starting from version 5.7, you can use the parameter `notificationsFilter` to restrict the severity or category of notifications that you are interested into. You may disable notifications altogether by setting the minimum severity to `OFF`.
 You can use that parameter either when creating a `Driver` instance, or when creating a session.
 
-Restricting the amount of notifications the server is allowed to raise can improve performance.
+There is a slight performance gain in restricting the amount of notifications the server is allowed to raise.
 
 .Allow only `WARNING` notifications, but not of `HINT` or `GENERIC` category
 [source, javascript]

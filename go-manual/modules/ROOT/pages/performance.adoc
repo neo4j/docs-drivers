@@ -1,5 +1,6 @@
 = Performance recommendations
 
+[[target-database]]
 == Always specify the target database
 
 *Specify the target database on all queries*, either with the xref:query-simple.adoc#_database_selection[`ExecuteQueryWithDatabase()` configuration callback in `ExecuteQuery()`] or with the xref:transactions.adoc#_database_selection[`DatabaseName` configuration parameter when creating new sessions].
@@ -38,156 +39,38 @@ session := driver.NewSession(ctx, neo4j.SessionConfig{})
 ----
 
 
-== Use `MERGE` for creation only when needed
+[[transactions-cost]]
+== Be aware of the cost of transactions
 
-The Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/merge/[`MERGE`] is convenient for data creation, as it allows to avoid duplicate data when an exact clone of the given pattern exists.
-However, it requires the database to run _two_ queries: it first needs to link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/match/[`MATCH`] the pattern, and only then can it link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/create/[`CREATE`] it.
+When submitting queries through xref:query-simple.adoc[`ExecuteQuery()`] or through xref:transactions.adoc#managed-transactions[`.ExecuteRead/Write()`], the server automatically wraps them into a <<transaction>>.
+This behavior ensures that the database always ends up in a consistent state, regardless of what happens during the execution of a transaction (power outages, software crashes, etc).
 
-If you know already that the data you are inserting is new, avoid using `MERGE` and use `CREATE` instead -- this practically halves the number of database queries.
+Creating a safe execution context around a number of queries yields an overhead that is not present if the driver just shoots queries at the server and hopes they will get through.
+The overhead is small, but can add up as the number of queries increases.
+For this reason, if your use case values throughput more than data integrity, you may extract further performance by running all queries within a single (auto-commit) transaction.
+You do this by creating a session and using `Session.Run()` to run as many queries as needed.
 
-
-== Use query parameters
-
-*Always use xref:query-simple#query-parameters[query parameters]* instead of hardcoding or concatenating values into queries.
-Besides protecting from Cypher injections, this allows to leverage the database query cache.
-
-[discrete]
-=== Good practices
-
-[source, go]
-----
-result, err := neo4j.ExecuteQuery(ctx, driver,
-    "MATCH (p:Person {name: $name}) RETURN p",
-    map[string]any{
-        "name": "Alice",
-    }, neo4j.EagerResultTransformer,
-    neo4j.ExecuteQueryWithDatabase("neo4j"))
-----
-
+.Privilege throughput over data integrity
 [source, go]
 ----
 session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
-session.Run(ctx, "MATCH (p:Person {name: $name}) RETURN p", map[string]any{
-    "name": "Alice",
-})
-----
-
-[discrete]
-=== Bad practices
-
-[source, go]
-----
-result, err := neo4j.ExecuteQuery(ctx, driver,
-    "MATCH (p:Person {name: 'Alice'}) RETURN p",
-    // or "MATCH (p:Person {name: '" + name + "'}) RETURN p"
-    nil, neo4j.EagerResultTransformer,
-    neo4j.ExecuteQueryWithDatabase("neo4j"))
-----
-
-[source, go]
-----
-session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
-session.Run(ctx, "MATCH (p:Person {name: $name}) RETURN p", nil)
-           // or "MATCH (p:Person {name: '" + name + "'}) RETURN p"
-----
-
-
-== Specify node labels
-
-*Specify node labels* in all queries.
-This allows the query planner to work much more efficiently, and to leverage indexes where available.
-To learn how to combine labels, see link:{neo4j-docs-base-uri}/cypher-manual/current/syntax/expressions/#query-syntax-label[Cypher -- Label expressions].
-
-[discrete]
-=== Good practices
-
-[source, go]
-----
-result, err := neo4j.ExecuteQuery(ctx, driver,
-    "MATCH (p:Person|Animal {name: $name}) RETURN p",
-    map[string]any{
-        "name": "Alice",
-    }, neo4j.EagerResultTransformer,
-    neo4j.ExecuteQueryWithDatabase("neo4j"))
-----
-
-[source, go]
-----
-session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
-result, err := session.Run(ctx,
-    "MATCH (p:Person|Animal {name: $name}) RETURN p",
-    map[string]any{
-        "name": "Alice",
-    })
-----
-
-[discrete]
-=== Bad practices
-
-[source, go]
-----
-result, err := neo4j.ExecuteQuery(ctx, driver,
-    "MATCH (p {name: $name}) RETURN p",
-    map[string]any{
-        "name": "Alice",
-    }, neo4j.EagerResultTransformer,
-    neo4j.ExecuteQueryWithDatabase("neo4j"))
-----
-
-[source, go]
-----
-session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
-result, err := session.Run(ctx,
-    "MATCH (p {name: $name}) RETURN p",
-    map[string]any{
-        "name": "Alice",
-    })
-----
-
-
-== Batch data creation
-
-*Batch queries when creating a lot of records* using the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/with/[`WITH`] and link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/unwind/[`UNWIND`] Cypher clauses.
-
-
-[discrete]
-=== Good practice
-
-[source, go]
-----
-numbers := make([]int, 10000)
-for i := range numbers { numbers[i] = i }
-neo4j.ExecuteQuery(ctx, driver, `
-    WITH $numbers AS batch
-    UNWIND batch AS value
-    MERGE (n:Number)
-    SET n.value = value
-    `, map[string]any{
-        "numbers": numbers,
-    }, neo4j.EagerResultTransformer,
-    neo4j.ExecuteQueryWithDatabase("neo4j"))
-----
-
-[discrete]
-=== Bad practice
-
-[source, go]
-----
+defer session.Close(ctx)
 for i := 0; i < 10000; i++ {
-    neo4j.ExecuteQuery(ctx, driver,
-        "MERGE (:Number {value: $value})",
-        map[string]any{
-            "value": i,
-        }, neo4j.EagerResultTransformer,
-        neo4j.ExecuteQueryWithDatabase("neo4j"))
+    session.Run(ctx, "<QUERY>", nil)
 }
 ----
 
-[TIP]
-The most efficient way of performing a _first import_ of large amounts of data into a new database is the link:{neo4j-docs-base-uri}/operations-manual/current/tutorial/neo4j-admin-import/[`neo4j-admin database import`] command.
-// source:  https://community.neo4j.com/t5/neo4j-graph-platform/improving-data-writing-efficiency-in-python/td-p/39520
+.Privilege data integrity over throughput
+[source, go]
+----
+for i := 0; i < 10000; i++ {
+    neo4j.ExecuteQuery(ctx, driver, "<QUERY>", nil, neo4j.EagerResultTransformer)
+    // or session.executeRead/Write() calls
+}
+----
 
 
+[[read-mode]]
 == Route read queries to cluster readers
 
 In a cluster, *route read queries to link:{neo4j-docs-base-uri}/operations-manual/current/clustering/introduction/#clustering-secondary-mode[secondary nodes]*. You do this by:
@@ -210,6 +93,7 @@ result, err := neo4j.ExecuteQuery(ctx, driver,
 [source, go]
 ----
 session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+defer session.Close(ctx)
 result, err := session.ExecuteRead(ctx,
     func(tx neo4j.ManagedTransaction) (any, error) {
         return tx.Run(ctx, "MATCH (p:Person) RETURN p", nil)
@@ -231,6 +115,7 @@ result, err := neo4j.ExecuteQuery(ctx, driver,
 [source, go]
 ----
 session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+defer session.Close(ctx)
 result, err := session.ExecuteWrite(ctx,  // don't ask to write on a read-only operation
     func(tx neo4j.ManagedTransaction) (any, error) {
         return tx.Run(ctx, "MATCH (p:Person) RETURN p", nil)
@@ -238,12 +123,12 @@ result, err := session.ExecuteWrite(ctx,  // don't ask to write on a read-only o
 ----
 
 
+[[indexes]]
 == Create indexes
 
 *Create indexes for properties that you often filter against*.
 For example, if you often look up `Person` nodes by the `name` property, it is beneficial to create an index on `Person.name`.
 You can create indexes with the `CREATE INDEX` Cypher clause, for both nodes and relationships.
-For more information, see link:{neo4j-docs-base-uri}/cypher-manual/current/indexes-for-search-performance/[Indexes for search performance].
 
 [source, go]
 ----
@@ -254,7 +139,10 @@ neo4j.ExecuteQuery(ctx, driver,
     neo4j.ExecuteQueryWithDatabase("neo4j"))
 ----
 
+For more information, see link:{neo4j-docs-base-uri}/cypher-manual/current/indexes-for-search-performance/[Indexes for search performance].
 
+
+[[profile-queries]]
 == Profile queries
 
 link:{neo4j-docs-base-uri}/cypher-manual/current/query-tuning/basic-example/#_profile_query[*Profile your queries*] to locate queries whose performance can be improved.
@@ -326,12 +214,174 @@ Total database accesses: ?
 ----
 
 
+[[node-labels]]
+== Specify node labels
+
+*Specify node labels* in all queries.
+This allows the query planner to work much more efficiently, and to leverage indexes where available.
+To learn how to combine labels, see link:{neo4j-docs-base-uri}/cypher-manual/current/syntax/expressions/#query-syntax-label[Cypher -> Label expressions].
+
+
+[discrete]
+=== Good practices
+
+[source, go]
+----
+result, err := neo4j.ExecuteQuery(ctx, driver,
+    "MATCH (p:Person|Animal {name: $name}) RETURN p",
+    map[string]any{
+        "name": "Alice",
+    }, neo4j.EagerResultTransformer,
+    neo4j.ExecuteQueryWithDatabase("neo4j"))
+----
+
+[source, go]
+----
+session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+defer session.Close(ctx)
+result, err := session.Run(ctx,
+    "MATCH (p:Person|Animal {name: $name}) RETURN p",
+    map[string]any{
+        "name": "Alice",
+    })
+----
+
+
+[discrete]
+=== Bad practices
+
+[source, go]
+----
+result, err := neo4j.ExecuteQuery(ctx, driver,
+    "MATCH (p {name: $name}) RETURN p",
+    map[string]any{
+        "name": "Alice",
+    }, neo4j.EagerResultTransformer,
+    neo4j.ExecuteQueryWithDatabase("neo4j"))
+----
+
+[source, go]
+----
+session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+defer session.Close(ctx)
+result, err := session.Run(ctx,
+    "MATCH (p {name: $name}) RETURN p",
+    map[string]any{
+        "name": "Alice",
+    })
+----
+
+
+[[batch-data-creation]]
+== Batch data creation
+
+*Batch queries when creating a lot of records* using the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/with/[`WITH`] and link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/unwind/[`UNWIND`] Cypher clauses.
+
+
+[discrete]
+=== Good practice
+
+[source, go]
+----
+numbers := make([]int, 10000)
+for i := range numbers { numbers[i] = i }
+neo4j.ExecuteQuery(ctx, driver, `
+    WITH $numbers AS batch
+    UNWIND batch AS value
+    MERGE (n:Number)
+    SET n.value = value
+    `, map[string]any{
+        "numbers": numbers,
+    }, neo4j.EagerResultTransformer,
+    neo4j.ExecuteQueryWithDatabase("neo4j"))
+----
+
+[discrete]
+=== Bad practice
+
+[source, go]
+----
+for i := 0; i < 10000; i++ {
+    neo4j.ExecuteQuery(ctx, driver,
+        "MERGE (:Number {value: $value})",
+        map[string]any{
+            "value": i,
+        }, neo4j.EagerResultTransformer,
+        neo4j.ExecuteQueryWithDatabase("neo4j"))
+}
+----
+
+[TIP]
+The most efficient way of performing a _first import_ of large amounts of data into a new database is the link:{neo4j-docs-base-uri}/operations-manual/current/tutorial/neo4j-admin-import/[`neo4j-admin database import`] command.
+// source:  https://community.neo4j.com/t5/neo4j-graph-platform/improving-data-writing-efficiency-in-python/td-p/39520
+
+
+[[query-parameters]]
+== Use query parameters
+
+*Always use xref:query-simple#query-parameters[query parameters]* instead of hardcoding or concatenating values into queries.
+Besides protecting from Cypher injections, this allows to leverage the database query cache.
+
+[discrete]
+=== Good practices
+
+[source, go]
+----
+result, err := neo4j.ExecuteQuery(ctx, driver,
+    "MATCH (p:Person {name: $name}) RETURN p",
+    map[string]any{
+        "name": "Alice",
+    }, neo4j.EagerResultTransformer,
+    neo4j.ExecuteQueryWithDatabase("neo4j"))
+----
+
+[source, go]
+----
+session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+defer session.Close(ctx)
+session.Run(ctx, "MATCH (p:Person {name: $name}) RETURN p", map[string]any{
+    "name": "Alice",
+})
+----
+
+[discrete]
+=== Bad practices
+
+[source, go]
+----
+result, err := neo4j.ExecuteQuery(ctx, driver,
+    "MATCH (p:Person {name: 'Alice'}) RETURN p",
+    // or "MATCH (p:Person {name: '" + name + "'}) RETURN p"
+    nil, neo4j.EagerResultTransformer,
+    neo4j.ExecuteQueryWithDatabase("neo4j"))
+----
+
+[source, go]
+----
+session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+defer session.Close(ctx)
+session.Run(ctx, "MATCH (p:Person {name: $name}) RETURN p", nil)
+           // or "MATCH (p:Person {name: '" + name + "'}) RETURN p"
+----
+
+
+[[concurrency]]
 == Concurrency
 
 *Use xref:concurrency.adoc[concurrency patterns]*.
 This is likely to be more impactful on performance if you parallelize complex and time-consuming queries in your application, but not so much if you run many simple ones.
 
 
+[[merge]]
+== Use `MERGE` for creation only when needed
+
+The Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/merge/[`MERGE`] is convenient for data creation, as it allows to avoid duplicate data when an exact clone of the given pattern exists.
+However, it requires the database to run _two_ queries: it first needs to link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/match/[`MATCH`] the pattern, and only then can it link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/create/[`CREATE`] it (if needed).
+
+If you know already that the data you are inserting is new, avoid using `MERGE` and use `CREATE` directly instead -- this practically halves the number of database queries.
+
+
+[[filter-notifications]]
 == Filter notifications
 
 xref:result-summary.adoc#_filter_notifications[Filter the category and/or severity of notifications] the server should raise.

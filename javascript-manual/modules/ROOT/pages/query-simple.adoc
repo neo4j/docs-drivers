@@ -1,10 +1,10 @@
 = Query the database
 
-Once you have xref:connect.adoc[connected to the database], you can run queries using <<Cypher>> and the method `Driver.executeQuery()`.
+Once you have xref:connect.adoc[connected to the database], you can run <<Cypher>> queries through the method `Driver.executeQuery()`.
 
 [TIP]
 `Driver.executeQuery()` was introduced with the version 5.8 of the driver. +
-For queries with earlier versions, see xref:transactions.adoc[Run your own transactions].
+For queries with earlier versions, use xref:transactions.adoc[sessions and transactions].
 
 [NOTE]
 ====
@@ -14,13 +14,13 @@ Due to the usage of `async/await`, the examples in this page need to be wrapped 
 
 == Write to the database
 
-To create a node representing a person named `Alice`, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/merge/[`MERGE`]:
+To create a node representing a person named `Alice`, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/create/[`CREATE`]:
 
 .Create a node representing a `Person` named `Alice`
 [source, javascript]
 ----
 let { records, summary } = await driver.executeQuery(
-  'MERGE (p:Person {name: $name})',  // <1>
+  'CREATE (p:Person {name: $name})',  // <1>
    { name: 'Alice' },  // <2>
    { database: 'neo4j' }  // <3>
 )
@@ -30,13 +30,9 @@ console.log(
 )
 ----
 
-<1> specifies the Cypher query.
-<2> is an object of _query parameters_.
-<3> specifies which database the query should be run against.
-
-[NOTE]
-`MERGE` creates a new node matching the requirements unless one already exists, in which case nothing is done.
-For strict node creation, use the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/create/[`CREATE`] clause.
+<1> The Cypher query.
+<2> An object of _query parameters_.
+<3> Which database the query should be run against.
 
 
 == Read from the database
@@ -51,10 +47,14 @@ let { records, summary } = await driver.executeQuery(
   {},
   { database: 'neo4j' }
 )
+
+// Loop through users and do process them
 for(let record of records) {  // <1>
   console.log(`Person with name: ${record.get('name')}`)
   console.log(`Available properties for this node are: ${record.keys}\n`)
 }
+
+// Summary information
 console.log(  // <2>
   `The query \`${summary.query.text}\` ` +
   `returned ${records.length} nodes.\n`
@@ -83,15 +83,15 @@ console.log('Query counters:')
 console.log(summary.counters.updates())
 ----
 
-To create new nodes and relationships linking it to an already existing node, use a combination of the Cypher clauses `MATCH` and `MERGE`:
+To create a new relationship, linking it to two already existing node, use a combination of the Cypher clauses `MATCH` and `CREATE`:
 
-.Create a relationship `KNOWS` between `Alice` and `Bob`
+.Create a relationship `:KNOWS` between `Alice` and `Bob`
 [source, javascript]
 ----
 let { records, summary } = await driver.executeQuery(`
-  MATCH (p:Person WHERE p.name = $name)
-  MERGE (friend:Person {name: $friendName})
-  MERGE (p)-[:KNOWS]->(friend)
+  MATCH (alice:Person {name: $name})  // <1>
+  MATCH (bob:Person {name: $friendName})  // <2>
+  CREATE (alice)-[:KNOWS]->(bob)  // <3>
   `, { name: 'Alice', friendName: 'Bob' },
   { database: 'neo4j' }
 )
@@ -99,14 +99,9 @@ console.log('Query counters:')
 console.log(summary.counters.updates())
 ----
 
-[WARNING]
-====
-It may feel tempting to create new relationships with a single `MERGE` clause, such as: +
-`MERGE (:Person {name: "Alice"})-[:KNOWS]->(:Person {name: "Bob"})`. +
-However, this would result in the creation of an _extra_ `Alice` node, so that you would end up with unintended duplicate records.
-To avoid this, always break out a path creation: `MATCH` (or `MERGE`) the nodes you need, and use the resulting references to `MERGE` the relationship (as shown in the previous example).
-See link:https://neo4j.com/developer/kb/understanding-how-merge-works/[Understanding how MERGE works].
-====
+<1> Retrieve the person node named `Alice` and bind it to a variable `alice`
+<2> Retrieve the person node named `Bob` and bind it to a variable `bob`
+<3> Create a new `:KNOWS` relationship outgoing from the node bound to `alice` and attach to it the `Person` node named `Bob`
 
 
 == Delete from the database
@@ -127,7 +122,7 @@ console.log(summary.counters.updates())
 
 
 [#query-parameters]
-== How to pass parameters to queries
+== Query parameters
 
 *Do not hardcode or concatenate parameters directly into queries*.
 Instead, always use placeholders and specify the link:{neo4j-docs-base-uri}/cypher-manual/current/syntax/parameters/[Cypher parameters] as keyword arguments or in a dictionary, as shown in the previous examples.
@@ -138,7 +133,7 @@ This is for:
 
 [NOTE]
 There can be circumstances where your query structure prevents the usage of parameters in all its parts.
-For those advanced use cases, see xref:query-advanced#_dynamic_values_in_property_keys_relationship_types_and_labels[Dynamic values in property keys, relationship types, and labels].
+For those rare use cases, see xref:query-advanced#_dynamic_values_in_property_keys_relationship_types_and_labels[Dynamic values in property keys, relationship types, and labels].
 
 
 == Error handling
@@ -158,6 +153,7 @@ try {
 
 [TIP]
 The driver automatically retries to run a failed query, if the failure is deemed to be transient (for example due to temporary server unavailability).
+An exception will be raised if the operation keeps failing after a number of attempts.
 
 
 == Query configuration
@@ -168,7 +164,7 @@ You can supply a link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/
 === Database selection
 
 It is recommended to *always specify the database explicitly* with the `database` parameter, even on single-database instances.
-This allows the driver to work more efficiently, as it does not have to resolve the home database first.
+This allows the driver to work more efficiently, as it saves a network round-trip to the server to resolve the home database.
 If no database is given, the link:{neo4j-docs-base-uri}/operations-manual/current/database-administration/#manage-databases-default[user's home database] is used.
 
 [source, javascript]
@@ -182,7 +178,11 @@ await driver.executeQuery(
 )
 ----
 
-Do not rely on the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/use/[`USE`] Cypher clause for database selection with the driver.
+
+[TIP]
+Specifying the database through the configuration parameter is preferred over the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/use/[`USE`] Cypher clause.
+If the server runs on a cluster, queries with `USE` require server-side routing to be enabled.
+Queries may also take longer to execute as they may not reach the right cluster member at the first attempt, and need to be routed to one containing the requested database.
 
 
 === Request routing
@@ -202,7 +202,11 @@ await driver.executeQuery(
 )
 ----
 
-Routing a _write_ query to `READ` nodes will likely result in a runtime error, but xref:transactions#access-control-note[do not rely on this for security purposes].
+[NOTE]
+====
+Although executing a _write_ query in read mode likely results in a runtime error, *you should not rely on this for access control.* The difference between the two modes is that _read_ transactions will be routed to any node of a cluster, whereas _write_ ones will be directed to the leader.
+In other words, there is no guarantee that a write query submitted in read mode will be rejected.
+====
 
 
 [#impersonation]
@@ -224,7 +228,7 @@ await driver.executeQuery(
 )
 ----
 
-When impersonating a user, the query is run within the complete security context of the impersonated user and not the authenticated user (i.e., home database, permissions, etc.).
+When impersonating a user, the query is run within the complete security context of the impersonated user and not the authenticated user (i.e. home database, permissions, etc.).
 
 
 == A full example

@@ -471,7 +471,7 @@ All errors raised by the driver are of type link:{neo4j-docs-base-uri}/api/javas
 For a list of errors the server can return, see the link:{neo4j-docs-base-uri}/status-codes/current/[Status code] page.
 
 Some server errors are marked as safe to retry without need to alter the original request.
-Examples of such errors are deadlocks and memory issues.
+Examples of such errors are deadlocks, memory issues, or connectivity issues.
 All driver's exception types implement the method `.isRetryable()`, which gives insights into whether a further attempt might be successful.
 This is particular useful when running queries in xref:transactions#explicit-transactions[explicit transactions], to know if a failed query should be run again.
 

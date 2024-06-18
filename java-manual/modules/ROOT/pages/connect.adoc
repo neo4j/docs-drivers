@@ -25,6 +25,7 @@ public class App {
 
         try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword))) {  // <1>
             driver.verifyConnectivity();  // <2>
+            System.out.println("Connection estabilished.");
         }
     }
 }
@@ -37,10 +38,9 @@ Connection is instead deferred to when the first query is executed.
 Both the creation of a `Driver` object and the connection verification can raise a number of different link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/exceptions/package-summary.html[exceptions].
 Since a connection error is a blocker for any subsequent task, the most common choice is to let the program crash should an exception occur while estabilishing a connection.
 
-`Driver` objects are _immutable_, _thread-safe_, and fairly _expensive to create_.
-You may share them across threads.
+**`Driver` objects are immutable, thread-safe, and expensive to create**, so your application should create only one instance and pass it around (you may share `Driver` instances across threads).
 If you need to query the database through several different users, use xref:query-simple#impersonation[impersonation] without creating a new `Driver` instance.
-If you want to alter a `Driver` configuration, you will need to create a new object.
+If you want to alter a `Driver` configuration, you need to create a new object.
 
 
 == Connect to an Aura instance
@@ -48,7 +48,7 @@ If you want to alter a `Driver` configuration, you will need to create a new obj
 When you create an <<Aura>> instance, you may download a text file (a so-called _Dotenv file_) containing the connection information to the database in the form of environment variables.
 The file has a name of the form `Neo4j-a0a2fa1d-Created-2023-11-06.txt`.
 
-You can either  manually extract the URI and the credentials from that file, or use a third party-module to load them.
+You can either manually extract the URI and the credentials from that file, or use a third party-module to load them.
 We recommend the module link:https://github.com/cdimascio/dotenv-java/[`dotenv-java`] for that purpose.
 
 .Using `dotenv-java` to extract credentials from a Dotenv file
@@ -76,6 +76,7 @@ public class App {
 
         try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword))) {
             driver.verifyConnectivity();
+             System.out.println("Connection estabilished.");
         }
     }
 }

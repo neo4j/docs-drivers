@@ -149,6 +149,14 @@ Unless you created them using the `with` statement, call the `.close()` method o
 
 [source, python]
 ----
+from neo4j import GraphDatabase
+
+
+driver = GraphDatabase.driver(URI, auth=AUTH)
+session = driver.session(database="neo4j")
+
+# session/driver usage
+
 session.close()
 driver.close()
 ----

@@ -44,18 +44,18 @@ Connection is instead deferred to when the first query is executed.
 
 Both the creation of a `Driver` object and the connection verification can raise exceptions, so error catching should include both.
 
-`Driver` objects are _immutable_, _thread-safe_, and fairly _expensive to create_.
-Share them across threads (but not across processes) and use xref:transactions#impersonation[impersonation] to query the database with a different user.
-If you want to alter a `Driver` configuration, you will need to create a new object.
+**`Driver` objects are immutable, thread-safe, and expensive to create**, so your application should create only one instance and pass it around (you may share `Driver` instances across threads).
+If you need to query the database through several different users, use xref:query-simple#impersonation[impersonation] without creating a new `Driver` instance.
+If you want to alter a `Driver` configuration, you need to create a new object.
 
 
 == Connect to an Aura instance
 
-When you create an <<Aura>> instance, you may download a text file containing the connection information to the database.
+When you create an <<Aura>> instance, you may download a text file (a so-called _Dotenv file_) containing the connection information to the database in the form of environment variables.
 The file has a name of the form `Neo4j-a0a2fa1d-Created-2023-11-06.txt`.
 
-To connect to such an instance, you may either use the URI, username, and password explicitly in your application, or load the content of the connection file in the environment with `dotenv.config()` and populate your local variables via `process.env.<NAME>`.
-This approach requires the package link:https://www.npmjs.com/package/dotenv[`dotenv`].
+You can either manually extract the URI and the credentials from that file, or use a third party-module to load them.
+We recommend the module link:https://github.com/cdimascio/dotenv-java/[`dotenv-java`] for that purpose.
 
 [source, javascript, role=nocollapse]
 ----
@@ -87,6 +87,15 @@ This approach requires the package link:https://www.npmjs.com/package/dotenv[`do
   await driver.close()
 })();
 ----
+
+[TIP]
+An Aura instance is not conceptually different from any other Neo4j instance, as Aura is simply a _deployment mode_ for Neo4j.
+When interacting with a Neo4j database through the driver, it doesn't make a difference whether it is an Aura instance it is working with or a different deployment.
+
+
+== Close connections
+
+Always close `Driver` objects via `Driver.close()` to free up all allocated resources, even upon unsuccessful connection or runtime errors.
 
 
 == Further connection parameters

@@ -1,8 +1,11 @@
 = Run your own transactions
 
-When xref:query-simple.adoc[querying the database with `execute_query()`], the driver automatically creates a _transaction_. A transaction is a unit of work that is either _committed_ in its entirety or _rolled back_ on failure. You can include multiple Cypher statements in a single query, as for example when using `MATCH` and `CREATE` in sequence to xref:query-simple#_update_the_database[update the database], but you cannot have multiple queries and interleave some client-logic in between them.
+When xref:query-simple.adoc[querying the database with `execute_query()`], the driver automatically creates a _transaction_.
+A transaction is a unit of work that is either _committed_ in its entirety or _rolled back_ on failure.
+You can include multiple Cypher statements in a single query, as for example when using `MATCH` and `CREATE` in sequence to xref:query-simple#_update_the_database[update the database], but you cannot have multiple queries and interleave some client-logic in between them.
 
-For these more advanced use-cases, the driver provides functions to take full control over the transaction lifecycle. These are called _managed transactions_, and you can think of them as a way of unwrapping the flow of `execute_query()` and being able to specify its desired behavior in more places.
+For these more advanced use-cases, the driver provides functions to take full control over the transaction lifecycle.
+These are called _managed transactions_, and you can think of them as a way of unwrapping the flow of `execute_query()` and being able to specify its desired behavior in more places.
 
 
 == Create a session
@@ -352,7 +355,7 @@ For a complete list of `Result` methods, see link:{neo4j-docs-base-uri}/api/pyth
 
 === Database selection
 
-It is recommended to *always specify the database explicitly* with the `database` parameter, even on single-database instances.
+You should *always specify the database explicitly* with the `database` parameter, even on single-database instances.
 This allows the driver to work more efficiently, as it saves a network round-trip to the server to resolve the home database.
 If no database is given, the link:{neo4j-docs-base-uri}/operations-manual/current/database-administration/#manage-databases-default[default database] set in the Neo4j instance settings is used.
 
@@ -391,7 +394,8 @@ with driver.session(
 // .Routing ≠ Access control
 [NOTE]
 ====
-Although executing a _write_ query in read mode likely results in a runtime error, *you should not rely on this for access control.* The difference between the two modes is that _read_ transactions will be routed to any node of a cluster, whereas _write_ ones will be directed to the leader.
+Although executing a _write_ query in read mode likely results in a runtime error, *you should not rely on this for access control.*
+The difference between the two modes is that _read_ transactions are routed to any node of a cluster, whereas _write_ ones are directed to the leader.
 In other words, there is no guarantee that a write query submitted in read mode will be rejected.
 
 Similar remarks hold for the `.executeRead()` and `.executeWrite()` methods.

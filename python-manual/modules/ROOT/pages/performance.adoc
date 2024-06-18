@@ -40,8 +40,8 @@ driver.session()
 When submitting queries through xref:query-simple.adoc[`.execute_query()`] or through xref:transactions.adoc#managed-transactions[`.execute_read/write()`], the server automatically wraps them into a <<transaction>>.
 This behavior ensures that the database always ends up in a consistent state, regardless of what happens during the execution of a transaction (power outages, software crashes, etc).
 
-Creating a safe execution context around a number of queries obviously yields an overhead that is not present if the driver just shoots queries at the server and hopes they will get through.
-The overhead is small, but can pile up as the number of queries increases.
+Creating a safe execution context around a number of queries yields an overhead that is not present if the driver just shoots queries at the server and hopes they will get through.
+The overhead is small, but can add up as the number of queries increases.
 For this reason, if your use case values throughput more than data integrity, you may extract further performance by running all queries within a single (auto-commit) transaction.
 You do this by creating a session and using `session.run()` to run as many queries as needed.
 
