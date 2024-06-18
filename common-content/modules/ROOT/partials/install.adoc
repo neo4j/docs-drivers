@@ -18,7 +18,6 @@ docker run \
 ----
 
 Alternatively, you can obtain a free *cloud instance* through <<Aura>>.
-Take a note of the connection URI and of the login credentials.
 
 You can also link:https://neo4j.com/download-center/#community[install Neo4j on your system], or use link:https://neo4j.com/download-center/#desktop[Neo4j Desktop] to create a local development environment (not for production).
 
