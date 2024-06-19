@@ -70,6 +70,180 @@ for i := 0; i < 10000; i++ {
 ----
 
 
+[[lazy-eager-loading]]
+== Don't fetch large result sets all at once
+
+When submitting queries that may result in a lot of records, don't retrieve them all at once.
+The Neo4j server can retrieve records in batches and stream the to the driver as they become available.
+Lazy-loading a result spreads out network traffic and memory usage.
+
+For convenience, xref:query-simple.adoc[`.ExecuteQuery()`] always retrieves all result records at once (it is what the `Eager` in `EagerResult` stands for).
+To lazy-load a result, you have to use xref:transactions.adoc#managed-transactions[`.ExecuteRead/Write()`] (or other forms of manually-handled xref:transactions.adoc[transactions]) and *not* call `.Collect(ctx)` on the result; iterate on it instead.
+
+.Comparison between eager and lazy loading
+====
+
+[cols="1a,1a", options="header"]
+|===
+|Eager loading
+|Lazy loading
+
+|
+- The server has to read all 250 records from the storage before it can send even the first one the driver (i.e. it takes more time for the client to receive the first record).
+- Before any record is available to the application, the driver has to receive all 250 records.
+- The client has to hold in memory all 250 records.
+
+|
+- The server reads the first record and sends it to the driver.
+- The application can process records as soon as the first record is transferred.
+- Waiting time and resource consumption (both client- and server-side) for the remaining records is deferred to when the application requests more records.
+- Resource consumption is bounded.
+
+|===
+
+.Time and memory comparison between eager and lazy loading
+[source, go]
+----
+package main
+
+import (
+    "context"
+    "time"
+    "fmt"
+    "github.com/neo4j/neo4j-go-driver/v5/neo4j"
+)
+
+// Returns 250 records, each with properties
+// - `output` (an expensive computation, to slow down retrieval)
+// - `dummyData` (a list of 10000 ints, about 8 KB).
+var slowQuery = `
+UNWIND range(1, 250) AS s
+RETURN reduce(s=s, x in range(1,1000000) | s + sin(toFloat(x))+cos(toFloat(x))) AS output,
+range(1, 10000) AS dummyData
+`
+// Delay for each processed record
+var sleepTime = "0.5s"
+
+func main() {
+    ctx := context.Background()
+    dbUri := "<URI for Neo4j database>"
+    dbUser := "<Username>"
+    dbPassword := "<Password>"
+    driver, err := neo4j.NewDriverWithContext(
+        dbUri,
+        neo4j.BasicAuth(dbUser, dbPassword, ""))
+    if err != nil {
+        panic(err)
+    }
+    defer driver.Close(ctx)
+
+    err = driver.VerifyConnectivity(ctx)
+    if err != nil {
+        panic(err)
+    }
+
+    log("LAZY LOADING (executeRead)")
+    lazyLoading(ctx, driver)
+
+    log("EAGER LOADING (executeQuery)")
+    eagerLoading(ctx, driver)
+}
+
+func lazyLoading(ctx context.Context, driver neo4j.DriverWithContext) {
+    defer timer("lazyLoading")()
+
+    sleepTimeParsed, err := time.ParseDuration(sleepTime)
+    if err != nil {
+        panic(err)
+    }
+
+    session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+    defer session.Close(ctx)
+    session.ExecuteRead(ctx,
+        func(tx neo4j.ManagedTransaction) (any, error) {
+            log("Submit query")
+            result, err := tx.Run(ctx, slowQuery, nil)
+            if err != nil {
+                return nil, err
+            }
+            for result.Next(ctx) != false {
+                record := result.Record()
+                output, _ := record.Get("output")
+                log(fmt.Sprintf("Processing record %v", output))
+                time.Sleep(sleepTimeParsed)  // proxy for some expensive operation
+            }
+            return nil, nil
+        })
+}
+
+func eagerLoading(ctx context.Context, driver neo4j.DriverWithContext) {
+    defer timer("eagerLoading")()
+
+    log("Submit query")
+    result, err := neo4j.ExecuteQuery(ctx, driver,
+        slowQuery,
+        nil,
+        neo4j.EagerResultTransformer,
+        neo4j.ExecuteQueryWithDatabase("neo4j"))
+    if err != nil {
+        panic(err)
+    }
+
+    sleepTimeParsed, err := time.ParseDuration(sleepTime)
+    if err != nil {
+        panic(err)
+    }
+
+    // Loop through results and do something with them
+    for _, record := range result.Records {
+        output, _ := record.Get("output")
+        log(fmt.Sprintf("Processing record %v", output))
+        time.Sleep(sleepTimeParsed)  // proxy for some expensive operation
+    }
+}
+
+func log(msg string) {
+    fmt.Println("[", time.Now().Unix(), "] ", msg)
+}
+
+func timer(name string) func() {
+    start := time.Now()
+    return func() {
+        fmt.Printf("-- %s took %v --\n\n", name, time.Since(start))
+    }
+}
+----
+
+.Output
+[source, output, role=nocollapse]
+----
+[ 1718802595 ]  LAZY LOADING (executeRead)
+[ 1718802595 ]  Submit query
+[ 1718802595 ]  Processing record 0.5309371354666308  // <1>
+[ 1718802595 ]  Processing record 1.5309371354662915
+[ 1718802596 ]  Processing record 2.5309371354663197
+...
+[ 1718802720 ]  Processing record 249.53093713547042
+-- lazyLoading took 2m5.467064085s --
+
+[ 1718802720 ]  EAGER LOADING (executeQuery)
+[ 1718802720 ]  Submit query
+[ 1718802744 ]  Processing record 0.5309371354666308  // <2>
+[ 1718802744 ]  Processing record 1.5309371354662915
+[ 1718802745 ]  Processing record 2.5309371354663197
+...
+[ 1718802869 ]  Processing record 249.53093713547042
+-- eagerLoading took 2m29.113482541s --  // <3>
+----
+
+<1> With lazy loading, the first record is available almost instantly (i.e. as soon as the server has retrieved it).
+<2> With eager loading, the first record is available ~25 seconds after the query has been submitted (i.e. after the server has retrieved all 250 records).
+<3> The total running time is lower with lazy loading, because while the client processes records the server can fetch the next one.
+With lazy loading, the client could also stop requesting records after some condition is met, saving time and resources.
+
+====
+
+
 [[read-mode]]
 == Route read queries to cluster readers
 
