@@ -96,8 +96,9 @@ To lazy-load a result, you have to use xref:transactions.adoc#managed-transactio
 |
 - The server reads the first record and sends it to the driver.
 - The application can process records as soon as the first record is transferred.
-- Waiting time and resource consumption (both client- and server-side) for the remaining records is deferred to when the application requests more records.
-- Resource consumption is bounded.
+- Waiting time and resource consumption for the remaining records is deferred to when the application requests more records.
+- The server's fetch time can be used for client-side processing.
+- Resource consumption is bounded by the driver's fetch size.
 
 |===
 
@@ -238,11 +239,23 @@ func timer(name string) func() {
 
 <1> With lazy loading, the first record is available almost instantly (i.e. as soon as the server has retrieved it).
 <2> With eager loading, the first record is available ~25 seconds after the query has been submitted (i.e. after the server has retrieved all 250 records).
-<3> The total running time is lower with lazy loading, because while the client processes records the server can fetch the next one.
-With lazy loading, the client could also stop requesting records after some condition is met, saving time and resources.
+<3> The total running time is lower with lazy loading, because while the client processes records the server can fetch the next ones.
+With lazy loading, the client could also stop requesting records after some condition is met (by calling `.Consume(ctx)` on the `Result`), saving time and resources.
 
 ====
 
+[TIP]
+====
+The driver's link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#SessionConfig[fetch size] affects the behavior of lazy loading.
+It instructs the server to stream an amount of records equal to the fetch size, and then wait until the client has caught up before retrieving and sending more.
+
+The fetch size allows to bound memory consumption on the client side.
+It doesn't always bound memory consumption on the server side though: that depends on the query.
+For example, a query with link:https://neo4j.com/docs/cypher-manual/current/clauses/order-by/[`ORDER BY`] requires the whole result set to be loaded into memory for sorting, before records can be streamed to the client.
+
+The lower the fetch size, the more messages client and server have to exchange.
+Especially if the server's latency is high, a low fetch size may deteriorate performance.
+====
 
 [[read-mode]]
 == Route read queries to cluster readers

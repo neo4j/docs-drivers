@@ -66,32 +66,30 @@ for i in range(1000):
 == Don't fetch large result sets all at once
 
 When submitting queries that may result in a lot of records, don't retrieve them all at once.
-The Neo4j server can retrieve records in batches, and the driver can receive one batch and _wait_ until it has been processed by the application before receiving another batch from the server.
-Lazy-loading a result spreads out network traffic and memory usage.
+The Neo4j server can retrieve records in batches and stream them to the driver as they become available.
+Lazy-loading a result spreads out network traffic and memory usage (both client- and server-side).
 
 For convenience, xref:query-simple.adoc[`.execute_query()`] always retrieves all result records at once (it is what the `Eager` in `EagerResult` stands for).
 To lazy-load a result, you have to use xref:transactions.adoc#managed-transactions[`.execute_read/write()`] (or other forms of manually-handled xref:transactions.adoc[transactions]) and *not* cast the `Result` object to `list` when processing the result; iterate on it instead.
 
 .Comparison between eager and lazy loading
 ====
-Consider a query that results in 250 result records, and that the driver's link:https://neo4j.com/docs/api/python-driver/current/api.html#fetch-size-ref[batch size] is set to 100 (default is 1000).
 [cols="1a,1a", options="header"]
 |===
 |Eager loading
 |Lazy loading
 
 |
-- The server has to read all 250 records from the storage before it can send even the first one the driver (i.e. it takes more time for the client to receive the first record).
+- The server has to read all 250 records from the storage before it can send even the first one to the driver (i.e. it takes more time for the client to receive the first record).
 - Before any record is available to the application, the driver has to receive all 250 records.
 - The client has to hold in memory all 250 records.
 
 |
-- The server reads the first 100 records and sends them to the driver.
-- The application can process records as soon as the first batch is transferred.
-- When the first batch has been processed, the server reads another batch and delivers it to the driver.
-Further records are delivered in further batches.
-- Waiting time and resource consumption (both client- and server-side) for the remaining records is deferred to when the application requests more records.
-- Resource consumption is bounded by at most 100 records.
+- The server reads the first record and sends it to the driver.
+- The application can process records as soon as the first record is transferred.
+- Waiting time and resource consumption for the remaining records is deferred to when the application requests more records.
+- The server's fetch time can be used for client-side processing.
+- Resource consumption is bounded by the driver's fetch size.
 
 |===
 
@@ -174,45 +172,46 @@ if __name__ == '__main__':
 .Output
 [source, output, role=nocollapse]
 ----
-[1718014246.64] LAZY LOADING (execute_read)
-[1718014246.64] Submit query
+[1718014256.98] LAZY LOADING (execute_read)
+[1718014256.98] Submit query
 [1718014256.21] Processing record 0  // <1>
 [1718014256.71] Processing record 1
+[1718014257.21] Processing record 2
 ...
-[1718014305.33] Processing record 98
-[1718014305.84] Processing record 99
-[1718014315.95] Processing record 100  // <2>
-[1718014316.45] Processing record 101
-...
-[1718014394.92] Processing record 248
 [1718014395.42] Processing record 249
-[1718014395.92] Peak memory usage: 37694 bytes
-[1718014395.92] --- 149.2824890613556 seconds ---
+[1718014395.92] Peak memory usage: 786254 bytes
+[1719984711.39] --- 135.9284942150116 seconds ---
 
 [1718014395.92] EAGER LOADING (execute_query)
 [1718014395.92] Submit query
-[1718014419.82] Processing record 0  // <3>
+[1718014419.82] Processing record 0  // <2>
 [1718014420.33] Processing record 1
+[1718014420.83] Processing record 2
 ...
-[1718014468.9] Processing record 98
-[1718014469.4] Processing record 99
-[1718014469.9] Processing record 100  // <4>
-[1718014470.4] Processing record 101
-...
-[1718014544.02] Processing record 248
 [1718014544.52] Processing record 249
-[1718014545.02] Peak memory usage: 80222 bytes  // <5>
-[1718014545.02] --- 149.10213112831116 seconds ---  // <6>
+[1718014545.02] Peak memory usage: 89587150 bytes  // <3>
+[1719984861.09] --- 149.70468592643738 seconds ---  // <4>
 ----
 
-<1> With lazy loading, the first record is available ~10 seconds after the query is submitted (i.e. as soon as the server has retrieved the first batch of 100 records).
-<2> It takes about the same time to receive the second batch as it took for the first batch (similar for subsequent batches).
-<3> With eager loading, the first record is available ~25 seconds after the query has been submitted submitted (i.e. after the server has retrieved all 250 records).
-<4> There's no delay in between batches: the processing time between any two records is the same.
-<5> Memory usage is larger with eager loading than with lazy loading, because the application materializes a list of 250 records (while in lazy loading it's never more than 100).
-<6> The total running time is practically the same, but lazy loading spreads that out across batches whereas eager loading has one longer waiting period.
-With lazy loading, the client could also stop requesting records after some condition is met, saving time and resources.
+<1> With lazy loading, the first record is available almost instantly (i.e. as soon as the server has retrieved it).
+<2> With eager loading, the first record is available ~25 seconds after the query has been submitted (i.e. after the server has retrieved all 250 records).
+<3> Memory usage is larger with eager loading than with lazy loading, because the application materializes a list of 250 records.
+<4> The total running time is lower with lazy loading, because while the client processes records the server can fetch the next ones.
+With lazy loading, the client could also stop requesting records after some condition is met (by calling `.consume()` on the `Result`), saving time and resources.
 
+====
+
+[TIP]
+====
+The driver's link:https://neo4j.com/docs/api/python-driver/current/api.html#fetch-size-ref[fetch size] affects the behavior of lazy loading.
+It instructs the server to stream an amount of records equal to the fetch size, and then wait until the client has caught up before retrieving and sending more.
+
+The fetch size allows to bound memory consumption on the client side.
+It doesn't always bound memory consumption on the server side though: that depends on the query.
+For example, a query with link:https://neo4j.com/docs/cypher-manual/current/clauses/order-by/[`ORDER BY`] requires the whole result set to be loaded into memory for sorting, before records can be streamed to the client.
+
+The lower the fetch size, the more messages client and server have to exchange.
+Especially if the server's latency is high, a low fetch size may deteriorate performance.
 ====
 
 
