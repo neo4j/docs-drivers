@@ -237,7 +237,7 @@ func timer(name string) func() {
 -- eagerLoading took 2m29.113482541s --  // <3>
 ----
 
-<1> With lazy loading, the first record is available almost instantly (i.e. as soon as the server has retrieved it).
+<1> With lazy loading, the first record is quickly available.
 <2> With eager loading, the first record is available ~25 seconds after the query has been submitted (i.e. after the server has retrieved all 250 records).
 <3> The total running time is lower with lazy loading, because while the client processes records the server can fetch the next ones.
 With lazy loading, the client could also stop requesting records after some condition is met (by calling `.Consume(ctx)` on the `Result`), saving time and resources.
