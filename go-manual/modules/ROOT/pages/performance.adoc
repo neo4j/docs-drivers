@@ -89,7 +89,7 @@ To lazy-load a result, you have to use xref:transactions.adoc#managed-transactio
 |Lazy loading
 
 |
-- The server has to read all 250 records from the storage before it can send even the first one the driver (i.e. it takes more time for the client to receive the first record).
+- The server has to read all 250 records from the storage before it can send even the first one to the driver (i.e. it takes more time for the client to receive the first record).
 - Before any record is available to the application, the driver has to receive all 250 records.
 - The client has to hold in memory all 250 records.
 
