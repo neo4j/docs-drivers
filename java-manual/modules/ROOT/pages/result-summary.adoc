@@ -21,7 +21,7 @@ var result = driver.executableQuery("""
     """)
     .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
     .execute();
-var resultSummary = result.summary();  // mark-line
+var resultSummary = result.summary();
 ----
 
 If you are using xref:transactions.adoc[transaction functions], you can retrieve the query execution summary with the method `Result.consume()`.
@@ -36,7 +36,7 @@ try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").
         UNWIND ['Alice', 'Bob'] AS name
         MERGE (p:Person {name: name})
         """);
-        return result.consume();  // mark-line
+        return result.consume();
     });
 }
 ----
@@ -55,7 +55,7 @@ var result = driver.executableQuery("""
     """).withParameters(Map.of("name", "Mark", "friend", "Bob"))
     .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
     .execute();
-var queryCounters = result.summary().counters();  // mark-line
+var queryCounters = result.summary().counters();
 System.out.println(queryCounters);
 
 /*
@@ -83,7 +83,7 @@ var result = driver.executableQuery("EXPLAIN MATCH (p {name: $name}) RETURN p")
     .withParameters(Map.of("name", "Alice"))
     .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
     .execute();
-var queryPlan = result.summary().plan().arguments().get("string-representation");  // mark-line
+var queryPlan = result.summary().plan().arguments().get("string-representation");
 System.out.println(queryPlan);
 
 /*
@@ -117,7 +117,7 @@ var result = driver.executableQuery("PROFILE MATCH (p {name: $name}) RETURN p")
     .withParameters(Map.of("name", "Alice"))
     .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
     .execute();
-var queryPlan = result.summary().profile().arguments().get("string-representation");  // mark-line
+var queryPlan = result.summary().profile().arguments().get("string-representation");
 System.out.println(queryPlan);
 
 /*
@@ -159,7 +159,7 @@ var result = driver.executableQuery("""
     .withParameters(Map.of("start", "Alice", "end", "Bob"))
     .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
     .execute();
-var notifications = result.summary().notifications();  // mark-line
+var notifications = result.summary().notifications();
 System.out.println(notifications);
 
 /*
@@ -201,9 +201,9 @@ You can call `.withNotificationConfig()` both on a `Config` object when creating
 var driver = GraphDatabase.driver(
     dbUri, AuthTokens.basic(dbUser, dbPassword),
     Config.builder()
-    .withNotificationConfig(NotificationConfig.defaultConfig()  // mark-line
-        .enableMinimumSeverity(NotificationSeverity.WARNING)  // mark-line
-        .disableCategories(Set.of(NotificationCategory.HINT, NotificationCategory.GENERIC))  // mark-line
+    .withNotificationConfig(NotificationConfig.defaultConfig()
+        .enableMinimumSeverity(NotificationSeverity.WARNING)
+        .disableCategories(Set.of(NotificationCategory.HINT, NotificationCategory.GENERIC))
     ).build()
 );
 
@@ -211,9 +211,9 @@ var driver = GraphDatabase.driver(
 var session = driver.session(
     SessionConfig.builder()
     .withDatabase("neo4j")
-    .withNotificationConfig(NotificationConfig.defaultConfig()  // mark-line
-        .enableMinimumSeverity(NotificationSeverity.WARNING)  // mark-line
-        .disableCategories(Set.of(NotificationCategory.HINT, NotificationCategory.GENERIC))  // mark-line
+    .withNotificationConfig(NotificationConfig.defaultConfig()
+        .enableMinimumSeverity(NotificationSeverity.WARNING)
+        .disableCategories(Set.of(NotificationCategory.HINT, NotificationCategory.GENERIC))
     ).build()
 );
 ----
@@ -229,7 +229,7 @@ var session = driver.session(
 var driver = GraphDatabase.driver(
     dbUri, AuthTokens.basic(dbUser, dbPassword),
     Config.builder()
-    .withNotificationConfig(NotificationConfig.disableAllConfig())  // mark-line
+    .withNotificationConfig(NotificationConfig.disableAllConfig())
     .build()
 );
 
@@ -237,7 +237,7 @@ var driver = GraphDatabase.driver(
 var session = driver.session(
     SessionConfig.builder()
     .withDatabase("neo4j")
-    .withNotificationConfig(NotificationConfig.disableAllConfig())  // mark-line
+    .withNotificationConfig(NotificationConfig.disableAllConfig())
     .build()
 );
 ----

@@ -184,7 +184,7 @@ If no database is given, the link:{neo4j-docs-base-uri}/operations-manual/curren
 ----
 driver.execute_query(
     "MATCH (p:Person) RETURN p.name",
-    database_="neo4j",  # mark-line
+    database_="neo4j",
 )
 ----
 
@@ -203,7 +203,7 @@ To improve performance on read queries, you can use the argument `routing_="r"` 
 ----
 driver.execute_query(
     "MATCH (p:Person) RETURN p.name",
-    routing_="r",  # short for neo4j.RoutingControl.READ  # mark-line
+    routing_="r",  # short for neo4j.RoutingControl.READ
     database_="neo4j",
 )
 ----
@@ -226,7 +226,7 @@ Impersonating a user is cheaper than creating a new `Driver` object.
 ----
 driver.execute_query(
     "MATCH (p:Person) RETURN p.name",
-    impersonated_user_="somebody_else",  # mark-line
+    impersonated_user_="somebody_else",
     database_="neo4j",
 )
 ----

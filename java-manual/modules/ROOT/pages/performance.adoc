@@ -87,7 +87,7 @@ In a cluster, *route read queries to link:{neo4j-docs-base-uri}/operations-manua
 driver.executableQuery("MATCH (p:Person) RETURN p")
     .withConfig(QueryConfig.builder()
         .withDatabase("neo4j")
-        .withRouting(RoutingControl.READ)  // mark-line
+        .withRouting(RoutingControl.READ)
         .build())
     .execute();
 ----
@@ -95,7 +95,7 @@ driver.executableQuery("MATCH (p:Person) RETURN p")
 [source, java]
 ----
 try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
-    session.executeRead(tx -> {  // mark-line
+    session.executeRead(tx -> {
         var result = tx.run("MATCH (p:Person) RETURN p");
         return result.list();
     });
@@ -153,11 +153,11 @@ The server output is available through the `.profile()` method of the xref:resul
 
 [source, java]
 ----
-var result = driver.executableQuery("PROFILE MATCH (p {name: $name}) RETURN p")  // mark-line
+var result = driver.executableQuery("PROFILE MATCH (p {name: $name}) RETURN p")
     .withParameters(Map.of("name", "Alice"))
     .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
     .execute();
-var queryPlan = result.summary().profile().arguments().get("string-representation");  // mark-line
+var queryPlan = result.summary().profile().arguments().get("string-representation");
 System.out.println(queryPlan);
 
 /*
@@ -186,11 +186,11 @@ The server output is available through the `.plan()` method of the xref:result-s
 
 [source, java]
 ----
-var result = driver.executableQuery("EXPLAIN MATCH (p {name: $name}) RETURN p")  // mark-line
+var result = driver.executableQuery("EXPLAIN MATCH (p {name: $name}) RETURN p")
     .withParameters(Map.of("name", "Alice"))
     .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
     .execute();
-var queryPlan = result.summary().plan().arguments().get("string-representation");  // mark-line
+var queryPlan = result.summary().plan().arguments().get("string-representation");
 System.out.println(queryPlan);
 
 /*

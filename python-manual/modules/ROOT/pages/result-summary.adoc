@@ -34,7 +34,7 @@ def create_people(tx):
         UNWIND ["Alice", "Bob"] AS name
         MERGE (p:Person {name: name})
     """)
-    return result.consume()  # mark-line
+    return result.consume()
 
 with driver.session(database="neo4j") as session:
     result_summary = session.execute_write(create_people)
@@ -54,7 +54,7 @@ summary = driver.execute_query("""
     """, name="Mark", friend="Bob",
     database_="neo4j",
 ).summary
-print(summary.counters)  # mark-line
+print(summary.counters)
 """
 {'_contains_updates': True, 'labels_added': 2, 'relationships_created': 1,
  'nodes_created': 2, 'properties_set': 2}
@@ -145,7 +145,7 @@ records, summary, keys = driver.execute_query("""
     RETURN p
     """, database_="neo4j"
 )
-print(summary.summary_notifications)  # mark-line
+print(summary.summary_notifications)
 """
 [SummaryNotification(
     title='The provided pattern is unbounded, consider adding an upper limit to the number of node hops.',
@@ -175,14 +175,14 @@ There is a slight performance gain in restricting the amount of notifications th
 ----
 driver = neo4j.GraphDatabase.driver(
     URI, auth=AUTH,
-    notifications_min_severity='WARNING',  # or 'OFF' to disable  # mark-line
-    notifications_disabled_categories=['HINT', 'GENERIC']  # mark-line
+    notifications_min_severity='WARNING',  # or 'OFF' to disable
+    notifications_disabled_categories=['HINT', 'GENERIC']
 )
 
 # at session level
 session = driver.session(
     database="neo4j",
-    notifications_min_severity='INFORMATION',  # mark-line
-    notifications_disabled_categories=['HINT']  # mark-line
+    notifications_min_severity='INFORMATION',
+    notifications_disabled_categories=['HINT']
 )
 ----

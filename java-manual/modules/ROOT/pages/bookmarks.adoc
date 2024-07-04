@@ -173,7 +173,7 @@ This will ensure that all work is executed under the same bookmark manager and t
 driver.executableQuery("<QUERY 1>").execute();
 
 try (var session = driver.session(SessionConfig.builder()
-    .withBookmarkManager(driver.executableQueryBookmarkManager())  // mark-line
+    .withBookmarkManager(driver.executableQueryBookmarkManager())
     .build())) {
 
     // every query inside this session will be causally chained

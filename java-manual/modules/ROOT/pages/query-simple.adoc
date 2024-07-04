@@ -160,7 +160,7 @@ You may provide query parameters as a map through the `.withParameters()` method
 [source, java]
 ----
 var result = driver.executableQuery("MATCH (p:Person {name: $name}) RETURN p")
-    .withParameters(Map.of("name", "Alice"))  // mark-line
+    .withParameters(Map.of("name", "Alice"))
     .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
     .execute();
 ----
@@ -198,7 +198,7 @@ If no database is given, the link:https://neo4j.com/docs/operations-manual/curre
 // import org.neo4j.driver.QueryConfig;
 
 var result = driver.executableQuery("MATCH (p:Person) RETURN p.name")
-    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())  // mark-line
+    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
     .execute();
 ----
 
@@ -221,7 +221,7 @@ To improve performance on read queries, you can use the method `.withRouting(Rou
 var result = driver.executableQuery("MATCH (p:Person) RETURN p.name")
     .withConfig(QueryConfig.builder()
         .withDatabase("neo4j")
-        .withRouting(RoutingControl.READ)  // mark-line
+        .withRouting(RoutingControl.READ)
         .build())
     .execute();
 ----
@@ -247,7 +247,7 @@ Impersonating a user is cheaper than creating a new `Driver` object.
 var result = driver.executableQuery("MATCH (p:Person) RETURN p.name")
     .withConfig(QueryConfig.builder()
         .withDatabase("neo4j")
-        .withImpersonatedUser("somebodyElse")  // mark-line
+        .withImpersonatedUser("somebodyElse")
         .build())
     .execute();
 ----

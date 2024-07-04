@@ -362,7 +362,7 @@ If no database is given, the link:{neo4j-docs-base-uri}/operations-manual/curren
 [source, python]
 ----
 with driver.session(
-    database="neo4j"  # mark-line
+    database="neo4j"
 ) as session:
     ...
 ----
@@ -385,7 +385,7 @@ import neo4j
 
 with driver.session(
     database="neo4j",
-    default_access_mode=neo4j.READ_ACCESS  # mark-line
+    default_access_mode=neo4j.READ_ACCESS
 ) as session:
     ...
 ----
@@ -413,7 +413,7 @@ Impersonating a user is cheaper than creating a new `Driver` object.
 ----
 with driver.session(
     database="neo4j",
-    impersonated_user="somebody_else"  # mark-line
+    impersonated_user="somebody_else"
 ) as session:
     ...
 ----

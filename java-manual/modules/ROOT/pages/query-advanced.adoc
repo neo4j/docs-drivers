@@ -76,7 +76,7 @@ For more information, see xref:transactions.adoc#_transaction_configuration[Tran
 
 try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
     var result = session.run("CREATE (a:Person {name: $name})", Map.of("name", "John"),
-        TransactionConfig.builder()  // mark-line
+        TransactionConfig.builder()
             .withTimeout(Duration.ofSeconds(5))
             .withMetadata(Map.of("appName", "peopleTracker"))
             .build()
