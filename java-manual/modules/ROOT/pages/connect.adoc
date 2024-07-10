@@ -25,7 +25,7 @@ public class App {
 
         try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword))) {  // <1>
             driver.verifyConnectivity();  // <2>
-            System.out.println("Connection estabilished.");
+            System.out.println("Connection established.");
         }
     }
 }
@@ -76,7 +76,7 @@ public class App {
 
         try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword))) {
             driver.verifyConnectivity();
-             System.out.println("Connection estabilished.");
+             System.out.println("Connection established.");
         }
     }
 }

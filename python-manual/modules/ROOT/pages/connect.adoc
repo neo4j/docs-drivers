@@ -17,7 +17,7 @@ AUTH = ("<Username>", "<Password>")
 
 with GraphDatabase.driver(URI, auth=AUTH) as driver: # <1>
     driver.verify_connectivity() # <2>
-    print("Connection estabilished.")
+    print("Connection established.")
 ----
 
 <1> Creating a `Driver` instance only provides information on _how_ to access the database, but does not actually _establish_ a connection.
@@ -55,7 +55,7 @@ AUTH = (os.getenv("NEO4J_USERNAME"), os.getenv("NEO4J_PASSWORD"))
 
 with GraphDatabase.driver(URI, auth=AUTH) as driver:
     driver.verify_connectivity()
-    print("Connection estabilished.")
+    print("Connection established.")
 ----
 
 [TIP]
