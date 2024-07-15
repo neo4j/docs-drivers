@@ -346,6 +346,13 @@ Only use it for debugging/prototyping purposes.
 |`consume()`
 |Return the query xref:result-summary.adoc[result summary].
 It exhausts the result, so should only be called when data processing is over.
+
+|`graph()`
+|Transform result into a collection of graph objects. See xref:transformers.adoc#_transform_to_graph[Transform to graph].
+
+|`to_df(expand, parse_dates)`
+|Transform result into a Pandas Dataframe. See xref:transformers.adoc#_transform_to_pandas_dataframe[Transform to Pandas Dataframe].
+
 |===
 
 For a complete list of `Result` methods, see link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#result[API documentation -- Result].

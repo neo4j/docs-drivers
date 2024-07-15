@@ -31,9 +31,9 @@ print(f"Available keys are {keys}")  # ['name', 'age'] <3>
 <3> The `keys` available in the returned rows.
 
 
-== Transform to pandas DataFrame
+== Transform to Pandas DataFrame
 
-The driver can transform the result into a pandas DataFrame.
+The driver can transform the result into a Pandas DataFrame.
 To achieve this, use the `.execute_query()` keyword argument `result_transformer_` and set it to `neo4j.Result.to_df`.
 This method is only available if the `pandas` library is installed.
 
