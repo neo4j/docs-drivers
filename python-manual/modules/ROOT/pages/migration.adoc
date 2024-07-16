@@ -66,23 +66,6 @@ For (optional) use with type checkers and linters.
 ====
 
 |
-.`BookmarkManager` support
-[%collapsible]
-====
-Bookmark managers make it easier to achieve causal chaining of sessions.
-
-See xref:bookmarks.adoc[].
-====
-|
-.Notification filtering API
-[%collapsible]
-====
-Filtering allows to receive only a subset of notifications from the server, and to improve performance server-side.
-
-See xref:result-summary.adoc#_filter_notifications[Explore the query execution summary -> Filter notifications].
-====
-
-|
 .Re-authentication
 [%collapsible]
 ====
@@ -97,6 +80,23 @@ See link:https://github.com/neo4j/neo4j-python-driver/discussions/921[Re-authent
 Allows for configuring client side TLS certificates to authenticate against the server.
 
 See link:https://github.com/neo4j/neo4j-python-driver/discussions/1031[Mutual TLS].
+====
+
+|
+.`BookmarkManager` support
+[%collapsible]
+====
+Bookmark managers make it easier to achieve causal chaining of sessions.
+
+See xref:bookmarks.adoc[].
+====
+|
+.Notification filtering API
+[%collapsible]
+====
+Filtering allows to receive only a subset of notifications from the server, and to improve performance server-side.
+
+See xref:result-summary.adoc#_filter_notifications[Explore the query execution summary -> Filter notifications].
 ====
 
 |
@@ -128,8 +128,8 @@ Use the driver configuration `telemetry_disabled=True` to opt out.
 [%collapsible]
 ====
 For local development, run your application with `python -X dev ...` or set the environment variable `PYTHONNEO4JDEBUG` to anything non-empty to get additional concurrency misuse checks.
-Some driver primitives (e.g. sessions) are not safe to be used concurrently, and using them concurrently will lead to hard to debug errors.
-This feature helps to identify such code paths. Note that detection is still inherently racy, hence not guaranteed to always work.
+Some driver primitives (e.g. sessions) are not safe to be used concurrently, and using them concurrently will lead to hard-to-debug errors.
+This feature helps identifying such code paths. Note that detection is still inherently racy, hence not guaranteed to always work.
 ====
 
 |===
