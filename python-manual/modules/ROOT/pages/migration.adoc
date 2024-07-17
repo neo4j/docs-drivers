@@ -237,6 +237,11 @@ Multiplication and division allow for floats but will always result in integer v
 |{check-mark}
 
 |5.0
+|link:https://neo4j.com/docs/api/python-driver/current/types/temporal.html#neo4j.time.Time[`Time`] -- The property `second` returns an int instead of a float. Use `nanosecond` to get the sub-second information.
+|label:removed[Changed]
+|{cross-mark}
+
+|5.0
 |link:https://neo4j.com/docs/api/python-driver/current/types/temporal.html#neo4j.time.Time[`Time`] -- The `ticks` property's type changed from float to int. It's now nanoseconds since midnight instead of seconds.
 |label:removed[Changed]
 |{cross-mark}
@@ -245,11 +250,6 @@ Multiplication and division allow for floats but will always result in integer v
 |link:https://neo4j.com/docs/api/python-driver/current/types/temporal.html#neo4j.time.Time[`Time`] -- The property `ticks_ns` has been renamed to `ticks`.
 |label:removed[]
 |{check-mark}
-
-|5.0
-|link:https://neo4j.com/docs/api/python-driver/current/types/temporal.html#neo4j.time.Time[`Time`] -- The property `second` returns an int instead of a float. Use `nanosecond` to get the sub-second information.
-|label:removed[Changed]
-|{cross-mark}
 
 |5.0
 |link:https://neo4j.com/docs/api/python-driver/current/types/temporal.html#neo4j.time.Time[`Time`] -- The property `hour_minute_second` has been removed. Use `hour_minute_second_nanosecond` instead.
