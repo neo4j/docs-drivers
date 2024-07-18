@@ -3,7 +3,7 @@
 This page contains the list of new features and breaking changes that happened in the driver from version 4.4 to 5.LTS.
 For a full list of changes, see the link:https://github.com/neo4j/neo4j-python-driver/wiki/5.x-changelog[Driver -> Changelog].
 
-The link:https://github.com/stefano-ottolenghi/neo4j-drivers-migration-assistent[Neo4j Drivers Migration Assistent] simplifies the upgrade process, by contextualizing the changelog to your codebase.
+The link:https://github.com/neo4j/drivers-migration-assistent[Neo4j Drivers Migration Assistent] simplifies the upgrade process, by contextualizing the changelog to your codebase.
 It scans your codebase for usage of deprecations and removals, and brings them up to you.
 The tool doesn't automatically rewrite your code; it only points at where action is needed, providing in-context information on how each hit should be addressed.
 
@@ -32,14 +32,14 @@ python main.py -l python <path...>
 python main.py -l python --regex-parser <path...>
 ----
 +
-The regex parser is able to parse implicit function calls and other hard-to-parse expressions, but is likely surface more false positive (for more information, see link:https://github.com/stefano-ottolenghi/neo4j-drivers-migration-assistent?tab=readme-ov-file#accuracy[Neo4j Drivers Migration Assistent -> Accuracy]).
+The regex parser can detect implicit function calls and other hard-to-parse expressions, but is likely to surface more false positives (for more information, see link:https://github.com/stefano-ottolenghi/neo4j-drivers-migration-assistent?tab=readme-ov-file#accuracy[Neo4j Drivers Migration Assistent -> Accuracy]).
 You can add any spurious entry to the ignored list, so that the assistent won't bring them up in future runs.
 3. Although the assistent can detect most of the locations where action is needed, a few changelog entries can't be surfaced in this form, so you should still revise the xref:breaking-changes[breaking changes] section and audit your codebase for the changes marked with {cross-mark}.
-4. You are ready to upgrade the driver package to the new version. +
+4. You are ready to upgrade the driver package to the new version. For example, using `pip`: +
 +
 [source, bash]
 ----
-pip install -U neo4j
+pip install -U neo4j==5.x
 ----
 
 
@@ -52,13 +52,13 @@ pip install -U neo4j
 .Support for Python 3.12
 [%collapsible]
 ====
-The driver is compatible with any Python version starting from 3.6 up to 3.12.
+The driver is compatible with any Python version starting from 3.7 up to 3.12.
 ====
 |
 .`asyncio` support
 [%collapsible]
 ====
-For using the driver's features in parallel via the link:https://docs.python.org/3/library/asyncio.html[asyncio] package.
+For using the driver's features asynchronously via the link:https://docs.python.org/3/library/asyncio.html[asyncio] package.
 
 See xref:concurrency.adoc[].
 ====
@@ -75,7 +75,7 @@ See xref:query-simple.adoc[].
 .Rust extension for performance
 [%collapsible]
 ====
-The link:https://github.com/neo4j-drivers/neo4j-python-driver-rust-ext[Rust extension to the Python driver] is an alternative driver package that yields a 3x to 10x speedup compared to the regular driver.
+The link:https://github.com/neo4j-drivers/neo4j-python-driver-rust-ext[Rust extension to the Python driver] is an alternative driver package that can yield a speedup up to 10x compared to the regular driver.
 You can install it with `pip install neo4j-rust-ext`, either alongside the `neo4j` package or as a replacement to it.
 Usage-wise, the drivers are identical.
 ====
@@ -171,7 +171,7 @@ This feature helps identifying such code paths (detection is still inherently ra
 The column `Assistent` denotes whether the Neo4j Drivers Migration Assistent can detect issues related to the given changelog entry.
 Entries with a cross mark {cross-mark} require manual inspection.
 
-Deprecated features get removed in the next LTS version.
+Deprecated features are likely to be removed in the next major release.
 
 [cols="1,5a,1,1"]
 |===
@@ -263,7 +263,7 @@ Through the new methods, the first argument of transaction functions is a `Manag
 |{check-mark}
 
 |5.3
-|Package-alias `neo4j-driver` is deprecated. It will stop receiving updates starting with 6.0.0. Install neo4j instead.
+|Package-alias `neo4j-driver` is deprecated. It will stop receiving updates starting with 6.0.0. Install `neo4j` instead.
 |label:deprecated[]
 |{cross-mark}
 
