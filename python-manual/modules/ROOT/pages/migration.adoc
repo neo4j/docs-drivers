@@ -1,7 +1,10 @@
 = Upgrade & Migration
 
-This page contains the list of new features and breaking changes that happened in the driver from version 4.4 to 5.LTS.
+This page contains the list of new features and breaking changes that happened in the driver from version 4.4 to 5.x.
 For a full list of changes, see the link:https://github.com/neo4j/neo4j-python-driver/wiki/5.x-changelog[Driver -> Changelog].
+
+[NOTE]
+This page may be revised with new changes up until the time when the latest 5.x version is released.
 
 The link:https://github.com/neo4j/drivers-migration-assistent[Neo4j Drivers Migration Assistent] simplifies the upgrade process, by contextualizing the changelog to your codebase.
 It scans your codebase for usage of deprecations and removals, and brings them up to you.
@@ -75,9 +78,10 @@ See xref:query-simple.adoc[].
 .Rust extension for performance
 [%collapsible]
 ====
-The link:https://github.com/neo4j-drivers/neo4j-python-driver-rust-ext[Rust extension to the Python driver] is an alternative driver package that can yield a speedup up to 10x compared to the regular driver.
-You can install it with `pip install neo4j-rust-ext`, either alongside the `neo4j` package or as a replacement to it.
-Usage-wise, the drivers are identical.
+The new Rust extension included within the driver can yield a speedup up to 10x compared to the pure-Python driver.
+The extension gets installed with a normal update of the driver package and doesn't alter the driver's user surface.
+
+See link:https://github.com/neo4j-drivers/neo4j-python-driver-rust-ext[Rust extension to the Python driver].
 ====
 
 |
@@ -130,9 +134,11 @@ See xref:result-summary.adoc#_filter_notifications[Explore the query execution s
 ====
 
 |
-.GQL statuses of queries in the ResultSummary
+.GQL statuses of queries in the `ResultSummary`
 [%collapsible]
 ====
+A new property `ResultSummary.gql_status_objects` has been introduced. It returns a sequence of `GqlStatusObjects`, containing information about the execution of the query.
+
 Eventually, this API is planned to supersede the current notifications API.
 
 See link:https://github.com/neo4j/neo4j-python-driver/discussions/1067[GQL statuses in ResultSummary].
@@ -141,7 +147,11 @@ See link:https://github.com/neo4j/neo4j-python-driver/discussions/1067[GQL statu
 .More convenient handling of server-side warnings and notifications
 [%collapsible]
 ====
-You can configure the driver to emit warnings on notifications and/or to log them.
+The new sub-logger `neo4j.notifications` logs every notification raised by the server.
+The log-level is determined by the notification's severity.
+
+If logging is not configured explicitly, the default behavior is for warnings to be logged to stderr via `warning.warn()`.
+The result of this change is that warnings (such as deprecations) received from the DBMS will appear on stderr.
 
 See link:https://github.com/neo4j/neo4j-python-driver/discussions/1064[Convenient DBMS notifications].
 ====
