@@ -6,7 +6,7 @@ For a full list of changes, see the link:https://github.com/neo4j/neo4j-python-d
 [NOTE]
 This page may be revised with new changes up until the time when the latest 5.x version is released.
 
-The link:https://github.com/neo4j/drivers-migration-assistent[Neo4j Drivers Migration Assistent] simplifies the upgrade process, by contextualizing the changelog to your codebase.
+The link:https://github.com/neo4j/drivers-migration-assistant[Neo4j Drivers Migration Assistant] simplifies the upgrade process, by contextualizing the changelog to your codebase.
 It scans your codebase for usage of deprecations and removals, and brings them up to you.
 The tool doesn't automatically rewrite your code; it only points at where action is needed, providing in-context information on how each hit should be addressed.
 
@@ -17,27 +17,28 @@ When upgrading the Neo4j server to a newer version, the Cypher queries in your a
 See link:https://neo4j.com/docs/cypher-manual/current/deprecations-additions-removals-compatibility/[Cypher -> Deprecations, additions, and compatibility].
 
 
+[[recommended-steps]]
 == Recommended steps
 
-Using the migration assistent, the recommended upgrade steps are:
+Using the migration assistant, the recommended upgrade steps are:
 
-1. Run the migration assistent with its default configuration and address all the issues that it surfaces. The `path` argument supports globbing and can be repeated as many times as needed. +
+1. Run the migration assistant with its default configuration and address all the issues that it surfaces. The `path` argument supports link:https://www.man7.org/linux/man-pages/man7/glob.7.html[globbing] and can be repeated as many times as needed. +
 +
 [source, bash]
 ----
-python main.py -l python <path...>
+python main.py -l python /path/*.py /path-recursive/**/*.py
 ----
 +
-2. Re-run the assistent with the regex parser and check if any more legit issues are raised. +
+2. Re-run the assistant with the regex parser and check if any more legit issues are raised. +
 +
 [source, bash]
 ----
-python main.py -l python --regex-parser <path...>
+python main.py -l python --regex-parser /path/*.py /path-recursive/**/*.py
 ----
 +
-The regex parser can detect implicit function calls and other hard-to-parse expressions, but is likely to surface more false positives (for more information, see link:https://github.com/stefano-ottolenghi/neo4j-drivers-migration-assistent?tab=readme-ov-file#accuracy[Neo4j Drivers Migration Assistent -> Accuracy]).
-You can add any spurious entry to the ignored list, so that the assistent won't bring them up in future runs.
-3. Although the assistent can detect most of the locations where action is needed, a few changelog entries can't be surfaced in this form, so you should still revise the xref:breaking-changes[breaking changes] section and audit your codebase for the changes marked with {cross-mark}.
+The regex parser can detect implicit function calls and other hard-to-parse expressions, but is likely to surface more false positives (for more information, see link:https://github.com/stefano-ottolenghi/neo4j-drivers-migration-assistant?tab=readme-ov-file#accuracy[Neo4j Drivers Migration Assistant -> Accuracy]).
+You can add any spurious entry to the ignored list, so that the assistant won't bring them up in future runs.
+3. Although the assistant can detect most of the locations where action is needed, a few changelog entries can't be surfaced in this form, so you should still revise the xref:breaking-changes[breaking changes] section and audit your codebase for the changes marked with {cross-mark}.
 4. You are ready to upgrade the driver package to the new version. For example, using `pip`: +
 +
 [source, bash]
@@ -46,6 +47,7 @@ pip install -U neo4j==5.x
 ----
 
 
+[[new-features]]
 == New features
 
 [cols="1a,1a"]
@@ -178,14 +180,14 @@ This feature helps identifying such code paths (detection is still inherently ra
 [[breaking-changes]]
 == Breaking changes and deprecations
 
-The column `Assistent` denotes whether the Neo4j Drivers Migration Assistent can detect issues related to the given changelog entry.
+The column `Assistant` denotes whether the Neo4j Drivers Migration Assistant can detect issues related to the given changelog entry.
 Entries with a cross mark {cross-mark} require manual inspection.
 
 Deprecated features are likely to be removed in the next major release.
 
 [cols="1,5a,1,1"]
 |===
-|Version |Message |Status |Assistent
+|Version |Message |Status |Assistant
 
 |5.0
 |Dropped support for Python 3.6.
@@ -306,7 +308,7 @@ Call `driver.close()` explicitly or create the driver via a `with` statement.
 |{check-mark}
 
 |5.0
-|`Session.last_bookmark()` is deprecated (its behaviour is partially incorrect and cannot be fixed without breaking its signature). Use link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.Session.last_bookmarks[`Session.last_bookmarks()`] instead.
+|`Session.last_bookmark()` is deprecated in favor of link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.Session.last_bookmarks[`Session.last_bookmarks()`]. The logic is similar, but the new method returns `neo4j.Bookmarks` instead of `str`.
 |label:deprecated[]
 |{check-mark}
 
