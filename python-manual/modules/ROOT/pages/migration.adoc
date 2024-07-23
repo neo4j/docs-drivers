@@ -11,6 +11,7 @@ It scans your codebase for usage of deprecations and removals, and brings them u
 The tool doesn't automatically rewrite your code; it only points at where action is needed, providing in-context information on how each hit should be addressed.
 
 Any of the 5.x versions of the driver is compatible both with Neo4j server 4.4 and 5.x, so you can upgrade the driver before you upgrade the server.
+The driver version 4.4 is forward compatible with Neo4j server 5.x as well, so you could also upgrade the server before the driver; however, given that it's easier to rollback an application upgrade than a server upgrade, it's recommended to start with the driver.
 
 [TIP]
 When upgrading the Neo4j server to a newer version, the Cypher queries in your application may also need updating. +
