@@ -27,14 +27,14 @@ Using the migration assistant, the recommended upgrade steps are:
 +
 [source, bash]
 ----
-python main.py -l python /path/*.py /path-recursive/**/*.py
+python3 main.py -l python /path/*.py /path-recursive/**/*.py
 ----
 +
 2. Re-run the assistant with the regex parser and check if any more legit issues are raised. +
 +
 [source, bash]
 ----
-python main.py -l python --regex-parser /path/*.py /path-recursive/**/*.py
+python3 main.py -l python --regex-parser /path/*.py /path-recursive/**/*.py
 ----
 +
 The regex parser can detect implicit function calls and other hard-to-parse expressions, but is likely to surface more false positives (for more information, see link:https://github.com/stefano-ottolenghi/neo4j-drivers-migration-assistant?tab=readme-ov-file#accuracy[Neo4j Drivers Migration Assistant -> Accuracy]).
@@ -44,7 +44,7 @@ You can add any spurious entry to the ignored list, so that the assistant won't 
 +
 [source, bash]
 ----
-pip install -U neo4j==5.x
+pip3 install -U neo4j==5.x
 ----
 
 
@@ -184,7 +184,7 @@ This feature helps identifying such code paths (detection is still inherently ra
 The column `Assistant` denotes whether the Neo4j Drivers Migration Assistant can detect issues related to the given changelog entry.
 Entries with a cross mark {cross-mark} require manual inspection.
 
-Deprecated features are likely to be removed in the next major release.
+Deprecated features are likely to be removed in version 6.
 
 [cols="1,5a,1,1"]
 |===
