@@ -81,10 +81,10 @@ See xref:query-simple.adoc[].
 .Rust extension for performance
 [%collapsible]
 ====
-The new Rust extension included within the driver can yield a speedup up to 10x compared to the pure-Python driver.
-The extension gets installed with a normal update of the driver package and doesn't alter the driver's user surface.
+The link:https://github.com/neo4j-drivers/neo4j-python-driver-rust-ext[Rust extension to the Python driver] is an alternative driver package that can yield a speedup up to 10x compared to the pure-Python driver.
 
-See link:https://github.com/neo4j-drivers/neo4j-python-driver-rust-ext[Rust extension to the Python driver].
+You can install it with `pip install neo4j-rust-ext`, either alongside the `neo4j` package or as a replacement to it.
+Usage-wise, the drivers are identical.
 ====
 
 |
