@@ -195,11 +195,6 @@ Deprecated features are likely to be removed in version 6.
 |label:removed[]
 |{cross-mark}
 
-|5.3
-|Package-alias `neo4j-driver` is deprecated. It will stop receiving updates starting with 6.0.0. Install `neo4j` instead.
-|label:deprecated[]
-|{cross-mark}
-
 |5.0
 |Driver options `update_routing_table_timeout` and `session_connection_timeout` have been removed. Regular keep-alives are sufficient to avoid the driver getting stuck. Further liveness check config options are available but normally not needed (link:https://neo4j.com/docs/api/python-driver/current/api.html#keep-alive-ref[`keep_alive`], link:https://neo4j.com/docs/api/python-driver/current/api.html#liveness-check-timeout[`liveness_check_timeout`]).
 |label:removed[]
@@ -279,6 +274,11 @@ Multiplication and division allow for floats but will always result in integer v
 Through the new methods, the first argument of transaction functions is a `ManagedTransaction` object. It behaves exactly like a regular `Transaction` object, except it does not offer the `.commit()`, `.rollback()`, `.close()`, and `.closed()` methods.
 |label:deprecated[]
 |{check-mark}
+
+|5.3
+|Package-alias `neo4j-driver` is deprecated. It will stop receiving updates starting with 6.0.0. Install `neo4j` instead.
+|label:deprecated[]
+|{cross-mark}
 
 |5.0
 |Property `id` (int) for link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.graph.Node[`Node`] and link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.graph.Relationship[`Relationship`] objects is deprecated in favor of `element_id` (str).
