@@ -334,7 +334,7 @@ Call `driver.close()` explicitly or create the driver via a `with` statement.
 |{check-mark}
 
 |5.22
-|Class link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.SummaryInputPosition[`SummaryNotificationPosition`] is deprecated in favor of `SummaryInputPosition`.
+|Class `SummaryNotificationPosition` is deprecated in favor of link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.SummaryInputPosition[`SummaryInputPosition`].
 |label:deprecated[]
 |{check-mark}
 
