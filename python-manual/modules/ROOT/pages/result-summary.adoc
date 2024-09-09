@@ -170,12 +170,13 @@ records, summary, keys = driver.execute_query("""
 ----
 
 ======
-[.include-with-GQLSTATUS-status-code]
+[.include-with-GQL-status-code]
 ======
 
 The property `ResultSummary.gql_status_objects` contains a sequence of link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#GqlStatusObject[`GqlStatusObject`]s, which are GQL-compliant status objects.
 
 Some (but not all) `GqlStatusObjects` are notifications, whereas some report an _outcome_ status: `00000` for "success", `02000` for "no data", and `00001` for "omitted result".
+`ResultSummary.gql_status_objects` always contains at least one entry, containing the outcome status.
 
 [source, python, role=nocollapse]
 ----
@@ -186,41 +187,42 @@ records, summary, keys = driver.execute_query("""
 )
 for status in summary.gql_status_objects:
     print("GQLSTATUS:", status.gql_status)
-    print("description:", status.status_description)
-    print("is notification:", status.is_notification)
+    print("Description:", status.status_description)
+    # Not all statuses are notifications.
+    print("Is notification:", status.is_notification)
 
     # Notification and thus vendor-specific fields.
     # These fields are only meaningful for notifications.
     if status.is_notification:
         # The position in the query that caused the notification.
-        print("position:", status.position)
+        print("Position:", status.position)
 
         # The notification's classification is counterpart to `neo4j.NotificationCategory`.
         # However, the term `category` has a different meaning in the context of GQL.
-        print("classification:", status.classification)
-        print("unparsed classification:", status.raw_classification)
+        print("Classification:", status.classification)
+        print("Unparsed classification:", status.raw_classification)
 
-        print("severity:", status.severity)
-        print("unparsed severity:", status.raw_severity)
+        print("Severity:", status.severity)
+        print("Unparsed severity:", status.raw_severity)
 
     # Any raw extra information provided by the DBMS:
-    print("diagnostic record:", status.diagnostic_record)
+    print("Diagnostic record:", status.diagnostic_record)
     print("=" * 80)
 """
 GQLSTATUS: 02000
-description: note: no data
-is notification: False
-diagnostic record: {'OPERATION': '', 'OPERATION_CODE': '0', 'CURRENT_SCHEMA': '/'}
+Description: note: no data
+Is notification: False
+Diagnostic record: {'OPERATION': '', 'OPERATION_CODE': '0', 'CURRENT_SCHEMA': '/'}
 ================================================================================
 GQLSTATUS: 03N91
-description: info: unbounded variable length pattern. The provided pattern `(:Person {name: 'Alice'})-[*]->(:Person {name: 'Bob'})` is unbounded. Shortest path with an unbounded pattern may result in long execution times. Use an upper limit (e.g. `[*..5]`) on the number of node hops in your pattern.
-is notification: True
-position: line: 1, column: 22, offset: 21
-classification: NotificationClassification.PERFORMANCE
-unparsed classification: PERFORMANCE
-severity: NotificationSeverity.INFORMATION
-unparsed severity: INFORMATION
-diagnostic record: {'_classification': 'PERFORMANCE', '_status_parameters': {'pat': "(:Person {name: 'Alice'})-[*]->(:Person {name: 'Bob'})"}, '_severity': 'INFORMATION', '_position': {'offset': 21, 'line': 1, 'column': 22}, 'OPERATION': '', 'OPERATION_CODE': '0', 'CURRENT_SCHEMA': '/'}
+Description: info: unbounded variable length pattern. The provided pattern `(:Person {name: 'Alice'})-[*]->(:Person {name: 'Bob'})` is unbounded. Shortest path with an unbounded pattern may result in long execution times. Use an upper limit (e.g. `[*..5]`) on the number of node hops in your pattern.
+Is notification: True
+Position: line: 1, column: 22, offset: 21
+Classification: NotificationClassification.PERFORMANCE
+Unparsed classification: PERFORMANCE
+Severity: NotificationSeverity.INFORMATION
+Unparsed severity: INFORMATION
+Diagnostic record: {'_classification': 'PERFORMANCE', '_status_parameters': {'pat': "(:Person {name: 'Alice'})-[*]->(:Person {name: 'Bob'})"}, '_severity': 'INFORMATION', '_position': {'offset': 21, 'line': 1, 'column': 22}, 'OPERATION': '', 'OPERATION_CODE': '0', 'CURRENT_SCHEMA': '/'}
 ================================================================================
 """
 ----
