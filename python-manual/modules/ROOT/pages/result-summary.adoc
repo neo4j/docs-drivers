@@ -133,11 +133,21 @@ For more information and examples, see link:{neo4j-docs-base-uri}/cypher-manual/
 
 == Notifications
 
-The property `ResultSummary.summary_notifications` contains a list of link:{neo4j-docs-base-uri}/status-codes/current/notifications[notifications coming from the server], if any were raised by the execution of the query.
-These include recommendations for performance improvements, warnings about the usage of deprecated features, and other hints about sub-optimal usage of Neo4j.
-Each notification comes as a link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.SummaryNotification[`SummaryNotification`] object.
+After executing a query, the server can return link:{neo4j-docs-base-uri}/status-codes/current/notifications[notifications] alongside the query result.
+Notifications contain recommendations for performance improvements, warnings about the usage of deprecated features, and other hints about sub-optimal usage of Neo4j.
+
+[TIP]
+For driver and server version >= 5.23, two forms of notifications are available (_Neo4j status codes_ and _GQL status codes_).
+For earlier versions, only _Neo4j status codes_ are available. +
+GQL status codes are planned to supersede Neo4j status codes.
 
 .An unbounded shortest path raises a performance notification
+[.tabbed-example]
+=====
+[.include-with-neo4j-status-code]
+======
+The property `ResultSummary.summary_notifications` contains a list of link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.SummaryNotification[`SummaryNotification`] objects.
+
 [source, python, role=nocollapse]
 ----
 records, summary, keys = driver.execute_query("""
@@ -160,29 +170,94 @@ print(summary.summary_notifications)
 """
 ----
 
+======
+[.include-with-GQLSTATUS-status-code]
+======
 
+The property `ResultSummary.gql_status_objects` contains a sequence of link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#GqlStatusObject[`GqlStatusObject`] objects.
+
+Some (but not all) `GqlStatusObjects` are notifications, whereas some report an _outcome_ status: `00000` for "success", `02000` for "no data", and `00001` for "omitted result".
+
+[source, python, role=nocollapse]
+----
+records, summary, keys = driver.execute_query("""
+    MATCH p=shortestPath((:Person {name: 'Alice'})-[*]->(:Person {name: 'Bob'}))
+    RETURN p
+    """, database_="neo4j"
+)
+for status in summary.gql_status_objects:
+    print("GQLSTATUS:", status.gql_status)
+    print("description:", status.status_description)
+    print("is notification:", status.is_notification)
+
+    # Notification and thus vendor-specific fields.
+    # These fields are only meaningful for notifications.
+    if status.is_notification:
+        # The position in the query that caused the notification.
+        print("position:", status.position)
+
+        # The notification's classification is counterpart to `neo4j.NotificationCategory`.
+        # However, the term `category` has a different meaning in the context of GQL.
+        print("classification:", status.classification)
+        print("unparsed classification:", status.raw_classification)
+
+        print("severity:", status.severity)
+        print("unparsed severity:", status.raw_severity)
+
+    # Any raw extra information provided by the DBMS:
+    print("diagnostic record:", status.diagnostic_record)
+    print("=" * 80)
+"""
+GQLSTATUS: 02000
+description: note: no data
+is notification: False
+diagnostic record: {'OPERATION': '', 'OPERATION_CODE': '0', 'CURRENT_SCHEMA': '/'}
+================================================================================
+GQLSTATUS: 03N91
+description: info: unbounded variable length pattern. The provided pattern `(:Person {name: 'Alice'})-[*]->(:Person {name: 'Bob'})` is unbounded. Shortest path with an unbounded pattern may result in long execution times. Use an upper limit (e.g. `[*..5]`) on the number of node hops in your pattern.
+is notification: True
+position: line: 1, column: 22, offset: 21
+classification: NotificationClassification.PERFORMANCE
+unparsed classification: PERFORMANCE
+severity: NotificationSeverity.INFORMATION
+unparsed severity: INFORMATION
+diagnostic record: {'_classification': 'PERFORMANCE', '_status_parameters': {'pat': "(:Person {name: 'Alice'})-[*]->(:Person {name: 'Bob'})"}, '_severity': 'INFORMATION', '_position': {'offset': 21, 'line': 1, 'column': 22}, 'OPERATION': '', 'OPERATION_CODE': '0', 'CURRENT_SCHEMA': '/'}
+================================================================================
+"""
+----
+
+======
+=====
+
+
+[role=label--new-5.7]
 === Filter notifications
 
 By default, the server analyses each query for all categories and severity of notifications.
-Starting from version 5.7, you can use the parameters `notifications_min_severity` and/or `notifications_disabled_categories` to restrict the severity or category of notifications that you are interested into.
-You may disable notifications altogether by setting the minimum severity to `OFF`.
-You can use those parameters either when creating a `Driver` instance, or when creating a session.
-
+Starting from version 5.7, you can use the parameters `notifications_min_severity` and/or `notifications_disabled_categories`/`notifications_disabled_classifications` to restrict the severity and/or category/classification of notifications that you are interested into.
 There is a slight performance gain in restricting the amount of notifications the server is allowed to raise.
+
+The severity filter applies to both Neo4j and GQL notifications, whereas the category filter applies to Neo4j notifications only, and the classification filter applies to GQL notifications only.
+You can use any of those parameters either when creating a `Driver` instance, or when creating a session.
+
+You may disable notifications altogether by setting the minimum severity to `OFF`.
 
 .Allow only `WARNING` notifications, but not of `HINT` or `GENERIC` category
 [source, python]
 ----
+# at driver level
 driver = neo4j.GraphDatabase.driver(
     URI, auth=AUTH,
     notifications_min_severity='WARNING',  # or 'OFF' to disable
-    notifications_disabled_categories=['HINT', 'GENERIC']
+    notifications_disabled_categories=['HINT', 'GENERIC'],
+    notifications_disabled_classifications=['HINT', 'GENERIC'],
 )
 
 # at session level
 session = driver.session(
     database="neo4j",
     notifications_min_severity='INFORMATION',
-    notifications_disabled_categories=['HINT']
+    notifications_disabled_categories=['HINT'],
+    notifications_disabled_classifications=['HINT']
 )
 ----
