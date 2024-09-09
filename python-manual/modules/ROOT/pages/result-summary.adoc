@@ -155,7 +155,6 @@ records, summary, keys = driver.execute_query("""
     RETURN p
     """, database_="neo4j"
 )
-print(summary.summary_notifications)
 """
 [SummaryNotification(
     title='The provided pattern is unbounded, consider adding an upper limit to the number of node hops.',
@@ -174,7 +173,7 @@ print(summary.summary_notifications)
 [.include-with-GQLSTATUS-status-code]
 ======
 
-The property `ResultSummary.gql_status_objects` contains a sequence of link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#GqlStatusObject[`GqlStatusObject`] objects.
+The property `ResultSummary.gql_status_objects` contains a sequence of link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#GqlStatusObject[`GqlStatusObject`]s, which are GQL-compliant status objects.
 
 Some (but not all) `GqlStatusObjects` are notifications, whereas some report an _outcome_ status: `00000` for "success", `02000` for "no data", and `00001` for "omitted result".
 
