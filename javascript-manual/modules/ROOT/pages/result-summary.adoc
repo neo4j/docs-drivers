@@ -155,7 +155,7 @@ After executing a query, the server can return link:{neo4j-docs-base-uri}/status
 Notifications contain recommendations for performance improvements, warnings about the usage of deprecated features, and other hints about sub-optimal usage of Neo4j.
 
 [TIP]
-For driver version >= 5.24 and server version >= 5.23, two forms of notifications are available (_Neo4j status codes_ and _GQL status codes_).
+For driver version >= 5.25 and server version >= 5.23, two forms of notifications are available (_Neo4j status codes_ and _GQL status codes_).
 For earlier versions, only _Neo4j status codes_ are available. +
 GQL status codes are planned to supersede Neo4j status codes.
 
@@ -196,7 +196,7 @@ console.log(summary.notifications)
 [.include-with-GQL-status-code]
 ======
 
-With version >= 5.24, the property `ResultSummary.gqlStatusObjects` contains a list of link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/notification.js~GqlStatusObject.html[`GqlStatusObject`]s.
+With version >= 5.25, the property `ResultSummary.gqlStatusObjects` contains a list of link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/notification.js~GqlStatusObject.html[`GqlStatusObject`]s.
 These are GQL-compliant status objects.
 
 Some (but not all) `GqlStatusObjects` are notifications, whereas some report an _outcome_ status: `00000` for "success", `02000` for "no data", and `00001` for "omitted result".
@@ -244,6 +244,7 @@ console.log(summary.gqlStatusObjects)
     isNotification: true
   }
 ]
+*/
 ----
 
 ======
