@@ -137,7 +137,7 @@ After executing a query, the server can return link:{neo4j-docs-base-uri}/status
 Notifications contain recommendations for performance improvements, warnings about the usage of deprecated features, and other hints about sub-optimal usage of Neo4j.
 
 [TIP]
-For driver and server version >= 5.23, two forms of notifications are available (_Neo4j status codes_ and _GQL status codes_).
+For driver version >= 5.24 and server version >= 5.23, two forms of notifications are available (_Neo4j status codes_ and _GQL status codes_).
 For earlier versions, only _Neo4j status codes_ are available. +
 GQL status codes are planned to supersede Neo4j status codes.
 
@@ -173,7 +173,8 @@ records, summary, keys = driver.execute_query("""
 [.include-with-GQL-status-code]
 ======
 
-The property `ResultSummary.gql_status_objects` contains a sequence of link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#GqlStatusObject[`GqlStatusObject`]s, which are GQL-compliant status objects.
+With version >= 5.24, the property `ResultSummary.gql_status_objects` contains a sequence of link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#GqlStatusObject[`GqlStatusObject`]s.
+These are GQL-compliant status objects.
 
 Some (but not all) `GqlStatusObjects` are notifications, whereas some report an _outcome_ status: `00000` for "success", `02000` for "no data", and `00001` for "omitted result".
 `ResultSummary.gql_status_objects` always contains at least one entry, containing the outcome status.
@@ -238,10 +239,11 @@ By default, the server analyses each query for all categories and severity of no
 Starting from version 5.7, you can use the parameters `notifications_min_severity` and/or `notifications_disabled_categories`/`notifications_disabled_classifications` to restrict the severity and/or category/classification of notifications that you are interested into.
 There is a slight performance gain in restricting the amount of notifications the server is allowed to raise.
 
-The severity filter applies to both Neo4j and GQL notifications, whereas the category filter applies to Neo4j notifications only, and the classification filter applies to GQL notifications only.
+The severity filter applies to both Neo4j and GQL notifications.
+Category and classification filters exist separately only due to the discrepancy in lexicon between GQL and Neo4j; both filters affect either form of notification though, so you should use only one of them. If you provide both a category and a classification filter, their contents will be merged.
 You can use any of those parameters either when creating a `Driver` instance, or when creating a session.
 
-You may disable notifications altogether by setting the minimum severity to `OFF`.
+You can disable notifications altogether by setting the minimum severity to `'OFF'`.
 
 .Allow only `WARNING` notifications, but not of `HINT` or `GENERIC` category
 [source, python]
@@ -249,16 +251,14 @@ You may disable notifications altogether by setting the minimum severity to `OFF
 # at driver level
 driver = neo4j.GraphDatabase.driver(
     URI, auth=AUTH,
-    notifications_min_severity='WARNING',  # or 'OFF' to disable
-    notifications_disabled_categories=['HINT', 'GENERIC'],
-    notifications_disabled_classifications=['HINT', 'GENERIC'],
+    notifications_min_severity='WARNING',  # or 'OFF' to disable entirely
+    notifications_disabled_classifications=['HINT', 'GENERIC'],  // filters categories as well
 )
 
 # at session level
 session = driver.session(
     database="neo4j",
-    notifications_min_severity='INFORMATION',
-    notifications_disabled_categories=['HINT'],
-    notifications_disabled_classifications=['HINT']
+    notifications_min_severity='INFORMATION',  # or 'OFF' to disable entirely
+    notifications_disabled_classifications=['HINT']  # filters categories as well
 )
 ----
