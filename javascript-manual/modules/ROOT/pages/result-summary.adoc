@@ -202,7 +202,7 @@ These are GQL-compliant status objects.
 Some (but not all) `GqlStatusObjects` are notifications, whereas some report an _outcome_ status: `00000` for "success", `02000` for "no data", and `00001` for "omitted result".
 `Summary.GqlStatusObjects()` always contains at least one entry, containing the outcome status.
 
-[source, go, role=nocollapse]
+[source, javascript, role=nocollapse]
 ----
 let { records, summary } = await driver.executeQuery(`
   MATCH p=shortestPath((:Person {name: 'Alice'})-[*]->(:Person {name: 'Bob'}))

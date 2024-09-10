@@ -252,7 +252,7 @@ You can disable notifications altogether by setting the minimum severity to `'OF
 driver = neo4j.GraphDatabase.driver(
     URI, auth=AUTH,
     notifications_min_severity='WARNING',  # or 'OFF' to disable entirely
-    notifications_disabled_classifications=['HINT', 'GENERIC'],  // filters categories as well
+    notifications_disabled_classifications=['HINT', 'GENERIC'],  # filters categories as well
 )
 
 # at session level
