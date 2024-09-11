@@ -145,11 +145,21 @@ For more information and examples, see link:{neo4j-docs-base-uri}/cypher-manual/
 
 == Notifications
 
-The method `ResultSummary.notifications()` returns a list of link:{neo4j-docs-base-uri}/status-codes/current/notifications[notifications coming from the server], if any were raised by the execution of the query.
-These include recommendations for performance improvements, warnings about the usage of deprecated features, and other hints about sub-optimal usage of Neo4j.
-Each notification comes as a link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/summary/Notification.html[`Notification`] object.
+After executing a query, the server can return link:{neo4j-docs-base-uri}/status-codes/current/notifications[notifications] alongside the query result.
+Notifications contain recommendations for performance improvements, warnings about the usage of deprecated features, and other hints about sub-optimal usage of Neo4j.
+
+[TIP]
+For driver version >= 5.25 and server version >= 5.23, two forms of notifications are available (_Neo4j status codes_ and _GQL status codes_).
+For earlier versions, only _Neo4j status codes_ are available. +
+GQL status codes are planned to supersede Neo4j status codes.
 
 .An unbounded shortest path raises a performance notification
+[.tabbed-example]
+=====
+[.include-with-neo4j-status-code]
+======
+The method `ResultSummary.notifications()` returns a list of link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/summary/Notification.html[`Notification`] objects.
+
 [source, java, role=nocollapse]
 ----
 var result = driver.executableQuery("""
@@ -161,7 +171,6 @@ var result = driver.executableQuery("""
     .execute();
 var notifications = result.summary().notifications();
 System.out.println(notifications);
-
 /*
 [
     code=Neo.ClientNotification.Statement.UnboundedVariableLengthPattern,
@@ -177,17 +186,54 @@ System.out.println(notifications);
 */
 ----
 
+======
+[.include-with-GQL-status-code]
+======
 
+With version >= 5.25, the method `ResultSummary.gqlStatusObjects()` returns a set of GQL-compliant status objects.
+
+The set can contain both link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/summary/Notification.html[`Notification`] objects and link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/summary/GqlStatusObject.html[`GqlStatusObject`] objects.
+The latter encodes the query's _outcome_ status: `00000` for "success", `02000` for "no data", and `00001` for "omitted result".
+`ResultSummary.gqlStatusObjects()` always contains at least one entry, containing the outcome status.
+
+[source, java, role=nocollapse]
+----
+var result = driver.executableQuery("""
+    MATCH p=shortestPath((:Person {name: $start})-[*]->(:Person {name: $end}))
+    RETURN p
+    """)
+    .withParameters(Map.of("start", "Alice", "end", "Bob"))
+    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+    .execute();
+var statuses = result.summary().gqlStatusObjects();
+System.out.println(statuses);
+/*
+[
+    InternalGqlStatusObject{gqlStatus='02000', statusDescription='note: no data', diagnosticRecord={OPERATION_CODE="0", OPERATION="", CURRENT_SCHEMA="/"}},
+    code=Neo.ClientNotification.Statement.UnboundedVariableLengthPattern, title=The provided pattern is unbounded, consider adding an upper limit to the number of node hops., description=Using shortest path with an unbounded pattern will likely result in long execution times. It is recommended to use an upper limit to the number of node hops in your pattern., severityLevel=InternalNotificationSeverity[type=INFORMATION, level=800], rawSeverityLevel=INFORMATION, classification=PERFORMANCE, rawClassification=PERFORMANCE, position={offset=21, line=1, column=22}
+]
+*/
+----
+
+======
+=====
+
+
+[role=label--new-5.7]
 === Filter notifications
 
 By default, the server analyses each query for all categories and severity of notifications.
-Starting from version 5.7, you can use the configuration method `.withNotificationConfig(link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/NotificationConfig.html[NotificationConfig])` to restrict the severity or category of notifications that you are interested into, or disable them altogether. There is a slight performance gain in restricting the amount of notifications the server is allowed to raise.
+Starting from version 5.7, you can use the configuration method `.withNotificationConfig(link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/NotificationConfig.html[NotificationConfig])` to restrict the severity or category/classification of notifications that you are interested into, or disable them altogether.
+There is a slight performance gain in restricting the amount of notifications the server is allowed to raise.
 
 The `NotificationConfig` interface provides the methods `.enableMinimumSeverity(link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/NotificationSeverity.html[NotificationSeverity])`, `.disableCategories(Set<link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/NotificationCategory.html[NotificationCategory]>)`, and `.disableAllConfig()` to set the configuration.
 
+The severity filter applies to both Neo4j and GQL notifications.
+The category filter acts on both categories and classifications.
+
 You can call `.withNotificationConfig()` both on a `Config` object when creating a `Driver` instance, and on a `SessionConfig` object when creating a session.
 
-.Allow only `WARNING` (and over) notifications, but not of `HINT` or `GENERIC` category
+.Allow only `WARNING` (and over) notifications, but not of `HINT` or `GENERIC` classifications
 [source, java]
 ----
 // import java.util.Set
@@ -203,7 +249,7 @@ var driver = GraphDatabase.driver(
     Config.builder()
     .withNotificationConfig(NotificationConfig.defaultConfig()
         .enableMinimumSeverity(NotificationSeverity.WARNING)
-        .disableCategories(Set.of(NotificationCategory.HINT, NotificationCategory.GENERIC))
+        .disableCategories(Set.of(NotificationCategory.HINT, NotificationCategory.GENERIC))  // filters classifcations as well
     ).build()
 );
 
@@ -213,7 +259,7 @@ var session = driver.session(
     .withDatabase("neo4j")
     .withNotificationConfig(NotificationConfig.defaultConfig()
         .enableMinimumSeverity(NotificationSeverity.WARNING)
-        .disableCategories(Set.of(NotificationCategory.HINT, NotificationCategory.GENERIC))
+        .disableCategories(Set.of(NotificationCategory.HINT, NotificationCategory.GENERIC))  // filters classifcations as well
     ).build()
 );
 ----
