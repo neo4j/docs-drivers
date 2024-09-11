@@ -1,4 +1,4 @@
-= Upgrade & Migration
+= Upgrade from older versions
 
 This page contains the list of new features and breaking changes that happened in the driver from version 4.4 to 5.x.
 For a full list of changes, see the link:https://github.com/neo4j/neo4j-python-driver/wiki/5.x-changelog[Driver -> Changelog].
@@ -23,7 +23,7 @@ See link:https://neo4j.com/docs/cypher-manual/current/deprecations-additions-rem
 
 Using the migration assistent, the recommended upgrade steps are:
 
-1. Run the migration assistent with its default configuration and address all the issues that it surfaces. The `path` argument supports link:https://www.man7.org/linux/man-pages/man7/glob.7.html[globbing] and can be repeated as many times as needed. +
+1. Run the migration assistent with its default configuration and address all the issues that it surfaces. The `path` argument supports link:https://www.man7.org/linux/man-pages/man7/glob.7.html[globbing], and can be repeated. +
 +
 [source, bash]
 ----
@@ -39,12 +39,12 @@ python3 main.py -l python --regex-parser /path/*.py /path-recursive/**/*.py
 +
 The regex parser can detect implicit function calls and other hard-to-parse expressions, but is likely to surface more false positives (for more information, see link:https://github.com/stefano-ottolenghi/neo4j-drivers-migration-assistent?tab=readme-ov-file#accuracy[Neo4j Drivers Migration Assistent -> Accuracy]).
 You can add any spurious entry to the ignored list, so that the assistent won't bring them up in future runs.
-3. Although the assistent can detect most of the locations where action is needed, a few changelog entries can't be surfaced in this form, so you should still revise the xref:breaking-changes[breaking changes] section and audit your codebase for the changes marked with {cross-mark}.
+3. Although the assistent can detect most of the locations where action is needed, a few changelog entries can't be surfaced in this form, so you should still revise the xref:breaking-changes[breaking changes] section and audit your codebase for the changes marked with {cross-mark} in the table.
 4. You are ready to upgrade the driver package to the new version. For example, using `pip`: +
 +
 [source, bash]
 ----
-pip3 install -U neo4j==5.x
+pip3 install -U neo4j==5.25
 ----
 
 
@@ -140,11 +140,12 @@ See xref:result-summary.adoc#_filter_notifications[Explore the query execution s
 .GQL statuses of queries in the `ResultSummary`
 [%collapsible]
 ====
-A new property `ResultSummary.gql_status_objects` has been introduced. It returns a sequence of `GqlStatusObjects`, containing information about the execution of the query.
+A new property `ResultSummary.gql_status_objects` is available.
+It contains a sequence of `GqlStatusObjects`, containing information about the execution of the query.
 
-Eventually, this API is planned to supersede the current notifications API.
+This API is planned to supersede the current notifications API.
 
-See link:https://github.com/neo4j/neo4j-python-driver/discussions/1067[GQL statuses in ResultSummary].
+See xref:result-summary.adoc#_notifications[Explore the query execution summary -> Notifications].
 ====
 |
 .More convenient handling of server-side warnings and notifications
