@@ -259,7 +259,7 @@ Starting from version 5.7, you can use the parameters `minimumSeverityLevel` and
 There is a slight performance gain in restricting the amount of notifications the server is allowed to raise.
 
 The severity filter applies to both Neo4j and GQL notifications.
-Category and classification filters exist separately only due to the discrepancy in lexicon between GQL and Neo4j; both filters affect either form of notification though, so you should use only one of them. If you provide both a category and a classification filter, their contents will be merged.
+Category and classification filters exist separately only due to the discrepancy in lexicon between GQL and Neo4j; both filters affect either form of notification though, so you should use only one of them.
 You can use any of those parameters either when creating a `Driver` instance, or when creating a session.
 
 You can disable notifications altogether by setting the minimum severity to `'OFF'`.
