@@ -151,11 +151,21 @@ For more information and examples, see link:{neo4j-docs-base-uri}/cypher-manual/
 
 == Notifications
 
-The property `ResultSummary.notifications` contains a list of link:{neo4j-docs-base-uri}/status-codes/current/notifications[notifications coming from the server], if any were raised by the execution of the query.
-These include recommendations for performance improvements, warnings about the usage of deprecated features, and other hints about sub-optimal usage of Neo4j.
-Each notification comes as a link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/result-summary.js~Notification.html[`Notification`] object.
+After executing a query, the server can return link:{neo4j-docs-base-uri}/status-codes/current/notifications/[notifications] alongside the query result.
+Notifications contain recommendations for performance improvements, warnings about the usage of deprecated features, and other hints about sub-optimal usage of Neo4j.
+
+[TIP]
+For driver version >= 5.25 and server version >= 5.23, two forms of notifications are available (_Neo4j status codes_ and _GQL status codes_).
+For earlier versions, only _Neo4j status codes_ are available. +
+GQL status codes are planned to supersede Neo4j status codes.
 
 .An unbounded shortest path raises a performance notification
+[.tabbed-example]
+=====
+[.include-with-neo4j-status-code]
+======
+The property `ResultSummary.notifications` contains a list of link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/result-summary.js~Notification.html[`Notification`] objects.
+
 [source, javascript, role=nocollapse]
 ----
 let { records, summary } = await driver.executeQuery(`
@@ -182,16 +192,79 @@ console.log(summary.notifications)
 */
 ----
 
+======
+[.include-with-GQL-status-code]
+======
 
+With version >= 5.25, the property `ResultSummary.gqlStatusObjects` contains a list of link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/notification.js~GqlStatusObject.html[`GqlStatusObject`]s.
+These are GQL-compliant status objects.
+
+Some (but not all) `GqlStatusObjects` are notifications, whereas some report an _outcome_ status: `00000` for "success", `02000` for "no data", and `00001` for "omitted result".
+`Summary.GqlStatusObjects()` always contains at least one entry, containing the outcome status.
+
+[source, javascript, role=nocollapse]
+----
+let { records, summary } = await driver.executeQuery(`
+  MATCH p=shortestPath((:Person {name: 'Alice'})-[*]->(:Person {name: 'Bob'}))
+  RETURN p
+  `, {},
+  { database: 'neo4j' }
+)
+console.log(summary.gqlStatusObjects)
+/*
+[
+  GqlStatusObject {
+    gqlStatus: '02000',
+    statusDescription: 'note: no data',
+    diagnosticRecord: { OPERATION: '', OPERATION_CODE: '0', CURRENT_SCHEMA: '/' },
+    position: undefined,
+    severity: 'UNKNOWN',
+    rawSeverity: undefined,
+    classification: 'UNKNOWN',
+    rawClassification: undefined,
+    isNotification: false
+  },
+  GqlStatusObject {
+    gqlStatus: '03N91',
+    statusDescription: "info: unbounded variable length pattern. The provided pattern `(:Person {name: 'Alice'})-[*]->(:Person {name: 'Bob'})` is unbounded. Shortest path with an unbounded pattern may result in long execution times. Use an upper limit (e.g. `[*..5]`) on the number of node hops in your pattern.",
+    diagnosticRecord: {
+      OPERATION: '',
+      OPERATION_CODE: '0',
+      CURRENT_SCHEMA: '/',
+      _classification: 'PERFORMANCE',
+      _status_parameters: [Object],
+      _severity: 'INFORMATION',
+      _position: [Object]
+    },
+    position: { offset: 24, line: 2, column: 24 },
+    severity: 'INFORMATION',
+    rawSeverity: 'INFORMATION',
+    classification: 'PERFORMANCE',
+    rawClassification: 'PERFORMANCE',
+    isNotification: true
+  }
+]
+*/
+----
+
+======
+=====
+
+
+[role=label--new-5.7]
 === Filter notifications
 
 By default, the server analyses each query for all categories and severity of notifications.
-Starting from version 5.7, you can use the parameter `notificationsFilter` to restrict the severity or category of notifications that you are interested into. You may disable notifications altogether by setting the minimum severity to `OFF`.
-You can use that parameter either when creating a `Driver` instance, or when creating a session.
-
+Starting from version 5.7, you can use the parameters `minimumSeverityLevel` and/or `disabledCategories`/`disabledClassifications` to restrict the severity and/or category/classification of notifications that you are interested into.
 There is a slight performance gain in restricting the amount of notifications the server is allowed to raise.
 
-.Allow only `WARNING` notifications, but not of `HINT` or `GENERIC` category
+The severity filter applies to both Neo4j and GQL notifications.
+Category and classification filters exist separately only due to the discrepancy in lexicon between GQL and Neo4j; both filters affect either form of notification though, so you should use only one of them.
+You can use any of those parameters either when creating a `Driver` instance, or when creating a session.
+
+You can disable notifications altogether by setting the minimum severity to `'OFF'`.
+
+.Allow only `WARNING` notifications, but not of `HINT` or `GENERIC` classifications
 [source, javascript]
 ----
 // at driver level
@@ -199,7 +272,7 @@ let driver = neo4j.driver(
   URI,  neo4j.auth.basic(USER, PASSWORD), {
     notificationsFilter: {
       minimumSeverityLevel: 'WARNING',  // or 'OFF' to disable entirely
-      disabledCategories: ['HINT', 'GENERIC']
+      disabledClassifications: ['HINT', 'GENERIC']  // filters categories as well
     }
   }
 )
@@ -209,7 +282,7 @@ let session = driver.session({
     database: 'neo4j',
     notificationsFilter: {
       minimumSeverityLevel: 'WARNING',  // or 'OFF' to disable entirely
-      disabledCategories: ['HINT', 'GENERIC']
+      disabledClassifications: ['HINT', 'GENERIC']  // filters categories as well
     }
 })
 ----
