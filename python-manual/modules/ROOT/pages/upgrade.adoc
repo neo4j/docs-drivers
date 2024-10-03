@@ -37,7 +37,7 @@ python3 main.py -l python /path/*.py /path-recursive/**/*.py
 python3 main.py -l python --regex-parser /path/*.py /path-recursive/**/*.py
 ----
 +
-The regex parser can detect implicit function calls and other hard-to-parse expressions, but is likely to surface more false positives (for more information, see link:https://github.com/stefano-ottolenghi/neo4j-drivers-migration-assistent?tab=readme-ov-file#accuracy[Neo4j Drivers Migration Assistent -> Accuracy]).
+The regex parser can detect implicit function calls and other hard-to-parse expressions, but is likely to surface more false positives (for more information, see link:https://github.com/neo4j/drivers-migration-assistent?tab=readme-ov-file#accuracy[Neo4j Drivers Migration Assistent -> Accuracy]).
 You can add any spurious entry to the ignored list, so that the assistent won't bring them up in future runs.
 3. Although the assistent can detect most of the locations where action is needed, a few changelog entries can't be surfaced in this form, so you should still revise the xref:breaking-changes[breaking changes] section and audit your codebase for the changes marked with {cross-mark} in the table.
 4. You are ready to upgrade the driver package to the new version. For example, using `pip`: +
