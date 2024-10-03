@@ -164,7 +164,7 @@ See link:https://github.com/neo4j/neo4j-python-driver/discussions/1064[Convenien
 .Telemetry
 [%collapsible]
 ====
-The driver sends anonymous API usage statistics to the server if requested.
+The driver sends anonymous API usage statistics to the server.
 Use the driver configuration `telemetry_disabled=True` to opt out.
 ====
 |
