@@ -1,0 +1,332 @@
+= Upgrade from older versions
+
+This page contains the list of new features and breaking changes that happened in the driver from version 4.4 to 5.x.
+For a full list of changes, see the link:https://github.com/neo4j/neo4j-go-driver/wiki/5.x-changelog[Driver -> Changelog].
+
+[NOTE]
+This page may be revised with new changes up until the time when the latest 5.x version is released.
+
+The link:https://github.com/neo4j/drivers-migration-assistent[Neo4j Drivers Migration Assistent] simplifies the upgrade process, by contextualizing the changelog to your codebase.
+It scans your codebase for usage of deprecations and removals, and brings them up to you.
+The tool doesn't automatically rewrite your code; it only points at where action is needed, providing in-context information on how each hit should be addressed.
+
+The migration assistent requires `python3`.
+
+Any of the 5.x versions of the driver is compatible both with Neo4j server 4.4 and 5.x, so you can upgrade the driver before you upgrade the server.
+The driver version 4.4 is forward compatible with Neo4j server 5.x as well, so you could also upgrade the server before the driver; however, given that it's easier to roll back an application upgrade than a server upgrade, it's recommended to start with the driver.
+
+[TIP]
+When upgrading the Neo4j server to a newer version, the Cypher queries in your application may also need updating. +
+See link:https://neo4j.com/docs/cypher-manual/current/deprecations-additions-removals-compatibility/[Cypher -> Deprecations, additions, and compatibility].
+
+[NOTE]
+If migrating from earlier than version 4.x, see the link:https://github.com/neo4j/neo4j-go-driver/blob/v4.0.0-beta1/MIGRATIONGUIDE.md[migration guide to version 4] first.
+
+
+[[recommended-steps]]
+== Recommended steps
+
+Using the migration assistent, the recommended upgrade steps are:
+
+1. Run the migration assistent with its default configuration and address all the issues that it surfaces. The `path` argument supports link:https://www.man7.org/linux/man-pages/man7/glob.7.html[globbing], and can be repeated. +
++
+[source, bash]
+----
+python3 main.py -l go /path/*.go /path-recursive/**/*.go
+----
++
+2. Re-run the assistent with the regex parser and check if any more legit issues are raised. +
++
+[source, bash]
+----
+python3 main.py -l go --regex-parser /path/*.go /path-recursive/**/*.go
+----
++
+The regex parser can detect implicit function calls and other hard-to-parse expressions, but is likely to surface more false positives (for more information, see link:https://github.com/neo4j/drivers-migration-assistent?tab=readme-ov-file#accuracy[Neo4j Drivers Migration Assistent -> Accuracy]).
+You can add any spurious entry to the ignored list, so that the assistent won't bring them up in future runs.
+3. Although the assistent can detect most of the locations where action is needed, a few changelog entries can't be surfaced in this form, so you should still revise the xref:breaking-changes[breaking changes] section and audit your codebase for the changes marked with {cross-mark} in the table.
+4. You are ready to upgrade the driver package to the new version. +
+*Note that* your include directives will need to be updated too. +
++
+[source, bash]
+----
+go get github.com/neo4j/neo4j-go-driver/v5
+----
+
+
+[[new-features]]
+== New features
+
+[cols="1a,1a"]
+|===
+
+|
+.Support for Go up to 1.23
+[%collapsible]
+====
+The driver is compatible with any Go version starting from 1.18 up to 1.23.
+====
+|
+.`neo4j.ExecuteQuery()` to run transactions with less knowledge of driver's internals
+[%collapsible]
+====
+The new function is a wrapper for `SessionWithContext.ExecuteRead/Write()`, but it abstracts away the result processing part and returns a list of records to the caller directly.
+
+See xref:query-simple.adoc[].
+====
+
+|
+.Support for user-provided `Context` instances
+[%collapsible]
+====
+A long requested feature from the community: the driver now exposes a set of APIs that take user-provided instances of `context.Context` into account.
+The entry point is `neo4j.NewDriverWithContext()`.
+====
+|
+.Improved support for generics
+[%collapsible]
+====
+Functions link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#GetRecordValue[`neo4j.GetRecordValue()`] and link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#GetProperty[`neo4j.GetProperty()`] allow to extract properties and record values of the specified type.
+
+Functions link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#ExecuteRead[`neo4j.ExecuteRead()`] and link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#ExecuteWrite[`neo4j.ExecuteWrite()`] provide generic variants of `SessionWithContext.ExecuteRead/Write()`.
+====
+
+
+|
+.Re-authentication
+[%collapsible]
+====
+Allows for handling expiring authentication (backwards compatible) as well as session scoped authentication.
+
+See link:https://github.com/neo4j/neo4j-go-driver/pull/467[Re-authentication].
+====
+|
+.Mutual TLS (mTLS) as second authentication factor (2FA)
+[%collapsible]
+====
+Allows for configuring client side TLS certificates to authenticate against the server.
+
+See link:https://github.com/neo4j/neo4j-go-driver/discussions/577[Mutual TLS].
+====
+
+|
+.`BookmarkManager` support
+[%collapsible]
+====
+Bookmark managers make it easier to achieve causal chaining of sessions.
+
+See xref:bookmarks.adoc[].
+====
+|
+.Notification filtering API
+[%collapsible]
+====
+Filtering allows to receive only a subset of notifications from the server, and to improve performance server-side.
+
+See xref:result-summary.adoc#_filter_notifications[Explore the query execution summary -> Filter notifications].
+====
+
+|
+.GQL statuses of queries in the `ResultSummary`
+[%collapsible]
+====
+These are GQL-compliant status objects.
+A new method `ResultSummary.GqlStatusObject()` is available.
+It returns a list of `GqlStatusObject`, containing information about the execution of the query.
+
+This API is planned to supersede the current notifications API.
+
+See xref:result-summary.adoc#_notifications[Explore the query execution summary -> Notifications].
+====
+|
+.Telemetry
+[%collapsible]
+====
+The driver sends anonymous API usage statistics to the server.
+Use the driver configuration `TelemtryDisabled = true` to opt out.
+
+For more information, see link:https://github.com/neo4j/neo4j-go-driver/pull/533[Telemetry API].
+====
+
+|===
+
+
+[[breaking-changes]]
+== Breaking changes and deprecations
+
+The column `Assistent` denotes whether the Neo4j Drivers Migration Assistent can detect issues related to the given changelog entry.
+Entries with a cross mark {cross-mark} require manual inspection.
+
+Deprecated features are likely to be removed in version 6.
+
+[cols="1,5a,1,1"]
+|===
+|Version |Message |Status |Assistent
+
+|5.0
+|Minimum supported Go version is 1.18.
+|label:removed[Changed]
+|{cross-mark}
+
+|5.0
+|link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#ExplicitTransaction[`ExplicitTransaction`] -- Calling `Rollback()` or `Commit()` multiple times is now prohibited and results in a `UsageError`.
+|label:removed[Changed]
+|{cross-mark}
+
+|5.0
+|Operations on closed sessions fail with error with `Operation attempted on a closed session`.
+|label:removed[Changed]
+|{cross-mark}
+
+|5.0
+|link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#Counters.ContainsUpdates[`ResultSummary.ContainUpdates()`] -- In 4.x, the function returned `true` if any of the summary counters were strictly positive.
+It now returns true only if at least a deletion or creation of the following entities happened: constraint, index, node, relationship, label, property.
+|label:removed[Changed]
+|{cross-mark}
+
+|5.0
+|A link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#WithTxTimeout[transaction timeout] of `0` (which is not the default value anymore) now disables the timeout on the server side.
+If no timeout is specified, the server uses the server-defined timeout.
+|label:removed[Changed]
+|{check-mark}
+
+|5.0
+|`Driver.Session()` has been removed in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#DriverWithContext.NewSession[`DriverWithContext.NewSession()`].
+|label:removed[]
+|{check-mark}
+
+|5.0
+|`Query.Params()` has been removed in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#Query.Parameters[`Query.Parameters()`].
+|label:removed[]
+|{check-mark}
+
+|5.0
+|`Record.GetByIndex()` has been removed.
+Access the link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/db#Record[`Record.Values`] struct slice directly instead.
+|label:removed[]
+|{check-mark}
+
+|5.0
+|`ResultSummary.Statement()` has been removed in favor of `ResultSummary.Query()`.
+The new method returns a link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#ResultSummary.Query[`Query`] rather than a `Statement` object.
+|label:removed[]
+|{check-mark}
+
+|5.0
+|`Session.LastBookmark()` is deprecated in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#Session.LastBookmarks[`Session.LastBookmarks()`].
+The logic is similar, but the new method returns `neo4j.Bookmarks` instead of `string`.
+|label:removed[]
+|{check-mark}
+
+|5.0
+|Some of the previously exported types from `neo4j.db` are now internal. +
+For `db.AccessMode`, `db.WriteMode` and `db.ReadMode`, use link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#AccessMode[`neo4j.AccessMode`], link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#AccessModeWrite[`neo4j.AccessModeWrite`] and link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#AccessModeRead[`neo4j.AccessModeRead`]. +
+For `db.TxConfig`, use link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#TransactionConfig[`neo4j.TransactionConfig`]. +
+All others have no replacement: `db.TxHandle`, `db.StreamHandle`, `db.Command`, `db.Connection`, `db.RoutingTable`, `db.DefaultDatabase`, `db.DatabaseSelector`.
+|label:removed[]
+|{check-mark}
+
+|5.0
+|`ServerInfo.Version` has been removed. 
+Use link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#ServerInfo[`ServerInfo.Agent`, `ServerInfo.ProtocolVersion`], or call the link:https://neo4j.com/docs/operations-manual/current/reference/procedures/#procedure_dbms_components[`dbms.components`] Cypher procedure instead.
+|label:removed[]
+|{check-mark}
+
+|5.0
+|`NewDriver()` is deprecated in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#NewDriverWithContext[`NewDriverWithContext()`]. 
+The behavior is similar, except that the new function takes a `ctx.Context` as first argument.
+|label:deprecated[]
+|{check-mark}
+
+|5.0
+|`Session.WriteTransaction()` and `Session.ReadTransaction()` are deprecated in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#SessionWithContext.ExecuteWrite[`Session.ExecuteWrite()`] and link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#SessionWithContext.ExecuteRead[`Session.ExecuteRead()`].
+The logic is the same, but the argument type changed from `Transaction` to `ManagedTransaction`, and explicit transaction handling methods (`.Commit()`, `.Rollback()`, `.Close()`) are not available on managed transactions anymore.
+|label:deprecated[]
+|{check-mark}
+
+|5.0
+|link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/dbtype#Node[`Node.Id`] and link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/dbtype#Relationship[`Relationship.Id`] are deprecated in favor of `Node.ElementId` and `Relationship.ElementId`. 
+Old identifiers were Int64, wereas new ElementIds are String.
+|label:deprecated[]
+|{check-mark}
+
+|5.0
+|`neo4j.SingleT()` is deprecated in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#SingleTWithContext[`neo4j.SingleTWithContext()`].
+The behavior is similar, except that the new function takes a `ctx.Context` as first argument.
+|label:deprecated[]
+|{check-mark}
+
+|5.0
+|`neo4j.Collect()` is deprecated in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#CollectWithContext[`neo4j.CollectWithContext()`].
+The behavior is similar, except that the new function takes a `ctx.Context` as first argument.
+|label:deprecated[]
+|{check-mark}
+
+|5.0
+|`neo4j.CollectT()` is deprecated in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#CollectTWithContext[`neo4j.CollectTWithContext()`].
+The behavior is similar, except that the new function takes a `ctx.Context` as first argument.
+|label:deprecated[]
+|{check-mark}
+
+|5.8
+|`neo4j.Config` is deprecated in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/config#Config[`config.Config`].
+|label:deprecated[]
+|{check-mark}
+
+|5.0
+|`neo4j.Session` is deprecated in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#SessionWithContext[`neo4j.SessionWithContext`].
+|label:deprecated[]
+|{check-mark}
+
+|5.0
+|`neo4j.Driver` is deprecated in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#DriverWithContext[`neo4j.DriverWithContext`].
+|label:deprecated[]
+|{check-mark}
+
+|5.0
+|`neo4j.Transaction` is deprecated in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#ExplicitTransaction[`neo4j.ExplicitTransaction`].
+|label:deprecated[]
+|{check-mark}
+
+|5.0
+|`neo4j.TransactionWork` is deprecated in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#ManagedTransactionWork[`neo4j.ManagedTransactionWork`].
+|label:deprecated[]
+|{check-mark}
+
+|5.0
+|`neo4j.Result` is deprecated in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#ResultWithContext[`neo4j.ResultWithContext`].
+|label:deprecated[]
+|{check-mark}
+
+|5.0
+|`Config.RootCAs` is deprecated in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/config#Config.TlsConfig[`Config.TlsConfig`].
+|label:deprecated[]
+|{check-mark}
+
+|5.8
+|`neo4j.ServerAddress` is deprecated in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/config#ServerAddress[`config.ServerAddress`].
+|label:deprecated[]
+|{check-mark}
+
+|5.8
+|`neo4j.ServerAddressResolver` is deprecated in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/config#ServerAddressResolver[`config.ServerAddressResolver`].
+|label:deprecated[]
+|{check-mark}
+
+|5.17
+|`neo4j.(LogLevel\|ERROR\|WARNING\|INFO\|DEBUG)` are deprecated in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/log#Level[`log.(Level\|ERROR\|WARNING\|INFO\|DEBUG)`].
+|label:deprecated[]
+|{check-mark}
+
+|5.17
+|`neo4j.ConsoleLogger()` is deprecated in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/log#ToConsole[`neo4j.log.ToConsole()`].
+The behavior is similar, except that the new function takes a `ctx.Context` as first argument.
+|label:deprecated[]
+|{check-mark}
+
+|5.17
+|`neo4j.ConsoleBoltLogger()` is deprecated in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/log#BoltToConsole[`neo4j.log.BoltToConsole()`].
+|label:deprecated[]
+|{check-mark}
+
+|===
