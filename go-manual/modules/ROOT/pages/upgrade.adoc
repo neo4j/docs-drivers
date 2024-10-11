@@ -227,13 +227,13 @@ All others have no replacement: `db.TxHandle`, `db.StreamHandle`, `db.Command`, 
 |{check-mark}
 
 |5.0
-|`ServerInfo.Version` has been removed. 
+|`ServerInfo.Version` has been removed.
 Use link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#ServerInfo[`ServerInfo.Agent`, `ServerInfo.ProtocolVersion`], or call the link:https://neo4j.com/docs/operations-manual/current/reference/procedures/#procedure_dbms_components[`dbms.components`] Cypher procedure instead.
 |label:removed[]
 |{check-mark}
 
 |5.0
-|`NewDriver()` is deprecated in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#NewDriverWithContext[`NewDriverWithContext()`]. 
+|`NewDriver()` is deprecated in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#NewDriverWithContext[`NewDriverWithContext()`].
 The behavior is similar, except that the new function takes a `ctx.Context` as first argument.
 |label:deprecated[]
 |{check-mark}
@@ -245,7 +245,7 @@ The logic is the same, but the argument type changed from `Transaction` to `Mana
 |{check-mark}
 
 |5.0
-|link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/dbtype#Node[`Node.Id`] and link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/dbtype#Relationship[`Relationship.Id`] are deprecated in favor of `Node.ElementId` and `Relationship.ElementId`. 
+|link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/dbtype#Node[`Node.Id`] and link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/dbtype#Relationship[`Relationship.Id`] are deprecated in favor of `Node.ElementId` and `Relationship.ElementId`.
 Old identifiers were Int64, wereas new ElementIds are String.
 |label:deprecated[]
 |{check-mark}
@@ -326,6 +326,11 @@ The behavior is similar, except that the new function takes a `ctx.Context` as f
 
 |5.17
 |`neo4j.ConsoleBoltLogger()` is deprecated in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/log#BoltToConsole[`neo4j.log.BoltToConsole()`].
+|label:deprecated[]
+|{check-mark}
+
+|5.23
+|Notifications-related objects have been moved from the global namespace `neo4j` into link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/notifications[`neo4j/notifications`] -- `neo4j.(NotificationSeverity\|Warning\|Information\|UnknownSeverity\|NotificationCategory\|Hint\|Unrecognized\|Unsupported\|Performance\|Deprecation\|Generic\|Security\|Topology\|UnknownCategory)` are deprecated in favor of `notifications.(NotificationSeverity\|Warning\|Information\|UnknownSeverity\|NotificationCategory\|Hint\|Unrecognized\|Unsupported\|Performance\|Deprecation\|Generic\|Security\|Topology\|UnknownCategory)`.
 |label:deprecated[]
 |{check-mark}
 
