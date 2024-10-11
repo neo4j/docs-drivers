@@ -28,14 +28,24 @@ If migrating from earlier than version 4.x, see the link:https://github.com/neo4
 
 Using the migration assistent, the recommended upgrade steps are:
 
-1. Run the migration assistent with its default configuration and address all the issues that it surfaces. The `path` argument supports link:https://www.man7.org/linux/man-pages/man7/glob.7.html[globbing], and can be repeated. +
+1. Set up the environment for the assistent to work in.
+Assuming `python3` and `pip3` are already installed,
++
+[source, bash]
+----
+python3 -m venv virtualenvs/neo-migration
+source virtualenvs/neo-migration/bin/activate
+pip3 install -r requirements.txt
+----
+
+2. Run the migration assistent with its default configuration and address all the issues that it surfaces. The `path` argument supports link:https://www.man7.org/linux/man-pages/man7/glob.7.html[globbing], and can be repeated. +
 +
 [source, bash]
 ----
 python3 main.py -l go /path/*.go /path-recursive/**/*.go
 ----
-+
-2. Re-run the assistent with the regex parser and check if any more legit issues are raised. +
+
+3. Re-run the assistent with the regex parser and check if any more legit issues are raised. +
 +
 [source, bash]
 ----
@@ -44,8 +54,10 @@ python3 main.py -l go --regex-parser /path/*.go /path-recursive/**/*.go
 +
 The regex parser can detect implicit function calls and other hard-to-parse expressions, but is likely to surface more false positives (for more information, see link:https://github.com/neo4j/drivers-migration-assistent?tab=readme-ov-file#accuracy[Neo4j Drivers Migration Assistent -> Accuracy]).
 You can add any spurious entry to the ignored list, so that the assistent won't bring them up in future runs.
-3. Although the assistent can detect most of the locations where action is needed, a few changelog entries can't be surfaced in this form, so you should still revise the xref:breaking-changes[breaking changes] section and audit your codebase for the changes marked with {cross-mark} in the table.
-4. You are ready to upgrade the driver package to the new version. +
+
+4. Although the assistent can detect most of the locations where action is needed, a few changelog entries can't be surfaced in this form, so you should still revise the xref:breaking-changes[breaking changes] section and audit your codebase for the changes marked with {cross-mark} in the table.
+
+5. You are ready to upgrade the driver package to the new version. +
 *Note that* your include directives will need to be updated too. +
 +
 [source, bash]
@@ -268,11 +280,6 @@ The behavior is similar, except that the new function takes a `ctx.Context` as f
 |label:deprecated[]
 |{check-mark}
 
-|5.8
-|`neo4j.Config` is deprecated in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/config#Config[`config.Config`].
-|label:deprecated[]
-|{check-mark}
-
 |5.0
 |`neo4j.Session` is deprecated in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#SessionWithContext[`neo4j.SessionWithContext`].
 |label:deprecated[]
@@ -304,6 +311,11 @@ The behavior is similar, except that the new function takes a `ctx.Context` as f
 |{check-mark}
 
 |5.8
+|`neo4j.Config` is deprecated in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/config#Config[`config.Config`].
+|label:deprecated[]
+|{check-mark}
+
+|5.8
 |`neo4j.ServerAddress` is deprecated in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/config#ServerAddress[`config.ServerAddress`].
 |label:deprecated[]
 |{check-mark}
@@ -326,6 +338,12 @@ The behavior is similar, except that the new function takes a `ctx.Context` as f
 
 |5.17
 |`neo4j.ConsoleBoltLogger()` is deprecated in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/log#BoltToConsole[`neo4j.log.BoltToConsole()`].
+|label:deprecated[]
+|{check-mark}
+
+|5.17
+|Types `neo4j.log.Console` and `neo4j.log.Void` are deprecated and unified into link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/log#Logger[`neo4j.log.Logger`]. +
+Functions `neo4j.ConsoleLogger()` and `neo4j.Void()` are deprecated in favor of https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/log#ToConsole[`neo4j.log.ToConsole()`] and https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/log#ToVoid[`neo4j.log.ToVoid()`], both returning a `neo4j.log.Logger` object.
 |label:deprecated[]
 |{check-mark}
 
