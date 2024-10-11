@@ -29,7 +29,8 @@ If migrating from earlier than version 4.x, see the link:https://github.com/neo4
 Using the migration assistent, the recommended upgrade steps are:
 
 1. Set up the environment for the assistent to work in.
-Assuming `python3` and `pip3` are already installed,
+Download the link:https://github.com/neo4j/drivers-migration-assistent/archive/refs/heads/dev.zip[Drivers Migration Assistent zip], extract it, and locate yourself in its directory.
+Then, assuming `python3` and `pip3` are already installed,
 +
 [source, bash]
 ----
