@@ -29,7 +29,7 @@ This conversion is lossy, as the driver's types support nanosecond precision, wh
 
 [NOTE]
 The driver's temporal types are designed to be used with link:https://pypi.org/project/pytz/[pytz].
-Other `datetime.tzinfo` implementations (e.g., `datetime.timezone`, `zoneinfo`, `dateutil.tz`) are not supported and likely won't work well.
+Other `datetime.tzinfo` implementations (e.g., `datetime.timezone`, `zoneinfo`, `dateutil.tz`) are not supported and are unlikely to work well.
 
 For a list of time zone abbreviations, see link:https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List[List of tz database time zones].
 
