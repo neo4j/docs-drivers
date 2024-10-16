@@ -1,0 +1,17 @@
+# tag::intro[]
+
+[NOTE]
+This page may be revised with new changes up until the time when the latest 5.x version is released.
+
+The link:https://github.com/neo4j/drivers-migration-assistent[Neo4j Drivers Migration Assistent] simplifies the upgrade process, by contextualizing the changelog to your codebase.
+It scans your codebase for usage of deprecations and removals, and brings them up to you.
+The tool doesn't automatically rewrite your code; it only points at where action is needed, providing in-context information on how each hit should be addressed.
+
+Any of the 5.x versions of the driver is compatible both with Neo4j server 4.4 and 5.x, so you can upgrade the driver before you upgrade the server.
+The driver version 4.4 is forward compatible with Neo4j server 5.x as well, so you could also upgrade the server before the driver; however, given that it's easier to roll back an application upgrade than a server upgrade, it's recommended to start with the driver.
+
+[TIP]
+When upgrading the Neo4j server to a newer version, the Cypher queries in your application may also need updating. +
+See link:https://neo4j.com/docs/cypher-manual/current/deprecations-additions-removals-compatibility/[Cypher -> Deprecations, additions, and compatibility].
+
+# end::intro[]
