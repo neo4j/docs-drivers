@@ -1,0 +1,166 @@
+= Upgrade from older versions
+
+This page contains the list of new features and breaking changes that happened in the driver from version 4.4 to 5.x.
+For a full list of changes, see the link:https://github.com/neo4j/neo4j-javascript-driver/wiki/5.0-changelog[Driver -> Changelog].
+
+include::{common-partial}/upgrade.adoc[tag=intro]
+
+
+[[recommended-steps]]
+== Recommended steps
+
+Using the migration assistent, the recommended upgrade steps are:
+
+1. Set up the environment for the assistent to work in.
+Download the link:https://github.com/neo4j/drivers-migration-assistent/archive/refs/heads/dev.zip[Drivers Migration Assistent zip], extract it, and locate yourself in its directory.
+Then, assuming `python3` and `pip3` are already installed,
++
+[source, bash]
+----
+python3 -m venv virtualenvs/neo-migration
+source virtualenvs/neo-migration/bin/activate
+pip3 install -r requirements.txt
+----
+
+2. Run the migration assistent with its default configuration and address all the issues that it surfaces. The `path` argument supports link:https://www.man7.org/linux/man-pages/man7/glob.7.html[globbing], and can be repeated. +
++
+[source, bash]
+----
+python3 main.py -l javascript /path/*.js /path-recursive/**/*.js
+----
+
+3. Re-run the assistent with the regex parser and check if any more legit issues are raised. +
++
+[source, bash]
+----
+python3 main.py -l javascript --regex-parser /path/*.js /path-recursive/**/*.js
+----
++
+The regex parser can detect implicit function calls and other hard-to-parse expressions, but is likely to surface more false positives (for more information, see link:https://github.com/neo4j/drivers-migration-assistent?tab=readme-ov-file#accuracy[Neo4j Drivers Migration Assistent -> Accuracy]).
+You can add any spurious entry to the ignored list, so that the assistent won't bring them up in future runs.
+
+4. Although the assistent can detect most of the locations where action is needed, a few changelog entries can't be surfaced in this form, so you should still revise the xref:breaking-changes[breaking changes] section and audit your codebase for the changes marked with {cross-mark} in the table.
+
+5. You are ready to upgrade the driver package to the new version. For example, using `npm`: +
++
+[source, bash]
+----
+npm update neo4j-driver@5.27
+----
+
+
+[[new-features]]
+== New features
+
+[cols="1a,1a"]
+|===
+
+|
+.`Driver.execute_query()` to run transactions with less knowledge of driver's internals
+[%collapsible]
+====
+The new function is a wrapper for `Session.execute_read/write()`, but it abstracts away the result processing part and returns a list of records to the caller directly.
+
+See xref:query-simple.adoc[].
+====
+|
+
+
+|
+.Re-authentication
+[%collapsible]
+====
+Allows for handling expiring authentication (backwards compatible) as well as session scoped authentication.
+
+See link:https://github.com/neo4j/neo4j-python-driver/discussions/921[Re-authentication].
+====
+|
+.Mutual TLS (mTLS) as second authentication factor (2FA)
+[%collapsible]
+====
+Allows for configuring client side TLS certificates to authenticate against the server.
+
+See link:https://github.com/neo4j/neo4j-python-driver/discussions/1031[Mutual TLS].
+====
+
+|
+.`BookmarkManager` support
+[%collapsible]
+====
+Bookmark managers make it easier to achieve causal chaining of sessions.
+
+See xref:bookmarks.adoc[].
+====
+|
+.Notification filtering API
+[%collapsible]
+====
+Filtering allows to receive only a subset of notifications from the server, and to improve performance server-side.
+
+See xref:result-summary.adoc#_filter_notifications[Explore the query execution summary -> Filter notifications].
+====
+
+|
+.GQL statuses of queries in the `ResultSummary`
+[%collapsible]
+====
+A new property `ResultSummary.gql_status_objects` is available.
+It contains a sequence of `GqlStatusObjects`, containing information about the execution of the query.
+
+This API is planned to supersede the current notifications API.
+
+See xref:result-summary.adoc#_notifications[Explore the query execution summary -> Notifications].
+====
+|
+.Telemetry
+[%collapsible]
+====
+The driver sends anonymous API usage statistics to the server.
+Use the driver configuration `telemetry_disabled=True` to opt out.
+====
+
+|===
+
+
+[[breaking-changes]]
+== Breaking changes and deprecations
+
+The column `Assistent` denotes whether the Neo4j Drivers Migration Assistent can detect issues related to the given changelog entry.
+Entries with a cross mark {cross-mark} require manual inspection.
+
+Deprecated features are likely to be removed in version 6.
+
+[cols="1,5a,1,1"]
+|===
+|Version |Message |Status |Assistent
+
+|5.0
+|Dropped support for Python 3.6.
+|label:removed[]
+|{cross-mark}
+
+|5.0
+|link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.ServerInfo[`neo4j.ServerInfo`] -- `ResultSummary.server.version_info` has been removed.
+Use `ResultSummary.server.agent`, `ResultSummary.server.protocol_version`, or call the link:https://neo4j.com/docs/operations-manual/current/reference/procedures/#procedure_dbms_components[`dbms.components`] Cypher procedure instead.
+|label:removed[]
+|{check-mark}
+
+|5.0
+|Session methods `.read_transaction()` and `.write_transaction()` are deprecated in favor of link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.Session.execute_read[`.execute_read()`] and link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.Session.execute_write[`.execute_write()`].
+Through the new methods, the first argument of transaction functions is a `ManagedTransaction` object. It behaves exactly like a regular `Transaction` object, except it does not offer the `.commit()`, `.rollback()`, `.close()`, and `.closed()` methods.
+|label:deprecated[]
+|{check-mark}
+
+|5.0
+|Property `id` (int) for link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.graph.Node[`Node`] and link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.graph.Relationship[`Relationship`] objects is deprecated in favor of `element_id` (str).
+This also affects link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.graph.Graph[`Graph`] objects, as indexing `graph.nodes[...]` and `graph.relationships[...]` with integers is deprecated in favor of indexing them with strings.
+|label:deprecated[]
+|{check-mark} property +
+{cross-mark} indexing
+
+|5.0
+|`Session.last_bookmark()` is deprecated in favor of link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.Session.last_bookmarks[`Session.last_bookmarks()`]. The logic is similar, but the new method returns `neo4j.Bookmarks` instead of `str`.
+|label:deprecated[]
+|{check-mark}
+
+|===
