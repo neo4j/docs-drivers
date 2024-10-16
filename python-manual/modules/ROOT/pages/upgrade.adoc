@@ -68,10 +68,10 @@ pip3 install -U neo4j==5.25
 |===
 
 |
-.Support for Python 3.12
+.Support for Python 3.13
 [%collapsible]
 ====
-The driver is compatible with any Python version starting from 3.7 up to 3.12.
+The driver is compatible with any Python version starting from 3.7 up to 3.13.
 ====
 |
 .`asyncio` support
