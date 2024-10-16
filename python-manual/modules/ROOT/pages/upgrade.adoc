@@ -1,0 +1,360 @@
+= Upgrade from older versions
+
+This page contains the list of new features and breaking changes that happened in the driver from version 4.4 to 5.x.
+For a full list of changes, see the link:https://github.com/neo4j/neo4j-python-driver/wiki/5.x-changelog[Driver -> Changelog].
+
+[NOTE]
+This page may be revised with new changes up until the time when the latest 5.x version is released.
+
+The link:https://github.com/neo4j/drivers-migration-assistent[Neo4j Drivers Migration Assistent] simplifies the upgrade process, by contextualizing the changelog to your codebase.
+It scans your codebase for usage of deprecations and removals, and brings them up to you.
+The tool doesn't automatically rewrite your code; it only points at where action is needed, providing in-context information on how each hit should be addressed.
+
+Any of the 5.x versions of the driver is compatible both with Neo4j server 4.4 and 5.x, so you can upgrade the driver before you upgrade the server.
+The driver version 4.4 is forward compatible with Neo4j server 5.x as well, so you could also upgrade the server before the driver; however, given that it's easier to roll back an application upgrade than a server upgrade, it's recommended to start with the driver.
+
+[TIP]
+When upgrading the Neo4j server to a newer version, the Cypher queries in your application may also need updating. +
+See link:https://neo4j.com/docs/cypher-manual/current/deprecations-additions-removals-compatibility/[Cypher -> Deprecations, additions, and compatibility].
+
+
+[[recommended-steps]]
+== Recommended steps
+
+Using the migration assistent, the recommended upgrade steps are:
+
+1. Set up the environment for the assistent to work in.
+Download the link:https://github.com/neo4j/drivers-migration-assistent/archive/refs/heads/dev.zip[Drivers Migration Assistent zip], extract it, and locate yourself in its directory.
+Then, assuming `python3` and `pip3` are already installed,
++
+[source, bash]
+----
+python3 -m venv virtualenvs/neo-migration
+source virtualenvs/neo-migration/bin/activate
+pip3 install -r requirements.txt
+----
+
+2. Run the migration assistent with its default configuration and address all the issues that it surfaces. The `path` argument supports link:https://www.man7.org/linux/man-pages/man7/glob.7.html[globbing], and can be repeated. +
++
+[source, bash]
+----
+python3 main.py -l python /path/*.py /path-recursive/**/*.py
+----
+
+3. Re-run the assistent with the regex parser and check if any more legit issues are raised. +
++
+[source, bash]
+----
+python3 main.py -l python --regex-parser /path/*.py /path-recursive/**/*.py
+----
++
+The regex parser can detect implicit function calls and other hard-to-parse expressions, but is likely to surface more false positives (for more information, see link:https://github.com/neo4j/drivers-migration-assistent?tab=readme-ov-file#accuracy[Neo4j Drivers Migration Assistent -> Accuracy]).
+You can add any spurious entry to the ignored list, so that the assistent won't bring them up in future runs.
+
+4. Although the assistent can detect most of the locations where action is needed, a few changelog entries can't be surfaced in this form, so you should still revise the xref:breaking-changes[breaking changes] section and audit your codebase for the changes marked with {cross-mark} in the table.
+
+5. You are ready to upgrade the driver package to the new version. For example, using `pip`: +
++
+[source, bash]
+----
+pip3 install -U neo4j==5.25
+----
+
+
+[[new-features]]
+== New features
+
+[cols="1a,1a"]
+|===
+
+|
+.Support for Python 3.13
+[%collapsible]
+====
+The driver is compatible with any Python version starting from 3.7 up to 3.13.
+====
+|
+.`asyncio` support
+[%collapsible]
+====
+For using the driver's features asynchronously via the link:https://docs.python.org/3/library/asyncio.html[asyncio] package.
+
+See xref:concurrency.adoc[].
+====
+
+|
+.`Driver.execute_query()` to run transactions with less knowledge of driver's internals
+[%collapsible]
+====
+The new function is a wrapper for `Session.execute_read/write()`, but it abstracts away the result processing part and returns a list of records to the caller directly.
+
+See xref:query-simple.adoc[].
+====
+|
+.Rust extension for performance
+[%collapsible]
+====
+The link:https://github.com/neo4j-drivers/neo4j-python-driver-rust-ext[Rust extension to the Python driver] is an alternative driver package that can yield a speedup up to 10x compared to the pure-Python driver.
+
+You can install it with `pip install neo4j-rust-ext`, either alongside the `neo4j` package or as a replacement to it.
+Usage-wise, the drivers are identical.
+====
+
+|
+.Export to Pandas Dataframe
+[%collapsible]
+====
+`Result.to_df()` allows for exporting a `Result` object into a Pandas DataFrame.
+
+See xref:transformers.adoc#_transform_to_pandas_dataframe[Manipulate query results -> Transform to Pandas Dataframe].
+====
+|
+.Type hints for all public APIs
+[%collapsible]
+====
+All public objects have type annotations via the link:https://docs.python.org/3/library/typing.html[typing] package. For (optional) use with type checkers and linters.
+====
+
+|
+.Re-authentication
+[%collapsible]
+====
+Allows for handling expiring authentication (backwards compatible) as well as session scoped authentication.
+
+See link:https://github.com/neo4j/neo4j-python-driver/discussions/921[Re-authentication].
+====
+|
+.Mutual TLS (mTLS) as second authentication factor (2FA)
+[%collapsible]
+====
+Allows for configuring client side TLS certificates to authenticate against the server.
+
+See link:https://github.com/neo4j/neo4j-python-driver/discussions/1031[Mutual TLS].
+====
+
+|
+.`BookmarkManager` support
+[%collapsible]
+====
+Bookmark managers make it easier to achieve causal chaining of sessions.
+
+See xref:bookmarks.adoc[].
+====
+|
+.Notification filtering API
+[%collapsible]
+====
+Filtering allows to receive only a subset of notifications from the server, and to improve performance server-side.
+
+See xref:result-summary.adoc#_filter_notifications[Explore the query execution summary -> Filter notifications].
+====
+
+|
+.GQL statuses of queries in the `ResultSummary`
+[%collapsible]
+====
+A new property `ResultSummary.gql_status_objects` is available.
+It contains a sequence of `GqlStatusObjects`, containing information about the execution of the query.
+
+This API is planned to supersede the current notifications API.
+
+See xref:result-summary.adoc#_notifications[Explore the query execution summary -> Notifications].
+====
+|
+.More convenient handling of server-side warnings and notifications
+[%collapsible]
+====
+The new sub-logger `neo4j.notifications` logs every notification raised by the server.
+The log-level is determined by the notification's severity.
+
+If logging is not configured explicitly, the default behavior is for warnings to be logged to stderr via `warning.warn()`.
+The result of this change is that warnings (such as deprecations) received from the DBMS will appear on stderr.
+
+See link:https://github.com/neo4j/neo4j-python-driver/discussions/1064[Convenient DBMS notifications].
+====
+
+|
+.Telemetry
+[%collapsible]
+====
+The driver sends anonymous API usage statistics to the server.
+Use the driver configuration `telemetry_disabled=True` to opt out.
+====
+|
+.Concurrency misuse checks
+[%collapsible]
+====
+For local development, run your application with `python -X dev ...` or set the environment variable `PYTHONNEO4JDEBUG` to anything non-empty to get additional concurrency misuse checks.
+Some driver primitives (e.g. sessions) are not safe to be used concurrently, and using them so will lead to hard-to-debug errors.
+This feature helps identifying such code paths (detection is still inherently racy, hence not guaranteed to always work).
+====
+
+|===
+
+
+[[breaking-changes]]
+== Breaking changes and deprecations
+
+The column `Assistent` denotes whether the Neo4j Drivers Migration Assistent can detect issues related to the given changelog entry.
+Entries with a cross mark {cross-mark} require manual inspection.
+
+Deprecated features are likely to be removed in version 6.
+
+[cols="1,5a,1,1"]
+|===
+|Version |Message |Status |Assistent
+
+|5.0
+|Dropped support for Python 3.6.
+|label:removed[]
+|{cross-mark}
+
+|5.0
+|Driver options `update_routing_table_timeout` and `session_connection_timeout` have been removed. Regular keep-alives are sufficient to avoid the driver getting stuck. Further liveness check config options are available but normally not needed (link:https://neo4j.com/docs/api/python-driver/current/api.html#keep-alive-ref[`keep_alive`], link:https://neo4j.com/docs/api/python-driver/current/api.html#liveness-check-timeout[`liveness_check_timeout`]).
+|label:removed[]
+|{check-mark}
+
+|5.0
+|`Result`, `Session`, and `Transaction` can no longer be imported from `neo4j.work`. Import them from `neo4j` instead.
+|label:removed[]
+|{check-mark}
+
+|5.0
+|link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.ServerInfo[`neo4j.ServerInfo`] -- `ResultSummary.server.version_info` has been removed.
+Use `ResultSummary.server.agent`, `ResultSummary.server.protocol_version`, or call the link:https://neo4j.com/docs/operations-manual/current/reference/procedures/#procedure_dbms_components[`dbms.components`] Cypher procedure instead.
+|label:removed[]
+|{check-mark}
+
+|5.0
+|link:https://neo4j.com/docs/api/python-driver/current/types/temporal.html#neo4j.time.Duration[`Duration`] -- The constructor does not accept `subseconds` anymore. Use `milliseconds`, `microseconds`, or `nanoseconds` instead.
+|label:removed[]
+|{check-mark}
+
+|5.0
+|link:https://neo4j.com/docs/api/python-driver/current/types/temporal.html#neo4j.time.Duration[`Duration`] -- The property `subseconds` has been removed. Use `nanoseconds` instead.
+|label:removed[]
+|{check-mark}
+
+|5.0
+|link:https://neo4j.com/docs/api/python-driver/current/types/temporal.html#neo4j.time.Duration[`Duration`] -- The property `hours_minutes_seconds` has been removed. Use `hours_minutes_seconds_nanoseconds` instead.
+|label:removed[]
+|{check-mark}
+
+|5.0
+|link:https://neo4j.com/docs/api/python-driver/current/types/temporal.html#neo4j.time.DateTime[`DateTime`] -- The property `hour_minute_second` has been removed. Use `hour_minute_second_nanosecond` instead.
+|label:removed[]
+|{check-mark}
+
+|5.0
+|link:https://neo4j.com/docs/api/python-driver/current/types/temporal.html#neo4j.time.DateTime[`DateTime`] -- The property `second` returns an int instead of a float. Use `nanosecond` to get the sub-second information.
+|label:removed[Changed]
+|{cross-mark}
+
+|5.0
+|All math operations on `DateTime` objects are element-wise on (months, days, nanoseconds). This changes the working of `//`, `%`, `/`, and `*`. +
+Years are equal to 12 months. Weeks are equal to 7 days. +
+Seconds, milliseconds, microseconds, and nanoseconds are implicitly converted to nanoseconds or seconds as fit. +
+Multiplication and division allow for floats but will always result in integer values (round to nearest even).
+|label:removed[Changed]
+|{cross-mark}
+
+|5.0
+|link:https://neo4j.com/docs/api/python-driver/current/types/temporal.html#neo4j.time.Time[`Time`] -- The constructor does not accept floats for `second` anymore. Use `nanosecond` instead.
+|label:removed[]
+|{check-mark}
+
+|5.0
+|link:https://neo4j.com/docs/api/python-driver/current/types/temporal.html#neo4j.time.Time[`Time`] -- The property `second` returns an int instead of a float. Use `nanosecond` to get the sub-second information.
+|label:removed[Changed]
+|{cross-mark}
+
+|5.0
+|link:https://neo4j.com/docs/api/python-driver/current/types/temporal.html#neo4j.time.Time[`Time`] -- The `ticks` property's type changed from float to int. It's now nanoseconds since midnight instead of seconds.
+|label:removed[Changed]
+|{cross-mark}
+
+|5.0
+|link:https://neo4j.com/docs/api/python-driver/current/types/temporal.html#neo4j.time.Time[`Time`] -- The property `ticks_ns` has been renamed to `ticks`.
+|label:removed[]
+|{check-mark}
+
+|5.0
+|link:https://neo4j.com/docs/api/python-driver/current/types/temporal.html#neo4j.time.Time[`Time`] -- The property `hour_minute_second` has been removed. Use `hour_minute_second_nanosecond` instead.
+|label:removed[]
+|{check-mark}
+
+|5.0
+|Session methods `.read_transaction()` and `.write_transaction()` are deprecated in favor of link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.Session.execute_read[`.execute_read()`] and link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.Session.execute_write[`.execute_write()`].
+Through the new methods, the first argument of transaction functions is a `ManagedTransaction` object. It behaves exactly like a regular `Transaction` object, except it does not offer the `.commit()`, `.rollback()`, `.close()`, and `.closed()` methods.
+|label:deprecated[]
+|{check-mark}
+
+|5.3
+|Package-alias `neo4j-driver` is deprecated. It will stop receiving updates starting with 6.0.0. Install `neo4j` instead.
+|label:deprecated[]
+|{cross-mark}
+
+|5.0
+|Property `id` (int) for link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.graph.Node[`Node`] and link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.graph.Relationship[`Relationship`] objects is deprecated in favor of `element_id` (str).
+This also affects link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.graph.Graph[`Graph`] objects, as indexing `graph.nodes[...]` and `graph.relationships[...]` with integers is deprecated in favor of indexing them with strings.
+|label:deprecated[]
+|{check-mark} property +
+{cross-mark} indexing
+
+|5.0
+|Implicit closing of drivers and sessions through `+++__del__()+++` (destructor) is deprecated.
+This behaviour is non-deterministic as there is no guarantee that the destructor will ever be called.
+A `ResourceWarning` is emitted instead. +
+Call `driver.close()` explicitly or create the driver via a `with` statement.
+|label:deprecated[]
+|{check-mark}
+
+|5.0
+|Import of the following modules is deprecated without replacement, as they are internal and should not be used by client code: `neo4j.packstream`, `neo4j.routing`, `neo4j.config`, `neo4j.meta`, `neo4j.data`.
+
+`ExperimentalWarning` (previously in `meta`) should be imported directly from neo4j. +
+`neo4j.meta.version` is exposed through `+++neo4j.__version__+++`.
+|label:deprecated[]
+|{check-mark}
+
+|5.0
+|The `trust` driver option is deprecated. New options link:https://neo4j.com/docs/api/python-driver/current/api.html#trusted-certificates-ref[`trusted_certificates`] and link:https://neo4j.com/docs/api/python-driver/current/api.html#ssl-context-ref[`ssl_context`] are available.
+|label:deprecated[]
+|{check-mark}
+
+|5.0
+|`Session.last_bookmark()` is deprecated in favor of link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.Session.last_bookmarks[`Session.last_bookmarks()`]. The logic is similar, but the new method returns `neo4j.Bookmarks` instead of `str`.
+|label:deprecated[]
+|{check-mark}
+
+|5.0
+|`neo4j.Bookmark` is deprecated in favor of link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.Bookmarks[`neo4j.Bookmarks`].
+|label:deprecated[]
+|{check-mark}
+
+|5.0
+|Importing submodules from `neo4j.time` is deprecated. Import everything from `neo4j.time` directly instead.
+|label:deprecated[]
+|{check-mark}
+
+|5.7
+|Importing `neo4j.work` and its submodules is deprecated. Import everything from `neo4j` directly instead.
+|label:deprecated[]
+|{check-mark}
+
+|5.0
+|The following objects are deprecated without replacement, as they are internal and should not be used by client code: `neo4j.spatial.hydrate_point`, `neo4j.spatial.dehydrate_point`, `neoj4.Config`, `neoj4.PoolConfig`, `neoj4.SessionConfig`, `neoj4.WorkspaceConfig`, `neo4j.data.DataDehydrator`, `neo4j.data.DataHydrator`.
+|label:deprecated[]
+|{check-mark}
+
+|5.22
+|Class `SummaryNotificationPosition` is deprecated in favor of link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.SummaryInputPosition[`SummaryInputPosition`].
+|label:deprecated[]
+|{check-mark}
+
+|5.0
+|Undocumented helper methods `Neo4jError.is_fatal_during_discovery()` and `Neo4jError.invalidates_all_connections()` are deprecated and will be removed without replacement in version 6.0.
+|label:deprecated[]
+|{check-mark}
+
+|===
