@@ -157,7 +157,7 @@ The new methods behave similarly, but the argument types are different and the n
 |label:deprecated[]
 
 |5.0
-|link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/types/Relationship.html[`Relationship`] -- Methods `.starNodeId()` and `.endNodeId()` are deprecated in favor of `.startNodeElementId()` and `.endNodeElementId()`. Old identifiers were `long`, wereas new ElementIds are `string`.
+|link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/types/Relationship.html[`Relationship`] -- Methods `.startNodeId()` and `.endNodeId()` are deprecated in favor of `.startNodeElementId()` and `.endNodeElementId()`. Old identifiers were `long`, wereas new ElementIds are `string`.
 |label:deprecated[]
 
 |5.0
