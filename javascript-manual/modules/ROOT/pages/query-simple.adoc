@@ -210,11 +210,28 @@ In other words, there is no guarantee that a write query submitted in read mode 
 
 
 [#impersonation]
+[role=label--new-5.14]
 === Run queries as a different user
 
-You can execute a query under the security context of a different user with the parameter `impersonatedUser`, specifying the name of the user to impersonate.
-For this to work, the user under which the `Driver` was created needs to have the link:{neo4j-docs-base-uri}/cypher-manual/current/administration/access-control/dbms-administration#access-control-dbms-administration-impersonation[appropriate permissions].
-Impersonating a user is cheaper than creating a new `Driver` object.
+You can execute a query through a different user with the configuration parameter `auth`.
+Switching user at the query level is cheaper than creating a new `Driver` object.
+The query is then run within the security context of the given user (i.e., home database, permissions, etc.). +
+Query-scoped authentication a server version >= 5.8.
+
+[source, javascript, test-skip]
+----
+await driver.executeQuery(
+  'MATCH (p:Person) RETURN p.name',
+  {},
+  {
+    auth: neo4j.auth.basic('somebodyElse', 'theirPassword'),
+    database: 'neo4j'
+  }
+)
+----
+
+The parameter `impersonatedUser` provides a similar functionality, and is available in driver/server versions >= 4.4.
+The difference is that you don't need to know a user's password to impersonate them, but the user under which the `Driver` was created needs to have the link:{neo4j-docs-base-uri}/operations-manual/current/authentication-authorization/dbms-administration/#access-control-dbms-administration-impersonation[appropriate permissions].
 
 [source, javascript, test-skip]
 ----
@@ -227,8 +244,6 @@ await driver.executeQuery(
   }
 )
 ----
-
-When impersonating a user, the query is run within the complete security context of the impersonated user and not the authenticated user (i.e. home database, permissions, etc.).
 
 
 == A full example

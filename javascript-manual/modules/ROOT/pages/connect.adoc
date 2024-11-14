@@ -19,7 +19,7 @@ You connect to a database by creating a <<Driver>> object and providing a URL an
   let driver
 
   try {
-    driver = neo4j.driver(URI,  neo4j.auth.basic(USER, PASSWORD))  // <1>
+    driver = neo4j.driver(URI, neo4j.auth.basic(USER, PASSWORD))  // <1>
     const serverInfo = await driver.getServerInfo()  // <2>
     console.log('Connection established')
     console.log(serverInfo)
