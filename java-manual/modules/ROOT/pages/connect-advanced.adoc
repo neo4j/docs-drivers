@@ -72,6 +72,52 @@ GraphDatabase.driver(dbUri, AuthTokens.custom(principal, credentials, realm, sch
 If authentication is disabled on the server, the authentication parameter can be omitted entirely.
 
 
+[role=label--new-5.18]
+== Rotating authentication tokens
+
+It is possible to rotate authentication tokens that are expected to expire (e.g. SSO).
+You need to provide a link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/AuthTokenManager.html[`AuthTokenManager`] instance when instantiating the `Driver`, rather than a static authentication token.
+
+The easiest way to get started is to use link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/AuthTokenManagers.html[one of built-in `AuthTokenManager` implementations]. AuthTokenManagers work with link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/AuthTokens.html[`AuthToken`] objects.
+
+.Rotating a bearer token expiring every 60 seconds
+[source, java, test-skip]
+----
+// import java.time.Clock;
+// import java.util.concurrent.TimeUnit;
+// import org.neo4j.driver.AuthTokenManagers;
+// import org.neo4j.driver.AuthTokens;
+// import org.neo4j.driver.GraphDatabase;
+
+void rotatingBearerDriver() {
+    var tokenManager = AuthTokenManagers.bearer(() -> {
+        var token = AuthTokens.bearer(getToken());
+
+        // Assume we know tokens expire every 60 seconds
+        var expiresIn = TimeUnit.SECONDS.toMillis(60);
+        // Include a little buffer so that new token is fetched before the old one expires
+        var expiration = Clock.systemUTC().millis() + (expiresIn - TimeUnit.SECONDS.toMillis(10));
+
+        return token.expiringAt(expiration);
+    });
+
+    var driver = GraphDatabase.driver(dbUri, tokenManager);
+}
+
+// Some way to get a token
+private String getToken() {
+    return "token-string";
+}
+----
+
+[NOTE]
+This API must not be used for switching users. Auth managers must always return tokens for the same identity.
+You can switch users at both xref:query-simple.adoc#impersonation[query level] and xref:transactions.adoc#impersonation[session level].
+
+[WARNING]
+`AuthTokenManager` objects must not interact with the driver in any way, as this can cause deadlocks and undefined behavior.
+
+
 == Logging
 
 By default, the driver logs `INFO` messages through the Java logging framework `java.util.logging`.

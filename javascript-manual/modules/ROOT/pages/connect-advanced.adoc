@@ -65,6 +65,61 @@ const driver = neo4j.driver(
 If authentication is disabled on the server, the authentication parameter can be omitted entirely.
 
 
+[role=label--new-5.14]
+== Rotating authentication tokens
+
+It is possible to rotate authentication tokens that are expected to expire (e.g. SSO).
+You need to provide a link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/auth-token-manager.js~AuthTokenManager.html[`AuthTokenManager`] instance when instantiating the `Driver`, rather than a static authentication token.
+
+The easiest way to get started is to use link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/auth-token-manager.js~AuthTokenManagers.html[one of built-in `AuthTokenManager` implementations].
+
+.Rotating a bearer token expiring every 60 seconds
+[source, javascript, test-skip]
+----
+import neo4j, { AuthToken } from 'neo4j-driver'
+
+/**
+ * Method called whenever the driver needs to refresh the token.
+ *
+ * The refresh will happen if the driver is notified by the server
+ * of token expiration, or if `Date.now() > tokenData.expiry`.
+ *
+ * The driver will block creation of all connections until
+ * this function resolves the new auth token.
+ */
+async function generateAuthToken () {
+   const bearer = await getSSOToken()  // some way to get a token
+   const token = neo4j.auth.bearer(bearer)
+
+   // assume we know tokens expire every 60 seconds
+   const expiresIn = 60
+   // Include a little buffer so that new token is fetched before the old one expires
+   const expiration = expiresIn - 10
+
+   return {
+      token,
+      // if expiration is not provided,
+      // the driver will only fetch a new token when an auth failure happens
+      expiration
+   }
+}
+
+const driver = neo4j.driver(
+    URI,
+    neo4j.authTokenManagers.bearer({
+        tokenProvider: generateAuthToken
+    })
+)
+----
+
+[NOTE]
+This API must not be used for switching users. Auth managers must always return tokens for the same identity.
+You can switch users at both xref:query-simple.adoc#impersonation[query level] and xref:transactions.adoc#impersonation[session level].
+
+[WARNING]
+`AuthManagers` (including provider functions passed to `expirationBasedAuthTokenManager()`) must not interact with the driver in any way, as this can cause deadlocks and undefined behavior.
+
+
 == Custom address resolver
 
 When creating a `Driver` object, you can specify a _resolver_ function to resolve the connection address the driver is initialized with.

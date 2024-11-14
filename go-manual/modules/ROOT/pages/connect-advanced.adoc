@@ -64,6 +64,43 @@ driver, err := neo4j.NewDriverWithContext(dbUri, neo4j.NoAuth())
 ----
 
 
+[role=label--new-5.14]
+== Rotating authentication tokens
+
+It is possible to rotate authentication tokens that are expected to expire (e.g. SSO).
+You need to provide a link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/auth#TokenManager[`TokenManager`] instance when instantiating the `Driver`, rather than a static authentication token.
+
+The easiest way to get started is to use one of built-in implementations: link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/auth#BasicTokenManager[`BasicTokenManager`] and link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/auth#BearerTokenManager[`BearerTokenManager`].
+
+.Rotating a bearer token expiring every 60 seconds
+[source, go, test-skip]
+----
+fetchAuthTokenFromProvider := func(ctx context.Context) (neo4j.AuthToken, *time.Time, error) {
+    // some way of getting a token
+    token, err := getSsoToken(ctx)
+    if err != nil {
+        return neo4j.AuthToken{}, nil, err
+    }
+    // assume we know tokens expire every 60 seconds
+    expiresIn := time.Now().Add(60 * time.Second)
+    // include a little buffer so that we fetch a new token before the old one expires
+    expiresIn = expiresIn.Add(-10 * time.Second)
+    // or return nil instead of `&expiresIn` if we don't expect it to expire
+    return token, &expiresIn, nil
+}
+
+// create a new driver with a bearer token manager
+_, _ = neo4j.NewDriverWithContext(dbUri, auth.BearerTokenManager(fetchAuthTokenFromProvider))
+----
+
+[NOTE]
+This API must not be used for switching users. Auth managers must always return tokens for the same identity.
+You can switch users at both xref:query-simple.adoc#impersonation[query level] and xref:transactions.adoc#impersonation[session level].
+
+[WARNING]
+`TokenManager` implementations and providers must not interact with the driver in any way, as this can cause deadlocks and undefined behavior.
+
+
 == Custom address resolver
 
 When creating a `DriverWithContext` object, you can specify a _resolver_ function to resolve the connection address the driver is initialized with.

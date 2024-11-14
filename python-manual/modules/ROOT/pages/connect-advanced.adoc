@@ -63,6 +63,50 @@ Use the function link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#n
 If authentication is disabled on the server, the authentication parameter can be omitted entirely.
 
 
+[role=label--new-5.14]
+== Rotating authentication tokens
+
+It is possible to rotate authentication tokens that are expected to expire (e.g. SSO).
+You need to provide a link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.auth_management.AuthManager[`AuthManager`] instance (or link:https://neo4j.com/docs/api/python-driver/current/async_api.html#neo4j.auth_management.AsyncAuthManager[`AsyncAuthManager`] for the async driver) when instantiating the `Driver`, rather than a static authentication token.
+
+The easiest way to get started is to use link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.auth_management.AuthManagers[one of built-in `AuthManager` implementations].
+
+.Rotating a bearer token expiring every 60 seconds
+[source, python, test-skip]
+----
+import neo4j
+from neo4j.auth_management import (
+    AuthManagers,
+    ExpiringAuth,
+)
+
+
+def auth_provider():
+    # Some way to get a token
+    sso_token = get_sso_token()
+    # Assume we know tokens expire every 60 seconds
+    expires_in = 60
+    # Include a little buffer so that new token is fetched before the old one expires
+    expires_in -= 10
+
+    auth = neo4j.bearer_auth(sso_token)
+    return ExpiringAuth(auth=auth).expires_in(expires_in)
+
+with neo4j.GraphDatabase.driver(
+    URI,
+    auth=AuthManagers.expiration_based(auth_provider)
+) as driver:
+    ...
+----
+
+[NOTE]
+This API must not be used for switching users. Auth managers must always return tokens for the same identity.
+You can switch users at both xref:query-simple.adoc#impersonation[query level] and xref:transactions.adoc#impersonation[session level].
+
+[WARNING]
+`AuthManagers` (including provider functions passed to `AuthManagers.expiration_based()`) must not interact with the driver in any way, as this can cause deadlocks and undefined behavior.
+
+
 == Custom address resolver
 
 When creating a `Driver` object, you can specify a _resolver_ function to resolve any addresses the driver receives ahead of DNS resolution.
