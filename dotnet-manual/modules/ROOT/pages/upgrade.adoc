@@ -120,14 +120,14 @@ Use `.Agent()`, `.ProtocolVersion()`, or call the link:https://neo4j.com/docs/op
 |label:removed[]
 
 |5.0
-|link:[`ISession`], link:[`IRxSession`], link:[`IAsyncSession`] -- Methods `.ReadTransaction()` and `.WriteTransaction()` are deprecated in favor of `.ExecuteRead()` and `.ExecuteWrite()`.
+|link:[`ISession`], link:[`IRxSession`], link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IAsyncSession.html[`IAsyncSession`] -- Methods `.ReadTransaction()` and `.WriteTransaction()` are deprecated in favor of `.ExecuteRead()` and `.ExecuteWrite()`.
 The same holds for the async coounterparts `.ReadTransactionAsync()` and `.WriteTransactionAsync()`, replaced by `.ExecuteReadAsync()` and `.ExecuteWriteAsync()`.
 
 The new methods behave similarly, but the argument types are different and the new methods do not support the `.commit()`, `.rollback()`, `.close()`, and `.closed()` methods.
 |label:deprecated[]
 
 |5.0
-|link:[`ISession`], link:[`IAsyncSession`] -- Method `.LastBookmark()` is deprecated in favor of `.LastBookmarks()`.
+|link:[`ISession`], link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IAsyncSession.html[`IAsyncSession`] -- Method `.LastBookmark()` is deprecated in favor of `.LastBookmarks()`.
 |label:deprecated[]
 
 |5.0
