@@ -118,6 +118,68 @@ You can switch users at both xref:query-simple.adoc#impersonation[query level] a
 `AuthTokenManager` objects must not interact with the driver in any way, as this can cause deadlocks and undefined behavior.
 
 
+[#mtls]
+[role=label--new-5.27]
+== Mutual TLS (client-side certificates as 2FA)
+
+Mutual TLS (mTLS) allows you to use a client certificate as second factor for authenticating with the server.
+The certificate can only be used together with an authentication token and is not a replacement of regular authentication, unless authentication is disabled on the server.
+
+The client's certificate and public key must be placed in the server's `<NEO4J_HOME>/certificates/bolt/trusted` directory. For more information on server setup, see link:https://neo4j.com/docs/operations-manual/current/security/ssl-framework/#ssl-bolt-config[Configure SSL over Bolt].
+
+[NOTE]
+For mTLS to work, the driver's connection with the server must be encrypted, i.e. the xref:_connection_protocols_and_security[connection URI scheme] must be either `+s` or `+ssc` (ex. `neo4j+s://example.com:7687`).
+
+Use link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/ClientCertificateManagers.html[`ClientCertificateManagers.rotating()`] for both static and rotating certificates. +
+The method takes a link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/ClientCertificates.html[`ClientCertificate`] instance. +
+For rotating certificates, use the `.rotate()` method; static certificates don't need to be updated.
+
+[.tabbed-example]
+=====
+[.include-with-static-certificate]
+======
+
+[source, java, test-skip]
+----
+var certificateFile = new File("/path/to/cert.pem");
+var privateKeyFile = new File("/path/to/key.pem");
+var keyPassword = "password";  // optional
+var certificate = ClientCertificates.of(certificateFile, privateKeyFile, keyPassword);
+var certificateManager = ClientCertificateManagers.rotating(certificate);
+try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword), certificateManager)) {
+    // use the driver
+}
+----
+
+======
+[.include-with-rotating-certificate]
+======
+
+[source, java, test-skip]
+----
+var certificateFile = new File("/path/to/cert.pem");
+var privateKeyFile = new File("/path/to/key.pem");
+var keyPassword = "password";  // optional
+var certificate = ClientCertificates.of(certificateFile, privateKeyFile, keyPassword);
+// instantiate the rotating certificate with an initial one
+var certificateManager = ClientCertificateManagers.rotating(certificate);
+try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword), certificateManager)) {
+    // use the driver...
+    // ... until it's time to rotate the certificate
+    var updatedCertificate = ClientCertificates.of(
+        new File("/path/to/new/cert.pem")
+        new File("/path/to/new/key.pem"),
+        "newPassword"  // optional
+    );
+    certificateManager.rotate(updatedCertificate);
+    // use the driver some more - new connections are opened with the new certificate
+}
+----
+
+======
+=====
+
+
 == Logging
 
 By default, the driver logs `INFO` messages through the Java logging framework `java.util.logging`.

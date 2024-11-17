@@ -101,6 +101,82 @@ You can switch users at both xref:query-simple.adoc#impersonation[query level] a
 `TokenManager` implementations and providers must not interact with the driver in any way, as this can cause deadlocks and undefined behavior.
 
 
+[#mtls]
+[role=label--new-5.27]
+== Mutual TLS (client-side certificates as 2FA)
+
+Mutual TLS (mTLS) allows you to use a client certificate as second factor for authenticating with the server.
+The certificate can only be used together with an authentication token and is not a replacement of regular authentication, unless authentication is disabled on the server.
+
+The client's certificate and public key must be placed in the server's `<NEO4J_HOME>/certificates/bolt/trusted` directory. For more information on server setup, see link:https://neo4j.com/docs/operations-manual/current/security/ssl-framework/#ssl-bolt-config[Configure SSL over Bolt].
+
+[NOTE]
+For mTLS to work, the driver's connection with the server must be encrypted, i.e. the xref:_connection_protocols_and_security[connection URI scheme] must be either `+s` or `+ssc` (ex. `neo4j+s://example.com:7687`).
+
+[.tabbed-example]
+=====
+[.include-with-static-certificate]
+======
+Use link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/auth#NewStaticClientCertificateProvider[`auth.NewStaticClientCertificateProvider()`] for static certificates. +
+The method takes a link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/auth#ClientCertificate[`ClientCertificate`] instance.
+
+[source, go, test-skip]
+----
+password := "theCertPassword"
+certProvider, err := auth.NewStaticClientCertificateProvider(auth.ClientCertificate {
+  CertFile: "path/to/cert.pem",
+  KeyFile:  "path/to/key.pem",
+  Password: &password,
+})
+if err != nil {
+  log.Fatalf("Failed to load certificate: %v", err)
+}
+_, _ = neo4j.NewDriverWithContext(dbUri, neo4j.BasicAuth(dbUser, dbPassword, ""), func(config *config.Config) {
+  config.ClientCertificateProvider = certProvider
+})
+----
+
+======
+[.include-with-rotating-certificate]
+======
+
+Use link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/auth#NewRotatingClientCertificateProvider[`auth.NewRotatingClientCertificateProvider()`] for rotating certificates. +
+The method takes a link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/auth#ClientCertificate[`ClientCertificate`] instance.
+
+[source, go, test-skip]
+----
+password := "theCertPassword"
+certProvider, err := auth.NewRotatingClientCertificateProvider(auth.ClientCertificate {
+  CertFile: "path/to/cert.pem",
+  KeyFile:  "path/to/key.pem",
+  Password: &password,
+})
+if err != nil {
+  log.Fatalf("Failed to load certificate: %v", err)
+}
+_, _ = neo4j.NewDriverWithContext(dbUri, neo4j.BasicAuth(dbUser, dbPassword, ""), func(config *config.Config) {
+  config.ClientCertificateProvider = certProvider
+})
+// use the driver a bit...
+// when it's time to rotate the certificate...
+err = provider.UpdateCertificate(auth.ClientCertificate {
+  CertFile: "path/to/new_cert.pem",
+  KeyFile:  "path/to/new_key.pem",
+  Password: &password,
+})
+if err != nil {
+  log.Fatalf("Failed to update certificate: %v", err)
+}
+// use the driver again...
+----
+
+======
+=====
+
+
+For more information, see link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/auth#ClientCertificateProvider[API docs -> `ClientCertificateProvider`].
+
+
 == Custom address resolver
 
 When creating a `DriverWithContext` object, you can specify a _resolver_ function to resolve the connection address the driver is initialized with.

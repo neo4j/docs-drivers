@@ -120,6 +120,68 @@ You can switch users at both xref:query-simple.adoc#impersonation[query level] a
 `AuthManagers` (including provider functions passed to `expirationBasedAuthTokenManager()`) must not interact with the driver in any way, as this can cause deadlocks and undefined behavior.
 
 
+[#mtls]
+[role=label--new-5.27]
+== Mutual TLS (client-side certificates as 2FA)
+
+Mutual TLS (mTLS) allows you to use a client certificate as second factor for authenticating with the server.
+The certificate can only be used together with an authentication token and is not a replacement of regular authentication, unless authentication is disabled on the server.
+
+The client's certificate and public key must be placed in the server's `<NEO4J_HOME>/certificates/bolt/trusted` directory. For more information on server setup, see link:https://neo4j.com/docs/operations-manual/current/security/ssl-framework/#ssl-bolt-config[Configure SSL over Bolt].
+
+[NOTE]
+For mTLS to work, the driver's connection with the server must be encrypted, i.e. the xref:_connection_protocols_and_security[connection URI scheme] must be either `+s` or `+ssc` (ex. `neo4j+s://example.com:7687`).
+
+[.tabbed-example]
+=====
+[.include-with-static-certificate]
+======
+Use the driver configuration option link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/types.js~Config.html#instance-member-clientCertificate[`clientCertificate`] to provide the certificate information as an object.
+
+[source, javascript, test-skip]
+----
+const driver = neo4j.driver(URI, neo4j.auth.basic(USER, PASSWORD), {
+   clientCertificate: {
+      certfile: '/path/to/cert.cert',
+      keyfile: '/path/to/cert.pem',
+      password: 'the_key_password' // optional
+   }
+})
+----
+
+======
+[.include-with-rotating-certificate]
+======
+
+Instantiate the certificate object via link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/client-certificate.js~ClientCertificateProviders.html[`clientCertificateProviders.rotating`] and provide it when instantiating the driver via the configuration option link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/types.js~Config.html#instance-member-clientCertificate[`clientCertificate`].
+
+[source, javascript, test-skip]
+----
+const initialClientCertificate: {
+  certfile: '/path/to/cert.cert',
+  keyfile: '/path/to/cert.pem',
+  password: 'the_key_password' // optional
+}
+const clientCertificateProvider = neo4j.clientCertificateProviders.rotating({
+    initialCertificate: initialClientCertificate
+})
+const driver = neo4j.driver(URI, MY_CREDENTIALS, {
+   clientCertificate: clientCertificateProvider
+})
+// use the driver...
+// ... until it's time to update the certificate
+clientCertificateProvider.updateCertificate({
+  certfile: '/path/to/new_cert.cert',
+  keyfile: '/path/to/new_cert.pem',
+  password: 'the_new_key_password' // optional
+})
+// use the driver some more
+----
+
+======
+=====
+
+
 == Custom address resolver
 
 When creating a `Driver` object, you can specify a _resolver_ function to resolve the connection address the driver is initialized with.
