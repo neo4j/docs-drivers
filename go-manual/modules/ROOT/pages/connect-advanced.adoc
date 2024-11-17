@@ -102,7 +102,7 @@ You can switch users at both xref:query-simple.adoc#impersonation[query level] a
 
 
 [#mtls]
-[role=label--new-5.27]
+[role=label--new-5.27 label--not-on-aura]
 == Mutual TLS (client-side certificates as 2FA)
 
 Mutual TLS (mTLS) allows you to use a client certificate as second factor for authenticating with the server.
@@ -122,11 +122,10 @@ The method takes a link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/n
 
 [source, go, test-skip]
 ----
-password := "theCertPassword"
 certProvider, err := auth.NewStaticClientCertificateProvider(auth.ClientCertificate {
   CertFile: "path/to/cert.pem",
   KeyFile:  "path/to/key.pem",
-  Password: &password,
+  Password: "theCertPassword",
 })
 if err != nil {
   log.Fatalf("Failed to load certificate: %v", err)
