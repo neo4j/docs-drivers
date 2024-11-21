@@ -81,9 +81,7 @@ See link:https://github.com/neo4j/neo4j-javascript-driver/pull/1010[Type mapping
 .Re-authentication
 [%collapsible]
 ====
-Allows for handling expiring authentication (backwards compatible) as well as session scoped authentication.
-
-See link:https://github.com/neo4j/neo4j-javascript-driver/pull/1050[Re-authentication].
+Allows for xref:connect-advanced.adoc#rotating-tokens[rotating authentication tokens] as well as xref:transactions.adoc#impersonation[session-scoped] and xref:query-simple.adoc#impersonation[query-scoped] authentication.
 ====
 
 |
@@ -92,7 +90,7 @@ See link:https://github.com/neo4j/neo4j-javascript-driver/pull/1050[Re-authentic
 ====
 Allows for configuring client side TLS certificates to authenticate against the server.
 
-See link:https://github.com/neo4j/neo4j-javascript-driver/pull/1183[Mutual TLS].
+See xref:connect-advanced.adoc#mtls[Mutual TLS].
 ====
 |
 .`BookmarkManager` support
