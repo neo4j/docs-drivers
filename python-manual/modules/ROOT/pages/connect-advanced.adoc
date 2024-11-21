@@ -63,6 +63,7 @@ Use the function link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#n
 If authentication is disabled on the server, the authentication parameter can be omitted entirely.
 
 
+[#rotating-tokens]
 [role=label--new-5.14]
 == Rotating authentication tokens
 

@@ -2,7 +2,7 @@
 
 = Upgrade from older versions
 
-This page contains the list of new features and breaking changes of the driver from version 4.4 to 5.x. +
+This page contains the list of new features and breaking changes of the driver from version 4.4 to 5.x.
 For a full list of changes, see the link:{driver-changelog-url}[Driver -> Changelog].
 
 The latest driver version of the 5.x series (5.27) is compatible with Neo4j server both 4.4 and 5.x, so you can upgrade the driver before you upgrade the server.

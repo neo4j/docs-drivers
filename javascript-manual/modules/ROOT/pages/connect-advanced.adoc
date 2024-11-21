@@ -65,6 +65,7 @@ const driver = neo4j.driver(
 If authentication is disabled on the server, the authentication parameter can be omitted entirely.
 
 
+[#rotating-tokens]
 [role=label--new-5.14]
 == Rotating authentication tokens
 

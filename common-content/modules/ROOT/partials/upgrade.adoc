@@ -1,10 +1,7 @@
 # tag::intro[]
 
-This page contains the list of new features and breaking changes of the driver from version 4.4 to 5.x. +
+This page contains the list of new features and breaking changes of the driver from version 4.4 to 5.x.
 For a full list of changes, see the link:{driver-changelog-url}[Driver -> Changelog].
-
-[NOTE]
-This page may be revised with new changes up until when the latest 5.x version is released.
 
 The link:https://github.com/neo4j/drivers-migration-assistent[Neo4j Drivers Migration Assistent] simplifies the upgrade process by contextualizing the changelog to your application.
 It scans your codebase for usage of deprecations and removals, and brings them up to you.
