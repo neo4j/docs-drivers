@@ -218,7 +218,7 @@ Especially if the server's latency is high, a low fetch size may deteriorate per
 [[read-mode]]
 == Route read queries to cluster readers
 
-In a cluster, *route read queries to link:{neo4j-docs-base-uri}/operations-manual/current/clustering/introduction/#clustering-secondary-mode[secondary nodes]*. You do this by:
+In a cluster, *route read queries to any reader node*. You do this by:
 
 - specifying `routing_="r"` in a xref:query-simple.adoc#_request_routing[`Driver.execute_query()`] call
 - using `Session.execute_read()` instead of `Session.execute_write()` (for managed transactions)
