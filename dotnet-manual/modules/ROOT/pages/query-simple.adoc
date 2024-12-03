@@ -3,7 +3,7 @@
 Once you have xref:connect.adoc[connected to the database], you can execute <<Cypher>> queries through the method `IDriver.ExecutableQuery()`.
 
 [TIP]
-`Driver.ExecutableQuery()` was introduced with the version 5.8 of the driver. +
+`IDriver.ExecutableQuery()` was introduced with the version 5.8 of the driver. +
 For queries with earlier versions, use xref:transactions.adoc[sessions and transactions].
 
 
@@ -12,24 +12,19 @@ For queries with earlier versions, use xref:transactions.adoc[sessions and trans
 To create a node representing a person named `Alice`, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/create/[`CREATE`]:
 
 .Create a node representing a person named `Alice`
-[source, java]
+[source, csharp]
 ----
-// import java.util.Map;
-// import java.util.concurrent.TimeUnit;
-// import org.neo4j.driver.QueryConfig;
-
-var result = driver.executableQuery("CREATE (:Person {name: $name})")  // <1>
-    .withParameters(Map.of("name", "Alice"))  // <2>
-    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())  // <3>
-    .execute();
-var summary = result.summary();  // <4>
-System.out.printf("Created %d records in %d ms.%n",
-    summary.counters().nodesCreated(),
-    summary.resultAvailableAfter(TimeUnit.MILLISECONDS));
+var result = await driver
+    .ExecutableQuery("CREATE (p:Person {name: $name})")  // <1>
+    .WithParameters(new { name = "Alice" })  // <2>
+    .WithConfig(new QueryConfig(RoutingControl.Writers, "neo4j"))  // <3>
+    .ExecuteAsync();
+var summary = result.Summary;  // <4>
+Console.WriteLine($"Created {summary.Counters.NodesCreated} nodes in {summary.ResultAvailableAfter.Milliseconds} ms.");
 ----
 
 <1> The Cypher query
-<2> A map of _query parameters_
+<2> A map of xref:query-parameters[_query parameters_]
 <3> Which database the query should be run against
 <4> The xref:result-summary.adoc[summary of execution] returned by the server
 
@@ -39,39 +34,44 @@ System.out.printf("Created %d records in %d ms.%n",
 To retrieve information from the database, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/match/[`MATCH`]:
 
 .Retrieve all `Person` nodes
-[source, java, role=nocollapse]
+[source, csharp, role=nocollapse]
 ----
-// import java.util.concurrent.TimeUnit;
-// import org.neo4j.driver.QueryConfig;
+var result = await driver
+    .ExecutableQuery("MATCH (p:Person) RETURN p.name AS name")
+    .WithConfig(new QueryConfig(RoutingControl.Writers, "neo4j"))
+    .ExecuteAsync();
 
-var result = driver.executableQuery("MATCH (p:Person) RETURN p.name AS name")
-    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
-    .execute();
-
-// Loop through results and do something with them
-var records = result.records();  // <1>
-records.forEach(r -> {
-    System.out.println(r);  // or r.get("name").asString()
-});
+// Loop through results and print people's name
+foreach (var record in result.Result) {  // <.>
+    Console.WriteLine(record.Get<string>("name"));  // <.>
+}
 
 // Summary information
-var summary = result.summary();  // <2>
-System.out.printf("The query %s returned %d records in %d ms.%n",
-    summary.query(), records.size(),
-    summary.resultAvailableAfter(TimeUnit.MILLISECONDS));
+var summary = result.Summary;  // <.>
+Console.WriteLine($"The query `{summary.Query.Text}` returned {result.Result.Count()} in {summary.ResultAvailableAfter.Milliseconds} ms.");
 ----
 
-<1> `records` contains the result as a list of link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Record.html[`Record`] objects
-<2> `summary` contains the xref:result-summary.adoc[summary of execution] returned by the server
+<.> `result.Result` contains the result as a list of link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IRecord.html[`IRecord`] objects
+<.> `.Get<type>(key)` extracts the entry named `key` from the returned record and casts it to `type`.
+For more information on types, see xref:data-types.adoc[].
+<.> The xref:result-summary.adoc[summary of execution] returned by the server
 
-[TIP]
-====
-Properties inside a link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Record.html[`Record`] object are embedded within link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Value.html[`Value`] objects.
-To extract and cast them to the corresponding Java types, use `.as<type>()` (eg. `.asString()`, `asInt()`, etc).
-For example, if the `name` property coming from the database is a string, `record.get("name").asString()` will yield the property value as a `String` object.
+To clean up the returned data structure, use the `.WithMap()` method when running the query.
+For example,
 
-For more information, see xref:data-types.adoc[].
-====
+[source, csharp]
+----
+var result = await driver
+    .ExecutableQuery("MATCH (p:Person) RETURN p.name AS name")
+    .WithConfig(new QueryConfig(RoutingControl.Writers, "neo4j"))
+    .WithMap(record => record["name"].As<string>())
+    .ExecuteAsync();
+foreach (var name in result.Result) {
+    Console.WriteLine(name);
+}
+----
+
+This can be especially handy when returning nodes rather than individual properties.
 
 
 == Update the database
@@ -79,42 +79,34 @@ For more information, see xref:data-types.adoc[].
 To update a node's information in the database, use the Cypher clauses link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/match/[`MATCH`] and link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/set/[`SET`]:
 
 .Update node `Alice` to add an `age` property
-[source, java]
+[source, csharp]
 ----
-// import java.util.Map;
-// import org.neo4j.driver.QueryConfig;
-
-var result = driver.executableQuery("""
-    MATCH (p:Person {name: $name})
-    SET p.age = $age
-    """)
-    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
-    .withParameters(Map.of("name", "Alice", "age", 42))
-    .execute();
-var summary = result.summary();
-System.out.println("Query updated the database?");
-System.out.println(summary.counters().containsUpdates());
+var result = await driver
+    .ExecutableQuery(@"
+        MATCH (p:Person {name: $name})
+        SET p.age = $age
+    ")
+    .WithConfig(new QueryConfig(RoutingControl.Writers, "neo4j"))
+    .WithParameters(new { name = "Alice", age = 42 })
+    .ExecuteAsync();
+Console.WriteLine($"Query updated the database? {result.Summary.Counters.ContainsUpdates}");
 ----
 
-To create a new relationship, linking it to two already existing node, use a combination of the Cypher clauses `MATCH` and `CREATE`:
+To create a new relationship, linking it to two already existing nodes, use a combination of the Cypher clauses `MATCH` and `CREATE`:
 
 .Create a relationship `:KNOWS` between `Alice` and `Bob`
-[source, java]
+[source, csharp]
 ----
-// import java.util.Map;
-// import org.neo4j.driver.QueryConfig;
-
-var result = driver.executableQuery("""
-    MATCH (alice:Person {name: $name})  // <1>
-    MATCH (bob:Person {name: $friend})  // <2>
-    CREATE (alice)-[:KNOWS]->(bob)  // <3>
-    """)
-    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
-    .withParameters(Map.of("name", "Alice", "friend", "Bob"))
-    .execute();
-var summary = result.summary();
-System.out.println("Query updated the database?");
-System.out.println(summary.counters().containsUpdates());
+var result = await driver
+    .ExecutableQuery(@"
+        MATCH (alice:Person {name: $name})  // <.>
+        MATCH (bob:Person {name: $friend})  // <.>
+        CREATE (alice)-[:KNOWS]->(bob)  // <.>
+    ")
+    .WithConfig(new QueryConfig(RoutingControl.Writers, "neo4j"))
+    .WithParameters(new { name = "Alice", friend = "Bob" })
+    .ExecuteAsync();
+Console.WriteLine($"Query updated the database? {result.Summary.Counters.ContainsUpdates}");
 ----
 
 <1> Retrieve the person node named `Alice` and bind it to a variable `alice`
@@ -126,22 +118,18 @@ System.out.println(summary.counters().containsUpdates());
 To remove a node and any relationship attached to it, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/delete/[`DETACH DELETE`]:
 
 .Remove the `Alice` node and all its relationships
-[source, java]
+[source, csharp]
 ----
-// import java.util.Map;
-// import org.neo4j.driver.QueryConfig;
-
-// This does not delete _only_ p, but also all its relationships!
-var result = driver.executableQuery("""
-    MATCH (p:Person {name: $name})
-    DETACH DELETE p
-    """)
-    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
-    .withParameters(Map.of("name", "Alice"))
-    .execute();
-var summary = result.summary();
-System.out.println("Query updated the database?");
-System.out.println(summary.counters().containsUpdates());
+// This does not delete _only_ `p`, but also all its relationships!
+var result = await driver
+    .ExecutableQuery(@"
+        MATCH (p:Person {name: $name})
+        DETACH DELETE p
+    ")
+    .WithConfig(new QueryConfig(RoutingControl.Writers, "neo4j"))
+    .WithParameters(new { name = "Alice" })
+    .ExecuteAsync();
+Console.WriteLine($"Query updated the database? {result.Summary.Counters.ContainsUpdates}");
 ----
 
 
@@ -155,14 +143,15 @@ This is for:
 1. *performance benefits*: Neo4j compiles and caches queries, but can only do so if the query structure is unchanged;
 2. *security reasons*: see link:https://neo4j.com/developer/kb/protecting-against-cypher-injection/[protecting against Cypher injection].
 
-You may provide query parameters as a map through the `.withParameters()` method.
+You can provide query parameters as a map through the `.WithParameters()` method.
 
-[source, java]
+[source, csharp]
 ----
-var result = driver.executableQuery("MATCH (p:Person {name: $name}) RETURN p")
-    .withParameters(Map.of("name", "Alice"))
-    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
-    .execute();
+var result = await driver
+    .ExecutableQuery("MATCH (p:Person {name: $name}) RETURN p")
+    .WithConfig(new QueryConfig(RoutingControl.Writers, "neo4j"))
+    .WithParameters(new { name = "Alice" })
+    .ExecuteAsync();
 ----
 
 [NOTE]
@@ -172,9 +161,8 @@ For those rare use cases, see xref:query-advanced#_dynamic_values_in_property_ke
 
 == Error handling
 
-A query run may fail for a number of reasons, with different link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/exceptions/package-summary.html[exceptions] being raised.
+A query run may fail for a number of reasons, with different link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.Neo4jException.html[exceptions] being raised.
 Some of them are due to Cypher syntax errors, permission issues, or other forms of misconfiguration/misusage.
-The choice of how to handle those exceptions is up to your application: whether you want to be defensive (for example check if there are records to process to avoid link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/exceptions/NoSuchRecordException.html[NoSuchRecordException]), or whether you want to catch and handle the exceptions as they arise.
 
 [TIP]
 The driver automatically retries to run a failed query, if the failure is deemed to be transient (for example due to temporary server unavailability).
@@ -183,8 +171,8 @@ An exception will be raised if the operation keeps failing after a number of att
 
 == Query configuration
 
-You can supply further configuration parameters to alter the default behavior of `.executableQuery()`.
-You do so through the method `.withConfig()`, which takes a link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/QueryConfig.html[`QueryConfig`] object.
+You can supply further configuration parameters to alter the default behavior of `.ExecutableQuery()`.
+You do so through the method `.WithConfig()`, which takes a link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.QueryConfig.html[`QueryConfig`] object.
 
 
 === Database selection
