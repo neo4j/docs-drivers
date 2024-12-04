@@ -233,7 +233,7 @@ In other words, there is no guarantee that a write query submitted in read mode 
 You can execute a query through a different user with the configuration callback `neo4j.ExecuteQueryWithAuthToken()`.
 Switching user at the query level is cheaper than creating a new `DriverWithContext` object.
 The query is then run within the security context of the given user (i.e., home database, permissions, etc.). +
-Query-scoped authentication a server version >= 5.8.
+Query-scoped authentication requires a server version >= 5.8.
 
 [source, go]
 ----
