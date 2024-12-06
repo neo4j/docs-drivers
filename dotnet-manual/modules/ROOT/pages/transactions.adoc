@@ -1,9 +1,9 @@
 = Run your own transactions
 
-When xref:query-simple.adoc[querying the database with `executableQuery()`], the driver automatically creates a _transaction_. A transaction is a unit of work that is either _committed_ in its entirety or _rolled back_ on failure. You can include multiple Cypher statements in a single query, as for example when using `MATCH` and `CREATE` in sequence to xref:query-simple#_update_the_database[update the database], but you cannot have multiple queries and interleave some client-logic in between them.
+When xref:query-simple.adoc[querying the database with `.ExecutableQuery()`], the driver automatically creates a _transaction_. A transaction is a unit of work that is either _committed_ in its entirety or _rolled back_ on failure. You can include multiple Cypher statements in a single query, as for example when using `MATCH` and `CREATE` in sequence to xref:query-simple#_update_the_database[update the database], but you cannot have multiple queries and interleave some client-logic in between them.
 
 For these more advanced use-cases, the driver provides functions to take full control over the transaction lifecycle.
-These are called _managed transactions_, and you can think of them as a way of unwrapping the flow of `executableQuery()` and being able to specify its desired behavior in more places.
+These are called _managed transactions_, and you can think of them as a way of unwrapping the flow of `.ExecutableQuery()` and being able to specify its desired behavior in more places.
 
 
 == Create a session
@@ -11,17 +11,13 @@ These are called _managed transactions_, and you can think of them as a way of u
 Before running a transaction, you need to obtain a _session_.
 Sessions act as concrete query channels between the driver and the server, and ensure <<causal consistency>> is enforced.
 
-Sessions are created with the method link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Driver.html#session()[`Driver.session()`].
+Sessions are created with the method link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IDriver.AsyncSession.html#Neo4j_Driver_IDriver_AsyncSession[`Driver.AsyncSession()`].
 Use the optional argument to alter the session's configuration, among which for example the xref:_database_selection[target database].
 For further configuration parameters, see xref:_session_configuration[Session configuration].
 
-[source, java]
+[source, csharp]
 ----
-// import org.neo4j.driver.SessionConfig
-
-try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
-    // session usage
-}
+using var session = driver.AsyncSession(SessionConfigBuilder.ForDatabase("neo4j"));
 ----
 
 Session creation is a lightweight operation, so sessions can be created and destroyed without significant cost.
@@ -37,128 +33,117 @@ A transaction can contain any number of queries.
 As Neo4j is <<ACID>> compliant, *queries within a transaction will either be executed as a whole or not at all*: you cannot get a part of the transaction succeeding and another failing.
 Use transactions to group together related queries which work together to achieve a single _logical_ database operation.
 
-A managed transaction is created with the methods link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Session.html#executeRead(org.neo4j.driver.TransactionCallback,org.neo4j.driver.TransactionConfig)[`Session.executeRead()`] and link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Session.html#executeWrite(org.neo4j.driver.TransactionCallback,org.neo4j.driver.TransactionConfig)[`Session.executeWrite()`], depending on whether you want to retrieve data from the database or alter it.
+A managed transaction is created with the methods link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IAsyncSession.ExecuteReadAsync.html)[`IAsyncSession.ExecuteRead()`] and link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IAsyncSession.ExecuteWriteAsync.html)[`IAsyncSession.ExecuteWrite()`], depending on whether you want to retrieve data from the database or alter it.
 Both methods take a <<transaction_function>> callback, which is responsible for actually carrying out the queries and processing the result.
 
 .Retrieve people whose name starts with `Al`.
-[source, java]
+[source, csharp, role=nocollapse]
 ----
-// import java.util.Map
-// import org.neo4j.driver.SessionConfig
+using var session = driver.AsyncSession(SessionConfigBuilder.ForDatabase("neo4j"));  // <.>
+var people = await session.ExecuteReadAsync(  // <.>
+    async tx => {
+        var result = await tx.RunAsync(@"
+            MATCH (p:Person) WHERE p.name STARTS WITH $filter  // <.>
+            RETURN p.name AS name, 3 as age ORDER BY name
+            ", new { filter = "Al" }
+        );
 
-try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {  // <1>
-    var people = session.executeRead(tx -> {  // <2>
-        var result = tx.run("""
-        MATCH (p:Person) WHERE p.name STARTS WITH $filter  // <3>
-        RETURN p.name AS name ORDER BY name
-        """, Map.of("filter", "Al"));
-        return result.list();  // return a list of Record objects # <4>
-    });
-    people.forEach(person -> {
-        System.out.println(person);
-    });
-    // further tx.run() calls will execute within the same transaction
+        // Loop through the records asynchronously
+        // `.Current` holds the record read by `.FetchAsync()`
+        var people = new List<string>();
+        while (await result.FetchAsync()) {  // <.>
+            people.Add(result.Current.Get<string>("name"));
+        }
+        // or `await result.ToListAsync()` to retrieve all records as a list.
+        return people;
+    }
+);
+
+foreach (var person in people) {
+    Console.WriteLine(person);
 }
+
+// further tx.run() calls will execute within the same transaction
 ----
 
-<1> Create a session. A single session can be the container for multiple queries. Unless created as a resource using the `try` construct, remember to close it when done.
-<2> The `.executeRead()` (or `.executeWrite()`) method is the entry point into a transaction. It takes a callback to a _transaction function_, which is responsible of running queries.
-<3> Use the method link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/SimpleQueryRunner.html#run(java.lang.String,java.util.Map)[`tx.run()`] to execute queries. You can provide a map of query parameters as second argument. Each query run returns a link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Result.html[`Result`] object.
-<4> xref:process-result[Process the result] using any of the methods on `Result`. The method `.list()` retrieves all records into a list.
+<1> Create a session. A single session can be the container for multiple queries. Unless created as a resource with the `using` keyword, remember to close it when done.
+<2> The `.ExecuteRead()` (or `.ExecuteWrite()`) method is the entry point into a transaction. It takes a callback to a _transaction function_, which is responsible of running queries.
+<3> Use the method link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IAsyncQueryRunner.RunAsync.html[`tx.RunAsync()`] to execute queries. You can provide a map of query parameters as second argument. Each query run returns a link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IResultCursor.html[`IResultCursor`] object.
+<4> xref:process-result[Process the result] using any of the methods on `IResultCursor`. The method `.FetchAsync()` retrives the next record in the queue and stores it in the property `.Current`; the method `.ToListAsync()` retrieves all records into a list.
 
 *Do not hardcode or concatenate parameters directly into the query*.
 Use xref:query-simple#query-parameters[query parameters] instead, both for performance and security reasons.
 
-*Transaction functions should never return the `Result` object directly*.
+*Transaction functions should never return the result object directly*.
 Instead, always xref:process-result[process the result] in some way.
 Within a transaction function, a `return` statement results in the transaction being committed, while the transaction is automatically rolled back if an exception is raised.
 
 [CAUTION]
-The methods `.executeRead()` and `.executeWrite()` have replaced `.readTransaction()` and `.writeTransaction()`, which are deprecated in version 5.x and will be removed in version 6.0.
+The methods `.ExecuteRead()` and `.ExecuteWrite()` have replaced `.ReadTransaction()` and `.WriteTransaction()`, which are deprecated in version 5.x and removed in version 6.0.
 
 .A transaction with multiple queries, client logic, and potential roll backs
-[source, java]
+[source, csharp]
 ----
-package demo;
+using Neo4j.Driver;
 
-import java.util.Map;
-import java.util.List;
-import java.util.Arrays;
-import java.util.concurrent.TimeUnit;
+const string dbUri = "<URI for Neo4j database>";
+const string dbUser = "<Username>";
+const string dbPassword = "<Password>";
 
-import org.neo4j.driver.AuthTokens;
-import org.neo4j.driver.GraphDatabase;
-import org.neo4j.driver.QueryConfig;
-import org.neo4j.driver.Record;
-import org.neo4j.driver.RoutingControl;
-import org.neo4j.driver.SessionConfig;
-import org.neo4j.driver.TransactionContext;
-import org.neo4j.driver.exceptions.NoSuchRecordException;
+await using var driver = GraphDatabase.Driver(dbUri, AuthTokens.Basic(dbUser, dbPassword));
+await driver.VerifyConnectivityAsync();
 
-public class App {
-
-    // Create & employ 100 people to 10 different organizations
-    public static void main(String... args) {
-
-        final String dbUri = "<URI for Neo4j database>";
-        final String dbUser = "<Username>";
-        final String dbPassword = "<Password>";
-
-        try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword))) {
-            try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
-                for (int i=0; i<100; i++) {
-                    String name = String.format("Thor%d", i);
-
-                    try {
-                        String orgId = session.executeWrite(tx -> employPersonTx(tx, name));
-                        System.out.printf("User %s added to organization %s.%n", name, orgId);
-                    } catch (Exception e) {
-                        System.out.println(e.getMessage());
-                    }
-                }
-            }
-        }
+// Create & employ 100 people to 10 different organizations
+using var session = driver.AsyncSession(SessionConfigBuilder.ForDatabase("neo4j"));
+for (int i=0; i<100; i++) {
+    var name = $"Thor{i}";
+    try {
+        string orgId = await session.ExecuteWriteAsync(async tx => {
+            return await employPersonTx(tx, name);
+        });
+        Console.WriteLine($"User {name} added to organization {orgId}.");
+    } catch (Neo4jException e) {
+        Console.WriteLine(e);
     }
+}
 
-    static String employPersonTx(TransactionContext tx, String name) {
-        final int employeeThreshold = 10;
+async Task<string> employPersonTx(IAsyncQueryRunner tx, string name) {
+     var employeeThreshold = 10;
 
         // Create new Person node with given name, if not exists already
-        tx.run("MERGE (p:Person {name: $name})", Map.of("name", name));
+        await tx.RunAsync("MERGE (p:Person {name: $name})", new { name = name });
 
         // Obtain most recent organization ID and the number of people linked to it
-        var result = tx.run("""
+        var result = await tx.RunAsync(@"
             MATCH (o:Organization)
             RETURN o.id AS id, COUNT{(p:Person)-[r:WORKS_FOR]->(o)} AS employeesN
             ORDER BY o.createdDate DESC
             LIMIT 1
-            """);
+            ");
 
-        Record org = null;
-        String orgId = null;
+        string orgId = "";
         int employeesN = 0;
-        try {
-            org = result.single();
-            orgId = org.get("id").asString();
-            employeesN = org.get("employeesN").asInt();
-        } catch (NoSuchRecordException e) {
-            // The query is guaranteed to return <= 1 results, so if.single() throws, it means there's none.
+        bool org = await result.FetchAsync();
+        if (org == false) {
             // If no organization exists, create one and add Person to it
-            orgId = createOrganization(tx);
-            System.out.printf("No orgs available, created %s.%n", orgId);
+            orgId = await createOrganization(tx);
+            Console.WriteLine($"No orgs available, created {orgId}.");
+        } else {
+            orgId = result.Current.Get<string>("id");
+            employeesN = result.Current.Get<int>("employeesN");
         }
 
         // If org does not have too many employees, add this Person to it
         if (employeesN < employeeThreshold) {
-            addPersonToOrganization(tx, name, orgId);
+            await addPersonToOrganization(tx, name, orgId);
             // If the above throws, the transaction will roll back
             // -> not even Person is created!
 
         // Otherwise, create a new Organization and link Person to it
         } else {
-            orgId = createOrganization(tx);
-            System.out.printf("Latest org is full, created %s.%n", orgId);
-            addPersonToOrganization(tx, name, orgId);
+            orgId = await createOrganization(tx);
+            Console.WriteLine($"Latest org is full, created {orgId}.");
+            await addPersonToOrganization(tx, name, orgId);
             // If any of the above throws, the transaction will roll back
             // -> not even Person is created!
         }
@@ -166,24 +151,23 @@ public class App {
         return orgId;  // Organization ID to which the new Person ends up in
     }
 
-    static String createOrganization(TransactionContext tx) {
-        var result = tx.run("""
-            CREATE (o:Organization {id: randomuuid(), createdDate: datetime()})
-            RETURN o.id AS id
-        """);
-        var org = result.single();
-        var orgId = org.get("id").asString();
-        return orgId;
-    }
+async Task<string> createOrganization(IAsyncQueryRunner tx) {
+    var result = await tx.RunAsync(@"
+        CREATE (o:Organization {id: randomuuid(), createdDate: datetime()})
+        RETURN o.id AS id
+    ");
+    bool org = await result.FetchAsync();  // can't be false
+    string orgId = result.Current.Get<string>("id");
+    return orgId;
+}
 
-    static void addPersonToOrganization(TransactionContext tx, String personName, String orgId) {
-        tx.run("""
-            MATCH (o:Organization {id: $orgId})
-            MATCH (p:Person {name: $name})
-            MERGE (p)-[:WORKS_FOR]->(o)
-            """, Map.of("orgId", orgId, "name", personName)
-        );
-    }
+async Task addPersonToOrganization(IAsyncQueryRunner tx, string personName, string orgId) {
+    await tx.RunAsync(@"
+        MATCH (o:Organization {id: $orgId})
+        MATCH (p:Person {name: $name})
+        MERGE (p)-[:WORKS_FOR]->(o)
+        ", new { orgId = orgId, name = personName }
+    );
 }
 ----
 
@@ -194,17 +178,6 @@ Note that although transactions functions might be executed multiple times, the 
 
 A session can chain multiple transactions, but *only one single transaction can be active within a session at any given time*.
 To maintain multiple concurrent transactions, use multiple concurrent sessions.
-
-[#executeWriteWithoutResult]
-[TIP]
-====
-The transaction functions callback passed to `.executeRead()` and `.executeWrite()` may return anything, as the return type is a Java Generic.
-**That also means they may not return `void`**, as that is not an instance of `Object`. +
-If you are not interested in returning anything out of a transaction function, you may either:
-
-1. use `.executeWriteWithoutResult()`, which supports returning `void` (and `void` only);
-2. use `.executeRead()`/`.executeWrite()` and return `null` in the transaction function.
-====
 
 
 [#explicit-transactions]
