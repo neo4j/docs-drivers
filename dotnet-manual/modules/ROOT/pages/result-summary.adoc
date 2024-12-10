@@ -1,7 +1,7 @@
 = Explore the query execution summary
 
 After all results coming from a query have been processed, the server ends the transaction by returning a summary of execution.
-It comes as a link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/summary/ResultSummary.html[`ResultSummary`] object, and it contains information among which:
+It comes as a link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IResultSummary.html[`IResultSummary`] object, and it contains information among which:
 
 - xref:_query_counters[**Query counters**] -- What changes the query triggered on the server
 - xref:_query_execution_plan[**Query execution plan**] -- How the database would execute (or executed) the query
@@ -11,81 +11,83 @@ It comes as a link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driv
 
 == Retrieve the execution summary
 
-When running queries with xref:query-simple.adoc[`Driver.executableQuery()`], the execution summary is part of the default return object, retrievable through the `.summary()` method.
+When running queries with xref:query-simple.adoc[`IDriver.ExecutableQuery()`], the execution summary is part of the default return object, available in the `Summary` property.
 
-[source, java]
+[source, csharp]
 ----
-var result = driver.executableQuery("""
-    UNWIND ['Alice', 'Bob'] AS name
-    MERGE (p:Person {name: name})
-    """)
-    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
-    .execute();
-var resultSummary = result.summary();
+var result = await driver
+    .ExecutableQuery(@"
+        UNWIND ['Alice', 'Bob'] AS name
+        MERGE (p:Person {name: name})
+    ")
+    .WithConfig(new QueryConfig(database: "neo4j"))
+    .ExecuteAsync();
+var resultSummary = result.Summary;
 ----
 
-If you are using xref:transactions.adoc[transaction functions], you can retrieve the query execution summary with the method `Result.consume()`.
+If you are using xref:transactions.adoc[transaction functions], you can retrieve the query execution summary with the method `Result.ConsumeAsync()`.
 **Notice that once you ask for the execution summary, the result stream is exhausted**.
 This means that any record which has not yet been processed is discarded.
 
-[source, java]
+[source, csharp]
 ----
-try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
-    var resultSummary = session.executeWrite(tx -> {
-        var result = tx.run("""
-        UNWIND ['Alice', 'Bob'] AS name
-        MERGE (p:Person {name: name})
-        """);
-        return result.consume();
-    });
-}
+using var session = driver.AsyncSession(SessionConfigBuilder.ForDatabase("neo4j"));
+var resultSummary = await session.ExecuteReadAsync(
+    async tx => {
+        var result = await tx.RunAsync(@"
+            UNWIND ['Alice', 'Bob'] AS name
+            MERGE (p:Person {name: name})
+        ");
+        return await result.ConsumeAsync();
+    }
+);
 ----
 
 
 == Query counters
 
-The method `ResultSummary.counters()` returns counters for the operations that a query triggered (as a link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/summary/SummaryCounters.html[`SummaryCounters`] object).
+The property `IResultSummary.Counters` contains counters for the operations that a query triggered (as a link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.ICounters.html[`ICounters`] object).
 
 .Insert some data and display the query counters
-[source, java]
+[source, csharp]
 ----
-var result = driver.executableQuery("""
-    MERGE (p:Person {name: $name})
-    MERGE (p)-[:KNOWS]->(:Person {name: $friend})
-    """).withParameters(Map.of("name", "Mark", "friend", "Bob"))
-    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
-    .execute();
-var queryCounters = result.summary().counters();
-System.out.println(queryCounters);
-
+var result = await driver
+    .ExecutableQuery(@"
+        MERGE (p:Person {name: $name})
+        MERGE (p)-[:KNOWS]->(:Person {name: $friend})
+    ", new { name = "Mark", friend = "Bob" })
+    .WithConfig(new QueryConfig(database: "neo4j"))
+    .ExecuteAsync();
+var queryCounters = result.Summary.Counters;
+Console.WriteLine(queryCounters);
 /*
-InternalSummaryCounters{nodesCreated=2, nodesDeleted=0, relationshipsCreated=1, relationshipsDeleted=0,
-propertiesSet=2, labelsAdded=2, labelsRemoved=0, indexesAdded=0, indexesRemoved=0, constraintsAdded=0,
-constraintsRemoved=0, systemUpdates=0}
+Counters{NodesCreated=2, NodesDeleted=0, RelationshipsCreated=1, RelationshipsDeleted=0,
+PropertiesSet=2, LabelsAdded=2, LabelsRemoved=0, IndexesAdded=0, IndexesRemoved=0,
+ConstraintsAdded=0, ConstraintsRemoved=0, SystemUpdates=0}
 */
 ----
 
-There are two additional boolean methods which act as meta-counters:
+There are two additional boolean properties which act as meta-counters:
 
-- `.containsUpdates()` -- Whether the query triggered any write operation on the database on which it ran
-- `.containsSystemUpdates()` -- Whether the query updated the `system` database
+- `.ContainsUpdates` -- Whether the query triggered any write operation on the database on which it ran
+- `.ContainsSystemUpdates` -- Whether the query updated the `system` database
 
 
 == Query execution plan
 
 If you prefix a query with `EXPLAIN`, the server will return the plan it _would_ use to run the query, but will not actually run it.
-The plan is then available as a link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/summary/Plan.html[`Plan`] object through the method `ResultSummary.plan()`, and contains the list of link:{neo4j-docs-base-uri}/cypher-manual/current/execution-plans/operators/[Cypher operators] that would be used to retrieve the result set.
+The plan is then available as a link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IPlan.html[`IPlan`] object in the property `IResultSummary.Plan`, and contains the list of link:{neo4j-docs-base-uri}/cypher-manual/current/execution-plans/operators/[Cypher operators] that would be used to retrieve the result set.
 You may use this information to locate potential bottlenecks or room for xref:performance.adoc[performance improvements] (for example through the creation of indexes).
 
-[source, java, role=nocollapse]
+[source, csharp, role=nocollapse]
 ----
-var result = driver.executableQuery("EXPLAIN MATCH (p {name: $name}) RETURN p")
-    .withParameters(Map.of("name", "Alice"))
-    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
-    .execute();
-var queryPlan = result.summary().plan().arguments().get("string-representation");
-System.out.println(queryPlan);
-
+var result = await driver
+    .ExecutableQuery("EXPLAIN MATCH (p {name: $name}) RETURN p")
+    .WithParameters(new { name = "Alice" })
+    .WithConfig(new QueryConfig(database: "neo4j"))
+    .ExecuteAsync();
+var queryPlan = result.Summary.Plan;
+Console.WriteLine(queryPlan.Arguments["string-representation"]);
 /*
 Planner COST
 Runtime PIPELINED
@@ -108,18 +110,19 @@ Total database accesses: ?
 
 If you instead prefix a query with the keyword `PROFILE`, the server will return the execution plan it has used to run the query, together with profiler statistics.
 This includes the list of operators that were used and additional profiling information about each intermediate step.
-The plan is available as a link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/summary/Plan.html[`Plan`] object through the method `ResultSummary.profile()`.
+The plan is available as a link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IProfiledPlan.html[`IProfiledPlan`] object in the property `IResultSummary.Profile`.
 Notice that the query is also _run_, so the result object also contains any result records.
 
-[source, java, role=nocollapse]
+[source, csharp, role=nocollapse]
 ----
-var result = driver.executableQuery("PROFILE MATCH (p {name: $name}) RETURN p")
-    .withParameters(Map.of("name", "Alice"))
-    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
-    .execute();
-var queryPlan = result.summary().profile().arguments().get("string-representation");
-System.out.println(queryPlan);
-
+var result = await driver
+    .ExecutableQuery("PROFILE MATCH (p {name: $name}) RETURN p")
+    .WithParameters(new { name = "Alice" })
+    .WithConfig(new QueryConfig(database: "neo4j"))
+    .ExecuteAsync();
+// Note: `result.Result` is non-empty
+var queryPlan = result.Summary.Profile;
+Console.WriteLine(queryPlan.Arguments["string-representation"]);
 /*
 Planner COST
 Runtime PIPELINED
@@ -158,7 +161,7 @@ GQL status codes are planned to supersede Neo4j status codes.
 =====
 [.include-with-neo4j-status-code]
 ======
-The method `ResultSummary.notifications()` returns a list of link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/summary/Notification.html[`Notification`] objects.
+The property `IResultSummary.Notifications` returns a list of link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.INotification.html[`INotification`] objects.
 
 [source, java, role=nocollapse]
 ----

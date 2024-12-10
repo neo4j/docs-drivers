@@ -425,7 +425,8 @@ using var session = driver.AsyncSession(
 
 == Transaction configuration
 
-You can exert further control on transactions by providing a  link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/TransactionConfig.html[`TransactionConfig`] object as (optional) second parameter to `.executeRead()`, `.executeWrite()`, and `.beginTransaction()`.
+You can exert further control on transactions by providing a `TransactionConfig` object as (optional) last parameter to `.ExecuteReadAsync()`, `.ExecuteWriteAsync()`, and `.BeginTransactionAsync()`.
+You can create one via link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.TransactionConfigBuilder.html[`TransactionConfigBuilder`].
 Use it to specify:
 
 - A transaction timeout.
@@ -436,22 +437,21 @@ The minimum value is one millisecond.
 These metadata get logged in the server `query.log`, and are visible in the output of the `SHOW TRANSACTIONS` Cypher command.
 Use this to tag transactions.
 
-[source, java]
+[source, csharp]
 ----
-// import java.time.Duration
-// import org.neo4j.driver.SessionConfig
-// import org.neo4j.driver.TransactionConfig
+using var session = driver.AsyncSession(SessionConfigBuilder.ForDatabase("neo4j"));
+var people = await session.ExecuteReadAsync(
+    async tx => {
+        var result = await tx.RunAsync("MATCH (p:Person) RETURN p");
+        return await result.ToListAsync();
+    },
+    TransactionConfigBuilder
+        .withTimeout(new TimeSpan(5))
+        .withMetadata(new { appName = "peopleTracker" })
+);
 
-try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
-    var people = session.executeRead(tx -> {
-        var result = tx.run("MATCH (p:Person) RETURN p");
-        return result.list();  // return a list of Record objects
-    }, TransactionConfig.builder()
-        .withTimeout(Duration.ofSeconds(5))
-        .withMetadata(Map.of("appName", "peopleTracker"))
-        .build()
-    );
-    people.forEach(person -> System.out.println(person));
+foreach (var person in people) {
+    Console.WriteLine(person);
 }
 ----
 
