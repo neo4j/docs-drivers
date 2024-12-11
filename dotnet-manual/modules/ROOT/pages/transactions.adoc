@@ -17,7 +17,7 @@ For further configuration parameters, see xref:_session_configuration[Session co
 
 [source, csharp]
 ----
-using var session = driver.AsyncSession(SessionConfigBuilder.ForDatabase("neo4j"));
+using var session = driver.AsyncSession(conf => conf.WithDatabase("neo4j"));
 ----
 
 Session creation is a lightweight operation, so sessions can be created and destroyed without significant cost.
@@ -39,7 +39,7 @@ Both methods take a <<transaction_function>> callback, which is responsible for 
 .Retrieve people whose name starts with `Al`.
 [source, csharp, role=nocollapse]
 ----
-using var session = driver.AsyncSession(SessionConfigBuilder.ForDatabase("neo4j"));  // <.>
+using var session = driver.AsyncSession(conf => conf.WithDatabase("neo4j"));  // <.>
 var people = await session.ExecuteReadAsync(  // <.>
     async tx => {
         var result = await tx.RunAsync(@"
@@ -94,7 +94,7 @@ await using var driver = GraphDatabase.Driver(dbUri, AuthTokens.Basic(dbUser, db
 await driver.VerifyConnectivityAsync();
 
 // Create & employ 100 people to 10 different organizations
-using var session = driver.AsyncSession(SessionConfigBuilder.ForDatabase("neo4j"));
+using var session = driver.AsyncSession(conf => conf.WithDatabase("neo4j"));
 for (int i=0; i<100; i++) {
     var name = $"Thor{i}";
     try {
@@ -227,7 +227,7 @@ async Task<string> createCustomer(IDriver driver) {
 }
 
 async Task transferToOtherBank(IDriver driver, string customerId, int otherBankId, float amount) {
-    using var session = driver.AsyncSession(SessionConfigBuilder.ForDatabase("neo4j"));
+    using var session = driver.AsyncSession(conf => conf.WithDatabase("neo4j"));
     using var tx = await session.BeginTransactionAsync();
 
     if (! await customerBalanceCheck(tx, customerId, amount)) {
@@ -354,8 +354,8 @@ If no database is given, the link:{neo4j-docs-base-uri}/operations-manual/curren
 
 [source, csharp]
 ----
-using var session = driver.AsyncSession(
-    SessionConfigBuilder.WithDatabase("neo4j").Build()
+using var session = driver.AsyncSession(conf => conf
+    .WithDatabase("neo4j")
 );
 ----
 
@@ -373,10 +373,9 @@ Note that `.ExecuteReadAsync()` and `.ExecuteWriteAsync()` automatically overrid
 
 [source, csharp]
 ----
-using var session = driver.AsyncSession(
-    SessionConfigBuilder.WithDatabase("neo4j")
+using var session = driver.AsyncSession(conf => conf
+    .WithDatabase("neo4j")
     .WithDefaultAccessMode(AccessMode.Read)
-    .Build()
 );
 ----
 
@@ -403,10 +402,9 @@ Session-scoped authentication requires a server version >= 5.8.
 
 [source, csharp, test-skip]
 ----
-using var session = driver.AsyncSession(
-    SessionConfigBuilder.WithDatabase("neo4j")
+using var session = driver.AsyncSession(conf => conf
+    .WithDatabase("neo4j")
     .WithAuthToken(AuthTokens.Basic("somebodyElse", "theirPassword"))
-    .Build()
 );
 ----
 
@@ -415,10 +413,9 @@ The difference is that you don't need to know a user's password to impersonate t
 
 [source, csharp, test-skip]
 ----
-using var session = driver.AsyncSession(
-    SessionConfigBuilder.WithDatabase("neo4j")
+using var session = driver.AsyncSession(conf => conf
+    .WithDatabase("neo4j")
     .WithImpersonatedUser("<somebodyElse>")
-    .Build()
 );
 ----
 
@@ -439,7 +436,7 @@ Use this to tag transactions.
 
 [source, csharp]
 ----
-using var session = driver.AsyncSession(SessionConfigBuilder.ForDatabase("neo4j"));
+using var session = driver.AsyncSession(conf => conf.WithDatabase("neo4j"));
 var people = await session.ExecuteReadAsync(
     async tx => {
         var result = await tx.RunAsync("MATCH (p:Person) RETURN p");
@@ -466,7 +463,7 @@ If you do not open sessions with `using`, remember to call the `.CloseAsync()` m
 
 [source, csharp]
 ----
-var session = driver.AsyncSession(SessionConfigBuilder.WithDatabase("neo4j").Build());
+using var session = driver.AsyncSession(conf => conf.WithDatabase("neo4j"));
 
 // session usage
 

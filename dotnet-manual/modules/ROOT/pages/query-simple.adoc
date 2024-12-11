@@ -57,6 +57,7 @@ For more information on types, see xref:data-types.adoc[].
 <.> The xref:result-summary.adoc[summary of execution] returned by the server
 
 To clean up the returned data structure, use the `.WithMap()` method when running the query.
+This can be especially handy when returning nodes rather than individual properties.
 For example,
 
 [source, csharp]
@@ -70,8 +71,6 @@ foreach (var name in result.Result) {
     Console.WriteLine(name);
 }
 ----
-
-This can be especially handy when returning nodes rather than individual properties.
 
 
 == Update the database
