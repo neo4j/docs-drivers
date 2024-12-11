@@ -73,8 +73,6 @@ import org.neo4j.driver.TransactionContext;
 
 public class App {
 
-    private static final int employeeThreshold = 10;
-
     public static void main(String... args) {
         final String dbUri = "<URI for Neo4j database>";
         final String dbUser = "<Username>";
