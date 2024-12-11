@@ -1,54 +1,42 @@
-The Neo4j Java driver is the official library to interact with a Neo4j instance through a Java application.
+The Neo4j .NET driver is the official library to interact with a Neo4j instance through a .NET application.
 
 At the hearth of Neo4j lies <<Cypher>>, the query language to interact with a Neo4j database.
-While this guide does not _require_ you to be a seasoned Cypher querier, it is going to be easier to focus on the Java-specific bits if you already know some Cypher.
+While this guide does not _require_ you to be a seasoned Cypher querier, it is going to be easier to focus on the .NET-specific bits if you already know some Cypher.
 For this reason, although this guide does _also_ provide a gentle introduction to Cypher along the way, consider checking out link:{neo4j-docs-base-uri}/getting-started/cypher-intro/[Getting started -> Cypher] for a more detailed walkthrough of graph databases modelling and querying if this is your first approach.
-You may then apply that knowledge while following this guide to develop your Java application.
+You may then apply that knowledge while following this guide to develop your .NET application.
 
 
 == Installation
 
-Add the Neo4j Java driver to the list of dependencies in the `pom.xml` of your Maven project:
+Add the Neo4j .NET driver to your project:
 
-[source, xml, subs="attributes+"]
+[source, bash]
 ----
-<dependency>
-    <groupId>org.neo4j.driver</groupId>
-    <artifactId>neo4j-java-driver</artifactId>
-    <version>{java-driver-version}</version>
-</dependency>
+dotnet add package Neo4j.Driver
 ----
+
+The driver supports the .NET Standard 2.0.
 
 xref:install#install-driver[More info on installing the driver ->]
 
 
 == Connect to the database
 
-Connect to a database by creating a <<Driver>> object and providing a URL and an authentication token.
-Once you have a `Driver` instance, use the `.verifyConnectivity()` method to ensure that a working connection can be established.
+Connect to a database by creating an <<IDriver>> object and providing a URL and an authentication token.
+Once you have a `IDriver` instance, use the `.VerifyConnectivityAsync()` method to ensure that a working connection can be established.
 
-[source, java, role=nocollapse]
+[source, csharp]
 ----
-package demo;
+using Neo4j.Driver;
 
-import org.neo4j.driver.AuthTokens;
-import org.neo4j.driver.GraphDatabase;
+// URI examples: "neo4j://localhost", "neo4j+s://xxx.databases.neo4j.io"
+const string dbUri = "<URI for Neo4j database>";
+const string dbUser = "<Username>";
+const string dbPassword = "<Password>";
 
-public class App {
-
-    public static void main(String... args) {
-
-        // URI examples: "neo4j://localhost", "neo4j+s://xxx.databases.neo4j.io"
-        final String dbUri = "<URI for Neo4j database>";
-        final String dbUser = "<Username>";
-        final String dbPassword = "<Password>";
-
-        try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword))) {
-            driver.verifyConnectivity();
-            System.out.println("Connection established.");
-        }
-    }
-}
+await using var driver = GraphDatabase.Driver(dbUri, AuthTokens.Basic(dbUser, dbPassword));
+await driver.VerifyConnectivityAsync();
+Console.WriteLine("Connection established.");
 ----
 
 xref:connect.adoc[More info on connecting to a database ->]
@@ -56,31 +44,26 @@ xref:connect.adoc[More info on connecting to a database ->]
 
 == Query the database
 
-Execute a Cypher statement with the method `Driver.executableQuery()`.
+Execute a Cypher statement with the method `IDriver.ExecutableQuery()`.
 Do not hardcode or concatenate parameters: use placeholders and specify the parameters as a map through the `.withParameters()` method.
 
-[source, java, role=nocollapse]
+[source, csharp]
 ----
-// import java.util.Map;
-// import org.neo4j.driver.QueryConfig;
-
 // Get all 42-year-olds
-var result = driver.executableQuery("MATCH (p:Person {age: $age}) RETURN p.name AS name")
-    .withParameters(Map.of("age", 42))
-    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
-    .execute();
+var result = await driver
+    .ExecutableQuery("MATCH (p:Person {age: $age}) RETURN p.name AS name")
+    .WithConfig(new QueryConfig(database: "neo4j"))
+    .WithParameters(new { age = 42 } )
+    .ExecuteAsync();
 
-// Loop through results and do something with them
-var records = result.records();
-records.forEach(r -> {
-    System.out.println(r);  // or r.get("name").asString()
-});
+// Loop through results and print people's name
+foreach (var record in result.Result) {
+    Console.WriteLine(record.Get<string>("name"));
+}
 
 // Summary information
-var summary = result.summary();
-System.out.printf("The query %s returned %d records in %d ms.%n",
-    summary.query(), records.size(),
-    summary.resultAvailableAfter(TimeUnit.MILLISECONDS));
+var summary = result.Summary;
+Console.WriteLine($"The query `{summary.Query.Text}` returned {result.Result.Count()} results in {summary.ResultAvailableAfter.Milliseconds} ms.");
 ----
 
 xref:query-simple.adoc[More info on querying the database ->]
@@ -89,91 +72,71 @@ xref:query-simple.adoc[More info on querying the database ->]
 == Run your own transactions
 
 For more advanced use-cases, you can run <<transaction,transactions>>.
-Use the methods `Session.executeRead()` and `Session.executeWrite()` to run managed transactions.
+Use the methods `IAsyncSession.ExecuteReadAsync()` and `IAsyncSession.ExecuteWriteAsync()` to run managed transactions.
 
 .A transaction with multiple queries, client logic, and potential roll backs
-[source, java]
+[source, csharp]
 ----
-package demo;
+using Neo4j.Driver;
 
-import java.util.Map;
-import java.util.List;
-import java.util.Arrays;
-import java.util.concurrent.TimeUnit;
+const string dbUri = "<URI for Neo4j database>";
+const string dbUser = "<Username>";
+const string dbPassword = "<Password>";
 
-import org.neo4j.driver.AuthTokens;
-import org.neo4j.driver.GraphDatabase;
-import org.neo4j.driver.QueryConfig;
-import org.neo4j.driver.Record;
-import org.neo4j.driver.RoutingControl;
-import org.neo4j.driver.SessionConfig;
-import org.neo4j.driver.TransactionContext;
-import org.neo4j.driver.exceptions.NoSuchRecordException;
+await using var driver = GraphDatabase.Driver(dbUri, AuthTokens.Basic(dbUser, dbPassword));
+await driver.VerifyConnectivityAsync();
 
-public class App {
-
-    // Create & employ 100 people to 10 different organizations
-    public static void main(String... args) {
-
-        final String dbUri = "<URI for Neo4j database>";
-        final String dbUser = "<Username>";
-        final String dbPassword = "<Password>";
-
-        try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword))) {
-            try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
-                for (int i=0; i<100; i++) {
-                    String name = String.format("Thor%d", i);
-
-                    try {
-                        String orgId = session.executeWrite(tx -> employPersonTx(tx, name));
-                        System.out.printf("User %s added to organization %s.%n", name, orgId);
-                    } catch (Exception e) {
-                        System.out.println(e.getMessage());
-                    }
-                }
-            }
-        }
+// Create & employ 100 people to 10 different organizations
+using var session = driver.AsyncSession(conf => conf.WithDatabase("neo4j"));
+for (int i=0; i<100; i++) {
+    var name = $"Thor{i}";
+    try {
+        string orgId = await session.ExecuteWriteAsync(async tx => {
+            return await employPersonTx(tx, name);
+        });
+        Console.WriteLine($"User {name} added to organization {orgId}.");
+    } catch (Neo4jException e) {
+        Console.WriteLine(e);
     }
+}
 
-    static String employPersonTx(TransactionContext tx, String name) {
-        final int employeeThreshold = 10;
+async Task<string> employPersonTx(IAsyncQueryRunner tx, string name) {
+     var employeeThreshold = 10;
 
         // Create new Person node with given name, if not exists already
-        tx.run("MERGE (p:Person {name: $name})", Map.of("name", name));
+        await tx.RunAsync("MERGE (p:Person {name: $name})", new { name = name });
 
         // Obtain most recent organization ID and the number of people linked to it
-        var result = tx.run("""
+        var result = await tx.RunAsync(@"
             MATCH (o:Organization)
             RETURN o.id AS id, COUNT{(p:Person)-[r:WORKS_FOR]->(o)} AS employeesN
             ORDER BY o.createdDate DESC
             LIMIT 1
-            """);
+            ");
 
-        Record org = null;
-        String orgId = null;
+        string orgId = "";
         int employeesN = 0;
-        try {
-            org = result.single();
-            orgId = org.get("id").asString();
-            employeesN = org.get("employeesN").asInt();
-        } catch (NoSuchRecordException e) {
-            // The query is guaranteed to return <= 1 results, so if.single() throws, it means there's none.
+        bool org = await result.FetchAsync();
+        if (org == false) {
             // If no organization exists, create one and add Person to it
-            orgId = createOrganization(tx);
-            System.out.printf("No orgs available, created %s.%n", orgId);
+            orgId = await createOrganization(tx);
+            Console.WriteLine($"No orgs available, created {orgId}.");
+        } else {
+            orgId = result.Current.Get<string>("id");
+            employeesN = result.Current.Get<int>("employeesN");
         }
 
         // If org does not have too many employees, add this Person to it
         if (employeesN < employeeThreshold) {
-            addPersonToOrganization(tx, name, orgId);
+            await addPersonToOrganization(tx, name, orgId);
             // If the above throws, the transaction will roll back
             // -> not even Person is created!
 
         // Otherwise, create a new Organization and link Person to it
         } else {
-            orgId = createOrganization(tx);
-            System.out.printf("Latest org is full, created %s.%n", orgId);
-            addPersonToOrganization(tx, name, orgId);
+            orgId = await createOrganization(tx);
+            Console.WriteLine($"Latest org is full, created {orgId}.");
+            await addPersonToOrganization(tx, name, orgId);
             // If any of the above throws, the transaction will roll back
             // -> not even Person is created!
         }
@@ -181,24 +144,23 @@ public class App {
         return orgId;  // Organization ID to which the new Person ends up in
     }
 
-    static String createOrganization(TransactionContext tx) {
-        var result = tx.run("""
-            CREATE (o:Organization {id: randomuuid(), createdDate: datetime()})
-            RETURN o.id AS id
-        """);
-        var org = result.single();
-        var orgId = org.get("id").asString();
-        return orgId;
-    }
+async Task<string> createOrganization(IAsyncQueryRunner tx) {
+    var result = await tx.RunAsync(@"
+        CREATE (o:Organization {id: randomuuid(), createdDate: datetime()})
+        RETURN o.id AS id
+    ");
+    bool org = await result.FetchAsync();  // can't be false
+    string orgId = result.Current.Get<string>("id");
+    return orgId;
+}
 
-    static void addPersonToOrganization(TransactionContext tx, String personName, String orgId) {
-        tx.run("""
-            MATCH (o:Organization {id: $orgId})
-            MATCH (p:Person {name: $name})
-            MERGE (p)-[:WORKS_FOR]->(o)
-            """, Map.of("orgId", orgId, "name", personName)
-        );
-    }
+async Task addPersonToOrganization(IAsyncQueryRunner tx, string personName, string orgId) {
+    await tx.RunAsync(@"
+        MATCH (o:Organization {id: $orgId})
+        MATCH (p:Person {name: $name})
+        MERGE (p)-[:WORKS_FOR]->(o)
+        ", new { orgId = orgId, name = personName }
+    );
 }
 ----
 
@@ -207,15 +169,15 @@ xref:transactions.adoc[More info on running transactions ->]
 
 == Close connections and sessions
 
-Unless you created them with `try-with-resources` statements, call the `.close()` method on all `Driver` and `Session` instances to release any resources still held by them.
+Unless you created them with the `using` keyword, remember to close all `IDriver` and `IAsyncSession` instances to release any resources still held by them.
 
-[source, java, test-skip]
+[source, csharp, test-skip]
 ----
-session.close();
-driver.close();
+await session.CloseAsync();
+await driver.CloseAsync();
 ----
 
 
 == API documentation
 
-For in-depth information about driver features, check out the link:https://neo4j.com/docs/api/java-driver/current/[API documentation].
+For in-depth information about driver features, check out the link:https://neo4j.com/docs/api/dotnet-driver/current/[API documentation].
