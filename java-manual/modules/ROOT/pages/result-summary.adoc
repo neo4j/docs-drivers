@@ -223,11 +223,11 @@ System.out.println(statuses);
 === Filter notifications
 
 By default, the server analyses each query for all categories and severity of notifications.
-Starting from version 5.22, you can use the configuration methods link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Config.ConfigBuilder.html#withMinimumNotificationSeverity(org.neo4j.driver.NotificationSeverity)[`.withMinimumNotificationSeverity()`] and link:https://neo4j.com/docs/api/java-driver/5.24/org.neo4j.driver/org/neo4j/driver/Config.ConfigBuilder.html#withDisabledNotificationClassifications(java.util.Set)[`.withDisabledNotificationClassification()`] to tweak the severity and/or category/classification of notifications that you are interested into, or to disable them altogether.
+Starting from version 5.22, you can use the configuration methods link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Config.ConfigBuilder.html#withMinimumNotificationSeverity(org.neo4j.driver.NotificationSeverity)[`.withMinimumNotificationSeverity()`] and link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Config.ConfigBuilder.html#withDisabledNotificationClassifications(java.util.Set)[`.withDisabledNotificationClassification()`] to tweak the severity and/or category/classification of notifications that you are interested into, or to disable them altogether.
 There is a slight performance gain in restricting the amount of notifications the server is allowed to raise.
 
 The severity filter applies to both Neo4j and GQL notifications.
-The category filter acts on both categories and classifications.
+The classification filter acts on both categories and classifications.
 
 You can call the methods both on a `Config` object when creating a `Driver` instance, and on a `SessionConfig` object when creating a session.
 
@@ -246,7 +246,7 @@ var driver = GraphDatabase.driver(
     dbUri, AuthTokens.basic(dbUser, dbPassword),
     Config.builder()
     .withMinimumNotificationSeverity(NotificationSeverity.WARNING)  // NotificationSeverity.OFF to disable entirely
-    .withDisabledNotificationClassifications(Set.of(NotificationClassification.PERFORMANCE, NotificationClassification.GENERIC))  // filters categories as well
+    .withDisabledNotificationClassifications(Set.of(NotificationClassification.HINT, NotificationClassification.GENERIC))  // filters categories as well
     .build()
 );
 
@@ -255,7 +255,7 @@ var session = driver.session(
     SessionConfig.builder()
     .withDatabase("neo4j")
     .withMinimumNotificationSeverity(NotificationSeverity.WARNING)  // NotificationSeverity.OFF to disable entirely
-    .withDisabledNotificationClassifications(Set.of(NotificationClassification.PERFORMANCE, NotificationClassification.GENERIC))  // filters categories as well
+    .withDisabledNotificationClassifications(Set.of(NotificationClassification.HINT, NotificationClassification.GENERIC))  // filters categories as well
     .build()
 );
 ----
