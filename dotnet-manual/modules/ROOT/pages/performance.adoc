@@ -3,44 +3,44 @@
 [[target-database]]
 == Always specify the target database
 
-*Specify the target database on all queries* with the `.withDatabase()` method, either in xref:query-simple.adoc#_database_selection[`Driver.executableQuery()`] calls or xref:transactions.adoc#_database_selection[when creating new sessions].
+*Specify the target database on all queries*, both in xref:query-simple.adoc#_database_selection[`Driver.ExecutableQuery()`] calls or xref:transactions.adoc#_database_selection[when creating new sessions].
 If no database is provided, the driver has to send an extra request to the server to figure out what the default database is.
 The overhead is minimal for a single query, but becomes significant over hundreds of queries.
 
 [discrete]
 === Good practices
 
-[source, java]
+[source, csharp]
 ----
-driver.executableQuery("<QUERY>")
-    .withConfig(QueryConfig.builder().withDatabase("<DB NAME>").build())
-    .execute();
+await driver.ExecutableQuery("<QUERY>")
+    .WithConfig(new QueryConfig(database: "<DB NAME>"))
+    .ExecuteAsync();
 ----
 
-[source, java]
+[source, csharp]
 ----
-driver.session(SessionConfig.builder().withDatabase("<DB NAME>").build());
+using var session = driver.AsyncSession(conf => conf.WithDatabase("DB NAME"));
 ----
 
 [discrete]
 === Bad practices
 
-[source, java]
+[source, csharp]
 ----
-driver.executableQuery("<QUERY>")
-    .execute();
+await driver.ExecutableQuery("<QUERY>")
+    .ExecuteAsync();
 ----
 
-[source, java]
+[source, csharp]
 ----
-driver.session();
+using var session = driver.AsyncSession();
 ----
 
 
 [[transactions-cost]]
 == Be aware of the cost of transactions
 
-When submitting queries through xref:query-simple.adoc[`.executableQuery()`] or through xref:transactions.adoc#managed-transactions[`.executeRead/Write()`], the server automatically wraps them into a <<transaction>>.
+When submitting queries through xref:query-simple.adoc[`.ExecutableQuery()`] or through xref:transactions.adoc#managed-transactions[`.ExecuteRead/WriteAsync()`], the server automatically wraps them into a <<transaction>>.
 This behavior ensures that the database always ends up in a consistent state, regardless of what happens during the execution of a transaction (power outages, software crashes, etc).
 
 Creating a safe execution context around a number of queries yields an overhead that is not present if the driver just shoots queries at the server and hopes they will get through.
@@ -49,21 +49,22 @@ For this reason, if your use case values throughput more than data integrity, yo
 You do this by creating a session and using `session.run()` to run as many queries as needed.
 
 .Privilege throughput over data integrity
-[source, java]
+[source, csharp]
 ----
-try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
-    for (int i=0; i<1000; i++) {
-        session.run("<QUERY>");
-    }
+using var session = driver.AsyncSession(conf => conf.WithDatabase("DB NAME"));
+for (int i=0; i<1000; i++) {
+    await session.RunAsync("<QUERY>");
 }
 ----
 
 .Privilege data integrity over throughput
-[source, java]
+[source, csharp]
 ----
 for (int i=0; i<1000; i++) {
-    driver.executableQuery("<QUERY>").execute();
-    // or session.executeRead/Write() calls
+    await driver.ExecutableQuery("<QUERY>")
+        .WithConfig(new QueryConfig(database: "<DB NAME>"))
+        .ExecuteAsync();
+    // or session.ExecuteRead/WriteAsync() calls
 }
 ----
 
