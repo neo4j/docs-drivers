@@ -46,7 +46,7 @@ This behavior ensures that the database always ends up in a consistent state, re
 Creating a safe execution context around a number of queries yields an overhead that is not present if the driver just shoots queries at the server and hopes they will get through.
 The overhead is small, but can add up as the number of queries increases.
 For this reason, if your use case values throughput more than data integrity, you may extract further performance by running all queries within a single (auto-commit) transaction.
-You do this by creating a session and using `session.run()` to run as many queries as needed.
+You do this by creating a session and using `session.RunAsync()` to run as many queries as needed.
 
 .Privilege throughput over data integrity
 [source, csharp]
@@ -78,8 +78,8 @@ When submitting queries that may result in a lot of records, don't retrieve them
 The Neo4j server can retrieve records in batches and stream them to the driver as they become available.
 Lazy-loading a result spreads out network traffic and memory usage (both client- and server-side).
 
-For convenience, xref:query-simple.adoc[`.execute_query()`] always retrieves all result records at once (it is what the `Eager` in `EagerResult` stands for).
-To lazy-load a result, you have to use xref:transactions.adoc#managed-transactions[`.execute_read/write()`] (or other forms of manually-handled xref:transactions.adoc[transactions]) and *not* cast the `Result` object to `list` when processing the result; iterate on it instead.
+For convenience, xref:query-simple.adoc[`.ExecutableQuery()`] always retrieves all result records at once.
+To lazy-load a result, use xref:transactions.adoc#managed-transactions[`.ExecuteRead/WriteAsync()`] (or other forms of manually-handled xref:transactions.adoc[transactions]) and do *not* call `.ToListAsync()` on the `IResultCursor` object when processing the result; iterate on it instead.
 
 .Comparison between eager and lazy loading
 ====
@@ -103,116 +103,103 @@ To lazy-load a result, you have to use xref:transactions.adoc#managed-transactio
 |===
 
 .Time and memory comparison between eager and lazy loading
-[source, python]
+[source, csharp]
 ----
-import neo4j
-from time import sleep, time
-import tracemalloc
+using Neo4j.Driver;
 
+const string dbUri = "<URI for Neo4j database>";
+const string dbUser = "<Username>";
+const string dbPassword = "<Password>";
 
-
-URI = "<URI for Neo4j database>"
-AUTH = ("<Username>", "<Password>")
-
-# Returns 250 records, each with properties
-# - `output` (an expensive computation, to slow down retrieval)
-# - `dummyData` (a list of 10000 ints, about 8 KB).
-slow_query = '''
+// Returns 250 records, each with properties
+// - `output` (an expensive computation, to slow down retrieval)
+// - `dummyData` (a list of 10000 ints, about 8 KB).
+string slowQuery = @"
 UNWIND range(1, 250) AS s
 RETURN reduce(s=s, x in range(1,1000000) | s + sin(toFloat(x))+cos(toFloat(x))) AS output,
        range(1, 10000) AS dummyData
-'''
-# Delay for each processed record
-sleep_time = 0.5
+";
+// Delay for each processed record (ms)
+int sleepTime = 500;
 
+await using var driver = GraphDatabase.Driver(dbUri, AuthTokens.Basic(dbUser, dbPassword));
+await driver.VerifyConnectivityAsync();
 
-def main():
-    with neo4j.GraphDatabase.driver(URI, auth=AUTH) as driver:
-        driver.verify_connectivity()
+var watch = System.Diagnostics.Stopwatch.StartNew();
+log("LAZY LOADING (ExecuteReadAsync)");
+await lazyLoading(driver);
+log($"--- {watch.ElapsedMilliseconds/1000} seconds ---");
+Console.WriteLine();
 
-        start_time = time()
-        log('LAZY LOADING (execute_read)')
-        tracemalloc.start()
-        lazy_loading(driver)
-        log(f'Peak memory usage: {tracemalloc.get_traced_memory()[1]} bytes')
-        tracemalloc.stop()
-        log('--- %s seconds ---' % (time() - start_time))
+watch.Restart();
+log("EAGER LOADING (ExecutableQuery)");
+await eagerLoading(driver);
+log($"--- {watch.ElapsedMilliseconds/1000} seconds ---");
 
-        start_time = time()
-        log('EAGER LOADING (execute_query)')
-        tracemalloc.start()
-        eager_loading(driver)
-        log(f'Peak memory usage: {tracemalloc.get_traced_memory()[1]} bytes')
-        tracemalloc.stop()
-        log('--- %s seconds ---' % (time() - start_time))
+async Task lazyLoading(IDriver driver) {
+    using var session = driver.AsyncSession(conf => conf.WithDatabase("neo4j"));
+    await session.ExecuteReadAsync(async tx => {
+        log("Submit query");
+        var result = await tx.RunAsync(slowQuery);
+        while (await result.FetchAsync()) {
+            int recordN = result.Current.Get<int>("output");
+            log($"Processing record {recordN}");
+            System.Threading.Thread.Sleep(sleepTime);  // proxy for some expensive operation
+        }
+    });
+}
 
+async Task eagerLoading(IDriver driver) {
+    log("Submit query");
+    var result = await driver.ExecutableQuery(slowQuery)
+        .WithConfig(new QueryConfig(database: "neo4j"))
+        .ExecuteAsync();
+    foreach (var record in result.Result) {
+        int recordN = record.Get<int>("output");
+        log($"Processing record {recordN}");
+        System.Threading.Thread.Sleep(sleepTime);  // proxy for some expensive operation
+    }
+}
 
-def lazy_loading(driver):
-
-    def process_records(tx):
-        log('Submit query')
-        result = tx.run(slow_query)
-
-        for record in result:
-            log(f'Processing record {int(record.get("output"))}')
-            sleep(sleep_time)  # proxy for some expensive operation
-
-    with driver.session(database='neo4j') as session:
-        processed_result = session.execute_read(process_records)
-
-
-def eager_loading(driver):
-    log('Submit query')
-    records, _, _ = driver.execute_query(slow_query, database_='neo4j')
-
-    for record in records:
-        log(f'Processing record {int(record.get("output"))}')
-        sleep(sleep_time)  # proxy for some expensive operation
-
-
-def log(msg):
-    print(f'[{round(time(), 2)}] {msg}')
-
-
-if __name__ == '__main__':
-    main()
+void log(string msg) {
+    Console.WriteLine($"[{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}] {msg}");
+}
 ----
 
 .Output
 [source, output, role=nocollapse]
 ----
-[1718014256.98] LAZY LOADING (execute_read)
-[1718014256.98] Submit query
-[1718014256.21] Processing record 0  // <1>
-[1718014256.71] Processing record 1
-[1718014257.21] Processing record 2
+[1734336457] LAZY LOADING (ExecuteReadAsync)
+[1734336457] Submit query
+[1734336457] Processing record 1  // <.>
+[1734336457] Processing record 2
+[1734336458] Processing record 3
 ...
-[1718014395.42] Processing record 249
-[1718014395.92] Peak memory usage: 786254 bytes
-[1719984711.39] --- 135.9284942150116 seconds ---
+[1734336581] Processing record 249
+[1734336581] Processing record 250
+[1734336582] --- 125 seconds ---
 
-[1718014395.92] EAGER LOADING (execute_query)
-[1718014395.92] Submit query
-[1718014419.82] Processing record 0  // <2>
-[1718014420.33] Processing record 1
-[1718014420.83] Processing record 2
+[1734336582] EAGER LOADING (ExecutableQuery)
+[1734336582] Submit query
+[1734336594] Processing record 1   // <.>
+[1734336594] Processing record 2
+[1734336595] Processing record 3
 ...
-[1718014544.52] Processing record 249
-[1718014545.02] Peak memory usage: 89587150 bytes  // <3>
-[1719984861.09] --- 149.70468592643738 seconds ---  // <4>
+[1734336718] Processing record 249
+[1734336718] Processing record 250
+[1734336719] --- 136 seconds ---  // <.>
 ----
 
-<1> With lazy loading, the first record is quickly available.
-<2> With eager loading, the first record is available ~25 seconds after the query has been submitted (i.e. after the server has retrieved all 250 records).
-<3> Memory usage is larger with eager loading than with lazy loading, because the application materializes a list of 250 records.
+<.> With lazy loading, the first record is quickly available.
+<.> With eager loading, the first record is available many seconds after the query has been submitted (i.e. after the server has retrieved all 250 records).
 <4> The total running time is lower with lazy loading, because while the client processes records the server can fetch the next ones.
-With lazy loading, the client could also stop requesting records after some condition is met (by calling `.consume()` on the `Result`), saving time and resources.
+With lazy loading, the client could also stop requesting records after some condition is met (by calling `.ConsumeAsync()` on the result), saving time and resources.
 
 ====
 
 [TIP]
 ====
-The driver's link:https://neo4j.com/docs/api/python-driver/current/api.html#fetch-size-ref[fetch size] affects the behavior of lazy loading.
+The driver's link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.SessionConfigBuilder.WithFetchSize.html[fetch size] affects the behavior of lazy loading.
 It instructs the server to stream an amount of records equal to the fetch size, and then wait until the client has caught up before retrieving and sending more.
 
 The fetch size allows to bound memory consumption on the client side.
@@ -229,58 +216,54 @@ Especially if the server's latency is high, a low fetch size may deteriorate per
 
 In a cluster, *route read queries to any reader node*. You do this by:
 
-- using the method `.withRouting(RoutingControl.READ)` in xref:query-simple.adoc#_request_routing[`Driver.executableQuery()`] calls
-- using `Session.executeRead()` instead of `Session.executeWrite()` (for xref:transactions.adoc#managed-transactions[managed transactions])
-- using the method xref:transactions.adoc#_request_routing[`.withRouting(RoutingControl.READ)` when creating a new session] (for explicit transactions).
+- using the config `routing: RoutingControl.Readers` in xref:query-simple.adoc#_request_routing[`IDriver.ExecutableQuery()`] calls
+- using `Session.ExecuteReadAsync()` instead of `Session.ExecuteWriteAsync()` (for xref:transactions.adoc#managed-transactions[managed transactions])
+- using the config method xref:transactions.adoc#_request_routing[`.WithDefaultAccessMode(AccessMode.Read)` when creating a new session] (for explicit transactions).
 
 [discrete]
 === Good practices
 
-[source, java]
+[source, csharp]
 ----
-// import org.neo4j.driver.RoutingControl;
-
-driver.executableQuery("MATCH (p:Person) RETURN p")
-    .withConfig(QueryConfig.builder()
-        .withDatabase("neo4j")
-        .withRouting(RoutingControl.READ)
-        .build())
-    .execute();
+await driver.ExecutableQuery("MATCH (p:Person) RETURN p")
+    .WithConfig(new QueryConfig(
+        database: "neo4j",
+        routing: RoutingControl.Readers
+    ))
+    .ExecuteAsync();
 ----
 
-[source, java]
+[source, csharp]
 ----
-try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
-    session.executeRead(tx -> {
-        var result = tx.run("MATCH (p:Person) RETURN p");
-        return result.list();
-    });
-}
+using var session = driver.AsyncSession(conf => conf
+    .WithDatabase("neo4j")
+    .WithDefaultAccessMode(AccessMode.Read)
+);
 ----
 
 
 [discrete]
 === Bad practices
 
-[source, java]
+[source, csharp]
 ----
 // defaults to routing = writers
-driver.executableQuery("MATCH (p:Person) RETURN p")
-    .withConfig(QueryConfig.builder()
-        .withDatabase("neo4j")
-        .build())
-    .execute();
+await driver.ExecutableQuery("MATCH (p:Person) RETURN p")
+    .WithConfig(new QueryConfig(
+        database: "neo4j"
+    ))
+    .ExecuteAsync();
 ----
 
-[source, java]
+[source, csharp]
 ----
+using var session = driver.AsyncSession(conf => conf.WithDatabase("neo4j"));
+
 // don't ask to write on a read-only operation
-try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
-    session.executeWrite(tx -> {
-        var result = tx.run("MATCH (p:Person) RETURN p");
-        return result.list();
-    });
-}
+await session.ExecuteWriteAsync(async tx => {
+    var result = await tx.RunAsync("MATCH (p:Person) RETURN p");
+    return result.ToListAsync();
+});
 ----
 
 
@@ -291,13 +274,13 @@ try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").
 For example, if you often look up `Person` nodes by the `name` property, it is beneficial to create an index on `Person.name`.
 You can create indexes with the `CREATE INDEX` Cypher clause, for both nodes and relationships.
 
-.Create an index on Person.name
-[source, java]
+.Create an index on `Person.name`
+[source, csharp]
 ----
-driver.executableQuery("CREATE INDEX person_name FOR (n:Person) ON (n.name)").execute();
+await driver.ExecutableQuery("CREATE INDEX person_name FOR (n:Person) ON (n.name)").ExecuteAsync();
 ----
 
-For more information, see link:{neo4j-docs-base-uri}/cypher-manual/current/indexes-for-search-performance/[Indexes for search performance].
+For more information, see link:{neo4j-docs-base-uri}/cypher-manual/current/indexes/search-performance-indexes/overview/[Indexes for search performance].
 
 
 [[profile-queries]]
@@ -305,17 +288,17 @@ For more information, see link:{neo4j-docs-base-uri}/cypher-manual/current/index
 
 link:{neo4j-docs-base-uri}/cypher-manual/current/query-tuning/basic-example/#_profile_query[*Profile your queries*] to locate queries whose performance can be improved.
 You can profile queries by prepending them with `PROFILE`.
-The server output is available through the `.profile()` method of the xref:result-summary.adoc[`ResultSummary`] object.
+The server output is available in the `Profile` property of the xref:result-summary.adoc[`IResultSummary`] object.
 
-[source, java]
+[source, csharp]
 ----
-var result = driver.executableQuery("PROFILE MATCH (p {name: $name}) RETURN p")
-    .withParameters(Map.of("name", "Alice"))
-    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
-    .execute();
-var queryPlan = result.summary().profile().arguments().get("string-representation");
-System.out.println(queryPlan);
-
+var result = await driver.ExecutableQuery("PROFILE MATCH (p {name: $name}) RETURN p")
+    .WithParameters(new { name = "Alice" })
+    .WithConfig(new QueryConfig(database: "neo4j"))
+    .ExecuteAsync();
+// Note: `result.Result` is non-empty
+var queryPlan = result.Summary.Profile;
+Console.WriteLine(queryPlan.Arguments["string-representation"]);
 /*
 Planner COST
 Runtime PIPELINED
@@ -338,17 +321,16 @@ Total database accesses: 12, total allocated memory: 184
 
 In case some queries are so slow that you are unable to even run them in reasonable times, you can prepend them with `EXPLAIN` instead of `PROFILE`.
 This will return the _plan_ that the server would use to run the query, but without executing it.
-The server output is available through the `.plan()` method of the xref:result-summary.adoc[`ResultSummary`] object.
+The server output is available in the `Plan` property of the xref:result-summary.adoc[`IResultSummary`] object.
 
-[source, java]
+[source, csharp]
 ----
-var result = driver.executableQuery("EXPLAIN MATCH (p {name: $name}) RETURN p")
-    .withParameters(Map.of("name", "Alice"))
-    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
-    .execute();
-var queryPlan = result.summary().plan().arguments().get("string-representation");
-System.out.println(queryPlan);
-
+var result = await driver.ExecutableQuery("EXPLAIN MATCH (p {name: $name}) RETURN p")
+    .WithParameters(new { name = "Alice" })
+    .WithConfig(new QueryConfig(database: "neo4j"))
+    .ExecuteAsync();
+var queryPlan = result.Summary.Plan;
+Console.WriteLine(queryPlan.Arguments["string-representation"]);
 /*
 Planner COST
 Runtime PIPELINED
@@ -380,38 +362,36 @@ To learn how to combine labels, see link:{neo4j-docs-base-uri}/cypher-manual/cur
 [discrete]
 === Good practices
 
-[source, java]
+[source, csharp]
 ----
-driver.executableQuery("MATCH (p:Person|Animal {name: $name}) RETURN p")
-    .withParameters(Map.of("name", "Alice"))
-    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
-    .execute();
+var result = await driver.ExecutableQuery("MATCH (p:Person|Animal {name: $name}) RETURN p")
+    .WithParameters(new { name = "Alice" })
+    .WithConfig(new QueryConfig(database: "neo4j"))
+    .ExecuteAsync();
 ----
 
-[source, java]
+[source, csharp]
 ----
-try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
-    session.run("MATCH (p:Person|Animal {name: $name}) RETURN p", Map.of("name", "Alice"));
-}
+using var session = driver.AsyncSession(conf => conf.WithDatabase("neo4j"));
+await session.RunAsync("MATCH (p:Person|Animal {name: $name}) RETURN p", new { name = "Alice" });
 ----
 
 
 [discrete]
 === Bad practices
 
-[source, java]
+[source, csharp]
 ----
-driver.executableQuery("MATCH (p {name: $name}) RETURN p")
-    .withParameters(Map.of("name", "Alice"))
-    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
-    .execute();
+var result = await driver.ExecutableQuery("MATCH (p {name: $name}) RETURN p")
+    .WithParameters(new { name = "Alice" })
+    .WithConfig(new QueryConfig(database: "neo4j"))
+    .ExecuteAsync();
 ----
 
-[source, java]
+[source, csharp]
 ----
-try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
-    session.run("MATCH (p {name: $name}) RETURN p", Map.of("name", "Alice"));
-}
+using var session = driver.AsyncSession(conf => conf.WithDatabase("neo4j"));
+await session.RunAsync("MATCH (p {name: $name}) RETURN p", new { name = "Alice" });
 ----
 
 
@@ -424,36 +404,38 @@ try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").
 === Good practice
 
 .Submit one single queries with all values inside
-[source, java]
+[source, csharp]
 ----
 // Generate a sequence of numbers
 int start = 1;
 int end = 10000;
-List<Map> numbers = new ArrayList<>(end - start + 1);
+var numbers = new List<Dictionary<string, dynamic>>();
 for (int i=start; i<=end; i++) {
-    numbers.add(Map.of("value", i));
+    numbers.Add(new Dictionary<string, dynamic>() {
+        {"value", i},
+    });
 }
 
-driver.executableQuery("""
+await driver.ExecutableQuery(@"
     UNWIND $numbers AS node
     CREATE (:Number {value: node.value})
-    """)
-    .withParameters(Map.of("numbers", numbers))
-    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
-    .execute();
+    ")
+    .WithParameters(new { numbers = numbers })
+    .WithConfig(new QueryConfig(database: "neo4j"))
+    .ExecuteAsync();
 ----
 
 [discrete]
 === Bad practice
 
 .Submit a lot of single queries, one for each value
-[source, java]
+[source, csharp]
 ----
 for (int i=1; i<=10000; i++) {
-driver.executableQuery("CREATE (:Number {value: $value})")
-    .withParameters(Map.of("value", i))
-    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
-    .execute();
+    await driver.ExecutableQuery("CREATE (:Number {value: $value})")
+        .WithParameters(new { value = i })
+        .WithConfig(new QueryConfig(database: "neo4j"))
+        .ExecuteAsync();
 }
 ----
 
@@ -471,44 +453,42 @@ Besides protecting from Cypher injections, this allows to better leverage the da
 [discrete]
 === Good practices
 
-[source, java]
+[source, csharp]
 ----
-driver.executableQuery("MATCH (p:Person {name: $name}) RETURN p")
-    .withParameters(Map.of("name", "Alice"))
-    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
-    .execute();
+await driver.ExecutableQuery("MATCH (p:Person {name: $name}) RETURN p")
+    .WithConfig(new QueryConfig(database: "neo4j"))
+    .WithParameters(new { name = "Alice" })
+    .ExecuteAsync();
 ----
 
-[source, java]
+[source, csharp]
 ----
-try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
-    session.run("MATCH (p:Person {name: $name}) RETURN p", Map.of("name", "Alice"));
-}
+using var session = driver.AsyncSession(conf => conf.WithDatabase("neo4j"));
+await session.RunAsync("MATCH (p:Person {name: $name}) RETURN p", new { name = "Alice" });
 ----
 
 [discrete]
 === Bad practices
 
-[source, java]
+[source, csharp]
 ----
-driver.executableQuery("MATCH (p:Person {name: 'Alice'}) RETURN p")
-    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
-    .execute();
+await driver.ExecutableQuery("MATCH (p:Person {name: 'Alice'}) RETURN p")
+    .WithConfig(new QueryConfig(database: "neo4j"))
+    .ExecuteAsync();
 // or
-String name = "Alice";
-driver.executableQuery("MATCH (p:Person {name: '" + name + "'}) RETURN p")
-    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
-    .execute();
+string name = "Alice";
+await driver.ExecutableQuery("MATCH (p:Person {name: '" + name + "'}) RETURN p")
+    .WithConfig(new QueryConfig(database: "neo4j"))
+    .ExecuteAsync();
 ----
 
-[source, java]
+[source, csharp]
 ----
-try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
-    session.run("MATCH (p:Person {name: 'Alice'}) RETURN p");
-    // or
-    String name = "Alice";
-    session.run("MATCH (p:Person {name: '" + name + "'}) RETURN p");
-}
+using var session = driver.AsyncSession(conf => conf.WithDatabase("neo4j"));
+await session.RunAsync("MATCH (p:Person {name: 'Alice'}) RETURN p");
+// or
+string name = "Alice";
+session.RunAsync("MATCH (p:Person {name: '" + name + "'}) RETURN p");
 ----
 
 

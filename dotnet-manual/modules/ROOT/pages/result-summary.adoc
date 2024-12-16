@@ -15,8 +15,7 @@ When running queries with xref:query-simple.adoc[`IDriver.ExecutableQuery()`], t
 
 [source, csharp]
 ----
-var result = await driver
-    .ExecutableQuery(@"
+var result = await driver.ExecutableQuery(@"
         UNWIND ['Alice', 'Bob'] AS name
         MERGE (p:Person {name: name})
     ")
@@ -51,8 +50,7 @@ The property `IResultSummary.Counters` contains counters for the operations that
 .Insert some data and display the query counters
 [source, csharp]
 ----
-var result = await driver
-    .ExecutableQuery(@"
+var result = await driver.ExecutableQuery(@"
         MERGE (p:Person {name: $name})
         MERGE (p)-[:KNOWS]->(:Person {name: $friend})
     ", new { name = "Mark", friend = "Bob" })
@@ -81,8 +79,7 @@ You may use this information to locate potential bottlenecks or room for xref:pe
 
 [source, csharp, role=nocollapse]
 ----
-var result = await driver
-    .ExecutableQuery("EXPLAIN MATCH (p {name: $name}) RETURN p")
+var result = await driver.ExecutableQuery("EXPLAIN MATCH (p {name: $name}) RETURN p")
     .WithParameters(new { name = "Alice" })
     .WithConfig(new QueryConfig(database: "neo4j"))
     .ExecuteAsync();
@@ -115,8 +112,7 @@ Notice that the query is also _run_, so the result object also contains any resu
 
 [source, csharp, role=nocollapse]
 ----
-var result = await driver
-    .ExecutableQuery("PROFILE MATCH (p {name: $name}) RETURN p")
+var result = await driver.ExecutableQuery("PROFILE MATCH (p {name: $name}) RETURN p")
     .WithParameters(new { name = "Alice" })
     .WithConfig(new QueryConfig(database: "neo4j"))
     .ExecuteAsync();
@@ -165,8 +161,7 @@ The property `IResultSummary.Notifications` contains a list of link:https://neo4
 
 [source, csharp, role=nocollapse]
 ----
-var result = await driver
-    .ExecutableQuery(@"
+var result = await driver.ExecutableQuery(@"
         MATCH p=shortestPath((:Person {name: $start})-[*]->(:Person {name: $end}))
         RETURN p
     ")
@@ -202,8 +197,7 @@ The list always contains at least one entry, containing the outcome status.
 
 [source, csharp, role=nocollapse]
 ----
-var result = await driver
-    .ExecutableQuery(@"
+var result = await driver.ExecutableQuery(@"
         MATCH p=shortestPath((:Person {name: $start})-[*]->(:Person {name: $end}))
         RETURN p
     ")
