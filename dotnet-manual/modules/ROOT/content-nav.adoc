@@ -22,11 +22,11 @@
 * xref:connect-advanced.adoc[Advanced connection information]
 * xref:data-types.adoc[Data types and mapping to Cypher types]
 * xref:upgrade.adoc[]
-* link:https://neo4j.com/docs/api/java-driver/current/[API documentation, window=_blank]
+* link:https://neo4j.com/docs/api/dotnet-driver/current/[API documentation, window=_blank]
 * xref:related-projects.adoc[Related projects]
 
 * *GraphAcademy courses*
 
-* link:https://graphacademy.neo4j.com/courses/modeling-fundamentals/?ref=docs-java[Graph Data Modeling Fundamentals]
-* link:https://graphacademy.neo4j.com/courses/cypher-intermediate-queries/?ref=docs-java[Intermediate Cypher Queries]
-* link:https://graphacademy.neo4j.com/courses/app-java/?ref=docs-java[Building Neo4j Applications with Java]
+* link:https://graphacademy.neo4j.com/courses/modeling-fundamentals/?ref=docs-dotnet[Graph Data Modeling Fundamentals]
+* link:https://graphacademy.neo4j.com/courses/cypher-intermediate-queries/?ref=docs-dotnet[Intermediate Cypher Queries]
+* link:https://graphacademy.neo4j.com/courses/app-dotnet/?ref=docs-dotnet[Building Neo4j Applications with .NET]
