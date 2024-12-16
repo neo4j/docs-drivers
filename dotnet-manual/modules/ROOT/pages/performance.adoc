@@ -192,7 +192,7 @@ void log(string msg) {
 
 <.> With lazy loading, the first record is quickly available.
 <.> With eager loading, the first record is available many seconds after the query has been submitted (i.e. after the server has retrieved all 250 records).
-<4> The total running time is lower with lazy loading, because while the client processes records the server can fetch the next ones.
+<.> The total running time is lower with lazy loading, because while the client processes records the server can fetch the next ones.
 With lazy loading, the client could also stop requesting records after some condition is met (by calling `.ConsumeAsync()` on the result), saving time and resources.
 
 ====
