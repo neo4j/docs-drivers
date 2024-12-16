@@ -57,7 +57,7 @@ with driver.session(database="neo4j") as session:
 [source, python]
 ----
 for i in range(1000):
-    driver.execute_query("<QUERY>")
+    driver.execute_query("<QUERY>", database_="<DB NAME>")
     # or session.execute_read/write() calls
 ----
 
