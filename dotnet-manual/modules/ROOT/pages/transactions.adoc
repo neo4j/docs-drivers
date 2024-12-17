@@ -63,7 +63,7 @@ foreach (var person in people) {
     Console.WriteLine(person);
 }
 
-// further tx.run() calls will execute within the same transaction
+// further tx.RunAsync() calls will execute within the same transaction
 ----
 
 <1> Create a session. A single session can be the container for multiple queries. Unless created as a resource with the `using` keyword, remember to close it when done.

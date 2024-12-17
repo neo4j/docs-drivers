@@ -14,8 +14,7 @@ To create a node representing a person named `Alice`, use the Cypher clause link
 .Create a node representing a person named `Alice`
 [source, csharp]
 ----
-var result = await driver
-    .ExecutableQuery("CREATE (p:Person {name: $name})")  // <1>
+var result = await driver.ExecutableQuery("CREATE (p:Person {name: $name})")  // <1>
     .WithParameters(new { name = "Alice" })  // <2>
     .WithConfig(new QueryConfig(database: "neo4j"))  // <3>
     .ExecuteAsync();
@@ -36,8 +35,7 @@ To retrieve information from the database, use the Cypher clause link:{neo4j-doc
 .Retrieve all `Person` nodes
 [source, csharp, role=nocollapse]
 ----
-var result = await driver
-    .ExecutableQuery("MATCH (p:Person) RETURN p.name AS name")
+var result = await driver.ExecutableQuery("MATCH (p:Person) RETURN p.name AS name")
     .WithConfig(new QueryConfig(database: "neo4j"))
     .ExecuteAsync();
 
@@ -62,8 +60,7 @@ For example,
 
 [source, csharp]
 ----
-var result = await driver
-    .ExecutableQuery("MATCH (p:Person) RETURN p.name AS name")
+var result = await driver.ExecutableQuery("MATCH (p:Person) RETURN p.name AS name")
     .WithConfig(new QueryConfig(database: "neo4j"))
     .WithMap(record => record["name"].As<string>())
     .ExecuteAsync();
@@ -80,8 +77,7 @@ To update a node's information in the database, use the Cypher clauses link:{neo
 .Update node `Alice` to add an `age` property
 [source, csharp]
 ----
-var result = await driver
-    .ExecutableQuery(@"
+var result = await driver.ExecutableQuery(@"
         MATCH (p:Person {name: $name})
         SET p.age = $age
     ")
@@ -96,8 +92,7 @@ To create a new relationship, linking it to two already existing nodes, use a co
 .Create a relationship `:KNOWS` between `Alice` and `Bob`
 [source, csharp]
 ----
-var result = await driver
-    .ExecutableQuery(@"
+var result = await driver.ExecutableQuery(@"
         MATCH (alice:Person {name: $name})  // <.>
         MATCH (bob:Person {name: $friend})  // <.>
         CREATE (alice)-[:KNOWS]->(bob)  // <.>
@@ -120,8 +115,7 @@ To remove a node and any relationship attached to it, use the Cypher clause link
 [source, csharp]
 ----
 // This does not delete _only_ `p`, but also all its relationships!
-var result = await driver
-    .ExecutableQuery(@"
+var result = await driver.ExecutableQuery(@"
         MATCH (p:Person {name: $name})
         DETACH DELETE p
     ")
@@ -146,8 +140,7 @@ You can provide query parameters as a map through the `.WithParameters()` method
 
 [source, csharp]
 ----
-var result = await driver
-    .ExecutableQuery("MATCH (p:Person {name: $name}) RETURN p")
+await driver.ExecutableQuery("MATCH (p:Person {name: $name}) RETURN p")
     .WithConfig(new QueryConfig(database: "neo4j"))
     .WithParameters(new { name = "Alice" })
     .ExecuteAsync();
@@ -182,8 +175,7 @@ If no database is given, the link:https://neo4j.com/docs/operations-manual/curre
 
 [source, csharp]
 ----
-var result = await driver
-    .ExecutableQuery("MATCH (p:Person) RETURN p.name")
+await driver.ExecutableQuery("MATCH (p:Person) RETURN p.name")
     .WithConfig(new QueryConfig(database: "neo4j"))
     .ExecuteAsync();
 ----
@@ -201,8 +193,7 @@ To improve performance on read queries, use `routing: RoutingControl.Readers` to
 
 [source, csharp]
 ----
-var result = await driver
-    .ExecutableQuery("MATCH (p:Person) RETURN p.name")
+await driver.ExecutableQuery("MATCH (p:Person) RETURN p.name")
     .WithConfig(new QueryConfig(
         database: "neo4j",
         routing: RoutingControl.Readers
@@ -228,8 +219,7 @@ Query-scoped authentication requires a server version >= 5.8.
 
 [source, csharp, test-skip]
 ----
-var result = await driver
-    .ExecutableQuery("MATCH (p:Person) RETURN p.name")
+await driver.ExecutableQuery("MATCH (p:Person) RETURN p.name")
     .WithConfig(new QueryConfig(
         database: "neo4j",
         authToken: AuthTokens.Basic("somebodyElse", "theirPassword")
@@ -242,8 +232,7 @@ The difference is that you don't need to know a user's password to impersonate t
 
 [source, csharp, test-skip]
 ----
-var result = await driver
-    .ExecutableQuery("MATCH (p:Person) RETURN p.name")
+await driver.ExecutableQuery("MATCH (p:Person) RETURN p.name")
     .WithConfig(new QueryConfig(
         database: "neo4j",
         impersonatedUser: "somebodyElse"
@@ -310,8 +299,7 @@ try {
     // Create some relationships
     foreach (var person in people) {
         if (person.ContainsKey("friends")) {
-            await driver
-                .ExecutableQuery(@"
+            await driver.ExecutableQuery(@"
                     MATCH (p:Person {name: $person.name})
                     UNWIND $person.friends AS friend_name
                     MATCH (friend:Person {name: friend_name})
@@ -325,8 +313,7 @@ try {
 
     // Retrieve Alice's friends who are under 40
     Console.WriteLine("Alice's friends under 40:");
-    var result = await driver
-        .ExecutableQuery(@"
+    var result = await driver.ExecutableQuery(@"
             MATCH (p:Person {name: $name})-[:KNOWS]-(friend:Person)
             WHERE friend.age < $age
             RETURN friend
