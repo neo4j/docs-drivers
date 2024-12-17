@@ -300,7 +300,7 @@ try (var driver = GraphDatabase.driver("neo4j://example.com:9999", AuthTokens.ba
 
 == OCSP stapling
 
-If link:https://en.wikipedia.org/wiki/OCSP_stapling[OCSP stapling] is link:https://neo4j.com/docs/operations-manual/4.2/reference/configuration-settings/#config_dbms.connector.bolt.ocsp_stapling_enabled[enabled on the server], the driver can be configured to check for certificate revocations during SSL handshakes.
+If link:https://en.wikipedia.org/wiki/OCSP_stapling[OCSP stapling] is link:https://neo4j.com/docs/operations-manual/current/configuration/configuration-settings/#config_server.bolt.ocsp_stapling_enabled[enabled on the server], the driver can be configured to check for certificate revocations during SSL handshakes.
 OCSP stapling improves both security and performance when using CA-signed certificates.
 
 There are two methods implementing this feature:
