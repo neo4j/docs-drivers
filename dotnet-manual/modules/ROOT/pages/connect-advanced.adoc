@@ -12,12 +12,9 @@ include::{common-partial}/connect-advanced.adoc[tag=connection-protocols]
 The basic authentication scheme relies on traditional username and password.
 These can either be the credentials for your local installation, or the ones provided with an Aura instance.
 
-[source, java]
+[source, csharp]
 ----
-// import org.neo4j.driver.AuthTokens;
-// import org.neo4j.driver.GraphDatabase;
-
-GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword));
+await using var driver = GraphDatabase.Driver(dbUri, AuthTokens.Basic(dbUser, dbPassword));
 ----
 
 [INFO]
@@ -29,41 +26,32 @@ The basic authentication scheme can also be used to authenticate against an LDAP
 The Kerberos authentication scheme requires a base64-encoded ticket.
 It can only be used if the server has the link:{neo4j-docs-base-uri}/kerberos-add-on/current/deployment/[Kerberos Add-on installed].
 
-[source, java, test-skip]
+[source, csharp, test-skip]
 ----
-// import org.neo4j.driver.AuthTokens;
-// import org.neo4j.driver.GraphDatabase;
-
-GraphDatabase.driver(dbUri, AuthTokens.kerberos(ticket));
+await using var driver = GraphDatabase.Driver(dbUri, AuthTokens.Kerberos(ticket));
 ----
 
 === Bearer authentication
 
-The bearer authentication scheme requires a base64-encoded token provided by an Identity Provider through Neo4j's link:{neo4j-docs-base-uri}/operations-manual/current/authentication-authorization/sso-integration[Single Sign-On feature].
+The bearer authentication scheme requires a base64-encoded token provided by an Identity Provider through Neo4j's link:{neo4j-docs-base-uri}/operations-manual/current/authentication-authorization/sso-integration/[Single Sign-On feature].
 
-[source, java, test-skip]
+[source, csharp, test-skip]
 ----
-// import org.neo4j.driver.AuthTokens;
-// import org.neo4j.driver.GraphDatabase;
-
-GraphDatabase.driver(dbUri, AuthTokens.bearer(ticket));
+await using var driver = GraphDatabase.Driver(dbUri, AuthTokens.Bearer(ticket));
 ----
-
-[NOTE]
-The bearer authentication scheme requires link:{neo4j-docs-base-uri}/operations-manual/current/authentication-authorization/sso-integration[configuring Single Sign-On on the server].
-Once configured, clients can discover Neo4j's configuration through the link:https://neo4j.com/docs/http-api/current/endpoints/#discovery-api[Discovery API].
 
 
 === Custom authentication
 
-Use link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/AuthTokens.html#custom(java.lang.String,java.lang.String,java.lang.String,java.lang.String,java.util.Map)[`AuthTokens.custom()`] to log into a server having a custom authentication scheme.
+Use link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.AuthTokens.Custom.html[`AuthTokens.Custom()`] to log into a server having a custom authentication scheme.
 
-[source, java, test-skip]
+[source, csharp, test-skip]
 ----
-// import org.neo4j.driver.AuthTokens;
-// import org.neo4j.driver.GraphDatabase;
-
-GraphDatabase.driver(dbUri, AuthTokens.custom(principal, credentials, realm, scheme, parameters));
+await using var driver = GraphDatabase.Driver(
+    dbUri,
+    AuthTokens.Custom(principal, credentials, realm, scheme, parameters)
+);
+// `parameters` is optional
 ----
 
 
