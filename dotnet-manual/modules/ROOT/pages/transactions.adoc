@@ -392,7 +392,7 @@ Similar remarks hold for the `.ExecuteReadAsync()` and `.ExecuteWriteAsync()` me
 
 
 [#impersonation]
-[role=label--new-5.18]
+[role=label--new-5.14]
 === Run queries as a different user
 
 You can execute a query through a different user by providing an link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/AuthTokens.html[`AuthToken`] to the `.WithAuthToken()` config method.

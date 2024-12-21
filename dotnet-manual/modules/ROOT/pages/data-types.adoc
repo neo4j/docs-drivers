@@ -1,15 +1,6 @@
 = Data types and mapping to Cypher types
 
-The tables in this section show the mapping between Cypher data types and Java types.
-
-Regardless of their type, all values in query results are embedded within link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Value.html[`Value`] objects.
-To extract and cast them to the corresponding Java types, use `.as<type>()` (eg. `.asString()`, `asInt()`, etc).
-For example, if the `name` property coming from the database is a string, `record.get("name").asString()` will yield the property value as a `String` object.
-
-On the other hand, you don't need to use the driver types when submitting query parameters.
-The driver will automatically serialize objects of native Java types passed as parameters.
-
-For a complete list of the value types the driver serializes data into, see the link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/package-summary.html[API documentation].
+The tables in this section show the mapping between Cypher data types and .NET types.
 
 
 == Core types
@@ -17,102 +8,55 @@ For a complete list of the value types the driver serializes data into, see the 
 |===
 | Cypher type   | Driver type
 
-| <<NULL>>      | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/NullValue.html[`NullValue`]
-| `LIST`        | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/ListValue.html[`ListValue`]
-| `MAP`         | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/MapValue.html[`MapValue`]
-| `BOOLEAN`     | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/BooleanValue.html[`BooleanValue`]
-| `INTEGER`     | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/IntegerValue.html[`IntegerValue`]
-| `FLOAT`       | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/FloatValue.html[`FloatValue`]
-| `STRING`      | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/StringValue.html[`StringValue`]
-| `ByteArray`   | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/BytesValue.html[`BytesValue`]
+| <<NULL>>      | `null`
+| `LIST`        | `IList<object>`
+| `MAP`         | `IDictionary<string, object>`
+| `BOOLEAN`     | `bool`
+| `INTEGER`     | `long`
+| `FLOAT`       | `double`
+| `STRING`      | `string`
+| `ByteArray`   | `byte[]`
 |===
 
 
 == Temporal types
 
-The driver provides a set of temporal data types compliant with ISO-8601 and Cypher.
+The driver provides a set of temporal data types compliant with ISO-8601 and Cypher. +
 Sub-second values are measured to nanosecond precision.
 
-The driver's types rely on Java's link:https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/package-summary.html[`time`] types.
-All temporal types, except link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/DurationValue.html[`DurationValue`], are in fact `java.time` objects under the hood.
-This means that:
-
-- if you want to _query_ the database with a temporal type, instantiate a `java.time` object and use it as query parameter (i.e. you don't need to care about driver's types).
-- if you _retrieve_ a temporal object from the database (including through one of link:https://neo4j.com/docs/cypher-manual/current/functions/temporal/[Cypher temporal functions]), you will get back the corresponding _driver type_ as displayed in the table below. The driver implements methods to convert driver time types into Java ones (ex. `.asZonedDateTime()`, `.asOffsetTime()`, etc).
+Time zone names adhere to the link:https://www.iana.org/time-zones[IANA system], rather than the link:https://docs.microsoft.com/en-us/windows-hardware/manufacture/desktop/default-time-zones[Windows system]. +
+Inbound conversion is carried out using link:http://cldr.unicode.org/development/development-process/design-proposals/extended-windows-olson-zid-mapping[Extended Windows-Olson zid mapping] as defined by Unicode CLDR.
 
 |===
 | Cypher type      | Driver type
 
-| `DATE`           | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/DateValue.html[`DateValue`]
-| `ZONED TIME`     | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/TimeValue.html[`TimeValue`]
-| `LOCAL TIME`     | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/LocalTimeValue.html[`LocalTimeValue`]
-| `ZONED DATETIME` | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/DateTimeValue.html[`DateTimeValue`]
-| `LOCAL DATETIME` | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/LocalDateTimeValue.html[`LocalDateTimeValue`]
-| `DURATION`       | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/DurationValue.html[`DurationValue`]
+| `DATE`           | link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.LocalDate.html[`LocalDate`]
+| `ZONED TIME`     | link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.OffsetTime.html[`OffsetTime`]
+| `LOCAL TIME`     | link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.LocalTime.html[`LocalTime`]
+| `ZONED DATETIME` | link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.ZonedDateTime.html[`ZonedDateTime`]
+| `LOCAL DATETIME` | link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.LocalDateTime.html[`LocalDateTime`]
+| `DURATION`       | link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.Duration.html[`Duration`]
 
 |===
 
 .How to use temporal types in queries
-[source, java]
+[source, csharp]
 ----
-package demo;
+// Define a date, with timezone, and use it to set a relationship property
+var friendsSince = new ZonedDateTime(new DateTime(2016, 12, 16, 13, 59, 59, 999), "Europe/Stockholm");
+var result = await driver.ExecutableQuery(@"
+    MERGE (a:Person {name: $name})
+    MERGE (b:Person {name: $friend})
+    MERGE (a)-[friendship:KNOWS {since: $friendsSince}]->(b)
+    RETURN friendship.since AS date
+")
+    .WithParameters(new { name = "Alice", friend = "Bob", friendsSince = friendsSince })
+    .WithConfig(new QueryConfig(database: "neo4j"))
+    .ExecuteAsync();
 
-import java.util.Map;
-import java.time.ZonedDateTime;
-import java.time.ZoneId;
-
-import org.neo4j.driver.AuthTokens;
-import org.neo4j.driver.Driver;
-import org.neo4j.driver.GraphDatabase;
-import org.neo4j.driver.QueryConfig;
-
-public class App {
-
-    public static void main(String... args) {
-        final String dbUri = "<URI for Neo4j database>";
-        final String dbUser = "<Username>";
-        final String dbPassword = "<Password>";
-
-        try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword))) {
-            driver.verifyConnectivity();
-
-            // Define a date, with timezone, and use it to set a relationship property
-            var friendsSince = ZonedDateTime.of(2016, 12, 16, 13, 59, 59, 9999999, ZoneId.of("Europe/Stockholm"));
-            var result = driver.executableQuery("""
-                MERGE (a:Person {name: $name})
-                MERGE (b:Person {name: $friend})
-                MERGE (a)-[friendship:KNOWS {since: $friendsSince}]->(b)
-                RETURN friendship.since AS date
-                """)
-                .withParameters(Map.of("name", "Alice", "friend", "Bob", "friendsSince", friendsSince))
-                .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
-                .execute();
-
-            var date = result.records().get(0).get("date");
-            System.out.println(date.getClass().getName());  // org.neo4j.driver.internal.value.DateTimeValue
-            System.out.println(date);  // 2016-12-16T13:59:59.009999999+01:00[Europe/Stockholm]
-
-            var nativeDate = date.asZonedDateTime();
-            System.out.println(nativeDate.getClass().getName());  // java.time.ZonedDateTime
-        }
-    }
-}
+Console.WriteLine(result.Result[0].Get<ZonedDateTime>("date"));
+// 2016-12-16T13:59:59.999000000[Europe/Stockholm]
 ----
-
-
-=== `DurationValue`
-
-Represents the difference between two points in time (expressed in months, days, seconds, nanoseconds).
-
-[source, java]
-----
-// import org.neo4j.driver.Values;
-
-var duration = Values.isoDuration(1, 2, 3, 4);  // months, days, seconds, nanoseconds
-System.out.println(duration);  // P1M2DT3.000000004S
-----
-
-For full documentation, see link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/DurationValue.html[API documentation -> DurationValue].
 
 
 == Spatial types
@@ -125,84 +69,34 @@ You can think of it as a unique identifier for each spatial type.
 |===
 | Cypher type            | Driver type | SRID
 
-| `POINT` (2D Cartesian) | `PointValue`     | 7203
-| `POINT` (2D WGS-84)    | `PointValue`     | 4326
-| `POINT` (3D Cartesian) | `PointValue`     | 9157
-| `POINT` (3D WGS-84)    | `PointValue`     | 4979
+| `POINT` (2D Cartesian) | link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.Point.html[`Point`]     | 7203
+| `POINT` (2D WGS-84)    | link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.Point.html[`Point`]     | 4326
+| `POINT` (3D Cartesian) | link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.Point.html[`Point`]     | 9157
+| `POINT` (3D WGS-84)    | link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.Point.html[`Point`]     | 4979
 
 |===
 
-You create a point value through link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Values.html#point(int,double,double)[`Values.point(srid, x, y[, z\])`] (the third coordinate is optional).
-Points returned from database queries are of type link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/PointValue.html[`PointValue`], and can be converted to link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/types/Point.html[`Point`] objects through the method `.asPoint()`.
 
 .Receive a `Point` value from the database
-[source, java]
+[source, csharp]
 ----
-package demo;
-
-import java.util.Map;
-
-import org.neo4j.driver.AuthTokens;
-import org.neo4j.driver.Driver;
-import org.neo4j.driver.GraphDatabase;
-import org.neo4j.driver.QueryConfig;
-import org.neo4j.driver.Values;
-
-public class App {
-
-    public static void main(String... args) {
-        final String dbUri = "<URI for Neo4j database>";
-        final String dbUser = "<Username>";
-        final String dbPassword = "<Password>";
-
-        try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword))) {
-            driver.verifyConnectivity();
-
-            var result = driver.executableQuery("RETURN point({x: 2.3, y: 4.5, z: 2}) AS point")
-                .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
-                .execute();
-            var point = result.records().get(0).get("point");
-            System.out.println(point);  // Point{srid=9157, x=2.3, y=4.5, z=2.0}
-            System.out.println(point.asPoint().x());  // 2.3
-        }
-    }
-}
+var result = await driver.ExecutableQuery("RETURN point({x: 2.3, y: 4.5, z: 2}) AS point")
+    .WithConfig(new QueryConfig(database: "neo4j"))
+    .ExecuteAsync();
+Console.WriteLine(result.Result[0].Get<Point>("point"));
+// Point{srId=9157, x=2.3, y=4.5, z=2}
 ----
 
 .Create a `Point` value and use it as property value
-[source, java]
+[source, csharp]
 ----
-package demo;
-
-import java.util.Map;
-
-import org.neo4j.driver.AuthTokens;
-import org.neo4j.driver.Driver;
-import org.neo4j.driver.GraphDatabase;
-import org.neo4j.driver.QueryConfig;
-import org.neo4j.driver.Values;
-
-public class App {
-
-    public static void main(String... args) {
-        final String dbUri = "<URI for Neo4j database>";
-        final String dbUser = "<Username>";
-        final String dbPassword = "<Password>";
-
-        try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword))) {
-            driver.verifyConnectivity();
-
-            var location = Values.point(4326, 67.28775180193841, 17.734163823312397);  // 4326 = 2D geodetic point
-            var result = driver.executableQuery("CREATE (p:PlaceOfInterest {location: $location}) RETURN p")
-                .withParameters(Map.of("location", location))
-                .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
-                .execute();
-            var place = result.records().get(0).get("p").get("location");
-            System.out.println(place);  // Point{srid=4326, x=67.28775180193841, y=17.734163823312397}
-            System.out.println(place.asPoint().y());  // 17.734163823312397
-        }
-    }
-}
+var location = new Point(4326, 67.28775180193841, 17.734163823312397);  // 4326 = 2D geodetic point
+var result = await driver.ExecutableQuery("CREATE (p:PlaceOfInterest {location: $location}) RETURN p")
+    .WithParameters(new { location = location })
+    .WithConfig(new QueryConfig(database: "neo4j"))
+    .ExecuteAsync();
+Console.WriteLine(result.Result[0].Get<INode>("p").Get<Point>("location"));
+// Point{srId=4326, x=67.28775180193841, y=17.734163823312397}
 ----
 
 
@@ -213,9 +107,9 @@ public class App {
 |===
 | Cypher Type    | Driver type
 
-| `NODE`         | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/NodeValue.html[`NodeValue`]
-| `RELATIONSHIP` | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/RelationshipValue.html[`RelationshipValue`]
-| `PATH`         | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/NodeValue.html[`PathValue`]
+| `NODE`         | link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.INode.html[`INode`]
+| `RELATIONSHIP` | link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IRelationship.html[`IRelationship`]
+| `PATH`         | link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IPath.html[`IPath`]
 
 |===
 

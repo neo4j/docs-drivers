@@ -209,7 +209,7 @@ In other words, there is no guarantee that a write query submitted in read mode 
 
 
 [#impersonation]
-[role=label--new-5.18]
+[role=label--new-5.14]
 === Run queries as a different user
 
 You can execute a query through a different user with the config key `authToken` (see link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.AuthTokens.html[`AuthTokens`] for available native implementations of authentication methods).
