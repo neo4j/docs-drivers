@@ -139,7 +139,7 @@ Total database accesses: 12, total allocated memory: 184
 */
 ----
 
-For more information and examples, see link:{neo4j-docs-base-uri}/cypher-manual/current/query-tuning/basic-example/#_profile_query[Basic query tuning].
+For more information and examples, see link:https://neo4j.com/docs/cypher-manual/current/appendix/tutorials/basic-query-tuning/#_profile_query[Basic query tuning].
 
 
 == Notifications
@@ -236,10 +236,10 @@ GqlStatusObject {
 === Filter notifications
 
 By default, the server analyses each query for all categories and severity of notifications.
-Starting from version 5.7, you can use the configuration method link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.ConfigBuilder.WithNotifications.html#Neo4j_Driver_ConfigBuilder_WithNotifications_System_Nullable_Neo4j_Driver_Severity__Neo4j_Driver_Category___[`.withNotifications()`] to tweak the severity and/or category/classification of notifications that you are interested into.
+Starting from version 5.7, you can use the configuration method link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.ConfigBuilder.WithNotifications.html#Neo4j_Driver_ConfigBuilder_WithNotifications_System_Nullable_Neo4j_Driver_Severity__Neo4j_Driver_Category___[`.WithNotifications()`] to tweak the severity and/or category/classification of notifications that you are interested into.
 There is a slight performance gain in restricting the amount of notifications the server is allowed to raise.
 
-`.withNotifications()` takes either a link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.Severity.html[`Severity`] and a list of  link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.Classification.html[`Classification`] (v5.26+), or a link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.Severity.html[`Severity`] and a list of link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.Category.html[`Category`]. The provided classifications/categories are _excluded_ from output. +
+`.WithNotifications()` takes either a link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.Severity.html[`Severity`] and a list of  link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.Classification.html[`Classification`] (v5.26+), or a link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.Severity.html[`Severity`] and a list of link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.Category.html[`Category`]. The provided classifications/categories are _excluded_ from output. +
 The severity filter applies to both Neo4j and GQL notifications. +
 The classification filter acts on both categories and classifications. +
 To disable all notifications, use `.WithNotificationsDisabled()`.

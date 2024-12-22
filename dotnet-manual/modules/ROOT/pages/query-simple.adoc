@@ -23,7 +23,7 @@ Console.WriteLine($"Created {summary.Counters.NodesCreated} nodes in {summary.Re
 ----
 
 <1> The Cypher query
-<2> A map of xref:query-parameters[_query parameters_]
+<2> A map of xref:query-parameters[query parameters]
 <3> Which database the query should be run against
 <4> The xref:result-summary.adoc[summary of execution] returned by the server
 

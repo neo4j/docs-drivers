@@ -11,7 +11,7 @@ These are called _managed transactions_, and you can think of them as a way of u
 Before running a transaction, you need to obtain a _session_.
 Sessions act as concrete query channels between the driver and the server, and ensure <<causal consistency>> is enforced.
 
-Sessions are created with the method link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IDriver.AsyncSession.html#Neo4j_Driver_IDriver_AsyncSession[`Driver.AsyncSession()`].
+Sessions are created with the method link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IDriver.AsyncSession.html#Neo4j_Driver_IDriver_AsyncSession[`IDriver.AsyncSession()`].
 Use the optional argument to alter the session's configuration, among which for example the xref:_database_selection[target database].
 For further configuration parameters, see xref:_session_configuration[Session configuration].
 
@@ -23,7 +23,7 @@ using var session = driver.AsyncSession(conf => conf.WithDatabase("neo4j"));
 Session creation is a lightweight operation, so sessions can be created and destroyed without significant cost.
 Always xref:_close_sessions[close sessions] when you are done with them.
 
-*Sessions are _not_ thread safe*: you can share the main `Driver` object across threads, but make sure each thread creates its own sessions.
+*Sessions are _not_ thread safe*: you can share the main `IDriver` object across threads, but make sure each thread creates its own sessions.
 
 
 [#managed-transactions]
@@ -55,6 +55,9 @@ var people = await session.ExecuteReadAsync(  // <.>
             people.Add(result.Current.Get<string>("name"));
         }
         // or `await result.ToListAsync()` to retrieve all records as a list.
+
+        // further tx.RunAsync() calls will execute within the same transaction
+
         return people;
     }
 );
@@ -62,8 +65,6 @@ var people = await session.ExecuteReadAsync(  // <.>
 foreach (var person in people) {
     Console.WriteLine(person);
 }
-
-// further tx.RunAsync() calls will execute within the same transaction
 ----
 
 <1> Create a session. A single session can be the container for multiple queries. Unless created as a resource with the `using` keyword, remember to close it when done.
@@ -108,48 +109,48 @@ for (int i=0; i<100; i++) {
 }
 
 async Task<string> employPersonTx(IAsyncQueryRunner tx, string name) {
-     var employeeThreshold = 10;
+    var employeeThreshold = 10;
 
-        // Create new Person node with given name, if not exists already
-        await tx.RunAsync("MERGE (p:Person {name: $name})", new { name = name });
+    // Create new Person node with given name, if not exists already
+    await tx.RunAsync("MERGE (p:Person {name: $name})", new { name = name });
 
-        // Obtain most recent organization ID and the number of people linked to it
-        var result = await tx.RunAsync(@"
-            MATCH (o:Organization)
-            RETURN o.id AS id, COUNT{(p:Person)-[r:WORKS_FOR]->(o)} AS employeesN
-            ORDER BY o.createdDate DESC
-            LIMIT 1
-            ");
+    // Obtain most recent organization ID and the number of people linked to it
+    var result = await tx.RunAsync(@"
+        MATCH (o:Organization)
+        RETURN o.id AS id, COUNT{(p:Person)-[r:WORKS_FOR]->(o)} AS employeesN
+        ORDER BY o.createdDate DESC
+        LIMIT 1
+        ");
 
-        string orgId = "";
-        int employeesN = 0;
-        bool org = await result.FetchAsync();
-        if (org == false) {
-            // If no organization exists, create one and add Person to it
-            orgId = await createOrganization(tx);
-            Console.WriteLine($"No orgs available, created {orgId}.");
-        } else {
-            orgId = result.Current.Get<string>("id");
-            employeesN = result.Current.Get<int>("employeesN");
-        }
-
-        // If org does not have too many employees, add this Person to it
-        if (employeesN < employeeThreshold) {
-            await addPersonToOrganization(tx, name, orgId);
-            // If the above throws, the transaction will roll back
-            // -> not even Person is created!
-
-        // Otherwise, create a new Organization and link Person to it
-        } else {
-            orgId = await createOrganization(tx);
-            Console.WriteLine($"Latest org is full, created {orgId}.");
-            await addPersonToOrganization(tx, name, orgId);
-            // If any of the above throws, the transaction will roll back
-            // -> not even Person is created!
-        }
-
-        return orgId;  // Organization ID to which the new Person ends up in
+    string orgId = "";
+    int employeesN = 0;
+    bool org = await result.FetchAsync();
+    if (org == false) {
+        // If no organization exists, create one and add Person to it
+        orgId = await createOrganization(tx);
+        Console.WriteLine($"No orgs available, created {orgId}.");
+    } else {
+        orgId = result.Current.Get<string>("id");
+        employeesN = result.Current.Get<int>("employeesN");
     }
+
+    // If org does not have too many employees, add this Person to it
+    if (employeesN < employeeThreshold) {
+        await addPersonToOrganization(tx, name, orgId);
+        // If the above throws, the transaction will roll back
+        // -> not even Person is created!
+
+    // Otherwise, create a new Organization and link Person to it
+    } else {
+        orgId = await createOrganization(tx);
+        Console.WriteLine($"Latest org is full, created {orgId}.");
+        await addPersonToOrganization(tx, name, orgId);
+        // If any of the above throws, the transaction will roll back
+        // -> not even Person is created!
+    }
+
+    return orgId;  // Organization ID to which the new Person ends up in
+}
 
 async Task<string> createOrganization(IAsyncQueryRunner tx) {
     var result = await tx.RunAsync(@"
@@ -368,7 +369,7 @@ Queries may also take longer to execute as they may not reach the right cluster 
 === Request routing
 
 In a cluster environment, all sessions are opened in write mode, routing them to the leader.
-You can change this with the method `.withDefaultAccessMode(AccessMode.Read)`.
+You can change this with the method `.WithDefaultAccessMode(AccessMode.Read)`.
 Note that `.ExecuteReadAsync()` and `.ExecuteWriteAsync()` automatically override the session's default access mode.
 
 [source, csharp]
@@ -408,7 +409,7 @@ using var session = driver.AsyncSession(conf => conf
 );
 ----
 
-The method `.withImpersonatedUser()` provides a similar functionality, and is available in driver/server versions >= 4.4.
+The method `.WithImpersonatedUser()` provides a similar functionality, and is available in driver/server versions >= 4.4.
 The difference is that you don't need to know a user's password to impersonate them, but the user under which the `IDriver` was created needs to have the link:{neo4j-docs-base-uri}/operations-manual/current/authentication-authorization/dbms-administration/#access-control-dbms-administration-impersonation[appropriate permissions].
 
 [source, csharp, test-skip]

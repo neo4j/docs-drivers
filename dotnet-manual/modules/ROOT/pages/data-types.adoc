@@ -122,16 +122,16 @@ Represents a node in a graph.
 |===
 |Property/Method |Return
 
-|.Labels
+|Labels
 |Node labels, as a list.
 
-|.Properties
+|Properties
 |Node properties, as a map.
 
-|.Get<type>("<propertyName>")
+|Get<type>("<propertyName>")
 |Value for the given property, casted to `type`.
 
-|.ElementId()
+|ElementId()
 |String identifier for the node.
 This should be used with care, as no guarantees are given about the mapping between id values and elements outside the scope of a single transaction. In other words, using an `elementId` to `MATCH` an element across different transactions is risky.
 
@@ -168,22 +168,22 @@ Represents a relationship in a graph.
 |===
 |Property/Method |Return
 
-|.Type
+|Type
 |Relationship type.
 
-|.Properties
+|Properties
 |Relationship properties, as a map.
 
-|.Get<type>("<propertyName>")
+|Get<type>("<propertyName>")
 |Value for the given property, casted to `type`.
 
-|.StartNodeElementId
+|StartNodeElementId
 |`elementId` of starting node.
 
-|.EndNodeElementId
+|EndNodeElementId
 | `elementId` of ending node.
 
-|.ElementId
+|ElementId
 |String identifier for the relationship.
 This should be used with care, as no guarantees are given about the mapping between id values and elements outside the scope of a single transaction. In other words, using an `elementId` to `MATCH` an element across different transactions is risky.
 

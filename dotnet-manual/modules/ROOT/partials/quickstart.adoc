@@ -45,7 +45,7 @@ xref:connect.adoc[More info on connecting to a database ->]
 == Query the database
 
 Execute a Cypher statement with the method `IDriver.ExecutableQuery()`.
-Do not hardcode or concatenate parameters: use placeholders and specify the parameters as a map through the `.withParameters()` method.
+Do not hardcode or concatenate parameters: use placeholders and specify the parameters as a map through the `.WithParameters()` method.
 
 [source, csharp]
 ----
@@ -101,48 +101,48 @@ for (int i=0; i<100; i++) {
 }
 
 async Task<string> employPersonTx(IAsyncQueryRunner tx, string name) {
-     var employeeThreshold = 10;
+    var employeeThreshold = 10;
 
-        // Create new Person node with given name, if not exists already
-        await tx.RunAsync("MERGE (p:Person {name: $name})", new { name = name });
+    // Create new Person node with given name, if not exists already
+    await tx.RunAsync("MERGE (p:Person {name: $name})", new { name = name });
 
-        // Obtain most recent organization ID and the number of people linked to it
-        var result = await tx.RunAsync(@"
-            MATCH (o:Organization)
-            RETURN o.id AS id, COUNT{(p:Person)-[r:WORKS_FOR]->(o)} AS employeesN
-            ORDER BY o.createdDate DESC
-            LIMIT 1
-            ");
+    // Obtain most recent organization ID and the number of people linked to it
+    var result = await tx.RunAsync(@"
+        MATCH (o:Organization)
+        RETURN o.id AS id, COUNT{(p:Person)-[r:WORKS_FOR]->(o)} AS employeesN
+        ORDER BY o.createdDate DESC
+        LIMIT 1
+        ");
 
-        string orgId = "";
-        int employeesN = 0;
-        bool org = await result.FetchAsync();
-        if (org == false) {
-            // If no organization exists, create one and add Person to it
-            orgId = await createOrganization(tx);
-            Console.WriteLine($"No orgs available, created {orgId}.");
-        } else {
-            orgId = result.Current.Get<string>("id");
-            employeesN = result.Current.Get<int>("employeesN");
-        }
-
-        // If org does not have too many employees, add this Person to it
-        if (employeesN < employeeThreshold) {
-            await addPersonToOrganization(tx, name, orgId);
-            // If the above throws, the transaction will roll back
-            // -> not even Person is created!
-
-        // Otherwise, create a new Organization and link Person to it
-        } else {
-            orgId = await createOrganization(tx);
-            Console.WriteLine($"Latest org is full, created {orgId}.");
-            await addPersonToOrganization(tx, name, orgId);
-            // If any of the above throws, the transaction will roll back
-            // -> not even Person is created!
-        }
-
-        return orgId;  // Organization ID to which the new Person ends up in
+    string orgId = "";
+    int employeesN = 0;
+    bool org = await result.FetchAsync();
+    if (org == false) {
+        // If no organization exists, create one and add Person to it
+        orgId = await createOrganization(tx);
+        Console.WriteLine($"No orgs available, created {orgId}.");
+    } else {
+        orgId = result.Current.Get<string>("id");
+        employeesN = result.Current.Get<int>("employeesN");
     }
+
+    // If org does not have too many employees, add this Person to it
+    if (employeesN < employeeThreshold) {
+        await addPersonToOrganization(tx, name, orgId);
+        // If the above throws, the transaction will roll back
+        // -> not even Person is created!
+
+    // Otherwise, create a new Organization and link Person to it
+    } else {
+        orgId = await createOrganization(tx);
+        Console.WriteLine($"Latest org is full, created {orgId}.");
+        await addPersonToOrganization(tx, name, orgId);
+        // If any of the above throws, the transaction will roll back
+        // -> not even Person is created!
+    }
+
+    return orgId;  // Organization ID to which the new Person ends up in
+}
 
 async Task<string> createOrganization(IAsyncQueryRunner tx) {
     var result = await tx.RunAsync(@"
