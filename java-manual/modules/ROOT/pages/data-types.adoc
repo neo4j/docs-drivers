@@ -238,7 +238,7 @@ Represents a node in a graph.
 |Value for the given property.
 
 |.elementId()
-|String identifier for the relationship.
+|String identifier for the node.
 This should be used with care, as no guarantees are given about the mapping between id values and elements outside the scope of a single transaction. In other words, using an `elementId` to `MATCH` an element across different transactions is risky.
 
 |===
