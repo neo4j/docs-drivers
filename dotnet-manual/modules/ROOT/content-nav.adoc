@@ -23,7 +23,6 @@
 * xref:data-types.adoc[Data types and mapping to Cypher types]
 * xref:upgrade.adoc[]
 * link:https://neo4j.com/docs/api/dotnet-driver/current/[API documentation, window=_blank]
-* xref:related-projects.adoc[Related projects]
 
 * *GraphAcademy courses*
 
