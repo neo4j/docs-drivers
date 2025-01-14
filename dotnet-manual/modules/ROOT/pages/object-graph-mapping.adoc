@@ -1,4 +1,97 @@
-= Object-Graph Mapping
+= Mapping query results to objects
+
+Live in namespace `Neo4j.Driver.Mapping`
+
+
+== Mapping to existing classes
+
+Simplest
+
+[source, csharp]
+----
+var record = await driver.ExecutableQuery(@"
+    MERGE (p:Person {name: $name, age: $age})
+    RETURN p.name AS name, p.age AS age
+    ")
+    .WithParameters(new { name = "Alice", age = 21 })
+    .WithConfig(new QueryConfig(database: "neo4j"))
+    .ExecuteAsync();
+
+var person = record.Result[0].AsObject<Person>();
+Console.WriteLine(person.name);
+
+class Person {
+    public string name { get; set; }
+    public int age { get; set; }
+}
+----
+
+To define different props-attrs mapping
+case sensitive
+
+[source, csharp]
+----
+var record = await driver.ExecutableQuery(@"
+    MERGE (p:Person {name: $name, age: $age})
+    RETURN p
+    ")
+    .WithParameters(new { name = "Alice", age = 21 })
+    .WithConfig(new QueryConfig(database: "neo4j"))
+    .ExecuteAsync();
+
+var person = record.Result[0].AsObject<Person>();
+Console.WriteLine(person.name);
+
+class Person {
+    [MappingSource("p.name")]
+    public string name { get; set; }
+
+    [MappingSource("p.age")]
+    public int age { get; set; }
+}
+----
+
+[NOTE]
+Max one level of nesting with `.`
+
+
+=== Value decorators
+
+
+- `[MappingSource("<dbPropertyName>")]`
+- `[MappingIgnored]`
+- `[MappingOptional]`
+- `[MappingDefaultValue(12)]`
+
+
+
+=== Working with constructors
+
+First thing mapper does is instantiate an object onto which to map, so it needs a constructor. It will use default one, or the easiest explicit one (i.e. with least params), or the one marked with `[MappingConstructor]`.
+Decorators can be used in constructor args (although the only meaningful one is defaultval).
+After the constructor, the mapper checks whether there's any more properties that should be set (i.e. ones that have public setters).
+
+Constructor is useful to make objects immutable: you can avoid having public setters on properties, so the mapper sets them, but further setting is forbidden.
+
+[source, csharp]
+----
+class Person {
+    [MappingConstructor]
+    public Person(string name, [MappingDefaultValue(21)] int age) {
+        Name = name;
+        Age = age;
+    }
+
+    public Person2() {
+    }
+
+    public string Name { get; private set; }
+    public int Age { get; private set; }
+}
+----
+
+
+== Defining new types on the fly
 
 
 ifndef::backend-pdf[]
