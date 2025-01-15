@@ -63,6 +63,19 @@ Max one level of nesting with `.`
 - `[MappingOptional]`
 - `[MappingDefaultValue(12)]`
 
+//
+
+[source, csharp]
+----
+[MappingSource("Friend", EntityMappingSource.NodeLabel)]
+public List<string> FriendLabel { get; set; }
+
+[MappingSource("movieJob",EntityMappingSource.RelationshipType)]
+public string Job { get; set; } // ACTED_IN
+
+[MappingSource("movieJob.roles", EntityMappingSource.Property)]
+private List<string> Roles { get; set; }
+----
 
 
 === Working with constructors
@@ -92,6 +105,53 @@ class Person {
 
 
 == Defining new types on the fly
+
+saves you defining 16 different classes for 16 slightly different entities. create anonymous types instead
+
+vals are thrown away, only used to infer type
+the entity must match exactly the blueprint, no optional or decorators
+
+[source, csharp]
+----
+var record = await driver.ExecutableQuery(@"
+    MERGE (p:Person {name: $name, age: $age})
+    RETURN p
+    ")
+    .WithParameters(new { name = "Alice", age = 21 })
+    .WithConfig(new QueryConfig(database: "neo4j"))
+    .ExecuteAsync();
+
+var person = record.AsObjectFromBlueprint(new { name = "", age = 0 });
+----
+
+you can also use `.AsObject` with a lambda
+
+[source, csharp]
+----
+var record = await driver.ExecutableQuery(@"
+    MERGE (p:Person {name: $name, age: $age})
+    RETURN p
+    ")
+    .WithParameters(new { name = "Alice", age = 21 })
+    .WithConfig(new QueryConfig(database: "neo4j"))
+    .ExecuteAsync();
+
+var person = record.AsObject( (string name, int age) => new { Name = name, Age = age, BirthYear = 2025 - age });
+----
+
+the lambda doesn't have to create a map; for example,
+
+[source, csharp]
+----
+var person = record.AsObject( (string name, int age) => $"{name} is {age} years old." );
+----
+
+decorators are allowed, but the only meaningful one is default val
+
+[source, csharp]
+----
+var person = record.AsObject( (string name, [MappingDefaultValue(21)] int age) => new { Name = name, Age = age, BirthYear = 2025 - age });
+----
 
 
 ifndef::backend-pdf[]
