@@ -55,7 +55,7 @@ When you create an <<Aura>> instance, you may download a text file (a so-called 
 The file has a name of the form `Neo4j-a0a2fa1d-Created-2023-11-06.txt`.
 
 You can either manually extract the URI and the credentials from that file, or use a third party-module to load them.
-We recommend the module link:https://github.com/cdimascio/dotenv-java/[`dotenv-java`] for that purpose.
+We recommend the module link:https://www.npmjs.com/package/dotenv/[`dotenv`] for that purpose.
 
 [source, javascript, role=nocollapse]
 ----
