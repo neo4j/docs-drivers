@@ -1,49 +1,74 @@
-= Mapping query results to objects
+= Map query results to objects
 
-Live in namespace `Neo4j.Driver.Mapping`
+When xref:query-simple.adoc#read[reading data from the database], results come back as link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IRecord.html[`IRecord`] objects.
+To process records, you can either extract properties with `.Get()` and other helper methods, or you can map them to objects in your application.
+You can either map records to classes you have explicitly defined, or provide a record-specific blueprint from which the driver will spawn new objects.
+
+This page show how the object-graph mapping (OGM) feature can help you reduce boilerplate and ...
+
+[TIP]
+To use Object-Graph Mapping (OGM) feature, you need to include the namespace `Neo4j.Driver.Mapping` beside the root `Neo4j.Driver`.
 
 
-== Mapping to existing classes
+== Map to existing classes
 
-Simplest
+To map records to an existing class, define a class having the same attributes as the keys returned by the query.
+**The class attributes must match exactly the query return keys**, and they are case-sensitive.
 
+To map a record to a class, use the method `IRecord.AsObject<className>()`.
+
+[NOTE]
+A record's property names and its query return keys can be different. +
+For example, consider a node with label `:Person` and a `name` property. +
+The returned keys for the query `MERGE (p:Person {name: "Alice"}) RETURN p.name` are `p.name`, even if the property name is `name`. +
+Similarly, for the query `MERGE (pers:Person {name: "Alice"}) RETURN pers.name`, the return keys are `pers.name`. +
+You can always alter the return key with the Cypher operator link:https://neo4j.com/docs/cypher-manual/current/clauses/return/#return-column-alias[`AS`], as in `MERGE (p:Person {name: "Alice"}) RETURN p.name AS name`.
+
+.Map a `:Person` node to a `Person` class
 [source, csharp]
 ----
-var record = await driver.ExecutableQuery(@"
+var result = await driver.ExecutableQuery(@"
     MERGE (p:Person {name: $name, age: $age})
-    RETURN p.name AS name, p.age AS age
+    RETURN p.name AS name, p.age AS age  // <.>
     ")
     .WithParameters(new { name = "Alice", age = 21 })
     .WithConfig(new QueryConfig(database: "neo4j"))
     .ExecuteAsync();
 
-var person = record.Result[0].AsObject<Person>();
-Console.WriteLine(person.name);
+var record = result.Result[0];
+var person = record.AsObject<Person>();  // <.>
+Console.WriteLine(person.name);  // "Alice"
 
-class Person {
-    public string name { get; set; }
+class Person {  // <.>
+    public string name { get; set; }  // <.>
     public int age { get; set; }
 }
 ----
 
-To define different props-attrs mapping
-case sensitive
+<.> Return keys are aliased in the query to match the class attributes.
+<.> The record is mapped to an instance of the `Person` class.
+<.> The class `Person` contains `name` and `age` attributes, as the query return keys.
+<.> Each class attribute must have a public getter _and_ setter, which the OGM can invoke after instantiating the class. If that doesn't fit your use-case, see xref:#constructors[how to use constructors] and have private setters.
 
-[source, csharp]
+You can alter the association between property names and class attributes with the class attribute decorator `[MappingSource("returnedKeyName")]`.
+For more information, see all xref:#decorators[decorators].
+
+.Map `p.name` to `name` and `p.age` to `age`
+[source, csharp role=nocollapse]
 ----
 var record = await driver.ExecutableQuery(@"
     MERGE (p:Person {name: $name, age: $age})
-    RETURN p
+    RETURN p  // <.>
     ")
     .WithParameters(new { name = "Alice", age = 21 })
     .WithConfig(new QueryConfig(database: "neo4j"))
     .ExecuteAsync();
 
 var person = record.Result[0].AsObject<Person>();
-Console.WriteLine(person.name);
+Console.WriteLine(person.name);  // "Alice"
 
-class Person {
-    [MappingSource("p.name")]
+class Person {  // <.>
+    [MappingSource("p.name")] // <.>
     public string name { get; set; }
 
     [MappingSource("p.age")]
@@ -51,60 +76,125 @@ class Person {
 }
 ----
 
-[NOTE]
-Max one level of nesting with `.`
+<.> The query returns the node, which results in the record keys `p.name` and `p.age`.
+<.> The class `Person` has attributes `name` and `age`, even if there's no such return keys in the query.
+<.> The `MappingSource` decorator associates the record key `p.name` with the class attribute `name`.
+
+// [NOTE]
+// Max one level of nesting with `.`
 
 
-=== Value decorators
+[#decorators]
+=== Class attribute decorators
 
+To make the object-graph mapping more flexible, you can use the following decorators. Use them on class attributes to alter how each attribute should be mapped to its respective query return key.
 
-- `[MappingSource("<dbPropertyName>")]`
-- `[MappingIgnored]`
-- `[MappingOptional]`
-- `[MappingDefaultValue(12)]`
+- `[MappingSource("<returnedKeyName>")]` -- Map `returnedKeyName` to the class attribute, instead of looking for a returned key that matches the class attribute name.
+- `[MappingIgnored]` -- Ignore the class attribute (i.e. don't look for a corresponding returned key).
+- `[MappingOptional]` -- Use the class attribute if it can be matched, but ignore it if the query doesn't return a compatible key to match.
+- `[MappingDefaultValue(val)]` -- Same as `MappingOptional`, and specify a default value `val` in case of missing match.
 
-//
-
-[source, csharp]
-----
-[MappingSource("Friend", EntityMappingSource.NodeLabel)]
-public List<string> FriendLabel { get; set; }
-
-[MappingSource("movieJob",EntityMappingSource.RelationshipType)]
-public string Job { get; set; } // ACTED_IN
-
-[MappingSource("movieJob.roles", EntityMappingSource.Property)]
-private List<string> Roles { get; set; }
-----
-
-
-=== Working with constructors
-
-First thing mapper does is instantiate an object onto which to map, so it needs a constructor. It will use default one, or the easiest explicit one (i.e. with least params), or the one marked with `[MappingConstructor]`.
-Decorators can be used in constructor args (although the only meaningful one is defaultval).
-After the constructor, the mapper checks whether there's any more properties that should be set (i.e. ones that have public setters).
-
-Constructor is useful to make objects immutable: you can avoid having public setters on properties, so the mapper sets them, but further setting is forbidden.
-
+.Decorators example
 [source, csharp]
 ----
 class Person {
-    [MappingConstructor]
+    [MappingSource("p.name")]  // <.>
+    public string name { get; set; }
+
+    [MappingOptional]  // <.>
+    public int age { get; set; }
+
+    [MappingIgnored]  // <.>
+    public string address { get; set; }
+
+    [MappingDefaultValue("Subscriber")]  // <.>
+    public string role { get; set; }
+}
+----
+
+<.> Map the `p.name` return key to the `name` class attribute.
+<.> Populate the class attribute `age` with the `age` return key if present, and set the attribute to `null` otherwise.
+<.> Set the `address` class attribute to `null` regardless of the query return keys.
+<.> Populate the class attribute `role` with the `role` return key if present, and set the attribute to the default value `Subscriber` otherwise.
+
+An extra optional parameter to the `MappingSource` decorator allows you to map node labels and relationship types into class attributes:
+
+- `[MappingSource("nodeEntity", EntityMappingSource.NodeLabel)]` -- Collect the labels found in the node returned under the alias `nodeEntity` into the given class attribute as a list of strings.
+The first argument to `MappingSource` must be a returned key referencing a node entity.
+If, instead of `List<string>`, the attribute type is plain `string`, you obtain a comma-separated list of labels.
+- `[MappingSource("relEntity", EntityMappingSource.RelationshipType)]` -- Map the relationship type `job` into the given class attribute.
+The first argument to `MappingSource` must be a returned key referencing a relationship entity.
+
+.Mapping node labels and relationship types
+[source, csharp]
+----
+var record = await driver.ExecutableQuery(@"
+    MERGE (p:Person:Actor {name: $name})
+    MERGE (m:Movie {name: $movie)
+    MERGE (p)-[r:ACTED_IN {role: $role}]->(m)
+    RETURN p AS person, r AS role  // <.>
+    ")
+    .WithParameters(new { name = "Keanu Reeves", movie: "The Matrix", role: "Neo" })
+    .WithConfig(new QueryConfig(database: "neo4j"))
+    .ExecuteAsync();
+
+var person = record.Result[0].AsObject<Person>();
+Console.WriteLine(string.Join(",", person.Labels));  // "Person,Actor"
+Console.WriteLine(person.Role);  // "Neo"
+
+class Person {
+    [MappingSource("person", EntityMappingSource.NodeLabel)]  // <.>
+    public List<string> Labels { get; set; }
+
+    [MappingSource("role", EntityMappingSource.RelationshipType)]  // <.>
+    public string Role { get; set; }
+}
+----
+
+<.> `person` is a node entity; `role` is a relationship entity.
+<.> `Labels` collects the labels found in the `person` node.
+<.> `Role` contains the relationship type of the `role` relationship.
+
+
+[#constructors]
+=== Work with constructors
+
+When mapping records to an existing class, the first thing the driver has to do is to instantiate an object onto which to map, which results in a class constructor to be invoked.
+
+- If no explicit constructor is defined, the driver chooses the implicitly-defined, trivial constructor and then proceeds to set the class attributes via their setters.
+- If one or more constructor are defined, the driver chooses the simplest one (i.e. the one with least parameters).
+You can override this choice by decorating with `[MappingConstructor]` the constructor you wish the driver to use.
+
+Defining a constructor is useful in making the resulting objects immutable: the constructor provides the driver with a way to set some (or all) attributes, but no other component is allowed to change those attributes.
+After invoking the constructor, the driver proceeds to set values for attributes with public setters, if any.
+
+You can use xref:#decorators[decorators] in constructor arguments, although the only meaningful ones are `MappingOptional` and `MappingDefaultValue` (anything else is best achieved by changing the constructor signature).
+
+.A class with two constructors and private setters
+[source, csharp, test-skip]
+----
+class Person {
+    [MappingConstructor]  // <.>
     public Person(string name, [MappingDefaultValue(21)] int age) {
         Name = name;
         Age = age;
     }
 
-    public Person2() {
+    public Person() {  // <.>
     }
 
-    public string Name { get; private set; }
+    public string Name { get; private set; }  // <.>
     public int Age { get; private set; }
 }
 ----
 
+<.> The decorator instructs the driver to use this as constructor when mapping records onto the `Person` class.
+The constructor signature implies that the `name` return key is mapped to the class attribute `Name`, and `age` to `Age` (with a default value of `21`).
+<.> This constructor would be invoked if the `[MappingConstructor]` decorator was not present in the other constructor.
+<.> Because the constructor sets the `Name` and `Age` attributes, the attributes can have private setters.
 
-== Defining new types on the fly
+
+== Map to anonymous types
 
 saves you defining 16 different classes for 16 slightly different entities. create anonymous types instead
 
