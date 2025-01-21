@@ -71,6 +71,8 @@ foreach (var name in result.Result) {
 }
 ----
 
+An alternative way of processing records is to xref:object-graph-mapping.adoc[map them to objects].
+
 
 [#update]
 == Update the database

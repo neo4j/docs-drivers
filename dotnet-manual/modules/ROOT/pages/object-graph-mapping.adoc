@@ -1,4 +1,5 @@
 = Map query results to objects
+:page-role: new-5.24
 
 When xref:query-simple.adoc#read[reading data from the database], results come back as link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IRecord.html[`IRecord`] objects.
 To process records, you can either extract properties with `.Get()` and other helper methods, or you can map them to objects in your application.
@@ -7,7 +8,7 @@ You can either map records to classes you have explicitly defined, or provide a 
 This page show how the object-graph mapping (OGM) feature can help you reduce boilerplate and ...
 
 [TIP]
-To use Object-Graph Mapping (OGM) feature, you need to include the namespace `Neo4j.Driver.Mapping` beside the root `Neo4j.Driver`.
+To use the Object-Graph Mapping (OGM) feature, you need to include the namespace `Neo4j.Driver.Mapping` beside the root `Neo4j.Driver`.
 
 
 == Map to existing classes
@@ -22,7 +23,7 @@ A record's property names and its query return keys can be different. +
 For example, consider a node with label `:Person` and a `name` property. +
 The returned keys for the query `MERGE (p:Person {name: "Alice"}) RETURN p.name` are `p.name`, even if the property name is `name`. +
 Similarly, for the query `MERGE (pers:Person {name: "Alice"}) RETURN pers.name`, the return keys are `pers.name`. +
-You can always alter the return key with the Cypher operator link:https://neo4j.com/docs/cypher-manual/current/clauses/return/#return-column-alias[`AS`], as in `MERGE (p:Person {name: "Alice"}) RETURN p.name AS name`.
+You can always alter the return key with the Cypher operator link:https://neo4j.com/docs/cypher-manual/current/clauses/return/#return-column-alias[`AS`] (ex. `MERGE (p:Person {name: "Alice"}) RETURN p.name AS name`).
 
 .Map a `:Person` node to a `Person` class
 [source, csharp]
@@ -92,7 +93,7 @@ To make the object-graph mapping more flexible, you can use the following decora
 - `[MappingSource("<returnedKeyName>")]` -- Map `returnedKeyName` to the class attribute, instead of looking for a returned key that matches the class attribute name.
 - `[MappingIgnored]` -- Ignore the class attribute (i.e. don't look for a corresponding returned key).
 - `[MappingOptional]` -- Use the class attribute if it can be matched, but ignore it if the query doesn't return a compatible key to match.
-- `[MappingDefaultValue(val)]` -- Same as `MappingOptional`, and specify a default value `val` in case of missing match.
+- `[MappingDefaultValue(val)]` -- Same as `[MappingOptional]`, and specify a default value `val` in case of missing match.
 
 .Decorators example
 [source, csharp]
@@ -117,13 +118,13 @@ class Person {
 <.> Set the `address` class attribute to `null` regardless of the query return keys.
 <.> Populate the class attribute `role` with the `role` return key if present, and set the attribute to the default value `Subscriber` otherwise.
 
-An extra optional parameter to the `MappingSource` decorator allows you to map node labels and relationship types into class attributes:
+An extra optional parameter to the `[MappingSource]` decorator allows you to map node labels and relationship types into class attributes:
 
 - `[MappingSource("nodeEntity", EntityMappingSource.NodeLabel)]` -- Collect the labels found in the node returned under the alias `nodeEntity` into the given class attribute as a list of strings.
 The first argument to `MappingSource` must be a returned key referencing a node entity.
 If, instead of `List<string>`, the attribute type is plain `string`, you obtain a comma-separated list of labels.
 - `[MappingSource("relEntity", EntityMappingSource.RelationshipType)]` -- Map the relationship type `job` into the given class attribute.
-The first argument to `MappingSource` must be a returned key referencing a relationship entity.
+The first argument to `[MappingSource]` must be a returned key referencing a relationship entity.
 
 .Mapping node labels and relationship types
 [source, csharp]
@@ -168,7 +169,7 @@ You can override this choice by decorating with `[MappingConstructor]` the const
 Defining a constructor is useful in making the resulting objects immutable: the constructor provides the driver with a way to set some (or all) attributes, but no other component is allowed to change those attributes.
 After invoking the constructor, the driver proceeds to set values for attributes with public setters, if any.
 
-You can use xref:#decorators[decorators] in constructor arguments, although the only meaningful ones are `MappingOptional` and `MappingDefaultValue` (anything else is best achieved by changing the constructor signature).
+You can use xref:#decorators[decorators] in constructor arguments, although the only meaningful ones are `[MappingOptional]` and `[MappingDefaultValue]` (anything else is best achieved by changing the constructor signature).
 
 .A class with two constructors and private setters
 [source, csharp, test-skip]
@@ -196,31 +197,36 @@ The constructor signature implies that the `name` return key is mapped to the cl
 
 == Map to anonymous types
 
-saves you defining 16 different classes for 16 slightly different entities. create anonymous types instead
+Especially if your queries return a broad variety of result keys, it can feel pointless to define a number of different classes just for the mapping to work, or to engineer one single class and try to make it adapt to a variety of return keys with attribute decorators.
+In those cases, you can provide a skeleton of definition (a _blueprint_) to the driver and let it instantiate anonymous objects out of that.
 
-vals are thrown away, only used to infer type
-the entity must match exactly the blueprint, no optional or decorators
+You provide a blueprint with the method link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.Mapping.RecordExtensions.AsObjectFromBlueprint.html[`IRecord.AsObjectFromBlueprint()`], and the record must match it exactly (i.e. you can't use decorators).
 
 [source, csharp]
 ----
 var record = await driver.ExecutableQuery(@"
     MERGE (p:Person {name: $name, age: $age})
-    RETURN p
+    RETURN p.name AS name, p.age AS age  // <.>
     ")
     .WithParameters(new { name = "Alice", age = 21 })
     .WithConfig(new QueryConfig(database: "neo4j"))
     .ExecuteAsync();
 
-var person = record.AsObjectFromBlueprint(new { name = "", age = 0 });
+var person = record.AsObjectFromBlueprint(new { name = "", age = 0 });  // <.>
 ----
 
-you can also use `.AsObject` with a lambda
+<.> Return keys need to be aliased, as `.AsObjectFromBlueprint()` doesn't support dots in identifiers.
+<.> Key names must match the return keys.
+Provided values don't work as default values; they are only used to infer the property type (i.e. the specific values provided in the definition are discarded).
+
+An alternative way of mapping to anonymous types is to use `.AsObject()` with a lambda function.
+That allows you to also add attributes that don't match a property from the database (such as `BirthYear` in the example below).
 
 [source, csharp]
 ----
 var record = await driver.ExecutableQuery(@"
     MERGE (p:Person {name: $name, age: $age})
-    RETURN p
+    RETURN p.name AS name, p.age AS age
     ")
     .WithParameters(new { name = "Alice", age = 21 })
     .WithConfig(new QueryConfig(database: "neo4j"))
@@ -229,18 +235,27 @@ var record = await driver.ExecutableQuery(@"
 var person = record.AsObject( (string name, int age) => new { Name = name, Age = age, BirthYear = 2025 - age });
 ----
 
-the lambda doesn't have to create a map; for example,
+The lambda function doesn't have to create a map: it can do any processing.
+
+.A lambda returning a string
+[source, csharp, test-skip]
+----
+var text = record.AsObject( (string name, int age) => $"{name} is {age} years old." );
+----
+
+Decorators are allowed, but the only meaningful ones a is default val
 
 [source, csharp]
 ----
-var person = record.AsObject( (string name, int age) => $"{name} is {age} years old." );
-----
+var record = await driver.ExecutableQuery(@"
+    MERGE (p:Person {name: $name, age: $age})
+    RETURN p
+    ")
+    .WithParameters(new { name = "Alice", age = 21 })
+    .WithConfig(new QueryConfig(database: "neo4j"))
+    .ExecuteAsync();
 
-decorators are allowed, but the only meaningful one is default val
-
-[source, csharp]
-----
-var person = record.AsObject( (string name, [MappingDefaultValue(21)] int age) => new { Name = name, Age = age, BirthYear = 2025 - age });
+var person = record.AsObject( ([MappingSource["p.name"] string name, [MappingSource["p.age"] [MappingDefaultValue(21)] int age) => new { Name = name, Age = age, BirthYear = 2025 - age });
 ----
 
 
