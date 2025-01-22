@@ -16,7 +16,7 @@ To use the Object-Graph Mapping (OGM) feature, you need to include the namespace
 To map records to an existing class, define a class having the same attributes as the keys returned by the query.
 **The class attributes must match exactly the query return keys**, and they are case-sensitive.
 
-To map a record to a class, use the method `IRecord.AsObject<className>()`.
+To map a record to a class named `className`, use the method `IRecord.AsObject<className>()`.
 
 [NOTE]
 A record's property names and its query return keys can be different. +
@@ -96,7 +96,7 @@ To make the object-graph mapping more flexible, you can use the following decora
 - `[MappingDefaultValue(val)]` -- Same as `[MappingOptional]`, and specify a default value `val` in case of missing match.
 
 .Decorators example
-[source, csharp]
+[source, csharp, test-skip]
 ----
 class Person {
     [MappingSource("p.name")]  // <.>
@@ -218,6 +218,24 @@ var person = record.AsObjectFromBlueprint(new { name = "", age = 0 });  // <.>
 <.> Return keys need to be aliased, as `.AsObjectFromBlueprint()` doesn't support dots in identifiers.
 <.> Key names must match the return keys.
 Provided values don't work as default values; they are only used to infer the property type (i.e. the specific values provided in the definition are discarded).
+
+If you want to avoid aliases in return keys, you can nest objects in the `.AsObjectFromBlueprint()` call.
+
+[source, csharp]
+----
+var record = await driver.ExecutableQuery(@"
+    MERGE (p:Person {name: $name, age: $age})
+    RETURN p  // <.>
+    ")
+    .WithParameters(new { name = "Alice", age = 21 })
+    .WithConfig(new QueryConfig(database: "neo4j"))
+    .ExecuteAsync();
+
+var person = record.AsObjectFromBlueprint(new { p = new { name = "", age = 0 }});  // <.>
+----
+
+<.> The only return key is `p`, containing `p.name` and `p.age`.
+<.> A nested object blueprint handles the node entity return key.
 
 An alternative way of mapping to anonymous types is to use `.AsObject()` with a lambda function.
 That allows you to also add attributes that don't match a property from the database (such as `BirthYear` in the example below).
