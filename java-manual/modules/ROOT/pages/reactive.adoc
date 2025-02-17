@@ -4,6 +4,7 @@
 ====
 The Reactive API is recommended for applications that already work in a reactive programming style, and which have needs that only Reactive workflows can address.
 For all other cases, the xref:query-simple.adoc[sync] and xref:async.adoc[async] APIs are recommended.
+The async API works well with virtual threads on Java 21+.
 ====
 
 In a reactive flow, consumers dictate the rate at which they consume records from queries, and the driver in turn manages the rate at which records are requested from the server.
