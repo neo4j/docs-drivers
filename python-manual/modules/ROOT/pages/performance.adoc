@@ -201,12 +201,11 @@ if __name__ == '__main__':
 [1719984861.09] --- 149.70468592643738 seconds ---  // <4>
 ----
 
-<1> With lazy loading, the first record is quickly available.
-<2> With eager loading, the first record is available ~25 seconds after the query has been submitted (i.e. after the server has retrieved all 250 records).
-<3> Memory usage is larger with eager loading than with lazy loading, because the application materializes a list of 250 records.
-<4> The total running time is lower with lazy loading, because while the client processes records the server can fetch the next ones.
-With lazy loading, the client could also stop requesting records after some condition is met (by calling `.consume()` on the `Result`), saving time and resources.
-
+<1> With lazy loading, the first record is available sooner.
+<2> With eager loading, the first record is available once the final result is consumed.
+<3> Memory usage is larger with eager loading because the application will materialize a list of 250 records.
+<4> The total running time is longer with eager loading because the thread is blocked until the final result is received and the results.
+With lazy loading, the client may also stop requesting records after some condition is met (by calling `.consume()` on the `Result` object) to save time and resources.
 ====
 
 [TIP]
