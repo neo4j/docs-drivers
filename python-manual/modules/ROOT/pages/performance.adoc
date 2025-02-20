@@ -79,6 +79,7 @@ Lazy-loading a result spreads out network traffic and memory usage (both client-
 
 For convenience, xref:query-simple.adoc[`.execute_query()`] always retrieves all result records at once (it is what the `Eager` in `EagerResult` stands for).
 To lazy-load a result, you have to use xref:transactions.adoc#managed-transactions[`.execute_read/write()`] (or other forms of manually-handled xref:transactions.adoc[transactions]) and *not* cast the `Result` object to `list` when processing the result; iterate on it instead.
+For more information on result processing, see xref:transactions.adoc#process-result[Transactions -> Process query results].
 
 .Comparison between eager and lazy loading
 ====
@@ -201,12 +202,11 @@ if __name__ == '__main__':
 [1719984861.09] --- 149.70468592643738 seconds ---  // <4>
 ----
 
-<1> With lazy loading, the first record is quickly available.
-<2> With eager loading, the first record is available ~25 seconds after the query has been submitted (i.e. after the server has retrieved all 250 records).
-<3> Memory usage is larger with eager loading than with lazy loading, because the application materializes a list of 250 records.
-<4> The total running time is lower with lazy loading, because while the client processes records the server can fetch the next ones.
-With lazy loading, the client could also stop requesting records after some condition is met (by calling `.consume()` on the `Result`), saving time and resources.
-
+<1> With lazy loading, the first record is available sooner.
+<2> With eager loading, the first record is available once the result is consumed (i.e. after the server has retrieved all 250 records).
+<3> Memory usage is larger with eager loading because the application materializes a list of 250 records.
+<4> The total running time is longer with eager loading because the client waits until it receives the last record, whereas with lazy loading the client can process records while the server fetches the next ones.
+With lazy loading, the client can also stop requesting records after some condition is met (by calling `.consume()` on the `Result` object) to save time and resources.
 ====
 
 [TIP]
