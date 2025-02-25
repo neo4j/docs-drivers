@@ -418,7 +418,7 @@ for (int i=start; i<=end; i++) {
 
 await driver.ExecutableQuery(@"
     UNWIND $numbers AS node
-    CREATE (:Number {value: node.value})
+    MERGE (:Number {value: node.value})
     ")
     .WithParameters(new { numbers = numbers })
     .WithConfig(new QueryConfig(database: "neo4j"))
@@ -432,7 +432,7 @@ await driver.ExecutableQuery(@"
 [source, csharp]
 ----
 for (int i=1; i<=10000; i++) {
-    await driver.ExecutableQuery("CREATE (:Number {value: $value})")
+    await driver.ExecutableQuery("MERGE (:Number {value: $value})")
         .WithParameters(new { value = i })
         .WithConfig(new QueryConfig(database: "neo4j"))
         .ExecuteAsync();
