@@ -475,10 +475,8 @@ result, err := session.Run(ctx,
 numbers := make([]int, 10000)
 for i := range numbers { numbers[i] = i }
 neo4j.ExecuteQuery(ctx, driver, `
-    WITH $numbers AS batch
-    UNWIND batch AS value
-    MERGE (n:Number)
-    SET n.value = value
+    UNWIND $numbers AS node
+    MERGE (n:Number {value: node.value})
     `, map[string]any{
         "numbers": numbers,
     }, neo4j.EagerResultTransformer,

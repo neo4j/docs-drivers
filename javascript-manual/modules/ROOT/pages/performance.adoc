@@ -261,8 +261,7 @@ for(let i=0; i<10000; i++) {
   numbers.push({value: Math.random()})
 }
 await driver.executeQuery(`
-    WITH $numbers AS batch
-    UNWIND batch AS node
+    UNWIND $numbers AS node
     MERGE (n:Number {value: node.value})
     `, { numbers: numbers }
 )

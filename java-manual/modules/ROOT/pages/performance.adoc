@@ -282,7 +282,7 @@ for (int i=start; i<=end; i++) {
 
 driver.executableQuery("""
     UNWIND $numbers AS node
-    CREATE (:Number {value: node.value})
+    MERGE (:Number {value: node.value})
     """)
     .withParameters(Map.of("numbers", numbers))
     .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
@@ -296,7 +296,7 @@ driver.executableQuery("""
 [source, java]
 ----
 for (int i=1; i<=10000; i++) {
-driver.executableQuery("CREATE (:Number {value: $value})")
+driver.executableQuery("MERGE (:Number {value: $value})")
     .withParameters(Map.of("value", i))
     .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
     .execute();
