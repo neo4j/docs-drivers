@@ -262,7 +262,7 @@ for(let i=0; i<10000; i++) {
 }
 await driver.executeQuery(`
     UNWIND $numbers AS node
-    MERGE (n:Number {value: node.value})
+    MERGE (:Number {value: node.value})
     `, { numbers: numbers }
 )
 ----

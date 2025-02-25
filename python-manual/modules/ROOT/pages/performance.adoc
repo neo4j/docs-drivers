@@ -390,7 +390,7 @@ with driver.session(database="<DB NAME>") as session:
 numbers = [{"value": random()} for _ in range(10000)]
 driver.execute_query("""
     UNWIND $numbers AS node
-    MERGE (n:Number {value: node.value})
+    MERGE (:Number {value: node.value})
     """, numbers=numbers,
 )
 ----

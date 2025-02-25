@@ -476,7 +476,7 @@ numbers := make([]int, 10000)
 for i := range numbers { numbers[i] = i }
 neo4j.ExecuteQuery(ctx, driver, `
     UNWIND $numbers AS node
-    MERGE (n:Number {value: node.value})
+    MERGE (:Number {value: node.value})
     `, map[string]any{
         "numbers": numbers,
     }, neo4j.EagerResultTransformer,
