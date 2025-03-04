@@ -189,7 +189,7 @@ if __name__ == '__main__':
 ...
 [1718014395.42] Processing record 249
 [1718014395.92] Peak memory usage: 786254 bytes
-[1719984711.39] --- 135.9284942150116 seconds ---
+[1718014395.92] --- 135.9284942150116 seconds ---
 
 [1718014395.92] EAGER LOADING (execute_query)
 [1718014395.92] Submit query
@@ -199,7 +199,7 @@ if __name__ == '__main__':
 ...
 [1718014544.52] Processing record 249
 [1718014545.02] Peak memory usage: 89587150 bytes  // <3>
-[1719984861.09] --- 149.70468592643738 seconds ---  // <4>
+[1718014545.02] --- 149.70468592643738 seconds ---  // <4>
 ----
 
 <1> With lazy loading, the first record is available sooner.
