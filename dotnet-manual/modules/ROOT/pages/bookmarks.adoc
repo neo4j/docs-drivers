@@ -17,7 +17,7 @@ In this case, you have the guarantee that subsequent queries can read previous c
 
 [source, csharp]
 ----
-await driver.ExecutableQuery("<QUERY 1>").AsyncExecute();
+await driver.ExecutableQuery("<QUERY 1>").ExecuteAsync();
 
 // subsequent .ExecutableQuery() calls will be causally chained
 
@@ -29,7 +29,7 @@ To disable bookmark management and causal consistency, use `enableBookmarkManage
 
 [source, csharp]
 ----
-await driver.executableQuery("<QUERY>")
+await driver.ExecutableQuery("<QUERY>")
     .WithConfig(new QueryConfig(enableBookmarkManager: false))
     .ExecuteAsync();
 ----

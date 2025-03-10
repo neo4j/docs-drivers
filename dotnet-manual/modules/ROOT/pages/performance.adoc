@@ -19,7 +19,7 @@ await driver.ExecutableQuery("<QUERY>")
 
 [source, csharp]
 ----
-using var session = driver.AsyncSession(conf => conf.WithDatabase("DB NAME"));
+using var session = driver.AsyncSession(conf => conf.WithDatabase("<DB NAME>"));
 ----
 
 [discrete]

@@ -284,7 +284,7 @@ var record = await driver.ExecutableQuery(@"
     .WithConfig(new QueryConfig(database: "neo4j"))
     .ExecuteAsync();
 
-var person = record.AsObject( ([MappingSource["p.name"] string name, [MappingSource["p.age"] [MappingDefaultValue(21)] int age) => new { Name = name, Age = age, BirthYear = 2025 - age });
+var person = record.AsObject( ([MappingSource["p.name"]] string name, [MappingSource["p.age"]] [MappingDefaultValue(21)] int age) => new { Name = name, Age = age, BirthYear = 2025 - age });
 ----
 ////
 

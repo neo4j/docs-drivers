@@ -31,7 +31,7 @@ This means that any record which has not yet been processed is discarded.
 [source, csharp]
 ----
 using var session = driver.AsyncSession(SessionConfigBuilder.ForDatabase("neo4j"));
-var resultSummary = await session.ExecuteReadAsync(
+var resultSummary = await session.ExecuteWriteAsync(
     async tx => {
         var result = await tx.RunAsync(@"
             UNWIND ['Alice', 'Bob'] AS name
@@ -54,7 +54,8 @@ The property `IResultSummary.Counters` contains counters for the operations that
 var result = await driver.ExecutableQuery(@"
         MERGE (p:Person {name: $name})
         MERGE (p)-[:KNOWS]->(:Person {name: $friend})
-    ", new { name = "Mark", friend = "Bob" })
+    ")
+    .WithParamaters(new { name = "Mark", friend = "Bob" })
     .WithConfig(new QueryConfig(database: "neo4j"))
     .ExecuteAsync();
 var queryCounters = result.Summary.Counters;
@@ -168,7 +169,7 @@ var result = await driver.ExecutableQuery(@"
         MATCH p=shortestPath((:Person {name: $start})-[*]->(:Person {name: $end}))
         RETURN p
     ")
-    .WithParameters(new { name = "Alice", end = "Bob" })
+    .WithParameters(new { start = "Alice", end = "Bob" })
     .WithConfig(new QueryConfig(database: "neo4j"))
     .ExecuteAsync();
 var notifications = result.Summary.Notifications;
@@ -204,7 +205,7 @@ var result = await driver.ExecutableQuery(@"
         MATCH p=shortestPath((:Person {name: $start})-[*]->(:Person {name: $end}))
         RETURN p
     ")
-    .WithParameters(new { name = "Alice", end = "Bob" })
+    .WithParameters(new { start = "Alice", end = "Bob" })
     .WithConfig(new QueryConfig(database: "neo4j"))
     .ExecuteAsync();
 var notifications = result.Summary.GqlStatusObjects;
@@ -307,7 +308,7 @@ using var session = driver.AsyncSession(conf => conf
     .WithDatabase("neo4j")
     .WithNotifications(
         Severity.Warning,
-        disabledCategories[Category.Hint, Category.Generic])
+        disabledCategories: [Category.Hint, Category.Generic])
 );
 ----
 ====

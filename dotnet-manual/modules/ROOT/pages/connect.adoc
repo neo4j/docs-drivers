@@ -49,7 +49,7 @@ using Neo4j.Driver;
 using dotenv.net;
 
 DotEnv.Load(options: new DotEnvOptions(
-    envFilePaths: new[] {"./path/to/Neo4j-a0a2fa1d-Created-2023-11-06.txt"},
+    envFilePaths: new[] {"Neo4j-a0a2fa1d-Created-2023-11-06.txt"},
     ignoreExceptions: false
 ));
 

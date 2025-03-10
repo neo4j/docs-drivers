@@ -66,8 +66,8 @@ await session.RunAsync(
     "CREATE (a:Person {name: $name})",
     new { name = "John" },
     TransactionConfigBuilder
-        .withTimeout(new TimeSpan(5))
-        .withMetadata(new { appName = "peopleTracker" })
+        .WithTimeout(new TimeSpan(5))
+        .WithMetadata(new { appName = "peopleTracker" })
 );
 ----
 

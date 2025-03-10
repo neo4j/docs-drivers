@@ -191,7 +191,7 @@ You may then run queries inside an explicit transaction with the method link:htt
 [source, csharp]
 ----
 using var session = driver.AsyncSession(SessionConfigBuilder.ForDatabase("neo4j"));
-using var tx = session.BeginTransactionAsync();
+using var tx = await session.BeginTransactionAsync();
 // use tx.RunAsync()      to run queries
 //     tx.CommitAsync()   to commit the transaction
 //     tx.RollbackAsync() to roll the transaction back
@@ -449,8 +449,8 @@ var people = await session.ExecuteReadAsync(
         return await result.ToListAsync();
     },
     TransactionConfigBuilder
-        .withTimeout(new TimeSpan(5))
-        .withMetadata(new { appName = "peopleTracker" })
+        .WithTimeout(new TimeSpan(5))
+        .WithMetadata(new { appName = "peopleTracker" })
 );
 
 foreach (var person in people) {
