@@ -2,15 +2,7 @@
 
 = Upgrade from older versions
 
-This page contains the list of new features and breaking changes of the driver from version 4.4 to 5.x.
-For a full list of changes, see the link:{driver-changelog-url}[Driver -> Changelog].
-
-The latest driver version of the 5.x series (5.28) is compatible with Neo4j server both 4.4 and 5.x, so you can upgrade the driver before you upgrade the server.
-At the same time, the driver version 4.4 is forward compatible with Neo4j server versions 5.x as well as 2025.x, so you could also upgrade the server before the driver; however, given that it's easier to roll back an application upgrade than a server upgrade, it's recommended to start with the driver.
-
-[TIP]
-When upgrading the Neo4j server to a newer version, the Cypher queries in your application may also need updating. +
-See link:https://neo4j.com/docs/cypher-manual/current/deprecations-additions-removals-compatibility/[Cypher -> Deprecations, additions, and compatibility].
+include::{common-partial}/upgrade.adoc[tag=intro]
 
 
 [[new-features]]
