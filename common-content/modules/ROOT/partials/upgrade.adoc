@@ -7,7 +7,7 @@ The link:https://github.com/neo4j/drivers-migration-assistent[Neo4j Drivers Migr
 It scans your codebase for usage of deprecations and removals, and brings them up to you.
 The tool doesn't automatically rewrite your code; it only points at where action is needed, providing in-context information on how each hit should be addressed.
 
-The latest driver version of the 5.x series (5.27) is compatible with Neo4j server both 4.4 and 5.x, so you can upgrade the driver before you upgrade the server.
+The latest driver version of the 5.x series (5.28) is compatible with Neo4j server both 4.4 and 5.x, so you can upgrade the driver before you upgrade the server.
 At the same time, the driver version 4.4 is forward compatible with Neo4j server 5.x, so you could also upgrade the server before the driver; however, given that it's easier to roll back an application upgrade than a server upgrade, it's recommended to start with the driver.
 
 [TIP]
