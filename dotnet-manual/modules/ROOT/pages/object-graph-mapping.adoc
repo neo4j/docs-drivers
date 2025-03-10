@@ -57,7 +57,7 @@ For more information, see all xref:#decorators[decorators].
 .Map `p.name` to `name` and `p.age` to `age`
 [source, csharp role=nocollapse]
 ----
-var record = await driver.ExecutableQuery(@"
+var result = await driver.ExecutableQuery(@"
     MERGE (p:Person {name: $name, age: $age})
     RETURN p  // <.>
     ")
@@ -65,7 +65,7 @@ var record = await driver.ExecutableQuery(@"
     .WithConfig(new QueryConfig(database: "neo4j"))
     .ExecuteAsync();
 
-var person = record.Result[0].AsObject<Person>();
+var person = result.Result[0].AsObject<Person>();
 Console.WriteLine(person.name);  // "Alice"
 
 class Person {  // <.>
@@ -130,17 +130,17 @@ The first argument to `[MappingSource]` must be a returned key referencing a rel
 .Mapping node labels and relationship types
 [source, csharp]
 ----
-var record = await driver.ExecutableQuery(@"
+var result = await driver.ExecutableQuery(@"
     MERGE (p:Person:Actor {name: $name})
     MERGE (m:Movie {name: $movie)
     MERGE (p)-[r:ACTED_IN {role: $role}]->(m)
     RETURN p AS person, r AS role  // <.>
     ")
-    .WithParameters(new { name = "Keanu Reeves", movie: "The Matrix", role: "Neo" })
+    .WithParameters(new { name = "Keanu Reeves", movie = "The Matrix", role = "Neo" })
     .WithConfig(new QueryConfig(database: "neo4j"))
     .ExecuteAsync();
 
-var person = record.Result[0].AsObject<Person>();
+var person = result.Result[0].AsObject<Person>();
 Console.WriteLine(string.Join(",", person.Labels));  // "Person,Actor"
 Console.WriteLine(person.Role);  // "Neo"
 
@@ -205,7 +205,7 @@ You provide a blueprint with the method link:https://neo4j.com/docs/api/dotnet-d
 
 [source, csharp]
 ----
-var record = await driver.ExecutableQuery(@"
+var result = await driver.ExecutableQuery(@"
     MERGE (p:Person {name: $name, age: $age})
     RETURN p.name AS name, p.age AS age  // <.>
     ")
@@ -213,7 +213,7 @@ var record = await driver.ExecutableQuery(@"
     .WithConfig(new QueryConfig(database: "neo4j"))
     .ExecuteAsync();
 
-var person = record.AsObjectFromBlueprint(new { name = "", age = 0 });  // <.>
+var person = result.Result[0].AsObjectFromBlueprint(new { name = "", age = 0 });  // <.>
 ----
 
 <.> Return keys must be aliased, as `.AsObjectFromBlueprint()` doesn't support dots in identifiers.
@@ -224,7 +224,7 @@ If you want to avoid aliases in return keys, you can nest objects in the `.AsObj
 
 [source, csharp]
 ----
-var record = await driver.ExecutableQuery(@"
+var result = await driver.ExecutableQuery(@"
     MERGE (p:Person {name: $name, age: $age})
     RETURN p  // <.>
     ")
@@ -232,7 +232,7 @@ var record = await driver.ExecutableQuery(@"
     .WithConfig(new QueryConfig(database: "neo4j"))
     .ExecuteAsync();
 
-var person = record.AsObjectFromBlueprint(new { p = new { name = "", age = 0 }});  // <.>
+var person = result.Result[0].AsObjectFromBlueprint(new { p = new { name = "", age = 0 }});  // <.>
 ----
 
 <.> The only return key is `p`, containing `p.name` and `p.age`.
@@ -243,7 +243,7 @@ That allows you to also add attributes that don't match a property from the data
 
 [source, csharp]
 ----
-var record = await driver.ExecutableQuery(@"
+var result = await driver.ExecutableQuery(@"
     MERGE (p:Person {name: $name, age: $age})
     RETURN p.name AS name, p.age AS age
     ")
@@ -251,7 +251,7 @@ var record = await driver.ExecutableQuery(@"
     .WithConfig(new QueryConfig(database: "neo4j"))
     .ExecuteAsync();
 
-var person = record.AsObject( (string name, int age) => new { Name = name, Age = age, BirthYear = 2025 - age });
+var person = result.Result[0].AsObject( (string name, int age) => new { Name = name, Age = age, BirthYear = 2025 - age });
 ----
 
 The lambda function doesn't have to create a map: it can do any processing.
@@ -259,7 +259,7 @@ The lambda function doesn't have to create a map: it can do any processing.
 .A lambda returning a string
 [source, csharp]
 ----
-var record = await driver.ExecutableQuery(@"
+var result = await driver.ExecutableQuery(@"
     MERGE (p:Person {name: $name, age: $age})
     RETURN p.name AS name, p.age AS age
     ")
@@ -267,16 +267,16 @@ var record = await driver.ExecutableQuery(@"
     .WithConfig(new QueryConfig(database: "neo4j"))
     .ExecuteAsync();
 
-var text = record.AsObject( (string name, int age) => $"{name} is {age} years old." );
+var text = result.Result[0].AsObject( (string name, int age) => $"{name} is {age} years old." );
 ----
 
 ////
 Decorators are allowed, but the only meaningful ones a is default val
 Comment: they don't work.
 
-[source, csharp]
+[source, csharp, test-skip]
 ----
-var record = await driver.ExecutableQuery(@"
+var result = await driver.ExecutableQuery(@"
     MERGE (p:Person {name: $name, age: $age})
     RETURN p
     ")
@@ -284,7 +284,7 @@ var record = await driver.ExecutableQuery(@"
     .WithConfig(new QueryConfig(database: "neo4j"))
     .ExecuteAsync();
 
-var person = record.AsObject( ([MappingSource["p.name"]] string name, [MappingSource["p.age"]] [MappingDefaultValue(21)] int age) => new { Name = name, Age = age, BirthYear = 2025 - age });
+var person = result.Result[0].AsObject( ([MappingSource["p.name"]] string name, [MappingSource["p.age"]] [MappingDefaultValue(21)] int age) => new { Name = name, Age = age, BirthYear = 2025 - age });
 ----
 ////
 

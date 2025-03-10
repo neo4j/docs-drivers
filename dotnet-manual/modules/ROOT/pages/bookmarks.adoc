@@ -21,8 +21,8 @@ await driver.ExecutableQuery("<QUERY 1>").ExecuteAsync();
 
 // subsequent .ExecutableQuery() calls will be causally chained
 
-await driver.ExecutableQueryAsync("<QUERY 2>").ExecuteAsync();  // can read result of <QUERY 1>
-await driver.ExecutableQueryAsync("<QUERY 3>").ExecuteAsync();  // can read result of <QUERY 2>
+await driver.ExecutableQuery("<QUERY 2>").ExecuteAsync();  // can read result of <QUERY 1>
+await driver.ExecutableQuery("<QUERY 3>").ExecuteAsync();  // can read result of <QUERY 2>
 ----
 
 To disable bookmark management and causal consistency, use `enableBookmarkManager: false` in the query configuration.

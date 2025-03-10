@@ -55,7 +55,7 @@ var result = await driver.ExecutableQuery(@"
         MERGE (p:Person {name: $name})
         MERGE (p)-[:KNOWS]->(:Person {name: $friend})
     ")
-    .WithParamaters(new { name = "Mark", friend = "Bob" })
+    .WithParameters(new { name = "Mark", friend = "Bob" })
     .WithConfig(new QueryConfig(database: "neo4j"))
     .ExecuteAsync();
 var queryCounters = result.Summary.Counters;
