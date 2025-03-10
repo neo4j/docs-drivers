@@ -279,6 +279,7 @@ async Task addFriend(IDriver driver, string name, string status, string friendNa
 For full documentation, see link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IPath.html[API documentation -> IPath].
 
 
+[#exceptions]
 == Exceptions
 
 The driver can raise a number of different exceptions, see link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.Neo4jException.html[API documentation -> Neo4jException]. Exception objects are GQL-compliant.

@@ -9,6 +9,7 @@ A _bookmark_ is a token that represents some state of the database.
 By passing one or multiple bookmarks along with a query, the server will make sure that the query does not get executed before the represented state(s) have been established.
 
 
+[#executablequery]
 == Bookmarks with `.ExecutableQuery()`
 
 When xref:query-simple.adoc[querying the database with `.ExecutableQuery()`], the driver manages bookmarks for you.
@@ -34,6 +35,7 @@ await driver.executableQuery("<QUERY>")
 ----
 
 
+[#single-session]
 == Bookmarks within a single session
 
 Bookmark management happens automatically for queries run within a single session, so you can trust that queries inside one session are causally chained.
@@ -47,6 +49,7 @@ await session.ExecuteWriteAsync(async tx => await tx.RunAsync("<QUERY 3>"));  //
 ----
 
 
+[#multiple-sessions]
 == Bookmarks across multiple sessions
 
 If your application uses multiple sessions, you may need to ensure that one session has completed all its transactions before another session is allowed to run its queries.
@@ -137,6 +140,8 @@ image:{common-image}/driver-passing-bookmarks.svg[]
 The use of bookmarks can negatively impact performance, since all queries are forced to wait for the latest changes to be propagated across the cluster.
 For simple use-cases, try to group queries within a single transaction, or within a single session.
 
+////
+Note: not possible on .NET
 
 == Mix `.ExecutableQuery()` and sessions
 
@@ -163,6 +168,7 @@ try (var session = driver.session(SessionConfig.builder()
 // (i.e., can read what was written by <QUERY 2>)
 driver.executableQuery("<QUERY 3>").execute();
 ----
+////
 
 
 ifndef::backend-pdf[]

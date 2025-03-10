@@ -6,6 +6,7 @@ For these more advanced use-cases, the driver provides functions to take full co
 These are called _managed transactions_, and you can think of them as a way of unwrapping the flow of `.ExecutableQuery()` and being able to specify its desired behavior in more places.
 
 
+[#session-create]
 == Create a session
 
 Before running a transaction, you need to obtain a _session_.
@@ -284,7 +285,7 @@ void requestInspection(string customerId, int otherBankId, float amount, Excepti
 ----
 
 
-[[process-result]]
+[#process-result]
 == Process query results
 
 The driver's output of a query is a link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IResultCursor.html[`IResultCursor`] object, which encapsulates the Cypher result in a rich data structure that requires some parsing on the client side.
@@ -341,12 +342,14 @@ It exhausts the result, so should only be called when data processing is over.
 For a complete list of `IResultCursor` methods, see link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IResultCursor.html[API documentation -> IResultCursor].
 
 
+[#session-config]
 == Session configuration
 
 You can customize the behavior of a session via the optional `SessioncConfig` parameter when creating a session.
 Use link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.SessionConfigBuilder.html[`SessionConfigBuilder`] to create a session configuration object.
 
 
+[#database-selection]
 === Database selection
 
 It is recommended to *always specify the database explicitly* through the `.WithDatabase("<dbName>")` session config method, even on single-database instances.
@@ -366,6 +369,7 @@ If the server runs on a cluster, queries with `USE` require server-side routing 
 Queries may also take longer to execute as they may not reach the right cluster member at the first attempt, and need to be routed to one containing the requested database.
 
 
+[#request-routing]
 === Request routing
 
 In a cluster environment, all sessions are opened in write mode, routing them to the leader.
@@ -386,7 +390,7 @@ using var session = driver.AsyncSession(conf => conf
 ====
 Although executing a _write_ query in read mode likely results in a runtime error, *you should not rely on this for access control.*
 The difference between the two modes is that _read_ transactions are routed to any node of a cluster, whereas _write_ ones are directed to primaries.
-In other words, there is no guarantee that a write query submitted in read mode will be rejected.
+There is no guarantee that a write query submitted in read mode will be rejected, and an issue with this feature will not be classified as a security vulnerability.
 
 Similar remarks hold for the `.ExecuteReadAsync()` and `.ExecuteWriteAsync()` methods.
 ====
@@ -421,6 +425,7 @@ using var session = driver.AsyncSession(conf => conf
 ----
 
 
+[#tx-config]
 == Transaction configuration
 
 You can exert further control on transactions by providing a `TransactionConfig` object as (optional) last parameter to `.ExecuteReadAsync()`, `.ExecuteWriteAsync()`, and `.BeginTransactionAsync()`.
@@ -464,7 +469,7 @@ If you do not open sessions with `using`, remember to call the `.CloseAsync()` m
 
 [source, csharp]
 ----
-using var session = driver.AsyncSession(conf => conf.WithDatabase("neo4j"));
+var session = driver.AsyncSession(conf => conf.WithDatabase("neo4j"));
 
 // session usage
 

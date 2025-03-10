@@ -5,7 +5,7 @@ When xref:query-simple.adoc#read[reading data from the database], results come b
 To process records, you can either extract properties with `.Get()` and other helper methods, or you can map them to objects in your application.
 You can either map records to classes you have explicitly defined, or provide a record-specific blueprint from which the driver will spawn new objects.
 
-This page show how the object-graph mapping (OGM) feature can help you reduce boilerplate and ...
+The object-graph mapping (OGM) feature can help you reduce boilerplate code and work more easily with the results of your queries.
 
 [TIP]
 To use the Object-Graph Mapping (OGM) feature, you need to include the namespace `Neo4j.Driver.Mapping` beside the root `Neo4j.Driver`.
@@ -13,13 +13,13 @@ To use the Object-Graph Mapping (OGM) feature, you need to include the namespace
 
 == Map to existing classes
 
-To map records to an existing class, define a class having the same attributes as the keys returned by the query.
+If you want to map records to an existing class, define a class having the same attributes as the keys returned by the query.
 **The class attributes must match exactly the query return keys**, and they are case-sensitive.
 
 To map a record to a class named `className`, use the method `IRecord.AsObject<className>()`.
 
 [NOTE]
-A record's property names and its query return keys can be different. +
+**A record's property names and its query return keys can be different.** +
 For example, consider a node with label `:Person` and a `name` property. +
 The returned keys for the query `MERGE (p:Person {name: "Alice"}) RETURN p.name` are `p.name`, even if the property name is `name`. +
 Similarly, for the query `MERGE (pers:Person {name: "Alice"}) RETURN pers.name`, the return keys are `pers.name`. +
@@ -88,7 +88,8 @@ class Person {  // <.>
 [#decorators]
 === Class attribute decorators
 
-To make the object-graph mapping more flexible, you can use the following decorators. Use them on class attributes to alter how each attribute should be mapped to its respective query return key.
+To make the object-graph mapping more flexible, decorators are available.
+Use them on class attributes to alter how each attribute should be mapped to its respective query return key.
 
 - `[MappingSource("<returnedKeyName>")]` -- Map `returnedKeyName` to the class attribute, instead of looking for a returned key that matches the class attribute name.
 - `[MappingIgnored]` -- Ignore the class attribute (i.e. don't look for a corresponding returned key).
@@ -160,7 +161,7 @@ class Person {
 [#constructors]
 === Work with constructors
 
-When mapping records to an existing class, the first thing the driver has to do is to instantiate an object onto which to map, which results in a class constructor to be invoked.
+When mapping records to an existing class, the first thing the driver has to do is to instantiate an object onto which to map records, which results in the class constructor to be invoked.
 
 - If no explicit constructor is defined, the driver chooses the implicitly-defined, trivial constructor and then proceeds to set the class attributes via their setters.
 - If one or more constructor are defined, the driver chooses the simplest one (i.e. the one with least parameters).
@@ -191,7 +192,7 @@ class Person {
 
 <.> The decorator instructs the driver to use this as constructor when mapping records onto the `Person` class.
 The constructor signature implies that the `name` return key is mapped to the class attribute `Name`, and `age` to `Age` (with a default value of `21`).
-<.> This constructor would be invoked if the `[MappingConstructor]` decorator was not present in the other constructor.
+<.> This form of constructor would be invoked if the `[MappingConstructor]` decorator was not present in the other constructor.
 <.> Because the constructor sets the `Name` and `Age` attributes, the attributes can have private setters.
 
 
@@ -215,7 +216,7 @@ var record = await driver.ExecutableQuery(@"
 var person = record.AsObjectFromBlueprint(new { name = "", age = 0 });  // <.>
 ----
 
-<.> Return keys need to be aliased, as `.AsObjectFromBlueprint()` doesn't support dots in identifiers.
+<.> Return keys must be aliased, as `.AsObjectFromBlueprint()` doesn't support dots in identifiers.
 <.> Key names must match the return keys.
 Provided values don't work as default values; they are only used to infer the property type (i.e. the specific values provided in the definition are discarded).
 
@@ -256,12 +257,22 @@ var person = record.AsObject( (string name, int age) => new { Name = name, Age =
 The lambda function doesn't have to create a map: it can do any processing.
 
 .A lambda returning a string
-[source, csharp, test-skip]
+[source, csharp]
 ----
+var record = await driver.ExecutableQuery(@"
+    MERGE (p:Person {name: $name, age: $age})
+    RETURN p.name AS name, p.age AS age
+    ")
+    .WithParameters(new { name = "Alice", age = 21 })
+    .WithConfig(new QueryConfig(database: "neo4j"))
+    .ExecuteAsync();
+
 var text = record.AsObject( (string name, int age) => $"{name} is {age} years old." );
 ----
 
+////
 Decorators are allowed, but the only meaningful ones a is default val
+Comment: they don't work.
 
 [source, csharp]
 ----
@@ -275,6 +286,7 @@ var record = await driver.ExecutableQuery(@"
 
 var person = record.AsObject( ([MappingSource["p.name"] string name, [MappingSource["p.age"] [MappingDefaultValue(21)] int age) => new { Name = name, Age = age, BirthYear = 2025 - age });
 ----
+////
 
 
 ifndef::backend-pdf[]

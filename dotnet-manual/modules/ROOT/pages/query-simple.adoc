@@ -163,6 +163,8 @@ For those rare use cases, see xref:query-advanced#_dynamic_values_in_property_ke
 A query run may fail for a number of reasons, with different link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.Neo4jException.html[exceptions] being raised.
 Some of them are due to Cypher syntax errors, permission issues, or other forms of misconfiguration/misusage.
 
+From version >= 5.28, the default exception format is GQL-compliant. For more information on the structure of the error object, see link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.Preview.GqlErrors.IGqlErrorPreview.html[GqlErrorPreview].
+
 [TIP]
 The driver automatically retries to run a failed query, if the failure is deemed to be transient (for example due to temporary server unavailability).
 An exception will be raised if the operation keeps failing after a number of attempts.
@@ -213,8 +215,9 @@ await driver.ExecutableQuery("MATCH (p:Person) RETURN p.name")
 
 [NOTE]
 ====
-Although executing a _write_ query in read mode likely results in a runtime error, *you should not rely on this for access control.* The difference between the two modes is that _read_ transactions will be routed to any node of a cluster, whereas _write_ ones are directed to primaries.
-In other words, there is no guarantee that a write query submitted in read mode will be rejected.
+Although executing a _write_ query in read mode likely results in a runtime error, *you should not rely on this for access control.*
+The difference between the two modes is that _read_ transactions will be routed to any node of a cluster, whereas _write_ ones are directed to primaries.
+There is no guarantee that a write query submitted in read mode will be rejected, and an issue with this feature will not be classified as a security vulnerability.
 ====
 
 
@@ -222,10 +225,11 @@ In other words, there is no guarantee that a write query submitted in read mode 
 [role=label--new-5.14]
 === Run queries as a different user
 
-You can execute a query through a different user with the config key `authToken` (see link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.AuthTokens.html[`AuthTokens`] for available native implementations of authentication methods).
+You can execute a query through a different user with the config key `authToken`.
 Switching user at the query level is cheaper than creating a new `IDriver` object.
-The query is then run within the security context of the given user (i.e., home database, permissions, etc.). +
-Query-scoped authentication requires a server version >= 5.8.
+The query is then run within the security context of the given user (i.e., home database, permissions, etc.).
+See link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.AuthTokens.html[`AuthTokens`] for available native implementations of authentication methods. +
+Query-scoped authentication requires a Neo4j server version >= 5.8.
 
 [source, csharp, test-skip]
 ----
@@ -238,7 +242,7 @@ await driver.ExecutableQuery("MATCH (p:Person) RETURN p.name")
 ----
 
 The `QueryConfig` key `impersonatedUser` provides a similar functionality, and is available in driver/server versions >= 4.4.
-The difference is that you don't need to know a user's password to impersonate them, but the user under which the `IDriver` was created needs to have the link:{neo4j-docs-base-uri}/operations-manual/current/authentication-authorization/dbms-administration/#access-control-dbms-administration-impersonation[appropriate permissions].
+The difference is that you don't need to know a user's password to impersonate them, but the user under which the `IDriver` was created needs to have link:{neo4j-docs-base-uri}/operations-manual/current/authentication-authorization/dbms-administration/#access-control-dbms-administration-impersonation[`IMPERSONATE` privileges].
 
 [source, csharp, test-skip]
 ----

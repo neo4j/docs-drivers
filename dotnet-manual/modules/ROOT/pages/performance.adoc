@@ -190,10 +190,10 @@ void log(string msg) {
 [1734336719] --- 136 seconds ---  // <.>
 ----
 
-<.> With lazy loading, the first record is quickly available.
-<.> With eager loading, the first record is available many seconds after the query has been submitted (i.e. after the server has retrieved all 250 records).
-<.> The total running time is lower with lazy loading, because while the client processes records the server can fetch the next ones.
-With lazy loading, the client could also stop requesting records after some condition is met (by calling `.ConsumeAsync()` on the result), saving time and resources.
+<.> With lazy loading, the first record is available sooner.
+<.> With eager loading, the first record is available once the result is consumed (i.e. after the server has retrieved all 250 records).
+<.> The total running time is longer with eager loading because the client waits until it receives the last record, whereas with lazy loading the client can process records while the server fetches the next ones.
+With lazy loading, the client can also stop requesting records after some condition is met (by calling .ConsumeAsync() on the Result object) to save time and resources.
 
 ====
 
@@ -216,9 +216,9 @@ Especially if the server's latency is high, a low fetch size may deteriorate per
 
 In a cluster, *route read queries to any reader node*. You do this by:
 
-- using the config `routing: RoutingControl.Readers` in xref:query-simple.adoc#_request_routing[`IDriver.ExecutableQuery()`] calls
+- using the config `routing: RoutingControl.Readers` in xref:query-simple.adoc#request-routing[`IDriver.ExecutableQuery()`] calls
 - using `Session.ExecuteReadAsync()` instead of `Session.ExecuteWriteAsync()` (for xref:transactions.adoc#managed-transactions[managed transactions])
-- using the config method xref:transactions.adoc#_request_routing[`.WithDefaultAccessMode(AccessMode.Read)` when creating a new session] (for explicit transactions).
+- using the config method xref:transactions.adoc#request-routing[`.WithDefaultAccessMode(AccessMode.Read)` when creating a new session] (for explicit transactions).
 
 [discrete]
 === Good practices
@@ -511,7 +511,7 @@ If you know already that the data you are inserting is new, avoid using `MERGE` 
 [[filter-notifications]]
 == Filter notifications
 
-xref:result-summary.adoc#_filter_notifications[Filter the category and/or severity of notifications] the server should raise.
+xref:result-summary.adoc#filter-notifications[Filter the category and/or severity of notifications] the server should raise.
 
 
 ifndef::backend-pdf[]

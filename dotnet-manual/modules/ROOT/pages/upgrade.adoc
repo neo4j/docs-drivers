@@ -5,8 +5,8 @@
 This page contains the list of new features and breaking changes of the driver from version 4.4 to 5.x.
 For a full list of changes, see the link:{driver-changelog-url}[Driver -> Changelog].
 
-The latest driver version of the 5.x series (5.27) is compatible with Neo4j server both 4.4 and 5.x, so you can upgrade the driver before you upgrade the server.
-At the same time, the driver version 4.4 is forward compatible with Neo4j server 5.x, so you could also upgrade the server before the driver; however, given that it's easier to roll back an application upgrade than a server upgrade, it's recommended to start with the driver.
+The latest driver version of the 5.x series (5.28) is compatible with Neo4j server both 4.4 and 5.x, so you can upgrade the driver before you upgrade the server.
+At the same time, the driver version 4.4 is forward compatible with Neo4j server versions 5.x as well as 2025.x, so you could also upgrade the server before the driver; however, given that it's easier to roll back an application upgrade than a server upgrade, it's recommended to start with the driver.
 
 [TIP]
 When upgrading the Neo4j server to a newer version, the Cypher queries in your application may also need updating. +
@@ -31,7 +31,7 @@ The driver supports the .NET Standard 2.0. For supported versions of the .NET Fr
 ====
 The new method `Driver.ExecutableQuery()` is a wrapper for `Session.ExecuteRead/Write()`, but it abstracts away the result processing part and returns a list of records to the caller directly.
 
-For more information, see link:https://github.com/neo4j/neo4j-dotnet-driver/wiki/5.X-Change-Log#examples[`ExecutableQuery`].
+For more information, see xref:query-simple.adoc[`ExecutableQuery`].
 ====
 
 |
@@ -40,15 +40,13 @@ For more information, see link:https://github.com/neo4j/neo4j-dotnet-driver/wiki
 ====
 Allows records to be mapped to objects simply and without endless boilerplate.
 
-For more information, see link:https://github.com/neo4j/neo4j-dotnet-driver/wiki/5.X-Change-Log#crystal_ball-preview-feature-record-to-object-mapping[Record to Object Mapping].
+For more information, see xref:object-graph-mapping.adoc[Record to Object Mapping].
 ====
 |
 .Re-authentication
 [%collapsible]
 ====
-Allows for handling expiring authentication (backwards compatible) as well as session scoped authentication.
-
-For more information, see link:https://github.com/neo4j/neo4j-dotnet-driver/discussions/705[Re-authentication].
+Allows for handling xref:connect-advanced.adoc#rotating-tokens[expiring authentication (rotating tokens)] as well as xref:transactions.adoc#impersonation[session scoped authentication].
 ====
 
 |
@@ -57,7 +55,7 @@ For more information, see link:https://github.com/neo4j/neo4j-dotnet-driver/disc
 ====
 Allows for configuring client side TLS certificates to authenticate against the server.
 
-// See link:https://github.com/neo4j/neo4j-javascript-driver/pull/1183[Mutual TLS].
+For more information, see xref:connect-advanced.adoc#mtls[Mutual TLS].
 ====
 |
 .`BookmarkManager` support
@@ -74,7 +72,7 @@ See link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IBook
 ====
 Filtering allows to receive only a subset of notifications from the server, and to improve performance server-side.
 
-For more information, see link:https://github.com/neo4j/neo4j-dotnet-driver/wiki/5.X-Change-Log#notificationconfig[NotificationConfig].
+For more information, see xref:result-summary.adoc#notification-filtering[NotificationConfig].
 ====
 |
 .GQL statuses and errors
@@ -83,9 +81,9 @@ For more information, see link:https://github.com/neo4j/neo4j-dotnet-driver/wiki
 The property link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IResultSummary.GqlStatusObjects.html[`IResultSummary.GqlStatusObjects`] contains a sequence of link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IGqlStatusObject.html[`IGqlStatusObject`], holding information about the execution of the query.
 This API is planned to supersede the current notifications API.
 
-// Interface link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/exceptions/Neo4jException.html[`Neo4jException`] exposes GQL metadata as well.
+For more information, see xref:result-summary.adoc#notifications[Explore the query execution summary -> Notifications].
 
-// For more information, see xref:result-summary.adoc#_notifications[Explore the query execution summary -> Notifications].
+xref:data-types.adoc#exceptions[Exception objects] are also GQL-compliant.
 ====
 
 |

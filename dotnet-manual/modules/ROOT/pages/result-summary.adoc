@@ -43,6 +43,7 @@ var resultSummary = await session.ExecuteReadAsync(
 ----
 
 
+[#query-counters]
 == Query counters
 
 The property `IResultSummary.Counters` contains counters for the operations that a query triggered (as a link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.ICounters.html[`ICounters`] object).
@@ -71,6 +72,7 @@ There are two additional boolean properties which act as meta-counters:
 - `.ContainsSystemUpdates` -- Whether the query updated the `system` database
 
 
+[#execution-plan]
 == Query execution plan
 
 If you prefix a query with `EXPLAIN`, the server will return the plan it _would_ use to run the query, but will not actually run it.
@@ -142,6 +144,7 @@ Total database accesses: 12, total allocated memory: 184
 For more information and examples, see link:https://neo4j.com/docs/cypher-manual/current/appendix/tutorials/basic-query-tuning/#_profile_query[Basic query tuning].
 
 
+[#notifications]
 == Notifications
 
 After executing a query, the server can return link:{neo4j-docs-base-uri}/status-codes/current/notifications/[notifications] alongside the query result.
@@ -232,6 +235,7 @@ GqlStatusObject {
 =====
 
 
+[#filter-notifications]
 [role=label--new-5.7]
 === Filter notifications
 
@@ -252,13 +256,17 @@ You can affect the notifications settings both when creating a new `IDriver` obj
 // at driver level
 await using var driver = GraphDatabase.Driver(
     dbUri, AuthTokens.Basic(dbUser, dbPassword), conf =>
-    conf.WithNotifications(Severity.Warning, new[] {Classification.Hint, Classification.Generic})
+    conf.WithNotifications(
+        Severity.Warning,
+        disabledClassifications: [Classification.Hint, Classification.Generic])
 );
 
 // at session level
 using var session = driver.AsyncSession(conf => conf
     .WithDatabase("neo4j")
-    .WithNotifications(Severity.Warning, new[] {Classification.Hint, Classification.Generic})
+    .WithNotifications(
+        Severity.Warning,
+        disabledClassifications: [Classification.Hint, Classification.Generic])
 );
 ----
 
@@ -278,7 +286,7 @@ using var session = driver.AsyncSession(conf => conf
 );
 ----
 
-.Notifications filtering on versions earlier than 5.26
+.Notifications filtering on versions < 5.26
 [%collapsible]
 ====
 For versions earlier than 5.26, notification filtering works the same, except you don't supply a list of _classifications_ but a list of _categories_.
@@ -289,14 +297,17 @@ For versions earlier than 5.26, notification filtering works the same, except yo
 // at driver level
 await using var driver = GraphDatabase.Driver(
     dbUri, AuthTokens.Basic(dbUser, dbPassword), conf =>
-    conf.WithNotifications(Severity.Warning, new[] {Category.Hint, Category.Generic})
+    conf.WithNotifications(
+        Severity.Warning,
+        disabledCategories: [Category.Hint, Category.Generic])
 );
 
 // at session level
 using var session = driver.AsyncSession(conf => conf
     .WithDatabase("neo4j")
-    .WithNotifications(Severity.Warning, new[] {Category.Hint, Category.Generic})
+    .WithNotifications(
+        Severity.Warning,
+        disabledCategories[Category.Hint, Category.Generic])
 );
 ----
-
 ====
