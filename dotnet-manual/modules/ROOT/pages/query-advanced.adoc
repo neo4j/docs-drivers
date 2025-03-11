@@ -1,6 +1,6 @@
 = Further query mechanisms
 
-[[implicit-transactions]]
+[#implicit-transactions]
 == Implicit (or auto-commit) transactions
 
 This is the most basic and limited form with which to run a Cypher query.
@@ -26,6 +26,7 @@ Since the driver cannot figure out whether the query in a `ISessionAsync.RunAsyn
 *Implicit transactions are the only ones that can be used for link:{neo4j-docs-base-uri}/cypher-manual/{page-version}/subqueries/subqueries-in-transactions[`CALL { ... } IN TRANSACTIONS`] queries*.
 
 
+[#import-csv]
 === Import CSV files
 
 The most common use case for using `IAsyncSession.RunAsync()` is for importing large CSV files into the database with the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/load-csv[`LOAD CSV`] Cypher clause, and preventing timeout errors due to the size of the transaction.
@@ -53,6 +54,7 @@ For efficient bulk data insertion, see xref:performance.adoc#_batch_data_creatio
 For more information, see link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/load-csv/[Cypher -> Clauses -> LOAD CSV].
 
 
+[#tx-config]
 === Transaction configuration
 
 You can exert further control on implicit transactions by providing a link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.TransactionConfigBuilder.html[`TransactionConfigBuilder`] object as optional last parameter to `IAsyncSession.RunAsync()` calls.
@@ -72,6 +74,7 @@ await session.RunAsync(
 ----
 
 
+[#dynamic-advanced]
 == Dynamic values in property keys, relationship types, and labels
 
 In general, you should not concatenate parameters directly into a query, but rather use xref:query-simple#query-parameters[query parameters].

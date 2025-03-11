@@ -11,6 +11,7 @@ The object-graph mapping (OGM) feature can help you reduce boilerplate code and 
 To use the Object-Graph Mapping (OGM) feature, you need to include the namespace `Neo4j.Driver.Mapping` beside the root `Neo4j.Driver`.
 
 
+[#existing-classes]
 == Map to existing classes
 
 If you want to map records to an existing class, define a class having the same attributes as the keys returned by the query.
@@ -196,6 +197,7 @@ The constructor signature implies that the `name` return key is mapped to the cl
 <.> Because the constructor sets the `Name` and `Age` attributes, the attributes can have private setters.
 
 
+[#anonymous-types]
 == Map to anonymous types
 
 Especially if your queries return a broad variety of result keys, it can feel pointless to define a number of different classes just for the mapping to work, or to engineer one single class and try to make it adapt to a variety of return keys with attribute decorators.

@@ -5,6 +5,7 @@ include::{common-partial}/connect-advanced.adoc[tag=connection-uri]
 include::{common-partial}/connect-advanced.adoc[tag=connection-protocols]
 
 
+[#auth]
 == Authentication methods
 
 [#auth-basic]

@@ -3,6 +3,7 @@
 The tables in this section show the mapping between Cypher data types and .NET types.
 
 
+[#core]
 == Core types
 
 |===
@@ -19,6 +20,7 @@ The tables in this section show the mapping between Cypher data types and .NET t
 |===
 
 
+[#temporal]
 == Temporal types
 
 The driver provides a set of temporal data types compliant with ISO-8601 and Cypher. +
@@ -59,6 +61,7 @@ Console.WriteLine(result.Result[0].Get<ZonedDateTime>("date"));
 ----
 
 
+[#spatial]
 == Spatial types
 
 Cypher supports spatial values (points), and Neo4j can store these point values as properties on nodes and relationships.
@@ -100,6 +103,7 @@ Console.WriteLine(result.Result[0].Get<INode>("p").Get<Point>("location"));
 ----
 
 
+[#graph]
 == Graph types
 
 *Graph types are only passed as results and may not be used as parameters*.
@@ -114,6 +118,7 @@ Console.WriteLine(result.Result[0].Get<INode>("p").Get<Point>("location"));
 |===
 
 
+[#inode]
 === `INode`
 Represents a node in a graph.
 
@@ -159,6 +164,7 @@ Name property: Alice
 For full documentation, see link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.INode.html[API documentation -> INode].
 
 
+[#irelationship]
 === `IRelationship`
 
 Represents a relationship in a graph.
@@ -216,6 +222,7 @@ Status property: BFF
 For full documentation, see link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IRelationship.html[API documentation -> IRelationship].
 
 
+[#ipath]
 === `IPath`
 
 Represents a path in a graph.

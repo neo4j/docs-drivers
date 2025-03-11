@@ -458,6 +458,7 @@ foreach (var person in people) {
 ----
 
 
+[#close-session]
 == Close sessions
 
 Each connection pool has *a finite number of sessions*, so if you open sessions without ever closing them, your application could run out of them.
