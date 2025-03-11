@@ -67,9 +67,9 @@ using var session = driver.AsyncSession(conf => conf.WithDatabase("neo4j"));
 await session.RunAsync(
     "CREATE (a:Person {name: $name})",
     new { name = "John" },
-    TransactionConfigBuilder
+    conf => conf
         .WithTimeout(new TimeSpan(5))
-        .WithMetadata(new { appName = "peopleTracker" })
+        .WithMetadata(new Dictionary<string, object>{ { "appName", "peopleTracker" } })
 );
 ----
 
