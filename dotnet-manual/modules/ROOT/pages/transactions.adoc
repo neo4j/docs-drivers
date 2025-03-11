@@ -448,11 +448,10 @@ var people = await session.ExecuteReadAsync(
         var result = await tx.RunAsync("MATCH (p:Person) RETURN p");
         return await result.ToListAsync();
     },
-    TransactionConfigBuilder
+    conf => conf
         .WithTimeout(new TimeSpan(5))
-        .WithMetadata(new { appName = "peopleTracker" })
+        .WithMetadata(new Dictionary<string, object>{ { "appName", "peopleTracker" } })
 );
-
 foreach (var person in people) {
     Console.WriteLine(person);
 }

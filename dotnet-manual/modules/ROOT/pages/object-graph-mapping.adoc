@@ -132,7 +132,7 @@ The first argument to `[MappingSource]` must be a returned key referencing a rel
 ----
 var result = await driver.ExecutableQuery(@"
     MERGE (p:Person:Actor {name: $name})
-    MERGE (m:Movie {name: $movie)
+    MERGE (m:Movie {name: $movie})
     MERGE (p)-[r:ACTED_IN {role: $role}]->(m)
     RETURN p AS person, r AS role  // <.>
     ")
