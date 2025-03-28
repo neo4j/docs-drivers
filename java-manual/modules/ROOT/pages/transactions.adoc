@@ -11,7 +11,7 @@ These are called _managed transactions_, and you can think of them as a way of u
 Before running a transaction, you need to obtain a _session_.
 Sessions act as concrete query channels between the driver and the server, and ensure <<causal consistency>> is enforced.
 
-Sessions are created with the method link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Driver.html#session()[`Driver.session()`].
+Sessions are created with the method link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/Driver.html#session()[`Driver.session()`].
 Use the optional argument to alter the session's configuration, among which for example the xref:_database_selection[target database].
 For further configuration parameters, see xref:_session_configuration[Session configuration].
 
@@ -37,7 +37,7 @@ A transaction can contain any number of queries.
 As Neo4j is <<ACID>> compliant, *queries within a transaction will either be executed as a whole or not at all*: you cannot get a part of the transaction succeeding and another failing.
 Use transactions to group together related queries which work together to achieve a single _logical_ database operation.
 
-A managed transaction is created with the methods link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Session.html#executeRead(org.neo4j.driver.TransactionCallback,org.neo4j.driver.TransactionConfig)[`Session.executeRead()`] and link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Session.html#executeWrite(org.neo4j.driver.TransactionCallback,org.neo4j.driver.TransactionConfig)[`Session.executeWrite()`], depending on whether you want to retrieve data from the database or alter it.
+A managed transaction is created with the methods link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/Session.html#executeRead(org.neo4j.driver.TransactionCallback,org.neo4j.driver.TransactionConfig)[`Session.executeRead()`] and link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/Session.html#executeWrite(org.neo4j.driver.TransactionCallback,org.neo4j.driver.TransactionConfig)[`Session.executeWrite()`], depending on whether you want to retrieve data from the database or alter it.
 Both methods take a <<transaction_function>> callback, which is responsible for actually carrying out the queries and processing the result.
 
 .Retrieve people whose name starts with `Al`.
@@ -63,7 +63,7 @@ try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").
 
 <1> Create a session. A single session can be the container for multiple queries. Unless created as a resource using the `try` construct, remember to close it when done.
 <2> The `.executeRead()` (or `.executeWrite()`) method is the entry point into a transaction. It takes a callback to a _transaction function_, which is responsible of running queries.
-<3> Use the method link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/SimpleQueryRunner.html#run(java.lang.String,java.util.Map)[`tx.run()`] to execute queries. You can provide a map of query parameters as second argument. Each query run returns a link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Result.html[`Result`] object.
+<3> Use the method link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/SimpleQueryRunner.html#run(java.lang.String,java.util.Map)[`tx.run()`] to execute queries. You can provide a map of query parameters as second argument. Each query run returns a link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/Result.html[`Result`] object.
 <4> xref:process-result[Process the result] using any of the methods on `Result`. The method `.list()` retrieves all records into a list.
 
 *Do not hardcode or concatenate parameters directly into the query*.
@@ -210,7 +210,7 @@ If you are not interested in returning anything out of a transaction function, y
 [#explicit-transactions]
 == Run an explicit transaction
 
-You can achieve full control over transactions by manually beginning one with the method link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Session.html#beginTransaction(org.neo4j.driver.TransactionConfig)[`Session.beginTransaction()`], which returns a link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Transaction.html[`Transaction`] object.
+You can achieve full control over transactions by manually beginning one with the method link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/Session.html#beginTransaction(org.neo4j.driver.TransactionConfig)[`Session.beginTransaction()`], which returns a link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/Transaction.html[`Transaction`] object.
 You may then run queries inside an explicit transaction with the method `Transaction.run()`.
 
 [source, java]
@@ -224,7 +224,7 @@ try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").
 }
 ----
 
-An explicit transaction can be committed with  link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Transaction.html#commit()[`Transaction.commit()`] or rolled back with  link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Transaction.html#rollback[`Transaction.rollback()`].
+An explicit transaction can be committed with  link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/Transaction.html#commit()[`Transaction.commit()`] or rolled back with  link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/Transaction.html#rollback[`Transaction.rollback()`].
 If no explicit action is taken, the driver will automatically roll back the transaction at the end of its lifetime.
 
 Explicit transactions are most useful for applications that need to distribute Cypher execution across multiple functions for the same transaction, or for applications that need to run multiple queries within a single transaction but without the automatic retries provided by managed transactions.
@@ -328,7 +328,7 @@ public class App {
 [[process-result]]
 == Process query results
 
-The driver's output of a query is a link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Result.html[`Result`] object, which encapsulates the Cypher result in a rich data structure that requires some parsing on the client side.
+The driver's output of a query is a link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/Result.html[`Result`] object, which encapsulates the Cypher result in a rich data structure that requires some parsing on the client side.
 There are two main points to be aware of:
 
 - *The result records are not immediately and entirely fetched and returned by the server*.
@@ -351,7 +351,7 @@ The animation below follows the path of a single query: it shows how the driver 
   type="video/mp4"></video>
 ++++
 
-**The easiest way of processing a result is by calling `.list()` on it**, which yields a list of link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Record.html[`Record`] objects.
+**The easiest way of processing a result is by calling `.list()` on it**, which yields a list of link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/Record.html[`Record`] objects.
 Otherwise, a `Result` object implements a number of methods for processing records.
 The most commonly needed ones are listed below.
 
@@ -383,11 +383,11 @@ This leaves the record in the buffer for further processing.
 It exhausts the result, so should only be called when data processing is over.
 |===
 
-For a complete list of `Result` methods, see link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Result.html[API documentation -> Result].
+For a complete list of `Result` methods, see link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/Result.html[API documentation -> Result].
 
 [TIP]
 ====
-Properties inside a link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Record.html[`Record`] object are embedded within link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Value.html[`Value`] objects.
+Properties inside a link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/Record.html[`Record`] object are embedded within link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/Value.html[`Value`] objects.
 To extract and cast them to the corresponding Java types, use `.as<type>()` (eg. `.asString()`, `asInt()`, etc).
 For example, if the `name` property coming from the database is a string, `record.get("name").asString()` will yield the property value as a `String` object.
 
@@ -401,7 +401,7 @@ For more information, see xref:data-types.adoc[].
 
 It is recommended to *always specify the database explicitly* through the `.withDatabase("<dbName>")` method, even on single-database instances.
 This allows the driver to work more efficiently, as it saves a network round-trip to the server to resolve the home database.
-If no database is given, the link:{neo4j-docs-base-uri}/operations-manual/current/manage-databases/introduction#manage-databases-default[default database] set in the Neo4j instance settings is used.
+If no database is given, the link:{neo4j-docs-base-uri}/operations-manual/5/manage-databases/introduction#manage-databases-default[default database] set in the Neo4j instance settings is used.
 
 [source, java]
 ----
@@ -412,7 +412,7 @@ var session = driver.session(SessionConfig.builder()
 ----
 
 [TIP]
-Specifying the database through the configuration method is preferred over the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/use/[`USE`] Cypher clause.
+Specifying the database through the configuration method is preferred over the link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/use/[`USE`] Cypher clause.
 If the server runs on a cluster, queries with `USE` require server-side routing to be enabled.
 Queries may also take longer to execute as they may not reach the right cluster member at the first attempt, and need to be routed to one containing the requested database.
 
@@ -450,7 +450,7 @@ Similar remarks hold for the `.executeRead()` and `.executeWrite()` methods.
 [role=label--new-5.18]
 === Run queries as a different user
 
-You can execute a query through a different user by providing an link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/AuthTokens.html[AuthToken] as third parameter upon session creation.
+You can execute a query through a different user by providing an link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/AuthTokens.html[AuthToken] as third parameter upon session creation.
 Switching user at the session level is cheaper than creating a new `Driver` object.
 Queries are then run within the security context of the given user (i.e., home database, permissions, etc.). +
 Session-scoped authentication requires a server version >= 5.8.
@@ -472,7 +472,7 @@ var session = driver.session(
 ----
 
 The method `.withImpersonatedUser()` provides a similar functionality, and is available in driver/server versions >= 4.4.
-The difference is that you don't need to know a user's password to impersonate them, but the user under which the `Driver` was created needs to have the link:{neo4j-docs-base-uri}/operations-manual/current/authentication-authorization/dbms-administration/#access-control-dbms-administration-impersonation[appropriate permissions].
+The difference is that you don't need to know a user's password to impersonate them, but the user under which the `Driver` was created needs to have the link:{neo4j-docs-base-uri}/operations-manual/5/authentication-authorization/dbms-administration/#access-control-dbms-administration-impersonation[appropriate permissions].
 
 [source, java]
 ----
@@ -487,7 +487,7 @@ var session = driver.session(SessionConfig.builder()
 
 == Transaction configuration
 
-You can exert further control on transactions by providing a  link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/TransactionConfig.html[`TransactionConfig`] object as (optional) second parameter to `.executeRead()`, `.executeWrite()`, and `.beginTransaction()`.
+You can exert further control on transactions by providing a  link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/TransactionConfig.html[`TransactionConfig`] object as (optional) second parameter to `.executeRead()`, `.executeWrite()`, and `.beginTransaction()`.
 Use it to specify:
 
 - A transaction timeout.
