@@ -77,7 +77,7 @@ There are two additional boolean properties which act as meta-counters:
 == Query execution plan
 
 If you prefix a query with `EXPLAIN`, the server will return the plan it _would_ use to run the query, but will not actually run it.
-The plan is then available as a link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IPlan.html[`IPlan`] object in the property `IResultSummary.Plan`, and contains the list of link:{neo4j-docs-base-uri}/cypher-manual/current/execution-plans/operators/[Cypher operators] that would be used to retrieve the result set.
+The plan is then available as a link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IPlan.html[`IPlan`] object in the property `IResultSummary.Plan`, and contains the list of link:{neo4j-docs-base-uri}/cypher-manual/5/execution-plans/operators/[Cypher operators] that would be used to retrieve the result set.
 You may use this information to locate potential bottlenecks or room for xref:performance.adoc[performance improvements] (for example through the creation of indexes).
 
 [source, csharp, role=nocollapse]
@@ -142,13 +142,13 @@ Total database accesses: 12, total allocated memory: 184
 */
 ----
 
-For more information and examples, see link:https://neo4j.com/docs/cypher-manual/current/appendix/tutorials/basic-query-tuning/#_profile_query[Basic query tuning].
+For more information and examples, see link:https://neo4j.com/docs/cypher-manual/5/appendix/tutorials/basic-query-tuning/#_profile_query[Basic query tuning].
 
 
 [#notifications]
 == Notifications
 
-After executing a query, the server can return link:{neo4j-docs-base-uri}/status-codes/current/notifications/[notifications] alongside the query result.
+After executing a query, the server can return link:{neo4j-docs-base-uri}/status-codes/5/notifications/[notifications] alongside the query result.
 Notifications contain recommendations for performance improvements, warnings about the usage of deprecated features, and other hints about sub-optimal usage of Neo4j.
 
 [TIP]
@@ -194,7 +194,7 @@ Notification{
 [.include-with-GQL-status-code]
 ======
 
-With version >= 5.26, the property `IResultSummary.GqlStatusObjects` contains a list of GQL-compliant status objects (of type link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/summary/GqlStatusObject.html[`GqlStatusObject`]).
+With version >= 5.26, the property `IResultSummary.GqlStatusObjects` contains a list of GQL-compliant status objects (of type link:https://neo4j.com/docs/api/java-driver/5/org.neo4j.driver/org/neo4j/driver/summary/GqlStatusObject.html[`GqlStatusObject`]).
 
 These objects contain either a notification or the query's _outcome_ status (`00000` for "success", `02000` for "no data", and `00001` for "omitted result").
 The list always contains at least one entry, containing the outcome status.

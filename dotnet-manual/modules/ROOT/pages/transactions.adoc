@@ -354,7 +354,7 @@ Use link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Ne
 
 It is recommended to *always specify the database explicitly* through the `.WithDatabase("<dbName>")` session config method, even on single-database instances.
 This allows the driver to work more efficiently, as it saves a network round-trip to the server to resolve the home database.
-If no database is given, the link:{neo4j-docs-base-uri}/operations-manual/current/manage-databases/introduction#manage-databases-default[default database] set in the Neo4j instance settings is used.
+If no database is given, the link:{neo4j-docs-base-uri}/operations-manual/5/manage-databases/introduction#manage-databases-default[default database] set in the Neo4j instance settings is used.
 
 [source, csharp]
 ----
@@ -364,7 +364,7 @@ using var session = driver.AsyncSession(conf => conf
 ----
 
 [TIP]
-Specifying the database through the configuration method is preferred over the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/use/[`USE`] Cypher clause.
+Specifying the database through the configuration method is preferred over the link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/use/[`USE`] Cypher clause.
 If the server runs on a cluster, queries with `USE` require server-side routing to be enabled.
 Queries may also take longer to execute as they may not reach the right cluster member at the first attempt, and need to be routed to one containing the requested database.
 
@@ -400,7 +400,7 @@ Similar remarks hold for the `.ExecuteReadAsync()` and `.ExecuteWriteAsync()` me
 [role=label--new-5.14]
 === Run queries as a different user
 
-You can execute a query through a different user by providing an link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/AuthTokens.html[`AuthToken`] to the `.WithAuthToken()` config method.
+You can execute a query through a different user by providing an link:https://neo4j.com/docs/api/java-driver/5/org.neo4j.driver/org/neo4j/driver/AuthTokens.html[`AuthToken`] to the `.WithAuthToken()` config method.
 Switching user at the session level is cheaper than creating a new `IDriver` object.
 Queries are then run within the security context of the given user (i.e., home database, permissions, etc.). +
 Session-scoped authentication requires a server version >= 5.8.
@@ -414,7 +414,7 @@ using var session = driver.AsyncSession(conf => conf
 ----
 
 The method `.WithImpersonatedUser()` provides a similar functionality, and is available in driver/server versions >= 4.4.
-The difference is that you don't need to know a user's password to impersonate them, but the user under which the `IDriver` was created needs to have the link:{neo4j-docs-base-uri}/operations-manual/current/authentication-authorization/dbms-administration/#access-control-dbms-administration-impersonation[appropriate permissions].
+The difference is that you don't need to know a user's password to impersonate them, but the user under which the `IDriver` was created needs to have the link:{neo4j-docs-base-uri}/operations-manual/5/authentication-authorization/dbms-administration/#access-control-dbms-administration-impersonation[appropriate permissions].
 
 [source, csharp, test-skip]
 ----

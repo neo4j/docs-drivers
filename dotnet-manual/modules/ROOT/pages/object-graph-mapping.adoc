@@ -24,7 +24,7 @@ To map a record to a class named `className`, use the method `IRecord.AsObject<c
 For example, consider a node with label `:Person` and a `name` property. +
 The returned keys for the query `MERGE (p:Person {name: "Alice"}) RETURN p.name` are `p.name`, even if the property name is `name`. +
 Similarly, for the query `MERGE (pers:Person {name: "Alice"}) RETURN pers.name`, the return keys are `pers.name`. +
-You can always alter the return key with the Cypher operator link:https://neo4j.com/docs/cypher-manual/current/clauses/return/#return-column-alias[`AS`] (ex. `MERGE (p:Person {name: "Alice"}) RETURN p.name AS name`).
+You can always alter the return key with the Cypher operator link:https://neo4j.com/docs/cypher-manual/5/clauses/return/#return-column-alias[`AS`] (ex. `MERGE (p:Person {name: "Alice"}) RETURN p.name AS name`).
 
 .Map a `:Person` node to a `Person` class
 [source, csharp]
