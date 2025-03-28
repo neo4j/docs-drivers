@@ -218,4 +218,4 @@ driver.close();
 
 == API documentation
 
-For in-depth information about driver features, check out the link:https://neo4j.com/docs/api/java-driver/current/[API documentation].
+For in-depth information about driver features, check out the link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/[API documentation].

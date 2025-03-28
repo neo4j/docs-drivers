@@ -8,7 +8,7 @@ The driver will not automatically retry implicit transactions, as it does instea
 Implicit transactions should only be used when the other driver query interfaces do not fit the purpose, or for quick prototyping.
 
 You run an implicit transaction with the method `Session.run()`.
-It returns a link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Result.html[`Result`] object that needs to be xref:transactions#process-result[processed accordingly].
+It returns a link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/Result.html[`Result`] object that needs to be xref:transactions#process-result[processed accordingly].
 
 [source, java]
 ----
@@ -63,7 +63,7 @@ For more information, see link:{neo4j-docs-base-uri}/cypher-manual/current/claus
 
 === Transaction configuration
 
-You can exert further control on implicit transactions by providing a link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/TransactionConfig.html[`TransactionConfig`] object as optional last parameter to `Session.run()` calls.
+You can exert further control on implicit transactions by providing a link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/TransactionConfig.html[`TransactionConfig`] object as optional last parameter to `Session.run()` calls.
 The configuration callbacks allow to specify a query timeout and to attach metadata to the transaction.
 For more information, see xref:transactions.adoc#_transaction_configuration[Transactions -> Transaction configuration].
 

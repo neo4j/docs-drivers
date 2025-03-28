@@ -61,12 +61,12 @@ System.out.printf("The query %s returned %d records in %d ms.%n",
     summary.resultAvailableAfter(TimeUnit.MILLISECONDS));
 ----
 
-<1> `records` contains the result as a list of link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Record.html[`Record`] objects
+<1> `records` contains the result as a list of link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/Record.html[`Record`] objects
 <2> `summary` contains the xref:result-summary.adoc[summary of execution] returned by the server
 
 [TIP]
 ====
-Properties inside a link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Record.html[`Record`] object are embedded within link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Value.html[`Value`] objects.
+Properties inside a link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/Record.html[`Record`] object are embedded within link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/Value.html[`Value`] objects.
 To extract and cast them to the corresponding Java types, use `.as<type>()` (eg. `.asString()`, `asInt()`, etc).
 For example, if the `name` property coming from the database is a string, `record.get("name").asString()` will yield the property value as a `String` object.
 
@@ -172,9 +172,9 @@ For those rare use cases, see xref:query-advanced#_dynamic_values_in_property_ke
 
 == Error handling
 
-A query run may fail for a number of reasons, with different link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/exceptions/package-summary.html[exceptions] being raised.
+A query run may fail for a number of reasons, with different link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/exceptions/package-summary.html[exceptions] being raised.
 Some of them are due to Cypher syntax errors, permission issues, or other forms of misconfiguration/misusage.
-The choice of how to handle those exceptions is up to your application: whether you want to be defensive (for example check if there are records to process to avoid link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/exceptions/NoSuchRecordException.html[NoSuchRecordException]), or whether you want to catch and handle the exceptions as they arise.
+The choice of how to handle those exceptions is up to your application: whether you want to be defensive (for example check if there are records to process to avoid link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/exceptions/NoSuchRecordException.html[NoSuchRecordException]), or whether you want to catch and handle the exceptions as they arise.
 
 [TIP]
 The driver automatically retries to run a failed query, if the failure is deemed to be transient (for example due to temporary server unavailability).
@@ -184,7 +184,7 @@ An exception will be raised if the operation keeps failing after a number of att
 == Query configuration
 
 You can supply further configuration parameters to alter the default behavior of `.executableQuery()`.
-You do so through the method `.withConfig()`, which takes a link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/QueryConfig.html[`QueryConfig`] object.
+You do so through the method `.withConfig()`, which takes a link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/QueryConfig.html[`QueryConfig`] object.
 
 
 === Database selection
@@ -361,7 +361,7 @@ public class App {
 }
 ----
 
-For more information see link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/ExecutableQuery.html[API documentation -> Driver.executableQuery()].
+For more information see link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/ExecutableQuery.html[API documentation -> Driver.executableQuery()].
 
 
 ifndef::backend-pdf[]
