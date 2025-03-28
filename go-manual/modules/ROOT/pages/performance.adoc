@@ -253,7 +253,7 @@ It instructs the server to stream an amount of records equal to the fetch size, 
 
 The fetch size allows to bound memory consumption on the client side.
 It doesn't always bound memory consumption on the server side though: that depends on the query.
-For example, a query with link:https://neo4j.com/docs/cypher-manual/current/clauses/order-by/[`ORDER BY`] requires the whole result set to be loaded into memory for sorting, before records can be streamed to the client.
+For example, a query with link:https://neo4j.com/docs/cypher-manual/5/clauses/order-by/[`ORDER BY`] requires the whole result set to be loaded into memory for sorting, before records can be streamed to the client.
 
 The lower the fetch size, the more messages client and server have to exchange.
 Especially if the server's latency is high, a low fetch size may deteriorate performance.
@@ -328,13 +328,13 @@ neo4j.ExecuteQuery(ctx, driver,
     neo4j.ExecuteQueryWithDatabase("neo4j"))
 ----
 
-For more information, see link:{neo4j-docs-base-uri}/cypher-manual/current/indexes-for-search-performance/[Indexes for search performance].
+For more information, see link:{neo4j-docs-base-uri}/cypher-manual/5/indexes-for-search-performance/[Indexes for search performance].
 
 
 [[profile-queries]]
 == Profile queries
 
-link:{neo4j-docs-base-uri}/cypher-manual/current/query-tuning/basic-example/#_profile_query[*Profile your queries*] to locate queries whose performance can be improved.
+link:{neo4j-docs-base-uri}/cypher-manual/5/query-tuning/basic-example/#_profile_query[*Profile your queries*] to locate queries whose performance can be improved.
 You can profile queries by prepending them with `PROFILE`.
 The server output is available through the `.Profile()` method on the xref:result-summary.adoc[`ResultSummary`] object.
 
@@ -408,7 +408,7 @@ Total database accesses: ?
 
 *Specify node labels* in all queries.
 This allows the query planner to work much more efficiently, and to leverage indexes where available.
-To learn how to combine labels, see link:{neo4j-docs-base-uri}/cypher-manual/current/syntax/expressions/#query-syntax-label[Cypher -> Label expressions].
+To learn how to combine labels, see link:{neo4j-docs-base-uri}/cypher-manual/5/syntax/expressions/#query-syntax-label[Cypher -> Label expressions].
 
 
 [discrete]
@@ -464,7 +464,7 @@ result, err := session.Run(ctx,
 [[batch-data-creation]]
 == Batch data creation
 
-*Batch queries when creating a lot of records* using the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/with/[`WITH`] and link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/unwind/[`UNWIND`] Cypher clauses.
+*Batch queries when creating a lot of records* using the link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/with/[`WITH`] and link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/unwind/[`UNWIND`] Cypher clauses.
 
 
 [discrete]
@@ -499,7 +499,7 @@ for i := 0; i < 10000; i++ {
 ----
 
 [TIP]
-The most efficient way of performing a _first import_ of large amounts of data into a new database is the link:{neo4j-docs-base-uri}/operations-manual/current/tutorial/neo4j-admin-import/[`neo4j-admin database import`] command.
+The most efficient way of performing a _first import_ of large amounts of data into a new database is the link:{neo4j-docs-base-uri}/operations-manual/5/tutorial/neo4j-admin-import/[`neo4j-admin database import`] command.
 // source:  https://community.neo4j.com/t5/neo4j-graph-platform/improving-data-writing-efficiency-in-python/td-p/39520
 
 
@@ -562,8 +562,8 @@ This is likely to be more impactful on performance if you parallelize complex an
 [[merge]]
 == Use `MERGE` for creation only when needed
 
-The Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/merge/[`MERGE`] is convenient for data creation, as it allows to avoid duplicate data when an exact clone of the given pattern exists.
-However, it requires the database to run _two_ queries: it first needs to link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/match/[`MATCH`] the pattern, and only then can it link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/create/[`CREATE`] it (if needed).
+The Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/merge/[`MERGE`] is convenient for data creation, as it allows to avoid duplicate data when an exact clone of the given pattern exists.
+However, it requires the database to run _two_ queries: it first needs to link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/match/[`MATCH`] the pattern, and only then can it link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/create/[`CREATE`] it (if needed).
 
 If you know already that the data you are inserting is new, avoid using `MERGE` and use `CREATE` directly instead -- this practically halves the number of database queries.
 
