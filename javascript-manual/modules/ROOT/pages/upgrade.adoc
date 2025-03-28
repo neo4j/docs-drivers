@@ -147,7 +147,7 @@ Deprecated features are likely to be removed in version 6.
 |Version |Message |Status |Assistant
 
 |5.0
-|link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/result-summary.js~ServerInfo.html[`ResultSummary.ServerInfo`] -- `ResultSummary.server.version` has been removed.
+|link:https://neo4j.com/docs/api/javascript-driver/{javascript-driver-version}/class/lib6/result-summary.js~ServerInfo.html[`ResultSummary.ServerInfo`] -- `ResultSummary.server.version` has been removed.
 Use `ResultSummary.server.agent`, `ResultSummary.server.protocolVersion`, or call the link:https://neo4j.com/docs/operations-manual/current/reference/procedures/#procedure_dbms_components[`dbms.components`] Cypher procedure instead.
 |label:removed[]
 |{check-mark}
@@ -159,38 +159,38 @@ Use `ResultSummary.server.agent`, `ResultSummary.server.protocolVersion`, or cal
 |{cross-mark}
 
 |5.0
-|link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/session.js~Session.html[`Session`] -- Methods `.readTransaction()` and `.writeTransaction()` are deprecated in favor of link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/session.js~Session.html#instance-method-executeRead[`.executeRead()`] and link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/session.js~Session.html#instance-method-executeWrite[`.executeWrite()`].
+|link:https://neo4j.com/docs/api/javascript-driver/{javascript-driver-version}/class/lib6/session.js~Session.html[`Session`] -- Methods `.readTransaction()` and `.writeTransaction()` are deprecated in favor of link:https://neo4j.com/docs/api/javascript-driver/{javascript-driver-version}/class/lib6/session.js~Session.html#instance-method-executeRead[`.executeRead()`] and link:https://neo4j.com/docs/api/javascript-driver/{javascript-driver-version}/class/lib6/session.js~Session.html#instance-method-executeWrite[`.executeWrite()`].
 Through the new methods, the first argument of transaction functions is a `ManagedTransaction` object. It behaves like a regular `Transaction` object, except it does not offer the `.commit()`, `.rollback()`, `.close()`, and `.closed()` methods.
 |label:deprecated[]
 |{check-mark}
 
 |5.0
-|link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/session.js~Session.html[`Session`] -- Method `.lastBookmark()` is deprecated in favor of link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/session.js~Session.html#instance-method-lastBookmarks[`.lastBookmarks()`].
+|link:https://neo4j.com/docs/api/javascript-driver/{javascript-driver-version}/class/lib6/session.js~Session.html[`Session`] -- Method `.lastBookmark()` is deprecated in favor of link:https://neo4j.com/docs/api/javascript-driver/{javascript-driver-version}/class/lib6/session.js~Session.html#instance-method-lastBookmarks[`.lastBookmarks()`].
 |label:deprecated[]
 |{check-mark}
 
 |5.0
-|link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/graph-types.js~Node.html[`Node`], link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/graph-types.js~Relationship.html[`Relationship`] -- Property `.identity` (NumberOrInteger) is deprecated in favor of `.elementId` (String).
+|link:https://neo4j.com/docs/api/javascript-driver/{javascript-driver-version}/class/lib6/graph-types.js~Node.html[`Node`], link:https://neo4j.com/docs/api/javascript-driver/{javascript-driver-version}/class/lib6/graph-types.js~Relationship.html[`Relationship`] -- Property `.identity` (NumberOrInteger) is deprecated in favor of `.elementId` (String).
 |label:deprecated[]
 |{check-mark}
 
 |5.0
-|link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/graph-types.js~Relationship.html[`Relationship`] -- Properties `.start` and `.end` are deprecated in favor of `.startNodeElementId` and `.endNodeElementId`. Old identifiers were `NumberOrInteger`, wereas new ElementIds are `string`.
+|link:https://neo4j.com/docs/api/javascript-driver/{javascript-driver-version}/class/lib6/graph-types.js~Relationship.html[`Relationship`] -- Properties `.start` and `.end` are deprecated in favor of `.startNodeElementId` and `.endNodeElementId`. Old identifiers were `NumberOrInteger`, wereas new ElementIds are `string`.
 |label:deprecated[]
 |{check-mark}
 
 |5.0
-|link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/driver.js~Driver.html[`Driver`] -- The return value of link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/driver.js~Driver.html#instance-method-verifyConnectivity[`.verifyConnectivity()`] is deprecated. The method still exists, but returns void. To retrieve the server info, use link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/driver.js~Driver.html#instance-method-getServerInfo[`.getServerInfo()`].
+|link:https://neo4j.com/docs/api/javascript-driver/{javascript-driver-version}/class/lib6/driver.js~Driver.html[`Driver`] -- The return value of link:https://neo4j.com/docs/api/javascript-driver/{javascript-driver-version}/class/lib6/driver.js~Driver.html#instance-method-verifyConnectivity[`.verifyConnectivity()`] is deprecated. The method still exists, but returns void. To retrieve the server info, use link:https://neo4j.com/docs/api/javascript-driver/{javascript-driver-version}/class/lib6/driver.js~Driver.html#instance-method-getServerInfo[`.getServerInfo()`].
 |label:deprecated[]
 |{check-mark}
 
 |5.7
-|link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/notification.js~Notification.html[`Notification`] -- Property `.severity` is deprecated. Use `.rawSeverityLevel` for the raw value and `.severityLevel` for an enumerated value.
+|link:https://neo4j.com/docs/api/javascript-driver/{javascript-driver-version}/class/lib6/notification.js~Notification.html[`Notification`] -- Property `.severity` is deprecated. Use `.rawSeverityLevel` for the raw value and `.severityLevel` for an enumerated value.
 |label:deprecated[]
 |{check-mark}
 
 |5.27
-|link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/result-summary.js~ResultSummary.html[`ResultSummary`] -- Property `.notifications` is deprecated in favor of `.gqlStatusObjects`. The replacement contains GQL-complaint statuses (link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/notification.js~GqlStatusObject.html[`GqlStatusObject`]), which are a superset of the old notifications.
+|link:https://neo4j.com/docs/api/javascript-driver/{javascript-driver-version}/class/lib6/result-summary.js~ResultSummary.html[`ResultSummary`] -- Property `.notifications` is deprecated in favor of `.gqlStatusObjects`. The replacement contains GQL-complaint statuses (link:https://neo4j.com/docs/api/javascript-driver/{javascript-driver-version}/class/lib6/notification.js~GqlStatusObject.html[`GqlStatusObject`]), which are a superset of the old notifications.
 |label:deprecated[]
 |{check-mark}
 

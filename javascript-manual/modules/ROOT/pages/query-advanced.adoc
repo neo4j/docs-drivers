@@ -7,7 +7,7 @@ This is the most basic and limited form with which to run a Cypher query.
 The driver will not automatically retry implicit transactions, as it does instead for queries run with xref:query-simple.adoc[`Driver.executeQuery()`] and with xref:transactions#managed-transactions[managed transactions].
 Implicit transactions should only be used when the other driver query interfaces do not fit the purpose, or for quick prototyping.
 
-You run an implicit transaction with the method link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/session.js~Session.html#instance-method-run[`Session.run()`], which returns a link:{neo4j-docs-base-uri}/api/api/javascript-driver/current/class/lib6/result.js~Result.html[`Result`] object.
+You run an implicit transaction with the method link:{neo4j-docs-base-uri}/api/javascript-driver/{javascript-driver-version}/class/lib6/session.js~Session.html#instance-method-run[`Session.run()`], which returns a link:{neo4j-docs-base-uri}/api/api/javascript-driver/{javascript-driver-version}/class/lib6/result.js~Result.html[`Result`] object.
 
 [source, javascript]
 ----
@@ -63,7 +63,7 @@ For more information, see link:{neo4j-docs-base-uri}/cypher-manual/current/claus
 
 === Transaction configuration
 
-You can exert further control on implicit transactions by providing an optional third parameter of type link:{neo4j-docs-base-uri}/api/javascript-driver/current/typedef/index.html#static-typedef-TransactionConfig[`TransactionConfig`] to `session.run()`.
+You can exert further control on implicit transactions by providing an optional third parameter of type link:{neo4j-docs-base-uri}/api/javascript-driver/{javascript-driver-version}/typedef/index.html#static-typedef-TransactionConfig[`TransactionConfig`] to `session.run()`.
 The configuration allows to specify a query timeout and to attach metadata to the transaction.
 For more information, see xref:transactions.adoc#_transaction_configuration[Transactions -- Transaction configuration].
 
@@ -186,7 +186,7 @@ neo4j.driver(
 )
 ----
 
-You can find more information about logging in the link:{neo4j-docs-base-uri}/api/javascript-driver/current/function/index.html#static-function-driver[API documentation].
+You can find more information about logging in the link:{neo4j-docs-base-uri}/api/javascript-driver/{javascript-driver-version}/function/index.html#static-function-driver[API documentation].
 
 
 ifndef::backend-pdf[]

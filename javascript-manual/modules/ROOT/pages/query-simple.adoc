@@ -62,7 +62,7 @@ console.log(  // <2>
 
 ----
 
-<1> `records` contains the actual result as a list of link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/record.js~Record.html[`Record`] objects.
+<1> `records` contains the actual result as a list of link:{neo4j-docs-base-uri}/api/javascript-driver/{javascript-driver-version}/class/lib6/record.js~Record.html[`Record`] objects.
 <2> `summary` contains the xref:result-summary.adoc[summary of execution] returned by the server.
 
 
@@ -158,7 +158,7 @@ An exception will be raised if the operation keeps failing after a number of att
 
 == Query configuration
 
-You can supply a link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/driver.js~QueryConfig.html[`QueryConfig`] object as third (optional) parameter to alter the default behavior of `.executeQuery()`.
+You can supply a link:{neo4j-docs-base-uri}/api/javascript-driver/{javascript-driver-version}/class/lib6/driver.js~QueryConfig.html[`QueryConfig`] object as third (optional) parameter to alter the default behavior of `.executeQuery()`.
 
 
 === Database selection
