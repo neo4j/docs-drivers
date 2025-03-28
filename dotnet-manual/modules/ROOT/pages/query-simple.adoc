@@ -51,7 +51,7 @@ var summary = result.Summary;  // <.>
 Console.WriteLine($"The query `{summary.Query.Text}` returned {result.Result.Count()} results in {summary.ResultAvailableAfter.Milliseconds} ms.");
 ----
 
-<.> `result.Result` contains the result as a list of link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IRecord.html[`IRecord`] objects
+<.> `result.Result` contains the result as a list of link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IRecord.html[`IRecord`] objects
 <.> `.Get<type>(key)` extracts the entry named `key` from the returned record and casts it to `type`.
 For more information on types, see xref:data-types.adoc[].
 <.> The xref:result-summary.adoc[summary of execution] returned by the server
@@ -160,10 +160,10 @@ For those rare use cases, see xref:query-advanced#_dynamic_values_in_property_ke
 [#error-handling]
 == Error handling
 
-A query run may fail for a number of reasons, with different link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.Neo4jException.html[exceptions] being raised.
+A query run may fail for a number of reasons, with different link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.Neo4jException.html[exceptions] being raised.
 Some of them are due to Cypher syntax errors, permission issues, or other forms of misconfiguration/misusage.
 
-From version >= 5.28, the default exception format is GQL-compliant. For more information on the structure of the error object, see link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.Preview.GqlErrors.IGqlErrorPreview.html[GqlErrorPreview].
+From version >= 5.28, the default exception format is GQL-compliant. For more information on the structure of the error object, see link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.Preview.GqlErrors.IGqlErrorPreview.html[GqlErrorPreview].
 
 [TIP]
 The driver automatically retries to run a failed query, if the failure is deemed to be transient (for example due to temporary server unavailability).
@@ -174,7 +174,7 @@ An exception will be raised if the operation keeps failing after a number of att
 == Query configuration
 
 You can supply further configuration parameters to alter the default behavior of `.ExecutableQuery()`.
-You do so through the method `.WithConfig()`, which takes a link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.QueryConfig.html[`QueryConfig`] object.
+You do so through the method `.WithConfig()`, which takes a link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.QueryConfig.html[`QueryConfig`] object.
 
 
 [#database-select]
@@ -228,7 +228,7 @@ There is no guarantee that a write query submitted in read mode will be rejected
 You can execute a query through a different user with the config key `authToken`.
 Switching user at the query level is cheaper than creating a new `IDriver` object.
 The query is then run within the security context of the given user (i.e., home database, permissions, etc.).
-See link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.AuthTokens.html[`AuthTokens`] for available native implementations of authentication methods. +
+See link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.AuthTokens.html[`AuthTokens`] for available native implementations of authentication methods. +
 Query-scoped authentication requires a Neo4j server version >= 5.8.
 
 [source, csharp, test-skip]
@@ -352,7 +352,7 @@ try {
 }
 ----
 
-For more information see link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IDriver.ExecutableQuery.html[API documentation -> IDriver.ExecutableQuery()].
+For more information see link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IDriver.ExecutableQuery.html[API documentation -> IDriver.ExecutableQuery()].
 
 
 ifndef::backend-pdf[]

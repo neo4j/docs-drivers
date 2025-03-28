@@ -131,7 +131,7 @@ async Task printFriendships(IAsyncQueryRunner tx) {
 }
 ----
 
-<1> Collect and combine bookmarks from different sessions using `AsyncSession.LastBookmarks`, storing them in a link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.Bookmarks.html[`Bookmarks`] object.
+<1> Collect and combine bookmarks from different sessions using `AsyncSession.LastBookmarks`, storing them in a link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.Bookmarks.html[`Bookmarks`] object.
 <2> Use them to initialize another session with the `.WithBookmarks()` config method.
 
 image:{common-image}/driver-passing-bookmarks.svg[]

@@ -1,7 +1,7 @@
 = Explore the query execution summary
 
 After all results coming from a query have been processed, the server ends the transaction by returning a summary of execution.
-It comes as a link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IResultSummary.html[`IResultSummary`] object, and it contains information among which:
+It comes as a link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IResultSummary.html[`IResultSummary`] object, and it contains information among which:
 
 - xref:_query_counters[**Query counters**] -- What changes the query triggered on the server
 - xref:_query_execution_plan[**Query execution plan**] -- How the database would execute (or executed) the query
@@ -46,7 +46,7 @@ var resultSummary = await session.ExecuteWriteAsync(
 [#query-counters]
 == Query counters
 
-The property `IResultSummary.Counters` contains counters for the operations that a query triggered (as a link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.ICounters.html[`ICounters`] object).
+The property `IResultSummary.Counters` contains counters for the operations that a query triggered (as a link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.ICounters.html[`ICounters`] object).
 
 .Insert some data and display the query counters
 [source, csharp]
@@ -77,7 +77,7 @@ There are two additional boolean properties which act as meta-counters:
 == Query execution plan
 
 If you prefix a query with `EXPLAIN`, the server will return the plan it _would_ use to run the query, but will not actually run it.
-The plan is then available as a link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IPlan.html[`IPlan`] object in the property `IResultSummary.Plan`, and contains the list of link:{neo4j-docs-base-uri}/cypher-manual/current/execution-plans/operators/[Cypher operators] that would be used to retrieve the result set.
+The plan is then available as a link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IPlan.html[`IPlan`] object in the property `IResultSummary.Plan`, and contains the list of link:{neo4j-docs-base-uri}/cypher-manual/current/execution-plans/operators/[Cypher operators] that would be used to retrieve the result set.
 You may use this information to locate potential bottlenecks or room for xref:performance.adoc[performance improvements] (for example through the creation of indexes).
 
 [source, csharp, role=nocollapse]
@@ -110,7 +110,7 @@ Total database accesses: ?
 
 If you instead prefix a query with the keyword `PROFILE`, the server will return the execution plan it has used to run the query, together with profiler statistics.
 This includes the list of operators that were used and additional profiling information about each intermediate step.
-The plan is available as a link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IProfiledPlan.html[`IProfiledPlan`] object in the property `IResultSummary.Profile`.
+The plan is available as a link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IProfiledPlan.html[`IProfiledPlan`] object in the property `IResultSummary.Profile`.
 Notice that the query is also _run_, so the result object also contains any result records.
 
 [source, csharp, role=nocollapse]
@@ -161,7 +161,7 @@ GQL status codes are planned to supersede Neo4j status codes.
 =====
 [.include-with-neo4j-status-code]
 ======
-The property `IResultSummary.Notifications` contains a list of link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.INotification.html[`INotification`] objects.
+The property `IResultSummary.Notifications` contains a list of link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.INotification.html[`INotification`] objects.
 
 [source, csharp, role=nocollapse]
 ----
@@ -241,10 +241,10 @@ GqlStatusObject {
 === Filter notifications
 
 By default, the server analyses each query for all categories and severity of notifications.
-Starting from version 5.7, you can use the configuration method link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.ConfigBuilder.WithNotifications.html#Neo4j_Driver_ConfigBuilder_WithNotifications_System_Nullable_Neo4j_Driver_Severity__Neo4j_Driver_Category___[`.WithNotifications()`] to tweak the severity and/or category/classification of notifications that you are interested into.
+Starting from version 5.7, you can use the configuration method link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.ConfigBuilder.WithNotifications.html#Neo4j_Driver_ConfigBuilder_WithNotifications_System_Nullable_Neo4j_Driver_Severity__Neo4j_Driver_Category___[`.WithNotifications()`] to tweak the severity and/or category/classification of notifications that you are interested into.
 There is a slight performance gain in restricting the amount of notifications the server is allowed to raise.
 
-`.WithNotifications()` takes either a link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.Severity.html[`Severity`] and a list of  link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.Classification.html[`Classification`] (v5.26+), or a link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.Severity.html[`Severity`] and a list of link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.Category.html[`Category`]. The provided classifications/categories are _excluded_ from output. +
+`.WithNotifications()` takes either a link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.Severity.html[`Severity`] and a list of  link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.Classification.html[`Classification`] (v5.26+), or a link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.Severity.html[`Severity`] and a list of link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.Category.html[`Category`]. The provided classifications/categories are _excluded_ from output. +
 The severity filter applies to both Neo4j and GQL notifications. +
 The classification filter acts on both categories and classifications. +
 To disable all notifications, use `.WithNotificationsDisabled()`.
