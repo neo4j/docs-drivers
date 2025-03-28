@@ -314,7 +314,7 @@ with GraphDatabase.driver(URI, auth=AUTH) as driver:
         # further logging/processing
 ----
 
-For more information see link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Driver.execute_query[API documentation -> Driver.execute_query()].
+For more information see link:{neo4j-docs-base-uri}/api/python-driver/{python-driver-version}/api.html#neo4j.Driver.execute_query[API documentation -> Driver.execute_query()].
 
 
 ifndef::backend-pdf[]

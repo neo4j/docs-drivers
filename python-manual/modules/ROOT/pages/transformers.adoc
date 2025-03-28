@@ -5,7 +5,7 @@ This section shows how to work with a query's result so as to extract data in th
 
 == Result as a list
 
-By default, xref:query-simple.adoc[`Driver.execute_query()`] returns an link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.EagerResult[`EagerResult`] object.
+By default, xref:query-simple.adoc[`Driver.execute_query()`] returns an link:{neo4j-docs-base-uri}/api/python-driver/{python-driver-version}/api.html#neo4j.EagerResult[`EagerResult`] object.
 
 [source, python]
 ----
@@ -52,7 +52,7 @@ print(type(pandas_df))  # <class 'pandas.core.frame.DataFrame'>
 
 This transformer accepts two optional arguments:
 
-- `expand` -- If `True`, some data structures in the result will be recursively expanded and flattened. More info in the link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Result.to_df[API documentation].
+- `expand` -- If `True`, some data structures in the result will be recursively expanded and flattened. More info in the link:{neo4j-docs-base-uri}/api/python-driver/{python-driver-version}/api.html#neo4j.Result.to_df[API documentation].
 - `parse_dates` -- If `True`, columns exclusively containing `time.DateTime` objects, `time.Date` objects, or `None`, will be converted to `pandas.Timestamp`.
 
 [NOTE]
@@ -65,7 +65,7 @@ If you need to pass parameters to `to_df`, use `lambda` functions: +
 The driver can transform the result into a collection of graph objects.
 To achieve this, use the `.execute_query()` keyword argument `result_transformer_` and set it to `neo4j.Result.graph`.
 To make the most out of this method, your query should return a graph-like result instead of a single column.
-The graph transformer returns a link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.graph.Graph[`Graph`] object exposing the properties `nodes` and `relationships`, which are set views into xref:data-types#_node[`Node`] and xref:data-types#_relationship[`Relationship`] objects.
+The graph transformer returns a link:https://neo4j.com/docs/api/python-driver/{python-driver-version}/api.html#neo4j.graph.Graph[`Graph`] object exposing the properties `nodes` and `relationships`, which are set views into xref:data-types#_node[`Node`] and xref:data-types#_relationship[`Relationship`] objects.
 
 You can use the graph format for further processing or to visualize the query result.
 An example implementation that uses the `pyvis` library to draw the graph is below.
@@ -149,7 +149,7 @@ image::{common-image}/pyvis-example.png[]
 
 == Custom transformers
 
-For more advanded scenarios, you can use the parameter `result_transformer_` to provide a custom function that further manipulates the link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Result[`Result`] object resulting from your query.
+For more advanded scenarios, you can use the parameter `result_transformer_` to provide a custom function that further manipulates the link:{neo4j-docs-base-uri}/api/python-driver/{python-driver-version}/api.html#neo4j.Result[`Result`] object resulting from your query.
 A transformer takes a `Result` object and can output any data structure. The transformer's return value is in turn returned by `.execute_query()`.
 
 Inside a transformer function you can use xref:transactions.adoc[any of the `Result` methods].

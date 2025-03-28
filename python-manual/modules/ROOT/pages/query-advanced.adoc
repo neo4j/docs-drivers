@@ -7,7 +7,7 @@ This is the most basic and limited form with which to run a Cypher query.
 The driver will not automatically retry implicit transactions, as it does instead for queries run with xref:query-simple.adoc[`execute_query()`] and with xref:transactions#managed-transactions[managed transactions].
 Implicit transactions should only be used when the other driver query interfaces do not fit the purpose, or for quick prototyping.
 
-You run an implicit transaction with the method link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Session.run[`Session.run()`].
+You run an implicit transaction with the method link:{neo4j-docs-base-uri}/api/python-driver/{python-driver-version}/api.html#neo4j.Session.run[`Session.run()`].
 It returns a `Result` object that needs to be xref:transactions#process-result[processed accordingly].
 
 [source, python]
@@ -54,7 +54,7 @@ For more information, see link:{neo4j-docs-base-uri}/cypher-manual/current/claus
 
 === Transaction configuration
 
-The link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Query[`Query`] object allows to specify a query timeout and to attach metadata to the transaction.
+The link:{neo4j-docs-base-uri}/api/python-driver/{python-driver-version}/api.html#neo4j.Query[`Query`] object allows to specify a query timeout and to attach metadata to the transaction.
 The metadata is visible in the server logs (as described for the xref:transactions#unit_of_work-decorator[`unit_of_work`] decorator).
 
 [source, python]
@@ -120,7 +120,7 @@ See link:https://neo4j.com/docs/apoc/current/installation/#docker[APOC -> Instal
 == Logging
 
 The driver logs messages through the native `logging` library to a logger named `neo4j`.
-To redirect log messages to standard output, use the link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.debug.watch[watch] function:
+To redirect log messages to standard output, use the link:{neo4j-docs-base-uri}/api/python-driver/{python-driver-version}/api.html#neo4j.debug.watch[watch] function:
 
 [source, python]
 ----

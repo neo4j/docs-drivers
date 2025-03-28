@@ -211,7 +211,7 @@ With lazy loading, the client can also stop requesting records after some condit
 
 [TIP]
 ====
-The driver's link:https://neo4j.com/docs/api/python-driver/current/api.html#fetch-size-ref[fetch size] affects the behavior of lazy loading.
+The driver's link:https://neo4j.com/docs/api/python-driver/{python-driver-version}/api.html#fetch-size-ref[fetch size] affects the behavior of lazy loading.
 It instructs the server to stream an amount of records equal to the fetch size, and then wait until the client has caught up before retrieving and sending more.
 
 The fetch size allows to bound memory consumption on the client side.

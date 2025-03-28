@@ -195,7 +195,7 @@ Deprecated features are likely to be removed in version 6.
 |{cross-mark}
 
 |5.0
-|link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.Driver[`Driver`] -- The config options `update_routing_table_timeout` and `session_connection_timeout` have been removed. Regular keep-alives are sufficient to avoid the driver getting stuck. Further liveness check config options are available but normally not needed (link:https://neo4j.com/docs/api/python-driver/current/api.html#keep-alive-ref[`keep_alive`], link:https://neo4j.com/docs/api/python-driver/current/api.html#liveness-check-timeout[`liveness_check_timeout`]).
+|link:https://neo4j.com/docs/api/python-driver/{python-driver-version}/api.html#neo4j.Driver[`Driver`] -- The config options `update_routing_table_timeout` and `session_connection_timeout` have been removed. Regular keep-alives are sufficient to avoid the driver getting stuck. Further liveness check config options are available but normally not needed (link:https://neo4j.com/docs/api/python-driver/{python-driver-version}/api.html#keep-alive-ref[`keep_alive`], link:https://neo4j.com/docs/api/python-driver/{python-driver-version}/api.html#liveness-check-timeout[`liveness_check_timeout`]).
 |label:removed[]
 |{check-mark}
 
@@ -205,33 +205,33 @@ Deprecated features are likely to be removed in version 6.
 |{check-mark}
 
 |5.0
-|link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.ServerInfo[`ServerInfo`] -- `ResultSummary.server.version_info` has been removed.
+|link:https://neo4j.com/docs/api/python-driver/{python-driver-version}/api.html#neo4j.ServerInfo[`ServerInfo`] -- `ResultSummary.server.version_info` has been removed.
 Use `ResultSummary.server.agent`, `ResultSummary.server.protocol_version`, or call the link:https://neo4j.com/docs/operations-manual/current/reference/procedures/#procedure_dbms_components[`dbms.components`] Cypher procedure instead.
 |label:removed[]
 |{check-mark}
 
 |5.0
-|link:https://neo4j.com/docs/api/python-driver/current/types/temporal.html#neo4j.time.Duration[`Duration`] -- The constructor does not accept `subseconds` anymore. Use `milliseconds`, `microseconds`, or `nanoseconds` instead.
+|link:https://neo4j.com/docs/api/python-driver/{python-driver-version}/types/temporal.html#neo4j.time.Duration[`Duration`] -- The constructor does not accept `subseconds` anymore. Use `milliseconds`, `microseconds`, or `nanoseconds` instead.
 |label:removed[]
 |{check-mark}
 
 |5.0
-|link:https://neo4j.com/docs/api/python-driver/current/types/temporal.html#neo4j.time.Duration[`Duration`] -- The property `subseconds` has been removed. Use `nanoseconds` instead.
+|link:https://neo4j.com/docs/api/python-driver/{python-driver-version}/types/temporal.html#neo4j.time.Duration[`Duration`] -- The property `subseconds` has been removed. Use `nanoseconds` instead.
 |label:removed[]
 |{check-mark}
 
 |5.0
-|link:https://neo4j.com/docs/api/python-driver/current/types/temporal.html#neo4j.time.Duration[`Duration`] -- The property `hours_minutes_seconds` has been removed. Use `hours_minutes_seconds_nanoseconds` instead.
+|link:https://neo4j.com/docs/api/python-driver/{python-driver-version}/types/temporal.html#neo4j.time.Duration[`Duration`] -- The property `hours_minutes_seconds` has been removed. Use `hours_minutes_seconds_nanoseconds` instead.
 |label:removed[]
 |{check-mark}
 
 |5.0
-|link:https://neo4j.com/docs/api/python-driver/current/types/temporal.html#neo4j.time.DateTime[`DateTime`] -- The property `hour_minute_second` has been removed. Use `hour_minute_second_nanosecond` instead.
+|link:https://neo4j.com/docs/api/python-driver/{python-driver-version}/types/temporal.html#neo4j.time.DateTime[`DateTime`] -- The property `hour_minute_second` has been removed. Use `hour_minute_second_nanosecond` instead.
 |label:removed[]
 |{check-mark}
 
 |5.0
-|link:https://neo4j.com/docs/api/python-driver/current/types/temporal.html#neo4j.time.DateTime[`DateTime`] -- The property `second` returns an int instead of a float. Use `nanosecond` to get the sub-second information.
+|link:https://neo4j.com/docs/api/python-driver/{python-driver-version}/types/temporal.html#neo4j.time.DateTime[`DateTime`] -- The property `second` returns an int instead of a float. Use `nanosecond` to get the sub-second information.
 |label:removed[Changed]
 |{cross-mark}
 
@@ -244,32 +244,32 @@ Multiplication and division allow for floats but will always result in integer v
 |{cross-mark}
 
 |5.0
-|link:https://neo4j.com/docs/api/python-driver/current/types/temporal.html#neo4j.time.Time[`Time`] -- The constructor does not accept floats for `second` anymore. Use `nanosecond` instead.
+|link:https://neo4j.com/docs/api/python-driver/{python-driver-version}/types/temporal.html#neo4j.time.Time[`Time`] -- The constructor does not accept floats for `second` anymore. Use `nanosecond` instead.
 |label:removed[]
 |{check-mark}
 
 |5.0
-|link:https://neo4j.com/docs/api/python-driver/current/types/temporal.html#neo4j.time.Time[`Time`] -- The property `second` returns an int instead of a float. Use `nanosecond` to get the sub-second information.
+|link:https://neo4j.com/docs/api/python-driver/{python-driver-version}/types/temporal.html#neo4j.time.Time[`Time`] -- The property `second` returns an int instead of a float. Use `nanosecond` to get the sub-second information.
 |label:removed[Changed]
 |{cross-mark}
 
 |5.0
-|link:https://neo4j.com/docs/api/python-driver/current/types/temporal.html#neo4j.time.Time[`Time`] -- The `ticks` property's type changed from float to int. It's now nanoseconds since midnight instead of seconds.
+|link:https://neo4j.com/docs/api/python-driver/{python-driver-version}/types/temporal.html#neo4j.time.Time[`Time`] -- The `ticks` property's type changed from float to int. It's now nanoseconds since midnight instead of seconds.
 |label:removed[Changed]
 |{cross-mark}
 
 |5.0
-|link:https://neo4j.com/docs/api/python-driver/current/types/temporal.html#neo4j.time.Time[`Time`] -- The property `ticks_ns` has been renamed to `ticks`.
+|link:https://neo4j.com/docs/api/python-driver/{python-driver-version}/types/temporal.html#neo4j.time.Time[`Time`] -- The property `ticks_ns` has been renamed to `ticks`.
 |label:removed[]
 |{check-mark}
 
 |5.0
-|link:https://neo4j.com/docs/api/python-driver/current/types/temporal.html#neo4j.time.Time[`Time`] -- The property `hour_minute_second` has been removed. Use `hour_minute_second_nanosecond` instead.
+|link:https://neo4j.com/docs/api/python-driver/{python-driver-version}/types/temporal.html#neo4j.time.Time[`Time`] -- The property `hour_minute_second` has been removed. Use `hour_minute_second_nanosecond` instead.
 |label:removed[]
 |{check-mark}
 
 |5.0
-|link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.Session[`Session`] -- Methods `.read_transaction()` and `.write_transaction()` are deprecated in favor of link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.Session.execute_read[`.execute_read()`] and link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.Session.execute_write[`.execute_write()`].
+|link:https://neo4j.com/docs/api/python-driver/{python-driver-version}/api.html#neo4j.Session[`Session`] -- Methods `.read_transaction()` and `.write_transaction()` are deprecated in favor of link:https://neo4j.com/docs/api/python-driver/{python-driver-version}/api.html#neo4j.Session.execute_read[`.execute_read()`] and link:https://neo4j.com/docs/api/python-driver/{python-driver-version}/api.html#neo4j.Session.execute_write[`.execute_write()`].
 Through the new methods, the first argument of transaction functions is a `ManagedTransaction` object. It behaves like a regular `Transaction` object, except it does not offer the `.commit()`, `.rollback()`, `.close()`, and `.closed()` methods.
 |label:deprecated[]
 |{check-mark}
@@ -280,8 +280,8 @@ Through the new methods, the first argument of transaction functions is a `Manag
 |{cross-mark}
 
 |5.0
-|link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.graph.Node[`Node`], link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.graph.Relationship[`Relationship`] -- Property `id` (int) is deprecated in favor of `element_id` (str).
-This also affects link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.graph.Graph[`Graph`] objects, as indexing `graph.nodes[...]` and `graph.relationships[...]` with integers is deprecated in favor of indexing them with strings.
+|link:https://neo4j.com/docs/api/python-driver/{python-driver-version}/api.html#neo4j.graph.Node[`Node`], link:https://neo4j.com/docs/api/python-driver/{python-driver-version}/api.html#neo4j.graph.Relationship[`Relationship`] -- Property `id` (int) is deprecated in favor of `element_id` (str).
+This also affects link:https://neo4j.com/docs/api/python-driver/{python-driver-version}/api.html#neo4j.graph.Graph[`Graph`] objects, as indexing `graph.nodes[...]` and `graph.relationships[...]` with integers is deprecated in favor of indexing them with strings.
 |label:deprecated[]
 |{check-mark} property +
 {cross-mark} indexing
@@ -303,17 +303,17 @@ Call `driver.close()` explicitly or create the driver via a `with` statement.
 |{check-mark}
 
 |5.0
-|link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.Driver[`Driver`] -- The config option `trust` is deprecated. New options link:https://neo4j.com/docs/api/python-driver/current/api.html#trusted-certificates-ref[`trusted_certificates`] and link:https://neo4j.com/docs/api/python-driver/current/api.html#ssl-context-ref[`ssl_context`] are available.
+|link:https://neo4j.com/docs/api/python-driver/{python-driver-version}/api.html#neo4j.Driver[`Driver`] -- The config option `trust` is deprecated. New options link:https://neo4j.com/docs/api/python-driver/{python-driver-version}/api.html#trusted-certificates-ref[`trusted_certificates`] and link:https://neo4j.com/docs/api/python-driver/{python-driver-version}/api.html#ssl-context-ref[`ssl_context`] are available.
 |label:deprecated[]
 |{check-mark}
 
 |5.0
-|link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.Session[`Session`] -- The method `.last_bookmark()` is deprecated in favor of link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.Session.last_bookmarks[`.last_bookmarks()`]. The logic is similar, but the new method returns `neo4j.Bookmarks` instead of `str`.
+|link:https://neo4j.com/docs/api/python-driver/{python-driver-version}/api.html#neo4j.Session[`Session`] -- The method `.last_bookmark()` is deprecated in favor of link:https://neo4j.com/docs/api/python-driver/{python-driver-version}/api.html#neo4j.Session.last_bookmarks[`.last_bookmarks()`]. The logic is similar, but the new method returns `neo4j.Bookmarks` instead of `str`.
 |label:deprecated[]
 |{check-mark}
 
 |5.0
-|`neo4j.Bookmark` is deprecated in favor of link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.Bookmarks[`neo4j.Bookmarks`].
+|`neo4j.Bookmark` is deprecated in favor of link:https://neo4j.com/docs/api/python-driver/{python-driver-version}/api.html#neo4j.Bookmarks[`neo4j.Bookmarks`].
 |label:deprecated[]
 |{check-mark}
 
@@ -333,7 +333,7 @@ Call `driver.close()` explicitly or create the driver via a `with` statement.
 |{check-mark}
 
 |5.22
-|Class `SummaryNotificationPosition` is deprecated in favor of link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.SummaryInputPosition[`SummaryInputPosition`].
+|Class `SummaryNotificationPosition` is deprecated in favor of link:https://neo4j.com/docs/api/python-driver/{python-driver-version}/api.html#neo4j.SummaryInputPosition[`SummaryInputPosition`].
 |label:deprecated[]
 |{check-mark}
 
