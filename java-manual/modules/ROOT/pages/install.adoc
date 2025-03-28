@@ -16,7 +16,7 @@ If you already have a Maven project, you may add the driver as a dependency in y
 <dependency>
     <groupId>org.neo4j.driver</groupId>
     <artifactId>neo4j-java-driver</artifactId>
-    <version>{java-driver-version}</version>
+    <version>{java-driver-version-minor}</version>
 </dependency>
 ----
 
