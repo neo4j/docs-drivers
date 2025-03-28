@@ -468,7 +468,7 @@ For full documentation, see link:{neo4j-docs-base-uri}/api/javascript-driver/{ja
 == Errors
 
 All errors raised by the driver are of type link:{neo4j-docs-base-uri}/api/javascript-driver/{javascript-driver-version}/class/lib6/error.js~Neo4jError.html[`Neo4jError`].
-For a list of errors the server can return, see the link:{neo4j-docs-base-uri}/status-codes/current/[Status code] page.
+For a list of errors the server can return, see the link:{neo4j-docs-base-uri}/status-codes/5/[Status code] page.
 
 Some server errors are marked as safe to retry without need to alter the original request.
 Examples of such errors are deadlocks, memory issues, or connectivity issues.
