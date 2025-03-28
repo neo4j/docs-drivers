@@ -13,7 +13,7 @@ These are called _managed transactions_, and you can think of them as a way of u
 Before running a transaction, you need to obtain a _session_.
 Sessions act as concrete query channels between the driver and the server, and ensure <<causal consistency>> is enforced.
 
-Sessions are created with the method link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/driver.js~Driver.html#instance-method-session[`Driver.session()`].
+Sessions are created with the method link:{neo4j-docs-base-uri}/api/javascript-driver/{javascript-driver-version}/class/lib6/driver.js~Driver.html#instance-method-session[`Driver.session()`].
 It takes a single (optional) object parameter, with the property `database` allowing to specify the xref:_database_selection[target database].
 For further parameters, see xref:_session_configuration[Session configuration].
 
@@ -35,7 +35,7 @@ A transaction can contain any number of queries.
 As Neo4j is <<ACID>> compliant, *queries within a transaction will either be executed as a whole or not at all*: you cannot get a part of the transaction succeeding and another failing.
 Use transactions to group together related queries which work together to achieve a single _logical_ database operation.
 
-A managed transaction is created with the methods link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/session.js~Session.html#instance-method-executeRead[`Session.executeRead()`] and link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/session.js~Session.html#instance-method-executeWrite[`Session.executeWrite()`], depending on whether you want to _retrieve_ data from the database or _alter_ it.
+A managed transaction is created with the methods link:{neo4j-docs-base-uri}/api/javascript-driver/{javascript-driver-version}/class/lib6/session.js~Session.html#instance-method-executeRead[`Session.executeRead()`] and link:{neo4j-docs-base-uri}/api/javascript-driver/{javascript-driver-version}/class/lib6/session.js~Session.html#instance-method-executeWrite[`Session.executeWrite()`], depending on whether you want to _retrieve_ data from the database or _alter_ it.
 Both methods take a <<transaction_function>> callback, which is responsible of actually carrying out the queries and processing the result.
 
 .Retrieve people whose name starts with `Al`.
@@ -64,7 +64,7 @@ try {
 
 <1> Create a session. A single session can be the container for multiple queries. Remember to close it when done.
 <2> The `.executeRead()` (or `.executeWrite()`) method is the entry point into a transaction.
-<3> Use the method link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/transaction.js~Transaction.html#instance-method-run[`Transaction.run()`] to run queries, providing a Cypher query and an object of query parameters. Each query run returns a link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/result.js~Result.html[`Result`] object.
+<3> Use the method link:{neo4j-docs-base-uri}/api/javascript-driver/{javascript-driver-version}/class/lib6/transaction.js~Transaction.html#instance-method-run[`Transaction.run()`] to run queries, providing a Cypher query and an object of query parameters. Each query run returns a link:{neo4j-docs-base-uri}/api/javascript-driver/{javascript-driver-version}/class/lib6/result.js~Result.html[`Result`] object.
 <4> Process the result records and query summary.
 
 *Do not hardcode or concatenate parameters directly into the query*.
@@ -171,8 +171,8 @@ To maintain multiple concurrent transactions, see xref:query-async.adoc[how to r
 [#explicit-transactions]
 == Run an explicit transaction
 
-You can achieve full control over transactions by manually beginning one with the method link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/session.js~Session.html#instance-method-beginTransaction[`Session.beginTransaction()`].
-You run queries inside an explicit transaction with the method link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/transaction.js~Transaction.html#instance-method-run[`Transaction.run()`], as you do in transaction functions.
+You can achieve full control over transactions by manually beginning one with the method link:{neo4j-docs-base-uri}/api/javascript-driver/{javascript-driver-version}/class/lib6/session.js~Session.html#instance-method-beginTransaction[`Session.beginTransaction()`].
+You run queries inside an explicit transaction with the method link:{neo4j-docs-base-uri}/api/javascript-driver/{javascript-driver-version}/class/lib6/transaction.js~Transaction.html#instance-method-run[`Transaction.run()`], as you do in transaction functions.
 
 [source, javascript]
 ----
@@ -187,7 +187,7 @@ await transaction.commit()
 await session.close()
 ----
 
-An explicit transaction can be committed with link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/transaction.js~Transaction.html#instance-method-commit[`Transaction.commit()`] or rolled back with link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/transaction.js~Transaction.html#instance-method-rollback[`Transaction.rollback()`].
+An explicit transaction can be committed with link:{neo4j-docs-base-uri}/api/javascript-driver/{javascript-driver-version}/class/lib6/transaction.js~Transaction.html#instance-method-commit[`Transaction.commit()`] or rolled back with link:{neo4j-docs-base-uri}/api/javascript-driver/{javascript-driver-version}/class/lib6/transaction.js~Transaction.html#instance-method-rollback[`Transaction.rollback()`].
 If no explicit action is taken, the driver will automatically roll back the transaction at the end of its lifetime.
 
 Explicit transactions are most useful for applications that need to distribute Cypher execution across multiple functions for the same transaction, or for applications that need to run multiple queries within a single transaction but without the automatic retries provided by managed transactions.
@@ -282,14 +282,14 @@ async function requestInspection(customerId, otherBankId, amount, error) {
 
 == Session configuration
 
-When creating a session, you can provide an optional parameter of type  link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/driver.js~SessionConfig.html[`SessionConfig`] to specify session configuration values.
+When creating a session, you can provide an optional parameter of type  link:{neo4j-docs-base-uri}/api/javascript-driver/{javascript-driver-version}/class/lib6/driver.js~SessionConfig.html[`SessionConfig`] to specify session configuration values.
 
 
 === Database selection
 
 You should *always specify the database explicitly* with the `database` parameter, even on single-database instances.
 This allows the driver to work more efficiently, as it saves a network round-trip to the server to resolve the home database.
-If no database is given, the link:{neo4j-docs-base-uri}/operations-manual/current/database-administration/#manage-databases-default[user's home database] set in the Neo4j instance settings is used.
+If no database is given, the link:{neo4j-docs-base-uri}/operations-manual/5/database-administration/#manage-databases-default[user's home database] set in the Neo4j instance settings is used.
 
 [source, javascript]
 ----
@@ -299,7 +299,7 @@ const session = driver.session({
 ----
 
 [TIP]
-Specifying the database through the configuration method is preferred over the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/use/[`USE`] Cypher clause.
+Specifying the database through the configuration method is preferred over the link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/use/[`USE`] Cypher clause.
 If the server runs on a cluster, queries with `USE` require server-side routing to be enabled.
 Queries may also take longer to execute as they may not reach the right cluster member at the first attempt, and need to be routed to one containing the requested database.
 
@@ -347,7 +347,7 @@ const session = driver.session({
 ----
 
 The parameter `impersonatedUser` provides a similar functionality, and is available in driver/server versions >= 4.4.
-The difference is that you don't need to know a user's password to impersonate them, but the user under which the `Driver` was created needs to have the link:{neo4j-docs-base-uri}/operations-manual/current/authentication-authorization/dbms-administration/#access-control-dbms-administration-impersonation[appropriate permissions].
+The difference is that you don't need to know a user's password to impersonate them, but the user under which the `Driver` was created needs to have the link:{neo4j-docs-base-uri}/operations-manual/5/authentication-authorization/dbms-administration/#access-control-dbms-administration-impersonation[appropriate permissions].
 
 [source, javascript]
 ----
@@ -360,7 +360,7 @@ const session = driver.session({
 
 == Transaction configuration
 
-You can exert further control on transactions by providing a second optional parameter of type link:{neo4j-docs-base-uri}/api/javascript-driver/current/typedef/index.html#static-typedef-TransactionConfig[`TransactionConfig`] to `.executeRead()`, `.executeWrite()`, and `.beginTransaction()`.
+You can exert further control on transactions by providing a second optional parameter of type link:{neo4j-docs-base-uri}/api/javascript-driver/{javascript-driver-version}/typedef/index.html#static-typedef-TransactionConfig[`TransactionConfig`] to `.executeRead()`, `.executeWrite()`, and `.beginTransaction()`.
 You can specify:
 
 - A transaction timeout (in milliseconds).

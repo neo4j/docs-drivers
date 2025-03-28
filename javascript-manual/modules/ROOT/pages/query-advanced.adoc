@@ -7,7 +7,7 @@ This is the most basic and limited form with which to run a Cypher query.
 The driver will not automatically retry implicit transactions, as it does instead for queries run with xref:query-simple.adoc[`Driver.executeQuery()`] and with xref:transactions#managed-transactions[managed transactions].
 Implicit transactions should only be used when the other driver query interfaces do not fit the purpose, or for quick prototyping.
 
-You run an implicit transaction with the method link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/session.js~Session.html#instance-method-run[`Session.run()`], which returns a link:{neo4j-docs-base-uri}/api/api/javascript-driver/current/class/lib6/result.js~Result.html[`Result`] object.
+You run an implicit transaction with the method link:{neo4j-docs-base-uri}/api/javascript-driver/{javascript-driver-version}/class/lib6/session.js~Session.html#instance-method-run[`Session.run()`], which returns a link:{neo4j-docs-base-uri}/api/api/javascript-driver/{javascript-driver-version}/class/lib6/result.js~Result.html[`Result`] object.
 
 [source, javascript]
 ----
@@ -33,7 +33,7 @@ You can run an implicit transaction with a xref:query-async.adoc#_reactive_api[r
 
 === Import CSV files
 
-The most common use case for using `Session.run()` is for importing large CSV files into the database with the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/load-csv[`LOAD CSV`] Cypher clause, and preventing timeout errors due to the size of the transaction.
+The most common use case for using `Session.run()` is for importing large CSV files into the database with the link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/load-csv[`LOAD CSV`] Cypher clause, and preventing timeout errors due to the size of the transaction.
 
 .Import CSV data into a Neo4j database
 [source, javascript]
@@ -58,12 +58,12 @@ While `LOAD CSV` can be a convenience, there is nothing _wrong_ in deferring the
 In fact, moving the parsing logic to the application can give you more control over the importing process.
 For efficient bulk data insertion, see xref:performance.adoc#_batch_data_creation[Performance -> Batch data creation].
 
-For more information, see link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/load-csv/[Cypher -> Clauses -> Load CSV].
+For more information, see link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/load-csv/[Cypher -> Clauses -> Load CSV].
 
 
 === Transaction configuration
 
-You can exert further control on implicit transactions by providing an optional third parameter of type link:{neo4j-docs-base-uri}/api/javascript-driver/current/typedef/index.html#static-typedef-TransactionConfig[`TransactionConfig`] to `session.run()`.
+You can exert further control on implicit transactions by providing an optional third parameter of type link:{neo4j-docs-base-uri}/api/javascript-driver/{javascript-driver-version}/typedef/index.html#static-typedef-TransactionConfig[`TransactionConfig`] to `session.run()`.
 The configuration allows to specify a query timeout and to attach metadata to the transaction.
 For more information, see xref:transactions.adoc#_transaction_configuration[Transactions -- Transaction configuration].
 
@@ -107,7 +107,7 @@ let result = await driver.executeQuery(
 console.log(`Executed query: ${result.summary.query.text}`)
 ----
 
-Another workaround, which avoids string concatenation, is using the <<APOC>> procedure link:{neo4j-docs-base-uri}/apoc/current/overview/apoc.merge/apoc.merge.node/[`apoc.merge.node`].
+Another workaround, which avoids string concatenation, is using the <<APOC>> procedure link:{neo4j-docs-base-uri}/apoc/5/overview/apoc.merge/apoc.merge.node/[`apoc.merge.node`].
 It supports dynamic labels and property keys, but only for node merging.
 
 .Using `apoc.merge.node` to create a node with dynamic labels/property keys
@@ -124,7 +124,7 @@ let result = await driver.executeQuery(
 
 [NOTE]
 If you are running Neo4j in Docker, APOC needs to be enabled when starting the container.
-See link:https://neo4j.com/docs/apoc/current/installation/#docker[APOC -> Installation -> Docker].
+See link:https://neo4j.com/docs/apoc/5/installation/#docker[APOC -> Installation -> Docker].
 
 
 == Logging
@@ -186,7 +186,7 @@ neo4j.driver(
 )
 ----
 
-You can find more information about logging in the link:{neo4j-docs-base-uri}/api/javascript-driver/current/function/index.html#static-function-driver[API documentation].
+You can find more information about logging in the link:{neo4j-docs-base-uri}/api/javascript-driver/{javascript-driver-version}/function/index.html#static-function-driver[API documentation].
 
 
 ifndef::backend-pdf[]
