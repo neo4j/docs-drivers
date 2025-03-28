@@ -17,7 +17,7 @@ The tables in this section show the mapping between Cypher data types and Python
 | `ByteArray`   | `bytearray`
 |===
 
-For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#core-data-types[API documentation -- Core data types].
+For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/{python-driver-version}/api.html#core-data-types[API documentation -- Core data types].
 
 
 == Temporal types
@@ -87,7 +87,7 @@ with GraphDatabase.driver(URI, auth=AUTH) as driver:
     print(py_out_datetime)  # 1999-11-23 07:47:00.000004-05:00
 ----
 
-For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#temporal-data-types[API documentation -- Temporal data types].
+For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/{python-driver-version}/api.html#temporal-data-types[API documentation -- Temporal data types].
 
 
 === `Date`
@@ -102,7 +102,7 @@ d = Date(year=2021, month=11, day=2)
 print(d)  # '2021-11-02'
 ----
 
-For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/types/temporal.html#date[API documentation -- Temporal data types -- Date].
+For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/{python-driver-version}/types/temporal.html#date[API documentation -- Temporal data types -- Date].
 
 
 === `Time`
@@ -118,7 +118,7 @@ t = Time(hour=7, minute=47, nanosecond=4123, tzinfo=pytz.FixedOffset(-240))
 print(t)  # '07:47:00.000004123-04:00'
 ----
 
-For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/types/temporal.html#time[API documentation -- Temporal data types -- Time].
+For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/{python-driver-version}/types/temporal.html#time[API documentation -- Temporal data types -- Time].
 
 
 === `LocalTime`
@@ -133,7 +133,7 @@ t = Time(hour=7, minute=47, nanosecond=4123)
 print(t)  # '07:47:00.000004123'
 ----
 
-For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/types/temporal.html#time[API documentation -- Temporal data types -- Time].
+For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/{python-driver-version}/types/temporal.html#time[API documentation -- Temporal data types -- Time].
 
 
 === `DateTime`
@@ -150,7 +150,7 @@ dt = pytz.timezone("US/Eastern").localize(dt)  # time zone localization (optiona
 print(dt)  # '2021-11-02T07:47:00.000004123-04:00'
 ----
 
-For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/types/temporal.html#datetime[API documentation -- Temporal data types -- DateTime].
+For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/{python-driver-version}/types/temporal.html#datetime[API documentation -- Temporal data types -- DateTime].
 
 
 === `LocalDateTime`
@@ -165,7 +165,7 @@ dt = DateTime(year=2021, month=11, day=2, hour=7, minute=47, nanosecond=4123)
 print(dt)  # '2021-11-02T07:47:00.000004123'
 ----
 
-For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/types/temporal.html#datetime[API documentation -- Temporal data types -- DateTime].
+For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/{python-driver-version}/types/temporal.html#datetime[API documentation -- Temporal data types -- DateTime].
 
 
 === `Duration`
@@ -182,7 +182,7 @@ duration = Duration(years=1, days=2, seconds=3, nanoseconds=4)
 print(duration)  # 'P1Y2DT3.000000004S'
 ----
 
-For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/types/temporal.html#duration[API documentation -- Temporal data types -- Duration].
+For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/{python-driver-version}/types/temporal.html#duration[API documentation -- Temporal data types -- Duration].
 
 
 == Spatial types
@@ -200,7 +200,7 @@ You can think of it as a unique identifier for each spatial type.
 | `POINT (WGS-84)`    | `neo4j.spatial.WGS84Point`
 |===
 
-For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/types/spatial.html[API documentation -- Spatial types].
+For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/{python-driver-version}/types/spatial.html[API documentation -- Spatial types].
 
 === `CartesianPoint`
 
@@ -222,7 +222,7 @@ print(point.x, point.y, point.z, point.srid)
 # 1.23 4.56 7.8 9157
 ----
 
-For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/types/spatial.html#cartesianpoint[API documentation -- Spatial types -- CartesianPoint].
+For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/{python-driver-version}/types/spatial.html#cartesianpoint[API documentation -- Spatial types -- CartesianPoint].
 
 === `WGS84Point`
 
@@ -246,7 +246,7 @@ print(point.longitude, point.latitude, point.height, point.srid)
 # 1.23 4.56 7.89 4979
 ----
 
-For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/types/spatial.html#wgs84point[API documentation -- Spatial types -- WSG84Point].
+For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/{python-driver-version}/types/spatial.html#wgs84point[API documentation -- Spatial types -- WSG84Point].
 
 
 == Graph types
@@ -262,7 +262,7 @@ The section xref:transformers#_transform_to_graph[Manipulate query results -- Tr
 | `PATH`         | `neo4j.graph.Path`
 |===
 
-For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#graph-data-types[API documentation -- Graph types].
+For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/{python-driver-version}/api.html#graph-data-types[API documentation -- Graph types].
 
 
 === `Node`
@@ -296,7 +296,7 @@ with GraphDatabase.driver(URI, auth=AUTH) as driver:
 # Properties: dict_items([('name', 'Alice')])
 ----
 
-For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.graph.Node[API documentation -- Graph types -- Node].
+For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/{python-driver-version}/api.html#neo4j.graph.Node[API documentation -- Graph types -- Node].
 
 
 === `Relationship`
@@ -338,7 +338,7 @@ with GraphDatabase.driver(URI, auth=AUTH) as driver:
 # All properties: dict_items([('since', neo4j.time.Date(2022, 11, 7)), ('status', 'BFF')])
 ----
 
-For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.graph.Relationship[API documentation -- Graph types -- Relationship].
+For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/{python-driver-version}/api.html#neo4j.graph.Relationship[API documentation -- Graph types -- Relationship].
 
 
 === `Path`
@@ -387,7 +387,7 @@ with GraphDatabase.driver(URI, auth=AUTH) as driver:
 
 ----
 
-For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.graph.Path[API documentation -- Graph types -- Path].
+For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/{python-driver-version}/api.html#neo4j.graph.Path[API documentation -- Graph types -- Path].
 
 
 == Extended types
@@ -424,7 +424,7 @@ with neo4j.GraphDatabase.driver(URI, auth=AUTH) as driver:
 == Exceptions
 
 The driver can raise a number of different exceptions.
-A full list is available in the link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#errors[API documentation].
+A full list is available in the link:{neo4j-docs-base-uri}/api/python-driver/{python-driver-version}/api.html#errors[API documentation].
 For a list of errors the server can return, see the link:{neo4j-docs-base-uri}/status-codes/{page-version}[Status code] page.
 
 .Root exception types

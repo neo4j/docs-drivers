@@ -13,7 +13,7 @@ These are called _managed transactions_, and you can think of them as a way of u
 Before running a transaction, you need to obtain a _session_.
 Sessions act as concrete query channels between the driver and the server, and ensure <<causal consistency>> is enforced.
 
-Sessions are created with the method link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#session[`Driver.session()`], with the keyword argument `database` allowing to specify the xref:_database_selection[target database].
+Sessions are created with the method link:{neo4j-docs-base-uri}/api/python-driver/{python-driver-version}/api.html#session[`Driver.session()`], with the keyword argument `database` allowing to specify the xref:_database_selection[target database].
 For further parameters, see xref:_session_configuration[Session configuration].
 
 [source, python]
@@ -35,7 +35,7 @@ A transaction can contain any number of queries.
 As Neo4j is <<ACID>> compliant, *queries within a transaction will either be executed as a whole or not at all*: you cannot get a part of the transaction succeeding and another failing.
 Use transactions to group together related queries which work together to achieve a single _logical_ database operation.
 
-A managed transaction is created with the methods link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Session.execute_read[`Session.execute_read()`] and link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Session.execute_write[`Session.execute_write()`], depending on whether you want to retrieve data from the database or alter it.
+A managed transaction is created with the methods link:{neo4j-docs-base-uri}/api/python-driver/{python-driver-version}/api.html#neo4j.Session.execute_read[`Session.execute_read()`] and link:{neo4j-docs-base-uri}/api/python-driver/{python-driver-version}/api.html#neo4j.Session.execute_write[`Session.execute_write()`], depending on whether you want to retrieve data from the database or alter it.
 Both methods take a _transaction function_ callback, which is responsible for actually carrying out the queries and processing the result.
 
 .Retrieve people whose name starts with `Al`.
@@ -60,7 +60,7 @@ with driver.session(database="neo4j") as session:  # <1>
 <1> Create a session. A single session can be the container for multiple queries. Unless created using the `with` construct, remember to close it when done.
 <2> The `.execute_read()` (or `.execute_write()`) method is the entry point into a transaction. It takes a callback to a _transaction function_ and an arbitrary number of positional and keyword arguments which are handed down to the transaction function.
 <3> The transaction function callback is responsible of running queries.
-<4> Use the method link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Transaction.run[`Transaction.run()`] to run queries. Each query run returns a link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Result[`Result`] object.
+<4> Use the method link:{neo4j-docs-base-uri}/api/python-driver/{python-driver-version}/api.html#neo4j.Transaction.run[`Transaction.run()`] to run queries. Each query run returns a link:{neo4j-docs-base-uri}/api/python-driver/{python-driver-version}/api.html#neo4j.Result[`Result`] object.
 <5> xref:process-result[Process the result] using any of the methods on `Result`.
 
 
@@ -155,7 +155,7 @@ To maintain multiple concurrent transactions, use multiple concurrent sessions.
 [#unit_of_work-decorator]
 === Transaction function configuration
 
-The decorator link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.unit_of_work[`unit_of_work()`] allows to exert further control on transaction functions.
+The decorator link:{neo4j-docs-base-uri}/api/python-driver/{python-driver-version}/api.html#neo4j.unit_of_work[`unit_of_work()`] allows to exert further control on transaction functions.
 It allows to specify:
 
 - a transaction timeout (in seconds).
@@ -185,8 +185,8 @@ with driver.session(database="neo4j") as session:
 [#explicit-transactions]
 == Run an explicit transaction
 
-You can achieve full control over transactions by manually beginning one with the method link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Session.begin_transaction[`Session.begin_transaction()`].
-You may then run queries inside an explicit transaction with the method link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Transaction.run[`Transaction.run()`].
+You can achieve full control over transactions by manually beginning one with the method link:{neo4j-docs-base-uri}/api/python-driver/{python-driver-version}/api.html#neo4j.Session.begin_transaction[`Session.begin_transaction()`].
+You may then run queries inside an explicit transaction with the method link:{neo4j-docs-base-uri}/api/python-driver/{python-driver-version}/api.html#neo4j.Transaction.run[`Transaction.run()`].
 
 [source, python]
 ----
@@ -199,7 +199,7 @@ with driver.session(database="neo4j") as session:
         tx.commit()
 ----
 
-An explicit transaction can be committed with  link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.Transaction.commit[`Transaction.commit()`] or rolled back with  link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.Transaction.rollback[`Transaction.rollback()`].
+An explicit transaction can be committed with  link:https://neo4j.com/docs/api/python-driver/{python-driver-version}/api.html#neo4j.Transaction.commit[`Transaction.commit()`] or rolled back with  link:https://neo4j.com/docs/api/python-driver/{python-driver-version}/api.html#neo4j.Transaction.rollback[`Transaction.rollback()`].
 If no explicit action is taken, the driver will automatically roll back the transaction at the end of its lifetime.
 
 Explicit transactions are most useful for applications that need to distribute Cypher execution across multiple functions for the same transaction, or for applications that need to run multiple queries within a single transaction but without the automatic retries provided by managed transactions.
@@ -287,7 +287,7 @@ if __name__ == "__main__":
 [[process-result]]
 == Process query results
 
-The driver's output of a query is a link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Result[`Result`] object, which encapsulates the Cypher result in a rich data structure that requires some parsing on the client side.
+The driver's output of a query is a link:{neo4j-docs-base-uri}/api/python-driver/{python-driver-version}/api.html#neo4j.Result[`Result`] object, which encapsulates the Cypher result in a rich data structure that requires some parsing on the client side.
 There are two main points to be aware of:
 
 - *The result records are not immediately and entirely fetched and returned by the server*.
@@ -310,7 +310,7 @@ The animation below follows the path of a single query: it shows how the driver 
   type="video/mp4"></video>
 ++++
 
-**The easiest way of processing a result is by casting it to list**, which yields a list of link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Record[`Record`] objects.
+**The easiest way of processing a result is by casting it to list**, which yields a list of link:{neo4j-docs-base-uri}/api/python-driver/{python-driver-version}/api.html#neo4j.Record[`Record`] objects.
 Otherwise, a `Result` object implements a number of methods for processing records.
 The most commonly needed ones are listed below.
 
@@ -355,7 +355,7 @@ It exhausts the result, so should only be called when data processing is over.
 
 |===
 
-For a complete list of `Result` methods, see link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#result[API documentation -- Result].
+For a complete list of `Result` methods, see link:{neo4j-docs-base-uri}/api/python-driver/{python-driver-version}/api.html#result[API documentation -- Result].
 
 
 == Session configuration
@@ -364,7 +364,7 @@ For a complete list of `Result` methods, see link:{neo4j-docs-base-uri}/api/pyth
 
 You should *always specify the database explicitly* with the `database` parameter, even on single-database instances.
 This allows the driver to work more efficiently, as it saves a network round-trip to the server to resolve the home database.
-If no database is given, the link:{neo4j-docs-base-uri}/operations-manual/current/database-administration/#manage-databases-default[default database] set in the Neo4j instance settings is used.
+If no database is given, the link:{neo4j-docs-base-uri}/operations-manual/5/database-administration/#manage-databases-default[default database] set in the Neo4j instance settings is used.
 
 [source, python]
 ----
@@ -375,7 +375,7 @@ with driver.session(
 ----
 
 [TIP]
-Specifying the database through the configuration method is preferred over the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/use/[`USE`] Cypher clause.
+Specifying the database through the configuration method is preferred over the link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/use/[`USE`] Cypher clause.
 If the server runs on a cluster, queries with `USE` require server-side routing to be enabled.
 Queries may also take longer to execute as they may not reach the right cluster member at the first attempt, and need to be routed to one containing the requested database.
 
@@ -428,7 +428,7 @@ with driver.session(
 ----
 
 The parameter `impersonated_user` provides a similar functionality, and is available in driver/server versions >= 4.4.
-The difference is that you don't need to know a user's password to impersonate them, but the user under which the `Driver` was created needs to have the link:{neo4j-docs-base-uri}/operations-manual/current/authentication-authorization/dbms-administration/#access-control-dbms-administration-impersonation[appropriate permissions].
+The difference is that you don't need to know a user's password to impersonate them, but the user under which the `Driver` was created needs to have the link:{neo4j-docs-base-uri}/operations-manual/5/authentication-authorization/dbms-administration/#access-control-dbms-administration-impersonation[appropriate permissions].
 
 [source, python]
 ----

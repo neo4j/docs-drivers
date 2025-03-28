@@ -164,4 +164,4 @@ driver.close()
 
 == API documentation
 
-For in-depth information about driver features, check out the link:https://neo4j.com/docs/api/python-driver/current/[API documentation].
+For in-depth information about driver features, check out the link:https://neo4j.com/docs/api/python-driver/{python-driver-version}/[API documentation].
