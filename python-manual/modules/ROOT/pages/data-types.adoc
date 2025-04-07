@@ -427,15 +427,6 @@ The driver can raise a number of different exceptions.
 A full list is available in the link:{neo4j-docs-base-uri}/api/python-driver/{python-driver-version}/api.html#errors[API documentation].
 For a list of errors the server can return, see the link:{neo4j-docs-base-uri}/status-codes/{page-version}[Status code] page.
 
-.Root exception types
-[options="header", cols="<25m,<75a"]
-|===
-| Classification    | Description
-|Neo4jError         | Errors reported by the Neo4j server (e.g., wrong Cypher syntax, bad connection, wrong credentials, ...)
-
-|DriverError        | Errors reported by the driver (e.g., bad usage of parameters or transactions, improper handling of results, ...)
-|===
-
 Some server errors are marked as safe to retry without need to alter the original request.
 Examples of such errors are deadlocks, memory issues, or connectivity issues.
 All driver's exception types implement the method `.is_retryable()`, which gives insights into whether a further attempt might be successful.
