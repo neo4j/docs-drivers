@@ -224,7 +224,7 @@ try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").
 }
 ----
 
-An explicit transaction can be committed with  link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/Transaction.html#commit()[`Transaction.commit()`] or rolled back with  link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/Transaction.html#rollback[`Transaction.rollback()`].
+An explicit transaction can be committed with  link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/Transaction.html#commit()[`Transaction.commit()`] or rolled back with  link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/Transaction.html#rollback()[`Transaction.rollback()`].
 If no explicit action is taken, the driver will automatically roll back the transaction at the end of its lifetime.
 
 Explicit transactions are most useful for applications that need to distribute Cypher execution across multiple functions for the same transaction, or for applications that need to run multiple queries within a single transaction but without the automatic retries provided by managed transactions.

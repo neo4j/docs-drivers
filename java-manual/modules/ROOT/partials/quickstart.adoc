@@ -2,7 +2,7 @@ The Neo4j Java driver is the official library to interact with a Neo4j instance 
 
 At the hearth of Neo4j lies <<Cypher>>, the query language to interact with a Neo4j database.
 While this guide does not _require_ you to be a seasoned Cypher querier, it is going to be easier to focus on the Java-specific bits if you already know some Cypher.
-For this reason, although this guide does _also_ provide a gentle introduction to Cypher along the way, consider checking out link:{neo4j-docs-base-uri}/getting-started/cypher-intro/[Getting started -> Cypher] for a more detailed walkthrough of graph databases modelling and querying if this is your first approach.
+For this reason, although this guide does _also_ provide a gentle introduction to Cypher along the way, consider checking out link:https://neo4j.com/docs/getting-started/cypher/[Getting started -> Cypher] for a more detailed walkthrough of graph databases modelling and querying if this is your first approach.
 You may then apply that knowledge while following this guide to develop your Java application.
 
 

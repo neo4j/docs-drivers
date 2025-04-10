@@ -71,7 +71,7 @@ try {
 Use xref:query-simple#query-parameters[query parameters] instead, both for performance and security reasons.
 
 *Transaction functions should never return the `Result` object directly*.
-Instead, always xref:process-result[process the result] in some way; at minimum, cast it to list.
+Instead, always process the result in some way; at minimum, cast it to list.
 Within a transaction function, a `return` statement results in the transaction being committed, while the transaction is automatically rolled back if an exception is raised.
 
 [CAUTION]

@@ -281,7 +281,7 @@ For more information, see link:{neo4j-docs-base-uri}/cypher-manual/5/indexes-for
 [[profile-queries]]
 == Profile queries
 
-link:{neo4j-docs-base-uri}/cypher-manual/5/query-tuning/basic-example/#_profile_query[*Profile your queries*] to locate queries whose performance can be improved.
+link:https://neo4j.com/docs/cypher-manual/5/appendix/tutorials/basic-query-tuning/#_profile_query[*Profile your queries*] to locate queries whose performance can be improved.
 You can profile queries by prepending them with `PROFILE`.
 The server output is available in the `profile` property of the xref:result-summary.adoc[`ResultSummary`] object.
 

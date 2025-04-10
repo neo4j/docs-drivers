@@ -24,7 +24,7 @@ The examples on this page use `org.neo4j.driver.reactivestreams`.
 
 == Install dependencies
 
-To use reactive features, you need to add the relevant dependencies to your project first (refer to link:https://projectreactor.io/docs/core/release/reference/#getting[Reactor -> Reference -> Getting reactor]).
+To use reactive features, you need to add the relevant dependencies to your project first (refer to link:https://projectreactor.io/docs/core/release/reference/gettingStarted.html#getting[Reactor -> Reference -> Getting reactor]).
 
 1. Add Reactor's BOM to your `pom.xml` in a `dependencyManagement` section. Notice that this is in addition to the regular `dependencies` section. If a `dependencyManagement` section already exists in your pom, add only the contents.
 +
@@ -116,7 +116,7 @@ Read more on this pattern in xref:session-creation[Always defer session creation
 <3> The session creation is similar to the async case, and xref:transactions.adoc#_session_configuration[the same configuration methods] apply.
 The difference is that the first argument must be `ReactiveSession.class`, and the return value is a link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/reactivestreams/ReactiveSession.html[`ReactiveSession`] object.
 <4> The method link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/reactive/ReactiveSession.html#executeRead(org.neo4j.driver.reactive.ReactiveTransactionCallback)[`ReactiveSession.executeRead()`] runs a read transaction and returns a `Publisher` with the callee's return, which link:https://projectreactor.io/docs/core/release/api/reactor/core/publisher/Mono.html#fromDirect-org.reactivestreams.Publisher-[`Mono.fromDirect()`] converts into a `Mono`.
-<5> The method link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/reactivestreams/ReactiveQueryRunner.html#method-summary)[`tx.run()`] returns a `Publisher<link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/reactivestreams/ReactiveResult.html[ReactiveResult]>`, which link:https://projectreactor.io/docs/core/release/api/reactor/core/publisher/Mono.html#fromDirect-org.reactivestreams.Publisher-[`Mono.fromDirect()`] converts into a `Mono`.
+<5> The method link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/reactivestreams/ReactiveQueryRunner.html#method-summary[`tx.run()`] returns a `Publisher<link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/reactivestreams/ReactiveResult.html[ReactiveResult]>`, which link:https://projectreactor.io/docs/core/release/api/reactor/core/publisher/Mono.html#fromDirect-org.reactivestreams.Publisher-[`Mono.fromDirect()`] converts into a `Mono`.
 <6> Before the final result is returned, link:https://projectreactor.io/docs/core/release/api/reactor/core/publisher/Mono.html#flatMapMany-java.util.function.Function-[`Mono.flatMapMany()`] retrieves the records from the result and returns them as a new `Flux`.
 <7> The final cleanup closes the session.
 <8> To show the result of the reactive workflow, `.block()` waits for the flow to complete so that values can be printed.
