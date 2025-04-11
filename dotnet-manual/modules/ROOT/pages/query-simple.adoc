@@ -10,23 +10,27 @@ For queries with earlier versions, use xref:transactions.adoc[sessions and trans
 [#write]
 == Write to the database
 
-To create a node representing a person named `Alice`, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/create/[`CREATE`]:
+To create two node representing persons named `Alice` and `David`, and a relationship `KNOWS` between them, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/create/[`CREATE`]:
 
-.Create a node representing a person named `Alice`
+.Create two nodes and a relationship
 [source, csharp]
 ----
-var result = await driver.ExecutableQuery("CREATE (p:Person {name: $name})")  // <1>
-    .WithParameters(new { name = "Alice" })  // <2>
-    .WithConfig(new QueryConfig(database: "neo4j"))  // <3>
+var result = await driver.ExecutableQuery(@"  // <.>
+    CREATE (a:Person {name: $name})
+    CREATE (b:Person {friend: $name})
+    CREATE (a)-[:KNOWS]->(b)
+    ")
+    .WithParameters(new { name = "Alice" })  // <.>
+    .WithConfig(new QueryConfig(database: "neo4j"))  // <.>
     .ExecuteAsync();
-var summary = result.Summary;  // <4>
+var summary = result.Summary;  // <.>
 Console.WriteLine($"Created {summary.Counters.NodesCreated} nodes in {summary.ResultAvailableAfter.Milliseconds} ms.");
 ----
 
-<1> The Cypher query
-<2> A map of xref:query-parameters[query parameters]
-<3> Which database the query should be run against
-<4> The xref:result-summary.adoc[summary of execution] returned by the server
+<.> The Cypher query
+<.> A map of xref:query-parameters[query parameters]
+<.> The database to run the query on
+<.> The xref:result-summary.adoc[summary of execution] returned by the server
 
 
 [#read]
@@ -34,10 +38,13 @@ Console.WriteLine($"Created {summary.Counters.NodesCreated} nodes in {summary.Re
 
 To retrieve information from the database, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/match/[`MATCH`]:
 
-.Retrieve all `Person` nodes
+.Retrieve all `Person` nodes who like other `Person` s
 [source, csharp, role=nocollapse]
 ----
-var result = await driver.ExecutableQuery("MATCH (p:Person) RETURN p.name AS name")
+var result = await driver.ExecutableQuery(@"
+    MATCH (p:Person)-[:KNOWS]->(:Person)
+    RETURN p.name AS name
+    ")
     .WithConfig(new QueryConfig(database: "neo4j"))
     .ExecuteAsync();
 
@@ -62,7 +69,10 @@ For example,
 
 [source, csharp]
 ----
-var result = await driver.ExecutableQuery("MATCH (p:Person) RETURN p.name AS name")
+var result = await driver.ExecutableQuery(@"
+    MATCH (p:Person)-[:KNOWS]->(:Person)
+    RETURN p.name AS name
+    ")
     .WithConfig(new QueryConfig(database: "neo4j"))
     .WithMap(record => record["name"].As<string>())
     .ExecuteAsync();
@@ -115,6 +125,7 @@ Console.WriteLine($"Query updated the database? {result.Summary.Counters.Contain
 
 [#delete]
 == Delete from the database
+
 To remove a node and any relationship attached to it, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/delete/[`DETACH DELETE`]:
 
 .Remove the `Alice` node and all its relationships
