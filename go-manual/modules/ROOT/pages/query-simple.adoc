@@ -9,13 +9,16 @@ For queries with earlier versions, use xref:transactions.adoc[sessions and trans
 
 == Write to the database
 
-To create a node representing a person named `Alice`, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/create/[`CREATE`]:
+To create two node representing persons named `Alice` and `David`, and a relationship `KNOWS` between them, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/create/[`CREATE`]:
 
-.Create a node representing a person named `Alice`
+.Create two nodes and a relationship
 [source, go]
 ----
-result, err := neo4j.ExecuteQuery(ctx, driver,
-    "CREATE (p:Person {name: $name}) RETURN p",  // <1>
+result, err := neo4j.ExecuteQuery(ctx, driver, `
+    CREATE (a:Person {name: $name})  // <1>
+    CREATE (b:Person {friend: $name})
+    CREATE (a)-[:KNOWS]->(b)
+    `,
     map[string]any{  // <2>
         "name": "Alice",
     }, neo4j.EagerResultTransformer,
@@ -32,7 +35,7 @@ fmt.Printf("Created %v nodes in %+v.\n",
 
 <1> The Cypher query
 <2> A map of _query parameters_
-<3> Which database the query should be run against
+<3> The database to run the query on
 <4> The xref:result-summary.adoc[summary of execution] returned by the server
 
 
@@ -40,11 +43,13 @@ fmt.Printf("Created %v nodes in %+v.\n",
 
 To retrieve information from the database, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/match/[`MATCH`]:
 
-.Retrieve all `Person` nodes
+.Retrieve all `Person` nodes who like other `Person` s
 [source, go, role=nocollapse]
 ----
-result, err := neo4j.ExecuteQuery(ctx, driver,
-    "MATCH (p:Person) RETURN p.name AS name",
+result, err := neo4j.ExecuteQuery(ctx, driver, `
+    MATCH (p:Person)-[:KNOWS]->(:Person)
+    RETURN p.name AS name
+    `,
     nil,
     neo4j.EagerResultTransformer,
     neo4j.ExecuteQueryWithDatabase("neo4j"))
@@ -125,6 +130,7 @@ fmt.Println("Query updated the database?",
 
 
 == Delete from the database
+
 To remove a node and any relationship attached to it, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/delete/[`DETACH DELETE`]:
 
 .Remove the `Alice` node and all its relationships

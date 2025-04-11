@@ -14,15 +14,18 @@ Due to the usage of `async/await`, the examples in this page need to be wrapped 
 
 == Write to the database
 
-To create a node representing a person named `Alice`, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/create/[`CREATE`]:
+To create two node representing persons named `Alice` and `David`, and a relationship `KNOWS` between them, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/create/[`CREATE`]:
 
-.Create a node representing a `Person` named `Alice`
+.Create two nodes and a relationship
 [source, javascript]
 ----
-let { records, summary } = await driver.executeQuery(
-  'CREATE (p:Person {name: $name})',  // <1>
-   { name: 'Alice' },  // <2>
-   { database: 'neo4j' }  // <3>
+let { records, summary } = await driver.executeQuery(`  // <1>
+  CREATE (a:Person {name: $name})
+  CREATE (b:Person {friend: $name})
+  CREATE (a)-[:KNOWS]->(b)
+  `,
+  { name: 'Alice', friend: 'David' },  // <2>
+  { database: 'neo4j' }  // <3>
 )
 console.log(
   `Created ${summary.counters.updates().nodesCreated} nodes ` +
@@ -32,23 +35,25 @@ console.log(
 
 <1> The Cypher query.
 <2> An object of _query parameters_.
-<3> Which database the query should be run against.
+<3> The database to run the query on
 
 
 == Read from the database
 
 To retrieve information from the database, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/match/[`MATCH`]:
 
-.Retrieve all `Person` nodes
-[source, javascript]
+.Retrieve all `Person` nodes who like other `Person` s
+[source, javascript, role=nocollapse]
 ----
-let { records, summary } = await driver.executeQuery(
-  'MATCH (p:Person) RETURN p.name AS name',
+let { records, summary } = await driver.executeQuery(`
+  MATCH (p:Person)-[:KNOWS]->(:Person)
+  RETURN p.name AS name
+  `,
   {},
   { database: 'neo4j' }
 )
 
-// Loop through users and do process them
+// Loop through users and do something with them
 for(let record of records) {  // <1>
   console.log(`Person with name: ${record.get('name')}`)
   console.log(`Available properties for this node are: ${record.keys}\n`)
@@ -76,7 +81,8 @@ To update a node's information in the database, use the Cypher clauses link:{neo
 let { _, summary } = await driver.executeQuery(`
   MATCH (p:Person {name: $name})
   SET p.age = $age
-  `, { name: 'Alice', age: 42 },
+  `,
+  { name: 'Alice', age: 42 },
   { database: 'neo4j' }
 )
 console.log('Query counters:')
@@ -105,11 +111,13 @@ console.log(summary.counters.updates())
 
 
 == Delete from the database
+
 To remove a node and any relationship attached to it, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/delete/[`DETACH DELETE`]:
 
 .Remove the `Alice` node
 [source, javascript]
 ----
+// This does not delete _only_ p, but also all its relationships!
 let { _, summary } = await driver.executeQuery(`
   MATCH (p:Person WHERE p.name = $name)
   DETACH DELETE p

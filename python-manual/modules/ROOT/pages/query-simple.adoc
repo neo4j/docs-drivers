@@ -9,14 +9,17 @@ For queries with earlier versions, use xref:transactions.adoc[sessions and trans
 
 == Write to the database
 
-To create a node representing a person named `Alice`, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/create/[`CREATE`]:
+To create two node representing persons named `Alice` and `David`, and a relationship `KNOWS` between them, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/create/[`CREATE`]:
 
-.Create a node representing a person named `Alice`
+.Create two nodes and a relationship
 [source, python]
 ----
-summary = driver.execute_query(
-    "CREATE (:Person {name: $name})",  # <1>
-    name="Alice",  # <2>
+summary = driver.execute_query(""" // <1>
+    CREATE (a:Person {name: $name})
+    CREATE (b:Person {friend: $name})
+    CREATE (a)-[:KNOWS]->(b)
+    """,
+    name="Alice", friend="David"  # <2>
     database_="neo4j",  # <3>
 ).summary
 print("Created {nodes_created} nodes in {time} ms.".format(
@@ -26,19 +29,21 @@ print("Created {nodes_created} nodes in {time} ms.".format(
 ----
 
 <1> The Cypher query
-<2> A map of _query parameters_
-<3> Which database the query should be run against
+<2> The _query parameters_, as keyword arguments
+<3> The database to run the query on
 
 
 == Read from the database
 
 To retrieve information from the database, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/match/[`MATCH`]:
 
-.Retrieve all `Person` nodes
+.Retrieve all `Person` nodes who like other `Person` s
 [source, python]
 ----
-records, summary, keys = driver.execute_query(
-    "MATCH (p:Person) RETURN p.name AS name",
+records, summary, keys = driver.execute_query("""
+    MATCH (p:Person)-[:KNOWS]->(:Person)
+    RETURN p.name AS name
+    """,
     database_="neo4j",
 )
 
@@ -59,7 +64,7 @@ print("The query `{query}` returned {records_count} records in {time} ms.".forma
 
 == Update the database
 
-To update a node's information in the database, use the Cypher clauses link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/match/[`MATCH`] and link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/set/[`SET`]:
+To update an entity's information in the database, use the Cypher clauses link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/match/[`MATCH`] and link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/set/[`SET`]:
 
 .Update node `Alice` to add an `age` property
 [source, python]
@@ -94,11 +99,13 @@ print(f"Query counters: {summary.counters}.")
 
 
 == Delete from the database
+
 To remove a node and any relationship attached to it, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/delete/[`DETACH DELETE`]:
 
 .Remove the `Alice` node
 [source, python]
 ----
+# This does not delete _only_ p, but also all its relationships!
 records, summary, keys = driver.execute_query("""
     MATCH (p:Person {name: $name})
     DETACH DELETE p

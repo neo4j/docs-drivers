@@ -9,17 +9,21 @@ For queries with earlier versions, use xref:transactions.adoc[sessions and trans
 
 == Write to the database
 
-To create a node representing a person named `Alice`, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/create/[`CREATE`]:
+To create two node representing persons named `Alice` and `David`, and a relationship `KNOWS` between them, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/create/[`CREATE`]:
 
-.Create a node representing a person named `Alice`
+.Create two nodes and a relationship
 [source, java]
 ----
 // import java.util.Map;
 // import java.util.concurrent.TimeUnit;
 // import org.neo4j.driver.QueryConfig;
 
-var result = driver.executableQuery("CREATE (:Person {name: $name})")  // <1>
-    .withParameters(Map.of("name", "Alice"))  // <2>
+var result = driver.executableQuery("""  // <1>
+    CREATE (a:Person {name: $name})
+    CREATE (b:Person {friend: $name})
+    CREATE (a)-[:KNOWS]->(b)
+    """,
+    .withParameters(Map.of("name", "Alice", "friend", "David"))  // <2>
     .withConfig(QueryConfig.builder().withDatabase("neo4j").build())  // <3>
     .execute();
 var summary = result.summary();  // <4>
@@ -30,7 +34,7 @@ System.out.printf("Created %d records in %d ms.%n",
 
 <1> The Cypher query
 <2> A map of _query parameters_
-<3> Which database the query should be run against
+<3> The database to run the query on
 <4> The xref:result-summary.adoc[summary of execution] returned by the server
 
 
@@ -38,13 +42,16 @@ System.out.printf("Created %d records in %d ms.%n",
 
 To retrieve information from the database, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/match/[`MATCH`]:
 
-.Retrieve all `Person` nodes
+.Retrieve all `Person` nodes who like other `Person` s
 [source, java, role=nocollapse]
 ----
 // import java.util.concurrent.TimeUnit;
 // import org.neo4j.driver.QueryConfig;
 
-var result = driver.executableQuery("MATCH (p:Person) RETURN p.name AS name")
+var result = driver.executableQuery("""
+    MATCH (p:Person)-[:KNOWS]->(:Person)
+    RETURN p.name AS name
+    """,
     .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
     .execute();
 
