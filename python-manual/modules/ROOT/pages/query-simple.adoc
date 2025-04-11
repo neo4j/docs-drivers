@@ -19,7 +19,7 @@ summary = driver.execute_query(""" // <1>
     CREATE (b:Person {friend: $name})
     CREATE (a)-[:KNOWS]->(b)
     """,
-    name="Alice", friend="David"  # <2>
+    name="Alice", friend="David",  # <2>
     database_="neo4j",  # <3>
 ).summary
 print("Created {nodes_created} nodes in {time} ms.".format(
