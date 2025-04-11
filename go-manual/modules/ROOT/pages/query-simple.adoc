@@ -9,7 +9,7 @@ For queries with earlier versions, use xref:transactions.adoc[sessions and trans
 
 == Write to the database
 
-To create two node representing persons named `Alice` and `David`, and a relationship `KNOWS` between them, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/create/[`CREATE`]:
+To create two nodes representing persons named `Alice` and `David`, and a relationship `KNOWS` between them, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/create/[`CREATE`]:
 
 .Create two nodes and a relationship
 [source, go]
