@@ -221,7 +221,7 @@ Total database accesses: ?
 
 *Specify node labels* in all queries.
 This allows the query planner to work much more efficiently, and to leverage indexes where available.
-To learn how to combine labels, see link:{neo4j-docs-base-uri}/cypher-manual/5/syntax/expressions/#query-syntax-label[Cypher -> Label expressions].
+To learn how to combine labels, see link:https://neo4j.com/docs/cypher-manual/5/patterns/reference/#label-expressions[Cypher -> Label expressions].
 
 [discrete]
 === Good practices
