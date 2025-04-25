@@ -251,9 +251,11 @@ With lazy loading, the client can also stop requesting records after some condit
 The driver's link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#SessionConfig[fetch size] affects the behavior of lazy loading.
 It instructs the server to stream an amount of records equal to the fetch size, and then wait until the client has caught up before retrieving and sending more.
 
-The fetch size allows to bound memory consumption on the client side.
-It doesn't always bound memory consumption on the server side though: that depends on the query.
-For example, a query with link:https://neo4j.com/docs/cypher-manual/5/clauses/order-by/[`ORDER BY`] requires the whole result set to be loaded into memory for sorting, before records can be streamed to the client.
+The fetch size usually allows to bound memory consumption on the client side, especially for results in which the variance of the records size is small.
+If one single record is very large, the driver still needs to allocate space for the whole object, so memory usage may get large even with a small fetch size.
+
+On the other hand, the fetch size doesn't always bound memory consumption on the server side: that depends on the query.
+For example, a query with link:https://neo4j.com/docs/cypher-manual/current/clauses/order-by/[`ORDER BY`] requires the whole result set to be loaded into memory for sorting, before records can be streamed to the client.
 
 The lower the fetch size, the more messages client and server have to exchange.
 Especially if the server's latency is high, a low fetch size may deteriorate performance.
