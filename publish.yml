@@ -37,16 +37,6 @@ ui:
 urls:
   html_extension_style: indexify
 
-antora:
-  extensions:
-  - require: "@neo4j-antora/antora-modify-sitemaps"
-    sitemap_version: '5'
-    sitemap_loc_version: 'current'
-    move_sitemaps_to_components: true
-    data:
-      components:
-        driver-manual: '4.1'
-
 asciidoc:
   extensions:
   - "@neo4j-documentation/remote-include"
