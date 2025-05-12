@@ -20,10 +20,10 @@ To create two nodes representing persons named `Alice` and `David`, and a relati
 
 var result = driver.executableQuery("""  // <1>
     CREATE (a:Person {name: $name})
-    CREATE (b:Person {friend: $name})
+    CREATE (b:Person {name: $friendName})
     CREATE (a)-[:KNOWS]->(b)
     """,
-    .withParameters(Map.of("name", "Alice", "friend", "David"))  // <2>
+    .withParameters(Map.of("name", "Alice", "friendName", "David"))  // <2>
     .withConfig(QueryConfig.builder().withDatabase("neo4j").build())  // <3>
     .execute();
 var summary = result.summary();  // <4>

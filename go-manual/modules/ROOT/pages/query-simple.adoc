@@ -16,11 +16,12 @@ To create two nodes representing persons named `Alice` and `David`, and a relati
 ----
 result, err := neo4j.ExecuteQuery(ctx, driver, `
     CREATE (a:Person {name: $name})  // <1>
-    CREATE (b:Person {friend: $name})
+    CREATE (b:Person {name: $friendName})
     CREATE (a)-[:KNOWS]->(b)
     `,
     map[string]any{  // <2>
         "name": "Alice",
+        "friendName": "David",
     }, neo4j.EagerResultTransformer,
     neo4j.ExecuteQueryWithDatabase("neo4j"))  // <3>
 if err != nil {
