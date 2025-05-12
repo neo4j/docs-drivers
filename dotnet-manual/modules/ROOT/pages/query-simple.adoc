@@ -17,10 +17,10 @@ To create two node representing persons named `Alice` and `David`, and a relatio
 ----
 var result = await driver.ExecutableQuery(@"  // <.>
     CREATE (a:Person {name: $name})
-    CREATE (b:Person {friend: $name})
+    CREATE (b:Person {name: $friendName})
     CREATE (a)-[:KNOWS]->(b)
     ")
-    .WithParameters(new { name = "Alice" })  // <.>
+    .WithParameters(new { name = "Alice", friendName = "David" })  // <.>
     .WithConfig(new QueryConfig(database: "neo4j"))  // <.>
     .ExecuteAsync();
 var summary = result.Summary;  // <.>
