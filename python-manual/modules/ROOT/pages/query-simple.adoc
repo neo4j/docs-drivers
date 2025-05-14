@@ -16,10 +16,10 @@ To create two nodes representing persons named `Alice` and `David`, and a relati
 ----
 summary = driver.execute_query(""" // <1>
     CREATE (a:Person {name: $name})
-    CREATE (b:Person {friend: $name})
+    CREATE (b:Person {name: $friendName})
     CREATE (a)-[:KNOWS]->(b)
     """,
-    name="Alice", friend="David",  # <2>
+    name="Alice", friendName="David",  # <2>
     database_="neo4j",  # <3>
 ).summary
 print("Created {nodes_created} nodes in {time} ms.".format(

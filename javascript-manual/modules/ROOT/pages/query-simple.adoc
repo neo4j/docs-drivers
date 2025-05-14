@@ -21,10 +21,10 @@ To create two nodes representing persons named `Alice` and `David`, and a relati
 ----
 let { records, summary } = await driver.executeQuery(`  // <1>
   CREATE (a:Person {name: $name})
-  CREATE (b:Person {friend: $name})
+  CREATE (b:Person {name: $friendName})
   CREATE (a)-[:KNOWS]->(b)
   `,
-  { name: 'Alice', friend: 'David' },  // <2>
+  { name: 'Alice', friendName: 'David' },  // <2>
   { database: 'neo4j' }  // <3>
 )
 console.log(
