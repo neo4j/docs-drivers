@@ -165,19 +165,23 @@ Note that addresses that the driver receives in routing tables are not resolved 
 
 You specify a resolver through the link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.ConfigBuilder.WithResolver.html)[`.WithResolver()`] config method, which works with link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IServerAddressResolver.html[`IServerAddressResolver`] objects.
 
-.Connection to `example.com` on port `9999` is resolved to `localhost` on port `7687`
+*The resolved address must have the same port and URI scheme.*
+In the example below, the driver is initialized with a `neo4j://` URI scheme and port `7687`, so the resolved address provided in `dbUri` must also be available at `neo4j://` and port `7687`.
+
+.Connection to `example.com` is resolved to `localhost`
 [source, csharp]
 ----
 using Neo4j.Driver;
 
-string dbUri = "localhost";  // omit scheme
-string dbUser = "neo4j";
-string dbPassword = "verysecret";
+const string dbUri = "<URI for Neo4j database>";  // omit scheme
+const string dbUser = "<Username>";
+const string dbPassword = "<Password>";
 
+// setting a port different than the one given in `driver` won't work
 var addresses = ServerAddress.From(dbUri, 7687);
 
 using var driver = GraphDatabase.Driver(
-    "neo4j://example.com:9999",
+    "neo4j://example.com:7687",
     AuthTokens.Basic(dbUser, dbPassword),
     conf => conf.WithResolver(new ListAddressResolver(addresses))
 );
