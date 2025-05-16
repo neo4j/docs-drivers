@@ -1,7 +1,7 @@
 = Explore the query execution summary
 
 After all results coming from a query have been processed, the server ends the transaction by returning a summary of execution.
-It comes as a link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#resultsummary[`ResultSummary`] object, and it contains information among which:
+It comes as a link:{neo4j-docs-base-uri}/api/python-driver/{python-driver-version}/api.html#resultsummary[`ResultSummary`] object, and it contains information among which:
 
 - xref:_query_counters[**Query counters**] -- What changes the query triggered on the server
 - xref:_query_execution_plan[**Query execution plan**] -- How the database would execute (or executed) the query
@@ -43,7 +43,7 @@ with driver.session(database="neo4j") as session:
 
 == Query counters
 
-The property `ResultSummary.counters` contains counters for the operations that a query triggered (as a link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#summarycounters[`SummaryCounters`] object).
+The property `ResultSummary.counters` contains counters for the operations that a query triggered (as a link:{neo4j-docs-base-uri}/api/python-driver/{python-driver-version}/api.html#summarycounters[`SummaryCounters`] object).
 
 .Insert some data and display the query counters
 [source, python]
@@ -70,7 +70,7 @@ There are two additional boolean properties which act as meta-counters:
 == Query execution plan
 
 If you prefix a query with `EXPLAIN`, the server will return the plan it _would_ use to run the query, but will not actually run it.
-The plan is then available under the property `ResultSummary.plan`, and contains the list of link:{neo4j-docs-base-uri}/cypher-manual/current/planning-and-tuning/operators/[Cypher operators] that would be used to retrieve the result set.
+The plan is then available under the property `ResultSummary.plan`, and contains the list of link:https://neo4j.com/docs/cypher-manual/5/planning-and-tuning/operators/[Cypher operators] that would be used to retrieve the result set.
 You may use this information to locate potential bottlenecks or room for performance improvements (for example through the creation of indexes).
 
 [source, python, role=nocollapse]
@@ -128,12 +128,12 @@ Total database accesses: 12, total allocated memory: 184
 """
 ----
 
-For more information and examples, see link:{neo4j-docs-base-uri}/cypher-manual/current/query-tuning/basic-example/#_profile_query[Basic query tuning].
+For more information and examples, see link:{neo4j-docs-base-uri}/cypher-manual/5/query-tuning/basic-example/#_profile_query[Basic query tuning].
 
 
 == Notifications
 
-After executing a query, the server can return link:{neo4j-docs-base-uri}/status-codes/current/notifications/[notifications] alongside the query result.
+After executing a query, the server can return link:{neo4j-docs-base-uri}/status-codes/5/notifications/[notifications] alongside the query result.
 Notifications contain recommendations for performance improvements, warnings about the usage of deprecated features, and other hints about sub-optimal usage of Neo4j.
 
 [TIP]
@@ -146,7 +146,7 @@ GQL status codes are planned to supersede Neo4j status codes.
 =====
 [.include-with-neo4j-status-code]
 ======
-The property `ResultSummary.summary_notifications` contains a list of link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.SummaryNotification[`SummaryNotification`] objects.
+The property `ResultSummary.summary_notifications` contains a list of link:{neo4j-docs-base-uri}/api/python-driver/{python-driver-version}/api.html#neo4j.SummaryNotification[`SummaryNotification`] objects.
 
 [source, python, role=nocollapse]
 ----
@@ -173,7 +173,7 @@ records, summary, keys = driver.execute_query("""
 [.include-with-GQL-status-code]
 ======
 
-With version >= 5.25, the property `ResultSummary.gql_status_objects` contains a sequence of link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#GqlStatusObject[`GqlStatusObject`]s.
+With version >= 5.25, the property `ResultSummary.gql_status_objects` contains a sequence of link:{neo4j-docs-base-uri}/api/python-driver/{python-driver-version}/api.html#gqlstatusobject[`GqlStatusObject`]s.
 These are GQL-compliant status objects.
 
 Some (but not all) `GqlStatusObjects` are notifications, whereas some report an _outcome_ status: `00000` for "success", `02000` for "no data", and `00001` for "omitted result".

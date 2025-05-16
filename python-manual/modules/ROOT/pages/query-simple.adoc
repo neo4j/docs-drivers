@@ -9,14 +9,17 @@ For queries with earlier versions, use xref:transactions.adoc[sessions and trans
 
 == Write to the database
 
-To create a node representing a person named `Alice`, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/create/[`CREATE`]:
+To create two nodes representing persons named `Alice` and `David`, and a relationship `KNOWS` between them, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/create/[`CREATE`]:
 
-.Create a node representing a person named `Alice`
+.Create two nodes and a relationship
 [source, python]
 ----
-summary = driver.execute_query(
-    "CREATE (:Person {name: $name})",  # <1>
-    name="Alice",  # <2>
+summary = driver.execute_query(""" // <1>
+    CREATE (a:Person {name: $name})
+    CREATE (b:Person {name: $friendName})
+    CREATE (a)-[:KNOWS]->(b)
+    """,
+    name="Alice", friendName="David",  # <2>
     database_="neo4j",  # <3>
 ).summary
 print("Created {nodes_created} nodes in {time} ms.".format(
@@ -26,19 +29,21 @@ print("Created {nodes_created} nodes in {time} ms.".format(
 ----
 
 <1> The Cypher query
-<2> A map of _query parameters_
-<3> Which database the query should be run against
+<2> The _query parameters_, as keyword arguments
+<3> The database to run the query on
 
 
 == Read from the database
 
-To retrieve information from the database, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/match/[`MATCH`]:
+To retrieve information from the database, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/match/[`MATCH`]:
 
-.Retrieve all `Person` nodes
+.Retrieve all `Person` nodes who like other `Person` s
 [source, python]
 ----
-records, summary, keys = driver.execute_query(
-    "MATCH (p:Person) RETURN p.name AS name",
+records, summary, keys = driver.execute_query("""
+    MATCH (p:Person)-[:KNOWS]->(:Person)
+    RETURN p.name AS name
+    """,
     database_="neo4j",
 )
 
@@ -59,7 +64,7 @@ print("The query `{query}` returned {records_count} records in {time} ms.".forma
 
 == Update the database
 
-To update a node's information in the database, use the Cypher clauses link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/match/[`MATCH`] and link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/set/[`SET`]:
+To update an entity's information in the database, use the Cypher clauses link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/match/[`MATCH`] and link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/set/[`SET`]:
 
 .Update node `Alice` to add an `age` property
 [source, python]
@@ -94,11 +99,13 @@ print(f"Query counters: {summary.counters}.")
 
 
 == Delete from the database
-To remove a node and any relationship attached to it, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/delete/[`DETACH DELETE`]:
+
+To remove a node and any relationship attached to it, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/delete/[`DETACH DELETE`]:
 
 .Remove the `Alice` node
 [source, python]
 ----
+# This does not delete _only_ p, but also all its relationships!
 records, summary, keys = driver.execute_query("""
     MATCH (p:Person {name: $name})
     DETACH DELETE p
@@ -113,7 +120,7 @@ print(f"Query counters: {summary.counters}.")
 == Query parameters
 
 *Do not hardcode or concatenate parameters directly into queries*.
-Instead, always use placeholders and specify the link:{neo4j-docs-base-uri}/cypher-manual/current/syntax/parameters/[Cypher parameters], as shown in the previous examples.
+Instead, always use placeholders and specify the link:{neo4j-docs-base-uri}/cypher-manual/5/syntax/parameters/[Cypher parameters], as shown in the previous examples.
 This is for:
 
 1. *performance benefits*: Neo4j compiles and caches queries, but can only do so if the query structure is unchanged;
@@ -178,7 +185,7 @@ Configuration parameters are suffixed with `_`.
 
 It is recommended to *always specify the database explicitly* with the `database_` parameter, even on single-database instances.
 This allows the driver to work more efficiently, as it saves a network round-trip to the server to resolve the home database.
-If no database is given, the link:{neo4j-docs-base-uri}/operations-manual/current/database-administration/#manage-databases-default[user's home database] is used.
+If no database is given, the link:{neo4j-docs-base-uri}/operations-manual/5/database-administration/#manage-databases-default[user's home database] is used.
 
 [source, python]
 ----
@@ -189,7 +196,7 @@ driver.execute_query(
 ----
 
 [TIP]
-Specifying the database through the configuration method is preferred over the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/use/[`USE`] Cypher clause.
+Specifying the database through the configuration method is preferred over the link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/use/[`USE`] Cypher clause.
 If the server runs on a cluster, queries with `USE` require server-side routing to be enabled.
 Queries may also take longer to execute as they may not reach the right cluster member at the first attempt, and need to be routed to one containing the requested database.
 
@@ -210,7 +217,7 @@ driver.execute_query(
 
 [NOTE]
 ====
-Although executing a _write_ query in read mode likely results in a runtime error, *you should not rely on this for access control.* The difference between the two modes is that _read_ transactions will be routed to any node of a cluster, whereas _write_ ones will be directed to the leader.
+Although executing a _write_ query in read mode likely results in a runtime error, *you should not rely on this for access control.* The difference between the two modes is that _read_ transactions will be routed to any node of a cluster, whereas _write_ ones are directed to primaries.
 In other words, there is no guarantee that a write query submitted in read mode will be rejected.
 ====
 
@@ -222,7 +229,7 @@ In other words, there is no guarantee that a write query submitted in read mode 
 You can execute a query through a different user with the parameter `auth_`.
 Switching user at the query level is cheaper than creating a new `Driver` object.
 The query is then run within the security context of the given user (i.e., home database, permissions, etc.). +
-Query-scoped authentication a server version >= 5.8.
+Query-scoped authentication requires a server version >= 5.8.
 
 [source, python, test-skip]
 ----
@@ -234,7 +241,7 @@ driver.execute_query(
 ----
 
 The parameter `impersonated_user_` provides a similar functionality, and is available in driver/server versions >= 4.4.
-The difference is that you don't need to know a user's password to impersonate them, but the user under which the `Driver` was created needs to have the link:{neo4j-docs-base-uri}/operations-manual/current/authentication-authorization/dbms-administration/#access-control-dbms-administration-impersonation[appropriate permissions].
+The difference is that you don't need to know a user's password to impersonate them, but the user under which the `Driver` was created needs to have the link:{neo4j-docs-base-uri}/operations-manual/5/authentication-authorization/dbms-administration/#access-control-dbms-administration-impersonation[appropriate permissions].
 
 [source, python, test-skip]
 ----
@@ -314,7 +321,7 @@ with GraphDatabase.driver(URI, auth=AUTH) as driver:
         # further logging/processing
 ----
 
-For more information see link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Driver.execute_query[API documentation -> Driver.execute_query()].
+For more information see link:{neo4j-docs-base-uri}/api/python-driver/{python-driver-version}/api.html#neo4j.Driver.execute_query[API documentation -> Driver.execute_query()].
 
 
 ifndef::backend-pdf[]

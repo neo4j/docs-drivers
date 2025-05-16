@@ -73,8 +73,6 @@ import org.neo4j.driver.TransactionContext;
 
 public class App {
 
-    private static final int employeeThreshold = 10;
-
     public static void main(String... args) {
         final String dbUri = "<URI for Neo4j database>";
         final String dbUser = "<Username>";
@@ -150,7 +148,7 @@ public class App {
 
 ----
 
-<1> Collect and combine bookmarks from different sessions using `Session.lastBookmarks()`, storing them in a link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Bookmark.html[`Bookmark`] object.
+<1> Collect and combine bookmarks from different sessions using `Session.lastBookmarks()`, storing them in a link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/Bookmark.html[`Bookmark`] object.
 <2> Use them to initialize another session with the `.withBookmarks()` config method.
 
 image:{common-image}/driver-passing-bookmarks.svg[]

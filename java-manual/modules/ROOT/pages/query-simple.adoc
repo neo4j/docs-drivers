@@ -9,17 +9,21 @@ For queries with earlier versions, use xref:transactions.adoc[sessions and trans
 
 == Write to the database
 
-To create a node representing a person named `Alice`, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/create/[`CREATE`]:
+To create two nodes representing persons named `Alice` and `David`, and a relationship `KNOWS` between them, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/create/[`CREATE`]:
 
-.Create a node representing a person named `Alice`
+.Create two nodes and a relationship
 [source, java]
 ----
 // import java.util.Map;
 // import java.util.concurrent.TimeUnit;
 // import org.neo4j.driver.QueryConfig;
 
-var result = driver.executableQuery("CREATE (:Person {name: $name})")  // <1>
-    .withParameters(Map.of("name", "Alice"))  // <2>
+var result = driver.executableQuery("""  // <1>
+    CREATE (a:Person {name: $name})
+    CREATE (b:Person {name: $friendName})
+    CREATE (a)-[:KNOWS]->(b)
+    """,
+    .withParameters(Map.of("name", "Alice", "friendName", "David"))  // <2>
     .withConfig(QueryConfig.builder().withDatabase("neo4j").build())  // <3>
     .execute();
 var summary = result.summary();  // <4>
@@ -30,21 +34,24 @@ System.out.printf("Created %d records in %d ms.%n",
 
 <1> The Cypher query
 <2> A map of _query parameters_
-<3> Which database the query should be run against
+<3> The database to run the query on
 <4> The xref:result-summary.adoc[summary of execution] returned by the server
 
 
 == Read from the database
 
-To retrieve information from the database, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/match/[`MATCH`]:
+To retrieve information from the database, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/match/[`MATCH`]:
 
-.Retrieve all `Person` nodes
+.Retrieve all `Person` nodes who like other `Person` s
 [source, java, role=nocollapse]
 ----
 // import java.util.concurrent.TimeUnit;
 // import org.neo4j.driver.QueryConfig;
 
-var result = driver.executableQuery("MATCH (p:Person) RETURN p.name AS name")
+var result = driver.executableQuery("""
+    MATCH (p:Person)-[:KNOWS]->(:Person)
+    RETURN p.name AS name
+    """,
     .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
     .execute();
 
@@ -61,12 +68,12 @@ System.out.printf("The query %s returned %d records in %d ms.%n",
     summary.resultAvailableAfter(TimeUnit.MILLISECONDS));
 ----
 
-<1> `records` contains the result as a list of link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Record.html[`Record`] objects
+<1> `records` contains the result as a list of link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/Record.html[`Record`] objects
 <2> `summary` contains the xref:result-summary.adoc[summary of execution] returned by the server
 
 [TIP]
 ====
-Properties inside a link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Record.html[`Record`] object are embedded within link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Value.html[`Value`] objects.
+Properties inside a link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/Record.html[`Record`] object are embedded within link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/Value.html[`Value`] objects.
 To extract and cast them to the corresponding Java types, use `.as<type>()` (eg. `.asString()`, `asInt()`, etc).
 For example, if the `name` property coming from the database is a string, `record.get("name").asString()` will yield the property value as a `String` object.
 
@@ -76,7 +83,7 @@ For more information, see xref:data-types.adoc[].
 
 == Update the database
 
-To update a node's information in the database, use the Cypher clauses link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/match/[`MATCH`] and link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/set/[`SET`]:
+To update a node's information in the database, use the Cypher clauses link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/match/[`MATCH`] and link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/set/[`SET`]:
 
 .Update node `Alice` to add an `age` property
 [source, java]
@@ -123,7 +130,7 @@ System.out.println(summary.counters().containsUpdates());
 
 
 == Delete from the database
-To remove a node and any relationship attached to it, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/delete/[`DETACH DELETE`]:
+To remove a node and any relationship attached to it, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/delete/[`DETACH DELETE`]:
 
 .Remove the `Alice` node and all its relationships
 [source, java]
@@ -149,7 +156,7 @@ System.out.println(summary.counters().containsUpdates());
 == Query parameters
 
 *Do not hardcode or concatenate parameters directly into queries*.
-Instead, always use placeholders and specify the link:{neo4j-docs-base-uri}/cypher-manual/current/syntax/parameters/[Cypher parameters], as shown in the previous examples.
+Instead, always use placeholders and specify the link:{neo4j-docs-base-uri}/cypher-manual/5/syntax/parameters/[Cypher parameters], as shown in the previous examples.
 This is for:
 
 1. *performance benefits*: Neo4j compiles and caches queries, but can only do so if the query structure is unchanged;
@@ -172,9 +179,9 @@ For those rare use cases, see xref:query-advanced#_dynamic_values_in_property_ke
 
 == Error handling
 
-A query run may fail for a number of reasons, with different link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/exceptions/package-summary.html[exceptions] being raised.
+A query run may fail for a number of reasons, with different link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/exceptions/package-summary.html[exceptions] being raised.
 Some of them are due to Cypher syntax errors, permission issues, or other forms of misconfiguration/misusage.
-The choice of how to handle those exceptions is up to your application: whether you want to be defensive (for example check if there are records to process to avoid link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/exceptions/NoSuchRecordException.html[NoSuchRecordException]), or whether you want to catch and handle the exceptions as they arise.
+The choice of how to handle those exceptions is up to your application: whether you want to be defensive (for example check if there are records to process to avoid link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/exceptions/NoSuchRecordException.html[NoSuchRecordException]), or whether you want to catch and handle the exceptions as they arise.
 
 [TIP]
 The driver automatically retries to run a failed query, if the failure is deemed to be transient (for example due to temporary server unavailability).
@@ -184,14 +191,14 @@ An exception will be raised if the operation keeps failing after a number of att
 == Query configuration
 
 You can supply further configuration parameters to alter the default behavior of `.executableQuery()`.
-You do so through the method `.withConfig()`, which takes a link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/QueryConfig.html[`QueryConfig`] object.
+You do so through the method `.withConfig()`, which takes a link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/QueryConfig.html[`QueryConfig`] object.
 
 
 === Database selection
 
 It is recommended to *always specify the database explicitly* with the `.withDatabase("<dbName>")` method, even on single-database instances.
 This allows the driver to work more efficiently, as it saves a network round-trip to the server to resolve the home database.
-If no database is given, the link:https://neo4j.com/docs/operations-manual/current/database-administration/#manage-databases-default[user's home database] is used.
+If no database is given, the link:https://neo4j.com/docs/operations-manual/5/database-administration/#manage-databases-default[user's home database] is used.
 
 [source, java]
 ----
@@ -203,7 +210,7 @@ var result = driver.executableQuery("MATCH (p:Person) RETURN p.name")
 ----
 
 [TIP]
-Specifying the database through the configuration method is preferred over the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/use/[`USE`] Cypher clause.
+Specifying the database through the configuration method is preferred over the link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/use/[`USE`] Cypher clause.
 If the server runs on a cluster, queries with `USE` require server-side routing to be enabled.
 Queries may also take longer to execute as they may not reach the right cluster member at the first attempt, and need to be routed to one containing the requested database.
 
@@ -228,7 +235,7 @@ var result = driver.executableQuery("MATCH (p:Person) RETURN p.name")
 
 [NOTE]
 ====
-Although executing a _write_ query in read mode likely results in a runtime error, *you should not rely on this for access control.* The difference between the two modes is that _read_ transactions will be routed to any node of a cluster, whereas _write_ ones will be directed to the leader.
+Although executing a _write_ query in read mode likely results in a runtime error, *you should not rely on this for access control.* The difference between the two modes is that _read_ transactions will be routed to any node of a cluster, whereas _write_ ones are directed to primaries.
 In other words, there is no guarantee that a write query submitted in read mode will be rejected.
 ====
 
@@ -240,7 +247,7 @@ In other words, there is no guarantee that a write query submitted in read mode 
 You can execute a query through a different user with the method `.withAuthToken()`.
 Switching user at the query level is cheaper than creating a new `Driver` object.
 The query is then run within the security context of the given user (i.e., home database, permissions, etc.). +
-Query-scoped authentication a server version >= 5.8.
+Query-scoped authentication requires a server version >= 5.8.
 
 [source, java, test-skip]
 ----
@@ -257,7 +264,7 @@ var result = driver.executableQuery("MATCH (p:Person) RETURN p.name")
 ----
 
 The method `.withImpersonatedUser()` provides a similar functionality, and is available in driver/server versions >= 4.4.
-The difference is that you don't need to know a user's password to impersonate them, but the user under which the `Driver` was created needs to have the link:{neo4j-docs-base-uri}/operations-manual/current/authentication-authorization/dbms-administration/#access-control-dbms-administration-impersonation[appropriate permissions].
+The difference is that you don't need to know a user's password to impersonate them, but the user under which the `Driver` was created needs to have the link:{neo4j-docs-base-uri}/operations-manual/5/authentication-authorization/dbms-administration/#access-control-dbms-administration-impersonation[appropriate permissions].
 
 [source, java, test-skip]
 ----
@@ -361,7 +368,7 @@ public class App {
 }
 ----
 
-For more information see link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/ExecutableQuery.html[API documentation -> Driver.executableQuery()].
+For more information see link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/ExecutableQuery.html[API documentation -> Driver.executableQuery()].
 
 
 ifndef::backend-pdf[]

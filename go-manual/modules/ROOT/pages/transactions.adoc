@@ -453,7 +453,7 @@ For a complete list of `ResultWithContext` methods, see link:https://pkg.go.dev/
 
 It is recommended to *always specify the database explicitly* with the configuration parameter `DatabaseName` upon session creation, even on single-database instances.
 This allows the driver to work more efficiently, as it saves a network round-trip to the server to resolve the home database.
-If no database is given, the link:{neo4j-docs-base-uri}/operations-manual/current/database-administration/#manage-databases-default[default database] set in the Neo4j instance settings is used.
+If no database is given, the link:{neo4j-docs-base-uri}/operations-manual/5/database-administration/#manage-databases-default[default database] set in the Neo4j instance settings is used.
 
 [source, go]
 ----
@@ -463,7 +463,7 @@ session := driver.NewSession(ctx, neo4j.SessionConfig{
 ----
 
 [TIP]
-Specifying the database through the configuration method is preferred over the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/use/[`USE`] Cypher clause.
+Specifying the database through the configuration method is preferred over the link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/use/[`USE`] Cypher clause.
 If the server runs on a cluster, queries with `USE` require server-side routing to be enabled.
 Queries may also take longer to execute as they may not reach the right cluster member at the first attempt, and need to be routed to one containing the requested database.
 
@@ -486,7 +486,7 @@ session := driver.NewSession(ctx, neo4j.SessionConfig{
 // .Routing ≠ Access control
 [NOTE]
 ====
-Although executing a _write_ query in read mode likely results in a runtime error, *you should not rely on this for access control.* The difference between the two modes is that _read_ transactions will be routed to any node of a cluster, whereas _write_ ones will be directed to the leader.
+Although executing a _write_ query in read mode likely results in a runtime error, *you should not rely on this for access control.* The difference between the two modes is that _read_ transactions will be routed to any node of a cluster, whereas _write_ ones are directed to primaries.
 In other words, there is no guarantee that a write query submitted in read mode will be rejected.
 
 Similar remarks hold for the `.ExecuteRead()` and `.ExecuteWrite()` methods.
@@ -512,7 +512,7 @@ session := driver.NewSession(ctx, neo4j.SessionConfig{
 ----
 
 The option `ImpersonatedUser` provides a similar functionality, and is available in driver/server versions >= 4.4.
-The difference is that you don't need to know a user's password to impersonate them, but the user under which the `Driver` was created needs to have the link:{neo4j-docs-base-uri}/operations-manual/current/authentication-authorization/dbms-administration/#access-control-dbms-administration-impersonation[appropriate permissions].
+The difference is that you don't need to know a user's password to impersonate them, but the user under which the `Driver` was created needs to have the link:{neo4j-docs-base-uri}/operations-manual/5/authentication-authorization/dbms-administration/#access-control-dbms-administration-impersonation[appropriate permissions].
 
 [source, go]
 ----

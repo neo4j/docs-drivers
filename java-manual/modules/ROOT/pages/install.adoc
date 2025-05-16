@@ -16,7 +16,7 @@ If you already have a Maven project, you may add the driver as a dependency in y
 <dependency>
     <groupId>org.neo4j.driver</groupId>
     <artifactId>neo4j-java-driver</artifactId>
-    <version>{java-driver-version}</version>
+    <version>{java-driver-version-minor}</version>
 </dependency>
 ----
 
@@ -38,7 +38,7 @@ java -jar target/neo4j-demo-app-1.0-SNAPSHOT-jar-with-dependencies.jar
 For other dependency management systems, refer to the link:https://central.sonatype.com/artifact/org.neo4j.driver/neo4j-java-driver[driver's package page].
 
 Always use the latest version of the driver, as it will always work both with the previous Neo4j <<LTS>> release and with the current and next major releases.
-The latest `5.x` driver supports connection to any Neo4j 5 and 4.4 instance, and will also be compatible with Neo4j 6.
+The latest `5.x` driver supports connection to any Neo4j instances version 4.4, 5.x, and 2025.x.
 For a detailed list of changes across versions, see the link:https://github.com/neo4j/neo4j-java-driver/wiki/5.x-changelog[driver's changelog].
 
 

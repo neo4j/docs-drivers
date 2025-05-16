@@ -1,7 +1,7 @@
 = Explore the query execution summary
 
 After all results coming from a query have been processed, the server ends the transaction by returning a summary of execution.
-It comes as a link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/summary/ResultSummary.html[`ResultSummary`] object, and it contains information among which:
+It comes as a link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/summary/ResultSummary.html[`ResultSummary`] object, and it contains information among which:
 
 - xref:_query_counters[**Query counters**] -- What changes the query triggered on the server
 - xref:_query_execution_plan[**Query execution plan**] -- How the database would execute (or executed) the query
@@ -44,7 +44,7 @@ try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").
 
 == Query counters
 
-The method `ResultSummary.counters()` returns counters for the operations that a query triggered (as a link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/summary/SummaryCounters.html[`SummaryCounters`] object).
+The method `ResultSummary.counters()` returns counters for the operations that a query triggered (as a link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/summary/SummaryCounters.html[`SummaryCounters`] object).
 
 .Insert some data and display the query counters
 [source, java]
@@ -74,7 +74,7 @@ There are two additional boolean methods which act as meta-counters:
 == Query execution plan
 
 If you prefix a query with `EXPLAIN`, the server will return the plan it _would_ use to run the query, but will not actually run it.
-The plan is then available as a link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/summary/Plan.html[`Plan`] object through the method `ResultSummary.plan()`, and contains the list of link:{neo4j-docs-base-uri}/cypher-manual/current/execution-plans/operators/[Cypher operators] that would be used to retrieve the result set.
+The plan is then available as a link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/summary/Plan.html[`Plan`] object through the method `ResultSummary.plan()`, and contains the list of link:https://neo4j.com/docs/cypher-manual/5/planning-and-tuning/operators/[Cypher operators] that would be used to retrieve the result set.
 You may use this information to locate potential bottlenecks or room for xref:performance.adoc[performance improvements] (for example through the creation of indexes).
 
 [source, java, role=nocollapse]
@@ -108,7 +108,7 @@ Total database accesses: ?
 
 If you instead prefix a query with the keyword `PROFILE`, the server will return the execution plan it has used to run the query, together with profiler statistics.
 This includes the list of operators that were used and additional profiling information about each intermediate step.
-The plan is available as a link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/summary/Plan.html[`Plan`] object through the method `ResultSummary.profile()`.
+The plan is available as a link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/summary/Plan.html[`Plan`] object through the method `ResultSummary.profile()`.
 Notice that the query is also _run_, so the result object also contains any result records.
 
 [source, java, role=nocollapse]
@@ -140,12 +140,12 @@ Total database accesses: 12, total allocated memory: 184
 */
 ----
 
-For more information and examples, see link:{neo4j-docs-base-uri}/cypher-manual/current/query-tuning/basic-example/#_profile_query[Basic query tuning].
+For more information and examples, see link:{neo4j-docs-base-uri}/cypher-manual/5/query-tuning/basic-example/#_profile_query[Basic query tuning].
 
 
 == Notifications
 
-After executing a query, the server can return link:{neo4j-docs-base-uri}/status-codes/current/notifications/[notifications] alongside the query result.
+After executing a query, the server can return link:{neo4j-docs-base-uri}/status-codes/5/notifications/[notifications] alongside the query result.
 Notifications contain recommendations for performance improvements, warnings about the usage of deprecated features, and other hints about sub-optimal usage of Neo4j.
 
 [TIP]
@@ -158,7 +158,7 @@ GQL status codes are planned to supersede Neo4j status codes.
 =====
 [.include-with-neo4j-status-code]
 ======
-The method `ResultSummary.notifications()` returns a list of link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/summary/Notification.html[`Notification`] objects.
+The method `ResultSummary.notifications()` returns a list of link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/summary/Notification.html[`Notification`] objects.
 
 [source, java, role=nocollapse]
 ----
@@ -192,7 +192,7 @@ System.out.println(notifications);
 
 With version >= 5.25, the method `ResultSummary.gqlStatusObjects()` returns an ordered set of GQL-compliant status objects.
 
-The set can contain both link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/summary/Notification.html[`Notification`] objects and link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/summary/GqlStatusObject.html[`GqlStatusObject`] objects.
+The set can contain both link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/summary/Notification.html[`Notification`] objects and link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/summary/GqlStatusObject.html[`GqlStatusObject`] objects.
 The latter encodes the query's _outcome_ status: `00000` for "success", `02000` for "no data", and `00001` for "omitted result".
 The set always contains at least one entry, containing the outcome status.
 
@@ -223,11 +223,11 @@ System.out.println(statuses);
 === Filter notifications
 
 By default, the server analyses each query for all categories and severity of notifications.
-Starting from version 5.22, you can use the configuration methods link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Config.ConfigBuilder.html#withMinimumNotificationSeverity(org.neo4j.driver.NotificationSeverity)[`.withMinimumNotificationSeverity()`] and link:https://neo4j.com/docs/api/java-driver/5.24/org.neo4j.driver/org/neo4j/driver/Config.ConfigBuilder.html#withDisabledNotificationClassifications(java.util.Set)[`.withDisabledNotificationClassification()`] to tweak the severity and/or category/classification of notifications that you are interested into, or to disable them altogether.
+Starting from version 5.22, you can use the configuration methods link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/Config.ConfigBuilder.html#withMinimumNotificationSeverity(org.neo4j.driver.NotificationSeverity)[`.withMinimumNotificationSeverity()`] and link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/Config.ConfigBuilder.html#withDisabledNotificationClassifications(java.util.Set)[`.withDisabledNotificationClassification()`] to tweak the severity and/or category/classification of notifications that you are interested into, or to disable them altogether.
 There is a slight performance gain in restricting the amount of notifications the server is allowed to raise.
 
 The severity filter applies to both Neo4j and GQL notifications.
-The category filter acts on both categories and classifications.
+The classification filter acts on both categories and classifications.
 
 You can call the methods both on a `Config` object when creating a `Driver` instance, and on a `SessionConfig` object when creating a session.
 
@@ -246,7 +246,7 @@ var driver = GraphDatabase.driver(
     dbUri, AuthTokens.basic(dbUser, dbPassword),
     Config.builder()
     .withMinimumNotificationSeverity(NotificationSeverity.WARNING)  // NotificationSeverity.OFF to disable entirely
-    .withDisabledNotificationClassifications(Set.of(NotificationClassification.PERFORMANCE, NotificationClassification.GENERIC))  // filters categories as well
+    .withDisabledNotificationClassifications(Set.of(NotificationClassification.HINT, NotificationClassification.GENERIC))  // filters categories as well
     .build()
 );
 
@@ -255,7 +255,7 @@ var session = driver.session(
     SessionConfig.builder()
     .withDatabase("neo4j")
     .withMinimumNotificationSeverity(NotificationSeverity.WARNING)  // NotificationSeverity.OFF to disable entirely
-    .withDisabledNotificationClassifications(Set.of(NotificationClassification.PERFORMANCE, NotificationClassification.GENERIC))  // filters categories as well
+    .withDisabledNotificationClassifications(Set.of(NotificationClassification.HINT, NotificationClassification.GENERIC))  // filters categories as well
     .build()
 );
 ----
@@ -263,7 +263,7 @@ var session = driver.session(
 .Notifications filtering on versions earlier than 5.22
 [%collapsible]
 ====
-For versions earlier than 5.22, notification filtering is done via the configuration method link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Config.ConfigBuilder.html#withNotificationConfig(org.neo4j.driver.NotificationConfig)[`.withNotificationConfig()`] (versions 5.7+).
+For versions earlier than 5.22, notification filtering is done via the configuration method link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/Config.ConfigBuilder.html#withNotificationConfig(org.neo4j.driver.NotificationConfig)[`.withNotificationConfig()`] (versions 5.7+).
 
 The `NotificationConfig` interface provides the methods `.enableMinimumSeverity()`, `.disableCategories()`, and `.disableAllConfig()` to set the configuration.
 

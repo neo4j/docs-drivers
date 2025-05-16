@@ -7,7 +7,7 @@ This is not a problem for most use cases, but for queries that have a long proce
 
 == Asynchronous managed transactions
 
-You run an asynchronous transaction through an link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/async/AsyncSession.html[`AsyncSession`].
+You run an asynchronous transaction through an link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/async/AsyncSession.html[`AsyncSession`].
 The flow is similar to that of xref:transactions.adoc[regular transactions], except that async transaction functions return a link:https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/CompletionStage.html[`CompletionStage`] object (which may be further converted into link:https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/CompletableFuture.html[`CompletableFuture`]).
 
 
@@ -65,13 +65,13 @@ public class App {
 ----
 
 <1> Driver creation is the same in the synchronous and asynchronous versions.
-<2> An asynchronous session is created by providing `AsyncSession.class` as first parameter to link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Driver.html#session(java.lang.Class,org.neo4j.driver.SessionConfig)[`Driver.session()`], which returns an link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/async/AsyncSession.html[`AsyncSession`] object.
+<2> An asynchronous session is created by providing `AsyncSession.class` as first parameter to link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/Driver.html#session(java.lang.Class,org.neo4j.driver.SessionConfig)[`Driver.session()`], which returns an link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/async/AsyncSession.html[`AsyncSession`] object.
 Note that async sessions may not be opened as resources with `try` statements, as the driver can't know when it is safe to close them.
 <3> As for regular transactions, `.executeWriteAsync()` (and `executeReadAsync()`) take a transaction function callback.
-Inside the transaction function, run queries with link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/async/AsyncQueryRunner.html#runAsync(org.neo4j.driver.Query)[`.runAsync()`].
+Inside the transaction function, run queries with link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/async/AsyncQueryRunner.html#runAsync(org.neo4j.driver.Query)[`.runAsync()`].
 Each query run returns a link:https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/CompletionStage.html[`CompletionStage`].
 <4> Optionally use methods on `CompletionStage` to process the result in the asynchronous runner.
-The query's result set is available as an link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/cursor/AsyncResultCursor.html[`AsyncResultCursor`], which implements a similar set of methods for processing the result to those of synchronous transactions (see xref:transactions.adoc#process-result[Transactions -> Process query results]). +
+The query's result set is available as an link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/async/ResultCursor.html[`async.ResultCursor`], which implements a similar set of methods for processing the result to those of synchronous transactions (see xref:transactions.adoc#process-result[Transactions -> Process query results]). +
 Inner object types are the same as the synchronous case (i.e. `Record`, `ResultSummary`).
 <5> Optionally run operations once the query has completed, such as closing the driver session.
 <6> link:https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/CompletableFuture.html[`CompletableFuture`] is a convenient type to return back to the caller.
