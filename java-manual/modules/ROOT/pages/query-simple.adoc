@@ -18,11 +18,11 @@ To create two nodes representing persons named `Alice` and `David`, and a relati
 // import java.util.concurrent.TimeUnit;
 // import org.neo4j.driver.QueryConfig;
 
-var result = driver.executableQuery("""  // <1>
-    CREATE (a:Person {name: $name})
+var result = driver.executableQuery("""
+    CREATE (a:Person {name: $name})  // <1>
     CREATE (b:Person {name: $friendName})
     CREATE (a)-[:KNOWS]->(b)
-    """,
+    """)
     .withParameters(Map.of("name", "Alice", "friendName", "David"))  // <2>
     .withConfig(QueryConfig.builder().withDatabase("neo4j").build())  // <3>
     .execute();
@@ -51,7 +51,7 @@ To retrieve information from the database, use the Cypher clause link:{neo4j-doc
 var result = driver.executableQuery("""
     MATCH (p:Person)-[:KNOWS]->(:Person)
     RETURN p.name AS name
-    """,
+    """)
     .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
     .execute();
 
