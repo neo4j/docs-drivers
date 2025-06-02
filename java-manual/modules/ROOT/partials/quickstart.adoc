@@ -6,6 +6,7 @@ For this reason, although this guide does _also_ provide a gentle introduction t
 You may then apply that knowledge while following this guide to develop your Java application.
 
 
+[#install]
 == Installation
 
 Add the Neo4j Java driver to the list of dependencies in the `pom.xml` of your Maven project:
@@ -15,13 +16,14 @@ Add the Neo4j Java driver to the list of dependencies in the `pom.xml` of your M
 <dependency>
     <groupId>org.neo4j.driver</groupId>
     <artifactId>neo4j-java-driver</artifactId>
-    <version>{java-driver-version}</version>
+    <version>{java-driver-version-minor}</version>
 </dependency>
 ----
 
 xref:install#install-driver[More info on installing the driver ->]
 
 
+[#connect]
 == Connect to the database
 
 Connect to a database by creating a <<Driver>> object and providing a URL and an authentication token.
@@ -54,19 +56,53 @@ public class App {
 xref:connect.adoc[More info on connecting to a database ->]
 
 
-== Query the database
+[#create-graph]
+== Create an example graph
 
-Execute a Cypher statement with the method `Driver.executableQuery()`.
+Run a Cypher query with the method `Driver.executableQuery()`.
 Do not hardcode or concatenate parameters: use placeholders and specify the parameters as a map through the `.withParameters()` method.
 
-[source, java, role=nocollapse]
+.Create two `Person` nodes and a `KNOWS` relationship between them
+[source, java]
 ----
 // import java.util.Map;
+// import java.util.concurrent.TimeUnit;
 // import org.neo4j.driver.QueryConfig;
 
-// Get all 42-year-olds
-var result = driver.executableQuery("MATCH (p:Person {age: $age}) RETURN p.name AS name")
-    .withParameters(Map.of("age", 42))
+var result = driver.executableQuery("""
+    CREATE (a:Person {name: $name})
+    CREATE (b:Person {name: $friendName})
+    CREATE (a)-[:KNOWS]->(b)
+    """)
+    .withParameters(Map.of("name", "Alice", "friendName", "David"))
+    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+    .execute();
+
+// Summary information
+var summary = result.summary();
+System.out.printf("Created %d records in %d ms.%n",
+    summary.counters().nodesCreated(),
+    summary.resultAvailableAfter(TimeUnit.MILLISECONDS));
+----
+
+xref:query-simple.adoc[More info on querying the database ->]
+
+
+[#query-graph]
+== Query a graph
+
+To retrieve information from the database, use the Cypher clause `MATCH`:
+
+.Retrieve all `Person` nodes who like other `Person` s
+[source, java]
+----
+// import java.util.concurrent.TimeUnit;
+// import org.neo4j.driver.QueryConfig;
+
+var result = driver.executableQuery("""
+    MATCH (p:Person)-[:KNOWS]->(:Person)
+    RETURN p.name AS name
+    """)
     .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
     .execute();
 
@@ -86,6 +122,7 @@ System.out.printf("The query %s returned %d records in %d ms.%n",
 xref:query-simple.adoc[More info on querying the database ->]
 
 
+[#transactions]
 == Run your own transactions
 
 For more advanced use-cases, you can run <<transaction,transactions>>.
@@ -205,6 +242,7 @@ public class App {
 xref:transactions.adoc[More info on running transactions ->]
 
 
+[#close]
 == Close connections and sessions
 
 Unless you created them with `try-with-resources` statements, call the `.close()` method on all `Driver` and `Session` instances to release any resources still held by them.

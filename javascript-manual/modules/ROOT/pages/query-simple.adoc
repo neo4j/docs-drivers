@@ -64,7 +64,6 @@ console.log(  // <2>
   `The query \`${summary.query.text}\` ` +
   `returned ${records.length} nodes.\n`
 )
-
 ----
 
 <1> `records` contains the actual result as a list of link:{neo4j-docs-base-uri}/api/javascript-driver/{javascript-driver-version}/class/lib6/record.js~Record.html[`Record`] objects.
