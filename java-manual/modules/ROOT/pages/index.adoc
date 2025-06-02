@@ -5,7 +5,6 @@ ifdef::backend-pdf[]
 endif::[]
 ifndef::backend-pdf[]
 = Build applications with Neo4j and Java
-:page-toclevels: 0
 endif::[]
 
 // If we are building the PDF, add a heading and include the quickstart information offset by one level
