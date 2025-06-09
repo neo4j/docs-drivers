@@ -6,7 +6,7 @@ site:
 content:
   sources:
   - url : ./
-    branches: ['HEAD','4.4','4.3','4.2']
+    branches: ['HEAD','4.4']
     edit_url: https://github.com/neo4j/docs-drivers/tree/{refname}/{path}
     worktrees: true
     start_paths:
@@ -16,14 +16,6 @@ content:
     - javascript-manual
     - python-manual
     - common-content
-    exclude:
-    - '!**/_includes/*'
-    - '!**/readme.adoc'
-    - '!**/README.adoc'
-  - url : ./
-    branches: ['4.1','4.0','1.7']
-    edit_url: https://github.com/neo4j/docs-drivers/tree/{refname}/{path}
-    worktrees: true
     exclude:
     - '!**/_includes/*'
     - '!**/readme.adoc'

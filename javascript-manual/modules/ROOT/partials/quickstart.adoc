@@ -6,6 +6,7 @@ For this reason, although this guide does _also_ provide a gentle introduction t
 You may then apply that knowledge while following this guide to develop your JavaScript application.
 
 
+[#install]
 == Installation
 
 Install the Neo4j Javascript driver with `npm`:
@@ -18,6 +19,7 @@ npm i neo4j-driver
 xref:install#install-driver[More info on installing the driver ->]
 
 
+[#connect]
 == Connect to the database
 
 Connect to a database by creating a <<Driver>> object and providing a URL and an authentication token.
@@ -47,37 +49,65 @@ var neo4j = require('neo4j-driver');
 xref:connect.adoc[More info on connecting to a database ->]
 
 
-== Query the database
+[#create-graph]
+== Create an example graph
 
-Execute a Cypher statement with the method `Driver.executeQuery()`.
+Run a Cypher query with the method `Driver.executeQuery()`.
 Do not hardcode or concatenate parameters: use placeholders and specify the parameters as key-value pairs.
 
-[source, javascript, role=nocollapse]
+.Create two `Person` nodes and a `KNOWS` relationship between them
+[source, javascript]
 ----
-// Get the name of all 42 year-olds
-const { records, summary, keys } = await driver.executeQuery(
-  'MATCH (p:Person {age: $age}) RETURN p.name AS name',
-  { age: 42 },
+let { records, summary } = await driver.executeQuery(`
+  CREATE (a:Person {name: $name})
+  CREATE (b:Person {name: $friendName})
+  CREATE (a)-[:KNOWS]->(b)
+  `,
+  { name: 'Alice', friendName: 'David' },
   { database: 'neo4j' }
 )
-
-// Summary information
 console.log(
-  `>> The query ${summary.query.text} ` +
-  `returned ${records.length} records ` +
+  `Created ${summary.counters.updates().nodesCreated} nodes ` +
   `in ${summary.resultAvailableAfter} ms.`
 )
-
-// Loop through results and do something with them
-console.log('>> Results')
-for(record of records) {
-  console.log(record.get('name'))
-}
 ----
 
 xref:query-simple.adoc[More info on querying the database ->]
 
 
+[#query-graph]
+== Query a graph
+
+To retrieve information from the database, use the Cypher clause `MATCH`:
+
+.Retrieve all `Person` nodes who like other `Person` s
+[source, javascript]
+----
+let { records, summary } = await driver.executeQuery(`
+  MATCH (p:Person)-[:KNOWS]->(:Person)
+  RETURN p.name AS name
+  `,
+  {},
+  { database: 'neo4j' }
+)
+
+// Loop through users and do something with them
+for(let record of records) {
+  console.log(`Person with name: ${record.get('name')}`)
+  console.log(`Available properties for this node are: ${record.keys}\n`)
+}
+
+// Summary information
+console.log(
+  `The query \`${summary.query.text}\` ` +
+  `returned ${records.length} nodes.\n`
+)
+----
+
+xref:query-simple.adoc[More info on querying the database ->]
+
+
+[#transactions]
 == Run your own transactions
 
 For more advanced use-cases, you can run <<transaction,transactions>>.
@@ -167,6 +197,7 @@ const neo4j = require('neo4j-driver');
 xref:transactions.adoc[More info on running transactions ->]
 
 
+[#close]
 == Close connections and sessions
 
 Call the `.close()` method on the `Driver` instance when you are finished with it, to release any resources still held by it.

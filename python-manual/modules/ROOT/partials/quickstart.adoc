@@ -6,6 +6,7 @@ For this reason, although this guide does _also_ provide a gentle introduction t
 You may then apply that knowledge while following this guide to develop your Python application.
 
 
+[#install]
 == Installation
 
 Install the Neo4j Python driver with `pip`:
@@ -18,6 +19,7 @@ pip install neo4j
 xref:install#install-driver[More info on installing the driver ->]
 
 
+[#connect]
 == Connect to the database
 
 Connect to a database by creating a <<Driver>> object and providing a URL and an authentication token.
@@ -38,34 +40,62 @@ with GraphDatabase.driver(URI, auth=AUTH) as driver:
 xref:connect.adoc[More info on connecting to a database ->]
 
 
-== Query the database
+[#create-graph]
+== Create an example graph
 
-Execute a Cypher statement with the method `Driver.execute_query()`.
+Run a Cypher query with the method `Driver.execute_query()`.
 Do not hardcode or concatenate parameters: use placeholders and specify the parameters as keyword arguments.
 
+.Create two `Person` nodes and a `KNOWS` relationship between them
 [source, python]
 ----
-# Get the name of all 42 year-olds
-records, summary, keys = driver.execute_query(
-    "MATCH (p:Person {age: $age}) RETURN p.name AS name",
-    age=42,
+summary = driver.execute_query("""
+    CREATE (a:Person {name: $name})
+    CREATE (b:Person {name: $friendName})
+    CREATE (a)-[:KNOWS]->(b)
+    """,
+    name="Alice", friendName="David",
     database_="neo4j",
-)
-
-# Loop through results and do something with them
-for person in records:
-    print(person)
-
-# Summary information
-print("The query `{query}` returned {records_count} records in {time} ms.".format(
-    query=summary.query, records_count=len(records),
-    time=summary.result_available_after,
+).summary
+print("Created {nodes_created} nodes in {time} ms.".format(
+    nodes_created=summary.counters.nodes_created,
+    time=summary.result_available_after
 ))
 ----
 
 xref:query-simple.adoc[More info on querying the database ->]
 
 
+[#query-graph]
+== Query a graph
+
+To retrieve information from the database, use the Cypher clause `MATCH`:
+
+.Retrieve all `Person` nodes who like other `Person` s
+[source, python]
+----
+records, summary, keys = driver.execute_query("""
+    MATCH (p:Person)-[:KNOWS]->(:Person)
+    RETURN p.name AS name
+    """,
+    database_="neo4j",
+)
+
+# Loop through results and do something with them
+for record in records:
+    print(record.data())  # obtain record as dict
+
+# Summary information
+print("The query `{query}` returned {records_count} records in {time} ms.".format(
+    query=summary.query, records_count=len(records),
+    time=summary.result_available_after
+))
+----
+
+xref:query-simple.adoc[More info on querying the database ->]
+
+
+[#transactions]
 == Run your own transactions
 
 For more advanced use-cases, you can run <<transaction,transactions>>.
@@ -143,6 +173,7 @@ if __name__ == "__main__":
 xref:transactions.adoc[More info on running transactions ->]
 
 
+[#close]
 == Close connections and sessions
 
 Unless you created them using the `with` statement, call the `.close()` method on all `Driver` and `Session` instances to release any resources still held by them.

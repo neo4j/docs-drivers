@@ -6,6 +6,7 @@ For this reason, although this guide does _also_ provide a gentle introduction t
 You may then apply that knowledge while following this guide to develop your Go application.
 
 
+[#install]
 == Installation
 
 From within a module, use `go get` to install the link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/[Neo4j Go Driver]:
@@ -18,6 +19,7 @@ go get github.com/neo4j/neo4j-go-driver/v5
 xref:install#install-driver[More info on installing the driver ->]
 
 
+[#connect]
 == Connect to the database
 
 Connect to a database by creating a <<DriverWithContext>> object and providing a URL and an authentication token.
@@ -55,24 +57,63 @@ func main() {
 xref:connect.adoc[More info on connecting to a database ->]
 
 
-== Query the database
+[#create-graph]
+== Create an example graph
 
-Execute a Cypher statement with the function `ExecuteQuery()`.
+Run a Cypher query with the function `ExecuteQuery()`.
 Do not hardcode or concatenate parameters: use placeholders and specify the parameters as keyword arguments.
 
-[source, go]
+.Create two `Person` nodes and a `KNOWS` relationship between them
+[source, go, role=nocollapse]
 ----
-// Get the name of all 42 year-olds
-result, _ := neo4j.ExecuteQuery(ctx, driver,
-    "MATCH (p:Person {age: $age}) RETURN p.name AS name",
+result, err := neo4j.ExecuteQuery(ctx, driver, `
+    CREATE (a:Person {name: $name})
+    CREATE (b:Person {name: $friendName})
+    CREATE (a)-[:KNOWS]->(b)
+    `,
     map[string]any{
-        "age": "42",
+        "name": "Alice",
+        "friendName": "David",
     }, neo4j.EagerResultTransformer,
     neo4j.ExecuteQueryWithDatabase("neo4j"))
+if err != nil {
+    panic(err)
+}
+
+summary := result.Summary
+fmt.Printf("Created %v nodes in %+v.\n",
+    summary.Counters().NodesCreated(),
+    summary.ResultAvailableAfter())
+----
+
+xref:query-simple.adoc[More info on querying the database ->]
+
+
+[#query-graph]
+== Query a graph
+
+To retrieve information from the database, use the Cypher clause `MATCH`:
+
+.Retrieve all `Person` nodes who like other `Person` s
+[source, go, role=nocollapse]
+----
+result, err := neo4j.ExecuteQuery(ctx, driver, `
+    MATCH (p:Person)-[:KNOWS]->(:Person)
+    RETURN p.name AS name
+    `,
+    nil,
+    neo4j.EagerResultTransformer,
+    neo4j.ExecuteQueryWithDatabase("neo4j"))
+if err != nil {
+    panic(err)
+}
 
 // Loop through results and do something with them
 for _, record := range result.Records {
-    fmt.Println(record.AsMap())
+    name, _ := record.Get("name")  // .Get() 2nd return is whether key is present
+    fmt.Println(name)
+    // or
+    // fmt.Println(record.AsMap())  // get Record as a map
 }
 
 // Summary information
@@ -84,6 +125,7 @@ fmt.Printf("The query `%v` returned %v records in %+v.\n",
 xref:query-simple.adoc[More info on querying the database ->]
 
 
+[#transactions]
 == Run your own transactions
 
 For more advanced use-cases, you can run <<transaction,transactions>>.
@@ -246,6 +288,7 @@ func addPersonToOrganization(ctx context.Context, tx neo4j.ManagedTransaction, p
 xref:transactions.adoc[More info on running transactions ->]
 
 
+[#close]
 == Close connections and sessions
 Call the `.close()` method on all `DriverWithContext` and `SessionWithContext` instances to release any resources still held by them.
 The best practice is to call the methods with the `defer` keyword as soon as you create new objects.
