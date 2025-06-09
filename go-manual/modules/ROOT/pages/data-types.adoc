@@ -184,7 +184,7 @@ Spatial types are implemented in the `dbtype` package, so that the actual types 
 However, they are also imported in the main `neo4j` package, so that they can also be used as `neo4j.Point2D/3D`.
 
 
-=== `Point2D`
+=== Point2D
 
 The type `Point2D` can be used to represent either a 2D Cartesian point or a 2D World Geodetic System (WGS84) point, depending on the value of `SpatialRefId`.
 
@@ -210,7 +210,7 @@ fmt.Println(wgs842d)
 ----
 
 
-=== `Point3D`
+=== Point3D
 
 The type `Point3D` can be used to represent either a 3D Cartesian point or a 3D World Geodetic System (WGS84) point, depending on the value of `SpatialRefId`.
 

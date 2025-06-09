@@ -224,7 +224,7 @@ print(point.x, point.y, point.z, point.srid)
 
 For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/{python-driver-version}/types/spatial.html#cartesianpoint[API documentation -- Spatial types -- CartesianPoint].
 
-=== `WGS84Point`
+=== WGS84Point
 
 Represents a point in the World Geodetic System (WGS84). +
 Exposes properties `longitude`, `latitude`, `height` (the latter for 3D points only), which are aliases for `x`, `y`, `z`.
