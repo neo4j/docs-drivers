@@ -119,7 +119,7 @@ Console.WriteLine(result.Result[0].Get<INode>("p").Get<Point>("location"));
 
 
 [#inode]
-=== `INode`
+=== INode
 Represents a node in a graph.
 
 .Essential members on node objects
@@ -165,7 +165,7 @@ For full documentation, see link:https://neo4j.com/docs/api/dotnet-driver/{dotne
 
 
 [#irelationship]
-=== `IRelationship`
+=== IRelationship
 
 Represents a relationship in a graph.
 
@@ -223,7 +223,7 @@ For full documentation, see link:https://neo4j.com/docs/api/dotnet-driver/{dotne
 
 
 [#ipath]
-=== `IPath`
+=== IPath
 
 Represents a path in a graph.
 
