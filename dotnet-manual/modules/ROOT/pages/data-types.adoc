@@ -52,7 +52,7 @@ var result = await driver.ExecutableQuery(@"
     MERGE (a)-[friendship:KNOWS {since: $friendsSince}]->(b)
     RETURN friendship.since AS date
 ")
-    .WithParameters(new { name = "Alice", friend = "Bob", friendsSince = friendsSince })
+    .WithParameters(new { name = "Astrid", friend = "Sara", friendsSince = friendsSince })
     .WithConfig(new QueryConfig(database: "neo4j"))
     .ExecuteAsync();
 
@@ -145,8 +145,8 @@ This should be used with care, as no guarantees are given about the mapping betw
 .Retrieve a node and display its details
 [source, csharp]
 ----
-var result = await driver.ExecutableQuery("MERGE (p:Person:Actor {name: $name, age: $age}) RETURN p")
-    .WithParameters(new { name = "Alice", age = 59 })
+var result = await driver.ExecutableQuery("MERGE (p:Person:Troublemaker {name: $name, age: $age}) RETURN p")
+    .WithParameters(new { name = "Carla", age = 59 })
     .WithConfig(new QueryConfig(database: "neo4j"))
     .ExecuteAsync();
 
@@ -155,9 +155,9 @@ Console.WriteLine("Labels: {0}", string.Join(", ", node.Labels));
 Console.WriteLine("Properties: {0}", string.Join(", ", node.Properties));
 Console.WriteLine("Name property: {0}", node.Get<string>("name"));
 /*
-Labels: Person, Actor
-Properties: [name, Alice], [age, 59]
-Name property: Alice
+Labels: Person, Troublemaker
+Properties: [name, Carla], [age, 59]
+Name property: Carla
 */
 ----
 
@@ -242,14 +242,14 @@ await driver.VerifyConnectivityAsync();
 // Create some :Person nodes linked by :KNOWS relationships
 await addFriend(driver, "Alice", "BFF", "Bob");
 await addFriend(driver, "Bob", "Fiends", "Sofia");
-await addFriend(driver, "Sofia", "Acquaintances", "Sofia");
+await addFriend(driver, "Sofia", "Acquaintances", "Alice");
 
 // Follow :KNOWS relationships outgoing from Alice three times, return as path
 var result = await driver.ExecutableQuery(@"
     MATCH path=(:Person {name: $name})-[:KNOWS*3]->(:Person)
     RETURN path AS friendshipChain
     ")
-    .WithParameters(new { name = "Alice", friendName = "Bob", status = "BFF" })
+    .WithParameters(new { name = "Alice" })
     .WithConfig(new QueryConfig(database: "neo4j"))
     .ExecuteAsync();
 
@@ -258,7 +258,7 @@ var path = result.Result[0].Get<IPath>("friendshipChain");
 
 Console.WriteLine("-- Path breakdown --");
 for (var i=0; i<path.Relationships.Count; i++) {
-    Console.WriteLine("{0} is friends with {1} ({2}).",
+    Console.WriteLine("{0} knows {1} ({2}).",
         path.Nodes[i].Get<string>("name"),
         path.Nodes[i+1].Get<string>("name"),
         path.Relationships[i].Get<string>("status")
@@ -266,9 +266,9 @@ for (var i=0; i<path.Relationships.Count; i++) {
 }
 /*
 -- Path breakdown --
-Alice is friends with Bob (BFF).
-Bob is friends with Sofia (Fiends).
-Sofia is friends with Sofia (Acquaintances).
+Alice knows Bob (BFF).
+Bob knows Sofia (Fiends).
+Sofia knows Sofia (Acquaintances).
 */
 
 async Task addFriend(IDriver driver, string name, string status, string friendName) {
