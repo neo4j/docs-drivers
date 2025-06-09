@@ -6,6 +6,7 @@ For this reason, although this guide does _also_ provide a gentle introduction t
 You may then apply that knowledge while following this guide to develop your .NET application.
 
 
+[#install]
 == Installation
 
 Add the Neo4j .NET driver to your project:
@@ -20,6 +21,7 @@ The driver supports the .NET Standard 2.0.
 xref:install#install-driver[More info on installing the driver ->]
 
 
+[#connect]
 == Connect to the database
 
 Connect to a database by creating an <<IDriver>> object and providing a URL and an authentication token.
@@ -42,18 +44,45 @@ Console.WriteLine("Connection established.");
 xref:connect.adoc[More info on connecting to a database ->]
 
 
-== Query the database
+[#create-graph]
+== Create an example graph
 
-Execute a Cypher statement with the method `IDriver.ExecutableQuery()`.
+Run a Cypher query with the method `IDriver.ExecutableQuery()`.
 Do not hardcode or concatenate parameters: use placeholders and specify the parameters as a map through the `.WithParameters()` method.
 
+.Create two `Person` nodes and a `KNOWS` relationship between them
 [source, csharp]
 ----
-// Get all 42-year-olds
-var result = await driver
-    .ExecutableQuery("MATCH (p:Person {age: $age}) RETURN p.name AS name")
+var result = await driver.ExecutableQuery(@"
+    CREATE (a:Person {name: $name})
+    CREATE (b:Person {name: $friendName})
+    CREATE (a)-[:KNOWS]->(b)
+    ")
+    .WithParameters(new { name = "Alice", friendName = "David" })
     .WithConfig(new QueryConfig(database: "neo4j"))
-    .WithParameters(new { age = 42 } )
+    .ExecuteAsync();
+
+// Summary information
+var summary = result.Summary;
+Console.WriteLine($"Created {summary.Counters.NodesCreated} nodes in {summary.ResultAvailableAfter.Milliseconds} ms.");
+----
+
+xref:query-simple.adoc[More info on querying the database ->]
+
+
+[#query-graph]
+== Query a graph
+
+To retrieve information from the database, use the Cypher clause `MATCH`:
+
+.Retrieve all `Person` nodes who like other `Person` s
+[source, csharp]
+----
+var result = await driver.ExecutableQuery(@"
+    MATCH (p:Person)-[:KNOWS]->(:Person)
+    RETURN p.name AS name
+    ")
+    .WithConfig(new QueryConfig(database: "neo4j"))
     .ExecuteAsync();
 
 // Loop through results and print people's name
@@ -69,104 +98,7 @@ Console.WriteLine($"The query `{summary.Query.Text}` returned {result.Result.Cou
 xref:query-simple.adoc[More info on querying the database ->]
 
 
-== Run your own transactions
-
-For more advanced use-cases, you can run <<transaction,transactions>>.
-Use the methods `IAsyncSession.ExecuteReadAsync()` and `IAsyncSession.ExecuteWriteAsync()` to run managed transactions.
-
-.A transaction with multiple queries, client logic, and potential roll backs
-[source, csharp]
-----
-using Neo4j.Driver;
-
-const string dbUri = "<URI for Neo4j database>";
-const string dbUser = "<Username>";
-const string dbPassword = "<Password>";
-
-await using var driver = GraphDatabase.Driver(dbUri, AuthTokens.Basic(dbUser, dbPassword));
-await driver.VerifyConnectivityAsync();
-
-// Create & employ 100 people to 10 different organizations
-using var session = driver.AsyncSession(conf => conf.WithDatabase("neo4j"));
-for (int i=0; i<100; i++) {
-    var name = $"Thor{i}";
-    try {
-        string orgId = await session.ExecuteWriteAsync(async tx => {
-            return await employPersonTx(tx, name);
-        });
-        Console.WriteLine($"User {name} added to organization {orgId}.");
-    } catch (Neo4jException e) {
-        Console.WriteLine(e);
-    }
-}
-
-async Task<string> employPersonTx(IAsyncQueryRunner tx, string name) {
-    var employeeThreshold = 10;
-
-    // Create new Person node with given name, if not exists already
-    await tx.RunAsync("MERGE (p:Person {name: $name})", new { name = name });
-
-    // Obtain most recent organization ID and the number of people linked to it
-    var result = await tx.RunAsync(@"
-        MATCH (o:Organization)
-        RETURN o.id AS id, COUNT{(p:Person)-[r:WORKS_FOR]->(o)} AS employeesN
-        ORDER BY o.createdDate DESC
-        LIMIT 1
-        ");
-
-    string orgId = "";
-    int employeesN = 0;
-    bool org = await result.FetchAsync();
-    if (org == false) {
-        // If no organization exists, create one and add Person to it
-        orgId = await createOrganization(tx);
-        Console.WriteLine($"No orgs available, created {orgId}.");
-    } else {
-        orgId = result.Current.Get<string>("id");
-        employeesN = result.Current.Get<int>("employeesN");
-    }
-
-    // If org does not have too many employees, add this Person to it
-    if (employeesN < employeeThreshold) {
-        await addPersonToOrganization(tx, name, orgId);
-        // If the above throws, the transaction will roll back
-        // -> not even Person is created!
-
-    // Otherwise, create a new Organization and link Person to it
-    } else {
-        orgId = await createOrganization(tx);
-        Console.WriteLine($"Latest org is full, created {orgId}.");
-        await addPersonToOrganization(tx, name, orgId);
-        // If any of the above throws, the transaction will roll back
-        // -> not even Person is created!
-    }
-
-    return orgId;  // Organization ID to which the new Person ends up in
-}
-
-async Task<string> createOrganization(IAsyncQueryRunner tx) {
-    var result = await tx.RunAsync(@"
-        CREATE (o:Organization {id: randomuuid(), createdDate: datetime()})
-        RETURN o.id AS id
-    ");
-    bool org = await result.FetchAsync();  // can't be false
-    string orgId = result.Current.Get<string>("id");
-    return orgId;
-}
-
-async Task addPersonToOrganization(IAsyncQueryRunner tx, string personName, string orgId) {
-    await tx.RunAsync(@"
-        MATCH (o:Organization {id: $orgId})
-        MATCH (p:Person {name: $name})
-        MERGE (p)-[:WORKS_FOR]->(o)
-        ", new { orgId = orgId, name = personName }
-    );
-}
-----
-
-xref:transactions.adoc[More info on running transactions ->]
-
-
+[#close]
 == Close connections and sessions
 
 Unless you created them with the `using` keyword, remember to close all `IDriver` and `IAsyncSession` instances to release any resources still held by them.
