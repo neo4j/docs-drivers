@@ -100,7 +100,7 @@ public class App {
 ----
 
 
-=== `DurationValue`
+=== DurationValue
 
 Represents the difference between two points in time (expressed in months, days, seconds, nanoseconds).
 
@@ -220,7 +220,7 @@ public class App {
 |===
 
 
-=== `NodeValue`
+=== NodeValue
 Represents a node in a graph.
 
 .Essential methods on node objects
@@ -293,7 +293,7 @@ public class App {
 For full documentation, see link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/internal/value/NodeValue.html[API documentation -> NodeValue].
 
 
-=== `RelationshipValue`
+=== RelationshipValue
 
 Represents a relationship in a graph.
 
@@ -381,7 +381,7 @@ public class App {
 For full documentation, see link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/internal/value/RelationshipValue.html[API documentation -> RelationshipValue].
 
 
-=== `PathValue`
+=== PathValue
 
 Represents a path in a graph.
 

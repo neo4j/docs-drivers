@@ -145,7 +145,7 @@ func main() {
 ----
 
 
-=== `Duration`
+=== Duration
 
 Represents the difference between two points in time.
 
@@ -184,7 +184,7 @@ Spatial types are implemented in the `dbtype` package, so that the actual types 
 However, they are also imported in the main `neo4j` package, so that they can also be used as `neo4j.Point2D/3D`.
 
 
-=== `Point2D`
+=== Point2D
 
 The type `Point2D` can be used to represent either a 2D Cartesian point or a 2D World Geodetic System (WGS84) point, depending on the value of `SpatialRefId`.
 
@@ -210,7 +210,7 @@ fmt.Println(wgs842d)
 ----
 
 
-=== `Point3D`
+=== Point3D
 
 The type `Point3D` can be used to represent either a 3D Cartesian point or a 3D World Geodetic System (WGS84) point, depending on the value of `SpatialRefId`.
 
@@ -251,7 +251,7 @@ fmt.Println(wgs843d)
 |===
 
 
-=== `Node`
+=== Node
 Represents a node in a graph. +
 The property `ElementId` contains the database internal identifier for the entity.
 This should be used with care, as no guarantees are given about the mapping between id values and elements outside the scope of a single transaction. In other words, using an `ElementId` to `MATCH` an element across different transactions is risky.
@@ -280,7 +280,7 @@ fmt.Println("Node properties:", node.Props)
 For full documentation, see link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/dbtype#Node[API documentation -> Node].
 
 
-=== `Relationship`
+=== Relationship
 
 Represents a relationship in a graph. +
 The property `ElementId` contains the database internal identifier for the entity.
@@ -318,7 +318,7 @@ fmt.Println("Relationship end elID:", relationship.EndElementId)
 For full documentation, see link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/dbtype#Relationship[API documentation -> Relationship].
 
 
-=== `Path`
+=== Path
 
 Represents a path in a graph.
 

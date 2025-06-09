@@ -90,7 +90,7 @@ with GraphDatabase.driver(URI, auth=AUTH) as driver:
 For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/{python-driver-version}/api.html#temporal-data-types[API documentation -- Temporal data types].
 
 
-=== `Date`
+=== Date
 
 Represents an instant capturing the date, but not the time, nor the timezone.
 
@@ -105,7 +105,7 @@ print(d)  # '2021-11-02'
 For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/{python-driver-version}/types/temporal.html#date[API documentation -- Temporal data types -- Date].
 
 
-=== `Time`
+=== Time
 
 Represents an instant capturing the time, and the timezone offset in seconds, but not the date.
 
@@ -121,7 +121,7 @@ print(t)  # '07:47:00.000004123-04:00'
 For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/{python-driver-version}/types/temporal.html#time[API documentation -- Temporal data types -- Time].
 
 
-=== `LocalTime`
+=== LocalTime
 
 Represents an instant capturing the time of day, but not the date, nor the timezone.
 
@@ -136,7 +136,7 @@ print(t)  # '07:47:00.000004123'
 For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/{python-driver-version}/types/temporal.html#time[API documentation -- Temporal data types -- Time].
 
 
-=== `DateTime`
+=== DateTime
 
 Represents an instant capturing the date, the time, and the timezone identifier.
 
@@ -153,7 +153,7 @@ print(dt)  # '2021-11-02T07:47:00.000004123-04:00'
 For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/{python-driver-version}/types/temporal.html#datetime[API documentation -- Temporal data types -- DateTime].
 
 
-=== `LocalDateTime`
+=== LocalDateTime
 
 Represents an instant capturing the date and the time, but not the timezone.
 
@@ -168,7 +168,7 @@ print(dt)  # '2021-11-02T07:47:00.000004123'
 For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/{python-driver-version}/types/temporal.html#datetime[API documentation -- Temporal data types -- DateTime].
 
 
-=== `Duration`
+=== Duration
 
 Represents the difference between two points in time.
 A `datetime.timedelta` object passed as a parameter will always be implicitly converted to `neo4j.time.Duration`.
@@ -202,7 +202,7 @@ You can think of it as a unique identifier for each spatial type.
 
 For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/{python-driver-version}/types/spatial.html[API documentation -- Spatial types].
 
-=== `CartesianPoint`
+=== CartesianPoint
 
 Represents a point in 2D/3D Cartesian space. +
 Exposes properties `x`, `y`, `z` (the latter for 3D points only).
@@ -224,7 +224,7 @@ print(point.x, point.y, point.z, point.srid)
 
 For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/{python-driver-version}/types/spatial.html#cartesianpoint[API documentation -- Spatial types -- CartesianPoint].
 
-=== `WGS84Point`
+=== WGS84Point
 
 Represents a point in the World Geodetic System (WGS84). +
 Exposes properties `longitude`, `latitude`, `height` (the latter for 3D points only), which are aliases for `x`, `y`, `z`.
@@ -265,7 +265,7 @@ The section xref:transformers#_transform_to_graph[Manipulate query results -- Tr
 For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/{python-driver-version}/api.html#graph-data-types[API documentation -- Graph types].
 
 
-=== `Node`
+=== Node
 Represents a node in a graph. +
 The property `element_id` provides an identifier for the entity.
 This should be used with care, as no guarantees are given about the mapping between id values and elements outside the scope of a single transaction. In other words, using an `element_id` to `MATCH` an element across different transactions is risky.
@@ -299,7 +299,7 @@ with GraphDatabase.driver(URI, auth=AUTH) as driver:
 For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/{python-driver-version}/api.html#neo4j.graph.Node[API documentation -- Graph types -- Node].
 
 
-=== `Relationship`
+=== Relationship
 
 Represents a relationship in a graph. +
 The property `element_id` provides an identifier for the entity.
@@ -341,7 +341,7 @@ with GraphDatabase.driver(URI, auth=AUTH) as driver:
 For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/{python-driver-version}/api.html#neo4j.graph.Relationship[API documentation -- Graph types -- Relationship].
 
 
-=== `Path`
+=== Path
 
 Represents a path in a graph.
 
