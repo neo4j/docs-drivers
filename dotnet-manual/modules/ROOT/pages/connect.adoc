@@ -32,6 +32,9 @@ Since a connection error is a blocker for any subsequent task, the most common c
 You can xref:query-simple#impersonation[run queries through several different users] without creating a new `IDriver` instance.
 If you want to alter a `IDriver` configuration, you need to create a new object.
 
+[TIP]
+The driver also supports other xref:connect-advanced.adoc#authentication-methods[authentication methods] (kerberos, bearer, custom).
+
 
 [#aura]
 == Connect to an Aura instance
