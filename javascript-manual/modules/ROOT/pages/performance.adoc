@@ -12,12 +12,12 @@ The overhead is minimal for a single query, but becomes significant over hundred
 
 [source, javascript]
 ----
-await driver.executeQuery('<QUERY>', {}, {database: '<DB NAME>'})
+await driver.executeQuery('<QUERY>', {}, {database: '{neo4j-database-name}'})
 ----
 
 [source, javascript]
 ----
-driver.session({database: '<DB NAME>'})
+driver.session({database: '{neo4j-database-name}'})
 ----
 
 [discrete]
@@ -48,7 +48,7 @@ You do this by creating a session and using `session.run()` to run as many queri
 .Privilege throughput over data integrity
 [source, javascript]
 ----
-let session = driver.session({database: '<DB NAME>'})
+let session = driver.session({database: '{neo4j-database-name}'})
 for(let i=0; i<1000; i++) {
     await session.run("<QUERY>")
 }
@@ -59,7 +59,7 @@ session.close()
 [source, javascript]
 ----
 for(let i=0; i<1000; i++) {
-    await driver.executeQuery("<QUERY>", {}, {database: '<DB NAME>'})
+    await driver.executeQuery("<QUERY>", {}, {database: '{neo4j-database-name}'})
     // or session.executeRead/Write() calls
 }
 ----
@@ -218,7 +218,7 @@ await driver.executeQuery(
 
 [source, javascript]
 ----
-let session = driver.session({database: '<DB NAME>'})
+let session = driver.session({database: '{neo4j-database-name}'})
 await session.run(
   'MATCH (p:Person|Animal {name: $name}) RETURN p',
   { name: 'Alice' }
@@ -238,7 +238,7 @@ await driver.executeQuery(
 
 [source, javascript]
 ----
-let session = driver.session({database: '<DB NAME>'})
+let session = driver.session({database: '{neo4j-database-name}'})
 await session.run(
   'MATCH (p {name: $name}) RETURN p',
   { name: 'Alice' }
@@ -304,7 +304,7 @@ await driver.executeQuery(
 
 [source, javascript]
 ----
-let session = driver.session({database: '<DB NAME>'})
+let session = driver.session({database: '{neo4j-database-name}'})
 await session.run(
   'MATCH (p:Person {name: $name}) RETURN p',
   { name: 'Alice' }  // query parameters
@@ -324,7 +324,7 @@ await driver.executeQuery('MATCH (p:Person {name: "' + name + '"}) RETURN p')
 
 [source, javascript]
 ----
-let session = driver.session({database: '<DB NAME>'})
+let session = driver.session({database: '{neo4j-database-name}'})
 await session.run(
   'MATCH (p:Person {name: "Alice"}) RETURN p',
   // or 'MATCH (p:Person {name: ' + name + '}) RETURN p'

@@ -38,9 +38,9 @@ import (
 func main() {
     ctx := context.Background()
     // URI examples: "neo4j://localhost", "neo4j+s://xxx.databases.neo4j.io"
-    dbUri := "<URI for Neo4j database>"
-    dbUser := "<Username>"
-    dbPassword := "<Password>"
+    dbUri := "{neo4j-database-uri}"
+    dbUser := "{neo4j-username}"
+    dbPassword := "{neo4j-password}"
     driver, err := neo4j.NewDriverWithContext(
         dbUri,
         neo4j.BasicAuth(dbUser, dbPassword, ""))

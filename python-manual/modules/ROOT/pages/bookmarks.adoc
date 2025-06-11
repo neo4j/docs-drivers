@@ -61,8 +61,8 @@ This guarantees the `Person` nodes `session_c` wants to act on actually exist.
 from neo4j import GraphDatabase, Bookmarks
 
 
-URI = "<URI for Neo4j database>"
-AUTH = ("<Username>", "<Password>")
+URI = "{neo4j-database-uri}"
+AUTH = ("{neo4j-username}", "{neo4j-password}")
 
 def main():
     with GraphDatabase.driver(URI, auth=AUTH) as driver:

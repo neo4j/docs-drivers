@@ -12,8 +12,8 @@ You connect to a database by creating a <<Driver>> object and providing a URL an
 from neo4j import GraphDatabase
 
 # URI examples: "neo4j://localhost", "neo4j+s://xxx.databases.neo4j.io"
-URI = "<URI for Neo4j database>"
-AUTH = ("<Username>", "<Password>")
+URI = "{neo4j-database-uri}"
+AUTH = ("{neo4j-username}", "{neo4j-password}")
 
 with GraphDatabase.driver(URI, auth=AUTH) as driver: # <1>
     driver.verify_connectivity() # <2>
