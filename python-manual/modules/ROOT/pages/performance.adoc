@@ -20,12 +20,12 @@ The overhead is minimal for a single query, but becomes significant over hundred
 
 [source, python]
 ----
-driver.execute_query("<QUERY>", database_="<DB NAME>")
+driver.execute_query("<QUERY>", database_="{neo4j-database-name}")
 ----
 
 [source, python]
 ----
-driver.session(database="<DB NAME>")
+driver.session(database="{neo4j-database-name}")
 ----
 
 [discrete]
@@ -65,7 +65,7 @@ with driver.session(database="neo4j") as session:
 [source, python]
 ----
 for i in range(1000):
-    driver.execute_query("<QUERY>", database_="<DB NAME>")
+    driver.execute_query("<QUERY>", database_="{neo4j-database-name}")
     # or session.execute_read/write() calls
 ----
 
@@ -357,7 +357,7 @@ driver.execute_query("MATCH (p:Person|Animal {name: $name}) RETURN p", name="Ali
 
 [source, python]
 ----
-with driver.session(database="<DB NAME>") as session:
+with driver.session(database="{neo4j-database-name}") as session:
     session.run("MATCH (p:Person|Animal {name: $name}) RETURN p", name="Alice")
 ----
 
@@ -372,7 +372,7 @@ driver.execute_query("MATCH (p {name: $name}) RETURN p", name="Alice")
 
 [source, python]
 ----
-with driver.session(database="<DB NAME>") as session:
+with driver.session(database="{neo4j-database-name}") as session:
     session.run("MATCH (p {name: $name}) RETURN p", name="Alice")
 ----
 
@@ -428,7 +428,7 @@ driver.execute_query("MATCH (p:Person {name: $name}) RETURN p", name="Alice")
 
 [source, python]
 ----
-with driver.session(database="<DB NAME>") as session:
+with driver.session(database="{neo4j-database-name}") as session:
     session.run("MATCH (p:Person {name: $name}) RETURN p", name="Alice")
 ----
 
@@ -445,7 +445,7 @@ driver.execute_query("MATCH (p:Person {name: '" + name + "'}) RETURN p")
 
 [source, python]
 ----
-with driver.session(database="<DB NAME>") as session:
+with driver.session(database="{neo4j-database-name}") as session:
     session.run("MATCH (p:Person {name: 'Alice'}) RETURN p")
     # or
     name = "Alice"
