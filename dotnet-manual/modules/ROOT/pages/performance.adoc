@@ -13,13 +13,13 @@ The overhead is minimal for a single query, but becomes significant over hundred
 [source, csharp]
 ----
 await driver.ExecutableQuery("<QUERY>")
-    .WithConfig(new QueryConfig(database: "<DB NAME>"))
+    .WithConfig(new QueryConfig(database: "{neo4j-database-name}"))
     .ExecuteAsync();
 ----
 
 [source, csharp]
 ----
-using var session = driver.AsyncSession(conf => conf.WithDatabase("<DB NAME>"));
+using var session = driver.AsyncSession(conf => conf.WithDatabase("{neo4j-database-name}"));
 ----
 
 [discrete]
@@ -51,7 +51,7 @@ You do this by creating a session and using `session.RunAsync()` to run as many 
 .Privilege throughput over data integrity
 [source, csharp]
 ----
-using var session = driver.AsyncSession(conf => conf.WithDatabase("<DB NAME>"));
+using var session = driver.AsyncSession(conf => conf.WithDatabase("{neo4j-database-name}"));
 for (int i=0; i<1000; i++) {
     await session.RunAsync("<QUERY>");
 }
@@ -62,7 +62,7 @@ for (int i=0; i<1000; i++) {
 ----
 for (int i=0; i<1000; i++) {
     await driver.ExecutableQuery("<QUERY>")
-        .WithConfig(new QueryConfig(database: "<DB NAME>"))
+        .WithConfig(new QueryConfig(database: "{neo4j-database-name}"))
         .ExecuteAsync();
     // or session.ExecuteRead/WriteAsync() calls
 }
