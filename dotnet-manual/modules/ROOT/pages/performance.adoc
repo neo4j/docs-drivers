@@ -107,9 +107,9 @@ To lazy-load a result, use xref:transactions.adoc#managed-transactions[`.Execute
 ----
 using Neo4j.Driver;
 
-const string dbUri = "<URI for Neo4j database>";
-const string dbUser = "<Username>";
-const string dbPassword = "<Password>";
+const string dbUri = "{neo4j-database-uri}";
+const string dbUser = "{neo4j-username}";
+const string dbPassword = "{neo4j-password}";
 
 // Returns 250 records, each with properties
 // - `output` (an expensive computation, to slow down retrieval)

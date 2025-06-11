@@ -62,9 +62,9 @@ This guarantees the `Person` nodes `sessionC` wants to act on actually exist.
 ----
 using Neo4j.Driver;
 
-const string dbUri = "<URI for Neo4j database>";
-const string dbUser = "<Username>";
-const string dbPassword = "<Password>";
+const string dbUri = "{neo4j-database-uri}";
+const string dbUser = "{neo4j-username}";
+const string dbPassword = "{neo4j-password}";
 
 await using var driver = GraphDatabase.Driver(dbUri, AuthTokens.Basic(dbUser, dbPassword));
 await driver.VerifyConnectivityAsync();

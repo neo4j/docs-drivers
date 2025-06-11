@@ -32,9 +32,9 @@ Once you have a `IDriver` instance, use the `.VerifyConnectivityAsync()` method 
 using Neo4j.Driver;
 
 // URI examples: "neo4j://localhost", "neo4j+s://xxx.databases.neo4j.io"
-const string dbUri = "<URI for Neo4j database>";
-const string dbUser = "<Username>";
-const string dbPassword = "<Password>";
+const string dbUri = "{neo4j-database-uri}";
+const string dbUser = "{neo4j-username}";
+const string dbPassword = "{neo4j-password}";
 
 await using var driver = GraphDatabase.Driver(dbUri, AuthTokens.Basic(dbUser, dbPassword));
 await driver.VerifyConnectivityAsync();
