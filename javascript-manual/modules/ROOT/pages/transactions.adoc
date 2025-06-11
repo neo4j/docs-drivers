@@ -83,9 +83,9 @@ The methods `.executeRead()` and `.executeWrite()` have replaced `.readTransacti
 const neo4j = require('neo4j-driver');
 
 (async () => {
-  const URI = '<URI for Neo4j database>'
-  const USER = '<Username>'
-  const PASSWORD = '<Password>'
+  const URI = '{neo4j-database-uri}'
+  const USER = '{neo4j-username}'
+  const PASSWORD = '{neo4j-password}'
   let driver, session
   let employeeThreshold = 10
 
@@ -196,9 +196,9 @@ Explicit transactions are most useful for applications that need to distribute C
 [source, javascript]
 ----
 const neo4j = require('neo4j-driver');
-const URI = '<URI for Neo4j database>';
-const USER = '<Username>';
-const PASSWORD = '<Password>';
+const URI = '{neo4j-database-uri}';
+const USER = '{neo4j-username}';
+const PASSWORD = '{neo4j-password}';
 
 (async () => {
 

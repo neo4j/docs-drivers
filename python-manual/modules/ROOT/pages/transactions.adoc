@@ -80,8 +80,8 @@ The methods `.execute_read()` and `.execute_write()` have replaced `.read_transa
 from neo4j import GraphDatabase
 
 
-URI = "<URI for Neo4j database>"
-AUTH = ("<Username>", "<Password>")
+URI = "{neo4j-database-uri}"
+AUTH = ("{neo4j-username}", "{neo4j-password}")
 employee_threshold=10
 
 
@@ -210,8 +210,8 @@ Explicit transactions are most useful for applications that need to distribute C
 import neo4j
 
 
-URI = "<URI for Neo4j database>"
-AUTH = ("<Username>", "<Password>")
+URI = "{neo4j-database-uri}"
+AUTH = ("{neo4j-username}", "{neo4j-password}")
 
 
 def main():

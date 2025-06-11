@@ -27,9 +27,9 @@ func main() {
     ctx := context.Background()
 
     // Connection to database
-    dbUri := "<URI for Neo4j database>"
-    dbUser := "<Username>"
-    dbPassword := "<Password>"
+    dbUri := "{neo4j-database-uri}"
+    dbUser := "{neo4j-username}"
+    dbPassword := "{neo4j-password}"
     driver, err := neo4j.NewDriverWithContext(
         dbUri,
         neo4j.BasicAuth(dbUser, dbPassword, ""))
@@ -133,9 +133,9 @@ func main() {
     ctx := context.Background()
 
     // Connection to database
-    dbUri := "<URI for Neo4j database>"
-    dbUser := "<Username>"
-    dbPassword := "<Password>"
+    dbUri := "{neo4j-database-uri}"
+    dbUser := "{neo4j-username}"
+    dbPassword := "{neo4j-password}"
     driver, err := neo4j.NewDriverWithContext(
         dbUri,
         neo4j.BasicAuth(dbUser, dbPassword, ""))
