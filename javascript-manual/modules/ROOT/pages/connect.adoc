@@ -48,6 +48,9 @@ Both the creation of a `Driver` object and the connection verification can raise
 If you need to query the database through several different users, use xref:query-simple#impersonation[impersonation] without creating a new `Driver` instance.
 If you want to alter a `Driver` configuration, you need to create a new object.
 
+[TIP]
+The driver also supports other xref:connect-advanced.adoc#authentication-methods[authentication methods] (kerberos, bearer, custom).
+
 
 == Connect to an Aura instance
 
