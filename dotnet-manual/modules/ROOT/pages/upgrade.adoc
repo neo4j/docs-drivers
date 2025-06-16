@@ -136,7 +136,7 @@ The new methods behave similarly, but the argument types are different and the n
 |label:deprecated[]
 
 |5.0
-|`ZonedDateTime` -- Two constructors not including `DateTimeKind` are deprecated (link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.ZonedDateTime.-ctor.html#Neo4j_Driver_ZonedDateTime__ctor_System_Int32_System_Int32_System_Int32_System_Int32_System_Int32_System_Int32_Neo4j_Driver_Zone_[this] and link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.ZonedDateTime.-ctor.html#Neo4j_Driver_ZonedDateTime__ctor_System_Int32_System_Int32_System_Int32_System_Int32_System_Int32_System_Int32_System_Int32_Neo4j_Driver_Zone_[this]).
+|`ZonedDateTime` -- Two constructors not including `DateTimeKind` are deprecated (link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.ZonedDateTime.-ctor.html#Neo4j_Driver_ZonedDateTime_\_ctor_System_Int32_System_Int32_System_Int32_System_Int32_System_Int32_System_Int32_Neo4j_Driver_Zone_[this] and link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.ZonedDateTime.-ctor.html#Neo4j_Driver_ZonedDateTime_\_ctor_System_Int32_System_Int32_System_Int32_System_Int32_System_Int32_System_Int32_System_Int32_Neo4j_Driver_Zone_[this]).
 |label:deprecated[]
 
 |5.0
