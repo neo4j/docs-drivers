@@ -1,6 +1,6 @@
 // This doc is also sourced in the Aura Developer Hub.
-// Because of that, cross-links are absolute and
-// source blocks have copy=true .
+// Because of that, cross-links are absolute and source blocks have copy=true .
+// Antora attributes (like driver version) can't be used in this page as they wouldn't be filled in Aura.
 
 The Neo4j Java driver is the official library to interact with a Neo4j instance through a Java application.
 
@@ -20,7 +20,7 @@ Add the Neo4j Java driver to the list of dependencies in the `pom.xml` of your M
 <dependency>
     <groupId>org.neo4j.driver</groupId>
     <artifactId>neo4j-java-driver</artifactId>
-    <version>{java-driver-version-minor}</version>
+    <version>5.28.5</version>
 </dependency>
 ----
 
