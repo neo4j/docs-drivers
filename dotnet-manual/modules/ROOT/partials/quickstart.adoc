@@ -1,3 +1,7 @@
+// This doc is also sourced in the Aura Developer Hub.
+// Because of that, cross-links are absolute and
+// source blocks have copy=true .
+
 The Neo4j .NET driver is the official library to interact with a Neo4j instance through a .NET application.
 
 At the hearth of Neo4j lies <<Cypher>>, the query language to interact with a Neo4j database.
@@ -7,18 +11,18 @@ You may then apply that knowledge while following this guide to develop your .NE
 
 
 [#install]
-== Installation
+== Install
 
 Add the Neo4j .NET driver to your project:
 
-[source, bash]
+[source, bash, copy=true]
 ----
 dotnet add package Neo4j.Driver
 ----
 
 The driver supports the .NET Standard 2.0.
 
-xref:install#install-driver[More info on installing the driver ->]
+link:https://neo4j.com/docs/dotnet-manual/current/[More info on installing the driver]
 
 
 [#connect]
@@ -27,7 +31,7 @@ xref:install#install-driver[More info on installing the driver ->]
 Connect to a database by creating an <<IDriver>> object and providing a URL and an authentication token.
 Once you have a `IDriver` instance, use the `.VerifyConnectivityAsync()` method to ensure that a working connection can be established.
 
-[source, csharp]
+[source, csharp, copy=true]
 ----
 using Neo4j.Driver;
 
@@ -41,7 +45,7 @@ await driver.VerifyConnectivityAsync();
 Console.WriteLine("Connection established.");
 ----
 
-xref:connect.adoc[More info on connecting to a database ->]
+link:https://neo4j.com/docs/dotnet-manual/current/[More info on connecting to a database]
 
 
 [#create-graph]
@@ -51,7 +55,7 @@ Run a Cypher query with the method `IDriver.ExecutableQuery()`.
 Do not hardcode or concatenate parameters: use placeholders and specify the parameters as a map through the `.WithParameters()` method.
 
 .Create two `Person` nodes and a `KNOWS` relationship between them
-[source, csharp]
+[source, csharp, copy=true]
 ----
 var result = await driver.ExecutableQuery(@"
     CREATE (a:Person {name: $name})
@@ -67,7 +71,7 @@ var summary = result.Summary;
 Console.WriteLine($"Created {summary.Counters.NodesCreated} nodes in {summary.ResultAvailableAfter.Milliseconds} ms.");
 ----
 
-xref:query-simple.adoc[More info on querying the database ->]
+link:https://neo4j.com/docs/dotnet-manual/current/[More info on querying the database]
 
 
 [#query-graph]
@@ -76,7 +80,7 @@ xref:query-simple.adoc[More info on querying the database ->]
 To retrieve information from the database, use the Cypher clause `MATCH`:
 
 .Retrieve all `Person` nodes who like other `Person` s
-[source, csharp]
+[source, csharp, copy=true]
 ----
 var result = await driver.ExecutableQuery(@"
     MATCH (p:Person)-[:KNOWS]->(:Person)
@@ -95,7 +99,7 @@ var summary = result.Summary;
 Console.WriteLine($"The query `{summary.Query.Text}` returned {result.Result.Count()} results in {summary.ResultAvailableAfter.Milliseconds} ms.");
 ----
 
-xref:query-simple.adoc[More info on querying the database ->]
+link:https://neo4j.com/docs/dotnet-manual/current/[More info on querying the database]
 
 
 [#close]
@@ -103,7 +107,7 @@ xref:query-simple.adoc[More info on querying the database ->]
 
 Unless you created them with the `using` keyword, remember to close all `IDriver` and `IAsyncSession` instances to release any resources still held by them.
 
-[source, csharp, test-skip]
+[source, csharp, test-skip, copy=true]
 ----
 await session.CloseAsync();
 await driver.CloseAsync();

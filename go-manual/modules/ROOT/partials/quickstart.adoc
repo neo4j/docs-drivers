@@ -1,3 +1,7 @@
+// This doc is also sourced in the Aura Developer Hub.
+// Because of that, cross-links are absolute and
+// source blocks have copy=true .
+
 The Neo4j Go driver is the official library to interact with a Neo4j instance through a Go application.
 
 At the hearth of Neo4j lies <<Cypher>>, the query language to interact with a Neo4j database.
@@ -7,16 +11,16 @@ You may then apply that knowledge while following this guide to develop your Go 
 
 
 [#install]
-== Installation
+== Install
 
 From within a module, use `go get` to install the link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/[Neo4j Go Driver]:
 
-[source, bash]
+[source, bash, copy=true]
 ----
 go get github.com/neo4j/neo4j-go-driver/v5
 ----
 
-xref:install#install-driver[More info on installing the driver ->]
+link:https://neo4j.com/docs/go-manual/current/install/[More info on installing the driver]
 
 
 [#connect]
@@ -25,7 +29,7 @@ xref:install#install-driver[More info on installing the driver ->]
 Connect to a database by creating a <<DriverWithContext>> object and providing a URL and an authentication token.
 Once you have a `DriverWithContext` instance, use the `.VerifyConnectivity()` method to ensure that a working connection can be established.
 
-[source, go, role=nocollapse]
+[source, go, role=nocollapse, copy=true]
 ----
 package main
 
@@ -54,7 +58,7 @@ func main() {
 }
 ----
 
-xref:connect.adoc[More info on connecting to a database ->]
+link:https://neo4j.com/docs/go-manual/current/connect/[More info on connecting to a database]
 
 
 [#create-graph]
@@ -64,7 +68,7 @@ Run a Cypher query with the function `ExecuteQuery()`.
 Do not hardcode or concatenate parameters: use placeholders and specify the parameters as keyword arguments.
 
 .Create two `Person` nodes and a `KNOWS` relationship between them
-[source, go, role=nocollapse]
+[source, go, role=nocollapse, copy=true]
 ----
 result, err := neo4j.ExecuteQuery(ctx, driver, `
     CREATE (a:Person {name: $name})
@@ -86,7 +90,7 @@ fmt.Printf("Created %v nodes in %+v.\n",
     summary.ResultAvailableAfter())
 ----
 
-xref:query-simple.adoc[More info on querying the database ->]
+link:https://neo4j.com/docs/go-manual/current/query-simple/[More info on querying the database]
 
 
 [#query-graph]
@@ -95,7 +99,7 @@ xref:query-simple.adoc[More info on querying the database ->]
 To retrieve information from the database, use the Cypher clause `MATCH`:
 
 .Retrieve all `Person` nodes who like other `Person` s
-[source, go, role=nocollapse]
+[source, go, role=nocollapse, copy=true]
 ----
 result, err := neo4j.ExecuteQuery(ctx, driver, `
     MATCH (p:Person)-[:KNOWS]->(:Person)
@@ -122,7 +126,7 @@ fmt.Printf("The query `%v` returned %v records in %+v.\n",
     result.Summary.ResultAvailableAfter())
 ----
 
-xref:query-simple.adoc[More info on querying the database ->]
+link:https://neo4j.com/docs/go-manual/current/query-simple/[More info on querying the database]
 
 
 [#close]
@@ -130,13 +134,13 @@ xref:query-simple.adoc[More info on querying the database ->]
 Call the `.close()` method on all `DriverWithContext` and `SessionWithContext` instances to release any resources still held by them.
 The best practice is to call the methods with the `defer` keyword as soon as you create new objects.
 
-[source, go]
+[source, go, copy=true]
 ----
 driver, err := neo4j.NewDriverWithContext(dbUri, neo4j.BasicAuth(dbUser, dbPassword, ""))
 defer driver.Close(ctx)
 ----
 
-[source, go]
+[source, go, copy=true]
 ----
 session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
 defer session.Close(ctx)

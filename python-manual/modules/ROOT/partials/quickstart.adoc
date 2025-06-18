@@ -1,3 +1,7 @@
+// This doc is also sourced in the Aura Developer Hub.
+// Because of that, cross-links are absolute and
+// source blocks have copy=true .
+
 The Neo4j Python driver is the official library to interact with a Neo4j instance through a Python application.
 
 At the hearth of Neo4j lies <<Cypher>>, the query language to interact with a Neo4j database.
@@ -7,16 +11,16 @@ You may then apply that knowledge while following this guide to develop your Pyt
 
 
 [#install]
-== Installation
+== Install
 
 Install the Neo4j Python driver with `pip`:
 
-[source, bash]
+[source, bash, copy=true]
 ----
 pip install neo4j
 ----
 
-xref:install#install-driver[More info on installing the driver ->]
+link:https://neo4j.com/docs/python-manual/current/install/[More info on installing the driver]
 
 
 [#connect]
@@ -25,7 +29,7 @@ xref:install#install-driver[More info on installing the driver ->]
 Connect to a database by creating a <<Driver>> object and providing a URL and an authentication token.
 Once you have a `Driver` instance, use the `.verify_connectivity()` method to ensure that a working connection can be established.
 
-[source, python]
+[source, python, copy=true]
 ----
 from neo4j import GraphDatabase
 
@@ -37,7 +41,7 @@ with GraphDatabase.driver(URI, auth=AUTH) as driver:
     driver.verify_connectivity()
 ----
 
-xref:connect.adoc[More info on connecting to a database ->]
+link:https://neo4j.com/docs/python-manual/current/connect/[More info on connecting to a database]
 
 
 [#create-graph]
@@ -47,7 +51,7 @@ Run a Cypher query with the method `Driver.execute_query()`.
 Do not hardcode or concatenate parameters: use placeholders and specify the parameters as keyword arguments.
 
 .Create two `Person` nodes and a `KNOWS` relationship between them
-[source, python]
+[source, python, copy=true]
 ----
 summary = driver.execute_query("""
     CREATE (a:Person {name: $name})
@@ -63,7 +67,7 @@ print("Created {nodes_created} nodes in {time} ms.".format(
 ))
 ----
 
-xref:query-simple.adoc[More info on querying the database ->]
+link:https://neo4j.com/docs/python-manual/current/query-simple/[More info on querying the database]
 
 
 [#query-graph]
@@ -72,7 +76,7 @@ xref:query-simple.adoc[More info on querying the database ->]
 To retrieve information from the database, use the Cypher clause `MATCH`:
 
 .Retrieve all `Person` nodes who like other `Person` s
-[source, python]
+[source, python, copy=true]
 ----
 records, summary, keys = driver.execute_query("""
     MATCH (p:Person)-[:KNOWS]->(:Person)
@@ -92,7 +96,7 @@ print("The query `{query}` returned {records_count} records in {time} ms.".forma
 ))
 ----
 
-xref:query-simple.adoc[More info on querying the database ->]
+link:https://neo4j.com/docs/python-manual/current/query-simple/[More info on querying the database]
 
 
 [#close]
@@ -100,7 +104,7 @@ xref:query-simple.adoc[More info on querying the database ->]
 
 Unless you created them using the `with` statement, call the `.close()` method on all `Driver` and `Session` instances to release any resources still held by them.
 
-[source, python]
+[source, python, copy=true]
 ----
 from neo4j import GraphDatabase
 

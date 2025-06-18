@@ -1,3 +1,7 @@
+// This doc is also sourced in the Aura Developer Hub.
+// Because of that, cross-links are absolute and
+// source blocks have copy=true .
+
 The Neo4j JavaScript driver is the official library to interact with a Neo4j instance through a JavaScript application.
 
 At the hearth of Neo4j lies <<Cypher>>, the query language to interact with a Neo4j database.
@@ -7,16 +11,16 @@ You may then apply that knowledge while following this guide to develop your Jav
 
 
 [#install]
-== Installation
+== Install
 
 Install the Neo4j Javascript driver with `npm`:
 
-[source,bash]
+[source, bash, copy=true]
 ----
 npm i neo4j-driver
 ----
 
-xref:install#install-driver[More info on installing the driver ->]
+link:https://neo4j.com/docs/javascript-manual/current/install/[More info on installing the driver]
 
 
 [#connect]
@@ -25,7 +29,7 @@ xref:install#install-driver[More info on installing the driver ->]
 Connect to a database by creating a <<Driver>> object and providing a URL and an authentication token.
 Once you have a `Driver` instance, use the `.getServerInfo()` method to ensure that a working connection can be established.
 
-[source, javascript]
+[source, javascript, copy=true]
 ----
 var neo4j = require('neo4j-driver');
 (async () => {
@@ -46,7 +50,7 @@ var neo4j = require('neo4j-driver');
 })();
 ----
 
-xref:connect.adoc[More info on connecting to a database ->]
+link:https://neo4j.com/docs/javascript-manual/current/connect/[More info on connecting to a database]
 
 
 [#create-graph]
@@ -56,7 +60,7 @@ Run a Cypher query with the method `Driver.executeQuery()`.
 Do not hardcode or concatenate parameters: use placeholders and specify the parameters as key-value pairs.
 
 .Create two `Person` nodes and a `KNOWS` relationship between them
-[source, javascript]
+[source, javascript, copy=true]
 ----
 let { records, summary } = await driver.executeQuery(`
   CREATE (a:Person {name: $name})
@@ -72,7 +76,7 @@ console.log(
 )
 ----
 
-xref:query-simple.adoc[More info on querying the database ->]
+link:https://neo4j.com/docs/javascript-manual/current/query-simple/[More info on querying the database]
 
 
 [#query-graph]
@@ -81,7 +85,7 @@ xref:query-simple.adoc[More info on querying the database ->]
 To retrieve information from the database, use the Cypher clause `MATCH`:
 
 .Retrieve all `Person` nodes who like other `Person` s
-[source, javascript]
+[source, javascript, copy=true]
 ----
 let { records, summary } = await driver.executeQuery(`
   MATCH (p:Person)-[:KNOWS]->(:Person)
@@ -104,7 +108,7 @@ console.log(
 )
 ----
 
-xref:query-simple.adoc[More info on querying the database ->]
+link:https://neo4j.com/docs/javascript-manual/current/query-simple/[More info on querying the database]
 
 
 [#close]
@@ -113,7 +117,7 @@ xref:query-simple.adoc[More info on querying the database ->]
 Call the `.close()` method on the `Driver` instance when you are finished with it, to release any resources still held by it.
 The same applies to any open sessions.
 
-[source, javascript]
+[source, javascript, copy=true]
 ----
 const driver = neo4j.driver(URI, neo4j.auth.basic(USER, PASSWORD))
 let session = driver.session({ database: 'neo4j' })

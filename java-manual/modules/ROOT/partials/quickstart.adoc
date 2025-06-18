@@ -1,3 +1,7 @@
+// This doc is also sourced in the Aura Developer Hub.
+// Because of that, cross-links are absolute and
+// source blocks have copy=true .
+
 The Neo4j Java driver is the official library to interact with a Neo4j instance through a Java application.
 
 At the hearth of Neo4j lies <<Cypher>>, the query language to interact with a Neo4j database.
@@ -7,11 +11,11 @@ You may then apply that knowledge while following this guide to develop your Jav
 
 
 [#install]
-== Installation
+== Install
 
 Add the Neo4j Java driver to the list of dependencies in the `pom.xml` of your Maven project:
 
-[source, xml, subs="attributes+"]
+[source, xml, subs="attributes+", copy=true]
 ----
 <dependency>
     <groupId>org.neo4j.driver</groupId>
@@ -20,7 +24,7 @@ Add the Neo4j Java driver to the list of dependencies in the `pom.xml` of your M
 </dependency>
 ----
 
-xref:install#install-driver[More info on installing the driver ->]
+link:https://neo4j.com/docs/java-manual/current/install/[More info on installing the driver]
 
 
 [#connect]
@@ -29,7 +33,7 @@ xref:install#install-driver[More info on installing the driver ->]
 Connect to a database by creating a <<Driver>> object and providing a URL and an authentication token.
 Once you have a `Driver` instance, use the `.verifyConnectivity()` method to ensure that a working connection can be established.
 
-[source, java, role=nocollapse]
+[source, java, role=nocollapse, copy=true]
 ----
 package demo;
 
@@ -53,7 +57,7 @@ public class App {
 }
 ----
 
-xref:connect.adoc[More info on connecting to a database ->]
+link:https://neo4j.com/docs/java-manual/current/connect/[More info on connecting to a database]
 
 
 [#create-graph]
@@ -63,7 +67,7 @@ Run a Cypher query with the method `Driver.executableQuery()`.
 Do not hardcode or concatenate parameters: use placeholders and specify the parameters as a map through the `.withParameters()` method.
 
 .Create two `Person` nodes and a `KNOWS` relationship between them
-[source, java]
+[source, java, copy=true]
 ----
 // import java.util.Map;
 // import java.util.concurrent.TimeUnit;
@@ -85,7 +89,7 @@ System.out.printf("Created %d records in %d ms.%n",
     summary.resultAvailableAfter(TimeUnit.MILLISECONDS));
 ----
 
-xref:query-simple.adoc[More info on querying the database ->]
+link:https://neo4j.com/docs/java-manual/current/query-simple/[More info on querying the database]
 
 
 [#query-graph]
@@ -94,7 +98,7 @@ xref:query-simple.adoc[More info on querying the database ->]
 To retrieve information from the database, use the Cypher clause `MATCH`:
 
 .Retrieve all `Person` nodes who like other `Person` s
-[source, java]
+[source, java, copy=true]
 ----
 // import java.util.concurrent.TimeUnit;
 // import org.neo4j.driver.QueryConfig;
@@ -119,7 +123,7 @@ System.out.printf("The query %s returned %d records in %d ms.%n",
     summary.resultAvailableAfter(TimeUnit.MILLISECONDS));
 ----
 
-xref:query-simple.adoc[More info on querying the database ->]
+link:https://neo4j.com/docs/java-manual/current/query-simple/[More info on querying the database]
 
 
 [#close]
@@ -127,7 +131,7 @@ xref:query-simple.adoc[More info on querying the database ->]
 
 Unless you created them with `try-with-resources` statements, call the `.close()` method on all `Driver` and `Session` instances to release any resources still held by them.
 
-[source, java, test-skip]
+[source, java, test-skip, copy=true]
 ----
 session.close();
 driver.close();
