@@ -40,7 +40,7 @@ For more information, see xref:query-simple.adoc[`ExecutableQuery`].
 ====
 Allows records to be mapped to objects simply and without endless boilerplate.
 
-For more information, see xref:object-graph-mapping.adoc[Record to Object Mapping].
+For more information, see xref:object-mapping.adoc[Record to Object Mapping].
 ====
 |
 .Re-authentication

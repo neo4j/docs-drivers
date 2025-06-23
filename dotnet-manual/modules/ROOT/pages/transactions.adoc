@@ -13,8 +13,8 @@ Before running a transaction, you need to obtain a _session_.
 Sessions act as concrete query channels between the driver and the server, and ensure <<causal consistency>> is enforced.
 
 Sessions are created with the method link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IDriver.AsyncSession.html#Neo4j_Driver_IDriver_AsyncSession[`IDriver.AsyncSession()`].
-Use the optional argument to alter the session's configuration, among which for example the xref:_database_selection[target database].
-For further configuration parameters, see xref:_session_configuration[Session configuration].
+Use the optional argument to alter the session's configuration, among which for example the xref:database-selection[target database].
+For further configuration parameters, see xref:session-config[Session configuration].
 
 [source, csharp]
 ----
@@ -22,7 +22,7 @@ using var session = driver.AsyncSession(conf => conf.WithDatabase("neo4j"));
 ----
 
 Session creation is a lightweight operation, so sessions can be created and destroyed without significant cost.
-Always xref:_close_sessions[close sessions] when you are done with them.
+Always xref:close-session[close sessions] when you are done with them.
 
 *Sessions are _not_ thread safe*: you can share the main `IDriver` object across threads, but make sure each thread creates its own sessions.
 

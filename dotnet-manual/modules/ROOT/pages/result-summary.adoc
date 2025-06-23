@@ -3,9 +3,9 @@
 After all results coming from a query have been processed, the server ends the transaction by returning a summary of execution.
 It comes as a link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IResultSummary.html[`IResultSummary`] object, and it contains information among which:
 
-- xref:_query_counters[**Query counters**] -- What changes the query triggered on the server
-- xref:_query_execution_plan[**Query execution plan**] -- How the database would execute (or executed) the query
-- xref:_notifications[**Notifications**] -- Extra information raised by the server while running the query
+- xref:query-counters[**Query counters**] -- What changes the query triggered on the server
+- xref:execution-plan[**Query execution plan**] -- How the database would execute (or executed) the query
+- xref:notifications[**Notifications**] -- Extra information raised by the server while running the query
 - Timing information and query request summary
 
 
