@@ -6,6 +6,6 @@ nav:
 - modules/ROOT/content-nav.adoc
 asciidoc:
   attributes:
-    dotnet-driver-version: '5.27' # the version of the package published
+    dotnet-driver-version: '5.28' # the version of the package published
     common-partial: 5@common-content:ROOT:partial$
     common-image: 5@common-content:ROOT:image$

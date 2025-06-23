@@ -260,9 +260,9 @@ await driver.executeQuery(
 const neo4j = require('neo4j-driver');
 
 (async () => {
-  const URI = '<URI for Neo4j database>'
-  const USER = '<Username>'
-  const PASSWORD = '<Password>'
+  const URI = '{neo4j-database-uri}'
+  const USER = '{neo4j-username}'
+  const PASSWORD = '{neo4j-password}'
   let driver, result
 
   let people = [{name: 'Alice', age: 42, friends: ['Bob', 'Peter', 'Anna']},

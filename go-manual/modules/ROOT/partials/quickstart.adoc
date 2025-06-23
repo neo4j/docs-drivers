@@ -1,3 +1,7 @@
+// This doc is also sourced in the Aura Developer Hub.
+// Because of that, cross-links are absolute and
+// source blocks have copy=true .
+
 The Neo4j Go driver is the official library to interact with a Neo4j instance through a Go application.
 
 At the hearth of Neo4j lies <<Cypher>>, the query language to interact with a Neo4j database.
@@ -7,16 +11,16 @@ You may then apply that knowledge while following this guide to develop your Go 
 
 
 [#install]
-== Installation
+== Install
 
 From within a module, use `go get` to install the link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/[Neo4j Go Driver]:
 
-[source, bash]
+[source, bash, copy=true]
 ----
 go get github.com/neo4j/neo4j-go-driver/v5
 ----
 
-xref:install#install-driver[More info on installing the driver ->]
+link:https://neo4j.com/docs/go-manual/current/install/[More info on installing the driver]
 
 
 [#connect]
@@ -25,7 +29,7 @@ xref:install#install-driver[More info on installing the driver ->]
 Connect to a database by creating a <<DriverWithContext>> object and providing a URL and an authentication token.
 Once you have a `DriverWithContext` instance, use the `.VerifyConnectivity()` method to ensure that a working connection can be established.
 
-[source, go, role=nocollapse]
+[source, go, role=nocollapse, copy=true]
 ----
 package main
 
@@ -38,9 +42,9 @@ import (
 func main() {
     ctx := context.Background()
     // URI examples: "neo4j://localhost", "neo4j+s://xxx.databases.neo4j.io"
-    dbUri := "<URI for Neo4j database>"
-    dbUser := "<Username>"
-    dbPassword := "<Password>"
+    dbUri := "{neo4j-database-uri}"
+    dbUser := "{neo4j-username}"
+    dbPassword := "{neo4j-password}"
     driver, err := neo4j.NewDriverWithContext(
         dbUri,
         neo4j.BasicAuth(dbUser, dbPassword, ""))
@@ -54,7 +58,7 @@ func main() {
 }
 ----
 
-xref:connect.adoc[More info on connecting to a database ->]
+link:https://neo4j.com/docs/go-manual/current/connect/[More info on connecting to a database]
 
 
 [#create-graph]
@@ -64,7 +68,7 @@ Run a Cypher query with the function `ExecuteQuery()`.
 Do not hardcode or concatenate parameters: use placeholders and specify the parameters as keyword arguments.
 
 .Create two `Person` nodes and a `KNOWS` relationship between them
-[source, go, role=nocollapse]
+[source, go, role=nocollapse, copy=true]
 ----
 result, err := neo4j.ExecuteQuery(ctx, driver, `
     CREATE (a:Person {name: $name})
@@ -86,7 +90,7 @@ fmt.Printf("Created %v nodes in %+v.\n",
     summary.ResultAvailableAfter())
 ----
 
-xref:query-simple.adoc[More info on querying the database ->]
+link:https://neo4j.com/docs/go-manual/current/query-simple/[More info on querying the database]
 
 
 [#query-graph]
@@ -95,7 +99,7 @@ xref:query-simple.adoc[More info on querying the database ->]
 To retrieve information from the database, use the Cypher clause `MATCH`:
 
 .Retrieve all `Person` nodes who like other `Person` s
-[source, go, role=nocollapse]
+[source, go, role=nocollapse, copy=true]
 ----
 result, err := neo4j.ExecuteQuery(ctx, driver, `
     MATCH (p:Person)-[:KNOWS]->(:Person)
@@ -122,170 +126,7 @@ fmt.Printf("The query `%v` returned %v records in %+v.\n",
     result.Summary.ResultAvailableAfter())
 ----
 
-xref:query-simple.adoc[More info on querying the database ->]
-
-
-[#transactions]
-== Run your own transactions
-
-For more advanced use-cases, you can run <<transaction,transactions>>.
-Use the methods `Session.ExecuteRead()` and `Session.ExecuteWrite()` to run managed transactions.
-
-.A transaction with multiple queries, client logic, and potential roll backs
-[source, go]
-----
-package main
-
-import (
-    "fmt"
-    "context"
-    "strconv"
-    "errors"
-    "github.com/neo4j/neo4j-go-driver/v5/neo4j"
-)
-
-func main() {
-    ctx := context.Background()
-    var employeeThreshold int64 = 10  // Neo4j's integer maps to Go's int64
-
-    // Connection to database
-    dbUri := "<URI for Neo4j database>"
-    dbUser := "<Username>"
-    dbPassword := "<Password>"
-    driver, err := neo4j.NewDriverWithContext(
-        dbUri,
-        neo4j.BasicAuth(dbUser, dbPassword, ""))
-    if err != nil {
-        panic(err)
-    }
-    defer driver.Close(ctx)
-    err = driver.VerifyConnectivity(ctx)
-    if err != nil {
-        panic(err)
-    }
-
-    session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
-    defer session.Close(ctx)
-
-    // Create 100 people and assign them to various organizations
-    for i := 0; i < 100; i++ {
-        name := "Thor" + strconv.Itoa(i)
-        orgId, err := session.ExecuteWrite(ctx,
-            func(tx neo4j.ManagedTransaction) (any, error) {
-                var orgId string
-
-                // Create new Person node with given name, if not exists already
-                _, err := tx.Run(
-                    ctx,
-                    "MERGE (p:Person {name: $name})",
-                    map[string]any{
-                        "name": name,
-                    })
-                if err != nil {
-                    return nil, err
-                }
-
-                // Obtain most recent organization ID and the number of people linked to it
-                result, err := tx.Run(
-                    ctx, `
-                    MATCH (o:Organization)
-                    RETURN o.id AS id, COUNT{(p:Person)-[r:WORKS_FOR]->(o)} AS employeesN
-                    ORDER BY o.createdDate DESC
-                    LIMIT 1
-                    `, nil)
-                if err != nil {
-                    return nil, err
-                }
-                org, err := result.Single(ctx)
-
-                // If no organization exists, create one and add Person to it
-                if org == nil {
-                    orgId, _ = createOrganization(ctx, tx)
-                    fmt.Println("No orgs available, created", orgId)
-                    err = addPersonToOrganization(ctx, tx, name, orgId)
-                    if err != nil {
-                        return nil, errors.New("Failed to add person to new org")
-                        // Transaction will roll back
-                        // -> not even Person and/or Organization is created!
-                    }
-                } else {
-                    orgId = org.AsMap()["id"].(string)
-                    if employeesN := org.AsMap()["employeesN"].(int64);
-                       employeesN == 0 {
-                        return nil, errors.New("Most recent organization is empty")
-                        // Transaction will roll back
-                        // -> not even Person is created!
-                    }
-
-                    // If org does not have too many employees, add this Person to it
-                    if employeesN := org.AsMap()["employeesN"].(int64);
-                       employeesN < employeeThreshold {
-                        err = addPersonToOrganization(ctx, tx, name, orgId)
-                        if err != nil {
-                            return nil, err
-                            // Transaction will roll back
-                            // -> not even Person is created!
-                        }
-                    // Otherwise, create a new Organization and link Person to it
-                    } else {
-                        orgId, err = createOrganization(ctx, tx)
-                        if err != nil {
-                            return nil, err
-                            // Transaction will roll back
-                            // -> not even Person is created!
-                        }
-                        fmt.Println("Latest org is full, created", orgId)
-                        err = addPersonToOrganization(ctx, tx, name, orgId)
-                        if err != nil {
-                            return nil, err
-                            // Transaction will roll back
-                            // -> not even Person and/or Organization is created!
-                        }
-                    }
-                }
-                // Return the Organization ID to which the new Person ends up in
-                return orgId, nil
-            })
-        if err != nil {
-            fmt.Println(err)
-        } else {
-            fmt.Println("User", name, "added to organization", orgId)
-        }
-    }
-}
-
-func createOrganization(ctx context.Context, tx neo4j.ManagedTransaction) (string, error) {
-    result, err := tx.Run(
-        ctx, `
-        CREATE (o:Organization {id: randomuuid(), createdDate: datetime()})
-        RETURN o.id AS id
-        `, nil)
-    if err != nil {
-        return "", err
-    }
-    org, err := result.Single(ctx)
-    if err != nil {
-        return "", err
-    }
-    orgId, _ := org.AsMap()["id"]
-    return orgId.(string), err
-}
-
-func addPersonToOrganization(ctx context.Context, tx neo4j.ManagedTransaction, personName string, orgId string) (error) {
-    _, err := tx.Run(
-        ctx, `
-        MATCH (o:Organization {id: $orgId})
-        MATCH (p:Person {name: $name})
-        MERGE (p)-[:WORKS_FOR]->(o)
-        `, map[string]any{
-            "orgId": orgId,
-            "name": personName,
-        })
-    return err
-}
-----
-
-xref:transactions.adoc[More info on running transactions ->]
+link:https://neo4j.com/docs/go-manual/current/query-simple/[More info on querying the database]
 
 
 [#close]
@@ -293,19 +134,14 @@ xref:transactions.adoc[More info on running transactions ->]
 Call the `.close()` method on all `DriverWithContext` and `SessionWithContext` instances to release any resources still held by them.
 The best practice is to call the methods with the `defer` keyword as soon as you create new objects.
 
-[source, go]
+[source, go, copy=true]
 ----
 driver, err := neo4j.NewDriverWithContext(dbUri, neo4j.BasicAuth(dbUser, dbPassword, ""))
 defer driver.Close(ctx)
 ----
 
-[source, go]
+[source, go, copy=true]
 ----
 session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
 defer session.Close(ctx)
 ----
-
-
-== API documentation
-
-For in-depth information about driver features, check out the link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j[API documentation].

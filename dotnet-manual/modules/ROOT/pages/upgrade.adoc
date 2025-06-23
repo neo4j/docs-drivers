@@ -2,7 +2,15 @@
 
 = Upgrade from older versions
 
-include::{common-partial}/upgrade.adoc[tag=intro]
+This page contains the list of new features and breaking changes of the driver from version 4.4 to 5.x.
+For a full list of changes, see the link:{driver-changelog-url}[Driver -> Changelog].
+
+The latest driver version of the 5.x series ({dotnet-driver-version}) is compatible with Neo4j server both 4.4 and 5.x, so you can upgrade the driver before you upgrade the server.
+At the same time, the driver version 4.4 is forward compatible with Neo4j server 5.x, so you could also upgrade the server before the driver; however, given that it's easier to roll back an application upgrade than a server upgrade, it's recommended to start with the driver.
+
+[TIP]
+When upgrading the Neo4j server to a newer version, the Cypher queries in your application may also need updating. +
+See link:https://neo4j.com/docs/cypher-manual/current/deprecations-additions-removals-compatibility/[Cypher -> Deprecations, additions, and compatibility].
 
 
 [[new-features]]
@@ -127,7 +135,7 @@ The new methods behave similarly, but the argument types are different and the n
 
 // a backslash is needed in first url to avoid it becoming a <em> with the subsequent link __
 |5.0
-|`ZonedDateTime` -- Two constructors not including `DateTimeKind` are deprecated (link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.ZonedDateTime.-ctor.html#Neo4j_Driver_ZonedDateTime\__ctor_System_Int32_System_Int32_System_Int32_System_Int32_System_Int32_System_Int32_Neo4j_Driver_Zone_[this] and link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.ZonedDateTime.-ctor.html#Neo4j_Driver_ZonedDateTime__ctor_System_Int32_System_Int32_System_Int32_System_Int32_System_Int32_System_Int32_System_Int32_Neo4j_Driver_Zone_[this]).
+|`ZonedDateTime` -- Two constructors not including `DateTimeKind` are deprecated (link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.ZonedDateTime.-ctor.html#Neo4j_Driver_ZonedDateTime_\_ctor_System_Int32_System_Int32_System_Int32_System_Int32_System_Int32_System_Int32_Neo4j_Driver_Zone_[this] and link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.ZonedDateTime.-ctor.html#Neo4j_Driver_ZonedDateTime_\_ctor_System_Int32_System_Int32_System_Int32_System_Int32_System_Int32_System_Int32_System_Int32_Neo4j_Driver_Zone_[this]).
 |label:deprecated[]
 
 |5.0

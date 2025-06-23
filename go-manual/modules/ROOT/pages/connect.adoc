@@ -19,9 +19,9 @@ import (
 
 func main() {
     ctx := context.Background() // <2>
-    dbUri := "<URI for Neo4j database>"
-    dbUser := "<Username>"
-    dbPassword := "<Password>"
+    dbUri := "{neo4j-database-uri}"
+    dbUser := "{neo4j-username}"
+    dbPassword := "{neo4j-password}"
     driver, err := neo4j.NewDriverWithContext(  // <1>
         dbUri,
         neo4j.BasicAuth(dbUser, dbPassword, ""))
@@ -49,6 +49,9 @@ Note that there are corner cases in which `.Close()` might return an error, so y
 **`Driver` objects are immutable, thread-safe, and expensive to create**, so your application should create only one instance and pass it around (you may share `Driver` instances across threads).
 If you need to query the database through several different users, use xref:query-simple#impersonation[impersonation] without creating a new `DriverWithContext` instance.
 If you want to alter a `DriverWithContext` configuration, you need to create a new object.
+
+[TIP]
+The driver also supports other xref:connect-advanced.adoc#authentication-methods[authentication methods] (kerberos, bearer, custom).
 
 
 == Connect to an Aura instance

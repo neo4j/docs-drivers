@@ -13,13 +13,13 @@ The overhead is minimal for a single query, but becomes significant over hundred
 [source, java]
 ----
 driver.executableQuery("<QUERY>")
-    .withConfig(QueryConfig.builder().withDatabase("<DB NAME>").build())
+    .withConfig(QueryConfig.builder().withDatabase("{neo4j-database-name}").build())
     .execute();
 ----
 
 [source, java]
 ----
-driver.session(SessionConfig.builder().withDatabase("<DB NAME>").build());
+driver.session(SessionConfig.builder().withDatabase("{neo4j-database-name}").build());
 ----
 
 [discrete]
@@ -63,7 +63,7 @@ try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").
 ----
 for (int i=0; i<1000; i++) {
     driver.executableQuery("<QUERY>")
-        .withConfig(QueryConfig.builder().withDatabase("<DB NAME>").build())
+        .withConfig(QueryConfig.builder().withDatabase("{neo4j-database-name}").build())
         .execute();
     // or session.executeRead/Write() calls
 }

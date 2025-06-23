@@ -5,15 +5,15 @@ Once you have xref:install.adoc#install-driver[installed the driver] and have xr
 
 == Connect to the database
 
-You connect to a database by creating a <<Driver>> object and providing a URL and an authentication token.
+You connect to a database by creating a <<Driver>> object and providing a URL and your login credentials.
 
 [source, python]
 ----
 from neo4j import GraphDatabase
 
 # URI examples: "neo4j://localhost", "neo4j+s://xxx.databases.neo4j.io"
-URI = "<URI for Neo4j database>"
-AUTH = ("<Username>", "<Password>")
+URI = "{neo4j-database-uri}"
+AUTH = ("{neo4j-username}", "{neo4j-password}")
 
 with GraphDatabase.driver(URI, auth=AUTH) as driver: # <1>
     driver.verify_connectivity() # <2>
@@ -30,6 +30,9 @@ Since error handling can get quite verbose, and a connection error is a blocker 
 **`Driver` objects are immutable, thread-safe, and expensive to create**, so your application should create only one instance and pass it around (you may share `Driver` instances across threads).
 If you need to query the database through several different users, use xref:query-simple#impersonation[impersonation] without creating a new `Driver` instance.
 If you want to alter a `Driver` configuration, you need to create a new object.
+
+[TIP]
+The driver also supports other xref:connect-advanced.adoc#authentication-methods[authentication methods] (kerberos, bearer, custom).
 
 
 == Connect to an Aura instance

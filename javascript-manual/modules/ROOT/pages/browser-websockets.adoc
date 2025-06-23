@@ -24,9 +24,9 @@ Including the driver in the page makes a global `neo4j` object available, throug
 .Driver usage example
 [source, javascript]
 ----
-const URI = '<URI for Neo4j database>'
-const USER = '<Username>'
-const PASSWORD = '<Password>'
+const URI = '{neo4j-database-uri}'
+const USER = '{neo4j-username}'
+const PASSWORD = '{neo4j-password}'
 const driver = neo4j.driver(URI, neo4j.auth.basic(USER, PASSWORD))
 const serverInfo = await driver.getServerInfo()
 

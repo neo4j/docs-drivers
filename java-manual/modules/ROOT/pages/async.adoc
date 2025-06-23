@@ -30,9 +30,9 @@ import org.neo4j.driver.SessionConfig;
 public class App {
 
     public static void main(String... args) throws ExecutionException, InterruptedException {
-        final String dbUri = "<URI for Neo4j database>";
-        final String dbUser = "<Username>";
-        final String dbPassword = "<Password>";
+        final String dbUri = "{neo4j-database-uri}";
+        final String dbUser = "{neo4j-username}";
+        final String dbPassword = "{neo4j-password}";
 
         try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword))) {  // <1>
             driver.verifyConnectivity();

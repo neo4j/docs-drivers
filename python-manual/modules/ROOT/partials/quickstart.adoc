@@ -1,3 +1,6 @@
+// This doc is also sourced in the Aura Developer Hub.
+// Because of that, cross-links are absolute and source blocks have copy=true .
+
 The Neo4j Python driver is the official library to interact with a Neo4j instance through a Python application.
 
 At the hearth of Neo4j lies <<Cypher>>, the query language to interact with a Neo4j database.
@@ -7,16 +10,16 @@ You may then apply that knowledge while following this guide to develop your Pyt
 
 
 [#install]
-== Installation
+== Install
 
 Install the Neo4j Python driver with `pip`:
 
-[source, bash]
+[source, bash, copy=true]
 ----
 pip install neo4j
 ----
 
-xref:install#install-driver[More info on installing the driver ->]
+link:https://neo4j.com/docs/python-manual/current/install/[More info on installing the driver]
 
 
 [#connect]
@@ -25,19 +28,19 @@ xref:install#install-driver[More info on installing the driver ->]
 Connect to a database by creating a <<Driver>> object and providing a URL and an authentication token.
 Once you have a `Driver` instance, use the `.verify_connectivity()` method to ensure that a working connection can be established.
 
-[source, python]
+[source, python, copy=true]
 ----
 from neo4j import GraphDatabase
 
 # URI examples: "neo4j://localhost", "neo4j+s://xxx.databases.neo4j.io"
-URI = "<URI for Neo4j database>"
-AUTH = ("<Username>", "<Password>")
+URI = "{neo4j-database-uri}"
+AUTH = ("{neo4j-username}", "{neo4j-password}")
 
 with GraphDatabase.driver(URI, auth=AUTH) as driver:
     driver.verify_connectivity()
 ----
 
-xref:connect.adoc[More info on connecting to a database ->]
+link:https://neo4j.com/docs/python-manual/current/connect/[More info on connecting to a database]
 
 
 [#create-graph]
@@ -47,7 +50,7 @@ Run a Cypher query with the method `Driver.execute_query()`.
 Do not hardcode or concatenate parameters: use placeholders and specify the parameters as keyword arguments.
 
 .Create two `Person` nodes and a `KNOWS` relationship between them
-[source, python]
+[source, python, copy=true]
 ----
 summary = driver.execute_query("""
     CREATE (a:Person {name: $name})
@@ -63,7 +66,7 @@ print("Created {nodes_created} nodes in {time} ms.".format(
 ))
 ----
 
-xref:query-simple.adoc[More info on querying the database ->]
+link:https://neo4j.com/docs/python-manual/current/query-simple/[More info on querying the database]
 
 
 [#query-graph]
@@ -72,7 +75,7 @@ xref:query-simple.adoc[More info on querying the database ->]
 To retrieve information from the database, use the Cypher clause `MATCH`:
 
 .Retrieve all `Person` nodes who like other `Person` s
-[source, python]
+[source, python, copy=true]
 ----
 records, summary, keys = driver.execute_query("""
     MATCH (p:Person)-[:KNOWS]->(:Person)
@@ -92,85 +95,7 @@ print("The query `{query}` returned {records_count} records in {time} ms.".forma
 ))
 ----
 
-xref:query-simple.adoc[More info on querying the database ->]
-
-
-[#transactions]
-== Run your own transactions
-
-For more advanced use-cases, you can run <<transaction,transactions>>.
-Use the methods `Session.execute_read()` and `Session.execute_write()` to run managed transactions.
-
-.A transaction with multiple queries, client logic, and potential roll backs
-[source, python]
-----
-from neo4j import GraphDatabase
-
-
-URI = "<URI for Neo4j database>"
-AUTH = ("<Username>", "<Password>")
-employee_threshold=10
-
-
-def main():
-    with GraphDatabase.driver(URI, auth=AUTH) as driver:
-        with driver.session(database="neo4j") as session:
-            for i in range(100):
-                name = f"Thor{i}"
-                org_id = session.execute_write(employ_person_tx, name)
-                print(f"User {name} added to organization {org_id}")
-
-
-def employ_person_tx(tx, name):
-    # Create new Person node with given name, if not exists already
-    result = tx.run("""
-        MERGE (p:Person {name: $name})
-        RETURN p.name AS name
-        """, name=name
-    )
-
-    # Obtain most recent organization ID and the number of people linked to it
-    result = tx.run("""
-        MATCH (o:Organization)
-        RETURN o.id AS id, COUNT{(p:Person)-[r:WORKS_FOR]->(o)} AS employees_n
-        ORDER BY o.created_date DESC
-        LIMIT 1
-    """)
-    org = result.single()
-
-    if org is not None and org["employees_n"] == 0:
-        raise Exception("Most recent organization is empty.")
-        # Transaction will roll back -> not even Person is created!
-
-    # If org does not have too many employees, add this Person to that
-    if org is not None and org.get("employees_n") < employee_threshold:
-        result = tx.run("""
-            MATCH (o:Organization {id: $org_id})
-            MATCH (p:Person {name: $name})
-            MERGE (p)-[r:WORKS_FOR]->(o)
-            RETURN $org_id AS id
-            """, org_id=org["id"], name=name
-        )
-
-    # Otherwise, create a new Organization and link Person to it
-    else:
-        result = tx.run("""
-            MATCH (p:Person {name: $name})
-            CREATE (o:Organization {id: randomuuid(), created_date: datetime()})
-            MERGE (p)-[r:WORKS_FOR]->(o)
-            RETURN o.id AS id
-            """, name=name
-        )
-
-    # Return the Organization ID to which the new Person ends up in
-    return result.single()["id"]
-
-
-if __name__ == "__main__":
-    main()
-----
-
-xref:transactions.adoc[More info on running transactions ->]
+link:https://neo4j.com/docs/python-manual/current/query-simple/[More info on querying the database]
 
 
 [#close]
@@ -178,7 +103,7 @@ xref:transactions.adoc[More info on running transactions ->]
 
 Unless you created them using the `with` statement, call the `.close()` method on all `Driver` and `Session` instances to release any resources still held by them.
 
-[source, python]
+[source, python, copy=true]
 ----
 from neo4j import GraphDatabase
 
@@ -191,8 +116,3 @@ session = driver.session(database="neo4j")
 session.close()
 driver.close()
 ----
-
-
-== API documentation
-
-For in-depth information about driver features, check out the link:https://neo4j.com/docs/api/python-driver/{python-driver-version}/[API documentation].

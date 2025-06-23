@@ -13,9 +13,9 @@ You connect to a database by creating a <<Driver>> object and providing a URL an
   var neo4j = require('neo4j-driver')
 
   // URI examples: 'neo4j://localhost', 'neo4j+s://xxx.databases.neo4j.io'
-  const URI = '<URI for Neo4j database>'
-  const USER = '<Username>'
-  const PASSWORD = '<Password>'
+  const URI = '{neo4j-database-uri}'
+  const USER = '{neo4j-username}'
+  const PASSWORD = '{neo4j-password}'
   let driver
 
   try {
@@ -47,6 +47,9 @@ Both the creation of a `Driver` object and the connection verification can raise
 **`Driver` objects are immutable, thread-safe, and expensive to create**, so your application should create only one instance and pass it around (you may share `Driver` instances across threads).
 If you need to query the database through several different users, use xref:query-simple#impersonation[impersonation] without creating a new `Driver` instance.
 If you want to alter a `Driver` configuration, you need to create a new object.
+
+[TIP]
+The driver also supports other xref:connect-advanced.adoc#authentication-methods[authentication methods] (kerberos, bearer, custom).
 
 
 == Connect to an Aura instance
