@@ -165,7 +165,7 @@ await driver.ExecutableQuery("MATCH (p:Person {name: $name}) RETURN p")
 
 [NOTE]
 There can be circumstances where your query structure prevents the usage of parameters in all its parts.
-For those rare use cases, see xref:query-advanced#_dynamic_values_in_property_keys_relationship_types_and_labels[Dynamic values in property keys, relationship types, and labels].
+For those rare use cases, see xref:query-advanced.adoc#dynamic-advanced[Dynamic values in property keys, relationship types, and labels].
 
 
 [#error-handling]

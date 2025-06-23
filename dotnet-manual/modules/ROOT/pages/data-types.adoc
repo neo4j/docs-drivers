@@ -293,7 +293,7 @@ The driver can raise a number of different exceptions, see link:https://neo4j.co
 
 For a list of errors the server can return, see link:{neo4j-docs-base-uri}/status-codes/{page-version}[Status codes].
 
-Some server errors are marked as safe to retry without need to alter the original request.
+Some errors are marked as safe to retry without need to alter the original request.
 Those exceptions have a `true` value for the `.IsRetriable` property.
 Examples of such errors are deadlocks, memory issues, or connectivity issues.
 This is particular useful when running queries in xref:transactions#explicit-transactions[explicit transactions], to know if a failed query is worth re-running.

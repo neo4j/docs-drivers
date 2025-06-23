@@ -5,10 +5,10 @@ When xref:query-simple.adoc#read[reading data from the database], results come b
 To process records, you can either extract properties with `.Get()` and other helper methods, or you can map them to objects in your application.
 You can either map records to classes you have explicitly defined, or provide a record-specific blueprint from which the driver will spawn new objects.
 
-The object-graph mapping (OGM) feature can help you reduce boilerplate code and work more easily with the results of your queries.
+The object mapping feature can help you reduce boilerplate code and work more easily with the results of your queries.
 
 [TIP]
-To use the Object-Graph Mapping (OGM) feature, you need to include the namespace `Neo4j.Driver.Mapping` beside the root `Neo4j.Driver`.
+To use the object mapping feature, you need to include the namespace `Neo4j.Driver.Mapping` beside the root `Neo4j.Driver`.
 
 
 [#existing-classes]
@@ -50,7 +50,7 @@ class Person {  // <.>
 <.> Return keys are aliased in the query to match the class attributes.
 <.> The record is mapped to an instance of the `Person` class.
 <.> The class `Person` contains `name` and `age` attributes, as the query return keys.
-<.> Each class attribute must have a public getter _and_ setter, which the OGM can invoke after instantiating the class. If that doesn't fit your use-case, see xref:#constructors[how to use constructors] and have private setters.
+<.> Each class attribute must have a public getter _and_ setter, which the driver can invoke after instantiating the class. If that doesn't fit your use-case, see xref:#constructors[how to use constructors] and have private setters.
 
 You can alter the association between property names and class attributes with the class attribute decorator `[MappingSource("returnedKeyName")]`.
 For more information, see all xref:#decorators[decorators].
@@ -89,7 +89,7 @@ class Person {  // <.>
 [#decorators]
 === Class attribute decorators
 
-To make the object-graph mapping more flexible, decorators are available.
+To make the mapping more flexible, decorators are available.
 Use them on class attributes to alter how each attribute should be mapped to its respective query return key.
 
 - `[MappingSource("<returnedKeyName>")]` -- Map `returnedKeyName` to the class attribute, instead of looking for a returned key that matches the class attribute name.
@@ -200,7 +200,7 @@ The constructor signature implies that the `name` return key is mapped to the cl
 [#anonymous-types]
 == Map to anonymous types
 
-Especially if your queries return a broad variety of result keys, it can feel pointless to define a number of different classes just for the mapping to work, or to engineer one single class and try to make it adapt to a variety of return keys with attribute decorators.
+Especially if your queries return a variety of result keys, it can feel pointless to define a number of different classes just for the mapping to work, or to engineer one single class and try to make it adapt to a variety of return keys with attribute decorators.
 In those cases, you can provide a skeleton of definition (a _blueprint_) to the driver and let it instantiate anonymous objects out of that.
 
 You provide a blueprint with the method link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.Mapping.RecordExtensions.AsObjectFromBlueprint.html[`IRecord.AsObjectFromBlueprint()`], and the record must match it exactly (i.e. you can't use decorators).

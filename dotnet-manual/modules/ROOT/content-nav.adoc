@@ -5,7 +5,7 @@
 * xref:install.adoc[Installation]
 * xref:connect.adoc[Connect to the database]
 * xref:query-simple.adoc[Query the database]
-* xref:object-graph-mapping.adoc[]
+* xref:object-mapping.adoc[]
 
 * *Advanced usage*
 
