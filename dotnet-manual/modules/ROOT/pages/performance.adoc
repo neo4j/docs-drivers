@@ -76,6 +76,7 @@ await session.ExecuteWriteAsync(async tx => {
 An even faster approach is to skip `.ExecuteRead/WriteAsync()` and call `.RunAsync()` directly on the session.
 The queries run as auto-commit transaction, and are still isolated from other concurrent queries, but if any of them fail, they will not be retried.
 With this method, you trade some robustness for more throughput, as the queries are shot to the server as fast as it can handle.
+One upper limit on the client size is given by the size of the connection pool: each call to `.RunAsync()` borrows a connection, so the amount of parallel work is limited by the number of available connections.
 
 .Queries as auto-commit transactions (highest throughput)
 [source, csharp]
