@@ -96,7 +96,7 @@ When submitting queries that may result in a lot of records, don't retrieve them
 The Neo4j server can retrieve records in batches and stream them to the driver as they become available.
 Lazy-loading a result spreads out network traffic and memory usage (both client- and server-side).
 
-For convenience, xref:query-simple.adoc[`.ExecutableQuery()`] always retrieves all result records at once.
+For convenience, xref:query-simple.adoc[`.ExecutableQuery()`] always retrieves all result records at once (eager loading).
 To lazy-load a result, use xref:transactions.adoc#managed-transactions[`.ExecuteRead/WriteAsync()`] (or other forms of manually-handled xref:transactions.adoc[transactions]) and do *not* call `.ToListAsync()` on the `IResultCursor` object when processing the result; iterate on it instead.
 
 .Comparison between eager and lazy loading
@@ -216,6 +216,13 @@ With lazy loading, the client can also stop requesting records after some condit
 ====
 
 [TIP]
+====
+When using `.ExecutableQuery()`, you can process records as they arrive using the link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IExecutableQuery-2.WithStreamProcessor.html[`.WithStreamProcessor()`] method.
+This will speed up response by not waiting for all records before processing them; it does not however improve memory footprint, as you can't control the flux of records.
+You can reduce the memory footprint of link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.EagerResult-1.html[`EagerResult`] using link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IConfiguredQuery-2.WithMap.html[`.WithMap()`] or link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IConfiguredQuery-2.WithReduce.html[`.WithReduce()`].
+====
+
+[NOTE]
 ====
 The driver's link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.SessionConfigBuilder.WithFetchSize.html[fetch size] affects the behavior of lazy loading.
 It instructs the server to stream an amount of records equal to the fetch size, and then wait until the client has caught up before retrieving and sending more.
