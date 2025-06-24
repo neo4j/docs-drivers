@@ -40,35 +40,52 @@ using var session = driver.AsyncSession();
 [[transactions-cost]]
 == Be aware of the cost of transactions
 
-When submitting queries through xref:query-simple.adoc[`.ExecutableQuery()`] or through xref:transactions.adoc#managed-transactions[`.ExecuteRead/WriteAsync()`], the server automatically wraps them into a <<transaction>>.
+When submitting queries through xref:query-simple.adoc[`.ExecutableQuery()`] or through xref:transactions.adoc#managed-transactions[`.ExecuteRead/WriteAsync()`], the driver wraps them into a <<transaction>>.
 This behavior ensures that the database always ends up in a consistent state, regardless of what happens during the execution of a transaction (power outages, software crashes, etc).
+As a further robustness layer, the driver also retries failed transactions with an exponential backoff.
 
-Creating a safe execution context around a number of queries yields an overhead that is not present if the driver just shoots queries at the server and hopes they will get through.
-The overhead is small, but can add up as the number of queries increases.
-For this reason, if your use case values throughput more than data integrity, you may extract further performance by running all queries within a single (auto-commit) transaction.
-You do this by creating a session and using `session.RunAsync()` to run as many queries as needed.
+Creating a safe execution context around a query yields an overhead that is small, but that adds up as the number of transactions increases.
+When each query is sent as a transaction of its own, if one transaction fails and needs to be rolled back, all the other transactions are unaffected.
+This is the safest mode of execution with respect to failures, but also the slowest due to the overhead of transactions scaling with the number of queries.
 
-.Privilege throughput over data integrity
-[source, csharp]
-----
-using var session = driver.AsyncSession(conf => conf.WithDatabase("{neo4j-database-name}"));
-for (int i=0; i<1000; i++) {
-    await session.RunAsync("<QUERY>");
-}
-----
-
-.Privilege data integrity over throughput
+.Each query as a separate transaction (low throughput)
 [source, csharp]
 ----
 for (int i=0; i<1000; i++) {
     await driver.ExecutableQuery("<QUERY>")
-        .WithConfig(new QueryConfig(database: "{neo4j-database-name}"))
+        .WithConfig(new QueryConfig(database: "neo4j"))
         .ExecuteAsync();
     // or session.ExecuteRead/WriteAsync() calls
 }
 ----
 
+A more performant approach is to group all queries into a single transaction.
+In this way, the transaction as a whole is isolated from others, but individual queries in the transaction are not isolated, and failure of one results in a rollback of all queries.
 
+.Group queries into one transaction (higher throughput)
+[source, csharp]
+----
+using var session = driver.AsyncSession(conf => conf.WithDatabase("neo4j"));
+await session.ExecuteWriteAsync(async tx => {
+    for (int i=0; i<1000; i++) {
+        var result = await tx.RunAsync("<QUERY>");
+    }
+});
+----
+
+An even faster approach is to skip `.ExecuteRead/WriteAsync()` and call `.RunAsync()` directly on the session.
+The queries run as auto-commit transaction, and are still isolated from other concurrent queries, but if any of them fail, they will not be retried.
+With this method, you trade some robustness for more throughput, as the queries are shot to the server as fast as it can handle.
+
+.Queries as auto-commit transactions (highest throughput)
+[source, csharp]
+----
+
+using var session = driver.AsyncSession(conf => conf.WithDatabase("neo4j"));
+for (int i=0; i<1000; i++) {
+    await session.RunAsync("<QUERY>");
+}
+----
 
 
 [[lazy-eager-loading]]
