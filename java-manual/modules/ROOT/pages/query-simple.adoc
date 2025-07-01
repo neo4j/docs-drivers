@@ -183,10 +183,85 @@ A query run may fail for a number of reasons, with different link:https://neo4j.
 Some of them are due to Cypher syntax errors, permission issues, or other forms of misconfiguration/misusage.
 The choice of how to handle those exceptions is up to your application: whether you want to be defensive (for example check if there are records to process to avoid link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/exceptions/NoSuchRecordException.html[NoSuchRecordException]), or whether you want to catch and handle the exceptions as they arise.
 
+All exceptions thrown by the Java driver are subclasses of link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/exceptions/Neo4jException.html[Neo4jException].
+When catching and handling exceptions, you can choose to catch all exceptions of class Neo4jException, or a more specific exception class.
+As of Java driver 5.26, each Neo4jException has a GQLSTATUS error code, which is stable and can thus be relied on in try-catch patterns.
+
+[source, java, test-skip]
+----
+// import org.neo4j.driver.QueryConfig;
+
+driver.executableQuery("CREATE CONSTRAINT userConstraint FOR (user:User) REQUIRE (user.name) IS UNIQUE")
+    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+    .execute();
+
+try {
+    for(String user: userInputList) {
+        driver.executableQuery("CREATE (:User {name:$username})")
+            .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+            .withParameters(Map.of("username", user))
+            .execute();
+    }
+} catch (ClientException e) {
+    if (e.gqStatus.equals("22N79")) {
+        System.out.println("Username is already taken");
+    }
+}
+----
+
+[NOTE]
+====
+The default GQLSTATUS code 50N42 is returned when an exception does not have a GQL-status object.
+This can happen if the driver is connected to an older Neo4j server.
+It is important not to rely on this default code, as future Neo4j server versions might change it by adding an appropriate GQL-status object to the exception.
+====
+
+A Neo4jException also has an optional GQL-status object cause, which in turn is a Neo4jException.
+Sometimes, the relevant GQLSTATUS code is situated in a GQLSTATUS-object cause, and the whole cause chain needs to be inspected:
+
+[source, java, test-skip]
+----
+// import java.util.Map;
+// import org.neo4j.driver.QueryConfig;
+var result;
+
+try {
+    result = driver.executableQuery("GRANT ROLE $role TO $user")
+    .withConfig(QueryConfig.builder().withDatabase("system").build())
+    .withParameters(Map.of("user", username, "role", roleName))
+    .execute();
+} catch (Neo4jException e) {
+    if (hasGqlStatus(e, "42N10")) {
+        // special handling of the role not existing
+        ...
+    } else if (hasGqlStatus(e, "42N09")) {
+        // special handling of the user not existing
+        ...
+    } else {
+        // handling of all other errors
+        ...
+    }
+}
+
+public boolean hasGqlStatus(Neo4jException exception, String... codes) {
+  var c = Set.of(codes);
+
+  Optional<Neo4jException> e = Optional.ofNullable(exception);
+  while (e.isPresent()) {
+    if (codes.contains(e.gqlStatus())) {
+      return true;
+    }
+    e = e.gqlCause();
+  }
+  return false;
+}
+----
+
+For more information on Neo4j error handling and GQLSTATUS error codes, see link:https://neo4j.com/docs/status-codes/current/errors[the status codes manual].
+
 [TIP]
 The driver automatically retries to run a failed query, if the failure is deemed to be transient (for example due to temporary server unavailability).
 An exception will be raised if the operation keeps failing after a number of attempts.
-
 
 == Query configuration
 
@@ -359,9 +434,13 @@ public class App {
                     result.summary().query(), result.records().size(),
                     result.summary().resultAvailableAfter(TimeUnit.MILLISECONDS));
 
-            } catch (Exception e) {
-                System.out.println(e.getMessage());
-                System.exit(1);
+            } catch (Neo4jException e) {
+                if (e.gqlSatus().equals("42NFF")) {
+                    System.out.println("There was a permission issue. Make sure you have correct permissions and try again.");
+                } else {
+                    System.out.println(e.getMessage());
+                    System.exit(1);
+                }
             }
         }
     }
