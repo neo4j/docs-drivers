@@ -473,7 +473,7 @@ public class App {
                     result.summary().resultAvailableAfter(TimeUnit.MILLISECONDS));
 
             } catch (Neo4jException e) {
-                if (e.gqlSatus().equals("42NFF")) {
+                if (e.gqlStatus().equals("42NFF")) {
                     System.out.println("There was a permission issue. Make sure you have correct permissions and try again.");
                 } else {
                     System.out.println(e.getMessage());
