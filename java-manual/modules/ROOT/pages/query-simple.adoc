@@ -177,91 +177,127 @@ There can be circumstances where your query structure prevents the usage of para
 For those rare use cases, see xref:query-advanced#_dynamic_values_in_property_keys_relationship_types_and_labels[Dynamic values in property keys, relationship types, and labels].
 
 
+[#error-handling]
 == Error handling
 
 A query run may fail for a number of reasons, with different link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/exceptions/package-summary.html[exceptions] being raised.
-Some of them are due to Cypher syntax errors, permission issues, or other forms of misconfiguration/misusage.
-The choice of how to handle those exceptions is up to your application: whether you want to be defensive (for example check if there are records to process to avoid link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/exceptions/NoSuchRecordException.html[NoSuchRecordException]), or whether you want to catch and handle the exceptions as they arise.
+All exceptions are subclasses of link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/exceptions/Neo4jException.html[`Neo4jException`].
+You can use an exception's code (retrievable with `.code()`) or GQL status (retrievable with `.gqlStatus()`) to stably identify a specific error.
 
-All exceptions thrown by the Java driver are subclasses of link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/exceptions/Neo4jException.html[Neo4jException].
-When catching and handling exceptions, you can choose to catch all exceptions of class Neo4jException, or a more specific exception class.
-As of Java driver 5.26, each Neo4jException has a GQLSTATUS error code, which is stable and can thus be relied on in try-catch patterns.
+Exception objects also expose methods that make them GQL-compliant.
+The actual _cause_ that triggered the exception is sometimes found in the optional GQL-status object retrievable with `.gqlCause()`, which is itself a `Neo4jException`.
 
-[source, java, test-skip]
+.Usage of `Neo4jException` methods
+[source, java]
 ----
-// import org.neo4j.driver.QueryConfig;
-
-driver.executableQuery("CREATE CONSTRAINT userConstraint FOR (user:User) REQUIRE (user.name) IS UNIQUE")
-    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
-    .execute();
+// import import org.neo4j.driver.exceptions.Neo4jException;
 
 try {
-    for(String user: userInputList) {
-        driver.executableQuery("CREATE (:User {name:$username})")
-            .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
-            .withParameters(Map.of("username", user))
-            .execute();
+    var result = driver.executableQuery("MATCH (p:Person) RETURN ")
+    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+    .execute();
+} catch (Neo4jException e) {
+    System.out.printf("Exception code: %s\n", e.code());
+    System.out.printf("Exception classification: %s\n", e.rawClassification());
+    System.out.printf("Exception message: %s\n", e);
+
+    // GQL-compliant methods
+    System.out.printf("Exception GQL status: %s\n", e.gqlStatus());
+    System.out.printf("Exception status description: %s\n", e.statusDescription());
+    System.out.printf("Exception GQL cause: %s\n", e.gqlCause());
+    System.out.printf("Exception GQL diagnostic record: %s\n", e.diagnosticRecord());
+}
+
+/*
+Exception code: Neo.ClientError.Statement.SyntaxError
+Exception classification: Optional[CLIENT_ERROR]
+Exception message: org.neo4j.driver.exceptions.ClientException: Invalid input '': expected an expression, '*', 'ALL' or 'DISTINCT' (line 1, column 24 (offset: 23))
+"MATCH (p:Person) RETURN"
+                        ^
+Exception GQL status: 42001
+Exception status description: error: syntax error or access rule violation - invalid syntax
+Exception GQL cause: Optional[org.neo4j.driver.exceptions.Neo4jException: 42I06: Invalid input '', expected: an expression, '*', 'ALL' or 'DISTINCT'.]
+Exception GQL diagnostic record: {_classification="CLIENT_ERROR", OPERATION_CODE="0", OPERATION="", CURRENT_SCHEMA="/", _position={column: 24, offset: 23, line: 1}}
+*/
+----
+
+GQL status codes are particularly helpful when you want your application to behave differently depending on the exact error that was raised by the server.
+
+.Distinguishing between different exception codes
+[source, java]
+----
+package demo;
+
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+
+import org.neo4j.driver.AuthTokens;
+import org.neo4j.driver.Driver;
+import org.neo4j.driver.GraphDatabase;
+import org.neo4j.driver.QueryConfig;
+import org.neo4j.driver.exceptions.Neo4jException;
+
+public class App {
+
+    final String dbUri = "{neo4j-database-uri}";
+    final String dbUser = "{neo4j-username}";
+    final String dbPassword = "{neo4j-password}";
+
+    public static void main(String... args) {
+        try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword))) {
+            try {
+                var result = driver.executableQuery("CREATE (p:Person {name: $name}) TURN p")
+                .withParameters(Map.of("name", "Frida"))
+                .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+                .execute();
+            } catch (Neo4jException e) {
+                if (hasGqlStatus(e, "42001")) {
+                    // Neo.ClientError.Statement.SyntaxError
+                    // special handling of syntax error in query
+                    System.out.println(e);
+                } else if (hasGqlStatus(e, "42NFF")) {
+                    // Neo.ClientError.Security.Forbidden
+                    // special handling of user not having CREATE permissions
+                    System.out.println(e);
+                } else {
+                    // handling of all other exceptions
+                    System.out.println(e);
+                }
+            }
+        }
     }
-} catch (ClientException e) {
-    if (e.gqStatus.equals("22N79")) {
-        System.out.println("Username is already taken");
+
+    public static boolean hasGqlStatus(Neo4jException exception, String... codes) {
+        var c = Set.of(codes);
+
+        Optional<Neo4jException> e = Optional.ofNullable(exception);
+        while (e.isPresent()) {
+            if (c.contains(e.get().gqlStatus())) {
+                return true;
+            }
+            e = e.get().gqlCause();
+        }
+        return false;
     }
 }
 ----
+
+For a full list of GQL-status error codes, see link:https://neo4j.com/docs/status-codes/current/errors[the status codes manual].
 
 [NOTE]
 ====
-The default GQLSTATUS code 50N42 is returned when an exception does not have a GQL-status object.
+The GQL status code `50N42` is returned when an exception does not have a GQL-status object.
 This can happen if the driver is connected to an older Neo4j server.
-It is important not to rely on this default code, as future Neo4j server versions might change it by adding an appropriate GQL-status object to the exception.
+Don't rely on this status code, as future Neo4j server versions might change it with a more appropriate one.
 ====
 
-A Neo4jException also has an optional GQL-status object cause, which in turn is a Neo4jException.
-Sometimes, the relevant GQLSTATUS code is situated in a GQLSTATUS-object cause, and the whole cause chain needs to be inspected:
-
-[source, java, test-skip]
-----
-// import java.util.Map;
-// import org.neo4j.driver.QueryConfig;
-var result;
-
-try {
-    result = driver.executableQuery("GRANT ROLE $role TO $user")
-    .withConfig(QueryConfig.builder().withDatabase("system").build())
-    .withParameters(Map.of("user", username, "role", roleName))
-    .execute();
-} catch (Neo4jException e) {
-    if (hasGqlStatus(e, "42N10")) {
-        // special handling of the role not existing
-        ...
-    } else if (hasGqlStatus(e, "42N09")) {
-        // special handling of the user not existing
-        ...
-    } else {
-        // handling of all other errors
-        ...
-    }
-}
-
-public boolean hasGqlStatus(Neo4jException exception, String... codes) {
-  var c = Set.of(codes);
-
-  Optional<Neo4jException> e = Optional.ofNullable(exception);
-  while (e.isPresent()) {
-    if (codes.contains(e.gqlStatus())) {
-      return true;
-    }
-    e = e.gqlCause();
-  }
-  return false;
-}
-----
-
-For more information on Neo4j error handling and GQLSTATUS error codes, see link:https://neo4j.com/docs/status-codes/current/errors[the status codes manual].
-
 [TIP]
+====
 The driver automatically retries to run a failed query, if the failure is deemed to be transient (for example due to temporary server unavailability).
 An exception will be raised if the operation keeps failing after a number of attempts.
+====
+
 
 == Query configuration
 
