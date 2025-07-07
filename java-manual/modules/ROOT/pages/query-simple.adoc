@@ -240,9 +240,9 @@ import org.neo4j.driver.exceptions.Neo4jException;
 
 public class App {
 
-    final String dbUri = "{neo4j-database-uri}";
-    final String dbUser = "{neo4j-username}";
-    final String dbPassword = "{neo4j-password}";
+    private static final String dbUri = "{neo4j-database-uri}";
+    private static final String dbUser = "{neo4j-username}";
+    private static final String dbPassword = "{neo4j-password}";
 
     public static void main(String... args) {
         try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword))) {
@@ -405,13 +405,15 @@ import org.neo4j.driver.GraphDatabase;
 import org.neo4j.driver.Record;
 import org.neo4j.driver.QueryConfig;
 import org.neo4j.driver.RoutingControl;
+import org.neo4j.driver.exceptions.Neo4jException;
 
 public class App {
 
+    private static final String dbUri = "{neo4j-database-uri}";
+    private static final String dbUser = "{neo4j-username}";
+    private static final String dbPassword = "{neo4j-password}";
+
     public static void main(String... args) {
-        final String dbUri = "{neo4j-database-uri}";
-        final String dbUser = "{neo4j-username}";
-        final String dbPassword = "{neo4j-password}";
 
         try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword))) {
 
