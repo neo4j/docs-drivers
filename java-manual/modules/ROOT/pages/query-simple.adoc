@@ -186,6 +186,7 @@ You can use an exception's code (retrievable with `.code()`) or GQL status (retr
 
 Exception objects also expose methods that make them GQL-compliant.
 The actual _cause_ that triggered the exception is sometimes found in the optional GQL-status object retrievable with `.gqlCause()`, which is itself a `Neo4jException`.
+You might need to recursively traverse the cause chain before reaching the root cause of the exception you caught.
 
 .Usage of `Neo4jException` methods
 [source, java]
