@@ -190,7 +190,7 @@ You can use an exception's code (retrievable with `.code()`) to stably identify 
 .Basic error handling
 [source, java, role=nocollapse]
 ----
-// import import org.neo4j.driver.exceptions.Neo4jException;
+// import org.neo4j.driver.exceptions.Neo4jException;
 
 try {
     var result = driver.executableQuery("MATCH (p:Person) RETURN ")
@@ -218,7 +218,7 @@ In the example below, the exception's GQL status code is `42001`, but the actual
 .Usage of `Neo4jException` with GQL-related methods
 [source, java]
 ----
-// import import org.neo4j.driver.exceptions.Neo4jException;
+// import org.neo4j.driver.exceptions.Neo4jException;
 
 try {
     var result = driver.executableQuery("MATCH (p:Person) RETURN ")
@@ -231,7 +231,6 @@ try {
     System.out.printf("Exception GQL cause: %s\n", e.gqlCause());
     System.out.printf("Exception GQL diagnostic record: %s\n", e.diagnosticRecord());
 }
-
 /*
 Exception GQL status code: 42001
 Exception GQL status description: error: syntax error or access rule violation - invalid syntax
