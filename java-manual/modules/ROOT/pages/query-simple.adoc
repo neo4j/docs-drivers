@@ -181,15 +181,14 @@ For those rare use cases, see xref:query-advanced#_dynamic_values_in_property_ke
 == Error handling
 
 A query run may fail for a number of reasons, with different link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/exceptions/package-summary.html[exceptions] being raised.
+The driver automatically retries to run a failed query, if the failure is deemed to be transient (for example due to temporary server unavailability).
+An exception will be raised if the operation keeps failing after a number of attempts.
+
 All exceptions are subclasses of link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/exceptions/Neo4jException.html[`Neo4jException`].
-You can use an exception's code (retrievable with `.code()`) or GQL status (retrievable with `.gqlStatus()`) to stably identify a specific error.
+You can use an exception's code (retrievable with `.code()`) to stably identify a specific error; error messages are instead not stable markers, and should not be relied upon.
 
-Exception objects also expose methods that make them GQL-compliant.
-The actual _cause_ that triggered the exception is sometimes found in the optional GQL-status object retrievable with `.gqlCause()`, which is itself a `Neo4jException`.
-You might need to recursively traverse the cause chain before reaching the root cause of the exception you caught.
-
-.Usage of `Neo4jException` methods
-[source, java]
+.Basic error handling
+[source, java, role=nocollapse]
 ----
 // import import org.neo4j.driver.exceptions.Neo4jException;
 
@@ -201,22 +200,42 @@ try {
     System.out.printf("Neo4j error code: %s\n", e.code());
     System.out.printf("Exception classification: %s\n", e.rawClassification());
     System.out.printf("Exception message: %s\n", e.getMessage());
-
-    // GQL-compliant methods
-    System.out.printf("Exception GQL status: %s\n", e.gqlStatus());
-    System.out.printf("Exception status description: %s\n", e.statusDescription());
-    System.out.printf("Exception GQL cause: %s\n", e.gqlCause());
-    System.out.printf("Exception GQL diagnostic record: %s\n", e.diagnosticRecord());
 }
-
 /*
 Neo4j error code: Neo.ClientError.Statement.SyntaxError
 Exception classification: Optional[CLIENT_ERROR]
 Exception message: Invalid input '': expected an expression, '*', 'ALL' or 'DISTINCT' (line 1, column 24 (offset: 23))
 "MATCH (p:Person) RETURN"
                         ^
-Exception GQL status: 42001
-Exception status description: error: syntax error or access rule violation - invalid syntax
+*/
+----
+
+Exception objects also expose errors as GQL-status objects.
+The main difference between link:https://neo4j.com/docs/status-codes/current/errors/all-errors/[Neo4j error codes] and link:https://neo4j.com/docs/status-codes/current/errors/gql-errors/[GQL error codes] is that the GQL ones are more granular: a single Neo4j error code might be broken in several, more specific GQL error codes.
+
+The actual _cause_ that triggered an exception is sometimes found in the optional GQL-status object retrievable with `.gqlCause()`, which is itself a `Neo4jException`.
+You might need to recursively traverse the cause chain before reaching the root cause of the exception you caught.
+In the example below, the exception's GQL status code is `42001`, but the actual source of the error has status code `42I06`.
+
+.Usage of `Neo4jException` with GQL-related methods
+[source, java]
+----
+// import import org.neo4j.driver.exceptions.Neo4jException;
+
+try {
+    var result = driver.executableQuery("MATCH (p:Person) RETURN ")
+    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+    .execute();
+} catch (Neo4jException e) {
+    System.out.printf("Exception GQL status code: %s\n", e.gqlStatus());
+    System.out.printf("Exception GQL status description: %s\n", e.statusDescription());
+    System.out.printf("Exception GQL cause: %s\n", e.gqlCause());
+    System.out.printf("Exception GQL diagnostic record: %s\n", e.diagnosticRecord());
+}
+
+/*
+Exception GQL status code: 42001
+Exception GQL status description: error: syntax error or access rule violation - invalid syntax
 Exception GQL cause: Optional[org.neo4j.driver.exceptions.Neo4jException: 42I06: Invalid input '', expected: an expression, '*', 'ALL' or 'DISTINCT'.]
 Exception GQL diagnostic record: {_classification="CLIENT_ERROR", OPERATION_CODE="0", OPERATION="", CURRENT_SCHEMA="/", _position={column: 24, offset: 23, line: 1}}
 */
@@ -248,7 +267,7 @@ public class App {
     public static void main(String... args) {
         try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword))) {
             try {
-                var result = driver.executableQuery("CREATE (p:Person {name: $name}) TURN p")
+                var result = driver.executableQuery("CREATE (p:Person {name: $name}) RETURN ")
                 .withParameters(Map.of("name", "Frida"))
                 .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
                 .execute();
@@ -284,19 +303,11 @@ public class App {
 }
 ----
 
-For a full list of GQL-status error codes, see link:https://neo4j.com/docs/status-codes/current/errors[the status codes manual].
-
 [NOTE]
 ====
 The GQL status code `50N42` is returned when an exception does not have a GQL-status object.
 This can happen if the driver is connected to an older Neo4j server.
 Don't rely on this status code, as future Neo4j server versions might change it with a more appropriate one.
-====
-
-[TIP]
-====
-The driver automatically retries to run a failed query, if the failure is deemed to be transient (for example due to temporary server unavailability).
-An exception will be raised if the operation keeps failing after a number of attempts.
 ====
 
 
