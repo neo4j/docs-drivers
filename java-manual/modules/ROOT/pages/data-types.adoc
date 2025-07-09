@@ -461,17 +461,6 @@ public class App {
 For full documentation, see link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/internal/value/PathValue.html[API documentation -> PathValue].
 
 
-== Exceptions
-
-The driver can raise a number of different exceptions, see link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/exceptions/package-summary.html[API documentation -> Exceptions].
-For a list of errors the server can return, see link:{neo4j-docs-base-uri}/status-codes/{page-version}[Status codes].
-
-Some server errors are marked as safe to retry without need to alter the original request.
-Examples of such errors are deadlocks, memory issues, or connectivity issues.
-Driver's exceptions implementing link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/exceptions/RetryableException.html[`RetryableException`] are such that a further attempt at the operation that caused it might be successful.
-This is particular useful when running queries in xref:transactions#explicit-transactions[explicit transactions], to know if a failed query is worth re-running.
-
-
 ifndef::backend-pdf[]
 [discrete.glossary]
 == Glossary
