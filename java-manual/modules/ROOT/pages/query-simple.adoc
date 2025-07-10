@@ -256,11 +256,11 @@ try {
     if (e.containsGqlStatus("42001")) {
         // Neo.ClientError.Statement.SyntaxError
         // special handling of syntax error in query
-        System.out.println(e.findByGqlStatus("42001").getMessage());
+        System.out.println(e.findByGqlStatus("42001").get().getMessage());
     } else if (e.containsGqlStatus("42NFF")) {
         // Neo.ClientError.Security.Forbidden
         // special handling of user not having CREATE permissions
-        System.out.println(e.findByGqlStatus("42NFF").getMessage());
+        System.out.println(e.findByGqlStatus("42NFF").get().getMessage());
     } else {
         // handling of all other exceptions
         System.out.println(e.getMessage());
