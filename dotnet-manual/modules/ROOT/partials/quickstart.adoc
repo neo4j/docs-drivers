@@ -28,7 +28,7 @@ link:https://neo4j.com/docs/dotnet-manual/current/[More info on installing the d
 [#connect]
 == Connect to the database
 
-Connect to a database by creating an <<IDriver>> object and providing a URL and an authentication token.
+Connect to a database by creating an `IDriver` object and providing a URL and an authentication token.
 Once you have a `IDriver` instance, use the `.VerifyConnectivityAsync()` method to ensure that a working connection can be established.
 
 [source, csharp, copy=true]
@@ -79,7 +79,7 @@ link:https://neo4j.com/docs/dotnet-manual/current/[More info on querying the dat
 
 To retrieve information from the database, use the Cypher clause `MATCH`:
 
-.Retrieve all `Person` nodes who like other `Person` s
+.Retrieve all `Person` nodes who know other persons
 [source, csharp, copy=true]
 ----
 var result = await driver.ExecutableQuery(@"

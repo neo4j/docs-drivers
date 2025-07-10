@@ -26,7 +26,7 @@ link:https://neo4j.com/docs/javascript-manual/current/install/[More info on inst
 [#connect]
 == Connect to the database
 
-Connect to a database by creating a <<Driver>> object and providing a URL and an authentication token.
+Connect to a database by creating a `Driver` object and providing a URL and an authentication token.
 Once you have a `Driver` instance, use the `.getServerInfo()` method to ensure that a working connection can be established.
 
 [source, javascript, copy=true]
@@ -84,7 +84,7 @@ link:https://neo4j.com/docs/javascript-manual/current/query-simple/[More info on
 
 To retrieve information from the database, use the Cypher clause `MATCH`:
 
-.Retrieve all `Person` nodes who like other `Person` s
+.Retrieve all `Person` nodes who know other persons
 [source, javascript, copy=true]
 ----
 let { records, summary } = await driver.executeQuery(`

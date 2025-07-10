@@ -26,7 +26,7 @@ link:https://neo4j.com/docs/go-manual/current/install/[More info on installing t
 [#connect]
 == Connect to the database
 
-Connect to a database by creating a <<DriverWithContext>> object and providing a URL and an authentication token.
+Connect to a database by creating a `DriverWithContext` object and providing a URL and an authentication token.
 Once you have a `DriverWithContext` instance, use the `.VerifyConnectivity()` method to ensure that a working connection can be established.
 
 [source, go, role=nocollapse, copy=true]
@@ -98,7 +98,7 @@ link:https://neo4j.com/docs/go-manual/current/query-simple/[More info on queryin
 
 To retrieve information from the database, use the Cypher clause `MATCH`:
 
-.Retrieve all `Person` nodes who like other `Person` s
+.Retrieve all `Person` nodes who know other persons
 [source, go, role=nocollapse, copy=true]
 ----
 result, err := neo4j.ExecuteQuery(ctx, driver, `
