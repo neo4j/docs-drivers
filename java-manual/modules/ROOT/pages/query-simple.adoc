@@ -245,59 +245,25 @@ GQL status codes are particularly helpful when you want your application to beha
 .Distinguishing between different exception codes
 [source, java]
 ----
-package demo;
+// import org.neo4j.driver.exceptions.Neo4jException;
 
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-
-import org.neo4j.driver.AuthTokens;
-import org.neo4j.driver.Driver;
-import org.neo4j.driver.GraphDatabase;
-import org.neo4j.driver.QueryConfig;
-import org.neo4j.driver.exceptions.Neo4jException;
-
-public class App {
-
-    private static final String dbUri = "{neo4j-database-uri}";
-    private static final String dbUser = "{neo4j-username}";
-    private static final String dbPassword = "{neo4j-password}";
-
-    public static void main(String... args) {
-        try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword))) {
-            try {
-                var result = driver.executableQuery("CREATE (p:Person {name: $name}) RETURN ")
-                .withParameters(Map.of("name", "Frida"))
-                .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
-                .execute();
-            } catch (Neo4jException e) {
-                if (hasGqlStatus(e, "42001")) {
-                    // Neo.ClientError.Statement.SyntaxError
-                    // special handling of syntax error in query
-                    System.out.println(e.getMessage());
-                } else if (hasGqlStatus(e, "42NFF")) {
-                    // Neo.ClientError.Security.Forbidden
-                    // special handling of user not having CREATE permissions
-                    System.out.println(e.getMessage());
-                } else {
-                    // handling of all other exceptions
-                    System.out.println(e.getMessage());
-                }
-            }
-        }
-    }
-
-    public static boolean hasGqlStatus(Neo4jException exception, String... codes) {
-        var c = Set.of(codes);
-
-        Optional<Neo4jException> e = Optional.ofNullable(exception);
-        while (e.isPresent()) {
-            if (c.contains(e.get().gqlStatus())) {
-                return true;
-            }
-            e = e.get().gqlCause();
-        }
-        return false;
+try {
+    var result = driver.executableQuery("CREATE (p:Person {name: $name}) RETURN ")
+    .withParameters(Map.of("name", "Frida"))
+    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+    .execute();
+} catch (Neo4jException e) {
+    if (e.containsGqlStatus("42001")) {
+        // Neo.ClientError.Statement.SyntaxError
+        // special handling of syntax error in query
+        System.out.println(e.findByGqlStatus("42001").getMessage());
+    } else if (e.containsGqlStatus("42NFF")) {
+        // Neo.ClientError.Security.Forbidden
+        // special handling of user not having CREATE permissions
+        System.out.println(e.findByGqlStatus("42NFF").getMessage());
+    } else {
+        // handling of all other exceptions
+        System.out.println(e.getMessage());
     }
 }
 ----
