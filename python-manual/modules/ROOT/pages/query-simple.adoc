@@ -268,8 +268,8 @@ For more information, see xref:transformers.adoc[Manipulate query results].
 from neo4j import GraphDatabase
 
 
-URI = "{neo4j-database-uri}"
-AUTH = ("{neo4j-username}", "{neo4j-password}")
+URI = "<database-uri>"
+AUTH = ("<username>", "<password>")
 
 people = [{"name": "Alice", "age": 42, "friends": ["Bob", "Peter", "Anna"]},
           {"name": "Bob", "age": 19},
