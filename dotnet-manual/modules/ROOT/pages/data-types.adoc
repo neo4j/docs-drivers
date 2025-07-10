@@ -232,9 +232,9 @@ Represents a path in a graph.
 ----
 using Neo4j.Driver;
 
-const string dbUri = "{neo4j-database-uri}";
-const string dbUser = "{neo4j-username}";
-const string dbPassword = "{neo4j-password}";
+const string dbUri = "<database-uri>";
+const string dbUser = "<username>";
+const string dbPassword = "<password>";
 
 await using var driver = GraphDatabase.Driver(dbUri, AuthTokens.Basic(dbUser, dbPassword));
 await driver.VerifyConnectivityAsync();

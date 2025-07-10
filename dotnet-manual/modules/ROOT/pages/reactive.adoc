@@ -74,9 +74,9 @@ import org.neo4j.driver.reactivestreams.ReactiveSession;
 public class App {
 
     public static void main(String... args) {
-        final String dbUri = "{neo4j-database-uri}";
-        final String dbUser = "{neo4j-username}";
-        final String dbPassword = "{neo4j-password}";
+        final String dbUri = "<database-uri>";
+        final String dbUser = "<username>";
+        final String dbPassword = "<password>";
 
         try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword))) {
             driver.verifyConnectivity();
@@ -143,9 +143,9 @@ import org.neo4j.driver.reactivestreams.ReactiveSession;
 public class App {
 
     public static void main(String... args) {
-        final String dbUri = "{neo4j-database-uri}";
-        final String dbUser = "{neo4j-username}";
-        final String dbPassword = "{neo4j-password}";
+        final String dbUri = "<database-uri>";
+        final String dbUser = "<username>";
+        final String dbPassword = "<password>";
 
         try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword))) {
             driver.verifyConnectivity();

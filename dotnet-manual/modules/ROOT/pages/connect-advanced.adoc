@@ -161,9 +161,9 @@ To enable logging use link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driv
 ----
 using Neo4j.Driver;
 
-const string dbUri = "{neo4j-database-uri}";
-const string dbUser = "{neo4j-username}";
-const string dbPassword = "{neo4j-password}";
+const string dbUri = "<database-uri>";
+const string dbUser = "<username>";
+const string dbPassword = "<password>";
 
 var logger = new Neo4jLogger();
 logger.EnableDebug();
@@ -263,9 +263,9 @@ In the example below, the driver is initialized with a `neo4j://` URI scheme and
 ----
 using Neo4j.Driver;
 
-const string dbUri = "{neo4j-database-uri}";  // omit scheme and port
-const string dbUser = "{neo4j-username}";
-const string dbPassword = "{neo4j-password}";
+const string dbUri = "<database-uri>";  // omit scheme and port
+const string dbUser = "<username>";
+const string dbPassword = "<password>";
 
 // setting a port different than the one given in `driver` won't work
 var addresses = ServerAddress.From(dbUri, 7687);
