@@ -270,16 +270,9 @@ try {
 
 [NOTE]
 ====
-The GQL status code `50N42` is returned when an exception does not have a GQL-status object.
+The GQL status code `50N42` is returned when an error does not have a GQL-status object.
 This can happen if the driver is connected to an older Neo4j server.
 Don't rely on this status code, as future Neo4j server versions might change it with a more appropriate one.
-====
-
-[TIP]
-====
-Transient server errors can be retried without need to alter the original request.
-Exceptions implementing link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/exceptions/RetryableException.html[`RetryableException`] are such that a further attempt at the operation that caused it might be successful.
-This is particular useful when running queries in xref:transactions#explicit-transactions[explicit transactions], to know if a failed query is worth re-running.
 ====
 
 
