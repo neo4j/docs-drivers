@@ -21,7 +21,7 @@ Add the Neo4j Java driver to the list of dependencies in the `pom.xml` of your M
 <dependency>
     <groupId>org.neo4j.driver</groupId>
     <artifactId>neo4j-java-driver</artifactId>
-    <version>5.28.5</version>
+    <version>5.28.8</version>
 </dependency>
 ----
 
@@ -31,7 +31,7 @@ link:https://neo4j.com/docs/java-manual/current/install/[More info on installing
 [#connect]
 == Connect to the database
 
-Connect to a database by creating a <<Driver>> object and providing a URL and an authentication token.
+Connect to a database by creating a `Driver` object and providing a URL and an authentication token.
 Once you have a `Driver` instance, use the `.verifyConnectivity()` method to ensure that a working connection can be established.
 
 [source, java, role=nocollapse, copy=true]
@@ -98,7 +98,7 @@ link:https://neo4j.com/docs/java-manual/current/query-simple/[More info on query
 
 To retrieve information from the database, use the Cypher clause `MATCH`:
 
-.Retrieve all `Person` nodes who like other `Person` s
+.Retrieve all `Person` nodes who know other persons
 [source, java, copy=true]
 ----
 // import java.util.concurrent.TimeUnit;
