@@ -219,7 +219,7 @@ Exception GQL diagnostic record: {'_classification': 'CLIENT_ERROR', '_position'
 
 GQL status codes are particularly helpful when you want your application to behave differently depending on the exact error that was raised by the server.
 
-.Distinguishing between different exception codes
+.Distinguishing between different error codes
 [source, python]
 ----
 # from neo4j.exceptions import Neo4jError

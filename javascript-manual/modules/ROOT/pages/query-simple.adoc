@@ -148,10 +148,10 @@ For those rare use cases, see xref:query-advanced#_dynamic_values_in_property_ke
 
 A query run may fail for a number of reasons.
 When using `driver.executeQuery()`, the driver automatically retries to run a failed query if the failure is deemed to be transient (for example due to temporary server unavailability).
-An exception is raised if the operation keeps failing after a number of attempts.
+An error is raised if the operation keeps failing after a number of attempts.
 
-All exceptions coming from the server are subclasses of link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/error.js~Neo4jError.html[`Neo4jError`].
-You can use an exception's code to stably identify a specific error; error messages are instead not stable markers, and should not be relied upon.
+All errors coming from the server are subclasses of link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/error.js~Neo4jError.html[`Neo4jError`].
+You can use an error's code to stably identify a specific error; error messages are instead not stable markers, and should not be relied upon.
 
 .Basic error handling
 [source, javascript, role=nocollapse]
@@ -163,22 +163,22 @@ let err = await driver.executeQuery(
   )
 } catch (err) {
   console.log('Neo4j error code:', err.code)
-  console.log('Exception message:', err.message)
+  console.log('Error message:', err.message)
 }
 /*
 Neo4j error code: Neo.ClientError.Statement.SyntaxError
-Exception message: Neo4jError: Invalid input '': expected an expression, '*', 'ALL' or 'DISTINCT' (line 1, column 25 (offset: 24))
+Error message: Neo4jError: Invalid input '': expected an expression, '*', 'ALL' or 'DISTINCT' (line 1, column 25 (offset: 24))
 "MATCH (p:Person) RETURN"
                          ^
 */
 ----
 
-Exception objects also expose errors as GQL-status objects.
+Error objects also expose errors as GQL-status objects.
 The main difference between link:https://neo4j.com/docs/status-codes/current/errors/all-errors/[Neo4j error codes] and link:https://neo4j.com/docs/status-codes/current/errors/gql-errors/[GQL error codes] is that the GQL ones are more granular: a single Neo4j error code might be broken in several, more specific GQL error codes.
 
-The actual _cause_ that triggered an exception is sometimes found in the optional GQL-status object `.cause`, which is itself a `Neo4jError`.
-You might need to recursively traverse the cause chain before reaching the root cause of the exception you caught.
-In the example below, the exception's GQL status code is `42001`, but the actual source of the error has status code `42I06`.
+The actual _cause_ that triggered an error is sometimes found in the optional GQL-status object `.cause`, which is itself a `Neo4jError`.
+You might need to recursively traverse the cause chain before reaching the root cause of the error you caught.
+In the example below, the error's GQL status code is `42001`, but the actual source of the error has status code `42I06`.
 
 .Usage of `Neo4jError` with GQL-related methods
 [source, javascript]
@@ -189,18 +189,18 @@ let err = await driver.executeQuery(
     { database: 'neo4j' }
   )
 } catch (err) {
-  console.log('Exception GQL status:', err.gqlStatus)
-  console.log('Exception GQL status description:', err.gqlStatusDescription)
-  console.log('Exception GQL classification:', err.classification)
-  console.log('Exception GQL cause:', err.cause.message)
-  console.log('Exception GQL diagnostic record:', err.diagnosticRecord)
+  console.log('Error GQL status:', err.gqlStatus)
+  console.log('Error GQL status description:', err.gqlStatusDescription)
+  console.log('Error GQL classification:', err.classification)
+  console.log('Error GQL cause:', err.cause.message)
+  console.log('Error GQL diagnostic record:', err.diagnosticRecord)
 }
 /*
-Exception GQL status: 42001
-Exception GQL status description: error: syntax error or access rule violation - invalid syntax
-Exception GQL classification: CLIENT_ERROR
-Exception GQL cause: GQLError: 42I06: Invalid input '', expected: an expression, '*', 'ALL' or 'DISTINCT'.
-Exception GQL diagnostic record: {
+Error GQL status: 42001
+Error GQL status description: error: syntax error or access rule violation - invalid syntax
+Error GQL classification: CLIENT_ERROR
+Error GQL cause: GQLError: 42I06: Invalid input '', expected: an expression, '*', 'ALL' or 'DISTINCT'.
+Error GQL diagnostic record: {
   OPERATION: '',
   OPERATION_CODE: '0',
   CURRENT_SCHEMA: '/',
@@ -216,7 +216,7 @@ Exception GQL diagnostic record: {
 
 GQL status codes are particularly helpful when you want your application to behave differently depending on the exact error that was raised by the server.
 
-.Distinguishing between different exception codes
+.Distinguishing between different error codes
 [source, javascript]
 ----
 let err = await driver.executeQuery(
@@ -234,7 +234,7 @@ let err = await driver.executeQuery(
         # special handling of user not having CREATE permissions
         console.log(err.message)
     } else {
-        # handling of all other exceptions
+        # handling of all other errors
         console.log(err.message)
     }
 }
@@ -242,7 +242,7 @@ let err = await driver.executeQuery(
 
 [NOTE]
 ====
-The GQL status code `50N42` is returned when an exception does not have a GQL-status object.
+The GQL status code `50N42` is returned when an error does not have a GQL-status object.
 This can happen if the driver is connected to an older Neo4j server.
 Don't rely on this status code, as future Neo4j server versions might change it with a more appropriate one.
 ====
