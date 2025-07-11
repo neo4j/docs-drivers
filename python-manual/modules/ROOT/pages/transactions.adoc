@@ -199,6 +199,12 @@ with driver.session(database="neo4j") as session:
         tx.commit()
 ----
 
+[TIP]
+====
+Queries run with `tx.run()` failing due to a transient server error can be retried without need to alter the original request.
+You can discover whether an error is transient via the method `Neo4jError.is_retryable()`, which gives insights into whether a further attempt might be successful.
+====
+
 An explicit transaction can be committed with  link:https://neo4j.com/docs/api/python-driver/{python-driver-version}/api.html#neo4j.Transaction.commit[`Transaction.commit()`] or rolled back with  link:https://neo4j.com/docs/api/python-driver/{python-driver-version}/api.html#neo4j.Transaction.rollback[`Transaction.rollback()`].
 If no explicit action is taken, the driver will automatically roll back the transaction at the end of its lifetime.
 
