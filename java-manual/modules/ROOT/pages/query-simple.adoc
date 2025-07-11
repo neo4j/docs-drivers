@@ -386,9 +386,9 @@ import org.neo4j.driver.exceptions.Neo4jException;
 
 public class App {
 
-    private static final String dbUri = "{neo4j-database-uri}";
-    private static final String dbUser = "{neo4j-username}";
-    private static final String dbPassword = "{neo4j-password}";
+    private static final String dbUri = "<database-uri>";
+    private static final String dbUser = "<username>";
+    private static final String dbPassword = "<password>";
 
     public static void main(String... args) {
 
