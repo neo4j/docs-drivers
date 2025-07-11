@@ -191,7 +191,7 @@ A query run may fail for a number of reasons.
 When using `ExecuteQuery()`, the driver automatically retries to run a failed query if the failure is deemed to be transient (for example due to temporary server unavailability).
 An error is raised if the operation keeps failing after a number of attempts.
 
-All errors coming from the server are subclasses of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#Neo4jError[`Neo4jError`].
+All errors coming from the server are of type link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#Neo4jError[`Neo4jError`].
 You can use an exception's code to stably identify a specific error; error messages are instead not stable markers, and should not be relied upon.
 
 .Basic error handling
