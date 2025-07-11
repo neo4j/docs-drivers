@@ -78,8 +78,8 @@ from neo4j import GraphDatabase
 import neo4j
 
 
-URI = "{neo4j-database-uri}"
-AUTH = ("{neo4j-username}", "{neo4j-password}")
+URI = "<database-uri>"
+AUTH = ("<username>", "<password>")
 
 
 def main():

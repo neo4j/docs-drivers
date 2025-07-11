@@ -75,8 +75,8 @@ const neo4j = require('neo4j-driver');
 
 (async () => {
   const URI = '<URI to Neo4j database>'
-  const USER = '{neo4j-username}'
-  const PASSWORD = '{neo4j-password}'
+  const USER = '<username>'
+  const PASSWORD = '<password>'
   let driver
   try {
     driver = neo4j.driver(URI, neo4j.auth.basic(USER, PASSWORD))

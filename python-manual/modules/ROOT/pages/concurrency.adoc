@@ -12,8 +12,8 @@ import asyncio
 from neo4j import AsyncGraphDatabase
 
 
-URI = "{neo4j-database-uri}"
-AUTH = ("{neo4j-username}", "{neo4j-password}")
+URI = "<database-uri>"
+AUTH = ("<username>", "<password>")
 
 
 async def main():
@@ -37,8 +37,8 @@ import asyncio
 from neo4j import AsyncGraphDatabase
 
 
-URI = "{neo4j-database-uri}"
-AUTH = ("{neo4j-username}", "{neo4j-password}")
+URI = "<database-uri>"
+AUTH = ("<username>", "<password>")
 
 
 async def main():
