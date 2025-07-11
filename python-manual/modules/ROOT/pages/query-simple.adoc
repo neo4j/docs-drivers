@@ -277,6 +277,7 @@ For more information, see xref:transformers.adoc[Manipulate query results].
 [source, python]
 ----
 from neo4j import GraphDatabase
+from neo4j.exceptions import Neo4jError
 
 
 URI = "<database-uri>"
@@ -327,7 +328,7 @@ with GraphDatabase.driver(URI, auth=AUTH) as driver:
             time=summary.result_available_after
         ))
 
-    except Exception as e:
+    except Neo4jError as e:
         print(e)
         # further logging/processing
 ----

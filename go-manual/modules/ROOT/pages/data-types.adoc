@@ -192,18 +192,18 @@ The type `Point2D` can be used to represent either a 2D Cartesian point or a 2D 
 ----
 // A 2D Cartesian Point
 cartesian2d := neo4j.Point2D{
-	X:            1.23,
-	Y:            4.56,
-	SpatialRefId: 7203,
+    X:            1.23,
+    Y:            4.56,
+    SpatialRefId: 7203,
 }
 fmt.Println(cartesian2d)
 // Point{srId=7203, x=1.230000, y=4.560000}
 
 // A 2D WGS84 Point
 wgs842d := neo4j.Point2D{
-	X:            1.23,
-	Y:            4.56,
-	SpatialRefId: 9157,
+    X:            1.23,
+    Y:            4.56,
+    SpatialRefId: 9157,
 }
 fmt.Println(wgs842d)
 // Point{srId=9157, x=1.230000, y=4.560000}
@@ -390,17 +390,6 @@ func addFriend(ctx context.Context, driver neo4j.DriverWithContext, name string,
 ----
 
 For full documentation, see link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/dbtype#Path[API documentation -> Path].
-
-
-== Exceptions
-
-For the most part, the driver simply forwards any error the server may raise.
-For a list of errors the server can return, see the link:{neo4j-docs-base-uri}/status-codes/{page-version}[Status code] page.
-
-Some server errors are marked as safe to retry without need to alter the original request.
-Examples of such errors are deadlocks, memory issues, or connectivity issues.
-When an error is raised, the function link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#IsRetryable[`neo4j.IsRetryable(error)`] gives insights into whether a further attempt might be successful.
-This is particular useful when running queries in xref:transactions#explicit-transactions[explicit transactions], to know if a failed query should be run again. Note that xref:transactions#managed-transactions[managed transactions] already implement a retry mechanism, so you don't need to implement your own.
 
 
 ifndef::backend-pdf[]

@@ -150,7 +150,7 @@ A query run may fail for a number of reasons.
 When using `driver.execute_query()`, the driver automatically retries to run a failed query if the failure is deemed to be transient (for example due to temporary server unavailability).
 An exception will be raised if the operation keeps failing after a number of attempts.
 
-All link:https://neo4j.com/docs/status-codes/current/errors/all-errors/[exceptions coming from the server] are subclasses of link:https://neo4j.com/docs/api/javascript-driver/{javascript-driver-version}/class/lib6/error.js~Neo4jError.html[`Neo4jError`].
+All link:https://neo4j.com/docs/status-codes/current/errors/all-errors/[errors coming from the server] are subclasses of link:https://neo4j.com/docs/api/javascript-driver/{javascript-driver-version}/class/lib6/error.js~Neo4jError.html[`Neo4jError`].
 You can use an exception's code to stably identify a specific error; error messages are instead not stable markers, and should not be relied upon.
 
 .Basic error handling
