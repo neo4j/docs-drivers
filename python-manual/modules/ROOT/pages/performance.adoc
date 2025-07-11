@@ -111,8 +111,8 @@ import tracemalloc
 
 
 
-URI = "{neo4j-database-uri}"
-AUTH = ("{neo4j-username}", "{neo4j-password}")
+URI = "<database-uri>"
+AUTH = ("<username>", "<password>")
 
 # Returns 250 records, each with properties
 # - `output` (an expensive computation, to slow down retrieval)

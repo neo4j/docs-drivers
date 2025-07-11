@@ -129,9 +129,9 @@ var sleepTime = "0.5s"
 
 func main() {
     ctx := context.Background()
-    dbUri := "{neo4j-database-uri}"
-    dbUser := "{neo4j-username}"
-    dbPassword := "{neo4j-password}"
+    dbUri := "<database-uri>"
+    dbUser := "<username>"
+    dbPassword := "<password>"
     driver, err := neo4j.NewDriverWithContext(
         dbUri,
         neo4j.BasicAuth(dbUser, dbPassword, ""))
