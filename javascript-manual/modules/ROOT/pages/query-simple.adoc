@@ -148,9 +148,9 @@ For those rare use cases, see xref:query-advanced#_dynamic_values_in_property_ke
 
 A query run may fail for a number of reasons.
 When using `driver.executeQuery()`, the driver automatically retries to run a failed query if the failure is deemed to be transient (for example due to temporary server unavailability).
-An exception will be raised if the operation keeps failing after a number of attempts.
+An exception is raised if the operation keeps failing after a number of attempts.
 
-All exceptions coming from the server are subclasses of link:https://neo4j.com/docs/api/javascript-driver/{javascript-driver-version}/class/lib6/error.js~Neo4jError.html[`Neo4jError`].
+All exceptions coming from the server are subclasses of link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/error.js~Neo4jError.html[`Neo4jError`].
 You can use an exception's code to stably identify a specific error; error messages are instead not stable markers, and should not be relied upon.
 
 .Basic error handling
@@ -163,69 +163,13 @@ let err = await driver.executeQuery(
   )
 } catch (err) {
   console.log('Neo4j error code:', err.code)
-  console.log('Exception message:', err)
-  console.log('Exception GQL status:', err.gqlStatus)
-  console.log('Exception GQL status description:', err.gqlStatusDescription)
-  console.log('Exception GQL classification:', err.classification)
-  console.log('Exception GQL cause:', err.cause)
-  console.log('Exception GQL diagnostic record:', err.diagnosticRecord)
+  console.log('Exception message:', err.message)
 }
 /*
 Neo4j error code: Neo.ClientError.Statement.SyntaxError
 Exception message: Neo4jError: Invalid input '': expected an expression, '*', 'ALL' or 'DISTINCT' (line 1, column 25 (offset: 24))
 "MATCH (p:Person) RETURN"
                          ^
-
-    at captureStacktrace (/home/stefano/git/docs-testing/drivers/node_modules/neo4j-driver-core/lib/result.js:624:17)
-    at new Result (/home/stefano/git/docs-testing/drivers/node_modules/neo4j-driver-core/lib/result.js:112:23)
-    at newCompletedResult (/home/stefano/git/docs-testing/drivers/node_modules/neo4j-driver-core/lib/transaction.js:531:12)
-    at Object.run (/home/stefano/git/docs-testing/drivers/node_modules/neo4j-driver-core/lib/transaction.js:363:20)
-    at Transaction.run (/home/stefano/git/docs-testing/drivers/node_modules/neo4j-driver-core/lib/transaction.js:184:34)
-    at ManagedTransaction.run (/home/stefano/git/docs-testing/drivers/node_modules/neo4j-driver-core/lib/transaction-managed.js:54:21)
-    at QueryExecutor.<anonymous> (/home/stefano/git/docs-testing/drivers/node_modules/neo4j-driver-core/lib/internal/query-executor.js:94:57)
-    at step (/home/stefano/git/docs-testing/drivers/node_modules/neo4j-driver-core/lib/internal/query-executor.js:49:23)
-    at Object.next (/home/stefano/git/docs-testing/drivers/node_modules/neo4j-driver-core/lib/internal/query-executor.js:30:53)
-    at /home/stefano/git/docs-testing/drivers/node_modules/neo4j-driver-core/lib/internal/query-executor.js:24:71 {
-  constructor: [Function: Neo4jError] { isRetriable: [Function (anonymous)] },
-  gqlStatus: '42001',
-  gqlStatusDescription: 'error: syntax error or access rule violation - invalid syntax',
-  diagnosticRecord: {
-    OPERATION: '',
-    OPERATION_CODE: '0',
-    CURRENT_SCHEMA: '/',
-    _classification: 'CLIENT_ERROR',
-    _position: { line: [Integer], column: [Integer], offset: [Integer] }
-  },
-  classification: 'CLIENT_ERROR',
-  rawClassification: 'CLIENT_ERROR',
-  code: 'Neo.ClientError.Statement.SyntaxError',
-  retriable: false,
-  [cause]: GQLError: 42I06: Invalid input '', expected: an expression, '*', 'ALL' or 'DISTINCT'.
-      at new GQLError (/home/stefano/git/docs-testing/drivers/node_modules/neo4j-driver-core/lib/error.js:117:24)
-      at newGQLError (/home/stefano/git/docs-testing/drivers/node_modules/neo4j-driver-core/lib/error.js:261:12)
-      at ResponseHandler._handleErrorCause (/home/stefano/git/docs-testing/drivers/node_modules/neo4j-driver-bolt-connection/lib/bolt/response-handler.js:199:57)
-      at ResponseHandler._handleErrorPayload (/home/stefano/git/docs-testing/drivers/node_modules/neo4j-driver-bolt-connection/lib/bolt/response-handler.js:193:50)
-      at ResponseHandler.handleResponse (/home/stefano/git/docs-testing/drivers/node_modules/neo4j-driver-bolt-connection/lib/bolt/response-handler.js:116:49)
-      at dechunker.onmessage (/home/stefano/git/docs-testing/drivers/node_modules/neo4j-driver-bolt-connection/lib/bolt/create.js:74:33)
-      at Dechunker._onHeader (/home/stefano/git/docs-testing/drivers/node_modules/neo4j-driver-bolt-connection/lib/channel/chunking.js:196:18)
-      at Dechunker.AWAITING_CHUNK (/home/stefano/git/docs-testing/drivers/node_modules/neo4j-driver-bolt-connection/lib/channel/chunking.js:149:25)
-      at Dechunker.write (/home/stefano/git/docs-testing/drivers/node_modules/neo4j-driver-bolt-connection/lib/channel/chunking.js:206:32)
-      at channel.onmessage (/home/stefano/git/docs-testing/drivers/node_modules/neo4j-driver-bolt-connection/lib/bolt/create.js:70:63) {
-    constructor: [Function: GQLError],
-    cause: undefined,
-    gqlStatus: '42I06',
-    gqlStatusDescription: "error: syntax error or access rule violation - invalid input. Invalid input '', expected: an expression, '*', 'ALL' or 'DISTINCT'.",
-    diagnosticRecord: {
-      OPERATION: '',
-      OPERATION_CODE: '0',
-      CURRENT_SCHEMA: '/',
-      _classification: 'CLIENT_ERROR',
-      _position: [Object]
-    },
-    classification: 'CLIENT_ERROR',
-    rawClassification: 'CLIENT_ERROR'
-  }
-}
 */
 ----
 
@@ -237,7 +181,7 @@ You might need to recursively traverse the cause chain before reaching the root 
 In the example below, the exception's GQL status code is `42001`, but the actual source of the error has status code `42I06`.
 
 .Usage of `Neo4jError` with GQL-related methods
-[source, javascript, role=nocollapse]
+[source, javascript]
 ----
 let err = await driver.executeQuery(
     'MATCH (p:Person) RETURN ',
@@ -248,7 +192,7 @@ let err = await driver.executeQuery(
   console.log('Exception GQL status:', err.gqlStatus)
   console.log('Exception GQL status description:', err.gqlStatusDescription)
   console.log('Exception GQL classification:', err.classification)
-  console.log('Exception GQL cause:', err.cause)
+  console.log('Exception GQL cause:', err.cause.message)
   console.log('Exception GQL diagnostic record:', err.diagnosticRecord)
 }
 /*
@@ -256,30 +200,6 @@ Exception GQL status: 42001
 Exception GQL status description: error: syntax error or access rule violation - invalid syntax
 Exception GQL classification: CLIENT_ERROR
 Exception GQL cause: GQLError: 42I06: Invalid input '', expected: an expression, '*', 'ALL' or 'DISTINCT'.
-    at new GQLError (/home/stefano/git/docs-testing/drivers/node_modules/neo4j-driver-core/lib/error.js:117:24)
-    at newGQLError (/home/stefano/git/docs-testing/drivers/node_modules/neo4j-driver-core/lib/error.js:261:12)
-    at ResponseHandler._handleErrorCause (/home/stefano/git/docs-testing/drivers/node_modules/neo4j-driver-bolt-connection/lib/bolt/response-handler.js:199:57)
-    at ResponseHandler._handleErrorPayload (/home/stefano/git/docs-testing/drivers/node_modules/neo4j-driver-bolt-connection/lib/bolt/response-handler.js:193:50)
-    at ResponseHandler.handleResponse (/home/stefano/git/docs-testing/drivers/node_modules/neo4j-driver-bolt-connection/lib/bolt/response-handler.js:116:49)
-    at dechunker.onmessage (/home/stefano/git/docs-testing/drivers/node_modules/neo4j-driver-bolt-connection/lib/bolt/create.js:74:33)
-    at Dechunker._onHeader (/home/stefano/git/docs-testing/drivers/node_modules/neo4j-driver-bolt-connection/lib/channel/chunking.js:196:18)
-    at Dechunker.AWAITING_CHUNK (/home/stefano/git/docs-testing/drivers/node_modules/neo4j-driver-bolt-connection/lib/channel/chunking.js:149:25)
-    at Dechunker.write (/home/stefano/git/docs-testing/drivers/node_modules/neo4j-driver-bolt-connection/lib/channel/chunking.js:206:32)
-    at channel.onmessage (/home/stefano/git/docs-testing/drivers/node_modules/neo4j-driver-bolt-connection/lib/bolt/create.js:70:63) {
-  constructor: [Function: GQLError],
-  cause: undefined,
-  gqlStatus: '42I06',
-  gqlStatusDescription: "error: syntax error or access rule violation - invalid input. Invalid input '', expected: an expression, '*', 'ALL' or 'DISTINCT'.",
-  diagnosticRecord: {
-    OPERATION: '',
-    OPERATION_CODE: '0',
-    CURRENT_SCHEMA: '/',
-    _classification: 'CLIENT_ERROR',
-    _position: { line: [Integer], column: [Integer], offset: [Integer] }
-  },
-  classification: 'CLIENT_ERROR',
-  rawClassification: 'CLIENT_ERROR'
-}
 Exception GQL diagnostic record: {
   OPERATION: '',
   OPERATION_CODE: '0',
@@ -297,24 +217,27 @@ Exception GQL diagnostic record: {
 GQL status codes are particularly helpful when you want your application to behave differently depending on the exact error that was raised by the server.
 
 .Distinguishing between different exception codes
-[source, python]
+[source, javascript]
 ----
-# from neo4j.exceptions import Neo4jError
-
-try:
-    driver.execute_query('MATCH (p:Person) RETURN', database_='neo4j')
-except Neo4jError as e:
-    if hasGqlStatus(e, '42001'):
+let err = await driver.executeQuery(
+    'MATCH (p:Person) RETURN ',
+    {},
+    { database: 'neo4j' }
+  )
+} catch (err) {
+    if hasGqlStatus(err, '42001') {
         # Neo.ClientError.Statement.SyntaxError
         # special handling of syntax error in query
-        print(e.message)
-    elif hasGqlStatus(e, '42NFF'):
+        console.log(err.message)
+    } else if hasGqlStatus(err, '42NFF') {
         # Neo.ClientError.Security.Forbidden
         # special handling of user not having CREATE permissions
-        print(e.message)
-    else:
+        console.log(err.message)
+    } else {
         # handling of all other exceptions
-        print(e.message)
+        console.log(err.message)
+    }
+}
 ----
 
 [NOTE]
