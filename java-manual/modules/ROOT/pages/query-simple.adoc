@@ -330,7 +330,7 @@ public class App {
 
     private static final String dbUri = "<database-uri>";
     private static final String dbUser = "<username>";
-    private static final String dbPassword = "<passwor>";
+    private static final String dbPassword = "<password>";
 
     public static void main(String... args) {
 

@@ -156,11 +156,12 @@ You can use an exception's code to stably identify a specific error; error messa
 .Basic error handling
 [source, javascript]
 ----
-let err = await driver.executeQuery(
-    'MATCH (p:Person) RETURN ',
-    {},
-    { database: 'neo4j' }
-  )
+try {
+    let err = await driver.executeQuery(
+        'MATCH (p:Person) RETURN ',
+        {},
+        { database: 'neo4j' }
+    )
 } catch (err) {
   console.log('Neo4j error code:', err.code)
   console.log('Error message:', err.message)
