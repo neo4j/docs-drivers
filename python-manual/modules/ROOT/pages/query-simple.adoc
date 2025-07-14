@@ -227,11 +227,11 @@ GQL status codes are particularly helpful when you want your application to beha
 try:
     driver.execute_query('MATCH (p:Person) RETURN', database_='neo4j')
 except Neo4jError as e:
-    if hasGqlStatus(e, '42001'):
+    if e.find_by_gql_status('42001'):
         # Neo.ClientError.Statement.SyntaxError
         # special handling of syntax error in query
         print(e.message)
-    elif hasGqlStatus(e, '42NFF'):
+    elif e.find_by_gql_status('42NFF'):
         # Neo.ClientError.Security.Forbidden
         # special handling of user not having CREATE permissions
         print(e.message)
