@@ -135,8 +135,8 @@ from neo4j.auth_management import (
     ClientCertificate,
     ClientCertificateProviders,
 )
-URI = "{neo4j-database-uri}"
-AUTH = ("{neo4j-username}", "{neo4j-password}")
+URI = "<database-uri>"
+AUTH = ("<username>", "<password>")
 cert_provider = ClientCertificateProviders.static(
     ClientCertificate(
         # path to certificate
@@ -169,8 +169,8 @@ from neo4j.auth_management import (
     ClientCertificate,
     ClientCertificateProviders,
 )
-URI = "{neo4j-database-uri}"
-AUTH = ("{neo4j-username}", "{neo4j-password}")
+URI = "<database-uri>"
+AUTH = ("<username>", "<password>")
 cert_provider = ClientCertificateProviders.rotating(
     ClientCertificate(
         # path to public certificate to load

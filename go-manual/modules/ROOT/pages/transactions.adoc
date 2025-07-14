@@ -98,9 +98,9 @@ func main() {
     var employeeThreshold int64 = 10  // Neo4j's integer maps to Go's int64
 
     // Connection to database
-    dbUri := "{neo4j-database-uri}"
-    dbUser := "{neo4j-username}"
-    dbPassword := "{neo4j-password}"
+    dbUri := "<database-uri>"
+    dbUser := "<username>"
+    dbPassword := "<password>"
     driver, err := neo4j.NewDriverWithContext(
         dbUri,
         neo4j.BasicAuth(dbUser, dbPassword, ""))
@@ -282,9 +282,9 @@ func main() {
     ctx := context.Background()
 
     // Connection to database
-    dbUri := "{neo4j-database-uri}"
-    dbUser := "{neo4j-username}"
-    dbPassword := "{neo4j-password}"
+    dbUri := "<database-uri>"
+    dbUser := "<username>"
+    dbPassword := "<password>"
     driver, err := neo4j.NewDriverWithContext(
         dbUri,
         neo4j.BasicAuth(dbUser, dbPassword, ""))

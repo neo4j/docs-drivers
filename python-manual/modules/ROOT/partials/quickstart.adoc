@@ -25,7 +25,7 @@ link:https://neo4j.com/docs/python-manual/current/install/[More info on installi
 [#connect]
 == Connect to the database
 
-Connect to a database by creating a <<Driver>> object and providing a URL and an authentication token.
+Connect to a database by creating a `Driver` object and providing a URL and an authentication token.
 Once you have a `Driver` instance, use the `.verify_connectivity()` method to ensure that a working connection can be established.
 
 [source, python, copy=true]
@@ -33,8 +33,8 @@ Once you have a `Driver` instance, use the `.verify_connectivity()` method to en
 from neo4j import GraphDatabase
 
 # URI examples: "neo4j://localhost", "neo4j+s://xxx.databases.neo4j.io"
-URI = "{neo4j-database-uri}"
-AUTH = ("{neo4j-username}", "{neo4j-password}")
+URI = "<database-uri>"
+AUTH = ("<username>", "<password>")
 
 with GraphDatabase.driver(URI, auth=AUTH) as driver:
     driver.verify_connectivity()
@@ -74,7 +74,7 @@ link:https://neo4j.com/docs/python-manual/current/query-simple/[More info on que
 
 To retrieve information from the database, use the Cypher clause `MATCH`:
 
-.Retrieve all `Person` nodes who like other `Person` s
+.Retrieve all `Person` nodes who know other persons
 [source, python, copy=true]
 ----
 records, summary, keys = driver.execute_query("""

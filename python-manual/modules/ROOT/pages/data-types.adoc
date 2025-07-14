@@ -56,8 +56,8 @@ from neo4j import GraphDatabase
 from neo4j.time import DateTime
 
 
-URI = "{neo4j-database-uri}"
-AUTH = ("{neo4j-username}", "{neo4j-password}")
+URI = "<database-uri>"
+AUTH = ("<username>", "<password>")
 
 
 friends_since = DateTime(year=1999, month=11, day=23,
@@ -275,8 +275,8 @@ This should be used with care, as no guarantees are given about the mapping betw
 from neo4j import GraphDatabase
 
 
-URI = "{neo4j-database-uri}"
-AUTH = ("{neo4j-username}", "{neo4j-password}")
+URI = "<database-uri>"
+AUTH = ("<username>", "<password>")
 
 with GraphDatabase.driver(URI, auth=AUTH) as driver:
     records, _, _ = driver.execute_query(
@@ -310,8 +310,8 @@ This should be used with care, as no guarantees are given about the mapping betw
 from neo4j import GraphDatabase
 
 
-URI = "{neo4j-database-uri}"
-AUTH = ("{neo4j-username}", "{neo4j-password}")
+URI = "<database-uri>"
+AUTH = ("<username>", "<password>")
 
 with GraphDatabase.driver(URI, auth=AUTH) as driver:
     records, _, _ = driver.execute_query("""
@@ -351,8 +351,8 @@ from neo4j import GraphDatabase
 from neo4j.time import Date
 
 
-URI = "{neo4j-database-uri}"
-AUTH = ("{neo4j-username}", "{neo4j-password}")
+URI = "<database-uri>"
+AUTH = ("<username>", "<password>")
 
 def add_friend(driver, name, status, date, friend_name):
     driver.execute_query("""
