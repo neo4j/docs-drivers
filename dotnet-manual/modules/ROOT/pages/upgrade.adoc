@@ -3,7 +3,7 @@
 = Upgrade from older versions
 
 This page contains the list of new features and breaking changes of the driver from version 4.4 to 5.x.
-For a full list of changes, see the link:{driver-changelog-url}[Driver -> Changelog].
+For a full list of changes, see the link:{driver-changelog-url}[driver changelog].
 
 The latest driver version of the 5.x series ({dotnet-driver-version}) is compatible with Neo4j server both 4.4 and 5.x, so you can upgrade the driver before you upgrade the server.
 At the same time, the driver version 4.4 is forward compatible with Neo4j server 5.x, so you could also upgrade the server before the driver; however, given that it's easier to roll back an application upgrade than a server upgrade, it's recommended to start with the driver.
@@ -72,7 +72,7 @@ See link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Ne
 ====
 Filtering allows to receive only a subset of notifications from the server, and to improve performance server-side.
 
-For more information, see xref:result-summary.adoc#notification-filtering[NotificationConfig].
+For more information, see xref:result-summary.adoc#filter-notifications[Explore the query execution summary -> Filter notifications].
 ====
 |
 .GQL statuses and errors
@@ -82,8 +82,6 @@ The property link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-versio
 This API is planned to supersede the current notifications API.
 
 For more information, see xref:result-summary.adoc#notifications[Explore the query execution summary -> Notifications].
-
-xref:data-types.adoc#exceptions[Exception objects] are also GQL-compliant.
 ====
 
 |
@@ -115,18 +113,18 @@ Use `.Agent()`, `.ProtocolVersion()`, or call the link:https://neo4j.com/docs/op
 |label:removed[]
 
 |5.0
-|link:[`ISession`], link:[`IRxSession`], link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IAsyncSession.html[`IAsyncSession`] -- Methods `.ReadTransaction()` and `.WriteTransaction()` are deprecated in favor of `.ExecuteRead()` and `.ExecuteWrite()`.
+|`ISession`, `IRxSession`, link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IAsyncSession.html[`IAsyncSession`] -- Methods `.ReadTransaction()` and `.WriteTransaction()` are deprecated in favor of `.ExecuteRead()` and `.ExecuteWrite()`.
 The same holds for the async coounterparts `.ReadTransactionAsync()` and `.WriteTransactionAsync()`, replaced by `.ExecuteReadAsync()` and `.ExecuteWriteAsync()`.
 
 The new methods behave similarly, but the argument types are different and the new methods do not support the `.commit()`, `.rollback()`, `.close()`, and `.closed()` methods.
 |label:deprecated[]
 
 |5.0
-|link:[`ISession`], link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IAsyncSession.html[`IAsyncSession`] -- Method `.LastBookmark()` is deprecated in favor of `.LastBookmarks()`.
+|`ISession`, link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IAsyncSession.html[`IAsyncSession`] -- Method `.LastBookmark()` is deprecated in favor of `.LastBookmarks()`.
 |label:deprecated[]
 
 |5.0
-|Type `Bookmark` is deprecated in favor of link:[`Bookmarks`].
+|Class `Bookmark` is deprecated in favor of link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.Bookmarks.html[`Bookmarks`].
 |label:deprecated[]
 
 |5.0

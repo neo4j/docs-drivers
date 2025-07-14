@@ -3,7 +3,7 @@
 [[target-database]]
 == Always specify the target database
 
-*Specify the target database on all queries*, both in xref:query-simple.adoc#_database_selection[`Driver.ExecutableQuery()`] calls or xref:transactions.adoc#_database_selection[when creating new sessions].
+*Specify the target database on all queries*, both in xref:query-simple.adoc#database-selection[`Driver.ExecutableQuery()`] calls or xref:transactions.adoc#database-selection[when creating new sessions].
 If no database is provided, the driver has to send an extra request to the server to figure out what the default database is.
 The overhead is minimal for a single query, but becomes significant over hundreds of queries.
 
@@ -217,9 +217,9 @@ With lazy loading, the client can also stop requesting records after some condit
 
 [TIP]
 ====
-When using `.ExecutableQuery()`, you can process records as they arrive using the link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IExecutableQuery-2.WithStreamProcessor.html[`.WithStreamProcessor()`] method.
+When using `.ExecutableQuery()`, you can process records as they arrive using the link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IExecutableQuery-2.WithStreamProcessor.html[`.WithStreamProcessor()`] method.
 This will speed up response by not waiting for all records before processing them; it does not however improve memory footprint, as you can't control the flux of records.
-You can reduce the memory footprint of link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.EagerResult-1.html[`EagerResult`] using link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IConfiguredQuery-2.WithMap.html[`.WithMap()`] or link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IConfiguredQuery-2.WithReduce.html[`.WithReduce()`].
+You can reduce the memory footprint of link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.EagerResult-1.html[`EagerResult`] using link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IConfiguredQuery-2.WithMap.html[`.WithMap()`] or link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IConfiguredQuery-2.WithReduce.html[`.WithReduce()`].
 ====
 
 [NOTE]

@@ -1,6 +1,6 @@
 = Run your own transactions
 
-When xref:query-simple.adoc[querying the database with `.ExecutableQuery()`], the driver automatically creates a _transaction_. A transaction is a unit of work that is either _committed_ in its entirety or _rolled back_ on failure. You can include multiple Cypher statements in a single query, as for example when using `MATCH` and `CREATE` in sequence to xref:query-simple#_update_the_database[update the database], but you cannot have multiple queries and interleave some client-logic in between them.
+When xref:query-simple.adoc[querying the database with `.ExecutableQuery()`], the driver automatically creates a _transaction_. A transaction is a unit of work that is either _committed_ in its entirety or _rolled back_ on failure. You can include multiple Cypher statements in a single query, as for example when using `MATCH` and `CREATE` in sequence to xref:query-simple#update[update the database], but you cannot have multiple queries and interleave some client-logic in between them.
 
 For these more advanced use-cases, the driver provides functions to take full control over the transaction lifecycle.
 These are called _managed transactions_, and you can think of them as a way of unwrapping the flow of `.ExecutableQuery()` and being able to specify its desired behavior in more places.
@@ -71,7 +71,7 @@ foreach (var person in people) {
 <1> Create a session. A single session can be the container for multiple queries. Unless created as a resource with the `using` keyword, remember to close it when done.
 <2> The `.ExecuteRead()` (or `.ExecuteWrite()`) method is the entry point into a transaction. It takes a callback to a _transaction function_, which is responsible of running queries.
 <3> Use the method link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IAsyncQueryRunner.RunAsync.html[`tx.RunAsync()`] to execute queries. You can provide a map of query parameters as second argument. Each query run returns a link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IResultCursor.html[`IResultCursor`] object.
-<4> xref:process-result[Process the result] using any of the methods on `IResultCursor`. The method `.FetchAsync()` retrives the next record in the queue and stores it in the property `.Current`; the method `.ToListAsync()` retrieves all records into a list.
+<4> xref:process-result[Process the result] using any of the methods on `IResultCursor`. The method `.FetchAsync()` retrieves the next record in the queue and stores it in the property `.Current`; the method `.ToListAsync()` retrieves all records into a list.
 
 *Do not hardcode or concatenate parameters directly into the query*.
 Use xref:query-simple#query-parameters[query parameters] instead, both for performance and security reasons.
@@ -203,7 +203,7 @@ Queries run with `tx.Run()` failing due to a transient server error can be retri
 You can discover whether an error is transient via the link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.Neo4jException.IsRetriable.html#Neo4j_Driver_Neo4jException_IsRetriable[`IsRetriable`] property, which gives insights into whether a further attempt might be successful.
 ====
 
-An explicit transaction can be committed with  link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IAsyncTransaction.CommitAsync.html#Neo4j_Driver_IAsyncTransaction_CommitAsync[`.CommitAsync()`] or rolled back with link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IAsyncTransaction.CommitAsync.html#Neo4j_Driver_IAsyncTransaction_RollbackAsync[`.RollbackAsync()`].
+An explicit transaction can be committed with  link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IAsyncTransaction.CommitAsync.html[`.CommitAsync()`] or rolled back with link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IAsyncTransaction.RollbackAsync.html[`.RollbackAsync()`].
 If no explicit action is taken, the driver will automatically roll the transaction back at the end of its lifetime.
 
 Explicit transactions are most useful for applications that need to distribute Cypher execution across multiple functions for the same transaction, or for applications that need to run multiple queries within a single transaction but without the automatic retries provided by managed transactions.
@@ -406,7 +406,7 @@ Similar remarks hold for the `.ExecuteReadAsync()` and `.ExecuteWriteAsync()` me
 [role=label--new-5.14]
 === Run queries as a different user
 
-You can execute a query through a different user by providing an link:https://neo4j.com/docs/api/java-driver/5/org.neo4j.driver/org/neo4j/driver/AuthTokens.html[`AuthToken`] to the `.WithAuthToken()` config method.
+You can execute a query through a different user by providing an link:https://neo4j.com/docs/api/dotnet-driver/5.28/api/Neo4j.Driver.IAuthToken.html[`IAuthToken`] to the `.WithAuthToken()` config method.
 Switching user at the session level is cheaper than creating a new `IDriver` object.
 Queries are then run within the security context of the given user (i.e., home database, permissions, etc.). +
 Session-scoped authentication requires a server version >= 5.8.

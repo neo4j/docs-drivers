@@ -37,13 +37,6 @@ Always use the latest version of the driver, as it will always work both with th
 The latest `5.x` driver supports connection to any Neo4j instances version 4.4, 5.x, and 2025.x.
 For a detailed list of changes across versions, see the link:https://github.com/neo4j/neo4j-dotnet-driver/wiki/5.X-Change-Log[driver's changelog].
 
-[TIP]
-====
-Beyond `Neo4j.Driver`, two other packages are available:
-
-- link:https://www.nuget.org/packages/Neo4j.Driver.Simple[`Neo4j.Driver.Simple`], exposing synchronous APIs,
-- link:https://www.nuget.org/packages/Neo4j.Driver.Reactive[`Neo4j.Driver.Reactive`], exposing reactive APIs.
-====
 
 include::{common-partial}/install.adoc[tag=get-an-instance]
 

@@ -26,7 +26,7 @@ Connection is instead deferred to when the first query is executed.
 <2> To verify immediately that the driver can connect to the database (valid credentials, compatible versions, etc), use the `.VerifyConnectivityAsync()` method after initializing the driver.
 
 Both the creation of a `IDriver` object and the connection verification can raise a number of different link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.Neo4jException.html[exceptions].
-Since a connection error is a blocker for any subsequent task, the most common choice is to let the program crash should an exception occur while estabilishing a connection.
+Since a connection error is a blocker for any subsequent task, the most common choice is to let the program crash should an exception occur while establishing a connection.
 
 **`IDriver` objects are immutable, thread-safe, and expensive to create**, so your application should create only one instance and pass it around (you may share `IDriver` instances across threads).
 You can xref:query-simple#impersonation[run queries through several different users] without creating a new `IDriver` instance.

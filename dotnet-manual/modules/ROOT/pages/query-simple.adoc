@@ -204,7 +204,7 @@ You can supply further configuration parameters to alter the default behavior of
 You do so through the method `.WithConfig()`, which takes a link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.QueryConfig.html[`QueryConfig`] object.
 
 
-[#database-select]
+[#database-selection]
 === Database selection
 
 It is recommended to *always specify the database explicitly*, even on single-database instances.

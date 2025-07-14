@@ -20,7 +20,7 @@ An implicit transaction gets committed _at the latest_ when the session is destr
 Other than that, there is no clear guarantee on when exactly an implicit transaction will be committed during the lifetime of a session.
 To ensure an implicit transaction is committed, you can call the `.ConsumeAsync()` method on its result.
 
-Since the driver cannot figure out whether the query in a `ISessionAsync.RunAsync()` call requires a read or write session with the database, it defaults to write. If your implicit transaction contains read queries only, there is a performance gain in xref:transactions#_request_routing[making the driver aware] through the config method `.WithDefaultAccessMode(AccessMode.Read)` when creating the session.
+Since the driver cannot figure out whether the query in a `ISessionAsync.RunAsync()` call requires a read or write session with the database, it defaults to write. If your implicit transaction contains read queries only, there is a performance gain in xref:transactions#request-routing[making the driver aware] through the config method `.WithDefaultAccessMode(AccessMode.Read)` when creating the session.
 
 [TIP]
 *Implicit transactions are the only ones that can be used for link:{neo4j-docs-base-uri}/cypher-manual/{page-version}/subqueries/subqueries-in-transactions[`CALL { ... } IN TRANSACTIONS`] queries*.
@@ -49,7 +49,7 @@ Console.WriteLine(summary.Counters);
 [NOTE]
 While `LOAD CSV` can be a convenience, there is nothing _wrong_ in deferring the parsing of the CSV file to your Java application and avoiding `LOAD CSV`.
 In fact, moving the parsing logic to the application can give you more control over the importing process.
-For efficient bulk data insertion, see xref:performance.adoc#_batch_data_creation[Performance -> Batch data creation].
+For efficient bulk data insertion, see xref:performance.adoc#batch-data-creation[Performance -> Batch data creation].
 
 For more information, see link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/load-csv/[Cypher -> Clauses -> LOAD CSV].
 
@@ -59,7 +59,7 @@ For more information, see link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/loa
 
 You can exert further control on implicit transactions by providing a link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.TransactionConfigBuilder.html[`TransactionConfigBuilder`] object as optional last parameter to `IAsyncSession.RunAsync()` calls.
 The configuration callbacks allow to specify a query timeout and to attach metadata to the transaction.
-For more information, see xref:transactions.adoc#_transaction_configuration[Transactions -> Transaction configuration].
+For more information, see xref:transactions.adoc#tx-config[Transactions -> Transaction configuration].
 
 [source, csharp]
 ----
