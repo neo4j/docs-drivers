@@ -1,5 +1,6 @@
 // This doc is also sourced in the Aura Developer Hub.
-// Because of that, cross-links are absolute and source blocks have copy=true .
+// Because of that, cross-links are absolute and
+// source blocks have copy=true .
 
 The Neo4j Python driver is the official library to interact with a Neo4j instance through a Python application.
 
