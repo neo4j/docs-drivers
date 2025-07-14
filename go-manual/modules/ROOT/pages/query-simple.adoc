@@ -195,7 +195,7 @@ All link:https://neo4j.com/docs/status-codes/current/errors/all-errors/[errors c
 You can use an error's code to stably identify a specific error; error messages are instead not stable markers, and should not be relied upon.
 
 .Basic error handling
-[source, go, role=nocollapse]
+[source, go]
 ----
 res, err := neo4j.ExecuteQuery(ctx, driver, "MATCH (p:Person) RETURN", nil,
     neo4j.EagerResultTransformer,
