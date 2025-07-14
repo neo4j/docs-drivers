@@ -197,6 +197,12 @@ using var tx = await session.BeginTransactionAsync();
 //     tx.RollbackAsync() to roll the transaction back
 ----
 
+[TIP]
+====
+Queries run with `tx.Run()` failing due to a transient server error can be retried without need to alter the original request.
+You can discover whether an error is transient via the link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.Neo4jException.IsRetriable.html#Neo4j_Driver_Neo4jException_IsRetriable[`IsRetriable`] property, which gives insights into whether a further attempt might be successful.
+====
+
 An explicit transaction can be committed with  link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IAsyncTransaction.CommitAsync.html#Neo4j_Driver_IAsyncTransaction_CommitAsync[`.CommitAsync()`] or rolled back with link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IAsyncTransaction.CommitAsync.html#Neo4j_Driver_IAsyncTransaction_RollbackAsync[`.RollbackAsync()`].
 If no explicit action is taken, the driver will automatically roll the transaction back at the end of its lifetime.
 

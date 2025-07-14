@@ -171,14 +171,30 @@ For those rare use cases, see xref:query-advanced.adoc#dynamic-advanced[Dynamic 
 [#error-handling]
 == Error handling
 
-A query run may fail for a number of reasons, with different link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.Neo4jException.html[exceptions] being raised.
-Some of them are due to Cypher syntax errors, permission issues, or other forms of misconfiguration/misusage.
+A query run may fail for a number of reasons.
+When using `IDriver.ExecutableQuery()`, the driver automatically retries to run a failed query if the failure is deemed to be transient (for example due to temporary server unavailability).
+An error will be raised if the operation keeps failing after a number of attempts.
 
-From version >= 5.28, the default exception format is GQL-compliant. For more information on the structure of the error object, see link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.Preview.GqlErrors.IGqlErrorPreview.html[GqlErrorPreview].
+All link:https://neo4j.com/docs/status-codes/current/errors/all-errors/[errors coming from the server] are of type link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.Neo4jException.html[`Neo4jException`].
+You can use an error's code to stably identify a specific error; error messages are instead not stable markers, and should not be relied upon.
 
-[TIP]
-The driver automatically retries to run a failed query, if the failure is deemed to be transient (for example due to temporary server unavailability).
-An exception will be raised if the operation keeps failing after a number of attempts.
+.Basic error handling
+[source, csharp]
+----
+try {
+    await driver.ExecutableQuery("MATCH (p:Person) RETURN")
+        .WithConfig(new QueryConfig(database: "neo4j"))
+        .ExecuteAsync();
+} catch (Neo4jException e) {
+    Console.WriteLine($"Neo4j error code: {e.Code}");
+    Console.WriteLine($"Exception message: {e.Message}");
+}
+/*
+Neo4j error code: Neo.ClientError.Statement.SyntaxError
+Exception message: Invalid input '': expected an expression, '*', 'ALL' or 'DISTINCT' (line 1, column 24 (offset: 23))
+"MATCH (p:Person) RETURN"
+*/
+----
 
 
 [#query-config]
