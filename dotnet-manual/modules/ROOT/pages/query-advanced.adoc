@@ -65,8 +65,7 @@ For more information, see xref:transactions.adoc#_transaction_configuration[Tran
 ----
 using var session = driver.AsyncSession(conf => conf.WithDatabase("neo4j"));
 await session.RunAsync(
-    "CREATE (a:Person {name: $name})",
-    new { name = "John" },
+    "MATCH (p:Person) RETURN p",
     conf => conf
         .WithTimeout(new TimeSpan(5))
         .WithMetadata(new Dictionary<string, object>{ { "appName", "peopleTracker" } })
