@@ -56,7 +56,7 @@ You can alter the association between property names and class attributes with t
 For more information, see all xref:#decorators[decorators].
 
 .Map `p.name` to `name` and `p.age` to `age`
-[source, csharp role=nocollapse]
+[source, csharp, role=nocollapse]
 ----
 var result = await driver.ExecutableQuery(@"
     MERGE (p:Person {name: $name, age: $age})
@@ -98,7 +98,7 @@ Use them on class attributes to alter how each attribute should be mapped to its
 - `[MappingDefaultValue(val)]` -- Same as `[MappingOptional]`, and specify a default value `val` in case of missing match.
 
 .Decorators example
-[source, csharp, test-skip]
+[source, csharp]
 ----
 class Person {
     [MappingSource("p.name")]  // <.>
@@ -174,7 +174,7 @@ After invoking the constructor, the driver proceeds to set values for attributes
 You can use xref:#decorators[decorators] in constructor arguments, although the only meaningful ones are `[MappingOptional]` and `[MappingDefaultValue]` (anything else is best achieved by changing the constructor signature).
 
 .A class with two constructors and private setters
-[source, csharp, test-skip]
+[source, csharp]
 ----
 class Person {
     [MappingConstructor]  // <.>

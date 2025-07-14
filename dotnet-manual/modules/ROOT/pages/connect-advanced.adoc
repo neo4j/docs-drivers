@@ -79,7 +79,7 @@ The easiest way to get started is to use link:https://neo4j.com/docs/api/dotnet-
 .Rotating a bearer token expiring every 60 seconds
 [source, csharp, test-skip]
 ----
-var driver = GraphDatabase.Driver(
+await using var driver = GraphDatabase.Driver(
     dbUri,
     AuthTokenManagers.Bearer(GetTokenAsync));
 
@@ -122,11 +122,9 @@ The client's certificate and public key must be placed in the server's `<NEO4J_H
 For mTLS to work, the driver's connection with the server must be encrypted, i.e. the xref:_connection_protocols_and_security[connection URI scheme] must be either `+s` or `+ssc` (ex. `neo4j+s://example.com:7687`).
 
 Use the config method link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.ConfigBuilder.WithClientCertificateProvider.html[`WithClientCertificateProvider()`] to provide an link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IClientCertificateProvider.html[`IClientCertificateProvider`]. +
-Your implementation must provide a thread-safe `GetCertificateAsync()` method, returning a `ValueTask<link:https://learn.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.x509certificate?view=net-9.0[X509Certificate]>`.
+Your implementation must provide a thread-safe `GetCertificateAsync()` method, returning a `ValueTask<link:https://learn.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.x509certificate2?view=net-9.0[X509Certificate2]>`.
 
-v1 or v2? v1 seems to be largely deprecated and not working with newer cert versions?
-
-[source, java, test-skip]
+[source, csharp, test-skip]
 ----
 using System.Security.Cryptography.X509Certificates;
 
@@ -142,7 +140,7 @@ class ClientCertificateProvider {
 
 }
 
-using var driver = GraphDatabase.Driver(
+await using var driver = GraphDatabase.Driver(
     dbUri,
     AuthTokens.Basic(dbUser, dbPassword),
     conf => conf.WithClientCertificateProvider(ClientCertificateProvider)
@@ -168,7 +166,7 @@ const string dbPassword = "<password>";
 var logger = new Neo4jLogger();
 logger.EnableDebug();
 
-using var driver = GraphDatabase.Driver(
+await using var driver = GraphDatabase.Driver(
     dbUri, AuthTokens.Basic(dbUser, dbPassword),
     conf => conf.WithLogger(logger)
 );
@@ -259,21 +257,21 @@ You specify a resolver through the link:https://neo4j.com/docs/api/dotnet-driver
 In the example below, the driver is initialized with a `neo4j://` URI scheme and port `7687`, so the resolved address provided in `dbUri` must also be available at `neo4j://` and port `7687`.
 
 .Connection to `example.com` is resolved to `localhost`
-[source, csharp]
+[source, csharp, test-skip]
 ----
 using Neo4j.Driver;
 
-const string dbUri = "<database-uri>";  // omit scheme and port
+const string dbUri = "localhost";  // omit scheme and port
 const string dbUser = "<username>";
 const string dbPassword = "<password>";
 
 // setting a port different than the one given in `driver` won't work
-var addresses = ServerAddress.From(dbUri, 7687);
+var address = ServerAddress.From(dbUri, 7687);
 
-using var driver = GraphDatabase.Driver(
+await using var driver = GraphDatabase.Driver(
     "neo4j://example.com:7687",
     AuthTokens.Basic(dbUser, dbPassword),
-    conf => conf.WithResolver(new ListAddressResolver(addresses))
+    conf => conf.WithResolver(new ListAddressResolver(address))
 );
 await driver.VerifyConnectivityAsync();
 

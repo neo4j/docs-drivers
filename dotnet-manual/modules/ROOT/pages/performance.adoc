@@ -13,13 +13,13 @@ The overhead is minimal for a single query, but becomes significant over hundred
 [source, csharp]
 ----
 await driver.ExecutableQuery("<QUERY>")
-    .WithConfig(new QueryConfig(database: "{neo4j-database-name}"))
+    .WithConfig(new QueryConfig(database: "<database-name>"))
     .ExecuteAsync();
 ----
 
 [source, csharp]
 ----
-using var session = driver.AsyncSession(conf => conf.WithDatabase("{neo4j-database-name}"));
+using var session = driver.AsyncSession(conf => conf.WithDatabase("<database-name>"));
 ----
 
 [discrete]
@@ -515,13 +515,6 @@ await session.RunAsync("MATCH (p:Person {name: 'Alice'}) RETURN p");
 string name = "Alice";
 session.RunAsync("MATCH (p:Person {name: '" + name + "'}) RETURN p");
 ----
-
-
-[[concurrency]]
-== Concurrency
-
-**Use xref:async.adoc[asynchronous querying]**.
-This is likely to be more impactful on performance if you parallelize complex and time-consuming queries in your application, but not so much if you run many simple ones.
 
 
 [[merge]]
