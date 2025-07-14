@@ -53,7 +53,8 @@ using dotenv.net;
 
 DotEnv.Load(options: new DotEnvOptions(
     envFilePaths: new[] {"Neo4j-a0a2fa1d-Created-2023-11-06.txt"},
-    ignoreExceptions: false
+    ignoreExceptions: false,
+    overwriteExistingVars: false
 ));
 
 string? dbUri = Environment.GetEnvironmentVariable("NEO4J_URI");
