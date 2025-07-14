@@ -1,0 +1,129 @@
+= Control results flow with reactive streams
+
+In a reactive flow, consumers dictate the rate at which they consume records from queries, and the driver in turn manages the rate at which records are requested from the server.
+
+An example use-case is an application fetching records from a Neo4j server and doing some very time-consuming post-processing on each one.
+If the server were allowed to push records to the client as soon as it has them available, the client could be overflown with a lot of entries while its processing is still lagging behind.
+The Reactive API ensures that the receiving side is not forced to buffer arbitrary amounts of data.
+
+[NOTE]
+====
+The Reactive API is recommended for applications that already work in a reactive programming style, and which have needs that only Reactive workflows can address.
+====
+
+
+== Install dependencies
+
+To use reactive features, you need to add the relevant dependencies to your project first.
+The driver's reactive implementation lives in the link:https://www.nuget.org/packages/Neo4j.Driver.Reactive/[`Neo4j.Driver.Reactive`] NuGet package (although symbols are defined in the regular `Neo4j.Driver` namespace).
+
+.Add the Reactive package to your project with the .NET CLI
+[source, bash]
+----
+dotnet add package Neo4j.Driver.Reactive
+----
+
+
+== Reactive query examples
+
+The basic driver's concepts are the same as the synchronous case, except that queries are run through a `RxSession`, and the objects related to querying have a reactive counterpart and prefix.
+
+
+=== Managed transaction with reactive sessions
+
+.A managed transaction `.executeRead()` example
+[source, csharp]
+----
+using Neo4j.Driver;
+
+const string dbUri = "<database-uri>";
+const string dbUser = "<username>";
+const string dbPassword = "<password>";
+
+await using var driver = GraphDatabase.Driver(
+    dbUri,
+    AuthTokens.Basic(dbUser, dbPassword));
+
+var rxSession = driver.RxSession(SessionConfigBuilder.ForDatabase("neo4j"));
+var observable = rxSession.ExecuteRead(
+    tx => {
+        return tx
+            .Run("UNWIND range (1, 5) AS x RETURN x")
+            .Records();
+    }
+);
+
+var tcs = new TaskCompletionSource();
+observable.Subscribe(
+    i => {
+        Console.WriteLine(i.Get<string>("x"));
+    },
+    ex => {
+        Console.WriteLine($"Error Occurred: {ex.Message}");
+        tcs.SetResult();
+    },
+    () => {
+        Console.WriteLine("Finished receiving records");
+        tcs.SetResult();
+   }
+);
+await tcs.Task;
+----
+
+
+=== Implicit transaction with reactive sessions
+
+The following example is very similar to the previous one, except it uses an xref:query-advanced.adoc#implicit-transactions[implicit transaction].
+
+.An implicit transaction `.run()` example
+[source, csharp]
+----
+using Neo4j.Driver;
+
+const string dbUri = "<database-uri>";
+const string dbUser = "<username>";
+const string dbPassword = "<password>";
+
+await using var driver = GraphDatabase.Driver(
+    dbUri,
+    AuthTokens.Basic(dbUser, dbPassword));
+
+var rxSession = driver.RxSession(SessionConfigBuilder.ForDatabase("neo4j"));
+var observable = rxSession
+    .Run("UNWIND range (1, 5) AS x RETURN x")
+    .Records();
+
+var tcs = new TaskCompletionSource();
+observable.Subscribe(
+    i => {
+        Console.WriteLine(i.Get<string>("x"));
+    },
+    ex => {
+        Console.WriteLine($"Error Occurred: {ex.Message}");
+        tcs.SetResult();
+    },
+    () => {
+        Console.WriteLine("Finished receiving records");
+        tcs.SetResult();
+   }
+);
+await tcs.Task;
+----
+
+
+== Always defer session creation
+
+Remember that in reactive programming a Publisher doesn't come to life until a Subscriber attaches to it.
+A Publisher is just an abstract description of your asynchronous process, but it's only the act of subscribing that triggers the flow of data in the whole chain.
+
+For this reason, always be mindful to make session creation/destruction part of this chain, and not to create sessions separately from the query Publisher chain.
+Doing so may result in many open sessions, none doing work and all waiting for a Publisher to use them, potentially exhausting the number of available sessions for your application.
+
+
+ifndef::backend-pdf[]
+[discrete.glossary]
+== Glossary
+
+include::{common-partial}/glossary.adoc[]
+include::../partials/glossary.adoc[]
+endif::[]

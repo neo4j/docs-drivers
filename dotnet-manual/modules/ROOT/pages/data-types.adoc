@@ -1,0 +1,295 @@
+= Data types and mapping to Cypher types
+
+The tables in this section show the mapping between Cypher data types and .NET types.
+
+
+[#core]
+== Core types
+
+|===
+| Cypher type   | Driver type
+
+| <<NULL>>      | `null`
+| `LIST`        | `IList<object>`
+| `MAP`         | `IDictionary<string, object>`
+| `BOOLEAN`     | `bool`
+| `INTEGER`     | `long`
+| `FLOAT`       | `double`
+| `STRING`      | `string`
+| `ByteArray`   | `byte[]`
+|===
+
+
+[#temporal]
+== Temporal types
+
+The driver provides a set of temporal data types compliant with ISO-8601 and Cypher. +
+Sub-second values are measured to nanosecond precision.
+
+Time zone names adhere to the link:https://www.iana.org/time-zones[IANA system], rather than the link:https://docs.microsoft.com/en-us/windows-hardware/manufacture/desktop/default-time-zones[Windows system]. +
+Inbound conversion is carried out using link:http://cldr.unicode.org/development/development-process/design-proposals/extended-windows-olson-zid-mapping[Extended Windows-Olson zid mapping] as defined by Unicode CLDR.
+
+|===
+| Cypher type      | Driver type
+
+| `DATE`           | link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.LocalDate.html[`LocalDate`]
+| `ZONED TIME`     | link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.OffsetTime.html[`OffsetTime`]
+| `LOCAL TIME`     | link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.LocalTime.html[`LocalTime`]
+| `ZONED DATETIME` | link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.ZonedDateTime.html[`ZonedDateTime`]
+| `LOCAL DATETIME` | link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.LocalDateTime.html[`LocalDateTime`]
+| `DURATION`       | link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.Duration.html[`Duration`]
+
+|===
+
+.How to use temporal types in queries
+[source, csharp]
+----
+// Define a date, with timezone, and use it to set a relationship property
+var friendsSince = new ZonedDateTime(new DateTime(2016, 12, 16, 13, 59, 59, 999), "Europe/Stockholm");
+var result = await driver.ExecutableQuery(@"
+    MERGE (a:Person {name: $name})
+    MERGE (b:Person {name: $friend})
+    MERGE (a)-[friendship:KNOWS {since: $friendsSince}]->(b)
+    RETURN friendship.since AS date
+")
+    .WithParameters(new { name = "Astrid", friend = "Sara", friendsSince = friendsSince })
+    .WithConfig(new QueryConfig(database: "neo4j"))
+    .ExecuteAsync();
+
+Console.WriteLine(result.Result[0].Get<ZonedDateTime>("date"));
+// 2016-12-16T13:59:59.999000000[Europe/Stockholm]
+----
+
+
+[#spatial]
+== Spatial types
+
+Cypher supports spatial values (points), and Neo4j can store these point values as properties on nodes and relationships.
+
+The attribute `SRID` (short for _Spatial Reference Identifier_) is a number identifying the coordinate system the spatial type is to be interpreted in.
+You can think of it as a unique identifier for each spatial type.
+
+|===
+| Cypher type            | Driver type | SRID
+
+| `POINT` (2D Cartesian) | link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.Point.html[`Point`]     | 7203
+| `POINT` (2D WGS-84)    | link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.Point.html[`Point`]     | 4326
+| `POINT` (3D Cartesian) | link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.Point.html[`Point`]     | 9157
+| `POINT` (3D WGS-84)    | link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.Point.html[`Point`]     | 4979
+
+|===
+
+
+.Receive a `Point` value from the database
+[source, csharp]
+----
+var result = await driver.ExecutableQuery("RETURN point({x: 2.3, y: 4.5, z: 2}) AS point")
+    .WithConfig(new QueryConfig(database: "neo4j"))
+    .ExecuteAsync();
+Console.WriteLine(result.Result[0].Get<Point>("point"));
+// Point{srId=9157, x=2.3, y=4.5, z=2}
+----
+
+.Create a `Point` value and use it as property value
+[source, csharp]
+----
+var location = new Point(4326, 67.28775180193841, 17.734163823312397);  // 4326 = 2D geodetic point
+var result = await driver.ExecutableQuery("CREATE (p:PlaceOfInterest {location: $location}) RETURN p")
+    .WithParameters(new { location = location })
+    .WithConfig(new QueryConfig(database: "neo4j"))
+    .ExecuteAsync();
+Console.WriteLine(result.Result[0].Get<INode>("p").Get<Point>("location"));
+// Point{srId=4326, x=67.28775180193841, y=17.734163823312397}
+----
+
+
+[#graph]
+== Graph types
+
+*Graph types are only passed as results and may not be used as parameters*.
+
+|===
+| Cypher Type    | Driver type
+
+| `NODE`         | link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.INode.html[`INode`]
+| `RELATIONSHIP` | link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IRelationship.html[`IRelationship`]
+| `PATH`         | link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IPath.html[`IPath`]
+
+|===
+
+
+[#inode]
+=== INode
+Represents a node in a graph.
+
+.Essential members on node objects
+[cols="1m,2"]
+|===
+|Property/Method |Return
+
+|Labels
+|Node labels, as a list.
+
+|Properties
+|Node properties, as a map.
+
+|Get<type>("<propertyName>")
+|Value for the given property, casted to `type`.
+
+|ElementId()
+|String identifier for the node.
+This should be used with care, as no guarantees are given about the mapping between id values and elements outside the scope of a single transaction. In other words, using an `elementId` to `MATCH` an element across different transactions is risky.
+
+|===
+
+.Retrieve a node and display its details
+[source, csharp]
+----
+var result = await driver.ExecutableQuery("MERGE (p:Person:Troublemaker {name: $name, age: $age}) RETURN p")
+    .WithParameters(new { name = "Carla", age = 59 })
+    .WithConfig(new QueryConfig(database: "neo4j"))
+    .ExecuteAsync();
+
+var node = result.Result[0].Get<INode>("p");
+Console.WriteLine("Labels: {0}", string.Join(", ", node.Labels));
+Console.WriteLine("Properties: {0}", string.Join(", ", node.Properties));
+Console.WriteLine("Name property: {0}", node.Get<string>("name"));
+/*
+Labels: Person, Troublemaker
+Properties: [name, Carla], [age, 59]
+Name property: Carla
+*/
+----
+
+For full documentation, see link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.INode.html[API documentation -> INode].
+
+
+[#irelationship]
+=== IRelationship
+
+Represents a relationship in a graph.
+
+.Essential members on relationsip objects
+[cols="1m,2"]
+|===
+|Property/Method |Return
+
+|Type
+|Relationship type.
+
+|Properties
+|Relationship properties, as a map.
+
+|Get<type>("<propertyName>")
+|Value for the given property, casted to `type`.
+
+|StartNodeElementId
+|`elementId` of starting node.
+
+|EndNodeElementId
+| `elementId` of ending node.
+
+|ElementId
+|String identifier for the relationship.
+This should be used with care, as no guarantees are given about the mapping between id values and elements outside the scope of a single transaction. In other words, using an `elementId` to `MATCH` an element across different transactions is risky.
+
+|===
+
+.Retrieve a relationship and display its details
+[source, csharp]
+----
+var result = await driver.ExecutableQuery(@"
+    MERGE (p:Person {name: $name})
+    MERGE (friend:Person {name: $friendName})
+    MERGE (p)-[r:KNOWS {status: $status, since: date()}]->(friend)
+    RETURN r AS friendship
+    ")
+    .WithParameters(new { name = "Alice", friendName = "Bob", status = "BFF" })
+    .WithConfig(new QueryConfig(database: "neo4j"))
+    .ExecuteAsync();
+
+var relationship = result.Result[0].Get<IRelationship>("friendship");
+Console.WriteLine($"Type: {relationship.Type}");
+Console.WriteLine("Properties: {0}", string.Join(", ", relationship.Properties));
+Console.WriteLine("Status property: {0}", relationship.Get<string>("status"));
+/*
+Type: KNOWS
+Properties: [since, 2024-12-22], [status, BFF]
+Status property: BFF
+*/
+----
+
+For full documentation, see link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IRelationship.html[API documentation -> IRelationship].
+
+
+[#ipath]
+=== IPath
+
+Represents a path in a graph.
+
+.Retrieve a path and _walk_ it
+[source, csharp]
+----
+using Neo4j.Driver;
+
+const string dbUri = "<database-uri>";
+const string dbUser = "<username>";
+const string dbPassword = "<password>";
+
+await using var driver = GraphDatabase.Driver(dbUri, AuthTokens.Basic(dbUser, dbPassword));
+await driver.VerifyConnectivityAsync();
+
+// Create some :Person nodes linked by :KNOWS relationships
+await addFriend(driver, "Alice", "BFF", "Bob");
+await addFriend(driver, "Bob", "Fiends", "Sofia");
+await addFriend(driver, "Sofia", "Acquaintances", "Alice");
+
+// Follow :KNOWS relationships outgoing from Alice three times, return as path
+var result = await driver.ExecutableQuery(@"
+    MATCH path=(:Person {name: $name})-[:KNOWS*3]->(:Person)
+    RETURN path AS friendshipChain
+    ")
+    .WithParameters(new { name = "Alice" })
+    .WithConfig(new QueryConfig(database: "neo4j"))
+    .ExecuteAsync();
+
+// Extract path from result
+var path = result.Result[0].Get<IPath>("friendshipChain");
+
+Console.WriteLine("-- Path breakdown --");
+for (var i=0; i<path.Relationships.Count; i++) {
+    Console.WriteLine("{0} knows {1} ({2}).",
+        path.Nodes[i].Get<string>("name"),
+        path.Nodes[i+1].Get<string>("name"),
+        path.Relationships[i].Get<string>("status")
+    );
+}
+/*
+-- Path breakdown --
+Alice knows Bob (BFF).
+Bob knows Sofia (Fiends).
+Sofia knows Sofia (Acquaintances).
+*/
+
+async Task addFriend(IDriver driver, string name, string status, string friendName) {
+    await driver.ExecutableQuery(@"
+        MERGE (p:Person {name: $name})
+        MERGE (friend:Person {name: $friendName})
+        MERGE (p)-[r:KNOWS {status: $status, since: date()}]->(friend)
+        ")
+        .WithParameters(new { name = name, status = status, friendName = friendName })
+        .WithConfig(new QueryConfig(database: "neo4j"))
+        .ExecuteAsync();
+}
+----
+
+For full documentation, see link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IPath.html[API documentation -> IPath].
+
+
+ifndef::backend-pdf[]
+[discrete.glossary]
+== Glossary
+
+include::{common-partial}/glossary.adoc[]
+include::../partials/glossary.adoc[]
+endif::[]

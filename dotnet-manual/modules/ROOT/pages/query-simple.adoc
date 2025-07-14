@@ -1,0 +1,391 @@
+= Query the database
+
+Once you have xref:connect.adoc[connected to the database], you can execute <<Cypher>> queries through the method `IDriver.ExecutableQuery()`.
+
+[TIP]
+`IDriver.ExecutableQuery()` was introduced with the version 5.8 of the driver. +
+For queries with earlier versions, use xref:transactions.adoc[sessions and transactions].
+
+
+[#write]
+== Write to the database
+
+To create two node representing persons named `Alice` and `David`, and a relationship `KNOWS` between them, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/create/[`CREATE`]:
+
+.Create two nodes and a relationship
+[source, csharp]
+----
+var result = await driver.ExecutableQuery(@"  // <.>
+    CREATE (a:Person {name: $name})
+    CREATE (b:Person {name: $friendName})
+    CREATE (a)-[:KNOWS]->(b)
+    ")
+    .WithParameters(new { name = "Alice", friendName = "David" })  // <.>
+    .WithConfig(new QueryConfig(database: "neo4j"))  // <.>
+    .ExecuteAsync();
+var summary = result.Summary;  // <.>
+Console.WriteLine($"Created {summary.Counters.NodesCreated} nodes in {summary.ResultAvailableAfter.Milliseconds} ms.");
+----
+
+<.> The Cypher query
+<.> A map of xref:query-parameters[query parameters]
+<.> The database to run the query on
+<.> The xref:result-summary.adoc[summary of execution] returned by the server
+
+
+[#read]
+== Read from the database
+
+To retrieve information from the database, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/match/[`MATCH`]:
+
+.Retrieve all `Person` nodes who like other `Person` s
+[source, csharp, role=nocollapse]
+----
+var result = await driver.ExecutableQuery(@"
+    MATCH (p:Person)-[:KNOWS]->(:Person)
+    RETURN p.name AS name
+    ")
+    .WithConfig(new QueryConfig(database: "neo4j"))
+    .ExecuteAsync();
+
+// Loop through results and print people's name
+foreach (var record in result.Result) {  // <.>
+    Console.WriteLine(record.Get<string>("name"));  // <.>
+}
+
+// Summary information
+var summary = result.Summary;  // <.>
+Console.WriteLine($"The query `{summary.Query.Text}` returned {result.Result.Count()} results in {summary.ResultAvailableAfter.Milliseconds} ms.");
+----
+
+<.> `result.Result` contains the result as a list of link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IRecord.html[`IRecord`] objects
+<.> `.Get<type>(key)` extracts the entry named `key` from the returned record and casts it to `type`.
+For more information on types, see xref:data-types.adoc[].
+<.> The xref:result-summary.adoc[summary of execution] returned by the server
+
+To clean up the returned data structure, use the `.WithMap()` method when running the query.
+This can be especially handy when returning nodes rather than individual properties.
+For example,
+
+[source, csharp]
+----
+var result = await driver.ExecutableQuery(@"
+    MATCH (p:Person)-[:KNOWS]->(:Person)
+    RETURN p.name AS name
+    ")
+    .WithConfig(new QueryConfig(database: "neo4j"))
+    .WithMap(record => record["name"].As<string>())
+    .ExecuteAsync();
+foreach (var name in result.Result) {
+    Console.WriteLine(name);
+}
+----
+
+An alternative way of processing records is to xref:object-mapping.adoc[map them to objects].
+
+
+[#update]
+== Update the database
+
+To update a node's information in the database, use the Cypher clauses link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/match/[`MATCH`] and link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/set/[`SET`]:
+
+.Update node `Alice` to add an `age` property
+[source, csharp]
+----
+var result = await driver.ExecutableQuery(@"
+        MATCH (p:Person {name: $name})
+        SET p.age = $age
+    ")
+    .WithConfig(new QueryConfig(database: "neo4j"))
+    .WithParameters(new { name = "Alice", age = 42 })
+    .ExecuteAsync();
+Console.WriteLine($"Query updated the database? {result.Summary.Counters.ContainsUpdates}");
+----
+
+To create a new relationship, linking it to two already existing nodes, use a combination of the Cypher clauses `MATCH` and `CREATE`:
+
+.Create a relationship `:KNOWS` between `Alice` and `Bob`
+[source, csharp]
+----
+var result = await driver.ExecutableQuery(@"
+        MATCH (alice:Person {name: $name})  // <.>
+        MATCH (bob:Person {name: $friend})  // <.>
+        CREATE (alice)-[:KNOWS]->(bob)  // <.>
+    ")
+    .WithConfig(new QueryConfig(database: "neo4j"))
+    .WithParameters(new { name = "Alice", friend = "Bob" })
+    .ExecuteAsync();
+Console.WriteLine($"Query updated the database? {result.Summary.Counters.ContainsUpdates}");
+----
+
+<1> Retrieve the person node named `Alice` and bind it to a variable `alice`
+<2> Retrieve the person node named `Bob` and bind it to a variable `bob`
+<3> Create a new `:KNOWS` relationship outgoing from the node bound to `alice` and attach to it the `Person` node named `Bob`
+
+
+[#delete]
+== Delete from the database
+
+To remove a node and any relationship attached to it, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/delete/[`DETACH DELETE`]:
+
+.Remove the `Alice` node and all its relationships
+[source, csharp]
+----
+// This does not delete _only_ `p`, but also all its relationships!
+var result = await driver.ExecutableQuery(@"
+        MATCH (p:Person {name: $name})
+        DETACH DELETE p
+    ")
+    .WithConfig(new QueryConfig(database: "neo4j"))
+    .WithParameters(new { name = "Alice" })
+    .ExecuteAsync();
+Console.WriteLine($"Query updated the database? {result.Summary.Counters.ContainsUpdates}");
+----
+
+
+[#query-parameters]
+== Query parameters
+
+*Do not hardcode or concatenate parameters directly into queries*.
+Instead, always use placeholders and specify the link:{neo4j-docs-base-uri}/cypher-manual/5/syntax/parameters/[Cypher parameters], as shown in the previous examples.
+This is for:
+
+1. *performance benefits*: Neo4j compiles and caches queries, but can only do so if the query structure is unchanged;
+2. *security reasons*: see link:https://neo4j.com/developer/kb/protecting-against-cypher-injection/[protecting against Cypher injection].
+
+You can provide query parameters as a map through the `.WithParameters()` method.
+
+[source, csharp]
+----
+await driver.ExecutableQuery("MATCH (p:Person {name: $name}) RETURN p")
+    .WithConfig(new QueryConfig(database: "neo4j"))
+    .WithParameters(new { name = "Alice" })
+    .ExecuteAsync();
+----
+
+[NOTE]
+There can be circumstances where your query structure prevents the usage of parameters in all its parts.
+For those rare use cases, see xref:query-advanced.adoc#dynamic-advanced[Dynamic values in property keys, relationship types, and labels].
+
+
+[#error-handling]
+== Error handling
+
+A query run may fail for a number of reasons.
+When using `IDriver.ExecutableQuery()`, the driver automatically retries to run a failed query if the failure is deemed to be transient (for example due to temporary server unavailability).
+An error will be raised if the operation keeps failing after a number of attempts.
+
+All link:https://neo4j.com/docs/status-codes/current/errors/all-errors/[errors coming from the server] are of type link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.Neo4jException.html[`Neo4jException`].
+You can use an error's code to stably identify a specific error; error messages are instead not stable markers, and should not be relied upon.
+
+.Basic error handling
+[source, csharp]
+----
+try {
+    await driver.ExecutableQuery("MATCH (p:Person) RETURN")
+        .WithConfig(new QueryConfig(database: "neo4j"))
+        .ExecuteAsync();
+} catch (Neo4jException e) {
+    Console.WriteLine($"Neo4j error code: {e.Code}");
+    Console.WriteLine($"Exception message: {e.Message}");
+}
+/*
+Neo4j error code: Neo.ClientError.Statement.SyntaxError
+Exception message: Invalid input '': expected an expression, '*', 'ALL' or 'DISTINCT' (line 1, column 24 (offset: 23))
+"MATCH (p:Person) RETURN"
+*/
+----
+
+
+[#query-config]
+== Query configuration
+
+You can supply further configuration parameters to alter the default behavior of `.ExecutableQuery()`.
+You do so through the method `.WithConfig()`, which takes a link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.QueryConfig.html[`QueryConfig`] object.
+
+
+[#database-selection]
+=== Database selection
+
+It is recommended to *always specify the database explicitly*, even on single-database instances.
+This allows the driver to work more efficiently, as it saves a network round-trip to the server to resolve the home database.
+If no database is given, the link:https://neo4j.com/docs/operations-manual/5/database-administration/#manage-databases-default[user's home database] is used.
+
+[source, csharp]
+----
+await driver.ExecutableQuery("MATCH (p:Person) RETURN p.name")
+    .WithConfig(new QueryConfig(database: "neo4j"))
+    .ExecuteAsync();
+----
+
+[TIP]
+Specifying the database through the configuration method is preferred over the link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/use/[`USE`] Cypher clause.
+If the server runs on a cluster, queries with `USE` require server-side routing to be enabled.
+Queries may also take longer to execute as they may not reach the right cluster member at the first attempt, and need to be routed to one containing the requested database.
+
+
+[#request-routing]
+=== Request routing
+
+In a cluster environment, all queries are directed to the leader node by default.
+To improve performance on read queries, use `routing: RoutingControl.Readers` to route a query to the read nodes.
+
+[source, csharp]
+----
+await driver.ExecutableQuery("MATCH (p:Person) RETURN p.name")
+    .WithConfig(new QueryConfig(
+        database: "neo4j",
+        routing: RoutingControl.Readers
+    ))
+    .ExecuteAsync();
+----
+
+[NOTE]
+====
+Although executing a _write_ query in read mode likely results in a runtime error, *you should not rely on this for access control.*
+The difference between the two modes is that _read_ transactions will be routed to any node of a cluster, whereas _write_ ones are directed to primaries.
+There is no guarantee that a write query submitted in read mode will be rejected, and an issue with this feature will not be classified as a security vulnerability.
+====
+
+
+[#impersonation]
+[role=label--new-5.14]
+=== Run queries as a different user
+
+You can execute a query through a different user with the config key `authToken`.
+Switching user at the query level is cheaper than creating a new `IDriver` object.
+The query is then run within the security context of the given user (i.e., home database, permissions, etc.).
+See link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.AuthTokens.html[`AuthTokens`] for available native implementations of authentication methods. +
+Query-scoped authentication requires a Neo4j server version >= 5.8.
+
+[source, csharp, test-skip]
+----
+await driver.ExecutableQuery("MATCH (p:Person) RETURN p.name")
+    .WithConfig(new QueryConfig(
+        database: "neo4j",
+        authToken: AuthTokens.Basic("somebodyElse", "theirPassword")
+    ))
+    .ExecuteAsync();
+----
+
+The `QueryConfig` key `impersonatedUser` provides a similar functionality, and is available in driver/server versions >= 4.4.
+The difference is that you don't need to know a user's password to impersonate them, but the user under which the `IDriver` was created needs to have link:{neo4j-docs-base-uri}/operations-manual/5/authentication-authorization/dbms-administration/#access-control-dbms-administration-impersonation[`IMPERSONATE` privileges].
+
+[source, csharp, test-skip]
+----
+await driver.ExecutableQuery("MATCH (p:Person) RETURN p.name")
+    .WithConfig(new QueryConfig(
+        database: "neo4j",
+        impersonatedUser: "somebodyElse"
+    ))
+    .ExecuteAsync();
+----
+
+
+[#full-example]
+== A full example
+
+This example uses the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/merge/[`MERGE`] to avoid data duplication in case the code is run more than once.
+
+[source, csharp]
+----
+using Neo4j.Driver;
+
+// URI examples: "neo4j://localhost", "neo4j+s://xxx.databases.neo4j.io"
+const string dbUri = "<database-uri>";
+const string dbUser = "<username>";
+const string dbPassword = "<password>";
+
+await using var driver = GraphDatabase.Driver(dbUri, AuthTokens.Basic(dbUser, dbPassword));
+await driver.VerifyConnectivityAsync();
+Console.WriteLine("Connection established.");
+
+// Toy dataset
+var people = new List<Dictionary<string, dynamic>>();
+people.Add(
+    new Dictionary<string, dynamic>() {
+        {"name", "Alice"},
+        {"age", 42},
+        {"friends", new List<string>(){"Bob", "Peter", "Anna"}},
+    }
+);
+people.Add(
+    new Dictionary<string, dynamic>() {
+        {"name", "Bob"},
+        {"age", 19},
+    }
+);
+people.Add(
+    new Dictionary<string, dynamic>() {
+        {"name", "Peter"},
+        {"age", 50},
+    }
+);
+people.Add(
+    new Dictionary<string, dynamic>() {
+        {"name", "Anna"},
+        {"age", 33},
+    }
+);
+
+try {
+    //Create some nodes
+    foreach (var person in people) {
+        await driver
+            .ExecutableQuery("MERGE (:Person {name: $person.name, age: $person.age})")
+            .WithConfig(new QueryConfig(database: "neo4j"))
+            .WithParameters(new { person = person })
+            .ExecuteAsync();
+    }
+
+    // Create some relationships
+    foreach (var person in people) {
+        if (person.ContainsKey("friends")) {
+            await driver.ExecutableQuery(@"
+                    MATCH (p:Person {name: $person.name})
+                    UNWIND $person.friends AS friend_name
+                    MATCH (friend:Person {name: friend_name})
+                    MERGE (p)-[:KNOWS]->(friend)
+                ")
+                .WithConfig(new QueryConfig(database: "neo4j"))
+                .WithParameters(new { person = person })
+                .ExecuteAsync();
+        }
+    }
+
+    // Retrieve Alice's friends who are under 40
+    Console.WriteLine("Alice's friends under 40:");
+    var result = await driver.ExecutableQuery(@"
+            MATCH (p:Person {name: $name})-[:KNOWS]-(friend:Person)
+            WHERE friend.age < $age
+            RETURN friend
+        ")
+        .WithConfig(new QueryConfig(database: "neo4j", routing: RoutingControl.Readers))
+        .WithParameters(new { name = "Alice", age = 40 })
+        .ExecuteAsync();
+
+    // Loop through results and do something with them
+    foreach (var record in result.Result) {
+        Console.WriteLine(record.Get<INode>("friend").Get<string>("name"));
+    }
+
+    // Summary information
+    var summary = result.Summary;
+    Console.WriteLine($"The query `{summary.Query.Text}` returned {result.Result.Count()} results in {summary.ResultAvailableAfter.Milliseconds} ms.");
+
+} catch (Neo4jException e) {
+    Console.WriteLine(e);
+    Environment.Exit(1);
+}
+----
+
+For more information see link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IDriver.ExecutableQuery.html[API documentation -> IDriver.ExecutableQuery()].
+
+
+ifndef::backend-pdf[]
+[discrete.glossary]
+== Glossary
+
+include::{common-partial}/glossary.adoc[]
+include::../partials/glossary.adoc[]
+endif::[]
