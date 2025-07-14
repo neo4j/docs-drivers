@@ -74,7 +74,7 @@ There are two additional boolean methods which act as meta-counters:
 == Query execution plan
 
 If you prefix a query with `EXPLAIN`, the server will return the plan it _would_ use to run the query, but will not actually run it.
-The plan is then available as a link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/summary/Plan.html[`Plan`] object through the method `ResultSummary.plan()`, and contains the list of link:https://neo4j.com/docs/cypher-manual/5/planning-and-tuning/operators/[Cypher operators] that would be used to retrieve the result set.
+The plan is then available as a link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/summary/Plan.html[`Plan`] object through the method `ResultSummary.plan()`, and contains the list of link:https://neo4j.com/docs/cypher-manual/current/planning-and-tuning/operators/[Cypher operators] that would be used to retrieve the result set.
 You may use this information to locate potential bottlenecks or room for xref:performance.adoc[performance improvements] (for example through the creation of indexes).
 
 [source, java, role=nocollapse]
@@ -140,7 +140,7 @@ Total database accesses: 12, total allocated memory: 184
 */
 ----
 
-For more information and examples, see link:{neo4j-docs-base-uri}/cypher-manual/5/query-tuning/basic-example/#_profile_query[Basic query tuning].
+For more information and examples, see link:{neo4j-docs-base-uri}/cypher-manual/current/query-tuning/basic-example/#_profile_query[Basic query tuning].
 
 
 == Notifications

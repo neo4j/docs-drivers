@@ -136,13 +136,13 @@ You can create indexes with the `CREATE INDEX` Cypher function, for both nodes a
 await driver.executeQuery('CREATE INDEX personName FOR (n:Person) ON (n.name)')
 ----
 
-For more information, see link:{neo4j-docs-base-uri}/cypher-manual/5/indexes-for-search-performance/[Indexes for search performance].
+For more information, see link:{neo4j-docs-base-uri}/cypher-manual/current/indexes-for-search-performance/[Indexes for search performance].
 
 
 [[profile-queries]]
 == Profile queries
 
-link:https://neo4j.com/docs/cypher-manual/5/appendix/tutorials/basic-query-tuning/#_profile_query[*Profile your queries*] to locate queries whose performance can be improved.
+link:https://neo4j.com/docs/cypher-manual/current/appendix/tutorials/basic-query-tuning/#_profile_query[*Profile your queries*] to locate queries whose performance can be improved.
 You can profile queries by prepending them with `PROFILE`.
 The server output is available in the `profile` property of the xref:result-summary.adoc[`ResultSummary`] object.
 
@@ -203,7 +203,7 @@ Total database accesses: ?
 == Specify node labels
 
 *Specify node labels* in all queries.
-To learn how to combine labels, see link:https://neo4j.com/docs/cypher-manual/5/patterns/reference/#label-expressions[Cypher -> Label expressions].
+To learn how to combine labels, see link:https://neo4j.com/docs/cypher-manual/current/patterns/reference/#label-expressions[Cypher -> Label expressions].
 
 [discrete]
 === Good practices
@@ -249,7 +249,7 @@ await session.run(
 [[batch-data-creation]]
 == Batch data creation
 
-*Batch queries when creating a lot of records* using the link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/with/[`WITH`] and link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/unwind/[`UNWIND`] Cypher clauses.
+*Batch queries when creating a lot of records* using the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/with/[`WITH`] and link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/unwind/[`UNWIND`] Cypher clauses.
 
 [discrete]
 === Good practice
@@ -281,7 +281,7 @@ for(let i=0; i<10000; i++) {
 ----
 
 [TIP]
-The most efficient way of performing a _first import_ of large amounts of data into a new database is the link:{neo4j-docs-base-uri}/operations-manual/5/tutorial/neo4j-admin-import/[`neo4j-admin database import`] command.
+The most efficient way of performing a _first import_ of large amounts of data into a new database is the link:{neo4j-docs-base-uri}/operations-manual/current/tutorial/neo4j-admin-import/[`neo4j-admin database import`] command.
 // source:  https://community.neo4j.com/t5/neo4j-graph-platform/improving-data-writing-efficiency-in-python/td-p/39520
 
 
@@ -343,8 +343,8 @@ This is likely to be more impactful on performance if you parallelize complex an
 [[merge]]
 == Use `MERGE` for creation only when needed
 
-The Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/merge/[`MERGE`] is convenient for data creation, as it allows to avoid duplicate data when an exact clone of the given pattern exists.
-However, it requires the database to run _two_ queries: it first needs to link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/match/[`MATCH`] the pattern, and only then can it link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/create/[`CREATE`] it (if needed).
+The Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/merge/[`MERGE`] is convenient for data creation, as it allows to avoid duplicate data when an exact clone of the given pattern exists.
+However, it requires the database to run _two_ queries: it first needs to link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/match/[`MATCH`] the pattern, and only then can it link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/create/[`CREATE`] it (if needed).
 
 If you know already that the data you are inserting is new, avoid using `MERGE` and use `CREATE` directly instead -- this practically halves the number of database queries.
 

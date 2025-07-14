@@ -105,7 +105,7 @@ Parameter values should adhere to link:{neo4j-docs-base-uri}/cypher-manual/{page
 A result summary is also generally available.
 This contains additional information relating to the query execution and the result content.
 For an `EXPLAIN` or `PROFILE` query, this is where the query plan is returned.
-See link:https://neo4j.com/docs/cypher-manual/5/planning-and-tuning/[Cypher Manual -> Profiling a query] for more information on these queries.
+See link:https://neo4j.com/docs/cypher-manual/current/planning-and-tuning/[Cypher Manual -> Profiling a query] for more information on these queries.
 
 # end::queries-results[]
 

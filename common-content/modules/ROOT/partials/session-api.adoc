@@ -780,9 +780,9 @@ The per-user home database is resolved at session creation and when first impers
 Therefore, the creation of a new session is necessary to reflect a changed home database.
 ====
 +
-See link:{neo4j-docs-base-uri}/operations-manual/5/manage-databases/introduction#manage-databases-default[Operations Manual -> The default database] for more information on databases.
+See link:{neo4j-docs-base-uri}/operations-manual/current/manage-databases/introduction#manage-databases-default[Operations Manual -> The default database] for more information on databases.
 +
-See below and link:{neo4j-docs-base-uri}/cypher-manual/5/access-control/dbms-administration#access-control-dbms-administration-impersonation[Cypher Manual -> The `DBMS IMPERSONATE` privileges] for more information on impersonation.
+See below and link:{neo4j-docs-base-uri}/cypher-manual/current/access-control/dbms-administration#access-control-dbms-administration-impersonation[Cypher Manual -> The `DBMS IMPERSONATE` privileges] for more information on impersonation.
 +
 *Default:* the default database as configured on the server.
 +

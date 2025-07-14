@@ -81,7 +81,7 @@ There are two additional boolean methods which act as meta-counters:
 == Query execution plan
 
 If you prefix a query with `EXPLAIN`, the server will return the plan it _would_ use to run the query, but will not actually run it.
-You can retrieve the plan by calling `ResultSummary.Plan()`, which contains the list of link:https://neo4j.com/docs/cypher-manual/5/planning-and-tuning/operators/[Cypher operators] that would be used to retrieve the result set.
+You can retrieve the plan by calling `ResultSummary.Plan()`, which contains the list of link:https://neo4j.com/docs/cypher-manual/current/planning-and-tuning/operators/[Cypher operators] that would be used to retrieve the result set.
 You may use this information to locate potential bottlenecks or room for performance improvements (for example through the creation of indexes).
 
 [source, go, role=nocollapse]
@@ -149,7 +149,7 @@ Total database accesses: 12, total allocated memory: 184
 */
 ----
 
-For more information and examples, see link:{neo4j-docs-base-uri}/cypher-manual/5/query-tuning/basic-example/#_profile_query[Basic query tuning].
+For more information and examples, see link:{neo4j-docs-base-uri}/cypher-manual/current/query-tuning/basic-example/#_profile_query[Basic query tuning].
 
 
 == Notifications

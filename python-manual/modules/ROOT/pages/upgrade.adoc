@@ -206,7 +206,7 @@ Deprecated features are likely to be removed in version 6.
 
 |5.0
 |link:https://neo4j.com/docs/api/python-driver/{python-driver-version}/api.html#neo4j.ServerInfo[`ServerInfo`] -- `ResultSummary.server.version_info` has been removed.
-Use `ResultSummary.server.agent`, `ResultSummary.server.protocol_version`, or call the link:https://neo4j.com/docs/operations-manual/5/reference/procedures/#procedure_dbms_components[`dbms.components`] Cypher procedure instead.
+Use `ResultSummary.server.agent`, `ResultSummary.server.protocol_version`, or call the link:https://neo4j.com/docs/operations-manual/current/reference/procedures/#procedure_dbms_components[`dbms.components`] Cypher procedure instead.
 |label:removed[]
 |{check-mark}
 

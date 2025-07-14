@@ -38,7 +38,7 @@ All temporal types, except link:https://neo4j.com/docs/api/java-driver/{java-dri
 This means that:
 
 - if you want to _query_ the database with a temporal type, instantiate a `java.time` object and use it as query parameter (i.e. you don't need to care about driver's types).
-- if you _retrieve_ a temporal object from the database (including through one of link:https://neo4j.com/docs/cypher-manual/5/functions/temporal/[Cypher temporal functions]), you will get back the corresponding _driver type_ as displayed in the table below. The driver implements methods to convert driver time types into Java ones (ex. `.asZonedDateTime()`, `.asOffsetTime()`, etc).
+- if you _retrieve_ a temporal object from the database (including through one of link:https://neo4j.com/docs/cypher-manual/current/functions/temporal/[Cypher temporal functions]), you will get back the corresponding _driver type_ as displayed in the table below. The driver implements methods to convert driver time types into Java ones (ex. `.asZonedDateTime()`, `.asOffsetTime()`, etc).
 
 |===
 | Cypher type      | Driver type

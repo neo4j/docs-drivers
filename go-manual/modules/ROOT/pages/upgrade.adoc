@@ -221,7 +221,7 @@ All others have no replacement: `db.TxHandle`, `db.StreamHandle`, `db.Command`, 
 
 |5.0
 |`ServerInfo.Version` has been removed.
-Use link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#ServerInfo[`ServerInfo.Agent`, `ServerInfo.ProtocolVersion`], or call the link:https://neo4j.com/docs/operations-manual/5/reference/procedures/#procedure_dbms_components[`dbms.components`] Cypher procedure instead.
+Use link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#ServerInfo[`ServerInfo.Agent`, `ServerInfo.ProtocolVersion`], or call the link:https://neo4j.com/docs/operations-manual/current/reference/procedures/#procedure_dbms_components[`dbms.components`] Cypher procedure instead.
 |label:removed[]
 |{check-mark}
 

@@ -10,7 +10,7 @@ For queries with earlier versions, use xref:transactions.adoc[sessions and trans
 [#write]
 == Write to the database
 
-To create two node representing persons named `Alice` and `David`, and a relationship `KNOWS` between them, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/create/[`CREATE`]:
+To create two node representing persons named `Alice` and `David`, and a relationship `KNOWS` between them, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/create/[`CREATE`]:
 
 .Create two nodes and a relationship
 [source, csharp]
@@ -36,7 +36,7 @@ Console.WriteLine($"Created {summary.Counters.NodesCreated} nodes in {summary.Re
 [#read]
 == Read from the database
 
-To retrieve information from the database, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/match/[`MATCH`]:
+To retrieve information from the database, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/match/[`MATCH`]:
 
 .Retrieve all `Person` nodes who like other `Person` s
 [source, csharp, role=nocollapse]
@@ -87,7 +87,7 @@ An alternative way of processing records is to xref:object-mapping.adoc[map them
 [#update]
 == Update the database
 
-To update a node's information in the database, use the Cypher clauses link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/match/[`MATCH`] and link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/set/[`SET`]:
+To update a node's information in the database, use the Cypher clauses link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/match/[`MATCH`] and link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/set/[`SET`]:
 
 .Update node `Alice` to add an `age` property
 [source, csharp]
@@ -126,7 +126,7 @@ Console.WriteLine($"Query updated the database? {result.Summary.Counters.Contain
 [#delete]
 == Delete from the database
 
-To remove a node and any relationship attached to it, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/delete/[`DETACH DELETE`]:
+To remove a node and any relationship attached to it, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/delete/[`DETACH DELETE`]:
 
 .Remove the `Alice` node and all its relationships
 [source, csharp]
@@ -147,7 +147,7 @@ Console.WriteLine($"Query updated the database? {result.Summary.Counters.Contain
 == Query parameters
 
 *Do not hardcode or concatenate parameters directly into queries*.
-Instead, always use placeholders and specify the link:{neo4j-docs-base-uri}/cypher-manual/5/syntax/parameters/[Cypher parameters], as shown in the previous examples.
+Instead, always use placeholders and specify the link:{neo4j-docs-base-uri}/cypher-manual/current/syntax/parameters/[Cypher parameters], as shown in the previous examples.
 This is for:
 
 1. *performance benefits*: Neo4j compiles and caches queries, but can only do so if the query structure is unchanged;
@@ -209,7 +209,7 @@ You do so through the method `.WithConfig()`, which takes a link:https://neo4j.c
 
 It is recommended to *always specify the database explicitly*, even on single-database instances.
 This allows the driver to work more efficiently, as it saves a network round-trip to the server to resolve the home database.
-If no database is given, the link:https://neo4j.com/docs/operations-manual/5/database-administration/#manage-databases-default[user's home database] is used.
+If no database is given, the link:https://neo4j.com/docs/operations-manual/current/database-administration/#manage-databases-default[user's home database] is used.
 
 [source, csharp]
 ----
@@ -219,7 +219,7 @@ await driver.ExecutableQuery("MATCH (p:Person) RETURN p.name")
 ----
 
 [TIP]
-Specifying the database through the configuration method is preferred over the link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/use/[`USE`] Cypher clause.
+Specifying the database through the configuration method is preferred over the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/use/[`USE`] Cypher clause.
 If the server runs on a cluster, queries with `USE` require server-side routing to be enabled.
 Queries may also take longer to execute as they may not reach the right cluster member at the first attempt, and need to be routed to one containing the requested database.
 
@@ -269,7 +269,7 @@ await driver.ExecutableQuery("MATCH (p:Person) RETURN p.name")
 ----
 
 The `QueryConfig` key `impersonatedUser` provides a similar functionality, and is available in driver/server versions >= 4.4.
-The difference is that you don't need to know a user's password to impersonate them, but the user under which the `IDriver` was created needs to have link:{neo4j-docs-base-uri}/operations-manual/5/authentication-authorization/dbms-administration/#access-control-dbms-administration-impersonation[`IMPERSONATE` privileges].
+The difference is that you don't need to know a user's password to impersonate them, but the user under which the `IDriver` was created needs to have link:{neo4j-docs-base-uri}/operations-manual/current/authentication-authorization/dbms-administration/#access-control-dbms-administration-impersonation[`IMPERSONATE` privileges].
 
 [source, csharp, test-skip]
 ----
@@ -285,7 +285,7 @@ await driver.ExecutableQuery("MATCH (p:Person) RETURN p.name")
 [#full-example]
 == A full example
 
-This example uses the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/merge/[`MERGE`] to avoid data duplication in case the code is run more than once.
+This example uses the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/merge/[`MERGE`] to avoid data duplication in case the code is run more than once.
 
 [source, csharp]
 ----
