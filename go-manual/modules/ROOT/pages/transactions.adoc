@@ -262,6 +262,12 @@ if err != nil {
     //     tx.Rollback() to rollback the transaction
 ----
 
+[TIP]
+====
+Queries run with `tx.Run()` failing due to a transient server error can be retried without need to alter the original request.
+You can discover whether an error is transient via the function link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#IsRetryable[`neo4j.IsRetryable(error)`], which gives insights into whether a further attempt might be successful.
+====
+
 An explicit transaction can be committed with link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#ExplicitTransaction[`ExplicitTransaction.Commit()`] or rolled back with link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#ExplicitTransaction[`ExplicitTransaction.Rollback()`].
 If no explicit action is taken, the driver automatically rolls back the transaction at the end of its lifetime.
 

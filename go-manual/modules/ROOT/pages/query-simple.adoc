@@ -184,6 +184,41 @@ There can be circumstances where your query structure prevents the usage of para
 For those rare use cases, see xref:query-advanced#_dynamic_values_in_property_keys_relationship_types_and_labels[Dynamic values in property keys, relationship types, and labels].
 
 
+[#error-handling]
+== Error handling
+
+A query run may fail for a number of reasons.
+When using `ExecuteQuery()`, the driver automatically retries to run a failed query if the failure is deemed to be transient (for example due to temporary server unavailability).
+An error will be raised if the operation keeps failing after a number of attempts.
+
+All link:https://neo4j.com/docs/status-codes/current/errors/all-errors/[errors coming from the server] are of type link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#Neo4jError[`Neo4jError`].
+You can use an error's code to stably identify a specific error; error messages are instead not stable markers, and should not be relied upon.
+
+.Basic error handling
+[source, go]
+----
+res, err := neo4j.ExecuteQuery(ctx, driver, "MATCH (p:Person) RETURN", nil,
+    neo4j.EagerResultTransformer,
+    neo4j.ExecuteQueryWithDatabase("neo4j"))
+if err != nil {
+    var neo4jErr *neo4j.Neo4jError
+    if errors.As(err, &neo4jErr) {
+        // error is of type Neo4jError
+        fmt.Println("Neo4j error code:", neo4jErr.Code)
+        fmt.Println("Error message:", neo4jErr.Msg)
+    } else {
+        fmt.Printf("Non-Neo4j error: %s\n", err.Error())
+    }
+}
+/*
+Neo4j error code: Neo.ClientError.Statement.SyntaxError
+Error message: Invalid input '': expected an expression, '*', 'ALL' or 'DISTINCT' (line 1, column 24 (offset: 23))
+"MATCH (p:Person) RETURN"
+                        ^
+*/
+----
+
+
 == Query configuration
 
 You can supply further configuration parameters to alter the default behavior of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#ExecuteQuery[`ExecuteQuery()`].

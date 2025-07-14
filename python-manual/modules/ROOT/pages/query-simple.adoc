@@ -161,19 +161,30 @@ For those rare use cases, see xref:query-advanced#_dynamic_values_in_property_ke
 
 == Error handling
 
-Because `.execute_query()` can potentially raise a number of different exceptions, the best way to handle errors is to catch all exceptions in a single `try/except` block:
+A query run may fail for a number of reasons, with different link:https://neo4j.com/docs/api/python-driver/current/api.html#errors[exceptions] being raised.
+When using `driver.execute_query()`, the driver automatically retries to run a failed query if the failure is deemed to be transient (for example due to temporary server unavailability).
+An exception will be raised if the operation keeps failing after a number of attempts.
 
+All link:https://neo4j.com/docs/status-codes/current/errors/all-errors/[exceptions coming from the server] are subclasses of link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.exceptions.Neo4jError[`Neo4jError`].
+You can use an exception's code to stably identify a specific error; error messages are instead not stable markers, and should not be relied upon.
+
+.Basic error handling
 [source, python]
 ----
-try:
-    driver.execute_query(...)
-except Exception as e:
-    ...  # handle exception
-----
+# from neo4j.exceptions import Neo4jError
 
-[TIP]
-The driver automatically retries to run a failed query, if the failure is deemed to be transient (for example due to temporary server unavailability).
-An exception will be raised if the operation keeps failing after a number of attempts.
+try:
+    driver.execute_query('MATCH (p:Person) RETURN', database_='neo4j')
+except Neo4jError as e:
+    print('Neo4j error code:', e.code)
+    print('Exception message:', e.message)
+'''
+Neo4j error code: Neo.ClientError.Statement.SyntaxError
+Exception message: Invalid input '': expected an expression, '*', 'ALL' or 'DISTINCT' (line 1, column 24 (offset: 23))
+"MATCH (p:Person) RETURN"
+                        ^
+'''
+----
 
 
 == Query configuration
@@ -266,6 +277,7 @@ For more information, see xref:transformers.adoc[Manipulate query results].
 [source, python]
 ----
 from neo4j import GraphDatabase
+from neo4j.exceptions import Neo4jError
 
 
 URI = "<database-uri>"
@@ -316,7 +328,7 @@ with GraphDatabase.driver(URI, auth=AUTH) as driver:
             time=summary.result_available_after
         ))
 
-    except Exception as e:
+    except Neo4jError as e:
         print(e)
         # further logging/processing
 ----

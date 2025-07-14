@@ -187,6 +187,12 @@ await transaction.commit()
 await session.close()
 ----
 
+[TIP]
+====
+Queries run with `tx.run()` failing due to a transient server error can be retried without need to alter the original request.
+You can discover whether an error is transient via the method `.isRetryable()`, which gives insights into whether a further attempt might be successful.
+====
+
 An explicit transaction can be committed with link:{neo4j-docs-base-uri}/api/javascript-driver/{javascript-driver-version}/class/lib6/transaction.js~Transaction.html#instance-method-commit[`Transaction.commit()`] or rolled back with link:{neo4j-docs-base-uri}/api/javascript-driver/{javascript-driver-version}/class/lib6/transaction.js~Transaction.html#instance-method-rollback[`Transaction.rollback()`].
 If no explicit action is taken, the driver will automatically roll back the transaction at the end of its lifetime.
 

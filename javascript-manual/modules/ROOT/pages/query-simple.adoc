@@ -143,24 +143,36 @@ There can be circumstances where your query structure prevents the usage of para
 For those rare use cases, see xref:query-advanced#_dynamic_values_in_property_keys_relationship_types_and_labels[Dynamic values in property keys, relationship types, and labels].
 
 
+[#error-handling]
 == Error handling
 
-To avoid an error in one query crashing your application, you can wrap queries into `try/catch` blocks.
-We avoid proper error handling throughout this manual to make examples lighter to parse, and because appropriate error handling depends on the application.
-Here below an example with a `try/catch` block.
+A query run may fail for a number of reasons.
+When using `driver.execute_query()`, the driver automatically retries to run a failed query if the failure is deemed to be transient (for example due to temporary server unavailability).
+An exception will be raised if the operation keeps failing after a number of attempts.
 
+All link:https://neo4j.com/docs/status-codes/current/errors/all-errors/[errors coming from the server] are subclasses of link:https://neo4j.com/docs/api/javascript-driver/{javascript-driver-version}/class/lib6/error.js~Neo4jError.html[`Neo4jError`].
+You can use an exception's code to stably identify a specific error; error messages are instead not stable markers, and should not be relied upon.
+
+.Basic error handling
 [source, javascript]
 ----
 try {
-  let result = await driver.executeQuery('MATCH (p:Person) RETURN p')
-} catch(err) {
-  console.log(`Error in query\n${err}`)
+    let err = await driver.executeQuery(
+        'MATCH (p:Person) RETURN ',
+        {},
+        { database: 'neo4j' }
+    )
+} catch (err) {
+  console.log('Neo4j error code:', err.code)
+  console.log('Error message:', err.message)
 }
+/*
+Neo4j error code: Neo.ClientError.Statement.SyntaxError
+Error message: Neo4jError: Invalid input '': expected an expression, '*', 'ALL' or 'DISTINCT' (line 1, column 25 (offset: 24))
+"MATCH (p:Person) RETURN"
+                         ^
+*/
 ----
-
-[TIP]
-The driver automatically retries to run a failed query, if the failure is deemed to be transient (for example due to temporary server unavailability).
-An exception will be raised if the operation keeps failing after a number of attempts.
 
 
 == Query configuration
