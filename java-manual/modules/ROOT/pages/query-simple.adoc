@@ -182,7 +182,7 @@ For those rare use cases, see xref:query-advanced#_dynamic_values_in_property_ke
 
 A query run may fail for a number of reasons, with different link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/exceptions/package-summary.html[exceptions] being raised.
 When using `Driver.executableQuery()`, the driver automatically retries to run a failed query if the failure is deemed to be transient (for example due to temporary server unavailability).
-An exception will be raised if the operation keeps failing after a number of attempts.
+An error will be raised if the operation keeps failing after the configured link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/Config.ConfigBuilder.html#withMaxTransactionRetryTime(long,java.util.concurrent.TimeUnit)[maximum retry time].
 
 All link:https://neo4j.com/docs/status-codes/current/errors/all-errors/[exceptions coming from the server] are subclasses of link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/exceptions/Neo4jException.html[`Neo4jException`].
 You can use an exception's code (retrievable with `.code()`) to stably identify a specific error; error messages are instead not stable markers, and should not be relied upon.
