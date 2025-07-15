@@ -71,8 +71,9 @@ session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
 defer session.Close(ctx)
 res, err := session.ExecuteRead(ctx, func(tx neo4j.ManagedTransaction) (any, error) {
     for i := 0; i < 10000; i++ {
-        result, err := tx.Run(ctx, "<QUERY>", nil)
+        tx.Run(ctx, "<QUERY>", nil)
     }
+    return nil, nil
 })
 ----
 
