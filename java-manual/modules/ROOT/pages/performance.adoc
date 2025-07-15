@@ -66,7 +66,7 @@ In this way, the transaction as a whole is isolated from others, but individual 
 [source, java]
 ----
 try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
-    session.executeRead(tx -> {
+    session.executeWriteWithoutResult(tx -> {
         for (int i=0; i<1000; i++) {
             tx.run("<QUERY>");
         }

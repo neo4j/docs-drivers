@@ -69,7 +69,7 @@ In this way, the transaction as a whole is isolated from others, but individual 
 ----
 def query(tx):
     for i in range(1000):
-        tx.run('QUERY')
+        tx.run("<QUERY>")
 
 with driver.session(database="neo4j") as session:
     people = session.execute_read(query)
