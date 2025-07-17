@@ -239,7 +239,7 @@ The logic is the same, but the argument type changed from `Transaction` to `Mana
 
 |5.0
 |link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/dbtype#Node[`Node.Id`] and link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/dbtype#Relationship[`Relationship.Id`] are deprecated in favor of `Node.ElementId` and `Relationship.ElementId`.
-Old identifiers were Int64, wereas new ElementIds are String.
+Old identifiers were Int64, whereas new ElementIds are String.
 |label:deprecated[]
 |{check-mark}
 

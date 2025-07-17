@@ -175,7 +175,7 @@ Through the new methods, the first argument of transaction functions is a `Manag
 |{check-mark}
 
 |5.0
-|link:https://neo4j.com/docs/api/javascript-driver/{javascript-driver-version}/class/lib6/graph-types.js~Relationship.html[`Relationship`] -- Properties `.start` and `.end` are deprecated in favor of `.startNodeElementId` and `.endNodeElementId`. Old identifiers were `NumberOrInteger`, wereas new ElementIds are `string`.
+|link:https://neo4j.com/docs/api/javascript-driver/{javascript-driver-version}/class/lib6/graph-types.js~Relationship.html[`Relationship`] -- Properties `.start` and `.end` are deprecated in favor of `.startNodeElementId` and `.endNodeElementId`. Old identifiers were `NumberOrInteger`, whereas new ElementIds are `string`.
 |label:deprecated[]
 |{check-mark}
 
