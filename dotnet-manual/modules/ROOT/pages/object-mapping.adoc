@@ -19,13 +19,6 @@ If you want to map records to an existing class, define a class having the same 
 
 To map a record to a class named `className`, use the method `IRecord.AsObject<className>()`.
 
-[NOTE]
-**A record's property names and its query return keys can be different.** +
-For example, consider a node with label `:Person` and a `name` property. +
-The returned keys for the query `MERGE (p:Person {name: "Alice"}) RETURN p.name` are `p.name`, even if the property name is `name`. +
-Similarly, for the query `MERGE (pers:Person {name: "Alice"}) RETURN pers.name`, the return keys are `pers.name`. +
-You can always alter the return key with the Cypher operator link:https://neo4j.com/docs/cypher-manual/current/clauses/return/#return-column-alias[`AS`] (ex. `MERGE (p:Person {name: "Alice"}) RETURN p.name AS name`).
-
 .Map a `:Person` node to a `Person` class
 [source, csharp]
 ----
@@ -52,7 +45,16 @@ class Person {  // <.>
 <.> The class `Person` contains `name` and `age` attributes, as the query return keys.
 <.> Each class attribute must have a public getter _and_ setter, which the driver can invoke after instantiating the class. If that doesn't fit your use-case, see xref:#constructors[how to use constructors] and have private setters.
 
-You can alter the association between property names and class attributes with the class attribute decorator `[MappingSource("returnedKeyName")]`.
+.A record's property names and its query return keys can be different.
+[NOTE]
+====
+For example, consider a node with label `:Person` and a `name` property. +
+The returned keys for the query `MERGE (p:Person {name: "Alice"}) RETURN p.name` are `p.name`, even if the property name is `name`. +
+Similarly, for the query `MERGE (pers:Person {name: "Alice"}) RETURN pers.name`, the return keys are `pers.name`. +
+====
+
+You can always alter a return key with the Cypher operator link:https://neo4j.com/docs/cypher-manual/current/clauses/return/#return-column-alias[`AS`] (ex. `MERGE (p:Person {name: "Alice"}) RETURN p.name AS name`).
+Otherwise, you can alter the association between property names and class attributes with the class attribute decorator `[MappingSource("returnedKeyName")]`.
 For more information, see all xref:#decorators[decorators].
 
 .Map `p.name` to `name` and `p.age` to `age`
