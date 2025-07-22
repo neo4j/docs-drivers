@@ -26,9 +26,9 @@ import org.neo4j.driver.QueryConfig;
 
 public class App {
 
-    private static final String URI = "neo4j://localhost:7687";
-    private static final String USER = "neo4j";
-    private static final String PASSWORD = "verysecret";
+    private static final String dbUri = "<database-uri>";
+    private static final String dbUser = "<username>";
+    private static final String dbPassword = "<password>";
 
     public static void main(String... args) {
         try (var driver = GraphDatabase.driver(URI, AuthTokens.basic(USER, PASSWORD))) {
