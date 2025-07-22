@@ -52,7 +52,7 @@ The example above uses the type `Integer` over the primitive `int` to account fo
 
 Declaring the `record` object side-by-side with the query that uses it is a convenient way to obtain results on which it is easy to extract properties.
 However, because the class is defined in a local scope, its type cannot be referenced outside of the method where it is defined.
-As a result, you can't return the mapped objects directly: you need to process them in the same function or ensure it implements a type that is accessible outside of the given method.
+As a result, such type may not be used as a return type of the method: you need to process the mapped value in the same function or ensure it implements a type that is accessible outside of the given method.
 Another solution is to declare the `record` object as a `public` member of the class, or to create a new standalone class containing your `record` definition.
 This will make the mapped object available out of the scope of the method in which it was defined.
 
