@@ -78,7 +78,7 @@ To extract and cast them to the corresponding Java types, use `.as<type>()` (eg.
 For example, if the `name` property coming from the database is a string, `record.get("name").asString()` will yield the property value as a `String` object.
 For more information, see xref:data-types.adoc[].
 
-Another way of extracting values from returned records is by xref:value-mapping.adoc[mapping them objects].
+Another way of extracting values from returned records is by xref:value-mapping.adoc[mapping them to objects].
 
 
 [#update]
