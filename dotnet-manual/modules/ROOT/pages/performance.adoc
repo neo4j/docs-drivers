@@ -53,7 +53,7 @@ This is the safest mode of execution with respect to failures, but also the slow
 ----
 for (int i=0; i<1000; i++) {
     await driver.ExecutableQuery("<QUERY>")
-        .WithConfig(new QueryConfig(database: "neo4j"))
+        .WithConfig(new QueryConfig(database: "<database-name>"))
         .ExecuteAsync();
     // or session.ExecuteRead/WriteAsync() calls
 }
@@ -65,7 +65,7 @@ In this way, the transaction as a whole is isolated from others, but individual 
 .Group queries into one transaction (higher throughput)
 [source, csharp]
 ----
-using var session = driver.AsyncSession(conf => conf.WithDatabase("neo4j"));
+using var session = driver.AsyncSession(conf => conf.WithDatabase("<database-name>"));
 await session.ExecuteWriteAsync(async tx => {
     for (int i=0; i<1000; i++) {
         var result = await tx.RunAsync("<QUERY>");
@@ -81,7 +81,7 @@ One upper limit on the client size is given by the size of the connection pool: 
 .Queries as auto-commit transactions (highest throughput)
 [source, csharp]
 ----
-using var session = driver.AsyncSession(conf => conf.WithDatabase("neo4j"));
+using var session = driver.AsyncSession(conf => conf.WithDatabase("<database-name>"));
 for (int i=0; i<1000; i++) {
     await session.RunAsync("<QUERY>");
 }
@@ -154,7 +154,7 @@ await eagerLoading(driver);
 log($"--- {watch.ElapsedMilliseconds/1000} seconds ---");
 
 async Task lazyLoading(IDriver driver) {
-    using var session = driver.AsyncSession(conf => conf.WithDatabase("neo4j"));
+    using var session = driver.AsyncSession(conf => conf.WithDatabase("<database-name>"));
     await session.ExecuteReadAsync(async tx => {
         log("Submit query");
         var result = await tx.RunAsync(slowQuery);
@@ -169,7 +169,7 @@ async Task lazyLoading(IDriver driver) {
 async Task eagerLoading(IDriver driver) {
     log("Submit query");
     var result = await driver.ExecutableQuery(slowQuery)
-        .WithConfig(new QueryConfig(database: "neo4j"))
+        .WithConfig(new QueryConfig(database: "<database-name>"))
         .ExecuteAsync();
     foreach (var record in result.Result) {
         int recordN = record.Get<int>("output");
@@ -251,7 +251,7 @@ In a cluster, *route read queries to any reader node*. You do this by:
 ----
 await driver.ExecutableQuery("MATCH (p:Person) RETURN p")
     .WithConfig(new QueryConfig(
-        database: "neo4j",
+        database: "<database-name>",
         routing: RoutingControl.Readers
     ))
     .ExecuteAsync();
@@ -260,7 +260,7 @@ await driver.ExecutableQuery("MATCH (p:Person) RETURN p")
 [source, csharp]
 ----
 using var session = driver.AsyncSession(conf => conf
-    .WithDatabase("neo4j")
+    .WithDatabase("<database-name>")
     .WithDefaultAccessMode(AccessMode.Read)
 );
 ----
@@ -274,14 +274,14 @@ using var session = driver.AsyncSession(conf => conf
 // defaults to routing = writers
 await driver.ExecutableQuery("MATCH (p:Person) RETURN p")
     .WithConfig(new QueryConfig(
-        database: "neo4j"
+        database: "<database-name>"
     ))
     .ExecuteAsync();
 ----
 
 [source, csharp]
 ----
-using var session = driver.AsyncSession(conf => conf.WithDatabase("neo4j"));
+using var session = driver.AsyncSession(conf => conf.WithDatabase("<database-name>"));
 
 // don't ask to write on a read-only operation
 await session.ExecuteWriteAsync(async tx => {
@@ -318,7 +318,7 @@ The server output is available in the `Profile` property of the xref:result-summ
 ----
 var result = await driver.ExecutableQuery("PROFILE MATCH (p {name: $name}) RETURN p")
     .WithParameters(new { name = "Alice" })
-    .WithConfig(new QueryConfig(database: "neo4j"))
+    .WithConfig(new QueryConfig(database: "<database-name>"))
     .ExecuteAsync();
 // Note: `result.Result` is non-empty
 var queryPlan = result.Summary.Profile;
@@ -351,7 +351,7 @@ The server output is available in the `Plan` property of the xref:result-summary
 ----
 var result = await driver.ExecutableQuery("EXPLAIN MATCH (p {name: $name}) RETURN p")
     .WithParameters(new { name = "Alice" })
-    .WithConfig(new QueryConfig(database: "neo4j"))
+    .WithConfig(new QueryConfig(database: "<database-name>"))
     .ExecuteAsync();
 var queryPlan = result.Summary.Plan;
 Console.WriteLine(queryPlan.Arguments["string-representation"]);
@@ -390,13 +390,13 @@ To learn how to combine labels, see link:https://neo4j.com/docs/cypher-manual/cu
 ----
 var result = await driver.ExecutableQuery("MATCH (p:Person|Animal {name: $name}) RETURN p")
     .WithParameters(new { name = "Alice" })
-    .WithConfig(new QueryConfig(database: "neo4j"))
+    .WithConfig(new QueryConfig(database: "<database-name>"))
     .ExecuteAsync();
 ----
 
 [source, csharp]
 ----
-using var session = driver.AsyncSession(conf => conf.WithDatabase("neo4j"));
+using var session = driver.AsyncSession(conf => conf.WithDatabase("<database-name>"));
 await session.RunAsync("MATCH (p:Person|Animal {name: $name}) RETURN p", new { name = "Alice" });
 ----
 
@@ -408,13 +408,13 @@ await session.RunAsync("MATCH (p:Person|Animal {name: $name}) RETURN p", new { n
 ----
 var result = await driver.ExecutableQuery("MATCH (p {name: $name}) RETURN p")
     .WithParameters(new { name = "Alice" })
-    .WithConfig(new QueryConfig(database: "neo4j"))
+    .WithConfig(new QueryConfig(database: "<database-name>"))
     .ExecuteAsync();
 ----
 
 [source, csharp]
 ----
-using var session = driver.AsyncSession(conf => conf.WithDatabase("neo4j"));
+using var session = driver.AsyncSession(conf => conf.WithDatabase("<database-name>"));
 await session.RunAsync("MATCH (p {name: $name}) RETURN p", new { name = "Alice" });
 ----
 
@@ -445,7 +445,7 @@ await driver.ExecutableQuery(@"
     MERGE (:Number {value: node.value})
     ")
     .WithParameters(new { numbers = numbers })
-    .WithConfig(new QueryConfig(database: "neo4j"))
+    .WithConfig(new QueryConfig(database: "<database-name>"))
     .ExecuteAsync();
 ----
 
@@ -458,7 +458,7 @@ await driver.ExecutableQuery(@"
 for (int i=1; i<=10000; i++) {
     await driver.ExecutableQuery("MERGE (:Number {value: $value})")
         .WithParameters(new { value = i })
-        .WithConfig(new QueryConfig(database: "neo4j"))
+        .WithConfig(new QueryConfig(database: "<database-name>"))
         .ExecuteAsync();
 }
 ----
@@ -480,14 +480,14 @@ Besides protecting from Cypher injections, this allows to better leverage the da
 [source, csharp]
 ----
 await driver.ExecutableQuery("MATCH (p:Person {name: $name}) RETURN p")
-    .WithConfig(new QueryConfig(database: "neo4j"))
+    .WithConfig(new QueryConfig(database: "<database-name>"))
     .WithParameters(new { name = "Alice" })
     .ExecuteAsync();
 ----
 
 [source, csharp]
 ----
-using var session = driver.AsyncSession(conf => conf.WithDatabase("neo4j"));
+using var session = driver.AsyncSession(conf => conf.WithDatabase("<database-name>"));
 await session.RunAsync("MATCH (p:Person {name: $name}) RETURN p", new { name = "Alice" });
 ----
 
@@ -497,18 +497,18 @@ await session.RunAsync("MATCH (p:Person {name: $name}) RETURN p", new { name = "
 [source, csharp]
 ----
 await driver.ExecutableQuery("MATCH (p:Person {name: 'Alice'}) RETURN p")
-    .WithConfig(new QueryConfig(database: "neo4j"))
+    .WithConfig(new QueryConfig(database: "<database-name>"))
     .ExecuteAsync();
 // or
 string name = "Alice";
 await driver.ExecutableQuery("MATCH (p:Person {name: '" + name + "'}) RETURN p")
-    .WithConfig(new QueryConfig(database: "neo4j"))
+    .WithConfig(new QueryConfig(database: "<database-name>"))
     .ExecuteAsync();
 ----
 
 [source, csharp]
 ----
-using var session = driver.AsyncSession(conf => conf.WithDatabase("neo4j"));
+using var session = driver.AsyncSession(conf => conf.WithDatabase("<database-name>"));
 await session.RunAsync("MATCH (p:Person {name: 'Alice'}) RETURN p");
 // or
 string name = "Alice";

@@ -42,7 +42,7 @@ Bookmark management happens automatically for queries run within a single sessio
 
 [source, csharp]
 ----
-using var session = driver.AsyncSession(conf => conf.WithDatabase("neo4j"));
+using var session = driver.AsyncSession(conf => conf.WithDatabase("<database-name>"));
 await session.ExecuteWriteAsync(async tx => await tx.RunAsync("<QUERY 1>"));
 await session.ExecuteWriteAsync(async tx => await tx.RunAsync("<QUERY 2>"));  // can read QUERY 1
 await session.ExecuteWriteAsync(async tx => await tx.RunAsync("<QUERY 3>"));  // can read QUERY 1,2
@@ -75,20 +75,20 @@ async Task createSomeFriends(IDriver driver) {
     Bookmarks savedBookmarks = Bookmarks.From(new List<string>());  // to collect the sessions' bookmarks
 
     // Create the first person and employment relationship
-    using var sessionA = driver.AsyncSession(conf => conf.WithDatabase("neo4j"));
+    using var sessionA = driver.AsyncSession(conf => conf.WithDatabase("<database-name>"));
     await sessionA.ExecuteWriteAsync(tx => createPerson(tx, "Alice"));
     await sessionA.ExecuteWriteAsync(tx => employ(tx, "Alice", "Wayne Enterprises"));
     savedBookmarks += sessionA.LastBookmarks;  // <1>
 
     // Create the second person and employment relationship
-    using var sessionB = driver.AsyncSession(conf => conf.WithDatabase("neo4j"));
+    using var sessionB = driver.AsyncSession(conf => conf.WithDatabase("<database-name>"));
     await sessionB.ExecuteWriteAsync(tx => createPerson(tx, "Bob"));
     await sessionB.ExecuteWriteAsync(tx => employ(tx, "Bob", "LexCorp"));
     savedBookmarks += sessionB.LastBookmarks;  // <1>
 
     // Create a friendship between the two people created above
     using var sessionC = driver.AsyncSession(conf => conf
-        .WithDatabase("neo4j")
+        .WithDatabase("<database-name>")
         .WithBookmarks(savedBookmarks)  // <2>
     );
     await sessionC.ExecuteWriteAsync(tx => createFriendship(tx, "Alice", "Bob"));

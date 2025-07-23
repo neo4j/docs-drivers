@@ -17,7 +17,7 @@ For further configuration parameters, see xref:_session_configuration[Session co
 
 [source, go]
 ----
-session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "<database-name>"})
 defer session.Close(ctx)
 ----
 
@@ -40,7 +40,7 @@ Both methods take a <<transaction_function>> callback, which is responsible for 
 .Retrieve people whose name starts with `Al`
 [source, go, role=nocollapse]
 ----
-session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})  // <1>
+session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "<database-name>"})  // <1>
 defer session.Close(ctx)
 people, err := session.ExecuteRead(ctx,  // <2>
     func(tx neo4j.ManagedTransaction) (any, error) {  // <3>
@@ -113,7 +113,7 @@ func main() {
         panic(err)
     }
 
-    session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+    session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "<database-name>"})
     defer session.Close(ctx)
 
     // Create 100 people and assign them to various organizations
@@ -251,7 +251,7 @@ You run queries inside an explicit transaction with the method link:https://pkg.
 
 [source, go]
 ----
-session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "<database-name>"})
 defer session.Close(ctx)
 tx, err := session.BeginTransaction(ctx)
 if err != nil {
@@ -316,7 +316,7 @@ func createCustomer(ctx context.Context, driver neo4j.DriverWithContext) (string
     RETURN c.id AS id
     `, nil,
     neo4j.EagerResultTransformer,
-    neo4j.ExecuteQueryWithDatabase("neo4j"))
+    neo4j.ExecuteQueryWithDatabase("<database-name>"))
     if err != nil {
         return "", err
     }
@@ -325,7 +325,7 @@ func createCustomer(ctx context.Context, driver neo4j.DriverWithContext) (string
 }
 
 func transferToOtherBank(ctx context.Context, driver neo4j.DriverWithContext, customerId string, otherBankId int, amount float32) {
-    session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+    session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "<database-name>"})
     defer session.Close(ctx)
     tx, err := session.BeginTransaction(ctx)
     if err != nil {
@@ -464,7 +464,7 @@ If no database is given, the link:{neo4j-docs-base-uri}/operations-manual/curren
 [source, go]
 ----
 session := driver.NewSession(ctx, neo4j.SessionConfig{
-    DatabaseName: "neo4j",
+    DatabaseName: "<database-name>",
 })
 ----
 
@@ -483,7 +483,7 @@ Note that `.ExecuteRead()` and `.ExecuteWrite()` automatically override the sess
 [source, go]
 ----
 session := driver.NewSession(ctx, neo4j.SessionConfig{
-    DatabaseName: "neo4j",
+    DatabaseName: "<database-name>",
     AccessMode: neo4j.AccessModeRead,
 })
 ----
@@ -512,7 +512,7 @@ Session-scoped authentication requires a server version >= 5.8.
 ----
 sessionAuth := neo4j.BasicAuth("somebodyElse", "theirPassword", "")
 session := driver.NewSession(ctx, neo4j.SessionConfig{
-    DatabaseName: "neo4j",
+    DatabaseName: "<database-name>",
     Auth: &sessionAuth,
 })
 ----
@@ -523,7 +523,7 @@ The difference is that you don't need to know a user's password to impersonate t
 [source, go]
 ----
 session := driver.NewSession(ctx, neo4j.SessionConfig{
-    DatabaseName: "neo4j",
+    DatabaseName: "<database-name>",
     ImpersonatedUser: "<somebodyElse>",
 })
 ----
@@ -544,7 +544,7 @@ Use this to tag transactions.
 
 [source, go]
 ----
-session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "<database-name>"})
 defer session.Close(ctx)
 people, err := session.ExecuteRead(ctx,
     func(tx neo4j.ManagedTransaction) (any, error) {
@@ -564,7 +564,7 @@ When a session is closed, it is returned to the connection pool to be later reus
 
 [source, go]
 ----
-session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "<database-name>"})
 defer session.Close(ctx)
 // session usage
 ----

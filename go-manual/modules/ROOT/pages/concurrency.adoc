@@ -67,7 +67,7 @@ func main() {
 
 func queryToChannel(ctx context.Context, driver neo4j.DriverWithContext) chan *neo4j.Record {
     recordsC := make(chan *neo4j.Record, 10)  // <2>
-    session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+    session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "<database-name>"})
     defer session.Close(ctx)
     go session.ExecuteWrite(ctx,
         func(tx neo4j.ManagedTransaction) (any, error) {
@@ -173,7 +173,7 @@ func runQuery(wg *sync.WaitGroup, ctx context.Context, driver neo4j.DriverWithCo
         WITH round(rand()*2000) AS waitTime
         CALL apoc.util.sleep(toInteger(waitTime)) RETURN waitTime AS time
         `, nil, neo4j.EagerResultTransformer,
-        neo4j.ExecuteQueryWithDatabase("neo4j"))
+        neo4j.ExecuteQueryWithDatabase("<database-name>"))
     if err != nil {
         log <- fmt.Sprintf("ERROR: %v", err)
     } else {

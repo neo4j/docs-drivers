@@ -60,7 +60,7 @@ In this way, the transaction as a whole is isolated from others, but individual 
 .Group queries into one transaction (higher throughput)
 [source, javascript]
 ----
-let session = driver.session({ database: 'neo4j' })
+let session = driver.session({ database: '<database-name>' })
 await session.executeRead(async tx => {
   for(let i=0; i<1000; i++) {
     await tx.run('<QUERY>')
@@ -103,14 +103,14 @@ await driver.executeQuery(
   {},
   {
     routing: 'READ',  // short for neo4j.routing.READ
-    database: 'neo4j'
+    database: '<database-name>'
   }
 )
 ----
 
 [source, javascript]
 ----
-let session = driver.session({ database: 'neo4j' })
+let session = driver.session({ database: '<database-name>' })
 await session.executeRead(async tx => {
   return await tx.run('MATCH (p:Person) RETURN p.name', {})
 })
@@ -126,7 +126,7 @@ await driver.executeQuery(
   'MATCH (p:Person) RETURN p.name',
   {},
   {
-    database: 'neo4j'
+    database: '<database-name>'
   }
 )
 // defaults to routing = writers
@@ -134,7 +134,7 @@ await driver.executeQuery(
 
 [source, javascript]
 ----
-let session = driver.session({ database: 'neo4j' })
+let session = driver.session({ database: '<database-name>' })
 await session.executeRead(async tx => {
   return await tx.run('MATCH (p:Person) RETURN p.name', {})
 })

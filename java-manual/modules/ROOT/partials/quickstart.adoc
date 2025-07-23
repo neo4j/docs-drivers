@@ -80,7 +80,7 @@ var result = driver.executableQuery("""
     CREATE (a)-[:KNOWS]->(b)
     """)
     .withParameters(Map.of("name", "Alice", "friendName", "David"))
-    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+    .withConfig(QueryConfig.builder().withDatabase("<database-name>").build())
     .execute();
 
 // Summary information
@@ -108,7 +108,7 @@ var result = driver.executableQuery("""
     MATCH (p:Person)-[:KNOWS]->(:Person)
     RETURN p.name AS name
     """)
-    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+    .withConfig(QueryConfig.builder().withDatabase("<database-name>").build())
     .execute();
 
 // Loop through results and do something with them

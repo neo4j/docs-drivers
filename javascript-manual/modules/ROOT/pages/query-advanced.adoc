@@ -11,7 +11,7 @@ You run an implicit transaction with the method link:{neo4j-docs-base-uri}/api/j
 
 [source, javascript]
 ----
-let session = driver.session({database: 'neo4j'})
+let session = driver.session({database: '<database-name>'})
 try {
   const result = await session.run(
     'MERGE (a:Person {name: $name})',
@@ -38,7 +38,7 @@ The most common use case for using `Session.run()` is for importing large CSV fi
 .Import CSV data into a Neo4j database
 [source, javascript]
 ----
-let session = driver.session({database: 'neo4j'})
+let session = driver.session({database: '<database-name>'})
 try {
   let result = await session.run(`
     LOAD CSV FROM 'https://data.neo4j.com/bands/artists.csv' AS line
@@ -69,7 +69,7 @@ For more information, see xref:transactions.adoc#_transaction_configuration[Tran
 
 [source, javascript]
 ----
-let session = driver.session({database: 'neo4j'})
+let session = driver.session({database: '<database-name>'})
 let result = await session.run(
   'MATCH (a:Person) RETURN count(a) AS people',
   {},  // query parameters
@@ -102,7 +102,7 @@ let escapedLabel = dangerousLabel.replace(/\\u0060/g, '`').replace(/`/g, '``')
 let result = await driver.executeQuery(
   'MATCH (p:`' + escapedLabel + '`) RETURN p.name',
   {},
-  {database: 'neo4j'}
+  {database: '<database-name>'}
 )
 console.log(`Executed query: ${result.summary.query.text}`)
 ----
@@ -118,7 +118,7 @@ let label = 'Person'
 let result = await driver.executeQuery(
   'CALL apoc.merge.node($labels, $properties)',
   {labels: [label], properties: {property_key: 'Alice'}},
-  {database: 'neo4j'}
+  {database: '<database-name>'}
 )
 ----
 

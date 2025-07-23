@@ -12,7 +12,7 @@ It returns a `Result` object that needs to be xref:transactions#process-result[p
 
 [source, python]
 ----
-with driver.session(database="neo4j") as session:
+with driver.session(database="<database-name>") as session:
     session.run("CREATE (a:Person {name: $name})", name="Licia")
 ----
 
@@ -33,7 +33,7 @@ The most common use case for using `Session.run()` is for importing large CSV fi
 .Import CSV data into a Neo4j database
 [source, python]
 ----
-with driver.session(database="neo4j") as session:
+with driver.session(database="<database-name>") as session:
     result = session.run("""
         LOAD CSV FROM 'https://data.neo4j.com/bands/artists.csv' AS line
         CALL {
@@ -61,7 +61,7 @@ The metadata is visible in the server logs (as described for the xref:transactio
 ----
 from neo4j import Query
 
-with driver.session(database="neo4j") as session:
+with driver.session(database="<database-name>") as session:
     query = Query("CREATE (a:Person {name: $name})",
                   timeout=1.0,
                   metadata={"app_name": "people"})
@@ -93,7 +93,7 @@ escaped_label = label.replace("\\u0060", "`").replace("`", "``")
 driver.execute_query(
     f"MATCH (p:`{escaped_label}` {{name: $name}}) RETURN p.name",
     name="Alice",
-    database_="neo4j"
+    database_="<database-name>"
 )
 ----
 
@@ -108,7 +108,7 @@ label = "Person"
 driver.execute_query(
     "CALL apoc.merge.node($labels, $properties)",
     labels=[label], properties={property_key: "Alice"},
-    database_="neo4j"
+    database_="<database-name>"
 )
 ----
 
@@ -127,7 +127,7 @@ To redirect log messages to standard output, use the link:{neo4j-docs-base-uri}/
 import sys
 from neo4j.debug import watch
 
-watch("neo4j", out=sys.stdout)
+watch("<database-name>", out=sys.stdout)
 ----
 
 .Example of log output upon driver connection

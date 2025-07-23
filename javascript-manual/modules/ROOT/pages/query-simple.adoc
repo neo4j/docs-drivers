@@ -25,7 +25,7 @@ let { records, summary } = await driver.executeQuery(`  // <1>
   CREATE (a)-[:KNOWS]->(b)
   `,
   { name: 'Alice', friendName: 'David' },  // <2>
-  { database: 'neo4j' }  // <3>
+  { database: '<database-name>' }  // <3>
 )
 console.log(
   `Created ${summary.counters.updates().nodesCreated} nodes ` +
@@ -50,7 +50,7 @@ let { records, summary } = await driver.executeQuery(`
   RETURN p.name AS name
   `,
   {},
-  { database: 'neo4j' }
+  { database: '<database-name>' }
 )
 
 // Loop through users and do something with them
@@ -82,7 +82,7 @@ let { _, summary } = await driver.executeQuery(`
   SET p.age = $age
   `,
   { name: 'Alice', age: 42 },
-  { database: 'neo4j' }
+  { database: '<database-name>' }
 )
 console.log('Query counters:')
 console.log(summary.counters.updates())
@@ -98,7 +98,7 @@ let { records, summary } = await driver.executeQuery(`
   MATCH (bob:Person {name: $friendName})  // <2>
   CREATE (alice)-[:KNOWS]->(bob)  // <3>
   `, { name: 'Alice', friendName: 'Bob' },
-  { database: 'neo4j' }
+  { database: '<database-name>' }
 )
 console.log('Query counters:')
 console.log(summary.counters.updates())
@@ -121,7 +121,7 @@ let { _, summary } = await driver.executeQuery(`
   MATCH (p:Person WHERE p.name = $name)
   DETACH DELETE p
   `, { name: 'Alice' },
-  { database: 'neo4j' }
+  { database: '<database-name>' }
 )
 console.log('Query counters:')
 console.log(summary.counters.updates())
@@ -160,7 +160,7 @@ try {
     let err = await driver.executeQuery(
         'MATCH (p:Person) RETURN ',
         {},
-        { database: 'neo4j' }
+        { database: '<database-name>' }
     )
 } catch (err) {
   console.log('Neo4j error code:', err.code)
@@ -192,7 +192,7 @@ await driver.executeQuery(
   'MATCH (p:Person) RETURN p.name',
   {},
   {
-    database: 'neo4j'
+    database: '<database-name>'
   }
 )
 ----
@@ -216,7 +216,7 @@ await driver.executeQuery(
   {},
   {
     routing: 'READ',  // short for neo4j.routing.READ
-    database: 'neo4j'
+    database: '<database-name>'
   }
 )
 ----
@@ -244,7 +244,7 @@ await driver.executeQuery(
   {},
   {
     auth: neo4j.auth.basic('somebodyElse', 'theirPassword'),
-    database: 'neo4j'
+    database: '<database-name>'
   }
 )
 ----
@@ -259,7 +259,7 @@ await driver.executeQuery(
   {},
   {
     impersonatedUser: 'somebodyElse',
-    database: 'neo4j'
+    database: '<database-name>'
   }
 )
 ----
@@ -297,7 +297,7 @@ const neo4j = require('neo4j-driver');
     await driver.executeQuery(
       'MERGE (p:Person {name: $person.name, age: $person.age})',
       { person: person },
-      { database: 'neo4j' }
+      { database: '<database-name>' }
     )
   }
 
@@ -310,7 +310,7 @@ const neo4j = require('neo4j-driver');
         MATCH (friend:Person {name: friendName})
         MERGE (p)-[:KNOWS]->(friend)
         `, { person: person },
-        { database: 'neo4j' }
+        { database: '<database-name>' }
       )
     }
   }
@@ -321,7 +321,7 @@ const neo4j = require('neo4j-driver');
     WHERE friend.age < $age
     RETURN friend
     `, { name: 'Alice', age: 40 },
-    { database: 'neo4j' }
+    { database: '<database-name>' }
   )
 
   // Loop through results and do something with them

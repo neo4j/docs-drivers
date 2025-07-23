@@ -21,7 +21,7 @@ var result = await driver.ExecutableQuery(@"  // <.>
     CREATE (a)-[:KNOWS]->(b)
     ")
     .WithParameters(new { name = "Alice", friendName = "David" })  // <.>
-    .WithConfig(new QueryConfig(database: "neo4j"))  // <.>
+    .WithConfig(new QueryConfig(database: "<database-name>"))  // <.>
     .ExecuteAsync();
 var summary = result.Summary;  // <.>
 Console.WriteLine($"Created {summary.Counters.NodesCreated} nodes in {summary.ResultAvailableAfter.Milliseconds} ms.");
@@ -45,7 +45,7 @@ var result = await driver.ExecutableQuery(@"
     MATCH (p:Person)-[:KNOWS]->(:Person)
     RETURN p.name AS name
     ")
-    .WithConfig(new QueryConfig(database: "neo4j"))
+    .WithConfig(new QueryConfig(database: "<database-name>"))
     .ExecuteAsync();
 
 // Loop through results and print people's name
@@ -73,7 +73,7 @@ var result = await driver.ExecutableQuery(@"
     MATCH (p:Person)-[:KNOWS]->(:Person)
     RETURN p.name AS name
     ")
-    .WithConfig(new QueryConfig(database: "neo4j"))
+    .WithConfig(new QueryConfig(database: "<database-name>"))
     .WithMap(record => record["name"].As<string>())
     .ExecuteAsync();
 foreach (var name in result.Result) {
@@ -96,7 +96,7 @@ var result = await driver.ExecutableQuery(@"
         MATCH (p:Person {name: $name})
         SET p.age = $age
     ")
-    .WithConfig(new QueryConfig(database: "neo4j"))
+    .WithConfig(new QueryConfig(database: "<database-name>"))
     .WithParameters(new { name = "Alice", age = 42 })
     .ExecuteAsync();
 Console.WriteLine($"Query updated the database? {result.Summary.Counters.ContainsUpdates}");
@@ -112,7 +112,7 @@ var result = await driver.ExecutableQuery(@"
         MATCH (bob:Person {name: $friend})  // <.>
         CREATE (alice)-[:KNOWS]->(bob)  // <.>
     ")
-    .WithConfig(new QueryConfig(database: "neo4j"))
+    .WithConfig(new QueryConfig(database: "<database-name>"))
     .WithParameters(new { name = "Alice", friend = "Bob" })
     .ExecuteAsync();
 Console.WriteLine($"Query updated the database? {result.Summary.Counters.ContainsUpdates}");
@@ -136,7 +136,7 @@ var result = await driver.ExecutableQuery(@"
         MATCH (p:Person {name: $name})
         DETACH DELETE p
     ")
-    .WithConfig(new QueryConfig(database: "neo4j"))
+    .WithConfig(new QueryConfig(database: "<database-name>"))
     .WithParameters(new { name = "Alice" })
     .ExecuteAsync();
 Console.WriteLine($"Query updated the database? {result.Summary.Counters.ContainsUpdates}");
@@ -158,7 +158,7 @@ You can provide query parameters as a map through the `.WithParameters()` method
 [source, csharp]
 ----
 await driver.ExecutableQuery("MATCH (p:Person {name: $name}) RETURN p")
-    .WithConfig(new QueryConfig(database: "neo4j"))
+    .WithConfig(new QueryConfig(database: "<database-name>"))
     .WithParameters(new { name = "Alice" })
     .ExecuteAsync();
 ----
@@ -183,7 +183,7 @@ You can use an error's code to stably identify a specific error; error messages 
 ----
 try {
     await driver.ExecutableQuery("MATCH (p:Person) RETURN")
-        .WithConfig(new QueryConfig(database: "neo4j"))
+        .WithConfig(new QueryConfig(database: "<database-name>"))
         .ExecuteAsync();
 } catch (Neo4jException e) {
     Console.WriteLine($"Neo4j error code: {e.Code}");
@@ -214,7 +214,7 @@ If no database is given, the link:https://neo4j.com/docs/operations-manual/curre
 [source, csharp]
 ----
 await driver.ExecutableQuery("MATCH (p:Person) RETURN p.name")
-    .WithConfig(new QueryConfig(database: "neo4j"))
+    .WithConfig(new QueryConfig(database: "<database-name>"))
     .ExecuteAsync();
 ----
 
@@ -234,7 +234,7 @@ To improve performance on read queries, use `routing: RoutingControl.Readers` to
 ----
 await driver.ExecutableQuery("MATCH (p:Person) RETURN p.name")
     .WithConfig(new QueryConfig(
-        database: "neo4j",
+        database: "<database-name>",
         routing: RoutingControl.Readers
     ))
     .ExecuteAsync();
@@ -262,7 +262,7 @@ Query-scoped authentication requires a Neo4j server version >= 5.8.
 ----
 await driver.ExecutableQuery("MATCH (p:Person) RETURN p.name")
     .WithConfig(new QueryConfig(
-        database: "neo4j",
+        database: "<database-name>",
         authToken: AuthTokens.Basic("somebodyElse", "theirPassword")
     ))
     .ExecuteAsync();
@@ -275,7 +275,7 @@ The difference is that you don't need to know a user's password to impersonate t
 ----
 await driver.ExecutableQuery("MATCH (p:Person) RETURN p.name")
     .WithConfig(new QueryConfig(
-        database: "neo4j",
+        database: "<database-name>",
         impersonatedUser: "somebodyElse"
     ))
     .ExecuteAsync();
@@ -333,7 +333,7 @@ try {
     foreach (var person in people) {
         await driver
             .ExecutableQuery("MERGE (:Person {name: $person.name, age: $person.age})")
-            .WithConfig(new QueryConfig(database: "neo4j"))
+            .WithConfig(new QueryConfig(database: "<database-name>"))
             .WithParameters(new { person = person })
             .ExecuteAsync();
     }
@@ -347,7 +347,7 @@ try {
                     MATCH (friend:Person {name: friend_name})
                     MERGE (p)-[:KNOWS]->(friend)
                 ")
-                .WithConfig(new QueryConfig(database: "neo4j"))
+                .WithConfig(new QueryConfig(database: "<database-name>"))
                 .WithParameters(new { person = person })
                 .ExecuteAsync();
         }
@@ -360,7 +360,7 @@ try {
             WHERE friend.age < $age
             RETURN friend
         ")
-        .WithConfig(new QueryConfig(database: "neo4j", routing: RoutingControl.Readers))
+        .WithConfig(new QueryConfig(database: "<database-name>", routing: RoutingControl.Readers))
         .WithParameters(new { name = "Alice", age = 40 })
         .ExecuteAsync();
 
