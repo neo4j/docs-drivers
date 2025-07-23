@@ -23,7 +23,7 @@ result, err := neo4j.ExecuteQuery(ctx, driver, `
         "name": "Alice",
         "friendName": "David",
     }, neo4j.EagerResultTransformer,
-    neo4j.ExecuteQueryWithDatabase("neo4j"))  // <3>
+    neo4j.ExecuteQueryWithDatabase("<database-name>"))  // <3>
 if err != nil {
     panic(err)
 }
@@ -53,7 +53,7 @@ result, err := neo4j.ExecuteQuery(ctx, driver, `
     `,
     nil,
     neo4j.EagerResultTransformer,
-    neo4j.ExecuteQueryWithDatabase("neo4j"))
+    neo4j.ExecuteQueryWithDatabase("<database-name>"))
 if err != nil {
     panic(err)
 }
@@ -96,7 +96,7 @@ result, err := neo4j.ExecuteQuery(ctx, driver, `
         "name": "Alice",
         "age": 42,
     }, neo4j.EagerResultTransformer,
-    neo4j.ExecuteQueryWithDatabase("neo4j"))
+    neo4j.ExecuteQueryWithDatabase("<database-name>"))
 if err != nil {
     panic(err)
 }
@@ -117,7 +117,7 @@ result, err := neo4j.ExecuteQuery(ctx, driver, `
         "name": "Alice",
         "friend": "Bob",
     }, neo4j.EagerResultTransformer,
-    neo4j.ExecuteQueryWithDatabase("neo4j"))
+    neo4j.ExecuteQueryWithDatabase("<database-name>"))
 if err != nil {
     panic(err)
 }
@@ -144,7 +144,7 @@ result, err := neo4j.ExecuteQuery(ctx, driver, `
     `, map[string]any{
         "name": "Alice",
     }, neo4j.EagerResultTransformer,
-    neo4j.ExecuteQueryWithDatabase("neo4j"))
+    neo4j.ExecuteQueryWithDatabase("<database-name>"))
 if err != nil {
     panic(err)
 }
@@ -176,7 +176,7 @@ neo4j.ExecuteQuery(ctx, driver,
     "MERGE (:Person {name: $name, age: $age})",
     parameters,
     neo4j.EagerResultTransformer,
-    neo4j.ExecuteQueryWithDatabase("neo4j"))
+    neo4j.ExecuteQueryWithDatabase("<database-name>"))
 ----
 
 [NOTE]
@@ -199,7 +199,7 @@ You can use an error's code to stably identify a specific error; error messages 
 ----
 res, err := neo4j.ExecuteQuery(ctx, driver, "MATCH (p:Person) RETURN", nil,
     neo4j.EagerResultTransformer,
-    neo4j.ExecuteQueryWithDatabase("neo4j"))
+    neo4j.ExecuteQueryWithDatabase("<database-name>"))
 if err != nil {
     var neo4jErr *neo4j.Neo4jError
     if errors.As(err, &neo4jErr) {
@@ -237,7 +237,7 @@ neo4j.ExecuteQuery(ctx, driver,
     "MATCH (p:Person) RETURN p.name",
     nil,
     neo4j.EagerResultTransformer,
-    neo4j.ExecuteQueryWithDatabase("neo4j"))
+    neo4j.ExecuteQueryWithDatabase("<database-name>"))
 ----
 
 [TIP]
@@ -257,7 +257,7 @@ neo4j.ExecuteQuery(ctx, driver,
     "MATCH (p:Person) RETURN p.name",
     nil,
     neo4j.EagerResultTransformer,
-    neo4j.ExecuteQueryWithDatabase("neo4j"),
+    neo4j.ExecuteQueryWithDatabase("<database-name>"),
     neo4j.ExecuteQueryWithReadersRouting())
 ----
 
@@ -284,7 +284,7 @@ neo4j.ExecuteQuery(ctx, driver,
     "MATCH (p:Person) RETURN p.name",
     nil,
     neo4j.EagerResultTransformer,
-    neo4j.ExecuteQueryWithDatabase("neo4j"),
+    neo4j.ExecuteQueryWithDatabase("<database-name>"),
     neo4j.ExecuteQueryWithAuthToken(queryAuth))
 ----
 
@@ -297,7 +297,7 @@ neo4j.ExecuteQuery(ctx, driver,
     "MATCH (p:Person) RETURN p.name",
     nil,
     neo4j.EagerResultTransformer,
-    neo4j.ExecuteQueryWithDatabase("neo4j"),
+    neo4j.ExecuteQueryWithDatabase("<database-name>"),
     neo4j.ExecuteQueryWithImpersonatedUser("<somebodyElse>"))
 ----
 
@@ -348,7 +348,7 @@ func main() {
             map[string]any{
                 "person": person,
             }, neo4j.EagerResultTransformer,
-            neo4j.ExecuteQueryWithDatabase("neo4j"))
+            neo4j.ExecuteQueryWithDatabase("<database-name>"))
         if err != nil {
             panic(err)
         }
@@ -365,7 +365,7 @@ func main() {
                 `, map[string]any{
                     "person": person,
                 }, neo4j.EagerResultTransformer,
-                neo4j.ExecuteQueryWithDatabase("neo4j"))
+                neo4j.ExecuteQueryWithDatabase("<database-name>"))
             if err != nil {
                 panic(err)
             }
@@ -381,7 +381,7 @@ func main() {
             "name": "Alice",
             "age": 40,
         }, neo4j.EagerResultTransformer,
-        neo4j.ExecuteQueryWithDatabase("neo4j"))
+        neo4j.ExecuteQueryWithDatabase("<database-name>"))
     if err != nil {
         panic(err)
     }

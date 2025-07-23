@@ -12,7 +12,7 @@ It returns a link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-versio
 
 [source, csharp]
 ----
-using var session = driver.AsyncSession(conf => conf.WithDatabase("neo4j"));
+using var session = driver.AsyncSession(conf => conf.WithDatabase("<database-name>"));
 await session.RunAsync("CREATE (a:Person {name: $name})", new { name = "Licia" });
 ----
 
@@ -34,7 +34,7 @@ The most common use case for using `IAsyncSession.RunAsync()` is for importing l
 .Import CSV data into a Neo4j database
 [source, csharp]
 ----
-using var session = driver.AsyncSession(conf => conf.WithDatabase("neo4j"));
+using var session = driver.AsyncSession(conf => conf.WithDatabase("<database-name>"));
 var result = await session.RunAsync(@"
     LOAD CSV FROM 'https://data.neo4j.com/bands/artists.csv' AS line
     CALL {
@@ -63,7 +63,7 @@ For more information, see xref:transactions.adoc#tx-config[Transactions -> Trans
 
 [source, csharp]
 ----
-using var session = driver.AsyncSession(conf => conf.WithDatabase("neo4j"));
+using var session = driver.AsyncSession(conf => conf.WithDatabase("<database-name>"));
 await session.RunAsync(
     "MATCH (p:Person) RETURN p",
     conf => conf
@@ -97,7 +97,7 @@ var escapedLabel = label.Replace("\\u0060", "`").Replace("`", "``");
 
 var result = await driver.ExecutableQuery("MATCH (p:`" + escapedLabel + "` {name: $name}) RETURN p.name")
     .WithParameters( new { name = "Alice" })
-    .WithConfig(new QueryConfig(database: "neo4j"))
+    .WithConfig(new QueryConfig(database: "<database-name>"))
     .ExecuteAsync();
 ----
 
@@ -117,7 +117,7 @@ var properties = new Dictionary<string, string>() {
 var result = await driver
     .ExecutableQuery("CALL apoc.merge.node($labels, $properties)")
     .WithParameters(new { labels = labels, properties = properties})
-    .WithConfig(new QueryConfig(database: "neo4j"))
+    .WithConfig(new QueryConfig(database: "<database-name>"))
     .ExecuteAsync();
 ----
 

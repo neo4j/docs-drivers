@@ -20,7 +20,7 @@ result, _ := neo4j.ExecuteQuery(ctx, driver, `
     MERGE (p:Person {name: name})
     `, nil,
     neo4j.EagerResultTransformer,
-    neo4j.ExecuteQueryWithDatabase("neo4j"))
+    neo4j.ExecuteQueryWithDatabase("<database-name>"))
 summary := result.Summary
 ----
 
@@ -30,7 +30,7 @@ This means that any record which has not yet been processed is discarded.
 
 [source, go]
 ----
-session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "<database-name>"})
 defer session.Close(ctx)
 summary, _ := session.ExecuteWrite(ctx,
     func(tx neo4j.ManagedTransaction) (any, error) {
@@ -58,7 +58,7 @@ result, _ := neo4j.ExecuteQuery(ctx, driver, `
         "name": "Mark",
         "friend": "Bob",
     }, neo4j.EagerResultTransformer,
-    neo4j.ExecuteQueryWithDatabase("neo4j"))
+    neo4j.ExecuteQueryWithDatabase("<database-name>"))
 summary := result.Summary
 counters := summary.Counters()
 fmt.Println("Nodes created:", counters.NodesCreated())
@@ -92,7 +92,7 @@ result, _ := neo4j.ExecuteQuery(ctx, driver,
         "name": "Alice",
     },
     neo4j.EagerResultTransformer,
-    neo4j.ExecuteQueryWithDatabase("neo4j"))
+    neo4j.ExecuteQueryWithDatabase("<database-name>"))
 fmt.Println(result.Summary.Plan().Arguments()["string-representation"])
 /*
 Planner COST
@@ -127,7 +127,7 @@ result, _ := neo4j.ExecuteQuery(ctx, driver,
         "name": "Alice",
     },
     neo4j.EagerResultTransformer,
-    neo4j.ExecuteQueryWithDatabase("neo4j"))
+    neo4j.ExecuteQueryWithDatabase("<database-name>"))
 fmt.Println(result.Summary.Profile().Arguments()["string-representation"])
 /*
 Planner COST
@@ -176,7 +176,7 @@ result, _ := neo4j.ExecuteQuery(ctx, driver, `
     RETURN p
     `, nil,
     neo4j.EagerResultTransformer,
-    neo4j.ExecuteQueryWithDatabase("neo4j"))
+    neo4j.ExecuteQueryWithDatabase("<database-name>"))
 
 for _, notification := range result.Summary.Notifications() {
     fmt.Println("Code:", notification.Code())
@@ -211,7 +211,7 @@ result, _ := neo4j.ExecuteQuery(ctx, driver, `
     RETURN p
     `, nil,
     neo4j.EagerResultTransformer,
-    neo4j.ExecuteQueryWithDatabase("neo4j"))
+    neo4j.ExecuteQueryWithDatabase("<database-name>"))
 
 for _, status := range result.Summary.GqlStatusObjects() {
     fmt.Println("GQLSTATUS:", status.GqlStatus())
@@ -291,6 +291,6 @@ driverNot, _ := neo4j.NewDriverWithContext(
 sessionNot := driver.NewSession(ctx, neo4j.SessionConfig{
     NotificationsMinSeverity: notifications.WarningLevel,  // or "OFF" to disable entirely
     NotificationsDisabledClassifications: notifications.DisableClassifications(notifications.Hint, notifications.Generic),  // filters categories as well
-    DatabaseName: "neo4j",  // always provide the database name
+    DatabaseName: "<database-name>",  // always provide the database name
 })
 ----

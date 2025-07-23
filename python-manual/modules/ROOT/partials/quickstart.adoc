@@ -59,7 +59,7 @@ summary = driver.execute_query("""
     CREATE (a)-[:KNOWS]->(b)
     """,
     name="Alice", friendName="David",
-    database_="neo4j",
+    database_="<database-name>",
 ).summary
 print("Created {nodes_created} nodes in {time} ms.".format(
     nodes_created=summary.counters.nodes_created,
@@ -82,7 +82,7 @@ records, summary, keys = driver.execute_query("""
     MATCH (p:Person)-[:KNOWS]->(:Person)
     RETURN p.name AS name
     """,
-    database_="neo4j",
+    database_="<database-name>",
 )
 
 # Loop through results and do something with them
@@ -110,7 +110,7 @@ from neo4j import GraphDatabase
 
 
 driver = GraphDatabase.driver(URI, auth=AUTH)
-session = driver.session(database="neo4j")
+session = driver.session(database="<database-name>")
 
 # session/driver usage
 

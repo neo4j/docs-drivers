@@ -20,7 +20,7 @@ async def main():
     async with AsyncGraphDatabase.driver(URI, auth=AUTH) as driver:
         records, summary, keys = await driver.execute_query(
             "MATCH (a:Person) RETURN a.name AS name",
-            database_="neo4j"
+            database_="<database-name>"
         )
         names = [record["name"] for record in records]
         print(names)
@@ -43,7 +43,7 @@ AUTH = ("<username>", "<password>")
 
 async def main():
     async with AsyncGraphDatabase.driver(URI, auth=AUTH) as driver:
-        async with driver.session(database="neo4j") as session:
+        async with driver.session(database="<database-name>") as session:
             records = await session.execute_read(get_people)
             print(records)
 

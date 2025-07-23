@@ -79,7 +79,7 @@ result, err := neo4j.ExecuteQuery(ctx, driver, `
         "name": "Alice",
         "friendName": "David",
     }, neo4j.EagerResultTransformer,
-    neo4j.ExecuteQueryWithDatabase("neo4j"))
+    neo4j.ExecuteQueryWithDatabase("<database-name>"))
 if err != nil {
     panic(err)
 }
@@ -107,7 +107,7 @@ result, err := neo4j.ExecuteQuery(ctx, driver, `
     `,
     nil,
     neo4j.EagerResultTransformer,
-    neo4j.ExecuteQueryWithDatabase("neo4j"))
+    neo4j.ExecuteQueryWithDatabase("<database-name>"))
 if err != nil {
     panic(err)
 }
@@ -142,6 +142,6 @@ defer driver.Close(ctx)
 
 [source, go, copy=true]
 ----
-session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "<database-name>"})
 defer session.Close(ctx)
 ----

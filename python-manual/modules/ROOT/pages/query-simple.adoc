@@ -20,7 +20,7 @@ summary = driver.execute_query(""" // <1>
     CREATE (a)-[:KNOWS]->(b)
     """,
     name="Alice", friendName="David",  # <2>
-    database_="neo4j",  # <3>
+    database_="<database-name>",  # <3>
 ).summary
 print("Created {nodes_created} nodes in {time} ms.".format(
     nodes_created=summary.counters.nodes_created,
@@ -44,7 +44,7 @@ records, summary, keys = driver.execute_query("""
     MATCH (p:Person)-[:KNOWS]->(:Person)
     RETURN p.name AS name
     """,
-    database_="neo4j",
+    database_="<database-name>",
 )
 
 # Loop through results and do something with them
@@ -73,7 +73,7 @@ records, summary, keys = driver.execute_query("""
     MATCH (p:Person {name: $name})
     SET p.age = $age
     """, name="Alice", age=42,
-    database_="neo4j",
+    database_="<database-name>",
 )
 print(f"Query counters: {summary.counters}.")
 ----
@@ -88,7 +88,7 @@ records, summary, keys = driver.execute_query("""
     MATCH (bob:Person {name: $friend})  // <2>
     CREATE (alice)-[:KNOWS]->(bob)  // <3>
     """, name="Alice", friend="Bob",
-    database_="neo4j",
+    database_="<database-name>",
 )
 print(f"Query counters: {summary.counters}.")
 ----
@@ -110,7 +110,7 @@ records, summary, keys = driver.execute_query("""
     MATCH (p:Person {name: $name})
     DETACH DELETE p
     """, name="Alice",
-    database_="neo4j",
+    database_="<database-name>",
 )
 print(f"Query counters: {summary.counters}.")
 ----
@@ -134,7 +134,7 @@ Query parameters can be passed either as several keyword arguments, or grouped t
 driver.execute_query(
     "MERGE (:Person {name: $name})",
     name="Alice", age=42,
-    database_="neo4j",
+    database_="<database-name>",
 )
 ----
 
@@ -148,7 +148,7 @@ parameters = {
 driver.execute_query(
     "MERGE (:Person {name: $name})",
     parameters_=parameters,
-    database_="neo4j",
+    database_="<database-name>",
 )
 ----
 
@@ -174,7 +174,7 @@ You can use an exception's code to stably identify a specific error; error messa
 # from neo4j.exceptions import Neo4jError
 
 try:
-    driver.execute_query('MATCH (p:Person) RETURN', database_='neo4j')
+    driver.execute_query('MATCH (p:Person) RETURN', database_='<database-name>')
 except Neo4jError as e:
     print('Neo4j error code:', e.code)
     print('Exception message:', e.message)
@@ -202,7 +202,7 @@ If no database is given, the link:{neo4j-docs-base-uri}/operations-manual/curren
 ----
 driver.execute_query(
     "MATCH (p:Person) RETURN p.name",
-    database_="neo4j",
+    database_="<database-name>",
 )
 ----
 
@@ -222,7 +222,7 @@ To improve performance on read queries, you can use the argument `routing_="r"` 
 driver.execute_query(
     "MATCH (p:Person) RETURN p.name",
     routing_="r",  # short for neo4j.RoutingControl.READ
-    database_="neo4j",
+    database_="<database-name>",
 )
 ----
 
@@ -247,7 +247,7 @@ Query-scoped authentication requires a server version >= 5.8.
 driver.execute_query(
     "MATCH (p:Person) RETURN p.name",
     auth_=("somebody_else", "their_password"),
-    database_="neo4j",
+    database_="<database-name>",
 )
 ----
 
@@ -259,7 +259,7 @@ The difference is that you don't need to know a user's password to impersonate t
 driver.execute_query(
     "MATCH (p:Person) RETURN p.name",
     impersonated_user_="somebody_else",
-    database_="neo4j",
+    database_="<database-name>",
 )
 ----
 
@@ -295,7 +295,7 @@ with GraphDatabase.driver(URI, auth=AUTH) as driver:
             records, summary, keys = driver.execute_query(
                 "MERGE (p:Person {name: $person.name, age: $person.age})",
                 person=person,
-                database_="neo4j",
+                database_="<database-name>",
             )
 
         # Create some relationships
@@ -307,7 +307,7 @@ with GraphDatabase.driver(URI, auth=AUTH) as driver:
                     MATCH (friend:Person {name: friend_name})
                     MERGE (p)-[:KNOWS]->(friend)
                     """, person=person,
-                    database_="neo4j",
+                    database_="<database-name>",
                 )
 
         # Retrieve Alice's friends who are under 40
@@ -317,7 +317,7 @@ with GraphDatabase.driver(URI, auth=AUTH) as driver:
             RETURN friend
             """, name="Alice", age=40,
             routing_="r",
-            database_="neo4j",
+            database_="<database-name>",
         )
         # Loop through results and do something with them
         for record in records:

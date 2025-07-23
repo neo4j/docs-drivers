@@ -15,7 +15,7 @@ It returns a link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/o
 // import java.util.Map
 // import org.neo4j.driver.SessionConfig
 
-try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
+try (var session = driver.session(SessionConfig.builder().withDatabase("<database-name>").build())) {
     session.run("CREATE (a:Person {name: $name})", Map.of("name", "Licia"));
 }
 ----
@@ -40,7 +40,7 @@ The most common use case for using `Session.run()` is for importing large CSV fi
 // import java.util.Map
 // import org.neo4j.driver.SessionConfig
 
-try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
+try (var session = driver.session(SessionConfig.builder().withDatabase("<database-name>").build())) {
     var result = session.run("""
         LOAD CSV FROM 'https://data.neo4j.com/bands/artists.csv' AS line
         CALL {
@@ -74,7 +74,7 @@ For more information, see xref:transactions.adoc#_transaction_configuration[Tran
 // import org.neo4j.driver.SessionConfig
 // import org.neo4j.driver.TransactionConfig
 
-try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
+try (var session = driver.session(SessionConfig.builder().withDatabase("<database-name>").build())) {
     var result = session.run("CREATE (a:Person {name: $name})", Map.of("name", "John"),
         TransactionConfig.builder()
             .withTimeout(Duration.ofSeconds(5))
@@ -110,7 +110,7 @@ var escapedLabel = label.replace("\\u0060", "`").replace("`", "``");
 
 var result = driver.executableQuery("MATCH (p:`" + escapedLabel + "` {name: $name}) RETURN p.name")
     .withParameters(Map.of("name", "Alice"))
-    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+    .withConfig(QueryConfig.builder().withDatabase("<database-name>").build())
     .execute();
 ----
 
@@ -126,7 +126,7 @@ String label = "Person";
 
 var result = driver.executableQuery("CALL apoc.merge.node($labels, $properties)")
     .withParameters(Map.of("labels", List.of(label), "properties", Map.of(propertyKey, "Alice")))
-    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+    .withConfig(QueryConfig.builder().withDatabase("<database-name>").build())
     .execute();
 ----
 

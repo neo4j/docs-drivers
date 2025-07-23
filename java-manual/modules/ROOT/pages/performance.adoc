@@ -65,7 +65,7 @@ In this way, the transaction as a whole is isolated from others, but individual 
 .Group queries into one transaction (higher throughput)
 [source, java]
 ----
-try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
+try (var session = driver.session(SessionConfig.builder().withDatabase("<database-name>").build())) {
     session.executeWriteWithoutResult(tx -> {
         for (int i=0; i<1000; i++) {
             tx.run("<QUERY>");
@@ -82,7 +82,7 @@ One upper limit on the client size is given by the size of the connection pool: 
 .Queries as auto-commit transactions (highest throughput)
 [source, java]
 ----
-try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
+try (var session = driver.session(SessionConfig.builder().withDatabase("<database-name>").build())) {
     for (int i=0; i<1000; i++) {
         session.run("<QUERY>");
     }
@@ -108,7 +108,7 @@ In a cluster, *route read queries to any reader node*. You do this by:
 
 driver.executableQuery("MATCH (p:Person) RETURN p")
     .withConfig(QueryConfig.builder()
-        .withDatabase("neo4j")
+        .withDatabase("<database-name>")
         .withRouting(RoutingControl.READ)
         .build())
     .execute();
@@ -116,7 +116,7 @@ driver.executableQuery("MATCH (p:Person) RETURN p")
 
 [source, java]
 ----
-try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
+try (var session = driver.session(SessionConfig.builder().withDatabase("<database-name>").build())) {
     session.executeRead(tx -> {
         var result = tx.run("MATCH (p:Person) RETURN p");
         return result.list();
@@ -133,7 +133,7 @@ try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").
 // defaults to routing = writers
 driver.executableQuery("MATCH (p:Person) RETURN p")
     .withConfig(QueryConfig.builder()
-        .withDatabase("neo4j")
+        .withDatabase("<database-name>")
         .build())
     .execute();
 ----
@@ -141,7 +141,7 @@ driver.executableQuery("MATCH (p:Person) RETURN p")
 [source, java]
 ----
 // don't ask to write on a read-only operation
-try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
+try (var session = driver.session(SessionConfig.builder().withDatabase("<database-name>").build())) {
     session.executeWrite(tx -> {
         var result = tx.run("MATCH (p:Person) RETURN p");
         return result.list();
@@ -177,7 +177,7 @@ The server output is available through the `.profile()` method of the xref:resul
 ----
 var result = driver.executableQuery("PROFILE MATCH (p {name: $name}) RETURN p")
     .withParameters(Map.of("name", "Alice"))
-    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+    .withConfig(QueryConfig.builder().withDatabase("<database-name>").build())
     .execute();
 var queryPlan = result.summary().profile().arguments().get("string-representation");
 System.out.println(queryPlan);
@@ -210,7 +210,7 @@ The server output is available through the `.plan()` method of the xref:result-s
 ----
 var result = driver.executableQuery("EXPLAIN MATCH (p {name: $name}) RETURN p")
     .withParameters(Map.of("name", "Alice"))
-    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+    .withConfig(QueryConfig.builder().withDatabase("<database-name>").build())
     .execute();
 var queryPlan = result.summary().plan().arguments().get("string-representation");
 System.out.println(queryPlan);
@@ -250,13 +250,13 @@ To learn how to combine labels, see link:https://neo4j.com/docs/cypher-manual/cu
 ----
 driver.executableQuery("MATCH (p:Person|Animal {name: $name}) RETURN p")
     .withParameters(Map.of("name", "Alice"))
-    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+    .withConfig(QueryConfig.builder().withDatabase("<database-name>").build())
     .execute();
 ----
 
 [source, java]
 ----
-try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
+try (var session = driver.session(SessionConfig.builder().withDatabase("<database-name>").build())) {
     session.run("MATCH (p:Person|Animal {name: $name}) RETURN p", Map.of("name", "Alice"));
 }
 ----
@@ -269,13 +269,13 @@ try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").
 ----
 driver.executableQuery("MATCH (p {name: $name}) RETURN p")
     .withParameters(Map.of("name", "Alice"))
-    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+    .withConfig(QueryConfig.builder().withDatabase("<database-name>").build())
     .execute();
 ----
 
 [source, java]
 ----
-try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
+try (var session = driver.session(SessionConfig.builder().withDatabase("<database-name>").build())) {
     session.run("MATCH (p {name: $name}) RETURN p", Map.of("name", "Alice"));
 }
 ----
@@ -305,7 +305,7 @@ driver.executableQuery("""
     MERGE (:Number {value: node.value})
     """)
     .withParameters(Map.of("numbers", numbers))
-    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+    .withConfig(QueryConfig.builder().withDatabase("<database-name>").build())
     .execute();
 ----
 
@@ -318,7 +318,7 @@ driver.executableQuery("""
 for (int i=1; i<=10000; i++) {
 driver.executableQuery("MERGE (:Number {value: $value})")
     .withParameters(Map.of("value", i))
-    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+    .withConfig(QueryConfig.builder().withDatabase("<database-name>").build())
     .execute();
 }
 ----
@@ -341,13 +341,13 @@ Besides protecting from Cypher injections, this allows to better leverage the da
 ----
 driver.executableQuery("MATCH (p:Person {name: $name}) RETURN p")
     .withParameters(Map.of("name", "Alice"))
-    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+    .withConfig(QueryConfig.builder().withDatabase("<database-name>").build())
     .execute();
 ----
 
 [source, java]
 ----
-try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
+try (var session = driver.session(SessionConfig.builder().withDatabase("<database-name>").build())) {
     session.run("MATCH (p:Person {name: $name}) RETURN p", Map.of("name", "Alice"));
 }
 ----
@@ -358,18 +358,18 @@ try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").
 [source, java]
 ----
 driver.executableQuery("MATCH (p:Person {name: 'Alice'}) RETURN p")
-    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+    .withConfig(QueryConfig.builder().withDatabase("<database-name>").build())
     .execute();
 // or
 String name = "Alice";
 driver.executableQuery("MATCH (p:Person {name: '" + name + "'}) RETURN p")
-    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+    .withConfig(QueryConfig.builder().withDatabase("<database-name>").build())
     .execute();
 ----
 
 [source, java]
 ----
-try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
+try (var session = driver.session(SessionConfig.builder().withDatabase("<database-name>").build())) {
     session.run("MATCH (p:Person {name: 'Alice'}) RETURN p");
     // or
     String name = "Alice";

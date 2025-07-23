@@ -18,7 +18,7 @@ For further configuration parameters, see xref:session-config[Session configurat
 
 [source, csharp]
 ----
-using var session = driver.AsyncSession(conf => conf.WithDatabase("neo4j"));
+using var session = driver.AsyncSession(conf => conf.WithDatabase("<database-name>"));
 ----
 
 Session creation is a lightweight operation, so sessions can be created and destroyed without significant cost.
@@ -40,7 +40,7 @@ Both methods take a <<transaction_function>> callback, which is responsible for 
 .Retrieve people whose name starts with `Al`.
 [source, csharp, role=nocollapse]
 ----
-using var session = driver.AsyncSession(conf => conf.WithDatabase("neo4j"));  // <.>
+using var session = driver.AsyncSession(conf => conf.WithDatabase("<database-name>"));  // <.>
 var people = await session.ExecuteReadAsync(  // <.>
     async tx => {
         var result = await tx.RunAsync(@"
@@ -96,7 +96,7 @@ await using var driver = GraphDatabase.Driver(dbUri, AuthTokens.Basic(dbUser, db
 await driver.VerifyConnectivityAsync();
 
 // Create & employ 100 people to 10 different organizations
-using var session = driver.AsyncSession(conf => conf.WithDatabase("neo4j"));
+using var session = driver.AsyncSession(conf => conf.WithDatabase("<database-name>"));
 for (int i=0; i<100; i++) {
     var name = $"Thor{i}";
     try {
@@ -190,7 +190,7 @@ You may then run queries inside an explicit transaction with the method link:htt
 
 [source, csharp]
 ----
-using var session = driver.AsyncSession(SessionConfigBuilder.ForDatabase("neo4j"));
+using var session = driver.AsyncSession(SessionConfigBuilder.ForDatabase("<database-name>"));
 using var tx = await session.BeginTransactionAsync();
 // use tx.RunAsync()      to run queries
 //     tx.CommitAsync()   to commit the transaction
@@ -229,13 +229,13 @@ async Task<string> createCustomer(IDriver driver) {
         MERGE (c:Customer {id: randomUUID(), balance: 1000})
         RETURN c.id AS id
         ")
-        .WithConfig(new QueryConfig(database: "neo4j"))
+        .WithConfig(new QueryConfig(database: "<database-name>"))
         .ExecuteAsync();
     return result.Result[0].Get<string>("id");
 }
 
 async Task transferToOtherBank(IDriver driver, string customerId, int otherBankId, float amount) {
-    using var session = driver.AsyncSession(conf => conf.WithDatabase("neo4j"));
+    using var session = driver.AsyncSession(conf => conf.WithDatabase("<database-name>"));
     using var tx = await session.BeginTransactionAsync();
 
     if (! await customerBalanceCheck(tx, customerId, amount)) {
@@ -365,7 +365,7 @@ If no database is given, the link:{neo4j-docs-base-uri}/operations-manual/curren
 [source, csharp]
 ----
 using var session = driver.AsyncSession(conf => conf
-    .WithDatabase("neo4j")
+    .WithDatabase("<database-name>")
 );
 ----
 
@@ -385,7 +385,7 @@ Note that `.ExecuteReadAsync()` and `.ExecuteWriteAsync()` automatically overrid
 [source, csharp]
 ----
 using var session = driver.AsyncSession(conf => conf
-    .WithDatabase("neo4j")
+    .WithDatabase("<database-name>")
     .WithDefaultAccessMode(AccessMode.Read)
 );
 ----
@@ -414,7 +414,7 @@ Session-scoped authentication requires a server version >= 5.8.
 [source, csharp, test-skip]
 ----
 using var session = driver.AsyncSession(conf => conf
-    .WithDatabase("neo4j")
+    .WithDatabase("<database-name>")
     .WithAuthToken(AuthTokens.Basic("somebodyElse", "theirPassword"))
 );
 ----
@@ -425,7 +425,7 @@ The difference is that you don't need to know a user's password to impersonate t
 [source, csharp, test-skip]
 ----
 using var session = driver.AsyncSession(conf => conf
-    .WithDatabase("neo4j")
+    .WithDatabase("<database-name>")
     .WithImpersonatedUser("<somebodyElse>")
 );
 ----
@@ -448,7 +448,7 @@ Use this to tag transactions.
 
 [source, csharp]
 ----
-using var session = driver.AsyncSession(conf => conf.WithDatabase("neo4j"));
+using var session = driver.AsyncSession(conf => conf.WithDatabase("<database-name>"));
 var people = await session.ExecuteReadAsync(
     async tx => {
         var result = await tx.RunAsync("MATCH (p:Person) RETURN p");
@@ -475,7 +475,7 @@ If you do not open sessions with `using`, remember to call the `.CloseAsync()` m
 
 [source, csharp]
 ----
-var session = driver.AsyncSession(conf => conf.WithDatabase("neo4j"));
+var session = driver.AsyncSession(conf => conf.WithDatabase("<database-name>"));
 
 // session usage
 

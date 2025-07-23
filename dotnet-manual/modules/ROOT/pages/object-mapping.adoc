@@ -27,7 +27,7 @@ var result = await driver.ExecutableQuery(@"
     RETURN p.name AS name, p.age AS age  // <.>
     ")
     .WithParameters(new { name = "Alice", age = 21 })
-    .WithConfig(new QueryConfig(database: "neo4j"))
+    .WithConfig(new QueryConfig(database: "<database-name>"))
     .ExecuteAsync();
 
 var record = result.Result[0];
@@ -65,7 +65,7 @@ var result = await driver.ExecutableQuery(@"
     RETURN p  // <.>
     ")
     .WithParameters(new { name = "Alice", age = 21 })
-    .WithConfig(new QueryConfig(database: "neo4j"))
+    .WithConfig(new QueryConfig(database: "<database-name>"))
     .ExecuteAsync();
 
 var person = result.Result[0].AsObject<Person>();
@@ -140,7 +140,7 @@ var result = await driver.ExecutableQuery(@"
     RETURN p AS person, r AS role  // <.>
     ")
     .WithParameters(new { name = "Keanu Reeves", movie = "The Matrix", role = "Neo" })
-    .WithConfig(new QueryConfig(database: "neo4j"))
+    .WithConfig(new QueryConfig(database: "<database-name>"))
     .ExecuteAsync();
 
 var person = result.Result[0].AsObject<Person>();
@@ -214,7 +214,7 @@ var result = await driver.ExecutableQuery(@"
     RETURN p.name AS name, p.age AS age  // <.>
     ")
     .WithParameters(new { name = "Alice", age = 21 })
-    .WithConfig(new QueryConfig(database: "neo4j"))
+    .WithConfig(new QueryConfig(database: "<database-name>"))
     .ExecuteAsync();
 
 var person = result.Result[0].AsObjectFromBlueprint(new { name = "", age = 0 });  // <.>
@@ -233,7 +233,7 @@ var result = await driver.ExecutableQuery(@"
     RETURN p  // <.>
     ")
     .WithParameters(new { name = "Alice", age = 21 })
-    .WithConfig(new QueryConfig(database: "neo4j"))
+    .WithConfig(new QueryConfig(database: "<database-name>"))
     .ExecuteAsync();
 
 var person = result.Result[0].AsObjectFromBlueprint(new { p = new { name = "", age = 0 }});  // <.>
@@ -252,7 +252,7 @@ var result = await driver.ExecutableQuery(@"
     RETURN p.name AS name, p.age AS age
     ")
     .WithParameters(new { name = "Alice", age = 21 })
-    .WithConfig(new QueryConfig(database: "neo4j"))
+    .WithConfig(new QueryConfig(database: "<database-name>"))
     .ExecuteAsync();
 
 var person = result.Result[0].AsObject( (string name, int age) => new { Name = name, Age = age, BirthYear = 2025 - age });
@@ -268,7 +268,7 @@ var result = await driver.ExecutableQuery(@"
     RETURN p.name AS name, p.age AS age
     ")
     .WithParameters(new { name = "Alice", age = 21 })
-    .WithConfig(new QueryConfig(database: "neo4j"))
+    .WithConfig(new QueryConfig(database: "<database-name>"))
     .ExecuteAsync();
 
 var text = result.Result[0].AsObject( (string name, int age) => $"{name} is {age} years old." );
@@ -285,7 +285,7 @@ var result = await driver.ExecutableQuery(@"
     RETURN p
     ")
     .WithParameters(new { name = "Alice", age = 21 })
-    .WithConfig(new QueryConfig(database: "neo4j"))
+    .WithConfig(new QueryConfig(database: "<database-name>"))
     .ExecuteAsync();
 
 var person = result.Result[0].AsObject( ([MappingSource["p.name"]] string name, [MappingSource["p.age"]] [MappingDefaultValue(21)] int age) => new { Name = name, Age = age, BirthYear = 2025 - age });

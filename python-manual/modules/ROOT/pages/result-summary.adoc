@@ -18,7 +18,7 @@ When running queries with xref:query-simple.adoc[`Driver.execute_query()`], the 
 records, result_summary, keys = driver.execute_query("""
     UNWIND ["Alice", "Bob"] AS name
     MERGE (p:Person {name: name})
-    """, database_="neo4j",
+    """, database_="<database-name>",
 )
 # or result_summary = driver.execute_query('<QUERY>').summary
 ----
@@ -36,7 +36,7 @@ def create_people(tx):
     """)
     return result.consume()
 
-with driver.session(database="neo4j") as session:
+with driver.session(database="<database-name>") as session:
     result_summary = session.execute_write(create_people)
 ----
 
@@ -52,7 +52,7 @@ summary = driver.execute_query("""
     MERGE (p:Person {name: $name})
     MERGE (p)-[:KNOWS]->(:Person {name: $friend})
     """, name="Mark", friend="Bob",
-    database_="neo4j",
+    database_="<database-name>",
 ).summary
 print(summary.counters)
 """
@@ -153,7 +153,7 @@ The property `ResultSummary.summary_notifications` contains a list of link:{neo4
 records, summary, keys = driver.execute_query("""
     MATCH p=shortestPath((:Person {name: 'Alice'})-[*]->(:Person {name: 'Bob'}))
     RETURN p
-    """, database_="neo4j"
+    """, database_="<database-name>"
 )
 """
 [SummaryNotification(
@@ -184,7 +184,7 @@ Some (but not all) `GqlStatusObjects` are notifications, whereas some report an 
 records, summary, keys = driver.execute_query("""
     MATCH p=shortestPath((:Person {name: 'Alice'})-[*]->(:Person {name: 'Bob'}))
     RETURN p
-    """, database_="neo4j"
+    """, database_="<database-name>"
 )
 for status in summary.gql_status_objects:
     print("GQLSTATUS:", status.gql_status)
@@ -257,7 +257,7 @@ driver = neo4j.GraphDatabase.driver(
 
 # at session level
 session = driver.session(
-    database="neo4j",
+    database="<database-name>",
     notifications_min_severity='INFORMATION',  # or 'OFF' to disable entirely
     notifications_disabled_classifications=['HINT']  # filters categories as well
 )

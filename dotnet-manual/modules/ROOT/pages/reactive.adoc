@@ -44,7 +44,7 @@ await using var driver = GraphDatabase.Driver(
     dbUri,
     AuthTokens.Basic(dbUser, dbPassword));
 
-var rxSession = driver.RxSession(SessionConfigBuilder.ForDatabase("neo4j"));
+var rxSession = driver.RxSession(SessionConfigBuilder.ForDatabase("<database-name>"));
 var observable = rxSession.ExecuteRead(
     tx => {
         return tx
@@ -88,7 +88,7 @@ await using var driver = GraphDatabase.Driver(
     dbUri,
     AuthTokens.Basic(dbUser, dbPassword));
 
-var rxSession = driver.RxSession(SessionConfigBuilder.ForDatabase("neo4j"));
+var rxSession = driver.RxSession(SessionConfigBuilder.ForDatabase("<database-name>"));
 var observable = rxSession
     .Run("UNWIND range (1, 5) AS x RETURN x")
     .Records();

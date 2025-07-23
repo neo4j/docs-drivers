@@ -24,7 +24,7 @@ var result = driver.executableQuery("""
     CREATE (a)-[:KNOWS]->(b)
     """)
     .withParameters(Map.of("name", "Alice", "friendName", "David"))  // <2>
-    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())  // <3>
+    .withConfig(QueryConfig.builder().withDatabase("<database-name>").build())  // <3>
     .execute();
 var summary = result.summary();  // <4>
 System.out.printf("Created %d records in %d ms.%n",
@@ -52,7 +52,7 @@ var result = driver.executableQuery("""
     MATCH (p:Person)-[:KNOWS]->(:Person)
     RETURN p.name AS name
     """)
-    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+    .withConfig(QueryConfig.builder().withDatabase("<database-name>").build())
     .execute();
 
 // Loop through results and do something with them
@@ -95,7 +95,7 @@ var result = driver.executableQuery("""
     MATCH (p:Person {name: $name})
     SET p.age = $age
     """)
-    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+    .withConfig(QueryConfig.builder().withDatabase("<database-name>").build())
     .withParameters(Map.of("name", "Alice", "age", 42))
     .execute();
 var summary = result.summary();
@@ -116,7 +116,7 @@ var result = driver.executableQuery("""
     MATCH (bob:Person {name: $friend})  // <2>
     CREATE (alice)-[:KNOWS]->(bob)  // <3>
     """)
-    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+    .withConfig(QueryConfig.builder().withDatabase("<database-name>").build())
     .withParameters(Map.of("name", "Alice", "friend", "Bob"))
     .execute();
 var summary = result.summary();
@@ -143,7 +143,7 @@ var result = driver.executableQuery("""
     MATCH (p:Person {name: $name})
     DETACH DELETE p
     """)
-    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+    .withConfig(QueryConfig.builder().withDatabase("<database-name>").build())
     .withParameters(Map.of("name", "Alice"))
     .execute();
 var summary = result.summary();
@@ -168,7 +168,7 @@ You may provide query parameters as a map through the `.withParameters()` method
 ----
 var result = driver.executableQuery("MATCH (p:Person {name: $name}) RETURN p")
     .withParameters(Map.of("name", "Alice"))
-    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+    .withConfig(QueryConfig.builder().withDatabase("<database-name>").build())
     .execute();
 ----
 
@@ -194,7 +194,7 @@ You can use an exception's code (retrievable with `.code()`) to stably identify 
 
 try {
     var result = driver.executableQuery("MATCH (p:Person) RETURN ")
-    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+    .withConfig(QueryConfig.builder().withDatabase("<database-name>").build())
     .execute();
 } catch (Neo4jException e) {
     System.out.printf("Neo4j error code: %s\n", e.code());
@@ -228,7 +228,7 @@ If no database is given, the link:https://neo4j.com/docs/operations-manual/curre
 // import org.neo4j.driver.QueryConfig;
 
 var result = driver.executableQuery("MATCH (p:Person) RETURN p.name")
-    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+    .withConfig(QueryConfig.builder().withDatabase("<database-name>").build())
     .execute();
 ----
 
@@ -250,7 +250,7 @@ To improve performance on read queries, you can use the method `.withRouting(Rou
 
 var result = driver.executableQuery("MATCH (p:Person) RETURN p.name")
     .withConfig(QueryConfig.builder()
-        .withDatabase("neo4j")
+        .withDatabase("<database-name>")
         .withRouting(RoutingControl.READ)
         .build())
     .execute();
@@ -280,7 +280,7 @@ Query-scoped authentication requires a server version >= 5.8.
 var authToken = AuthTokens.basic("somebodyElse", "theirPassword");
 var result = driver.executableQuery("MATCH (p:Person) RETURN p.name")
     .withConfig(QueryConfig.builder()
-        .withDatabase("neo4j")
+        .withDatabase("<database-name>")
         .withAuthToken(authToken)
         .build())
     .execute();
@@ -295,7 +295,7 @@ The difference is that you don't need to know a user's password to impersonate t
 
 var result = driver.executableQuery("MATCH (p:Person) RETURN p.name")
     .withConfig(QueryConfig.builder()
-        .withDatabase("neo4j")
+        .withDatabase("<database-name>")
         .withImpersonatedUser("somebodyElse")
         .build())
     .execute();
@@ -341,7 +341,7 @@ public class App {
                 //Create some nodes
                 people.forEach(person -> {
                     var result = driver.executableQuery("CREATE (p:Person {name: $person.name, age: $person.age})")
-                        .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+                        .withConfig(QueryConfig.builder().withDatabase("<database-name>").build())
                         .withParameters(Map.of("person", person))
                         .execute();
                 });
@@ -355,7 +355,7 @@ public class App {
                             MATCH (friend:Person {name: friend_name})
                             CREATE (p)-[:KNOWS]->(friend)
                              """)
-                            .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+                            .withConfig(QueryConfig.builder().withDatabase("<database-name>").build())
                             .withParameters(Map.of("person", person))
                             .execute();
                     }
@@ -368,7 +368,7 @@ public class App {
                     RETURN friend
                      """)
                     .withConfig(QueryConfig.builder()
-                        .withDatabase("neo4j")
+                        .withDatabase("<database-name>")
                         .withRouting(RoutingControl.READ)
                         .build())
                     .withParameters(Map.of("name", "Alice", "age", 40))

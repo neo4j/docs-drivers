@@ -44,7 +44,7 @@ public class App {
     }
 
     public static CompletableFuture<ResultSummary> printAllPeople(Driver driver) {
-        var session = driver.session(AsyncSession.class, SessionConfig.builder().withDatabase("neo4j").build());  // <2>
+        var session = driver.session(AsyncSession.class, SessionConfig.builder().withDatabase("<database-name>").build());  // <2>
 
         var query = """
         UNWIND ['Alice', 'Bob', 'Sofia', 'Charles'] AS name

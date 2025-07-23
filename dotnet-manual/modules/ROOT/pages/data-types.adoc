@@ -53,7 +53,7 @@ var result = await driver.ExecutableQuery(@"
     RETURN friendship.since AS date
 ")
     .WithParameters(new { name = "Astrid", friend = "Sara", friendsSince = friendsSince })
-    .WithConfig(new QueryConfig(database: "neo4j"))
+    .WithConfig(new QueryConfig(database: "<database-name>"))
     .ExecuteAsync();
 
 Console.WriteLine(result.Result[0].Get<ZonedDateTime>("date"));
@@ -84,7 +84,7 @@ You can think of it as a unique identifier for each spatial type.
 [source, csharp]
 ----
 var result = await driver.ExecutableQuery("RETURN point({x: 2.3, y: 4.5, z: 2}) AS point")
-    .WithConfig(new QueryConfig(database: "neo4j"))
+    .WithConfig(new QueryConfig(database: "<database-name>"))
     .ExecuteAsync();
 Console.WriteLine(result.Result[0].Get<Point>("point"));
 // Point{srId=9157, x=2.3, y=4.5, z=2}
@@ -96,7 +96,7 @@ Console.WriteLine(result.Result[0].Get<Point>("point"));
 var location = new Point(4326, 67.28775180193841, 17.734163823312397);  // 4326 = 2D geodetic point
 var result = await driver.ExecutableQuery("CREATE (p:PlaceOfInterest {location: $location}) RETURN p")
     .WithParameters(new { location = location })
-    .WithConfig(new QueryConfig(database: "neo4j"))
+    .WithConfig(new QueryConfig(database: "<database-name>"))
     .ExecuteAsync();
 Console.WriteLine(result.Result[0].Get<INode>("p").Get<Point>("location"));
 // Point{srId=4326, x=67.28775180193841, y=17.734163823312397}
@@ -147,7 +147,7 @@ This should be used with care, as no guarantees are given about the mapping betw
 ----
 var result = await driver.ExecutableQuery("MERGE (p:Person:Troublemaker {name: $name, age: $age}) RETURN p")
     .WithParameters(new { name = "Carla", age = 59 })
-    .WithConfig(new QueryConfig(database: "neo4j"))
+    .WithConfig(new QueryConfig(database: "<database-name>"))
     .ExecuteAsync();
 
 var node = result.Result[0].Get<INode>("p");
@@ -205,7 +205,7 @@ var result = await driver.ExecutableQuery(@"
     RETURN r AS friendship
     ")
     .WithParameters(new { name = "Alice", friendName = "Bob", status = "BFF" })
-    .WithConfig(new QueryConfig(database: "neo4j"))
+    .WithConfig(new QueryConfig(database: "<database-name>"))
     .ExecuteAsync();
 
 var relationship = result.Result[0].Get<IRelationship>("friendship");
@@ -250,7 +250,7 @@ var result = await driver.ExecutableQuery(@"
     RETURN path AS friendshipChain
     ")
     .WithParameters(new { name = "Alice" })
-    .WithConfig(new QueryConfig(database: "neo4j"))
+    .WithConfig(new QueryConfig(database: "<database-name>"))
     .ExecuteAsync();
 
 // Extract path from result
@@ -278,7 +278,7 @@ async Task addFriend(IDriver driver, string name, string status, string friendNa
         MERGE (p)-[r:KNOWS {status: $status, since: date()}]->(friend)
         ")
         .WithParameters(new { name = name, status = status, friendName = friendName })
-        .WithConfig(new QueryConfig(database: "neo4j"))
+        .WithConfig(new QueryConfig(database: "<database-name>"))
         .ExecuteAsync();
 }
 ----

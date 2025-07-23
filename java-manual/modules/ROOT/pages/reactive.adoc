@@ -91,7 +91,7 @@ public class App {
             Flux<Record> records = Flux.usingWhen(  // <1>
                 Mono.just(driver.session(  // <2>
                     ReactiveSession.class,  // <3>
-                    SessionConfig.builder().withDatabase("neo4j").build()
+                    SessionConfig.builder().withDatabase("<database-name>").build()
                 )),
                 rxSession -> Mono.fromDirect(rxSession.executeRead(  // <4>
                     tx -> Mono
@@ -161,7 +161,7 @@ public class App {
             Flux<Record> records = Flux.usingWhen(
                 Mono.just(driver.session(
                     ReactiveSession.class,
-                    SessionConfig.builder().withDatabase("neo4j").build()
+                    SessionConfig.builder().withDatabase("<database-name>").build()
                 )),
                 rxSession -> Mono
                     .fromDirect(rxSession.run("UNWIND range (1, 5) AS x RETURN x"))

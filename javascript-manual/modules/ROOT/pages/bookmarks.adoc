@@ -44,7 +44,7 @@ Bookmark management happens automatically for queries run within a single sessio
 
 [source, javascript]
 ----
-let session = driver.session({database: 'neo4j'})
+let session = driver.session({database: '<database-name>'})
 try {
   await session.executeWrite(async tx => {
     await tx.run("<QUERY 1>")
@@ -92,7 +92,7 @@ async function createFriends(driver) {
   let savedBookmarks = []  // To collect the sessions' bookmarks
 
   // Create the first person and employment relationship.
-  const sessionA = driver.session({database: 'neo4j'})
+  const sessionA = driver.session({database: '<database-name>'})
   try {
     await createPerson(sessionA, 'Alice')
     await employPerson(sessionA, 'Alice', 'Wayne Enterprises')
@@ -102,7 +102,7 @@ async function createFriends(driver) {
   }
 
   // Create the second person and employment relationship.
-  const sessionB = driver.session({database: 'neo4j'})
+  const sessionB = driver.session({database: '<database-name>'})
   try {
     await createPerson(sessionB, 'Bob')
     await employPerson(sessionB, 'Bob', 'LexCorp')
@@ -113,7 +113,7 @@ async function createFriends(driver) {
 
   // Create (and show) a friendship between the two people created above.
   const sessionC = driver.session({
-    database: 'neo4j',
+    database: '<database-name>',
     bookmarks: savedBookmarks  // <2>
   })
   try {

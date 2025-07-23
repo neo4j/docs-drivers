@@ -14,13 +14,13 @@ The overhead is minimal for a single query, but becomes significant over hundred
 ----
 result, err := neo4j.ExecuteQuery(ctx, driver, "<QUERY>", nil,
     neo4j.EagerResultTransformer,
-    neo4j.ExecuteQueryWithDatabase("neo4j"))
+    neo4j.ExecuteQueryWithDatabase("<database-name>"))
 ----
 
 [source, go]
 ----
 session := driver.NewSession(ctx, neo4j.SessionConfig{
-    DatabaseName: "neo4j",
+    DatabaseName: "<database-name>",
 })
 ----
 
@@ -56,7 +56,7 @@ This is the safest mode of execution with respect to failures, but also the slow
 for i := 0; i < 10000; i++ {
     neo4j.ExecuteQuery(ctx, driver, "<QUERY>", nil,
     neo4j.EagerResultTransformer,
-    neo4j.ExecuteQueryWithDatabase("neo4j"))
+    neo4j.ExecuteQueryWithDatabase("<database-name>"))
     // or session.executeRead/Write() calls
 }
 ----
@@ -67,7 +67,7 @@ In this way, the transaction as a whole is isolated from others, but individual 
 .Group queries into one transaction (higher throughput)
 [source, go]
 ----
-session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "<database-name>"})
 defer session.Close(ctx)
 res, err := session.ExecuteRead(ctx, func(tx neo4j.ManagedTransaction) (any, error) {
     for i := 0; i < 10000; i++ {
@@ -85,7 +85,7 @@ One upper limit on the client size is given by the size of the connection pool: 
 .Queries as auto-commit transactions (highest throughput)
 [source, go]
 ----
-session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "<database-name>"})
 defer session.Close(ctx)
 for i := 0; i < 10000; i++ {
     session.Run(ctx, "<QUERY>", nil)
@@ -181,7 +181,7 @@ func lazyLoading(ctx context.Context, driver neo4j.DriverWithContext) {
         panic(err)
     }
 
-    session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+    session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "<database-name>"})
     defer session.Close(ctx)
     session.ExecuteRead(ctx,
         func(tx neo4j.ManagedTransaction) (any, error) {
@@ -208,7 +208,7 @@ func eagerLoading(ctx context.Context, driver neo4j.DriverWithContext) {
         slowQuery,
         nil,
         neo4j.EagerResultTransformer,
-        neo4j.ExecuteQueryWithDatabase("neo4j"))
+        neo4j.ExecuteQueryWithDatabase("<database-name>"))
     if err != nil {
         panic(err)
     }
@@ -298,13 +298,13 @@ In a cluster, *route read queries to any reader node*. You do this by:
 ----
 result, err := neo4j.ExecuteQuery(ctx, driver,
     "MATCH (p:Person) RETURN p", nil, neo4j.EagerResultTransformer,
-    neo4j.ExecuteQueryWithDatabase("neo4j"),
+    neo4j.ExecuteQueryWithDatabase("<database-name>"),
     neo4j.ExecuteQueryWithReadersRouting())
 ----
 
 [source, go]
 ----
-session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "<database-name>"})
 defer session.Close(ctx)
 result, err := session.ExecuteRead(ctx,
     func(tx neo4j.ManagedTransaction) (any, error) {
@@ -320,13 +320,13 @@ result, err := session.ExecuteRead(ctx,
 ----
 result, err := neo4j.ExecuteQuery(ctx, driver,
     "MATCH (p:Person) RETURN p", nil, neo4j.EagerResultTransformer,
-    neo4j.ExecuteQueryWithDatabase("neo4j"))
+    neo4j.ExecuteQueryWithDatabase("<database-name>"))
     // defaults to routing = writers
 ----
 
 [source, go]
 ----
-session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "<database-name>"})
 defer session.Close(ctx)
 result, err := session.ExecuteWrite(ctx,  // don't ask to write on a read-only operation
     func(tx neo4j.ManagedTransaction) (any, error) {
@@ -348,7 +348,7 @@ You can create indexes with the `CREATE INDEX` Cypher clause, for both nodes and
 neo4j.ExecuteQuery(ctx, driver,
     "CREATE INDEX personName FOR (n:Person) ON (n.name)",
     nil, neo4j.EagerResultTransformer,
-    neo4j.ExecuteQueryWithDatabase("neo4j"))
+    neo4j.ExecuteQueryWithDatabase("<database-name>"))
 ----
 
 For more information, see link:{neo4j-docs-base-uri}/cypher-manual/current/indexes-for-search-performance/[Indexes for search performance].
@@ -369,7 +369,7 @@ result, _ := neo4j.ExecuteQuery(ctx, driver,
         "name": "Alice",
     },
     neo4j.EagerResultTransformer,
-    neo4j.ExecuteQueryWithDatabase("neo4j"))
+    neo4j.ExecuteQueryWithDatabase("<database-name>"))
 fmt.Println(result.Summary.Profile().Arguments()["string-representation"])
 /*
 Planner COST
@@ -403,7 +403,7 @@ result, _ := neo4j.ExecuteQuery(ctx, driver,
         "name": "Alice",
     },
     neo4j.EagerResultTransformer,
-    neo4j.ExecuteQueryWithDatabase("neo4j"))
+    neo4j.ExecuteQueryWithDatabase("<database-name>"))
 fmt.Println(result.Summary.Plan().Arguments()["string-representation"])
 /*
 Planner COST
@@ -444,12 +444,12 @@ result, err := neo4j.ExecuteQuery(ctx, driver,
     map[string]any{
         "name": "Alice",
     }, neo4j.EagerResultTransformer,
-    neo4j.ExecuteQueryWithDatabase("neo4j"))
+    neo4j.ExecuteQueryWithDatabase("<database-name>"))
 ----
 
 [source, go]
 ----
-session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "<database-name>"})
 defer session.Close(ctx)
 result, err := session.Run(ctx,
     "MATCH (p:Person|Animal {name: $name}) RETURN p",
@@ -469,12 +469,12 @@ result, err := neo4j.ExecuteQuery(ctx, driver,
     map[string]any{
         "name": "Alice",
     }, neo4j.EagerResultTransformer,
-    neo4j.ExecuteQueryWithDatabase("neo4j"))
+    neo4j.ExecuteQueryWithDatabase("<database-name>"))
 ----
 
 [source, go]
 ----
-session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "<database-name>"})
 defer session.Close(ctx)
 result, err := session.Run(ctx,
     "MATCH (p {name: $name}) RETURN p",
@@ -503,7 +503,7 @@ neo4j.ExecuteQuery(ctx, driver, `
     `, map[string]any{
         "numbers": numbers,
     }, neo4j.EagerResultTransformer,
-    neo4j.ExecuteQueryWithDatabase("neo4j"))
+    neo4j.ExecuteQueryWithDatabase("<database-name>"))
 ----
 
 [discrete]
@@ -517,7 +517,7 @@ for i := 0; i < 10000; i++ {
         map[string]any{
             "value": i,
         }, neo4j.EagerResultTransformer,
-        neo4j.ExecuteQueryWithDatabase("neo4j"))
+        neo4j.ExecuteQueryWithDatabase("<database-name>"))
 }
 ----
 
@@ -542,12 +542,12 @@ result, err := neo4j.ExecuteQuery(ctx, driver,
     map[string]any{
         "name": "Alice",
     }, neo4j.EagerResultTransformer,
-    neo4j.ExecuteQueryWithDatabase("neo4j"))
+    neo4j.ExecuteQueryWithDatabase("<database-name>"))
 ----
 
 [source, go]
 ----
-session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "<database-name>"})
 defer session.Close(ctx)
 session.Run(ctx, "MATCH (p:Person {name: $name}) RETURN p", map[string]any{
     "name": "Alice",
@@ -563,12 +563,12 @@ result, err := neo4j.ExecuteQuery(ctx, driver,
     "MATCH (p:Person {name: 'Alice'}) RETURN p",
     // or "MATCH (p:Person {name: '" + name + "'}) RETURN p"
     nil, neo4j.EagerResultTransformer,
-    neo4j.ExecuteQueryWithDatabase("neo4j"))
+    neo4j.ExecuteQueryWithDatabase("<database-name>"))
 ----
 
 [source, go]
 ----
-session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "<database-name>"})
 defer session.Close(ctx)
 session.Run(ctx, "MATCH (p:Person {name: $name}) RETURN p", nil)
            // or "MATCH (p:Person {name: '" + name + "'}) RETURN p"

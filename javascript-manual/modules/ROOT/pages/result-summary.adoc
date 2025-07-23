@@ -19,7 +19,7 @@ let { records, summary } = await driver.executeQuery(`
   UNWIND ['Alice', 'Bob'] AS name
   MERGE (p:Person {name: name})
   `, {},
-  { database: 'neo4j' }
+  { database: '<database-name>' }
 )
 // or summary = (await driver.executeQuery('<QUERY>')).summary
 ----
@@ -32,7 +32,7 @@ This means that any record which has not yet been processed is discarded.
 
 [source, javascript]
 ----
-let session = driver.session({ database: 'neo4j' })
+let session = driver.session({ database: '<database-name>' })
 try {
   let summary = await session.executeWrite(async tx => {
     let result = await tx.run(`
@@ -59,7 +59,7 @@ let { records, summary } = await driver.executeQuery(`
   UNWIND ['Alice', 'Bob'] AS name
   MERGE (p:Person {name: name})
   `, {},
-  { database: 'neo4j' }
+  { database: '<database-name>' }
 )
 console.log(summary.counters.updates())
 /*
@@ -172,7 +172,7 @@ let { records, summary } = await driver.executeQuery(`
   MATCH p=shortestPath((:Person {name: 'Alice'})-[*]->(:Person {name: 'Bob'}))
   RETURN p
   `, {},
-  { database: 'neo4j' }
+  { database: '<database-name>' }
 )
 console.log(summary.notifications)
 /*
@@ -208,7 +208,7 @@ let { records, summary } = await driver.executeQuery(`
   MATCH p=shortestPath((:Person {name: 'Alice'})-[*]->(:Person {name: 'Bob'}))
   RETURN p
   `, {},
-  { database: 'neo4j' }
+  { database: '<database-name>' }
 )
 console.log(summary.gqlStatusObjects)
 /*
@@ -279,7 +279,7 @@ let driver = neo4j.driver(
 
 // at session level
 let session = driver.session({
-    database: 'neo4j',
+    database: '<database-name>',
     notificationsFilter: {
       minimumSeverityLevel: 'WARNING',  // or 'OFF' to disable entirely
       disabledClassifications: ['HINT', 'GENERIC']  // filters categories as well

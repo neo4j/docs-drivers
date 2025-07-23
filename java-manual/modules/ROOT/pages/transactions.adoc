@@ -19,7 +19,7 @@ For further configuration parameters, see xref:_session_configuration[Session co
 ----
 // import org.neo4j.driver.SessionConfig
 
-try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
+try (var session = driver.session(SessionConfig.builder().withDatabase("<database-name>").build())) {
     // session usage
 }
 ----
@@ -46,7 +46,7 @@ Both methods take a <<transaction_function>> callback, which is responsible for 
 // import java.util.Map
 // import org.neo4j.driver.SessionConfig
 
-try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {  // <1>
+try (var session = driver.session(SessionConfig.builder().withDatabase("<database-name>").build())) {  // <1>
     var people = session.executeRead(tx -> {  // <2>
         var result = tx.run("""
         MATCH (p:Person) WHERE p.name STARTS WITH $filter  // <3>
@@ -105,7 +105,7 @@ public class App {
         final String dbPassword = "<password>";
 
         try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword))) {
-            try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
+            try (var session = driver.session(SessionConfig.builder().withDatabase("<database-name>").build())) {
                 for (int i=0; i<100; i++) {
                     String name = String.format("Thor%d", i);
 
@@ -215,7 +215,7 @@ You may then run queries inside an explicit transaction with the method `Transac
 
 [source, java]
 ----
-try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
+try (var session = driver.session(SessionConfig.builder().withDatabase("<database-name>").build())) {
     try (Transaction tx = session.beginTransaction()) {
         // use tx.run() to run queries
         //     tx.commit() to commit the transaction
@@ -273,13 +273,13 @@ public class App {
             MERGE (c:Customer {id: randomUUID(), balance: 1000})
             RETURN c.id AS id
             """)
-            .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+            .withConfig(QueryConfig.builder().withDatabase("<database-name>").build())
             .execute();
         return result.records().get(0).get("id").asString();
     }
 
     static void transferToOtherBank(Driver driver, String customerId, int otherBankId, float amount) {
-        try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
+        try (var session = driver.session(SessionConfig.builder().withDatabase("<database-name>").build())) {
             try (var tx = session.beginTransaction()) {
                 if (! customerBalanceCheck(tx, customerId, amount)) {
                     System.out.printf("Customer %s doesn't have enough funds.%n", customerId);
@@ -414,7 +414,7 @@ If no database is given, the link:{neo4j-docs-base-uri}/operations-manual/curren
 // import org.neo4j.driver.SessionConfig;
 
 var session = driver.session(SessionConfig.builder()
-    .withDatabase("neo4j").build());
+    .withDatabase("<database-name>").build());
 ----
 
 [TIP]
@@ -435,7 +435,7 @@ Note that `.executeRead()` and `.executeWrite()` automatically override the sess
 // import org.neo4j.driver.AccessMode;
 
 var session = driver.session(SessionConfig.builder()
-    .withDatabase("neo4j")
+    .withDatabase("<database-name>")
     .withDefaultAccessMode(AccessMode.READ)
     .build());
 ----
@@ -471,7 +471,7 @@ var authToken = AuthTokens.basic("somebodyElse", "theirPassword");
 var session = driver.session(
     Session.class,
     SessionConfig.builder()
-        .withDatabase("neo4j")
+        .withDatabase("<database-name>")
         .build(),
     authToken
 );
@@ -485,7 +485,7 @@ The difference is that you don't need to know a user's password to impersonate t
 // import org.neo4j.driver.SessionConfig;
 
 var session = driver.session(SessionConfig.builder()
-    .withDatabase("neo4j")
+    .withDatabase("<database-name>")
     .withImpersonatedUser("somebodyElse")
     .build());
 ----
@@ -510,7 +510,7 @@ Use this to tag transactions.
 // import org.neo4j.driver.SessionConfig
 // import org.neo4j.driver.TransactionConfig
 
-try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
+try (var session = driver.session(SessionConfig.builder().withDatabase("<database-name>").build())) {
     var people = session.executeRead(tx -> {
         var result = tx.run("MATCH (p:Person) RETURN p");
         return result.list();  // return a list of Record objects
@@ -534,7 +534,7 @@ If you do not open sessions as resources with `try`, remember to call the `.clos
 
 [source, java]
 ----
-var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build());
+var session = driver.session(SessionConfig.builder().withDatabase("<database-name>").build());
 
 // session usage
 

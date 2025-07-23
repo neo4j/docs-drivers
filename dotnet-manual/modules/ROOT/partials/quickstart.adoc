@@ -62,7 +62,7 @@ var result = await driver.ExecutableQuery(@"
     CREATE (a)-[:KNOWS]->(b)
     ")
     .WithParameters(new { name = "Alice", friendName = "David" })
-    .WithConfig(new QueryConfig(database: "neo4j"))
+    .WithConfig(new QueryConfig(database: "<database-name>"))
     .ExecuteAsync();
 
 // Summary information
@@ -85,7 +85,7 @@ var result = await driver.ExecutableQuery(@"
     MATCH (p:Person)-[:KNOWS]->(:Person)
     RETURN p.name AS name
     ")
-    .WithConfig(new QueryConfig(database: "neo4j"))
+    .WithConfig(new QueryConfig(database: "<database-name>"))
     .ExecuteAsync();
 
 // Loop through results and print people's name

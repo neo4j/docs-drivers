@@ -19,7 +19,7 @@ var result = await driver.ExecutableQuery(@"
         UNWIND ['Alice', 'Bob'] AS name
         MERGE (p:Person {name: name})
     ")
-    .WithConfig(new QueryConfig(database: "neo4j"))
+    .WithConfig(new QueryConfig(database: "<database-name>"))
     .ExecuteAsync();
 var resultSummary = result.Summary;
 ----
@@ -30,7 +30,7 @@ This means that any record which has not yet been processed is discarded.
 
 [source, csharp]
 ----
-using var session = driver.AsyncSession(SessionConfigBuilder.ForDatabase("neo4j"));
+using var session = driver.AsyncSession(SessionConfigBuilder.ForDatabase("<database-name>"));
 var resultSummary = await session.ExecuteWriteAsync(
     async tx => {
         var result = await tx.RunAsync(@"
@@ -56,7 +56,7 @@ var result = await driver.ExecutableQuery(@"
         MERGE (p)-[:KNOWS]->(:Person {name: $friend})
     ")
     .WithParameters(new { name = "Mark", friend = "Bob" })
-    .WithConfig(new QueryConfig(database: "neo4j"))
+    .WithConfig(new QueryConfig(database: "<database-name>"))
     .ExecuteAsync();
 var queryCounters = result.Summary.Counters;
 Console.WriteLine(queryCounters);
@@ -84,7 +84,7 @@ You may use this information to locate potential bottlenecks or room for xref:pe
 ----
 var result = await driver.ExecutableQuery("EXPLAIN MATCH (p {name: $name}) RETURN p")
     .WithParameters(new { name = "Alice" })
-    .WithConfig(new QueryConfig(database: "neo4j"))
+    .WithConfig(new QueryConfig(database: "<database-name>"))
     .ExecuteAsync();
 var queryPlan = result.Summary.Plan;
 Console.WriteLine(queryPlan.Arguments["string-representation"]);
@@ -117,7 +117,7 @@ Notice that the query is also _run_, so the result object also contains any resu
 ----
 var result = await driver.ExecutableQuery("PROFILE MATCH (p {name: $name}) RETURN p")
     .WithParameters(new { name = "Alice" })
-    .WithConfig(new QueryConfig(database: "neo4j"))
+    .WithConfig(new QueryConfig(database: "<database-name>"))
     .ExecuteAsync();
 // Note: `result.Result` is non-empty
 var queryPlan = result.Summary.Profile;
@@ -170,7 +170,7 @@ var result = await driver.ExecutableQuery(@"
         RETURN p
     ")
     .WithParameters(new { start = "Alice", end = "Bob" })
-    .WithConfig(new QueryConfig(database: "neo4j"))
+    .WithConfig(new QueryConfig(database: "<database-name>"))
     .ExecuteAsync();
 var notifications = result.Summary.Notifications;
 foreach (var n in notifications) {
@@ -206,7 +206,7 @@ var result = await driver.ExecutableQuery(@"
         RETURN p
     ")
     .WithParameters(new { start = "Alice", end = "Bob" })
-    .WithConfig(new QueryConfig(database: "neo4j"))
+    .WithConfig(new QueryConfig(database: "<database-name>"))
     .ExecuteAsync();
 var notifications = result.Summary.GqlStatusObjects;
 foreach (var n in notifications) {
@@ -264,7 +264,7 @@ await using var driver = GraphDatabase.Driver(
 
 // at session level
 using var session = driver.AsyncSession(conf => conf
-    .WithDatabase("neo4j")
+    .WithDatabase("<database-name>")
     .WithNotifications(
         Severity.Warning,
         disabledClassifications: [Classification.Hint, Classification.Generic])
@@ -282,7 +282,7 @@ await using var driver = GraphDatabase.Driver(
 
 // at session level
 using var session = driver.AsyncSession(conf => conf
-    .WithDatabase("neo4j")
+    .WithDatabase("<database-name>")
     .WithNotificationsDisabled()
 );
 ----
@@ -305,7 +305,7 @@ await using var driver = GraphDatabase.Driver(
 
 // at session level
 using var session = driver.AsyncSession(conf => conf
-    .WithDatabase("neo4j")
+    .WithDatabase("<database-name>")
     .WithNotifications(
         Severity.Warning,
         disabledCategories: [Category.Hint, Category.Generic])
