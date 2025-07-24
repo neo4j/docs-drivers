@@ -96,7 +96,7 @@ def auth_provider():
 
 with neo4j.GraphDatabase.driver(
     URI,
-    auth=AuthManagers.expiration_based(auth_provider)
+    auth=AuthManagers.bearer(auth_provider)
 ) as driver:
     ...
 ----
