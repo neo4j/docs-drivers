@@ -127,7 +127,7 @@ To redirect log messages to standard output, use the link:{neo4j-docs-base-uri}/
 import sys
 from neo4j.debug import watch
 
-watch("<database-name>", out=sys.stdout)
+watch("neo4j", out=sys.stdout)
 ----
 
 .Example of log output upon driver connection
