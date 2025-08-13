@@ -428,7 +428,7 @@ Session-scoped authentication requires a server version >= 5.8.
 ----
 with driver.session(
     database="<database-name>",
-    auth=("somebody_else", "their_password")
+    auth=("<username>", "<password>")
 ) as session:
     ...
 ----
@@ -440,7 +440,7 @@ The difference is that you don't need to know a user's password to impersonate t
 ----
 with driver.session(
     database="<database-name>",
-    impersonated_user="somebody_else"
+    impersonated_user="<username>"
 ) as session:
     ...
 ----

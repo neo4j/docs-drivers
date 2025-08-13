@@ -237,13 +237,13 @@ Switching user at the query level is cheaper than creating a new `Driver` object
 The query is then run within the security context of the given user (i.e., home database, permissions, etc.). +
 Query-scoped authentication requires a server version >= 5.8.
 
-[source, javascript, test-skip]
+[source, javascript]
 ----
 await driver.executeQuery(
   'MATCH (p:Person) RETURN p.name',
   {},
   {
-    auth: neo4j.auth.basic('somebodyElse', 'theirPassword'),
+    auth: neo4j.auth.basic('<username>', '<password>'),
     database: '<database-name>'
   }
 )
@@ -252,13 +252,13 @@ await driver.executeQuery(
 The parameter `impersonatedUser` provides a similar functionality, and is available in driver/server versions >= 4.4.
 The difference is that you don't need to know a user's password to impersonate them, but the user under which the `Driver` was created needs to have the link:{neo4j-docs-base-uri}/operations-manual/current/authentication-authorization/dbms-administration/#access-control-dbms-administration-impersonation[appropriate permissions].
 
-[source, javascript, test-skip]
+[source, javascript]
 ----
 await driver.executeQuery(
   'MATCH (p:Person) RETURN p.name',
   {},
   {
-    impersonatedUser: 'somebodyElse',
+    impersonatedUser: '<username>',
     database: '<database-name>'
   }
 )

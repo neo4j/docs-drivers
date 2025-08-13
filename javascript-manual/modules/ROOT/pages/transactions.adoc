@@ -348,7 +348,7 @@ Session-scoped authentication requires a server version >= 5.8.
 ----
 const session = driver.session({
     database: '<database-name>',
-    auth: neo4j.auth.basic('somebodyElse', 'theirPassword')
+    auth: neo4j.auth.basic('<username>', '<password>')
 })
 ----
 
@@ -359,7 +359,7 @@ The difference is that you don't need to know a user's password to impersonate t
 ----
 const session = driver.session({
     database: '<database-name>',
-    impersonatedUser: 'somebodyElse'
+    impersonatedUser: '<username>'
 })
 ----
 

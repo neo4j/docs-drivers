@@ -510,7 +510,7 @@ Session-scoped authentication requires a server version >= 5.8.
 
 [source, go]
 ----
-sessionAuth := neo4j.BasicAuth("somebodyElse", "theirPassword", "")
+sessionAuth := neo4j.BasicAuth("<username>", "<password>", "")
 session := driver.NewSession(ctx, neo4j.SessionConfig{
     DatabaseName: "<database-name>",
     Auth: &sessionAuth,
@@ -524,7 +524,7 @@ The difference is that you don't need to know a user's password to impersonate t
 ----
 session := driver.NewSession(ctx, neo4j.SessionConfig{
     DatabaseName: "<database-name>",
-    ImpersonatedUser: "<somebodyElse>",
+    ImpersonatedUser: "<username>",
 })
 ----
 
