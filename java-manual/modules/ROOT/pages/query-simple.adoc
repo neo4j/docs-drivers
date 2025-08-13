@@ -279,9 +279,9 @@ Query-scoped authentication requires a server version >= 5.8.
 
 var authToken = AuthTokens.basic("somebodyElse", "theirPassword");
 var result = driver.executableQuery("MATCH (p:Person) RETURN p.name")
+    .withAuthToken(authToken)
     .withConfig(QueryConfig.builder()
         .withDatabase("<database-name>")
-        .withAuthToken(authToken)
         .build())
     .execute();
 ----
