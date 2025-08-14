@@ -279,7 +279,7 @@ Query-scoped authentication requires a server version >= 5.8.
 
 [source, go]
 ----
-queryAuth := neo4j.BasicAuth("somebodyElse", "theirPassword", "")
+queryAuth := neo4j.BasicAuth("<username>", "<password>", "")
 neo4j.ExecuteQuery(ctx, driver,
     "MATCH (p:Person) RETURN p.name",
     nil,
@@ -298,7 +298,7 @@ neo4j.ExecuteQuery(ctx, driver,
     nil,
     neo4j.EagerResultTransformer,
     neo4j.ExecuteQueryWithDatabase("<database-name>"),
-    neo4j.ExecuteQueryWithImpersonatedUser("<somebodyElse>"))
+    neo4j.ExecuteQueryWithImpersonatedUser("<username>"))
 ----
 
 

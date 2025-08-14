@@ -467,7 +467,7 @@ Session-scoped authentication requires a server version >= 5.8.
 // import org.neo4j.driver.Session;
 // import org.neo4j.driver.SessionConfig;
 
-var authToken = AuthTokens.basic("somebodyElse", "theirPassword");
+var authToken = AuthTokens.basic("<username>", "<password>");
 var session = driver.session(
     Session.class,
     SessionConfig.builder()
@@ -486,7 +486,7 @@ The difference is that you don't need to know a user's password to impersonate t
 
 var session = driver.session(SessionConfig.builder()
     .withDatabase("<database-name>")
-    .withImpersonatedUser("somebodyElse")
+    .withImpersonatedUser("<username>")
     .build());
 ----
 

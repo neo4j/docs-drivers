@@ -411,22 +411,22 @@ Switching user at the session level is cheaper than creating a new `IDriver` obj
 Queries are then run within the security context of the given user (i.e., home database, permissions, etc.). +
 Session-scoped authentication requires a server version >= 5.8.
 
-[source, csharp, test-skip]
+[source, csharp]
 ----
 using var session = driver.AsyncSession(conf => conf
     .WithDatabase("<database-name>")
-    .WithAuthToken(AuthTokens.Basic("somebodyElse", "theirPassword"))
+    .WithAuthToken(AuthTokens.Basic("<username>", "<password>"))
 );
 ----
 
 The method `.WithImpersonatedUser()` provides a similar functionality, and is available in driver/server versions >= 4.4.
 The difference is that you don't need to know a user's password to impersonate them, but the user under which the `IDriver` was created needs to have the link:{neo4j-docs-base-uri}/operations-manual/current/authentication-authorization/dbms-administration/#access-control-dbms-administration-impersonation[appropriate permissions].
 
-[source, csharp, test-skip]
+[source, csharp]
 ----
 using var session = driver.AsyncSession(conf => conf
     .WithDatabase("<database-name>")
-    .WithImpersonatedUser("<somebodyElse>")
+    .WithImpersonatedUser("<username>")
 );
 ----
 

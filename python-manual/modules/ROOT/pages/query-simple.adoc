@@ -242,11 +242,11 @@ Switching user at the query level is cheaper than creating a new `Driver` object
 The query is then run within the security context of the given user (i.e., home database, permissions, etc.). +
 Query-scoped authentication requires a server version >= 5.8.
 
-[source, python, test-skip]
+[source, python]
 ----
 driver.execute_query(
     "MATCH (p:Person) RETURN p.name",
-    auth_=("somebody_else", "their_password"),
+    auth_=("<username>", "<password>"),
     database_="<database-name>",
 )
 ----
@@ -258,7 +258,7 @@ The difference is that you don't need to know a user's password to impersonate t
 ----
 driver.execute_query(
     "MATCH (p:Person) RETURN p.name",
-    impersonated_user_="somebody_else",
+    impersonated_user_="<username>",
     database_="<database-name>",
 )
 ----
