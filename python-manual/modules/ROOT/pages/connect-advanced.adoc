@@ -12,7 +12,6 @@ include::{common-partial}/connect-advanced.adoc[tag=connection-protocols]
 === Basic authentication (default)
 
 The basic authentication scheme relies on traditional username and password.
-These can either be the credentials for your local installation, or the ones provided with an Aura instance.
 
 [source, python]
 ----
@@ -56,7 +55,7 @@ Once configured, clients can discover Neo4j's configuration through the link:htt
 
 === Custom authentication
 
-Use the function link:{neo4j-docs-base-uri}/api/python-driver/{python-driver-version}/api.html#neo4j.custom_auth[`custom_auth`] to log into a server having a custom authentication scheme.
+Use the function link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.custom_auth[`custom_auth`] to log into a server having a custom authentication scheme.
 
 
 === No authentication
@@ -65,13 +64,12 @@ If authentication is disabled on the server, the authentication parameter can be
 
 
 [#rotating-tokens]
-[role=label--new-5.14]
 == Rotating authentication tokens
 
 It is possible to rotate authentication tokens that are expected to expire (e.g. SSO).
-You need to provide a link:https://neo4j.com/docs/api/python-driver/{python-driver-version}/api.html#neo4j.auth_management.AuthManager[`AuthManager`] instance (or link:https://neo4j.com/docs/api/python-driver/{python-driver-version}/async_api.html#neo4j.auth_management.AsyncAuthManager[`AsyncAuthManager`] for the async driver) when instantiating the `Driver`, rather than a static authentication token.
+You need to provide a link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.auth_management.AuthManager[`AuthManager`] instance (or link:https://neo4j.com/docs/api/python-driver/current/async_api.html#neo4j.auth_management.AsyncAuthManager[`AsyncAuthManager`] for the async driver) when instantiating the `Driver`, rather than a static authentication token.
 
-The easiest way to get started is to use link:https://neo4j.com/docs/api/python-driver/{python-driver-version}/api.html#neo4j.auth_management.AuthManagers[one of built-in `AuthManager` implementations].
+The easiest way to get started is to use link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.auth_management.AuthManagers[one of built-in `AuthManager` implementations].
 
 .Rotating a bearer token expiring every 60 seconds
 [source, python, test-skip]
@@ -110,7 +108,7 @@ You can switch users at both xref:query-simple.adoc#impersonation[query level] a
 
 
 [#mtls]
-[role=label--new-5.27 label--not-on-aura]
+[role=label--not-on-aura]
 == Mutual TLS (client-side certificates as 2FA)
 
 Mutual TLS (mTLS) allows you to use a client certificate as second factor for authenticating with the server.
@@ -125,8 +123,8 @@ For mTLS to work, the driver's connection with the server must be encrypted, i.e
 =====
 [.include-with-static-certificate]
 ======
-Use link:https://neo4j.com/docs/api/python-driver/{python-driver-version}/api.html#neo4j.auth_management.ClientCertificateProviders.static[`ClientCertificateProviders.static()`] for static certificates. +
-The method takes a link:https://neo4j.com/docs/api/python-driver/{python-driver-version}/api.html#neo4j.auth_management.ClientCertificate[`ClientCertificate`] instance, which takes the same parameters as Python's link:https://docs.python.org/3/library/ssl.html#ssl.SSLContext.load_cert_chain[`ssl.SSLContext.load_cert_chain()`].
+Use link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.auth_management.ClientCertificateProviders.static[`ClientCertificateProviders.static()`] for static certificates. +
+The method takes a link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.auth_management.ClientCertificate[`ClientCertificate`] instance, which takes the same parameters as Python's link:https://docs.python.org/3/library/ssl.html#ssl.SSLContext.load_cert_chain[`ssl.SSLContext.load_cert_chain()`].
 
 [source, python, test-skip]
 ----
@@ -159,8 +157,8 @@ with neo4j.GraphDatabase.driver(
 [.include-with-rotating-certificate]
 ======
 
-Use link:https://neo4j.com/docs/api/python-driver/{python-driver-version}/api.html#neo4j.auth_management.ClientCertificateProviders.rotating[`ClientCertificateProviders.rotating()`] for rotating certificates. +
-The method takes a link:https://neo4j.com/docs/api/python-driver/{python-driver-version}/api.html#neo4j.auth_management.ClientCertificate[`ClientCertificate`] instance.
+Use link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.auth_management.ClientCertificateProviders.rotating[`ClientCertificateProviders.rotating()`] for rotating certificates. +
+The method takes a link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.auth_management.ClientCertificate[`ClientCertificate`] instance.
 
 [source, python, test-skip]
 ----
@@ -204,13 +202,13 @@ cert_provider.update_certificate(
 ======
 =====
 
-For more information, see link:https://neo4j.com/docs/api/python-driver/{python-driver-version}/api.html#neo4j.auth_management.ClientCertificateProvider[API docs -> `ClientCertificateProvider`].
+For more information, see link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.auth_management.ClientCertificateProvider[API docs -> `ClientCertificateProvider`].
 
 
 == Custom address resolver
 
 When creating a `Driver` object, you can specify a _resolver_ function to resolve any addresses the driver receives ahead of DNS resolution.
-Your resolver function is called with an link:{neo4j-docs-base-uri}/api/python-driver/{python-driver-version}/api.html#neo4j.Address[`Address`] object and should return an iterable of link:{neo4j-docs-base-uri}/api/python-driver/{python-driver-version}/api.html#neo4j.Address[`Address`] objects (or values that can be used to construct `Address` objects)
+Your resolver function is called with an link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Address[`Address`] object and should return an iterable of link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Address[`Address`] objects (or values that can be used to construct `Address` objects)
 
 .Connection to `example.com` on port `9999` is resolved to `localhost` on port `7687`
 [source, python]
@@ -247,7 +245,7 @@ driver = neo4j.GraphDatabase.driver("neo4j://example.com:9999",
 
 == Further connection parameters
 
-You can find all `Driver` configuration parameters in the link:{neo4j-docs-base-uri}/api/python-driver/{python-driver-version}/api.html#driver-configuration[API documentation].
+You can find all `Driver` configuration parameters in the link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#driver-configuration[API documentation].
 
 
 ifndef::backend-pdf[]
