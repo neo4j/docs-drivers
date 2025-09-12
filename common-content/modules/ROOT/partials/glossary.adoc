@@ -1,6 +1,6 @@
 [glossary]
 [[LTS]]LTS:: A _Long Term Support_ release is one guaranteed to be supported for a number of years.
-Neo4j 4.4 is LTS, and Neo4j 5 will also have an LTS version.
+Neo4j 4.4 and 5.26 are LTS versions.
 [[Aura]]Aura:: link:https://neo4j.com/product/auradb/[Aura] is Neo4j's fully managed cloud service.
 It comes with both free and paid plans.
 [[Cypher]]Cypher:: link:https://neo4j.com/docs/cypher-manual/current/introduction/cypher-overview/[Cypher] is Neo4j's graph query language that lets you retrieve data from the database.
