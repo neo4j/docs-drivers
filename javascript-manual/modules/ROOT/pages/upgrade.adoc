@@ -1,4 +1,4 @@
-:driver-changelog-url: https://github.com/neo4j/neo4j-javascript-driver/wiki/5.0-changelog
+:driver-changelog-url: https://github.com/neo4j/neo4j-javascript-driver/wiki/6.x-changelog
 
 = Upgrade from older versions
 
@@ -100,6 +100,10 @@ Through the new methods, the first argument of transaction functions is a `Manag
 
 |6.0
 |Method `Neo4jError.isRetriable()` has been removed in favor of `Neo4jError.isRetryable()`.
+|label:removed[]
+
+|6.0
+|link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/driver.js~Driver.html[`Driver`] -- The method link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/driver.js~Driver.html#instance-method-verifyConnectivity[`.verifyConnectivity()`] now returns `void` instead of `ServerInfo`. To retrieve the server info, use link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/driver.js~Driver.html#instance-method-getServerInfo[`.getServerInfo()`].
 |label:removed[]
 
 |5.0
