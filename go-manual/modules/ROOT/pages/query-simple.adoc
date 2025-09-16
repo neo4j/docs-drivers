@@ -299,7 +299,6 @@ You can discover whether an error is transient via the function link:https://pkg
 This is particular useful when running queries in xref:transactions#explicit-transactions[explicit transactions], to know if a failed query is worth re-running.
 ====
 
-=======
 
 == Query configuration
 
