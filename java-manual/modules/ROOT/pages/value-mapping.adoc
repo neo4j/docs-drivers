@@ -1,0 +1,176 @@
+= Map query results to objects
+
+When xref:query-simple.adoc#read[working with values coming from a query result], you have to manually extract their properties and convert them to the relevant Java types.
+For example, to retrieve the `name` property as a string, you have to do `person.get("name").asString()`.
+
+With the driver's Value Mapping feature, you can declare a Java Record containing the specification of the values your query is expected to return, and ask the driver to use that class to spawn new objects from a query result.
+
+
+== Map driver values to a local class
+
+To map records into objects, define a link:https://docs.oracle.com/en/java/javase/17/language/records.html[Java Record] having the same components as the keys returned by the query.
+**The constructor arguments must match exactly the query return keys**, and they are case-sensitive.
+
+The most straightforward option is to use a link:https://docs.oracle.com/en/java/javase/17/language/records.html[Java Record], but using a standard class with a constructor that matches the query result keys works as well.
+Either way, you provide the class definition to the driver through the link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Value.html#as(java.lang.Class)[`Value.as()`] method.
+
+.Map `:Person` nodes onto a `Person` record objects
+[source, java]
+----
+package demo;
+
+import org.neo4j.driver.AuthTokens;
+import org.neo4j.driver.Driver;
+import org.neo4j.driver.GraphDatabase;
+import org.neo4j.driver.QueryConfig;
+
+public class App {
+
+    private static final String dbUri = "<database-uri>";
+    private static final String dbUser = "<username>";
+    private static final String dbPassword = "<password>";
+
+    public static void main(String... args) {
+        try (var driver = GraphDatabase.driver(URI, AuthTokens.basic(USER, PASSWORD))) {
+            record Person(String name, Integer age) {}
+            var persons = driver.executableQuery("MERGE (p:Person {name: 'Margarida', age: 29}) RETURN p")
+                .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+                .execute()
+                .records()
+                .stream()
+                .map(record -> record.get("p").as(Person.class))
+                .toList();
+            System.out.println(persons.get(0));  // Person[name=Margarida, age=29]
+        }
+    }
+}
+----
+
+Arguments that don't have a matching property receive a `null` value.
+If the argument does not accept a `null` value (for ex. primitive types), an xref:constructors[alternative constructor] that excludes it must be available.
+The example above uses the type `Integer` over the primitive `int` to account for nodes missing the `age` property.
+
+Declaring the `record` object side-by-side with the query that uses it is a convenient way to obtain results on which it is easy to extract properties.
+However, because the class is defined in a local scope, its type cannot be referenced outside of the method where it is defined.
+As a result, such type may not be used as a return type of the method: you need to process the mapped value in the same function or ensure it implements a type that is accessible outside of the given method.
+Another solution is to declare the `record` object as a `public` member of the class, or to create a new standalone class containing your `record` definition.
+This will make the mapped object available out of the scope of the method in which it was defined.
+
+[NOTE]
+====
+While constructor arguments with specific complex types (ex. `record Friends(List<String> names) {}`) are supported, constructor arguments with generic complex types (ex. `record Friends<T>(List<T> names) {}`) are not supported.
+====
+
+
+== Map properties with different names (`@Property`)
+
+A record's property names and its query return keys can be different.
+For example, consider a node `(:Person {name: "Alice"})`.
+The returned keys for the query `MERGE (p:Person {name: "Alice"}) RETURN p.name` are `p.name`, even if the property name is `name`.
+Similarly, for the query `MERGE (pers:Person {name: "Alice"}) RETURN pers.name`, the return keys are `pers.name`.
+
+You can always alter the return key with the Cypher operator link:https://neo4j.com/docs/cypher-manual/current/clauses/return/#return-column-alias[`AS`] (ex. `MERGE (p:Person {name: "Alice"}) RETURN p.name AS name`), or use the `@Property(<dbPropertyName>)` annotation to specify the property name that the following constructor argument should map to.
+
+.Map properties `name`/`age` to the object attributes `firstName`/`Years`
+[source, java]
+----
+// import org.neo4j.driver.mapping.Property;
+
+record Person(@Property("name") String firstName, @Property("age") Integer Years) {}
+var persons = driver.executableQuery("MERGE (p:Person {name: 'Margarida', age: 29}) RETURN p")
+    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+    .execute()
+    .records()
+    .stream()
+    .map(record -> record.get("p").as(Person.class))
+    .toList();
+System.out.println(persons.get(0));  // Person[firstName=Margarida, Years=29]
+----
+
+
+== Map driver records to a local class
+
+The earlier examples have mapped a driver `Value` (for example a node identified with `p`) to a class.
+You can also use the mapping feature with driver `Record` instances, through the link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Record.html#as(java.lang.Class)[`Record.as()`] method.
+
+.Return keys `name`/`p.age` are mapped to the object attributes `Name`/`Age`
+[source, java]
+----
+// import org.neo4j.driver.mapping.Property;
+
+record Person(String name, @Property("p.age") Integer age) {}
+var persons = driver.executableQuery("""
+            MERGE (p:Person {name: 'Margarida', age: 29})
+            RETURN p.name AS name, p.age
+        """)
+    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+    .execute()
+    .records()
+    .stream()
+    .map(record -> record.as(Person.class))
+    .toList();
+System.out.println(persons.get(0));  // Person[name=Margarida, age=29]
+----
+
+
+[#constructors]
+== Work with multiple constructors
+
+Your Java record class can contain multiple constructors.
+In that case, the driver picks one basing on the following criteria (in order of priority):
+
+- Most matching properties
+- Least mis-matching properties
+
+At least one property must match for a constructor to work with the mapping.
+
+.An additional constructor to handle the optional `age` property
+[source, java]
+----
+// import org.neo4j.driver.mapping.Property;
+
+record Person(String name, int age) {
+    public Person(@Property("name") String name) {
+        this(name, -1);
+    }
+}
+var persons = driver.executableQuery("MERGE (p:Person {name: 'Axel'}) RETURN p")
+    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+    .execute()
+    .records()
+    .stream()
+    .map(record -> record.get("p").as(Person.class))
+    .toList();
+----
+
+[NOTE]
+====
+The compiler renames constructor parameters by default, unless the compiler `-parameters` option is used or the parameters belong to the cannonical constructor of `java.lang.Record`.
+
+In the example above, the constructor containing only `name` uses the `@Property` annotation even if it doesn't specify a different name than the constructor argument. This is needed because that is not the canonical constructor.
+====
+
+
+[#insert-update]
+== Insert and update data
+
+You can also use the mapping feature to insert or update data, by creating an instance of the Java Record object that serves as a blueprint for your object and then passing it to the query as a parameter.
+
+.Create and update a `:Person` node
+[source, java]
+----
+record Person(String name, int age) {}
+
+var person = new Person("Lucia", 29);
+driver.executableQuery("CREATE (:Person $person)")
+         .withParameters(Map.of("person", person))
+         .execute();
+
+var happyBirthday = new Person("Lucia", 30);
+driver.executableQuery("""
+            MATCH (p:Person {name: $person.name})
+            SET person += $person
+            """)
+    .withParameters(Map.of("person", happyBirthday))
+    .execute();
+----

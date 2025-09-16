@@ -7,6 +7,7 @@ Once you have xref:connect.adoc[connected to the database], you can execute <<Cy
 For queries with earlier versions, use xref:transactions.adoc[sessions and transactions].
 
 
+[#write]
 == Write to the database
 
 To create two nodes representing persons named `Alice` and `David`, and a relationship `KNOWS` between them, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/create/[`CREATE`]:
@@ -38,6 +39,7 @@ System.out.printf("Created %d records in %d ms.%n",
 <4> The xref:result-summary.adoc[summary of execution] returned by the server
 
 
+[#read]
 == Read from the database
 
 To retrieve information from the database, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/match/[`MATCH`]:
@@ -71,16 +73,15 @@ System.out.printf("The query %s returned %d records in %d ms.%n",
 <1> `records` contains the result as a list of link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/Record.html[`Record`] objects
 <2> `summary` contains the xref:result-summary.adoc[summary of execution] returned by the server
 
-[TIP]
-====
 Properties inside a link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/Record.html[`Record`] object are embedded within link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/Value.html[`Value`] objects.
 To extract and cast them to the corresponding Java types, use `.as<type>()` (eg. `.asString()`, `asInt()`, etc).
 For example, if the `name` property coming from the database is a string, `record.get("name").asString()` will yield the property value as a `String` object.
-
 For more information, see xref:data-types.adoc[].
-====
+
+Another way of extracting values from returned records is by xref:value-mapping.adoc[mapping them to objects].
 
 
+[#update]
 == Update the database
 
 To update a node's information in the database, use the Cypher clauses link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/match/[`MATCH`] and link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/set/[`SET`]:
@@ -129,7 +130,9 @@ System.out.println(summary.counters().containsUpdates());
 <3> Create a new `:KNOWS` relationship outgoing from the node bound to `alice` and attach to it the `Person` node named `Bob`
 
 
+[#delete]
 == Delete from the database
+
 To remove a node and any relationship attached to it, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/delete/[`DETACH DELETE`]:
 
 .Remove the `Alice` node and all its relationships
@@ -464,6 +467,7 @@ public class App {
 ----
 
 For more information see link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/ExecutableQuery.html[API documentation -> Driver.executableQuery()].
+
 
 
 ifndef::backend-pdf[]
