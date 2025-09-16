@@ -14,7 +14,7 @@ Due to the usage of `async/await`, the examples in this page need to be wrapped 
 
 == Write to the database
 
-To create two nodes representing persons named `Alice` and `David`, and a relationship `KNOWS` between them, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/create/[`CREATE`]:
+To create two nodes representing persons named `Alice` and `David`, and a relationship `KNOWS` between them, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/create/[`CREATE`]:
 
 .Create two nodes and a relationship
 [source, javascript]
@@ -25,7 +25,7 @@ let { records, summary } = await driver.executeQuery(`  // <1>
   CREATE (a)-[:KNOWS]->(b)
   `,
   { name: 'Alice', friendName: 'David' },  // <2>
-  { database: 'neo4j' }  // <3>
+  { database: '<database-name>' }  // <3>
 )
 console.log(
   `Created ${summary.counters.updates().nodesCreated} nodes ` +
@@ -40,7 +40,7 @@ console.log(
 
 == Read from the database
 
-To retrieve information from the database, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/match/[`MATCH`]:
+To retrieve information from the database, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/match/[`MATCH`]:
 
 .Retrieve all `Person` nodes who like other `Person` s
 [source, javascript, role=nocollapse]
@@ -50,7 +50,7 @@ let { records, summary } = await driver.executeQuery(`
   RETURN p.name AS name
   `,
   {},
-  { database: 'neo4j' }
+  { database: '<database-name>' }
 )
 
 // Loop through users and do something with them
@@ -72,7 +72,7 @@ console.log(  // <2>
 
 == Update the database
 
-To update a node's information in the database, use the Cypher clauses link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/match/[`MATCH`] and link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/set/[`SET`]:
+To update a node's information in the database, use the Cypher clauses link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/match/[`MATCH`] and link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/set/[`SET`]:
 
 .Update node `Alice` to add an `age` property
 [source, javascript]
@@ -82,7 +82,7 @@ let { _, summary } = await driver.executeQuery(`
   SET p.age = $age
   `,
   { name: 'Alice', age: 42 },
-  { database: 'neo4j' }
+  { database: '<database-name>' }
 )
 console.log('Query counters:')
 console.log(summary.counters.updates())
@@ -98,7 +98,7 @@ let { records, summary } = await driver.executeQuery(`
   MATCH (bob:Person {name: $friendName})  // <2>
   CREATE (alice)-[:KNOWS]->(bob)  // <3>
   `, { name: 'Alice', friendName: 'Bob' },
-  { database: 'neo4j' }
+  { database: '<database-name>' }
 )
 console.log('Query counters:')
 console.log(summary.counters.updates())
@@ -111,7 +111,7 @@ console.log(summary.counters.updates())
 
 == Delete from the database
 
-To remove a node and any relationship attached to it, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/delete/[`DETACH DELETE`]:
+To remove a node and any relationship attached to it, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/delete/[`DETACH DELETE`]:
 
 .Remove the `Alice` node
 [source, javascript]
@@ -121,7 +121,7 @@ let { _, summary } = await driver.executeQuery(`
   MATCH (p:Person WHERE p.name = $name)
   DETACH DELETE p
   `, { name: 'Alice' },
-  { database: 'neo4j' }
+  { database: '<database-name>' }
 )
 console.log('Query counters:')
 console.log(summary.counters.updates())
@@ -132,7 +132,7 @@ console.log(summary.counters.updates())
 == Query parameters
 
 *Do not hardcode or concatenate parameters directly into queries*.
-Instead, always use placeholders and specify the link:{neo4j-docs-base-uri}/cypher-manual/5/syntax/parameters/[Cypher parameters] as keyword arguments or in a dictionary, as shown in the previous examples.
+Instead, always use placeholders and specify the link:{neo4j-docs-base-uri}/cypher-manual/current/syntax/parameters/[Cypher parameters] as keyword arguments or in a dictionary, as shown in the previous examples.
 This is for:
 
 1. *performance benefits*: Neo4j compiles and caches queries, but can only do so if the query structure is unchanged;
@@ -147,11 +147,12 @@ For those rare use cases, see xref:query-advanced#_dynamic_values_in_property_ke
 == Error handling
 
 A query run may fail for a number of reasons.
-When using `driver.executeQuery()`, the driver automatically retries to run a failed query if the failure is deemed to be transient (for example due to temporary server unavailability).
-An error is raised if the operation keeps failing after a number of attempts.
 
-All errors coming from the server are subclasses of link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/error.js~Neo4jError.html[`Neo4jError`].
-You can use an error's code to stably identify a specific error; error messages are instead not stable markers, and should not be relied upon.
+When using `driver.execute_query()`, the driver automatically retries to run a failed query if the failure is deemed to be transient (for example due to temporary server unavailability).
+An error will be raised if the operation keeps failing after the configured link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/types.js~Config.html#instance-member-maxTransactionRetryTime[maximum retry time].
+
+All link:https://neo4j.com/docs/status-codes/current/errors/all-errors/[errors coming from the server] are subclasses of link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/error.js~Neo4jError.html[`Neo4jError`].
+You can use an exception's code to stably identify a specific error; error messages are instead not stable markers, and should not be relied upon.
 
 .Basic error handling
 [source, javascript, role=nocollapse]
@@ -264,7 +265,7 @@ You can supply a link:{neo4j-docs-base-uri}/api/javascript-driver/{javascript-dr
 
 It is recommended to *always specify the database explicitly* with the `database` parameter, even on single-database instances.
 This allows the driver to work more efficiently, as it saves a network round-trip to the server to resolve the home database.
-If no database is given, the link:{neo4j-docs-base-uri}/operations-manual/5/database-administration/#manage-databases-default[user's home database] is used.
+If no database is given, the link:{neo4j-docs-base-uri}/operations-manual/current/database-administration/#manage-databases-default[user's home database] is used.
 
 [source, javascript]
 ----
@@ -272,14 +273,14 @@ await driver.executeQuery(
   'MATCH (p:Person) RETURN p.name',
   {},
   {
-    database: 'neo4j'
+    database: '<database-name>'
   }
 )
 ----
 
 
 [TIP]
-Specifying the database through the configuration parameter is preferred over the link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/use/[`USE`] Cypher clause.
+Specifying the database through the configuration parameter is preferred over the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/use/[`USE`] Cypher clause.
 If the server runs on a cluster, queries with `USE` require server-side routing to be enabled.
 Queries may also take longer to execute as they may not reach the right cluster member at the first attempt, and need to be routed to one containing the requested database.
 
@@ -296,7 +297,7 @@ await driver.executeQuery(
   {},
   {
     routing: 'READ',  // short for neo4j.routing.READ
-    database: 'neo4j'
+    database: '<database-name>'
   }
 )
 ----
@@ -317,29 +318,29 @@ Switching user at the query level is cheaper than creating a new `Driver` object
 The query is then run within the security context of the given user (i.e., home database, permissions, etc.). +
 Query-scoped authentication requires a server version >= 5.8.
 
-[source, javascript, test-skip]
+[source, javascript]
 ----
 await driver.executeQuery(
   'MATCH (p:Person) RETURN p.name',
   {},
   {
-    auth: neo4j.auth.basic('somebodyElse', 'theirPassword'),
-    database: 'neo4j'
+    auth: neo4j.auth.basic('<username>', '<password>'),
+    database: '<database-name>'
   }
 )
 ----
 
 The parameter `impersonatedUser` provides a similar functionality, and is available in driver/server versions >= 4.4.
-The difference is that you don't need to know a user's password to impersonate them, but the user under which the `Driver` was created needs to have the link:{neo4j-docs-base-uri}/operations-manual/5/authentication-authorization/dbms-administration/#access-control-dbms-administration-impersonation[appropriate permissions].
+The difference is that you don't need to know a user's password to impersonate them, but the user under which the `Driver` was created needs to have the link:{neo4j-docs-base-uri}/operations-manual/current/authentication-authorization/dbms-administration/#access-control-dbms-administration-impersonation[appropriate permissions].
 
-[source, javascript, test-skip]
+[source, javascript]
 ----
 await driver.executeQuery(
   'MATCH (p:Person) RETURN p.name',
   {},
   {
-    impersonatedUser: 'somebodyElse',
-    database: 'neo4j'
+    impersonatedUser: '<username>',
+    database: '<database-name>'
   }
 )
 ----
@@ -352,9 +353,9 @@ await driver.executeQuery(
 const neo4j = require('neo4j-driver');
 
 (async () => {
-  const URI = '{neo4j-database-uri}'
-  const USER = '{neo4j-username}'
-  const PASSWORD = '{neo4j-password}'
+  const URI = '<database-uri>'
+  const USER = '<username>'
+  const PASSWORD = '<password>'
   let driver, result
 
   let people = [{name: 'Alice', age: 42, friends: ['Bob', 'Peter', 'Anna']},
@@ -377,7 +378,7 @@ const neo4j = require('neo4j-driver');
     await driver.executeQuery(
       'MERGE (p:Person {name: $person.name, age: $person.age})',
       { person: person },
-      { database: 'neo4j' }
+      { database: '<database-name>' }
     )
   }
 
@@ -390,7 +391,7 @@ const neo4j = require('neo4j-driver');
         MATCH (friend:Person {name: friendName})
         MERGE (p)-[:KNOWS]->(friend)
         `, { person: person },
-        { database: 'neo4j' }
+        { database: '<database-name>' }
       )
     }
   }
@@ -401,7 +402,7 @@ const neo4j = require('neo4j-driver');
     WHERE friend.age < $age
     RETURN friend
     `, { name: 'Alice', age: 40 },
-    { database: 'neo4j' }
+    { database: '<database-name>' }
   )
 
   // Loop through results and do something with them

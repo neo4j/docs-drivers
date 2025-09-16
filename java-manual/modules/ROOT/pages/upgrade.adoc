@@ -10,7 +10,7 @@ At the same time, the driver version 4.4 is forward compatible with Neo4j server
 
 [TIP]
 When upgrading the Neo4j server to a newer version, the Cypher queries in your application may also need updating. +
-See link:https://neo4j.com/docs/cypher-manual/5/deprecations-additions-removals-compatibility/[Cypher -> Deprecations, additions, and compatibility].
+See link:https://neo4j.com/docs/cypher-manual/current/deprecations-additions-removals-compatibility/[Cypher -> Deprecations, additions, and compatibility].
 
 
 [[new-features]]
@@ -123,7 +123,7 @@ Deprecated features are likely to be removed in version 6.
 
 |5.0
 |link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/summary/ServerInfo.html[`ServerInfo`] -- Method `.version()` has been removed.
-Use `.agent()`, `.protocolVersion()`, or call the link:https://neo4j.com/docs/operations-manual/5/reference/procedures/#procedure_dbms_components[`dbms.components`] Cypher procedure instead.
+Use `.agent()`, `.protocolVersion()`, or call the link:https://neo4j.com/docs/operations-manual/current/reference/procedures/#procedure_dbms_components[`dbms.components`] Cypher procedure instead.
 |label:removed[]
 
 |5.0
@@ -152,7 +152,7 @@ The new methods behave similarly, but the argument types are different and the n
 |label:deprecated[]
 
 |5.0
-|link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/types/Relationship.html[`Relationship`] -- Methods `.startNodeId()` and `.endNodeId()` are deprecated in favor of `.startNodeElementId()` and `.endNodeElementId()`. Old identifiers were `long`, wereas new ElementIds are `string`.
+|link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/types/Relationship.html[`Relationship`] -- Methods `.startNodeId()` and `.endNodeId()` are deprecated in favor of `.startNodeElementId()` and `.endNodeElementId()`. Old identifiers were `long`, whereas new ElementIds are `string`.
 |label:deprecated[]
 
 |5.0

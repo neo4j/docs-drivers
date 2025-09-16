@@ -1,12 +1,9 @@
 = Coordinate parallel transactions
 
-When working with a Neo4j cluster, <<causal_consistency>> is enforced by default in most cases, which guarantees that a query is able to read changes made by previous queries.
+When working with a Neo4j cluster, <<causal_consistency>> is enforced by default in most cases, guaranteeing that a query is able to read changes made by previous queries.
 The same does not happen by default for multiple xref:transactions.adoc[transactions] running in parallel though.
 In that case, you can use _bookmarks_ to have one transaction wait for the result of another to be propagated across the cluster before running its own work.
-This is not a requirement, and *you should only use bookmarks if you _need_ casual consistency across different transactions*, as waiting for bookmarks can have a negative performance impact.
-
-A _bookmark_ is a token that represents some state of the database.
-By passing one or multiple bookmarks along with a query, the server will make sure that the query does not get executed before the represented state(s) have been established.
+This is not a requirement, and *you should only use <<bookmark,bookmarks>> if you _need_ casual consistency across different transactions*, as waiting for bookmarks can have a negative performance impact.
 
 
 == Bookmarks with `.execute_query()`
@@ -18,7 +15,7 @@ In this case, you have the guarantee that subsequent queries can read previous c
 ----
 driver.execute_query("<QUERY 1>")
 
-# subsequent execute_query calls will be causally chained
+# subsequent .execute_query() calls will be causally chained
 
 driver.execute_query("<QUERY 2>") # can read result of <QUERY 1>
 driver.execute_query("<QUERY 3>") # can read result of <QUERY 2>
@@ -37,7 +34,7 @@ driver.execute_query(
 
 == Bookmarks within a single session
 
-Bookmark management happens automatically for queries run within a single session, so that you can trust that queries inside one session are causally chained.
+Bookmark management happens automatically for queries run within a single session: queries inside the same session are causally chained.
 
 [source,python]
 ----
@@ -53,7 +50,7 @@ with driver.session() as session:
 If your application uses multiple sessions, you may need to ensure that one session has completed all its transactions before another session is allowed to run its queries.
 
 In the example below, `session_a` and `session_b` are allowed to run concurrently, while `session_c` waits until their results have been propagated.
-This guarantees the `Person` nodes `session_c` wants to act on actually exist.
+This guarantees that the `Person` nodes `session_c` wants to act on actually exist.
 
 .Coordinate multiple sessions using bookmarks
 [source,python]
@@ -61,8 +58,8 @@ This guarantees the `Person` nodes `session_c` wants to act on actually exist.
 from neo4j import GraphDatabase, Bookmarks
 
 
-URI = "{neo4j-database-uri}"
-AUTH = ("{neo4j-username}", "{neo4j-password}")
+URI = "<database-uri>"
+AUTH = ("<username>", "<password>")
 
 def main():
     with GraphDatabase.driver(URI, auth=AUTH) as driver:
@@ -74,20 +71,20 @@ def create_some_friends(driver):
     saved_bookmarks = Bookmarks()  # To collect the sessions' bookmarks
 
     # Create the first person and employment relationship
-    with driver.session(database="neo4j") as session_a:
+    with driver.session(database="<database-name>") as session_a:
         session_a.execute_write(create_person, "Alice")
         session_a.execute_write(employ, "Alice", "Wayne Enterprises")
         saved_bookmarks += session_a.last_bookmarks()  # <1>
 
     # Create the second person and employment relationship
-    with driver.session(database="neo4j") as session_b:
+    with driver.session(database="<database-name>") as session_b:
         session_b.execute_write(create_person, "Bob")
         session_b.execute_write(employ, "Bob", "LexCorp")
         saved_bookmarks += session_b.last_bookmarks()  # <1>
 
     # Create a friendship between the two people created above
     with driver.session(
-        database="neo4j", bookmarks=saved_bookmarks
+        database="<database-name>", bookmarks=saved_bookmarks
     ) as session_c:  # <2>
         session_c.execute_write(create_friendship, "Alice", "Bob")
         session_c.execute_read(print_friendships)
@@ -136,13 +133,13 @@ if __name__ == "__main__":
 image:{common-image}/driver-passing-bookmarks.svg[]
 
 [TIP]
-The use of bookmarks can negatively impact performance, since all queries are forced to wait for the latest changes to be propagated across the cluster.
+The use of bookmarks can negatively impact performance, since the query is forced to wait for the latest changes to be propagated across the cluster.
 For simple use-cases, try to group queries within a single transaction, or within a single session.
 
 
 == Mix `.execute_query()` and sessions
 
-To ensure causal consistency among transactions executed partly with `.execute_query()` and partly with sessions, you can use the parameter `bookmark_manager` upon session creation, setting it to `driver.execute_query_bookmark_manager`.
+To ensure causal consistency among transactions executed partly with `.execute_query()` and partly with sessions, create the session with `bookmark_manager=driver.execute_query_bookmark_manager`.
 Since that is the default bookmark manager for `.execute_query()` calls, this will ensure that all work is executed under the same bookmark manager and thus causally consistent.
 
 [source, python]
@@ -166,9 +163,9 @@ driver.execute_query("<QUERY 3>")
 
 The _bookmark manager_ is an interface used by the driver for keeping track of the bookmarks and keeping sessions automatically consistent.
 
-You can subclass the link:{neo4j-docs-base-uri}/api/python-driver/{python-driver-version}/api.html#neo4j.api.BookmarkManager[`BookmarkManager`] interface to implement a custom bookmark manager, or use the default implementation provided by the driver through link:{neo4j-docs-base-uri}/api/python-driver/{python-driver-version}/api.html#neo4j.GraphDatabase.bookmark_manager[`GraphDatabase.bookmark_manager()`]. When implementing a bookmark manager, keep in mind that all methods must be concurrency safe.
+You can subclass the link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.api.BookmarkManager[`BookmarkManager`] interface to implement a custom bookmark manager, or use the default implementation provided by the driver through link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.GraphDatabase.bookmark_manager[`GraphDatabase.bookmark_manager()`]. When implementing a bookmark manager, keep in mind that all methods must be concurrency safe.
 
-The details of the interface can be found in the link:{neo4j-docs-base-uri}/api/python-driver/{python-driver-version}/api.html#neo4j.api.BookmarkManager[API documentation].
+The details of the interface can be found in the link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.api.BookmarkManager[API documentation].
 
 
 ifndef::backend-pdf[]

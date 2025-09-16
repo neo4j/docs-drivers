@@ -72,7 +72,7 @@ You can think of this query method as allowing you to specify a Cypher query and
 
 [source, javascript, role=nocollapse]
 ----
-const session = driver.session({database: 'neo4j'})
+const session = driver.session({database: '<database-name>'})
 const result = session.executeWrite(async tx => {  // <1>
   return tx.run(
     'MERGE (p:Person {name: $name}) RETURN p.name AS name',
@@ -112,7 +112,7 @@ It runs asynchronous operations concurrently, so you can submit multiple queries
 [source, javascript]
 ----
 const companyName = 'Neo4j'
-const session = driver.session({database: 'neo4j'})
+const session = driver.session({database: '<database-name>'})
 try {
   const names = await session.executeRead(async tx => {
     const result = await tx.run('MATCH (p:Person) RETURN p.name AS name')
@@ -149,7 +149,7 @@ The behavior is similar to the xref:_asynchronous_iteration[async iterator]; the
 
 [source, javascript, role=nocollapse]
 ----
-const session = driver.session({database: 'neo4j'})
+const session = driver.session({database: '<database-name>'})
 let peopleNames = []
 
 session

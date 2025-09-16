@@ -30,7 +30,7 @@ You may compile and run the project with the commands:
 
 [source, bash]
 ----
-mvn install
+mvn package
 java -jar target/neo4j-demo-app-1.0-SNAPSHOT-jar-with-dependencies.jar
 ----
 ====

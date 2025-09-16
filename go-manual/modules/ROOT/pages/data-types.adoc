@@ -36,7 +36,7 @@ This means that:
 
 - if you want to _query_ the database with a temporal type, instantiate a `time.Date` object and use it as query parameter (i.e. you don't need to care about driver's types)
 - if you _retrieve_ a temporal object that you had previously inserted starting from a `time.Date` object, you will get back a `time.Date` object (i.e. you don't need to care about driver's types)
-- if you receive a temporal object using one of  link:https://neo4j.com/docs/cypher-manual/5/functions/temporal/[_Cypher temporal functions_], you will get back the corresponding _driver type_ as displayed in the table below. You may then use `.Time()` on them to convert them into Go `time.Date` objects.
+- if you receive a temporal object using one of  link:https://neo4j.com/docs/cypher-manual/current/functions/temporal/[_Cypher temporal functions_], you will get back the corresponding _driver type_ as displayed in the table below. You may then use `.Time()` on them to convert them into Go `time.Date` objects.
 +
 [options="header"]
 |===
@@ -66,9 +66,9 @@ func main() {
     ctx := context.Background()
 
     // Connection to database
-    dbUri := "{neo4j-database-uri}"
-    dbUser := "{neo4j-username}"
-    dbPassword := "{neo4j-password}"
+    dbUri := "<database-uri>"
+    dbUser := "<username>"
+    dbPassword := "<password>"
     driver, _ := neo4j.NewDriverWithContext(
         dbUri,
         neo4j.BasicAuth(dbUser, dbPassword, ""))
@@ -88,7 +88,7 @@ func main() {
             "friend": "Bob",
             "friendsSince": friendsSince,
         }, neo4j.EagerResultTransformer,
-        neo4j.ExecuteQueryWithDatabase("neo4j"))
+        neo4j.ExecuteQueryWithDatabase("<database-name>"))
     if err != nil {
         panic(err)
     }
@@ -115,9 +115,9 @@ func main() {
     ctx := context.Background()
 
     // Connection to database
-    dbUri := "{neo4j-database-uri}"
-    dbUser := "{neo4j-username}"
-    dbPassword := "{neo4j-password}"
+    dbUri := "<database-uri>"
+    dbUser := "<username>"
+    dbPassword := "<password>"
     driver, _ := neo4j.NewDriverWithContext(
         dbUri,
         neo4j.BasicAuth(dbUser, dbPassword, ""))
@@ -133,7 +133,7 @@ func main() {
             "name": "Alice",
             "friend": "Sofia",
         }, neo4j.EagerResultTransformer,
-        neo4j.ExecuteQueryWithDatabase("neo4j"))
+        neo4j.ExecuteQueryWithDatabase("<database-name>"))
     if err != nil {
         panic(err)
     }
@@ -165,7 +165,7 @@ For full documentation, see link:https://pkg.go.dev/github.com/neo4j/neo4j-go-dr
 
 == Spatial types
 
-Cypher supports link:{neo4j-docs-base-uri}/cypher-manual/5/values-and-types/spatial/[spatial values] (points), and Neo4j can store these point values as properties on nodes and relationships.
+Cypher supports link:{neo4j-docs-base-uri}/cypher-manual/current/values-and-types/spatial/[spatial values] (points), and Neo4j can store these point values as properties on nodes and relationships.
 
 The object attribute `SpatialRefId` (short for _Spatial Reference Identifier_) is a number identifying the coordinate system the spatial type is to be interpreted in.
 You can think of it as a unique identifier for each spatial type.
@@ -263,7 +263,7 @@ result, err := neo4j.ExecuteQuery(ctx, driver, `
     `, map[string]any{
         "name": "Alice",
     }, neo4j.EagerResultTransformer,
-    neo4j.ExecuteQueryWithDatabase("neo4j"))
+    neo4j.ExecuteQueryWithDatabase("<database-name>"))
 if err != nil {
     panic(err)
 }
@@ -297,7 +297,7 @@ result, err := neo4j.ExecuteQuery(ctx, driver, `
         "status": "BFF",
         "friendName": "Bob",
     }, neo4j.EagerResultTransformer,
-    neo4j.ExecuteQueryWithDatabase("neo4j"))
+    neo4j.ExecuteQueryWithDatabase("<database-name>"))
 if err != nil {
     panic(err)
 }
@@ -337,9 +337,9 @@ func main() {
     ctx := context.Background()
 
     // Connection to database
-    dbUri := "{neo4j-database-uri}"
-    dbUser := "{neo4j-username}"
-    dbPassword := "{neo4j-password}"
+    dbUri := "<database-uri>"
+    dbUser := "<username>"
+    dbPassword := "<password>"
     driver, _ := neo4j.NewDriverWithContext(
         dbUri,
         neo4j.BasicAuth(dbUser, dbPassword, ""))
@@ -357,7 +357,7 @@ func main() {
         `, map[string]any{
             "name": "Alice",
         }, neo4j.EagerResultTransformer,
-        neo4j.ExecuteQueryWithDatabase("neo4j"))
+        neo4j.ExecuteQueryWithDatabase("<database-name>"))
     if err != nil {
         panic(err)
     }
@@ -381,7 +381,7 @@ func addFriend(ctx context.Context, driver neo4j.DriverWithContext, name string,
             "status": status,
             "friendName": friendName,
         }, neo4j.EagerResultTransformer,
-        neo4j.ExecuteQueryWithDatabase("neo4j"))
+        neo4j.ExecuteQueryWithDatabase("<database-name>"))
     if err != nil {
         panic(err)
     }

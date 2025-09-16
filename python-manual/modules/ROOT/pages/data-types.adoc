@@ -56,8 +56,8 @@ from neo4j import GraphDatabase
 from neo4j.time import DateTime
 
 
-URI = "{neo4j-database-uri}"
-AUTH = ("{neo4j-username}", "{neo4j-password}")
+URI = "<database-uri>"
+AUTH = ("<username>", "<password>")
 
 
 friends_since = DateTime(year=1999, month=11, day=23,
@@ -251,7 +251,7 @@ For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/{python
 
 == Graph types
 
-*Graph types are only passed as results and may not be used as parameters*.
+*Graph types are only passed as results and can't be used as parameters*.
 The section xref:transformers#_transform_to_graph[Manipulate query results -- Transform to graph] contains an example with graph types.
 
 [options="header"]
@@ -275,14 +275,14 @@ This should be used with care, as no guarantees are given about the mapping betw
 from neo4j import GraphDatabase
 
 
-URI = "{neo4j-database-uri}"
-AUTH = ("{neo4j-username}", "{neo4j-password}")
+URI = "<database-uri>"
+AUTH = ("<username>", "<password>")
 
 with GraphDatabase.driver(URI, auth=AUTH) as driver:
     records, _, _ = driver.execute_query(
         "MERGE (p:Person {name: $name}) RETURN p AS person",
         name="Alice",
-        database_="neo4j",
+        database_="<database-name>",
     )
     for record in records:
         node = record["person"]
@@ -310,8 +310,8 @@ This should be used with care, as no guarantees are given about the mapping betw
 from neo4j import GraphDatabase
 
 
-URI = "{neo4j-database-uri}"
-AUTH = ("{neo4j-username}", "{neo4j-password}")
+URI = "<database-uri>"
+AUTH = ("<username>", "<password>")
 
 with GraphDatabase.driver(URI, auth=AUTH) as driver:
     records, _, _ = driver.execute_query("""
@@ -351,15 +351,15 @@ from neo4j import GraphDatabase
 from neo4j.time import Date
 
 
-URI = "{neo4j-database-uri}"
-AUTH = ("{neo4j-username}", "{neo4j-password}")
+URI = "<database-uri>"
+AUTH = ("<username>", "<password>")
 
 def add_friend(driver, name, status, date, friend_name):
     driver.execute_query("""
         MERGE (p:Person {name: $name})
         MERGE (p)-[r:KNOWS {status: $status, since: $date}]->(friend:Person {name: $friend_name})
         """, name=name, status=status, date=date, friend_name=friend_name,
-        database_="neo4j",
+        database_="<database-name>",
     )
 
 with GraphDatabase.driver(URI, auth=AUTH) as driver:
@@ -373,7 +373,7 @@ with GraphDatabase.driver(URI, auth=AUTH) as driver:
         MATCH path=(:Person {name: $name})-[:KNOWS*3]->(:Person)
         RETURN path AS friendship_chain
         """, name="Alice",
-        database_="neo4j",
+        database_="<database-name>",
     )
     path = records[0]["friendship_chain"]
 

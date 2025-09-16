@@ -1,0 +1,314 @@
+= Explore the query execution summary
+
+After all results coming from a query have been processed, the server ends the transaction by returning a summary of execution.
+It comes as a link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IResultSummary.html[`IResultSummary`] object, and it contains information among which:
+
+- xref:query-counters[**Query counters**] -- What changes the query triggered on the server
+- xref:execution-plan[**Query execution plan**] -- How the database would execute (or executed) the query
+- xref:notifications[**Notifications**] -- Extra information raised by the server while running the query
+- Timing information and query request summary
+
+
+== Retrieve the execution summary
+
+When running queries with xref:query-simple.adoc[`IDriver.ExecutableQuery()`], the execution summary is part of the default return object, available in the `Summary` property.
+
+[source, csharp]
+----
+var result = await driver.ExecutableQuery(@"
+        UNWIND ['Alice', 'Bob'] AS name
+        MERGE (p:Person {name: name})
+    ")
+    .WithConfig(new QueryConfig(database: "<database-name>"))
+    .ExecuteAsync();
+var resultSummary = result.Summary;
+----
+
+If you are using xref:transactions.adoc[transaction functions], you can retrieve the query execution summary with the method `Result.ConsumeAsync()`.
+**Notice that once you ask for the execution summary, the result stream is exhausted**.
+This means that any record which has not yet been processed is discarded.
+
+[source, csharp]
+----
+using var session = driver.AsyncSession(SessionConfigBuilder.ForDatabase("<database-name>"));
+var resultSummary = await session.ExecuteWriteAsync(
+    async tx => {
+        var result = await tx.RunAsync(@"
+            UNWIND ['Alice', 'Bob'] AS name
+            MERGE (p:Person {name: name})
+        ");
+        return await result.ConsumeAsync();
+    }
+);
+----
+
+
+[#query-counters]
+== Query counters
+
+The property `IResultSummary.Counters` contains counters for the operations that a query triggered (as a link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.ICounters.html[`ICounters`] object).
+
+.Insert some data and display the query counters
+[source, csharp]
+----
+var result = await driver.ExecutableQuery(@"
+        MERGE (p:Person {name: $name})
+        MERGE (p)-[:KNOWS]->(:Person {name: $friend})
+    ")
+    .WithParameters(new { name = "Mark", friend = "Bob" })
+    .WithConfig(new QueryConfig(database: "<database-name>"))
+    .ExecuteAsync();
+var queryCounters = result.Summary.Counters;
+Console.WriteLine(queryCounters);
+/*
+Counters{NodesCreated=2, NodesDeleted=0, RelationshipsCreated=1, RelationshipsDeleted=0,
+PropertiesSet=2, LabelsAdded=2, LabelsRemoved=0, IndexesAdded=0, IndexesRemoved=0,
+ConstraintsAdded=0, ConstraintsRemoved=0, SystemUpdates=0}
+*/
+----
+
+There are two additional boolean properties which act as meta-counters:
+
+- `.ContainsUpdates` -- Whether the query triggered any write operation on the database on which it ran
+- `.ContainsSystemUpdates` -- Whether the query updated the `system` database
+
+
+[#execution-plan]
+== Query execution plan
+
+If you prefix a query with `EXPLAIN`, the server will return the plan it _would_ use to run the query, but will not actually run it.
+The plan is then available as a link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IPlan.html[`IPlan`] object in the property `IResultSummary.Plan`, and contains the list of link:{neo4j-docs-base-uri}/cypher-manual/current/execution-plans/operators/[Cypher operators] that would be used to retrieve the result set.
+You may use this information to locate potential bottlenecks or room for xref:performance.adoc[performance improvements] (for example through the creation of indexes).
+
+[source, csharp, role=nocollapse]
+----
+var result = await driver.ExecutableQuery("EXPLAIN MATCH (p {name: $name}) RETURN p")
+    .WithParameters(new { name = "Alice" })
+    .WithConfig(new QueryConfig(database: "<database-name>"))
+    .ExecuteAsync();
+var queryPlan = result.Summary.Plan;
+Console.WriteLine(queryPlan.Arguments["string-representation"]);
+/*
+Planner COST
+Runtime PIPELINED
+Runtime version 5.0
+Batch size 128
+
++-----------------+----------------+----------------+---------------------+
+| Operator        | Details        | Estimated Rows | Pipeline            |
++-----------------+----------------+----------------+---------------------+
+| +ProduceResults | p              |              1 |                     |
+| |               +----------------+----------------+                     |
+| +Filter         | p.name = $name |              1 |                     |
+| |               +----------------+----------------+                     |
+| +AllNodesScan   | p              |             10 | Fused in Pipeline 0 |
++-----------------+----------------+----------------+---------------------+
+
+Total database accesses: ?
+*/
+----
+
+If you instead prefix a query with the keyword `PROFILE`, the server will return the execution plan it has used to run the query, together with profiler statistics.
+This includes the list of operators that were used and additional profiling information about each intermediate step.
+The plan is available as a link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IProfiledPlan.html[`IProfiledPlan`] object in the property `IResultSummary.Profile`.
+Notice that the query is also _run_, so the result object also contains any result records.
+
+[source, csharp, role=nocollapse]
+----
+var result = await driver.ExecutableQuery("PROFILE MATCH (p {name: $name}) RETURN p")
+    .WithParameters(new { name = "Alice" })
+    .WithConfig(new QueryConfig(database: "<database-name>"))
+    .ExecuteAsync();
+// Note: `result.Result` is non-empty
+var queryPlan = result.Summary.Profile;
+Console.WriteLine(queryPlan.Arguments["string-representation"]);
+/*
+Planner COST
+Runtime PIPELINED
+Runtime version 5.0
+Batch size 128
+
++-----------------+----------------+----------------+------+---------+----------------+------------------------+-----------+---------------------+
+| Operator        | Details        | Estimated Rows | Rows | DB Hits | Memory (Bytes) | Page Cache Hits/Misses | Time (ms) | Pipeline            |
++-----------------+----------------+----------------+------+---------+----------------+------------------------+-----------+---------------------+
+| +ProduceResults | p              |              1 |    1 |       3 |                |                        |           |                     |
+| |               +----------------+----------------+------+---------+----------------+                        |           |                     |
+| +Filter         | p.name = $name |              1 |    1 |       4 |                |                        |           |                     |
+| |               +----------------+----------------+------+---------+----------------+                        |           |                     |
+| +AllNodesScan   | p              |             10 |    4 |       5 |            120 |                 9160/0 |   108.923 | Fused in Pipeline 0 |
++-----------------+----------------+----------------+------+---------+----------------+------------------------+-----------+---------------------+
+
+Total database accesses: 12, total allocated memory: 184
+*/
+----
+
+For more information and examples, see link:https://neo4j.com/docs/cypher-manual/current/appendix/tutorials/basic-query-tuning/#_profile_query[Basic query tuning].
+
+
+[#notifications]
+== Notifications
+
+After executing a query, the server can return link:{neo4j-docs-base-uri}/status-codes/5/notifications/[notifications] alongside the query result.
+Notifications contain recommendations for performance improvements, warnings about the usage of deprecated features, and other hints about sub-optimal usage of Neo4j.
+
+[TIP]
+For driver version >= 5.26 and server version >= 5.23, two forms of notifications are available (_Neo4j status codes_ and _GQL status codes_).
+For earlier versions, only _Neo4j status codes_ are available. +
+GQL status codes are planned to supersede Neo4j status codes.
+
+.An unbounded shortest path raises a performance notification
+[.tabbed-example]
+=====
+[.include-with-neo4j-status-code]
+======
+The property `IResultSummary.Notifications` contains a list of link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.INotification.html[`INotification`] objects.
+
+[source, csharp, role=nocollapse]
+----
+var result = await driver.ExecutableQuery(@"
+        MATCH p=shortestPath((:Person {name: $start})-[*]->(:Person {name: $end}))
+        RETURN p
+    ")
+    .WithParameters(new { start = "Alice", end = "Bob" })
+    .WithConfig(new QueryConfig(database: "<database-name>"))
+    .ExecuteAsync();
+var notifications = result.Summary.Notifications;
+foreach (var n in notifications) {
+    Console.WriteLine(n);
+}
+/*
+Notification{
+    Code=Neo.ClientNotification.Statement.UnboundedVariableLengthPattern
+    Title=The provided pattern is unbounded, consider adding an upper limit to the number of node hops.
+    Description=Using shortest path with an unbounded pattern will likely result in long execution times. It is recommended to use an upper limit to the number of node hops in your pattern.
+    Position=InputPosition{Offset=30, Line=2, Column=30}
+    SeverityLevel=Information
+    Category=Performance
+    RawSeverityLevel=INFORMATION
+    RawCategory=PERFORMANCE
+}
+*/
+----
+
+======
+[.include-with-GQL-status-code]
+======
+
+With version >= 5.26, the property `IResultSummary.GqlStatusObjects` contains a list of GQL-compliant status objects (of type link:https://neo4j.com/docs/api/dotnet-driver/5.28/api/Neo4j.Driver.IGqlStatusObject.html[`IGqlStatusObject`]).
+
+These objects contain either a notification or the query's _outcome_ status (`00000` for "success", `02000` for "no data", and `00001` for "omitted result").
+The list always contains at least one entry, containing the outcome status.
+
+[source, csharp, role=nocollapse]
+----
+var result = await driver.ExecutableQuery(@"
+        MATCH p=shortestPath((:Person {name: $start})-[*]->(:Person {name: $end}))
+        RETURN p
+    ")
+    .WithParameters(new { start = "Alice", end = "Bob" })
+    .WithConfig(new QueryConfig(database: "<database-name>"))
+    .ExecuteAsync();
+var notifications = result.Summary.GqlStatusObjects;
+foreach (var n in notifications) {
+    Console.WriteLine(n);
+}
+/*
+GqlStatusObject {
+    Position = , RawClassification = , RawSeverity = , Title = , IsNotification = False, GqlStatus = 00000, StatusDescription = note: successful completion, Classification = Unknown, Severity = Unknown, DiagnosticRecord = System.Collections.Generic.Dictionary`2[System.String,System.Object], RawDiagnosticRecord = [{CURRENT_SCHEMA, /}, {OPERATION, }, {OPERATION_CODE, 0}]
+}
+GqlStatusObject {
+    Position = InputPosition{Offset=30, Line=2, Column=30},
+    RawClassification = PERFORMANCE,
+    RawSeverity = INFORMATION,
+    Title = The provided pattern is unbounded, consider adding an upper limit to the number of node hops.,
+    IsNotification = True,
+    GqlStatus = 03N91,
+    StatusDescription = info: unbounded variable length pattern. The provided pattern '(:Person {name: $start})-[*]->(:Person {name: $end})' is unbounded. Shortest path with an unbounded pattern may result in long execution times. Use an upper limit (e.g. '[*..5]') on the number of node hops in your pattern.,
+    Classification = Performance,
+    Severity = Information,
+    DiagnosticRecord = System.Collections.Generic.Dictionary`2[System.String,System.Object],
+    RawDiagnosticRecord = [{CURRENT_SCHEMA, /}, {OPERATION, }, {OPERATION_CODE, 0}, {_classification, PERFORMANCE}, {_severity, INFORMATION}, {_position, [{offset, 30}, {line, 2}, {column, 30}]}]
+}
+*/
+----
+
+======
+=====
+
+
+[#filter-notifications]
+[role=label--new-5.7]
+=== Filter notifications
+
+By default, the server analyses each query for all categories and severity of notifications.
+Starting from version 5.7, you can use the configuration method link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.ConfigBuilder.WithNotifications.html[`.WithNotifications()`] to tweak the severity and/or category/classification of notifications that you are interested in.
+There is a slight performance gain in restricting the amount of notifications the server is allowed to raise.
+
+`.WithNotifications()` takes either a link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.Severity.html[`Severity`] and a list of  link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.Classification.html[`Classification`] (v5.26+), or a link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.Severity.html[`Severity`] and a list of link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.Category.html[`Category`]. The provided classifications/categories are *excluded* from output. +
+The severity filter applies to both Neo4j and GQL notifications. +
+The classification filter acts on both categories and classifications. +
+To disable all notifications, use `.WithNotificationsDisabled()`.
+
+You can affect the notifications settings both when creating a new `IDriver` object and upon session creation.
+
+.Allow only `Warning` notifications, but not of classification/category `Hint` or `Generic`
+[source, csharp]
+----
+// at driver level
+await using var driver = GraphDatabase.Driver(
+    dbUri, AuthTokens.Basic(dbUser, dbPassword), conf =>
+    conf.WithNotifications(
+        Severity.Warning,
+        disabledClassifications: [Classification.Hint, Classification.Generic])
+);
+
+// at session level
+using var session = driver.AsyncSession(conf => conf
+    .WithDatabase("<database-name>")
+    .WithNotifications(
+        Severity.Warning,
+        disabledClassifications: [Classification.Hint, Classification.Generic])
+);
+----
+
+.Disable all notifications
+[source, csharp]
+----
+// at driver level
+await using var driver = GraphDatabase.Driver(
+    dbUri, AuthTokens.Basic(dbUser, dbPassword),
+    conf => conf.WithNotificationsDisabled()
+);
+
+// at session level
+using var session = driver.AsyncSession(conf => conf
+    .WithDatabase("<database-name>")
+    .WithNotificationsDisabled()
+);
+----
+
+.Notifications filtering on versions < 5.26
+[%collapsible]
+====
+For versions earlier than 5.26, notification filtering works the same, except you don't supply a list of _classifications_ but a list of _categories_.
+
+.Allow only `Warning` notifications, but not of classification/category `Hint` or `Generic`
+[source, csharp]
+----
+// at driver level
+await using var driver = GraphDatabase.Driver(
+    dbUri, AuthTokens.Basic(dbUser, dbPassword), conf =>
+    conf.WithNotifications(
+        Severity.Warning,
+        disabledCategories: [Category.Hint, Category.Generic])
+);
+
+// at session level
+using var session = driver.AsyncSession(conf => conf
+    .WithDatabase("<database-name>")
+    .WithNotifications(
+        Severity.Warning,
+        disabledCategories: [Category.Hint, Category.Generic])
+);
+----
+====

@@ -81,9 +81,9 @@ import org.neo4j.driver.reactivestreams.ReactiveSession;
 public class App {
 
     public static void main(String... args) {
-        final String dbUri = "{neo4j-database-uri}";
-        final String dbUser = "{neo4j-username}";
-        final String dbPassword = "{neo4j-password}";
+        final String dbUri = "<database-uri>";
+        final String dbUser = "<username>";
+        final String dbPassword = "<password>";
 
         try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword))) {
             driver.verifyConnectivity();
@@ -91,7 +91,7 @@ public class App {
             Flux<Record> records = Flux.usingWhen(  // <1>
                 Mono.just(driver.session(  // <2>
                     ReactiveSession.class,  // <3>
-                    SessionConfig.builder().withDatabase("neo4j").build()
+                    SessionConfig.builder().withDatabase("<database-name>").build()
                 )),
                 rxSession -> Mono.fromDirect(rxSession.executeRead(  // <4>
                     tx -> Mono
@@ -151,9 +151,9 @@ import org.neo4j.driver.reactivestreams.ReactiveSession;
 public class App {
 
     public static void main(String... args) {
-        final String dbUri = "{neo4j-database-uri}";
-        final String dbUser = "{neo4j-username}";
-        final String dbPassword = "{neo4j-password}";
+        final String dbUri = "<database-uri>";
+        final String dbUser = "<username>";
+        final String dbPassword = "<password>";
 
         try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword))) {
             driver.verifyConnectivity();
@@ -161,7 +161,7 @@ public class App {
             Flux<Record> records = Flux.usingWhen(
                 Mono.just(driver.session(
                     ReactiveSession.class,
-                    SessionConfig.builder().withDatabase("neo4j").build()
+                    SessionConfig.builder().withDatabase("<database-name>").build()
                 )),
                 rxSession -> Mono
                     .fromDirect(rxSession.run("UNWIND range (1, 5) AS x RETURN x"))

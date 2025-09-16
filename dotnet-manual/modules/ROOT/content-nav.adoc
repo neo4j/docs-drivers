@@ -1,7 +1,30 @@
-* xref:index.adoc[]
-* xref:get-started.adoc[]
-* xref:client-applications.adoc[]
-* xref:cypher-workflow.adoc[]
-* xref:session-api.adoc[]
+* xref:index.adoc[Quickstart]
+
+* *Regular workflow*
+
+* xref:install.adoc[Installation]
+* xref:connect.adoc[Connect to the database]
+* xref:query-simple.adoc[Query the database]
+* xref:object-mapping.adoc[]
+
+* *Advanced usage*
+
+* xref:transactions.adoc[Run your own transactions]
+* xref:result-summary.adoc[Explore the query execution summary]
+* xref:bookmarks.adoc[Coordinate parallel transactions]
+* xref:query-advanced.adoc[Further query mechanisms]
+* xref:reactive.adoc[Control results flow with reactive streams]
+* xref:performance.adoc[Performance recommendations]
+
+* *Reference*
+
+* xref:connect-advanced.adoc[Advanced connection information]
+* xref:data-types.adoc[Data types and mapping to Cypher types]
 * xref:upgrade.adoc[]
-* xref:terminology.adoc[]
+* link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/[API documentation, window=_blank]
+
+* *GraphAcademy courses*
+
+* link:https://graphacademy.neo4j.com/courses/modeling-fundamentals/?ref=docs-dotnet[Graph Data Modeling Fundamentals]
+* link:https://graphacademy.neo4j.com/courses/cypher-intermediate-queries/?ref=docs-dotnet[Intermediate Cypher Queries]
+* link:https://graphacademy.neo4j.com/courses/app-dotnet/?ref=docs-dotnet[Building Neo4j Applications with .NET]

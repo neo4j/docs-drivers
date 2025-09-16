@@ -18,16 +18,16 @@ In this case, you have the guarantee that subsequent queries can read previous c
 ----
 neo4j.ExecuteQuery(ctx, driver, "<QUERY 1>", nil,
     neo4j.EagerResultTransformer,
-    neo4j.ExecuteQueryWithDatabase("neo4j"))
+    neo4j.ExecuteQueryWithDatabase("<database-name>"))
 
 // subsequent ExecuteQuery calls will be causally chained
 
 neo4j.ExecuteQuery(ctx, driver, "<QUERY 2>", nil,  // can read result of <QUERY 1>
     neo4j.EagerResultTransformer,
-    neo4j.ExecuteQueryWithDatabase("neo4j"))
+    neo4j.ExecuteQueryWithDatabase("<database-name>"))
 neo4j.ExecuteQuery(ctx, driver, "<QUERY 3>", nil,  // can read result of <QUERY 2>
     neo4j.EagerResultTransformer,
-    neo4j.ExecuteQueryWithDatabase("neo4j"))
+    neo4j.ExecuteQueryWithDatabase("<database-name>"))
 ----
 
 To disable bookmark management and causal consistency, use the configuration callback `neo4j.ExecuteQueryWithoutBookmarkManager()` in `ExecuteQuery()` calls.
@@ -36,7 +36,7 @@ To disable bookmark management and causal consistency, use the configuration cal
 ----
 neo4j.ExecuteQuery(
     ctx, driver, "<QUERY>", nil, neo4j.EagerResultTransformer,
-    neo4j.ExecuteQueryWithDatabase("neo4j"),
+    neo4j.ExecuteQueryWithDatabase("<database-name>"),
     neo4j.ExecuteQueryWithoutBookmarkManager())
 ----
 
@@ -47,7 +47,7 @@ Bookmark management happens automatically for queries run within a single sessio
 
 [source, go]
 ----
-session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "<database-name>"})
 defer session.Close(ctx)
 session.ExecuteWrite(ctx,
     func(tx neo4j.ManagedTransaction) (any, error) {
@@ -86,9 +86,9 @@ func main() {
     ctx := context.Background()
 
     // Connection to database
-    dbUri := "{neo4j-database-uri}"
-    dbUser := "{neo4j-username}"
-    dbPassword := "{neo4j-password}"
+    dbUri := "<database-uri>"
+    dbUser := "<username>"
+    dbPassword := "<password>"
     driver, err := neo4j.NewDriverWithContext(
         dbUri,
         neo4j.BasicAuth(dbUser, dbPassword, ""))
@@ -108,14 +108,14 @@ func main() {
     // we don't catch them here for simplicity.
 
     // Create the first person and employment relationship
-    sessionA := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+    sessionA := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "<database-name>"})
     createPerson(ctx, sessionA, "Alice")
     employ(ctx, sessionA, "Alice", "Wayne Enterprises")
     savedBookmarks = neo4j.CombineBookmarks(savedBookmarks, sessionA.LastBookmarks())  // <1>
     sessionA.Close(ctx)
 
     // Create the second person and employment relationship
-    sessionB := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+    sessionB := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "<database-name>"})
     createPerson(ctx, sessionB, "Bob")
     employ(ctx, sessionB, "Bob", "LexCorp")
     savedBookmarks = neo4j.CombineBookmarks(savedBookmarks, sessionB.LastBookmarks())  // <1>
@@ -123,7 +123,7 @@ func main() {
 
     // Create a friendship between the two people created above
     sessionC := driver.NewSession(ctx, neo4j.SessionConfig{
-        DatabaseName: "neo4j",
+        DatabaseName: "<database-name>",
         Bookmarks: savedBookmarks,  // <2>
     })
     createFriendship(ctx, sessionC, "Alice", "Bob")
@@ -211,10 +211,10 @@ Since that is the default bookmark manager for `ExecuteQuery()` calls, this will
 ----
 neo4j.ExecuteQuery(ctx, driver, "<QUERY 1>", nil,
     neo4j.EagerResultTransformer,
-    neo4j.ExecuteQueryWithDatabase("neo4j"))
+    neo4j.ExecuteQueryWithDatabase("<database-name>"))
 
 session := driver.NewSession(ctx, neo4j.SessionConfig{
-    DatabaseName: "neo4j",
+    DatabaseName: "<database-name>",
     BookmarkManager: driver.ExecuteQueryBookmarkManager(),
 })
 // every query inside this session will be causally chained
@@ -229,7 +229,7 @@ session.Close(ctx)
 // (i.e., can read what was written by <QUERY 2>)
 neo4j.ExecuteQuery(ctx, driver, "<QUERY 3>", nil,
     neo4j.EagerResultTransformer,
-    neo4j.ExecuteQueryWithDatabase("neo4j"))
+    neo4j.ExecuteQueryWithDatabase("<database-name>"))
 ----
 
 

@@ -1,0 +1,492 @@
+= Run your own transactions
+
+When xref:query-simple.adoc[querying the database with `.ExecutableQuery()`], the driver automatically creates a _transaction_. A transaction is a unit of work that is either _committed_ in its entirety or _rolled back_ on failure. You can include multiple Cypher statements in a single query, as for example when using `MATCH` and `CREATE` in sequence to xref:query-simple#update[update the database], but you cannot have multiple queries and interleave some client-logic in between them.
+
+For these more advanced use-cases, the driver provides functions to take full control over the transaction lifecycle.
+These are called _managed transactions_, and you can think of them as a way of unwrapping the flow of `.ExecutableQuery()` and being able to specify its desired behavior in more places.
+
+
+[#session-create]
+== Create a session
+
+Before running a transaction, you need to obtain a _session_.
+Sessions act as concrete query channels between the driver and the server, and ensure <<causal consistency>> is enforced.
+
+Sessions are created with the method link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IDriver.AsyncSession.html#Neo4j_Driver_IDriver_AsyncSession[`IDriver.AsyncSession()`].
+Use the optional argument to alter the session's configuration, among which for example the xref:database-selection[target database].
+For further configuration parameters, see xref:session-config[Session configuration].
+
+[source, csharp]
+----
+using var session = driver.AsyncSession(conf => conf.WithDatabase("<database-name>"));
+----
+
+Session creation is a lightweight operation, so sessions can be created and destroyed without significant cost.
+Always xref:close-session[close sessions] when you are done with them.
+
+*Sessions are _not_ thread safe*: you can share the main `IDriver` object across threads, but make sure each thread creates its own sessions.
+
+
+[#managed-transactions]
+== Run a managed transaction
+
+A transaction can contain any number of queries.
+As Neo4j is <<ACID>> compliant, *queries within a transaction will either be executed as a whole or not at all*: you cannot get a part of the transaction succeeding and another failing.
+Use transactions to group together related queries which work together to achieve a single _logical_ database operation.
+
+A managed transaction is created with the methods link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IAsyncSession.ExecuteReadAsync.html)[`IAsyncSession.ExecuteRead()`] and link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IAsyncSession.ExecuteWriteAsync.html)[`IAsyncSession.ExecuteWrite()`], depending on whether you want to retrieve data from the database or alter it.
+Both methods take a <<transaction_function>> callback, which is responsible for actually carrying out the queries and processing the result.
+
+.Retrieve people whose name starts with `Al`.
+[source, csharp, role=nocollapse]
+----
+using var session = driver.AsyncSession(conf => conf.WithDatabase("<database-name>"));  // <.>
+var people = await session.ExecuteReadAsync(  // <.>
+    async tx => {
+        var result = await tx.RunAsync(@"
+            MATCH (p:Person) WHERE p.name STARTS WITH $filter  // <.>
+            RETURN p.name AS name, 3 as age ORDER BY name
+            ", new { filter = "Al" }
+        );
+
+        // Loop through the records asynchronously
+        // `.Current` holds the record read by `.FetchAsync()`
+        var people = new List<string>();
+        while (await result.FetchAsync()) {  // <.>
+            people.Add(result.Current.Get<string>("name"));
+        }
+        // or `await result.ToListAsync()` to retrieve all records as a list.
+
+        // further tx.RunAsync() calls will execute within the same transaction
+
+        return people;
+    }
+);
+
+foreach (var person in people) {
+    Console.WriteLine(person);
+}
+----
+
+<1> Create a session. A single session can be the container for multiple queries. Unless created as a resource with the `using` keyword, remember to close it when done.
+<2> The `.ExecuteRead()` (or `.ExecuteWrite()`) method is the entry point into a transaction. It takes a callback to a _transaction function_, which is responsible of running queries.
+<3> Use the method link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IAsyncQueryRunner.RunAsync.html[`tx.RunAsync()`] to execute queries. You can provide a map of query parameters as second argument. Each query run returns a link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IResultCursor.html[`IResultCursor`] object.
+<4> xref:process-result[Process the result] using any of the methods on `IResultCursor`. The method `.FetchAsync()` retrieves the next record in the queue and stores it in the property `.Current`; the method `.ToListAsync()` retrieves all records into a list.
+
+*Do not hardcode or concatenate parameters directly into the query*.
+Use xref:query-simple#query-parameters[query parameters] instead, both for performance and security reasons.
+
+*Transaction functions should never return the result object directly*.
+Instead, always xref:process-result[process the result] in some way.
+Within a transaction function, a `return` statement results in the transaction being committed, while the transaction is automatically rolled back if an exception is raised.
+
+[CAUTION]
+The methods `.ExecuteRead()` and `.ExecuteWrite()` have replaced `.ReadTransaction()` and `.WriteTransaction()`, which are deprecated in version 5.x and removed in version 6.0.
+
+.A transaction with multiple queries, client logic, and potential roll backs
+[source, csharp]
+----
+using Neo4j.Driver;
+
+const string dbUri = "<database-uri>";
+const string dbUser = "<username>";
+const string dbPassword = "<password>";
+
+await using var driver = GraphDatabase.Driver(dbUri, AuthTokens.Basic(dbUser, dbPassword));
+await driver.VerifyConnectivityAsync();
+
+// Create & employ 100 people to 10 different organizations
+using var session = driver.AsyncSession(conf => conf.WithDatabase("<database-name>"));
+for (int i=0; i<100; i++) {
+    var name = $"Thor{i}";
+    try {
+        string orgId = await session.ExecuteWriteAsync(async tx => {
+            return await employPersonTx(tx, name);
+        });
+        Console.WriteLine($"User {name} added to organization {orgId}.");
+    } catch (Neo4jException e) {
+        Console.WriteLine(e);
+    }
+}
+
+async Task<string> employPersonTx(IAsyncQueryRunner tx, string name) {
+    var employeeThreshold = 10;
+
+    // Create new Person node with given name, if not exists already
+    await tx.RunAsync("MERGE (p:Person {name: $name})", new { name = name });
+
+    // Obtain most recent organization ID and the number of people linked to it
+    var result = await tx.RunAsync(@"
+        MATCH (o:Organization)
+        RETURN o.id AS id, COUNT{(p:Person)-[r:WORKS_FOR]->(o)} AS employeesN
+        ORDER BY o.createdDate DESC
+        LIMIT 1
+        ");
+
+    string orgId = "";
+    int employeesN = 0;
+    bool org = await result.FetchAsync();
+    if (org == false) {
+        // If no organization exists, create one and add Person to it
+        orgId = await createOrganization(tx);
+        Console.WriteLine($"No orgs available, created {orgId}.");
+    } else {
+        orgId = result.Current.Get<string>("id");
+        employeesN = result.Current.Get<int>("employeesN");
+    }
+
+    // If org does not have too many employees, add this Person to it
+    if (employeesN < employeeThreshold) {
+        await addPersonToOrganization(tx, name, orgId);
+        // If the above throws, the transaction will roll back
+        // -> not even Person is created!
+
+    // Otherwise, create a new Organization and link Person to it
+    } else {
+        orgId = await createOrganization(tx);
+        Console.WriteLine($"Latest org is full, created {orgId}.");
+        await addPersonToOrganization(tx, name, orgId);
+        // If any of the above throws, the transaction will roll back
+        // -> not even Person is created!
+    }
+
+    return orgId;  // Organization ID to which the new Person ends up in
+}
+
+async Task<string> createOrganization(IAsyncQueryRunner tx) {
+    var result = await tx.RunAsync(@"
+        CREATE (o:Organization {id: randomuuid(), createdDate: datetime()})
+        RETURN o.id AS id
+    ");
+    bool org = await result.FetchAsync();  // can't be false
+    string orgId = result.Current.Get<string>("id");
+    return orgId;
+}
+
+async Task addPersonToOrganization(IAsyncQueryRunner tx, string personName, string orgId) {
+    await tx.RunAsync(@"
+        MATCH (o:Organization {id: $orgId})
+        MATCH (p:Person {name: $name})
+        MERGE (p)-[:WORKS_FOR]->(o)
+        ", new { orgId = orgId, name = personName }
+    );
+}
+----
+
+Should a transaction fail for a reason that the driver deems transient, it automatically retries to run the transaction function (with an exponentially increasing delay).
+For this reason, *transaction functions must be _idempotent_* (i.e., they should produce the same effect when run several times), because you do not know upfront how many times they are going to be executed.
+In practice, this means that you should not edit nor rely on globals, for example.
+Note that although transactions functions might be executed multiple times, the queries inside it will always run only once.
+
+A session can chain multiple transactions, but *only one single transaction can be active within a session at any given time*.
+To maintain multiple concurrent transactions, use multiple concurrent sessions.
+
+
+[#explicit-transactions]
+== Run an explicit transaction
+
+You can achieve full control over transactions by manually beginning one with the method link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IAsyncSession.BeginTransactionAsync.html[`IAsyncSession.BeginTransactionAsync()`], which returns a link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IAsyncTransaction.html[`IAsyncTransaction`] object.
+You may then run queries inside an explicit transaction with the method link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IAsyncQueryRunner.RunAsync.html[`.RunAsync()`].
+
+[source, csharp]
+----
+using var session = driver.AsyncSession(SessionConfigBuilder.ForDatabase("<database-name>"));
+using var tx = await session.BeginTransactionAsync();
+// use tx.RunAsync()      to run queries
+//     tx.CommitAsync()   to commit the transaction
+//     tx.RollbackAsync() to roll the transaction back
+----
+
+[TIP]
+====
+Queries run with `tx.Run()` failing due to a transient server error can be retried without need to alter the original request.
+You can discover whether an error is transient via the link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.Neo4jException.IsRetriable.html#Neo4j_Driver_Neo4jException_IsRetriable[`IsRetriable`] property, which gives insights into whether a further attempt might be successful.
+====
+
+An explicit transaction can be committed with  link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IAsyncTransaction.CommitAsync.html[`.CommitAsync()`] or rolled back with link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IAsyncTransaction.RollbackAsync.html[`.RollbackAsync()`].
+If no explicit action is taken, the driver will automatically roll the transaction back at the end of its lifetime.
+
+Explicit transactions are most useful for applications that need to distribute Cypher execution across multiple functions for the same transaction, or for applications that need to run multiple queries within a single transaction but without the automatic retries provided by managed transactions.
+
+.An explicit transaction example involving an external API
+[source, csharp]
+----
+using Neo4j.Driver;
+
+const string dbUri = "<database-uri>";
+const string dbUser = "<username>";
+const string dbPassword = "<password>";
+
+await using var driver = GraphDatabase.Driver(dbUri, AuthTokens.Basic(dbUser, dbPassword));
+await driver.VerifyConnectivityAsync();
+
+string customerId = await createCustomer(driver);
+int otherBankId = 42;
+await transferToOtherBank(driver, customerId, otherBankId, 999);
+
+async Task<string> createCustomer(IDriver driver) {
+    var result = await driver.ExecutableQuery(@"
+        MERGE (c:Customer {id: randomUUID(), balance: 1000})
+        RETURN c.id AS id
+        ")
+        .WithConfig(new QueryConfig(database: "<database-name>"))
+        .ExecuteAsync();
+    return result.Result[0].Get<string>("id");
+}
+
+async Task transferToOtherBank(IDriver driver, string customerId, int otherBankId, float amount) {
+    using var session = driver.AsyncSession(conf => conf.WithDatabase("<database-name>"));
+    using var tx = await session.BeginTransactionAsync();
+
+    if (! await customerBalanceCheck(tx, customerId, amount)) {
+        Console.WriteLine($"Customer {customerId} doesn't have enough funds.");
+        return;  // give up
+    }
+
+    otherBankTransferApi(customerId, otherBankId, amount);
+    // Now the money has been transferred => can't rollback anymore
+    // (cannot rollback external services interactions)
+
+    try {
+        await decreaseCustomerBalance(tx, customerId, amount);
+        await tx.CommitAsync();
+        Console.WriteLine($"Transferred {amount} to {customerId}.");
+    } catch (Neo4jException e) {
+        requestInspection(customerId, otherBankId, amount, e);
+        throw new InvalidOperationException(e.Message);
+    }
+}
+
+async Task<bool> customerBalanceCheck(IAsyncTransaction tx, string customerId, float amount) {
+    var result = await tx.RunAsync(@"
+        MATCH (c:Customer {id: $id})
+        RETURN c.balance >= $amount AS sufficient
+        ", new { id = customerId, amount = amount }
+    );
+    bool isRecord = await result.FetchAsync();
+    if (isRecord == false) {
+        return false;
+    }
+    var record = result.Current;
+    return record.Get<bool>("sufficient");
+}
+
+void otherBankTransferApi(string customerId, int otherBankId, float amount) {
+    // make some API call to other bank
+}
+
+async Task decreaseCustomerBalance(IAsyncTransaction tx, string customerId, float amount) {
+    await tx.RunAsync(@"
+        MATCH (c:Customer {id: $id})
+        SET c.balance = c.balance - $amount
+        ", new { id = customerId, amount = amount }
+    );
+}
+
+void requestInspection(string customerId, int otherBankId, float amount, Exception e) {
+    // manual cleanup required; log this or similar
+    Console.WriteLine($"WARNING: transaction rolled back due to exception: {e.Message}.");
+    Console.WriteLine($"customerId: {customerId}, otherBankId: {otherBankId}, amount: {amount}.");
+}
+----
+
+
+[#process-result]
+== Process query results
+
+The driver's output of a query is a link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IResultCursor.html[`IResultCursor`] object, which encapsulates the Cypher result in a rich data structure that requires some parsing on the client side.
+There are two main points to be aware of:
+
+- *The result records are not immediately and entirely fetched and returned by the server*.
+Instead, results come as a _lazy stream_.
+In particular, when the driver receives some records from the server, they are initially _buffered_ in a background queue.
+Records stay in the buffer until they are _consumed_ by the application, at which point they are _removed from the buffer_.
+When no more records are available, the result is _exhausted_.
+- *The result acts as a _cursor_*.
+This means that there is no way to retrieve a previous record from the stream, unless you saved it in an auxiliary data structure.
+
+The animation below follows the path of a single query: it shows how the driver works with result records and how the application should handle results.
+
+++++
+<video
+  class="rounded-corners"
+  controls
+  width="100%"
+  src="../../../common-content/5/_images/result.mp4"
+  poster="../../../common-content/5/_images/result-poster.jpg"
+  type="video/mp4"></video>
+++++
+
+**The easiest way of processing a result is by calling `.ToListAsync()` on it**, which yields a list of link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IRecord.html[`IRecord`] objects.
+Otherwise, a `IResultCursor` object implements a number of properties and methods for processing records.
+The most commonly needed ones are listed below.
+
+// .An essential list of `IResultCursor` methods
+[cols="2,3"]
+|===
+|Property/Method |Description
+
+|`Current IRecord`
+|Holds the record the cursor is currently pointing at.
+
+|`FetchAsync() Task<bool>`
+a|Advances the cursor the next record in the result.
+Returns `false` if no further records are available.
+
+|`ToListAsync() Task<List<IRecord>>`
+|Returns the remainder of the result as a list.
+
+|`PeekAsync() Task<IRecord>`
+|Returns the next record from the result _without consuming it_.
+This leaves the record in the buffer for further processing.
+
+|`ConsumeAsync() Task<IResultSummary>`
+|Returns the query xref:result-summary.adoc[result summary].
+It exhausts the result, so should only be called when data processing is over.
+|===
+
+For a complete list of `IResultCursor` methods, see link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IResultCursor.html[API documentation -> IResultCursor].
+
+
+[#session-config]
+== Session configuration
+
+You can customize the behavior of a session via the optional `SessioncConfig` parameter when creating a session.
+Use link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.SessionConfigBuilder.html[`SessionConfigBuilder`] to create a session configuration object.
+
+
+[#database-selection]
+=== Database selection
+
+It is recommended to *always specify the database explicitly* through the `.WithDatabase("<dbName>")` session config method, even on single-database instances.
+This allows the driver to work more efficiently, as it saves a network round-trip to the server to resolve the home database.
+If no database is given, the link:{neo4j-docs-base-uri}/operations-manual/current/manage-databases/introduction#manage-databases-default[default database] set in the Neo4j instance settings is used.
+
+[source, csharp]
+----
+using var session = driver.AsyncSession(conf => conf
+    .WithDatabase("<database-name>")
+);
+----
+
+[TIP]
+Specifying the database through the configuration method is preferred over the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/use/[`USE`] Cypher clause.
+If the server runs on a cluster, queries with `USE` require server-side routing to be enabled.
+Queries may also take longer to execute as they may not reach the right cluster member at the first attempt, and need to be routed to one containing the requested database.
+
+
+[#request-routing]
+=== Request routing
+
+In a cluster environment, all sessions are opened in write mode, routing them to the leader.
+You can change this with the method `.WithDefaultAccessMode(AccessMode.Read)`.
+Note that `.ExecuteReadAsync()` and `.ExecuteWriteAsync()` automatically override the session's default access mode.
+
+[source, csharp]
+----
+using var session = driver.AsyncSession(conf => conf
+    .WithDatabase("<database-name>")
+    .WithDefaultAccessMode(AccessMode.Read)
+);
+----
+
+[#access-control-note]
+// .Routing ≠ Access control
+[NOTE]
+====
+Although executing a _write_ query in read mode likely results in a runtime error, *you should not rely on this for access control.*
+The difference between the two modes is that _read_ transactions are routed to any node of a cluster, whereas _write_ ones are directed to primaries.
+There is no guarantee that a write query submitted in read mode will be rejected, and an issue with this feature will not be classified as a security vulnerability.
+
+Similar remarks hold for the `.ExecuteReadAsync()` and `.ExecuteWriteAsync()` methods.
+====
+
+
+[#impersonation]
+[role=label--new-5.14]
+=== Run queries as a different user
+
+You can execute a query through a different user by providing an link:https://neo4j.com/docs/api/dotnet-driver/5.28/api/Neo4j.Driver.IAuthToken.html[`IAuthToken`] to the `.WithAuthToken()` config method.
+Switching user at the session level is cheaper than creating a new `IDriver` object.
+Queries are then run within the security context of the given user (i.e., home database, permissions, etc.). +
+Session-scoped authentication requires a server version >= 5.8.
+
+[source, csharp]
+----
+using var session = driver.AsyncSession(conf => conf
+    .WithDatabase("<database-name>")
+    .WithAuthToken(AuthTokens.Basic("<username>", "<password>"))
+);
+----
+
+The method `.WithImpersonatedUser()` provides a similar functionality, and is available in driver/server versions >= 4.4.
+The difference is that you don't need to know a user's password to impersonate them, but the user under which the `IDriver` was created needs to have the link:{neo4j-docs-base-uri}/operations-manual/current/authentication-authorization/dbms-administration/#access-control-dbms-administration-impersonation[appropriate permissions].
+
+[source, csharp]
+----
+using var session = driver.AsyncSession(conf => conf
+    .WithDatabase("<database-name>")
+    .WithImpersonatedUser("<username>")
+);
+----
+
+
+[#tx-config]
+== Transaction configuration
+
+You can exert further control on transactions by providing a `TransactionConfig` object as (optional) last parameter to `.ExecuteReadAsync()`, `.ExecuteWriteAsync()`, and `.BeginTransactionAsync()`.
+You can create one via link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.TransactionConfigBuilder.html[`TransactionConfigBuilder`].
+Use it to specify:
+
+- A transaction timeout.
+Transactions that run longer will be terminated by the server.
+The default value is set on the server side.
+The minimum value is one millisecond.
+- A map of metadata that gets attached to the transaction.
+These metadata get logged in the server `query.log`, and are visible in the output of the `SHOW TRANSACTIONS` Cypher command.
+Use this to tag transactions.
+
+[source, csharp]
+----
+using var session = driver.AsyncSession(conf => conf.WithDatabase("<database-name>"));
+var people = await session.ExecuteReadAsync(
+    async tx => {
+        var result = await tx.RunAsync("MATCH (p:Person) RETURN p");
+        return await result.ToListAsync();
+    },
+    conf => conf
+        .WithTimeout(new TimeSpan(5))
+        .WithMetadata(new Dictionary<string, object>{ { "appName", "peopleTracker" } })
+);
+foreach (var person in people) {
+    Console.WriteLine(person);
+}
+----
+
+
+[#close-session]
+== Close sessions
+
+Each connection pool has *a finite number of sessions*, so if you open sessions without ever closing them, your application could run out of them.
+It is thus recommended to create sessions with the `using` keyword, which automatically closes them when the scope ends.
+When a session is closed, it is returned to the connection pool to be later reused.
+
+If you do not open sessions with `using`, remember to call the `.CloseAsync()` method when you have finished using them.
+
+[source, csharp]
+----
+var session = driver.AsyncSession(conf => conf.WithDatabase("<database-name>"));
+
+// session usage
+
+await session.CloseAsync();
+----
+
+
+ifndef::backend-pdf[]
+[discrete.glossary]
+== Glossary
+
+include::{common-partial}/glossary.adoc[]
+include::../partials/glossary.adoc[]
+endif::[]

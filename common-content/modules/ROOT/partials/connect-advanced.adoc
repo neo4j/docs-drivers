@@ -54,6 +54,7 @@ If you want to target a _specific_ machine, use the `bolt`, `bolt+s`, or `bolt+s
 
 The connection scheme to use is not your choice, but is rather determined by the server requirements.
 You must know the right server scheme upfront, as no metadata is exposed prior to connection.
+The connection scheme is part of the instance URI.
 If you are unsure, ask the database administrator.
 
 # end::connection-protocols[]

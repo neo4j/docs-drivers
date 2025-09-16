@@ -40,7 +40,7 @@ Bookmark management happens automatically for queries run within a single sessio
 
 [source, java]
 ----
-try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
+try (var session = driver.session(SessionConfig.builder().withDatabase("<database-name>").build())) {
     session.executeWriteWithoutResult(tx -> tx.run("<QUERY 1>"));
     session.executeWriteWithoutResult(tx -> tx.run("<QUERY 2>"));  // can read QUERY 1
     session.executeWriteWithoutResult(tx -> tx.run("<QUERY 3>"));  // can read QUERY 1,2
@@ -74,9 +74,9 @@ import org.neo4j.driver.TransactionContext;
 public class App {
 
     public static void main(String... args) {
-        final String dbUri = "{neo4j-database-uri}";
-        final String dbUser = "{neo4j-username}";
-        final String dbPassword = "{neo4j-password}";
+        final String dbUri = "<database-uri>";
+        final String dbUser = "<username>";
+        final String dbPassword = "<password>";
 
         try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword))) {
             createSomeFriends(driver);
@@ -87,14 +87,14 @@ public class App {
         List<Bookmark> savedBookmarks = new ArrayList<>();  // to collect the sessions' bookmarks
 
         // Create the first person and employment relationship
-        try (var sessionA = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
+        try (var sessionA = driver.session(SessionConfig.builder().withDatabase("<database-name>").build())) {
             sessionA.executeWriteWithoutResult(tx -> createPerson(tx, "Alice"));
             sessionA.executeWriteWithoutResult(tx -> employ(tx, "Alice", "Wayne Enterprises"));
             savedBookmarks.addAll(sessionA.lastBookmarks());  // <1>
         }
 
         // Create the second person and employment relationship
-        try (var sessionB = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
+        try (var sessionB = driver.session(SessionConfig.builder().withDatabase("<database-name>").build())) {
             sessionB.executeWriteWithoutResult(tx -> createPerson(tx, "Bob"));
             sessionB.executeWriteWithoutResult(tx -> employ(tx, "Bob", "LexCorp"));
             savedBookmarks.addAll(sessionB.lastBookmarks());  // <1>
@@ -102,7 +102,7 @@ public class App {
 
         // Create a friendship between the two people created above
         try (var sessionC = driver.session(SessionConfig.builder()
-            .withDatabase("neo4j")
+            .withDatabase("<database-name>")
             .withBookmarks(savedBookmarks)  // <2>
             .build())) {
             sessionC.executeWriteWithoutResult(tx -> createFriendship(tx, "Alice", "Bob"));

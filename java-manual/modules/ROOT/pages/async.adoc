@@ -30,9 +30,9 @@ import org.neo4j.driver.SessionConfig;
 public class App {
 
     public static void main(String... args) throws ExecutionException, InterruptedException {
-        final String dbUri = "{neo4j-database-uri}";
-        final String dbUser = "{neo4j-username}";
-        final String dbPassword = "{neo4j-password}";
+        final String dbUri = "<database-uri>";
+        final String dbUser = "<username>";
+        final String dbPassword = "<password>";
 
         try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword))) {  // <1>
             driver.verifyConnectivity();
@@ -44,7 +44,7 @@ public class App {
     }
 
     public static CompletableFuture<ResultSummary> printAllPeople(Driver driver) {
-        var session = driver.session(AsyncSession.class, SessionConfig.builder().withDatabase("neo4j").build());  // <2>
+        var session = driver.session(AsyncSession.class, SessionConfig.builder().withDatabase("<database-name>").build());  // <2>
 
         var query = """
         UNWIND ['Alice', 'Bob', 'Sofia', 'Charles'] AS name

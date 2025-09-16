@@ -26,7 +26,7 @@ link:https://neo4j.com/docs/javascript-manual/current/install/[More info on inst
 [#connect]
 == Connect to the database
 
-Connect to a database by creating a <<Driver>> object and providing a URL and an authentication token.
+Connect to a database by creating a `Driver` object and providing a URL and an authentication token.
 Once you have a `Driver` instance, use the `.getServerInfo()` method to ensure that a working connection can be established.
 
 [source, javascript, copy=true]
@@ -34,19 +34,17 @@ Once you have a `Driver` instance, use the `.getServerInfo()` method to ensure t
 var neo4j = require('neo4j-driver');
 (async () => {
   // URI examples: 'neo4j://localhost', 'neo4j+s://xxx.databases.neo4j.io'
-  const URI = '{neo4j-database-uri}'
-  const USER = '{neo4j-username}'
-  const PASSWORD = '{neo4j-password}'
-  let driver
+  const URI = '<database-uri>'
+  const USER = '<username>'
+  const PASSWORD = '<password>'
+  let driver = neo4j.driver(URI, neo4j.auth.basic(USER, PASSWORD))
+  const serverInfo = await driver.getServerInfo()
+  console.log('Connection established')
+  console.log(serverInfo)
 
-  try {
-    driver = neo4j.driver(URI, neo4j.auth.basic(USER, PASSWORD))
-    const serverInfo = await driver.getServerInfo()
-    console.log('Connection established')
-    console.log(serverInfo)
-  } catch(err) {
-    console.log(`Connection error\n${err}\nCause: ${err.cause}`)
-  }
+  // Use the driver to run queries
+
+  await driver.close()
 })();
 ----
 
@@ -68,7 +66,7 @@ let { records, summary } = await driver.executeQuery(`
   CREATE (a)-[:KNOWS]->(b)
   `,
   { name: 'Alice', friendName: 'David' },
-  { database: 'neo4j' }
+  { database: '<database-name>' }
 )
 console.log(
   `Created ${summary.counters.updates().nodesCreated} nodes ` +
@@ -84,7 +82,7 @@ link:https://neo4j.com/docs/javascript-manual/current/query-simple/[More info on
 
 To retrieve information from the database, use the Cypher clause `MATCH`:
 
-.Retrieve all `Person` nodes who like other `Person` s
+.Retrieve all `Person` nodes who know other persons
 [source, javascript, copy=true]
 ----
 let { records, summary } = await driver.executeQuery(`
@@ -92,7 +90,7 @@ let { records, summary } = await driver.executeQuery(`
   RETURN p.name AS name
   `,
   {},
-  { database: 'neo4j' }
+  { database: '<database-name>' }
 )
 
 // Loop through users and do something with them
@@ -120,7 +118,7 @@ The same applies to any open sessions.
 [source, javascript, copy=true]
 ----
 const driver = neo4j.driver(URI, neo4j.auth.basic(USER, PASSWORD))
-let session = driver.session({ database: 'neo4j' })
+let session = driver.session({ database: '<database-name>' })
 
 // session/driver usage
 
