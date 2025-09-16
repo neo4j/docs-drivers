@@ -48,7 +48,6 @@ pip3 install -U neo4j==5.27
 ----
 ////
 
-
 ////
 [[new-features]]
 == New features
@@ -60,10 +59,16 @@ pip3 install -U neo4j==5.27
 .Vector support
 [%collapsible]
 ====
-Introduce Bolt 6.0 support, which includes vector types.
+The type xref:data-types.adoc#vector[`Vector`] allows for storing and retrieving Cypher Vector objects stored in the database.
 ====
 |
-
+|
+.New type `UNKNOWN`
+[%collapsible]
+====
+The type xref:data-types.adoc#unknown[`UNKNOWN`] will be returned for objects coming from the server, when the driver doesn't recognize the type.
+====
+|
 
 |===
 ////
@@ -79,26 +84,23 @@ Deprecated features are likely to be removed in the next major release.
 |Version |Message |Status
 
 |6.0
-|link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.Session[`Session`] -- Methods `.read_transaction()` and `.write_transaction()` are removed in favor of link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.Session.execute_read[`.execute_read()`] and link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.Session.execute_write[`.execute_write()`].
+|*Environment*
+
+- Dropped support for Python 3.7, 3.8, 3.9.
+- Package-alias `neo4j-driver` stopped receiving updates starting with 6.0. Install `neo4j` instead.
+- `setup.py` has been removed. Use a recent enough packaging/build tool supporting `pyproject.toml`.
+|label:removed[]
+
+|6.0
+|link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.Session[`Session`] -- Methods `.read_transaction()` and `.write_transaction()` have been removed in favor of link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.Session.execute_read[`.execute_read()`] and link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.Session.execute_write[`.execute_write()`].
 Through the new methods, the first argument of transaction functions is a `ManagedTransaction` object. It behaves like a regular `Transaction` object, except it does not offer the `.commit()`, `.rollback()`, `.close()`, and `.closed()` methods.
 |label:removed[]
 
 |6.0
-|Package-alias `neo4j-driver` stopped receiving updates starting with 6.0. Install `neo4j` instead.
-|label:removed[]
-
-|6.0
-|Implicit closing of drivers and sessions through `+++__del__()+++` (destructor) is removed.
-This behaviour is non-deterministic as there is no guarantee that the destructor will ever be called.
+|Driver and session objects are not implicitly closed through `+++__del__()+++` (destructor) anymore.
+This behaviour was non-deterministic as there is no guarantee that the destructor would ever be called.
 A `ResourceWarning` is emitted instead. +
 Call `driver.close()` explicitly or create the driver via a `with` statement.
-|label:removed[]
-
-|6.0
-|Import of the following modules is not possible anymore without replacement, as they are internal and should not be used by client code: `neo4j.packstream`, `neo4j.routing`, `neo4j.config`, `neo4j.meta`, `neo4j.data`.
-
-`ExperimentalWarning` (previously in `meta`) should be imported directly from neo4j. +
-`neo4j.meta.version` is exposed through `+++neo4j.__version__+++`.
 |label:removed[]
 
 |6.0
@@ -106,42 +108,66 @@ Call `driver.close()` explicitly or create the driver via a `with` statement.
 |label:removed[]
 
 |6.0
-|link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.Session[`Session`] -- The method `.last_bookmark()` is removed in favor of link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.Session.last_bookmarks[`.last_bookmarks()`]. The logic is similar, but the new method returns `neo4j.Bookmarks` instead of `str`.
+|*Bookmarks*
+
+- The method `Session.last_bookmark()` has been removed in favor of link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.Session.last_bookmarks[`Session.last_bookmarks()`]. The logic is similar, but the new method returns `neo4j.Bookmarks` instead of `str`.
+- `neo4j.Bookmark` has been removed in favor of link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.Bookmarks[`neo4j.Bookmarks`].
+- `Driver.session()` no longer accepts raw string bookmarks as bookmarks argument. Use a `neo4j.Bookmarks` object instead.
+|label:removed[]
+
+
+|6.0
+|*Imports*
+
+- Import of the following modules has been removed without replacement, as they are internal and should not be used by client code: `neo4j.packstream`, `neo4j.routing`, `neo4j.config`, `neo4j.meta`, `neo4j.data`.
+`neo4j.meta.version` is exposed through `+++neo4j.__version__+++`.
+- Importing submodules from `neo4j.time` is not possible anymore. Import everything from `neo4j.time` directly instead.
+- Importing `neo4j.work` and its submodules is not possible anymore. Import everything from `neo4j` directly instead.
+- The following objects have been removed without replacement, as they are internal and should not be used by client code: `neo4j.spatial.hydrate_point`, `neo4j.spatial.dehydrate_point`, `neoj4.Config`, `neoj4.PoolConfig`, `neoj4.SessionConfig`, `neoj4.WorkspaceConfig`, `neo4j.data.DataDehydrator`, `neo4j.data.DataHydrator`.
+- The following modules have been removed: `neo4j.conf`, `neo4j.data`, `neo4j.meta`, `neo4j.packstream`, `neo4j.routing`, `neo4j.time.arithmetic`, `neo4j.time.clock_implementation`, `neo4j.time.hydration`, `neo4j.time.metaclasses`, `neo4j.work`, `neo4j.work.query`, `neo4j.work.summary`
+- `api.Version` has been removed as it's unused now.
+`ServerInfo.protocol_version` is now a `tuple[int, int]` instead of a `api.Version`. This should be drop-in replacement is most cases.
+- Make undocumented constants, helper functions, and other internal items private. For a full list, see the link:https://github.com/neo4j/neo4j-python-driver/blob/6.x/CHANGELOG.md[changelog].
 |label:removed[]
 
 |6.0
-|`neo4j.Bookmark` is removed in favor of link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.Bookmarks[`neo4j.Bookmarks`].
+|Class `SummaryNotificationPosition` has been removed in favor of link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.SummaryInputPosition[`SummaryInputPosition`].
 |label:removed[]
 
 |6.0
-|Importing submodules from `neo4j.time` is not possible anymore. Import everything from `neo4j.time` directly instead.
+|Method `Neo4jError.is_retriable()` has been removed in favor of `Neo4jError.is_retryable()`.
 |label:removed[]
 
 |6.0
-|Importing `neo4j.work` and its submodules is not possible anymore. Import everything from `neo4j` directly instead.
+|The magic method `Record.\\__getslice__()` has been removed.
+If you were calling it directly, use `Record.\\__getitem__(slice(...))` or simply `record[...]` instead.
 |label:removed[]
 
 |6.0
-|The following objects are removed without replacement, as they are internal and should not be used by client code: `neo4j.spatial.hydrate_point`, `neo4j.spatial.dehydrate_point`, `neoj4.Config`, `neoj4.PoolConfig`, `neoj4.SessionConfig`, `neoj4.WorkspaceConfig`, `neo4j.data.DataDehydrator`, `neo4j.data.DataHydrator`.
-|label:removed[]
+|Changed errors raised under certain circumstances. For a full list, see the link:https://github.com/neo4j/neo4j-python-driver/blob/6.x/CHANGELOG.md[changelog].
+|label:removed[Changed]
 
 |6.0
-|Class `SummaryNotificationPosition` is deprecated in favor of link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.SummaryInputPosition[`SummaryInputPosition`].
-|label:removed[]
-
-|6.0
-|Undocumented methods `Neo4jError.is_fatal_during_discovery()` and `Neo4jError.invalidates_all_connections()` are removed without replacement.
-|label:removed[]
-
-|6.0
-|Undocumented method `Neo4jError.hydrate()` is removed without replacement. +
-Altering the attributes of a `Neo4jError` is removed.
-|label:removed[]
+|Graph type sets (`neo4j.graph.EntitySetView`) can no longer by indexed by legacy `id` (`int`, e.g., `graph.nodes[0]`).
+Use the `element_id` instead (`str`, e.g., `graph.nodes["..."]`).
+|label:removed[Changed]
 
 |5.0
 |link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.graph.Node[`Node`], link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.graph.Relationship[`Relationship`] -- Property `id` (int) is deprecated in favor of `element_id` (str).
 This also affects link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.graph.Graph[`Graph`] objects, as indexing `graph.nodes[...]` and `graph.relationships[...]` with integers is deprecated in favor of indexing them with strings.
 |label:deprecated[]
 
+|6.0
+|xref:result-summary.adoc#_notifications[Notifications] as Neo4j status codes are deprecated in favor of GQL status objects.
+|label:deprecated[]
+
+|6.0
+|Module `neo4j.time.ClockTime` and its accessors are deprecated.
+|label:deprecated[]
+
+|6.0
+|Passing raw sting bookmarks as `initial_bookmarks` to `GraphDatabase.bookmark_manager()` is deprecated.
+Use a `neo4j.Bookmarks` object instead.
+|label:deprecated[]
 
 |===
