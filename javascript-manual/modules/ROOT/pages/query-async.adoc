@@ -28,6 +28,7 @@ Your application receives the result in bits, for lazy consumption.
 When using `await tx.run()` in a transaction function, you may return the query result _out_ of the transaction function as-is for further processing.
 On the other hand, *for async queries, you have to process the result _inside_ the transaction function* (except for the Promise API).
 
+
 == Asynchronous iteration
 
 The `Result` object supports link:https://javascript.info/async-iterators-generators[asynchronous iteration].
@@ -213,7 +214,7 @@ console.log(people)
 <4> Reactive processing
 
 [NOTE]
-The reactive API requires a link:{neo4j-docs-base-uri}/api/javascript-driver/{javascript-driver-version}/class/src/session-rx.js~RxSession.html[`RxSession`] and returns a link:{neo4j-docs-base-uri}/api/javascript-driver/{javascript-driver-version}/class/src/result-rx.js~RxResult.html[`RxResult`].
+The reactive API requires a link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/src/session-rx.js~RxSession.html[`RxSession`] and returns a link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/src/result-rx.js~RxResult.html[`RxResult`].
 
 [NOTE]
 The reactive API is not available in the lite version of the driver.

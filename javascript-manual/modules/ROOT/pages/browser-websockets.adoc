@@ -1,4 +1,4 @@
-# Usage within a browser (WebSockets)
+= Usage within a browser (WebSockets)
 
 There is a special browser version of the driver, which supports connecting to Neo4j over WebSockets.
 You can include it in an HTML page using one of the following tags:
@@ -19,7 +19,7 @@ You can include it in an HTML page using one of the following tags:
 <script src="https://cdn.jsdelivr.net/npm/neo4j-driver@X.Y.Z/lib/browser/neo4j-web.min.js"></script>
 ----
 
-Including the driver in the page makes a global `neo4j` object available, through which you may then xref:connect.adoc[connect] and xref:query-simple.adoc[query] a Neo4j database, in the same way as you would do for a local application.
+Including the driver in the page makes a global `neo4j` object available, through which you can then xref:connect.adoc[connect] and xref:query-simple.adoc[query] a Neo4j database in the same way as you would do for a local application.
 
 .Driver usage example
 [source, javascript]
@@ -39,7 +39,7 @@ await driver.close()
 Code running in a browser is visible to the client, **including your database credentials**.
 You have to take extra steps to ensure that no unauthorized access is allowed.
 
-Starting from version 5.4, the browser version is also exported as an ECMA Script Module.
+The browser version is also exported as an ECMA Script Module.
 You can import it using one of the following statements:
 
 [source, javascript, test-skip]
@@ -60,7 +60,7 @@ import neo4j from 'https://cdn.jsdelivr.net/npm/neo4j-driver@X.Y.Z/lib/browser/n
 import neo4j from 'https://cdn.jsdelivr.net/npm/neo4j-driver@X.Y.Z/lib/browser/neo4j-web.esm.min.js'
 ----
 
-It is not required to explicitly close the driver on a web page, unless its lifetime does not correspond to the lifetime of the page.
+You don't need to explicitly close the driver on a web page, unless its lifetime does not correspond to the lifetime of the page.
 The reason for this is that web browsers are supposed to gracefully terminate all open WebSockets when a page is closed.
 
 

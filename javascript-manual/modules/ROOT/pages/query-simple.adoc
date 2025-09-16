@@ -2,10 +2,6 @@
 
 Once you have xref:connect.adoc[connected to the database], you can run <<Cypher>> queries through the method `Driver.executeQuery()`.
 
-[TIP]
-`Driver.executeQuery()` was introduced with the version 5.8 of the driver. +
-For queries with earlier versions, use xref:transactions.adoc[sessions and transactions].
-
 [NOTE]
 ====
 Due to the usage of `async/await`, the examples in this page need to be wrapped in an `async` function. See xref:_a_full_example[a full example] if you are unsure how to do it.
@@ -66,7 +62,7 @@ console.log(  // <2>
 )
 ----
 
-<1> `records` contains the actual result as a list of link:{neo4j-docs-base-uri}/api/javascript-driver/{javascript-driver-version}/class/lib6/record.js~Record.html[`Record`] objects.
+<1> `records` contains the actual result as a list of link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/record.js~Record.html[`Record`] objects.
 <2> `summary` contains the xref:result-summary.adoc[summary of execution] returned by the server.
 
 
@@ -132,7 +128,7 @@ console.log(summary.counters.updates())
 == Query parameters
 
 *Do not hardcode or concatenate parameters directly into queries*.
-Instead, always use placeholders and specify the link:{neo4j-docs-base-uri}/cypher-manual/current/syntax/parameters/[Cypher parameters] as keyword arguments or in a dictionary, as shown in the previous examples.
+Instead, always use placeholders and provide dynamic data as link:{neo4j-docs-base-uri}/cypher-manual/current/syntax/parameters/[Cypher parameters].
 This is for:
 
 1. *performance benefits*: Neo4j compiles and caches queries, but can only do so if the query structure is unchanged;
@@ -258,12 +254,12 @@ This is particular useful when running queries in xref:transactions#explicit-tra
 
 == Query configuration
 
-You can supply a link:{neo4j-docs-base-uri}/api/javascript-driver/{javascript-driver-version}/class/lib6/driver.js~QueryConfig.html[`QueryConfig`] object as third (optional) parameter to alter the default behavior of `.executeQuery()`.
+You can supply a link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/driver.js~QueryConfig.html[`QueryConfig`] object as third (optional) parameter to alter the default behavior of `.executeQuery()`.
 
 
 === Database selection
 
-It is recommended to *always specify the database explicitly* with the `database` parameter, even on single-database instances.
+*Always specify the database explicitly* with the `database` parameter, even on single-database instances.
 This allows the driver to work more efficiently, as it saves a network round-trip to the server to resolve the home database.
 If no database is given, the link:{neo4j-docs-base-uri}/operations-manual/current/database-administration/#manage-databases-default[user's home database] is used.
 
@@ -281,8 +277,8 @@ await driver.executeQuery(
 
 [TIP]
 Specifying the database through the configuration parameter is preferred over the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/use/[`USE`] Cypher clause.
-If the server runs on a cluster, queries with `USE` require server-side routing to be enabled.
-Queries may also take longer to execute as they may not reach the right cluster member at the first attempt, and need to be routed to one containing the requested database.
+If the server runs on a cluster, queries with `USE` require link:https://neo4j.com/docs/operations-manual/current/clustering/setup/routing/#clustering-routing[server-side routing] to be enabled.
+Queries can also take longer to execute as they may not reach the right cluster member at the first attempt, and need to be routed to one containing the requested database.
 
 
 === Request routing
@@ -304,19 +300,17 @@ await driver.executeQuery(
 
 [NOTE]
 ====
-Although executing a _write_ query in read mode likely results in a runtime error, *you should not rely on this for access control.* The difference between the two modes is that _read_ transactions will be routed to any node of a cluster, whereas _write_ ones are directed to primaries.
-In other words, there is no guarantee that a write query submitted in read mode will be rejected.
+Although executing a _write_ query in read mode results in a runtime error, *you should not rely on this for access control.* The difference between the two modes is that _read_ transactions will be routed to any node of a cluster, whereas _write_ ones are directed to primaries.
+There is no security guarantee that a write query submitted in read mode will be rejected.
 ====
 
 
 [#impersonation]
-[role=label--new-5.14]
 === Run queries as a different user
 
 You can execute a query through a different user with the configuration parameter `auth`.
 Switching user at the query level is cheaper than creating a new `Driver` object.
-The query is then run within the security context of the given user (i.e., home database, permissions, etc.). +
-Query-scoped authentication requires a server version >= 5.8.
+The query is then run within the security context of the given user (i.e., home database, permissions, etc.).
 
 [source, javascript]
 ----
@@ -330,7 +324,7 @@ await driver.executeQuery(
 )
 ----
 
-The parameter `impersonatedUser` provides a similar functionality, and is available in driver/server versions >= 4.4.
+The parameter `impersonatedUser` provides a similar functionality.
 The difference is that you don't need to know a user's password to impersonate them, but the user under which the `Driver` was created needs to have the link:{neo4j-docs-base-uri}/operations-manual/current/authentication-authorization/dbms-administration/#access-control-dbms-administration-impersonation[appropriate permissions].
 
 [source, javascript]
