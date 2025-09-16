@@ -189,9 +189,4 @@ Through the new methods, the first argument of transaction functions is a `Manag
 |label:deprecated[]
 |{check-mark}
 
-|5.27
-|link:https://neo4j.com/docs/api/javascript-driver/{javascript-driver-version}/class/lib6/result-summary.js~ResultSummary.html[`ResultSummary`] -- Property `.notifications` is deprecated in favor of `.gqlStatusObjects`. The replacement contains GQL-complaint statuses (link:https://neo4j.com/docs/api/javascript-driver/{javascript-driver-version}/class/lib6/notification.js~GqlStatusObject.html[`GqlStatusObject`]), which are a superset of the old notifications.
-|label:deprecated[]
-|{check-mark}
-
 |===
