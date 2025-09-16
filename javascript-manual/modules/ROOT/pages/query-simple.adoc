@@ -147,21 +147,21 @@ For those rare use cases, see xref:query-advanced#_dynamic_values_in_property_ke
 == Error handling
 
 A query run may fail for a number of reasons.
-When using `driver.execute_query()`, the driver automatically retries to run a failed query if the failure is deemed to be transient (for example due to temporary server unavailability).
-An error will be raised if the operation keeps failing after the configured link:https://neo4j.com/docs/api/javascript-driver/{javascript-driver-version}/class/lib6/types.js~Config.html#instance-member-maxTransactionRetryTime[maximum retry time].
 
-All link:https://neo4j.com/docs/status-codes/current/errors/all-errors/[errors coming from the server] are subclasses of link:https://neo4j.com/docs/api/javascript-driver/{javascript-driver-version}/class/lib6/error.js~Neo4jError.html[`Neo4jError`].
+When using `driver.execute_query()`, the driver automatically retries to run a failed query if the failure is deemed to be transient (for example due to temporary server unavailability).
+An error will be raised if the operation keeps failing after the configured link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/types.js~Config.html#instance-member-maxTransactionRetryTime[maximum retry time].
+
+All link:https://neo4j.com/docs/status-codes/current/errors/all-errors/[errors coming from the server] are subclasses of link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/error.js~Neo4jError.html[`Neo4jError`].
 You can use an exception's code to stably identify a specific error; error messages are instead not stable markers, and should not be relied upon.
 
 .Basic error handling
-[source, javascript]
+[source, javascript, role=nocollapse]
 ----
-try {
-    let err = await driver.executeQuery(
-        'MATCH (p:Person) RETURN ',
-        {},
-        { database: '<database-name>' }
-    )
+let err = await driver.executeQuery(
+    'MATCH (p:Person) RETURN ',
+    {},
+    { database: 'neo4j' }
+  )
 } catch (err) {
   console.log('Neo4j error code:', err.code)
   console.log('Error message:', err.message)
@@ -173,6 +173,87 @@ Error message: Neo4jError: Invalid input '': expected an expression, '*', 'ALL' 
                          ^
 */
 ----
+
+Error objects also expose errors as GQL-status objects.
+The main difference between link:https://neo4j.com/docs/status-codes/current/errors/all-errors/[Neo4j error codes] and link:https://neo4j.com/docs/status-codes/current/errors/gql-errors/[GQL error codes] is that the GQL ones are more granular: a single Neo4j error code might be broken in several, more specific GQL error codes.
+
+The actual _cause_ that triggered an error is sometimes found in the optional GQL-status object `.cause`, which is itself a `Neo4jError`.
+You might need to recursively traverse the cause chain before reaching the root cause of the error you caught.
+In the example below, the error's GQL status code is `42001`, but the actual source of the error has status code `42I06`.
+
+.Usage of `Neo4jError` with GQL-related methods
+[source, javascript]
+----
+let err = await driver.executeQuery(
+    'MATCH (p:Person) RETURN ',
+    {},
+    { database: 'neo4j' }
+  )
+} catch (err) {
+  console.log('Error GQL status:', err.gqlStatus)
+  console.log('Error GQL status description:', err.gqlStatusDescription)
+  console.log('Error GQL classification:', err.classification)
+  console.log('Error GQL cause:', err.cause.message)
+  console.log('Error GQL diagnostic record:', err.diagnosticRecord)
+}
+/*
+Error GQL status: 42001
+Error GQL status description: error: syntax error or access rule violation - invalid syntax
+Error GQL classification: CLIENT_ERROR
+Error GQL cause: GQLError: 42I06: Invalid input '', expected: an expression, '*', 'ALL' or 'DISTINCT'.
+Error GQL diagnostic record: {
+  OPERATION: '',
+  OPERATION_CODE: '0',
+  CURRENT_SCHEMA: '/',
+  _classification: 'CLIENT_ERROR',
+  _position: {
+    line: Integer { low: 1, high: 0 },
+    column: Integer { low: 25, high: 0 },
+    offset: Integer { low: 24, high: 0 }
+  }
+}
+*/
+----
+
+GQL status codes are particularly helpful when you want your application to behave differently depending on the exact error that was raised by the server.
+
+.Distinguishing between different error codes
+[source, javascript]
+----
+let err = await driver.executeQuery(
+    'MATCH (p:Person) RETURN ',
+    {},
+    { database: 'neo4j' }
+  )
+} catch (err) {
+    if hasGqlStatus(err, '42001') {
+        # Neo.ClientError.Statement.SyntaxError
+        # special handling of syntax error in query
+        console.log(err.message)
+    } else if hasGqlStatus(err, '42NFF') {
+        # Neo.ClientError.Security.Forbidden
+        # special handling of user not having CREATE permissions
+        console.log(err.message)
+    } else {
+        # handling of all other errors
+        console.log(err.message)
+    }
+}
+----
+
+[NOTE]
+====
+The GQL status code `50N42` is returned when an error does not have a GQL-status object.
+This can happen if the driver is connected to an older Neo4j server.
+Don't rely on this status code, as future Neo4j server versions might change it with a more appropriate one.
+====
+
+[TIP]
+====
+Transient server errors can be retried without need to alter the original request.
+You can discover whether an error is transient via the method `Neo4jError.isRetryable()`, which gives insights into whether a further attempt might be successful.
+This is particular useful when running queries in xref:transactions#explicit-transactions[explicit transactions], to know if a failed query is worth re-running.
+====
 
 
 == Query configuration
