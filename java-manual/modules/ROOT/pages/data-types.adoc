@@ -38,7 +38,7 @@ All temporal types, except link:https://neo4j.com/docs/api/java-driver/{java-dri
 This means that:
 
 - if you want to _query_ the database with a temporal type, instantiate a `java.time` object and use it as query parameter (i.e. you don't need to care about driver's types).
-- if you _retrieve_ a temporal object from the database (including through one of link:https://neo4j.com/docs/cypher-manual/5/functions/temporal/[Cypher temporal functions]), you will get back the corresponding _driver type_ as displayed in the table below. The driver implements methods to convert driver time types into Java ones (ex. `.asZonedDateTime()`, `.asOffsetTime()`, etc).
+- if you _retrieve_ a temporal object from the database (including through one of link:https://neo4j.com/docs/cypher-manual/current/functions/temporal/[Cypher temporal functions]), you will get back the corresponding _driver type_ as displayed in the table below. The driver implements methods to convert driver time types into Java ones (ex. `.asZonedDateTime()`, `.asOffsetTime()`, etc).
 
 |===
 | Cypher type      | Driver type
@@ -85,7 +85,7 @@ public class App {
                 RETURN friendship.since AS date
                 """)
                 .withParameters(Map.of("name", "Alice", "friend", "Bob", "friendsSince", friendsSince))
-                .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+                .withConfig(QueryConfig.builder().withDatabase("<database-name>").build())
                 .execute();
 
             var date = result.records().get(0).get("date");
@@ -159,7 +159,7 @@ public class App {
             driver.verifyConnectivity();
 
             var result = driver.executableQuery("RETURN point({x: 2.3, y: 4.5, z: 2}) AS point")
-                .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+                .withConfig(QueryConfig.builder().withDatabase("<database-name>").build())
                 .execute();
             var point = result.records().get(0).get("point");
             System.out.println(point);  // Point{srid=9157, x=2.3, y=4.5, z=2.0}
@@ -195,7 +195,7 @@ public class App {
             var location = Values.point(4326, 67.28775180193841, 17.734163823312397);  // 4326 = 2D geodetic point
             var result = driver.executableQuery("CREATE (p:PlaceOfInterest {location: $location}) RETURN p")
                 .withParameters(Map.of("location", location))
-                .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+                .withConfig(QueryConfig.builder().withDatabase("<database-name>").build())
                 .execute();
             var place = result.records().get(0).get("p").get("location");
             System.out.println(place);  // Point{srid=4326, x=67.28775180193841, y=17.734163823312397}
@@ -268,7 +268,7 @@ public class App {
             // Get a node from the database
             var result = driver.executableQuery("MERGE (p:Person:Actor {name: $name, age: 59}) RETURN p")
                 .withParameters(Map.of("name", "Alice"))
-                .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+                .withConfig(QueryConfig.builder().withDatabase("<database-name>").build())
                 .execute();
 
             // Extract node from result
@@ -352,7 +352,7 @@ public class App {
                 RETURN r AS friendship
                 """)
                 .withParameters(Map.of("name", "Alice", "status", "BFF", "friendName", "Bob"))
-                .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+                .withConfig(QueryConfig.builder().withDatabase("<database-name>").build())
                 .execute();
 
             // Extract relationship from result
@@ -422,7 +422,7 @@ public class App {
                 RETURN path AS friendshipChain
                 """)
                 .withParameters(Map.of("name", "Alice"))
-                .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+                .withConfig(QueryConfig.builder().withDatabase("<database-name>").build())
                 .execute();
 
             // Extract path from result
@@ -452,7 +452,7 @@ public class App {
             MERGE (p)-[r:KNOWS {status: $status, since: date()}]->(friend:Person {name: $friendName})
             """)
             .withParameters(Map.of("name", name, "status", status, "friendName", friendName))
-            .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+            .withConfig(QueryConfig.builder().withDatabase("<database-name>").build())
             .execute();
     }
 }

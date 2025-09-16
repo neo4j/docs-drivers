@@ -18,3 +18,4 @@ For more information, see link:{neo4j-docs-base-uri}/cypher-manual/current/value
 [[transaction]]transaction:: A transaction is a unit of work that is either _committed_ in its entirety or _rolled back_ on failure.
 An example is a bank transfer: it involves multiple steps, but they must _all_ succeed or be reverted, to avoid money being subtracted from one account but not added to the other.
 [[backpressure]]backpressure:: Backpressure is a force opposing the flow of data. It ensures that the client is not being overwhelmed by data faster than it can handle.
+[[bookmark]]bookmark:: A _bookmark_ is a token representing some state of the database. By passing one or multiple bookmarks along with a query, the server will make sure that the query does not get executed before the represented state(s) have been established.

@@ -1,0 +1,302 @@
+= Map query results to objects
+:page-role: new-5.24
+
+When xref:query-simple.adoc#read[reading data from the database], results come back as link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IRecord.html[`IRecord`] objects.
+To process records, you can either extract properties with `.Get()` and other helper methods, or you can map them to objects in your application.
+You can either map records to classes you have explicitly defined, or provide a record-specific blueprint from which the driver will spawn new objects.
+
+The object mapping feature can help you reduce boilerplate code and work more easily with the results of your queries.
+
+[TIP]
+To use the object mapping feature, you need to include the namespace `Neo4j.Driver.Mapping` beside the root `Neo4j.Driver`.
+
+
+[#existing-classes]
+== Map to existing classes
+
+If you want to map records to an existing class, define a class having the same attributes as the keys returned by the query.
+**The class attributes must match exactly the query return keys**, and they are case-sensitive.
+
+To map a record to a class named `className`, use the method `IRecord.AsObject<className>()`.
+
+.Map a `:Person` node to a `Person` class
+[source, csharp]
+----
+var result = await driver.ExecutableQuery(@"
+    MERGE (p:Person {name: $name, age: $age})
+    RETURN p.name AS name, p.age AS age  // <.>
+    ")
+    .WithParameters(new { name = "Alice", age = 21 })
+    .WithConfig(new QueryConfig(database: "<database-name>"))
+    .ExecuteAsync();
+
+var record = result.Result[0];
+var person = record.AsObject<Person>();  // <.>
+Console.WriteLine(person.name);  // "Alice"
+
+class Person {  // <.>
+    public string name { get; set; }  // <.>
+    public int age { get; set; }
+}
+----
+
+<.> Return keys are aliased in the query to match the class attributes.
+<.> The record is mapped to an instance of the `Person` class.
+<.> The class `Person` contains `name` and `age` attributes, as the query return keys.
+<.> Each class attribute must have a public getter _and_ setter, which the driver can invoke after instantiating the class. If that doesn't fit your use-case, see xref:#constructors[how to use constructors] and have private setters.
+
+.A record's property names and its query return keys can be different.
+[NOTE]
+====
+For example, consider a node with label `:Person` and a `name` property. +
+The returned keys for the query `MERGE (p:Person {name: "Alice"}) RETURN p.name` are `p.name`, even if the property name is `name`. +
+Similarly, for the query `MERGE (pers:Person {name: "Alice"}) RETURN pers.name`, the return keys are `pers.name`. +
+====
+
+You can always alter a return key with the Cypher operator link:https://neo4j.com/docs/cypher-manual/current/clauses/return/#return-column-alias[`AS`] (ex. `MERGE (p:Person {name: "Alice"}) RETURN p.name AS name`).
+Otherwise, you can alter the association between property names and class attributes with the class attribute decorator `[MappingSource("returnedKeyName")]`.
+For more information, see all xref:#decorators[decorators].
+
+.Map `p.name` to `name` and `p.age` to `age`
+[source, csharp, role=nocollapse]
+----
+var result = await driver.ExecutableQuery(@"
+    MERGE (p:Person {name: $name, age: $age})
+    RETURN p  // <.>
+    ")
+    .WithParameters(new { name = "Alice", age = 21 })
+    .WithConfig(new QueryConfig(database: "<database-name>"))
+    .ExecuteAsync();
+
+var person = result.Result[0].AsObject<Person>();
+Console.WriteLine(person.name);  // "Alice"
+
+class Person {  // <.>
+    [MappingSource("p.name")] // <.>
+    public string name { get; set; }
+
+    [MappingSource("p.age")]
+    public int age { get; set; }
+}
+----
+
+<.> The query returns the node, which results in the record keys `p.name` and `p.age`.
+<.> The class `Person` has attributes `name` and `age`, even if there's no such return keys in the query.
+<.> The `MappingSource` decorator associates the record key `p.name` with the class attribute `name`.
+
+// [NOTE]
+// Max one level of nesting with `.`
+
+
+[#decorators]
+=== Class attribute decorators
+
+To make the mapping more flexible, decorators are available.
+Use them on class attributes to alter how each attribute should be mapped to its respective query return key.
+
+- `[MappingSource("<returnedKeyName>")]` -- Map `returnedKeyName` to the class attribute, instead of looking for a returned key that matches the class attribute name.
+- `[MappingIgnored]` -- Ignore the class attribute (i.e. don't look for a corresponding returned key).
+- `[MappingOptional]` -- Use the class attribute if it can be matched, but ignore it if the query doesn't return a compatible key to match.
+- `[MappingDefaultValue(val)]` -- Same as `[MappingOptional]`, and specify a default value `val` in case of missing match.
+
+.Decorators example
+[source, csharp]
+----
+class Person {
+    [MappingSource("p.name")]  // <.>
+    public string name { get; set; }
+
+    [MappingOptional]  // <.>
+    public int age { get; set; }
+
+    [MappingIgnored]  // <.>
+    public string address { get; set; }
+
+    [MappingDefaultValue("Subscriber")]  // <.>
+    public string role { get; set; }
+}
+----
+
+<.> Map the `p.name` return key to the `name` class attribute.
+<.> Populate the class attribute `age` with the `age` return key if present, and set the attribute to `null` otherwise.
+<.> Set the `address` class attribute to `null` regardless of the query return keys.
+<.> Populate the class attribute `role` with the `role` return key if present, and set the attribute to the default value `Subscriber` otherwise.
+
+An extra optional parameter to the `[MappingSource]` decorator allows you to map node labels and relationship types into class attributes:
+
+- `[MappingSource("nodeEntity", EntityMappingSource.NodeLabel)]` -- Collect the labels found in the node returned under the alias `nodeEntity` into the given class attribute as a list of strings.
+The first argument to `MappingSource` must be a returned key referencing a node entity.
+If, instead of `List<string>`, the attribute type is plain `string`, you obtain a comma-separated list of labels.
+- `[MappingSource("relEntity", EntityMappingSource.RelationshipType)]` -- Map the relationship type `job` into the given class attribute.
+The first argument to `[MappingSource]` must be a returned key referencing a relationship entity.
+
+.Mapping node labels and relationship types
+[source, csharp]
+----
+var result = await driver.ExecutableQuery(@"
+    MERGE (p:Person:Actor {name: $name})
+    MERGE (m:Movie {name: $movie})
+    MERGE (p)-[r:ACTED_IN {role: $role}]->(m)
+    RETURN p AS person, r AS role  // <.>
+    ")
+    .WithParameters(new { name = "Keanu Reeves", movie = "The Matrix", role = "Neo" })
+    .WithConfig(new QueryConfig(database: "<database-name>"))
+    .ExecuteAsync();
+
+var person = result.Result[0].AsObject<Person>();
+Console.WriteLine(string.Join(",", person.Labels));  // "Person,Actor"
+Console.WriteLine(person.Role);  // "Neo"
+
+class Person {
+    [MappingSource("person", EntityMappingSource.NodeLabel)]  // <.>
+    public List<string> Labels { get; set; }
+
+    [MappingSource("role", EntityMappingSource.RelationshipType)]  // <.>
+    public string Role { get; set; }
+}
+----
+
+<.> `person` is a node entity; `role` is a relationship entity.
+<.> `Labels` collects the labels found in the `person` node.
+<.> `Role` contains the relationship type of the `role` relationship.
+
+
+[#constructors]
+=== Work with constructors
+
+When mapping records to an existing class, the first thing the driver has to do is to instantiate an object onto which to map records, which results in the class constructor to be invoked.
+
+- If no explicit constructor is defined, the driver chooses the implicitly-defined, trivial constructor and then proceeds to set the class attributes via their setters.
+- If one or more constructor are defined, the driver chooses the simplest one (i.e. the one with least parameters).
+You can override this choice by decorating with `[MappingConstructor]` the constructor you wish the driver to use.
+
+Defining a constructor is useful in making the resulting objects immutable: the constructor provides the driver with a way to set some (or all) attributes, but no other component is allowed to change those attributes.
+After invoking the constructor, the driver proceeds to set values for attributes with public setters, if any.
+
+You can use xref:#decorators[decorators] in constructor arguments, although the only meaningful ones are `[MappingOptional]` and `[MappingDefaultValue]` (anything else is best achieved by changing the constructor signature).
+
+.A class with two constructors and private setters
+[source, csharp]
+----
+class Person {
+    [MappingConstructor]  // <.>
+    public Person(string name, [MappingDefaultValue(21)] int age) {
+        Name = name;
+        Age = age;
+    }
+
+    public Person() {  // <.>
+    }
+
+    public string Name { get; private set; }  // <.>
+    public int Age { get; private set; }
+}
+----
+
+<.> The decorator instructs the driver to use this as constructor when mapping records onto the `Person` class.
+The constructor signature implies that the `name` return key is mapped to the class attribute `Name`, and `age` to `Age` (with a default value of `21`).
+<.> This form of constructor would be invoked if the `[MappingConstructor]` decorator was not present in the other constructor.
+<.> Because the constructor sets the `Name` and `Age` attributes, the attributes can have private setters.
+
+
+[#anonymous-types]
+== Map to anonymous types
+
+Especially if your queries return a variety of result keys, it can feel pointless to define a number of different classes just for the mapping to work, or to engineer one single class and try to make it adapt to a variety of return keys with attribute decorators.
+In those cases, you can provide a skeleton of definition (a _blueprint_) to the driver and let it instantiate anonymous objects out of that.
+
+You provide a blueprint with the method link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.Mapping.RecordExtensions.AsObjectFromBlueprint.html[`IRecord.AsObjectFromBlueprint()`], and the record must match it exactly (i.e. you can't use decorators).
+
+[source, csharp]
+----
+var result = await driver.ExecutableQuery(@"
+    MERGE (p:Person {name: $name, age: $age})
+    RETURN p.name AS name, p.age AS age  // <.>
+    ")
+    .WithParameters(new { name = "Alice", age = 21 })
+    .WithConfig(new QueryConfig(database: "<database-name>"))
+    .ExecuteAsync();
+
+var person = result.Result[0].AsObjectFromBlueprint(new { name = "", age = 0 });  // <.>
+----
+
+<.> Return keys must be aliased, as `.AsObjectFromBlueprint()` doesn't support dots in identifiers.
+<.> Key names must match the return keys.
+Provided values don't work as default values; they are only used to infer the property type (i.e. the specific values provided in the definition are discarded).
+
+If you want to avoid aliases in return keys, you can nest objects in the `.AsObjectFromBlueprint()` call.
+
+[source, csharp]
+----
+var result = await driver.ExecutableQuery(@"
+    MERGE (p:Person {name: $name, age: $age})
+    RETURN p  // <.>
+    ")
+    .WithParameters(new { name = "Alice", age = 21 })
+    .WithConfig(new QueryConfig(database: "<database-name>"))
+    .ExecuteAsync();
+
+var person = result.Result[0].AsObjectFromBlueprint(new { p = new { name = "", age = 0 }});  // <.>
+----
+
+<.> The only return key is `p`, containing `p.name` and `p.age`.
+<.> A nested object blueprint handles the node entity return key.
+
+An alternative way of mapping to anonymous types is to use `.AsObject()` with a lambda function.
+That allows you to also add attributes that don't match a property from the database (such as `BirthYear` in the example below).
+
+[source, csharp]
+----
+var result = await driver.ExecutableQuery(@"
+    MERGE (p:Person {name: $name, age: $age})
+    RETURN p.name AS name, p.age AS age
+    ")
+    .WithParameters(new { name = "Alice", age = 21 })
+    .WithConfig(new QueryConfig(database: "<database-name>"))
+    .ExecuteAsync();
+
+var person = result.Result[0].AsObject( (string name, int age) => new { Name = name, Age = age, BirthYear = 2025 - age });
+----
+
+The lambda function doesn't have to create a map: it can do any processing.
+
+.A lambda returning a string
+[source, csharp]
+----
+var result = await driver.ExecutableQuery(@"
+    MERGE (p:Person {name: $name, age: $age})
+    RETURN p.name AS name, p.age AS age
+    ")
+    .WithParameters(new { name = "Alice", age = 21 })
+    .WithConfig(new QueryConfig(database: "<database-name>"))
+    .ExecuteAsync();
+
+var text = result.Result[0].AsObject( (string name, int age) => $"{name} is {age} years old." );
+----
+
+////
+Decorators are allowed, but the only meaningful ones a is default val
+Comment: they don't work.
+
+[source, csharp, test-skip]
+----
+var result = await driver.ExecutableQuery(@"
+    MERGE (p:Person {name: $name, age: $age})
+    RETURN p
+    ")
+    .WithParameters(new { name = "Alice", age = 21 })
+    .WithConfig(new QueryConfig(database: "<database-name>"))
+    .ExecuteAsync();
+
+var person = result.Result[0].AsObject( ([MappingSource["p.name"]] string name, [MappingSource["p.age"]] [MappingDefaultValue(21)] int age) => new { Name = name, Age = age, BirthYear = 2025 - age });
+----
+////
+
+
+ifndef::backend-pdf[]
+[discrete.glossary]
+== Glossary
+
+include::{common-partial}/glossary.adoc[]
+include::../partials/glossary.adoc[]
+endif::[]

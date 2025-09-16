@@ -2,14 +2,10 @@
 
 Once you have xref:connect.adoc[connected to the database], you can run queries using <<Cypher>> and the method `Driver.execute_query()`.
 
-[TIP]
-`Driver.execute_query()` was introduced with the version 5.8 of the driver. +
-For queries with earlier versions, use xref:transactions.adoc[sessions and transactions].
-
 
 == Write to the database
 
-To create two nodes representing persons named `Alice` and `David`, and a relationship `KNOWS` between them, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/create/[`CREATE`]:
+To create two nodes representing persons named `Alice` and `David`, and a relationship `KNOWS` between them, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/create/[`CREATE`]:
 
 .Create two nodes and a relationship
 [source, python]
@@ -20,7 +16,7 @@ summary = driver.execute_query(""" // <1>
     CREATE (a)-[:KNOWS]->(b)
     """,
     name="Alice", friendName="David",  # <2>
-    database_="neo4j",  # <3>
+    database_="<database-name>",  # <3>
 ).summary
 print("Created {nodes_created} nodes in {time} ms.".format(
     nodes_created=summary.counters.nodes_created,
@@ -35,7 +31,7 @@ print("Created {nodes_created} nodes in {time} ms.".format(
 
 == Read from the database
 
-To retrieve information from the database, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/match/[`MATCH`]:
+To retrieve information from the database, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/match/[`MATCH`]:
 
 .Retrieve all `Person` nodes who like other `Person` s
 [source, python]
@@ -44,12 +40,12 @@ records, summary, keys = driver.execute_query("""
     MATCH (p:Person)-[:KNOWS]->(:Person)
     RETURN p.name AS name
     """,
-    database_="neo4j",
+    database_="<database-name>",
 )
 
 # Loop through results and do something with them
 for record in records:  # <1>
-    print(record.data())  # obtain record as dict
+    print(record.data())  # get record as dict
 
 # Summary information  <2>
 print("The query `{query}` returned {records_count} records in {time} ms.".format(
@@ -64,7 +60,7 @@ print("The query `{query}` returned {records_count} records in {time} ms.".forma
 
 == Update the database
 
-To update an entity's information in the database, use the Cypher clauses link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/match/[`MATCH`] and link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/set/[`SET`]:
+To update an entity's information in the database, use the Cypher clauses link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/match/[`MATCH`] and link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/set/[`SET`]:
 
 .Update node `Alice` to add an `age` property
 [source, python]
@@ -73,7 +69,7 @@ records, summary, keys = driver.execute_query("""
     MATCH (p:Person {name: $name})
     SET p.age = $age
     """, name="Alice", age=42,
-    database_="neo4j",
+    database_="<database-name>",
 )
 print(f"Query counters: {summary.counters}.")
 ----
@@ -88,7 +84,7 @@ records, summary, keys = driver.execute_query("""
     MATCH (bob:Person {name: $friend})  // <2>
     CREATE (alice)-[:KNOWS]->(bob)  // <3>
     """, name="Alice", friend="Bob",
-    database_="neo4j",
+    database_="<database-name>",
 )
 print(f"Query counters: {summary.counters}.")
 ----
@@ -100,7 +96,7 @@ print(f"Query counters: {summary.counters}.")
 
 == Delete from the database
 
-To remove a node and any relationship attached to it, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/delete/[`DETACH DELETE`]:
+To remove a node and any relationship attached to it, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/delete/[`DETACH DELETE`]:
 
 .Remove the `Alice` node
 [source, python]
@@ -110,7 +106,7 @@ records, summary, keys = driver.execute_query("""
     MATCH (p:Person {name: $name})
     DETACH DELETE p
     """, name="Alice",
-    database_="neo4j",
+    database_="<database-name>",
 )
 print(f"Query counters: {summary.counters}.")
 ----
@@ -120,13 +116,13 @@ print(f"Query counters: {summary.counters}.")
 == Query parameters
 
 *Do not hardcode or concatenate parameters directly into queries*.
-Instead, always use placeholders and specify the link:{neo4j-docs-base-uri}/cypher-manual/5/syntax/parameters/[Cypher parameters], as shown in the previous examples.
+Instead, always use placeholders and provide dynamic data as link:{neo4j-docs-base-uri}/cypher-manual/current/syntax/parameters/[Cypher parameters].
 This is for:
 
 1. *performance benefits*: Neo4j compiles and caches queries, but can only do so if the query structure is unchanged;
 2. *security reasons*: see link:https://neo4j.com/developer/kb/protecting-against-cypher-injection/[protecting against Cypher injection].
 
-Query parameters can be passed either as several keyword arguments, or grouped together in a dictionary as value to the `parameters_` keyword argument. In case of mix, keyword-argument parameters take precedence over dictionary ones.
+Query parameters can be passed either as several keyword arguments, or grouped together in a dictionary passed as value to the `parameters_` keyword argument. In case of mix, keyword-argument parameters take precedence over dictionary ones.
 
 .Pass query parameters as keyword arguments
 [source, python]
@@ -134,7 +130,7 @@ Query parameters can be passed either as several keyword arguments, or grouped t
 driver.execute_query(
     "MERGE (:Person {name: $name})",
     name="Alice", age=42,
-    database_="neo4j",
+    database_="<database-name>",
 )
 ----
 
@@ -148,7 +144,7 @@ parameters = {
 driver.execute_query(
     "MERGE (:Person {name: $name})",
     parameters_=parameters,
-    database_="neo4j",
+    database_="<database-name>",
 )
 ----
 
@@ -159,21 +155,101 @@ There can be circumstances where your query structure prevents the usage of para
 For those rare use cases, see xref:query-advanced#_dynamic_values_in_property_keys_relationship_types_and_labels[Dynamic values in property keys, relationship types, and labels].
 
 
+
+[#error-handling]
 == Error handling
 
-Because `.execute_query()` can potentially raise a number of different exceptions, the best way to handle errors is to catch all exceptions in a single `try/except` block:
+A query run may fail for a number of reasons, with different link:https://neo4j.com/docs/api/python-driver/current/api.html#errors[exceptions] being raised.
+When using `driver.execute_query()`, the driver automatically retries to run a failed query if the failure is deemed to be transient (for example due to temporary server unavailability).
 
+An exception will be raised if the operation keeps failing after a number of attempts.
+
+All exceptions coming from the server are subclasses of link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.exceptions.Neo4jError[`Neo4jError`].
+You can use an exception's code to stably identify a specific error; error messages are instead not stable markers, and should not be relied upon.
+
+.Basic error handling
+[source, python, role=nocollapse]
+----
+# from neo4j.exceptions import Neo4jError
+
+try:
+    driver.execute_query('MATCH (p:Person) RETURN', database_='neo4j')
+except Neo4jError as e:
+    print('Neo4j error code:', e.code)
+    print('Exception message:', e.message)
+'''
+Neo4j error code: Neo.ClientError.Statement.SyntaxError
+Exception message: Invalid input '': expected an expression, '*', 'ALL' or 'DISTINCT' (line 1, column 24 (offset: 23))
+"MATCH (p:Person) RETURN"
+                        ^
+'''
+----
+
+Exception objects also expose errors as GQL-status objects.
+The main difference between link:https://neo4j.com/docs/status-codes/current/errors/all-errors/[Neo4j error codes] and link:https://neo4j.com/docs/status-codes/current/errors/gql-errors/[GQL error codes] is that the GQL ones are more granular: a single Neo4j error code might be broken in several, more specific GQL error codes.
+
+The actual _cause_ that triggered an exception is sometimes found in the optional GQL-status object `\\__cause__`, which is itself a `Neo4jError`.
+You might need to recursively traverse the cause chain before reaching the root cause of the exception you caught.
+In the example below, the exception's GQL status code is `42001`, but the actual source of the error has status code `42I06`.
+
+.Usage of `Neo4jError` with GQL-related methods
 [source, python]
 ----
+# from neo4j.exceptions import Neo4jError
+
 try:
-    driver.execute_query(...)
-except Exception as e:
-    ...  # handle exception
+    driver.execute_query('MATCH (p:Person) RETURN', database_='neo4j')
+except Neo4jError as e:
+    print('Exception GQL status:', e.gql_status)
+    print('Exception GQL status description:', e.gql_status_description)
+    print('Exception GQL classification:', e.gql_classification)
+    print('Exception GQL cause:', e.__cause__)
+    print('Exception GQL diagnostic record:', e.diagnostic_record)
+'''
+Exception GQL status: 42001
+Exception GQL status description: error: syntax error or access rule violation - invalid syntax
+Exception GQL classification: GqlErrorClassification.CLIENT_ERROR
+Exception GQL cause: {gql_status: 42I06} {gql_status_description: error: syntax error or access rule violation - invalid input. Invalid input '', expected: an expression, '*', 'ALL' or 'DISTINCT'.} {message: 42I06: Invalid input '', expected: an expression, '*', 'ALL' or 'DISTINCT'.} {diagnostic_record: {'_classification': 'CLIENT_ERROR', '_position': {'line': 1, 'column': 24, 'offset': 23}, 'OPERATION': '', 'OPERATION_CODE': '0', 'CURRENT_SCHEMA': '/'}} {raw_classification: CLIENT_ERROR}
+Exception GQL diagnostic record: {'_classification': 'CLIENT_ERROR', '_position': {'line': 1, 'column': 24, 'offset': 23}, 'OPERATION': '', 'OPERATION_CODE': '0', 'CURRENT_SCHEMA': '/'}
+'''
 ----
 
+GQL status codes are particularly helpful when you want your application to behave differently depending on the exact error that was raised by the server.
+
+.Distinguishing between different error codes
+[source, python]
+----
+# from neo4j.exceptions import Neo4jError
+
+try:
+    driver.execute_query('MATCH (p:Person) RETURN', database_='neo4j')
+except Neo4jError as e:
+    if e.find_by_gql_status('42001'):
+        # Neo.ClientError.Statement.SyntaxError
+        # special handling of syntax error in query
+        print(e.message)
+    elif e.find_by_gql_status('42NFF'):
+        # Neo.ClientError.Security.Forbidden
+        # special handling of user not having CREATE permissions
+        print(e.message)
+    else:
+        # handling of all other exceptions
+        print(e.message)
+----
+
+[NOTE]
+====
+The GQL status code `50N42` is returned when an exception does not have a GQL-status object.
+This can happen if the driver is connected to an older Neo4j server.
+Don't rely on this status code, as future Neo4j server versions might change it with a more appropriate one.
+====
+
 [TIP]
-The driver automatically retries to run a failed query, if the failure is deemed to be transient (for example due to temporary server unavailability).
-An exception will be raised if the operation keeps failing after a number of attempts.
+====
+Transient server errors can be retried without need to alter the original request.
+You can discover whether an error is transient via the method `Neo4jError.is_retryable()`, which gives insights into whether a further attempt might be successful.
+This is particular useful when running queries in xref:transactions#explicit-transactions[explicit transactions], to know if a failed query is worth re-running.
+====
 
 
 == Query configuration
@@ -181,24 +257,25 @@ An exception will be raised if the operation keeps failing after a number of att
 You can supply further keyword arguments to alter the default behavior of `.execute_query()`.
 Configuration parameters are suffixed with `_`.
 
+
 === Database selection
 
-It is recommended to *always specify the database explicitly* with the `database_` parameter, even on single-database instances.
+*Always specify the database explicitly* with the `database_` parameter, even on single-database instances.
 This allows the driver to work more efficiently, as it saves a network round-trip to the server to resolve the home database.
-If no database is given, the link:{neo4j-docs-base-uri}/operations-manual/5/database-administration/#manage-databases-default[user's home database] is used.
+If no database is given, the link:{neo4j-docs-base-uri}/operations-manual/current/database-administration/#manage-databases-default[user's home database] is used.
 
 [source, python]
 ----
 driver.execute_query(
     "MATCH (p:Person) RETURN p.name",
-    database_="neo4j",
+    database_="<database-name>",
 )
 ----
 
 [TIP]
-Specifying the database through the configuration method is preferred over the link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/use/[`USE`] Cypher clause.
-If the server runs on a cluster, queries with `USE` require server-side routing to be enabled.
-Queries may also take longer to execute as they may not reach the right cluster member at the first attempt, and need to be routed to one containing the requested database.
+Specifying the database through the configuration method is preferred over the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/use/[`USE`] Cypher clause.
+If the server runs on a cluster, queries with `USE` require link:https://neo4j.com/docs/operations-manual/current/clustering/setup/routing/#clustering-routing[server-side routing] to be enabled.
+Queries can also take longer to execute as they may not reach the right cluster member at the first attempt, and need to be routed to one containing the requested database.
 
 
 === Request routing
@@ -211,44 +288,42 @@ To improve performance on read queries, you can use the argument `routing_="r"` 
 driver.execute_query(
     "MATCH (p:Person) RETURN p.name",
     routing_="r",  # short for neo4j.RoutingControl.READ
-    database_="neo4j",
+    database_="<database-name>",
 )
 ----
 
 [NOTE]
 ====
-Although executing a _write_ query in read mode likely results in a runtime error, *you should not rely on this for access control.* The difference between the two modes is that _read_ transactions will be routed to any node of a cluster, whereas _write_ ones are directed to primaries.
-In other words, there is no guarantee that a write query submitted in read mode will be rejected.
+Although executing a _write_ query in read mode results in a runtime error, *you should not rely on this for access control.* The difference between the two modes is that _read_ transactions will be routed to any node of a cluster, whereas _write_ ones are directed to primaries.
+There is no security guarantee that a write query submitted in read mode will be rejected.
 ====
 
 
 [#impersonation]
-[role=label--new-5.14]
 === Run queries as a different user
 
 You can execute a query through a different user with the parameter `auth_`.
 Switching user at the query level is cheaper than creating a new `Driver` object.
-The query is then run within the security context of the given user (i.e., home database, permissions, etc.). +
-Query-scoped authentication requires a server version >= 5.8.
+The query is then run within the security context of the given user (i.e., home database, permissions, etc.).
 
-[source, python, test-skip]
+[source, python]
 ----
 driver.execute_query(
     "MATCH (p:Person) RETURN p.name",
-    auth_=("somebody_else", "their_password"),
-    database_="neo4j",
+    auth_=("<username>", "<password>"),
+    database_="<database-name>",
 )
 ----
 
-The parameter `impersonated_user_` provides a similar functionality, and is available in driver/server versions >= 4.4.
-The difference is that you don't need to know a user's password to impersonate them, but the user under which the `Driver` was created needs to have the link:{neo4j-docs-base-uri}/operations-manual/5/authentication-authorization/dbms-administration/#access-control-dbms-administration-impersonation[appropriate permissions].
+The parameter `impersonated_user_` provides a similar functionality.
+The difference is that you don't need to know a user's password to impersonate them, but the user under which the `Driver` was created needs to have the link:{neo4j-docs-base-uri}/operations-manual/current/authentication-authorization/dbms-administration/#access-control-dbms-administration-impersonation[appropriate permissions].
 
-[source, python, test-skip]
+[source, python]
 ----
 driver.execute_query(
     "MATCH (p:Person) RETURN p.name",
-    impersonated_user_="somebody_else",
-    database_="neo4j",
+    impersonated_user_="<username>",
+    database_="<database-name>",
 )
 ----
 
@@ -266,6 +341,7 @@ For more information, see xref:transformers.adoc[Manipulate query results].
 [source, python]
 ----
 from neo4j import GraphDatabase
+from neo4j.exceptions import Neo4jError
 
 
 URI = "<database-uri>"
@@ -283,7 +359,7 @@ with GraphDatabase.driver(URI, auth=AUTH) as driver:
             records, summary, keys = driver.execute_query(
                 "MERGE (p:Person {name: $person.name, age: $person.age})",
                 person=person,
-                database_="neo4j",
+                database_="<database-name>",
             )
 
         # Create some relationships
@@ -295,7 +371,7 @@ with GraphDatabase.driver(URI, auth=AUTH) as driver:
                     MATCH (friend:Person {name: friend_name})
                     MERGE (p)-[:KNOWS]->(friend)
                     """, person=person,
-                    database_="neo4j",
+                    database_="<database-name>",
                 )
 
         # Retrieve Alice's friends who are under 40
@@ -305,7 +381,7 @@ with GraphDatabase.driver(URI, auth=AUTH) as driver:
             RETURN friend
             """, name="Alice", age=40,
             routing_="r",
-            database_="neo4j",
+            database_="<database-name>",
         )
         # Loop through results and do something with them
         for record in records:
@@ -316,12 +392,12 @@ with GraphDatabase.driver(URI, auth=AUTH) as driver:
             time=summary.result_available_after
         ))
 
-    except Exception as e:
+    except Neo4jError as e:
         print(e)
         # further logging/processing
 ----
 
-For more information see link:{neo4j-docs-base-uri}/api/python-driver/{python-driver-version}/api.html#neo4j.Driver.execute_query[API documentation -> Driver.execute_query()].
+For more information see link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Driver.execute_query[API documentation -> Driver.execute_query()].
 
 
 ifndef::backend-pdf[]

@@ -1,6 +1,5 @@
 // This doc is also sourced in the Aura Developer Hub.
-// Because of that, cross-links are absolute and
-// source blocks have copy=true .
+// Because of that, cross-links are absolute and source blocks have copy=true .
 
 The Neo4j .NET driver is the official library to interact with a Neo4j instance through a .NET application.
 
@@ -22,7 +21,7 @@ dotnet add package Neo4j.Driver
 
 The driver supports the .NET Standard 2.0.
 
-link:https://neo4j.com/docs/dotnet-manual/current/[More info on installing the driver]
+link:https://neo4j.com/docs/dotnet-manual/current/install/[More info on installing the driver]
 
 
 [#connect]
@@ -45,7 +44,7 @@ await driver.VerifyConnectivityAsync();
 Console.WriteLine("Connection established.");
 ----
 
-link:https://neo4j.com/docs/dotnet-manual/current/[More info on connecting to a database]
+link:https://neo4j.com/docs/dotnet-manual/current/connect/[More info on connecting to a database]
 
 
 [#create-graph]
@@ -63,7 +62,7 @@ var result = await driver.ExecutableQuery(@"
     CREATE (a)-[:KNOWS]->(b)
     ")
     .WithParameters(new { name = "Alice", friendName = "David" })
-    .WithConfig(new QueryConfig(database: "neo4j"))
+    .WithConfig(new QueryConfig(database: "<database-name>"))
     .ExecuteAsync();
 
 // Summary information
@@ -71,7 +70,7 @@ var summary = result.Summary;
 Console.WriteLine($"Created {summary.Counters.NodesCreated} nodes in {summary.ResultAvailableAfter.Milliseconds} ms.");
 ----
 
-link:https://neo4j.com/docs/dotnet-manual/current/[More info on querying the database]
+link:https://neo4j.com/docs/dotnet-manual/current/query-simple/[More info on querying the database]
 
 
 [#query-graph]
@@ -86,7 +85,7 @@ var result = await driver.ExecutableQuery(@"
     MATCH (p:Person)-[:KNOWS]->(:Person)
     RETURN p.name AS name
     ")
-    .WithConfig(new QueryConfig(database: "neo4j"))
+    .WithConfig(new QueryConfig(database: "<database-name>"))
     .ExecuteAsync();
 
 // Loop through results and print people's name
@@ -99,7 +98,7 @@ var summary = result.Summary;
 Console.WriteLine($"The query `{summary.Query.Text}` returned {result.Result.Count()} results in {summary.ResultAvailableAfter.Milliseconds} ms.");
 ----
 
-link:https://neo4j.com/docs/dotnet-manual/current/[More info on querying the database]
+link:https://neo4j.com/docs/dotnet-manual/current/query-simple/[More info on querying the database]
 
 
 [#close]

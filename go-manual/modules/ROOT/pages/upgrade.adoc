@@ -221,7 +221,7 @@ All others have no replacement: `db.TxHandle`, `db.StreamHandle`, `db.Command`, 
 
 |5.0
 |`ServerInfo.Version` has been removed.
-Use link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#ServerInfo[`ServerInfo.Agent`, `ServerInfo.ProtocolVersion`], or call the link:https://neo4j.com/docs/operations-manual/5/reference/procedures/#procedure_dbms_components[`dbms.components`] Cypher procedure instead.
+Use link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#ServerInfo[`ServerInfo.Agent`, `ServerInfo.ProtocolVersion`], or call the link:https://neo4j.com/docs/operations-manual/current/reference/procedures/#procedure_dbms_components[`dbms.components`] Cypher procedure instead.
 |label:removed[]
 |{check-mark}
 
@@ -239,7 +239,7 @@ The logic is the same, but the argument type changed from `Transaction` to `Mana
 
 |5.0
 |link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/dbtype#Node[`Node.Id`] and link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/dbtype#Relationship[`Relationship.Id`] are deprecated in favor of `Node.ElementId` and `Relationship.ElementId`.
-Old identifiers were Int64, wereas new ElementIds are String.
+Old identifiers were Int64, whereas new ElementIds are String.
 |label:deprecated[]
 |{check-mark}
 
@@ -330,6 +330,11 @@ Functions `neo4j.ConsoleLogger()` and `neo4j.Void()` are deprecated in favor of 
 
 |5.23
 |Notifications-related objects have been moved from the global namespace `neo4j` into link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/notifications[`neo4j/notifications`] -- `neo4j.(NotificationSeverity\|Warning\|Information\|UnknownSeverity\|NotificationCategory\|Hint\|Unrecognized\|Unsupported\|Performance\|Deprecation\|Generic\|Security\|Topology\|UnknownCategory)` are deprecated in favor of `notifications.(NotificationSeverity\|Warning\|Information\|UnknownSeverity\|NotificationCategory\|Hint\|Unrecognized\|Unsupported\|Performance\|Deprecation\|Generic\|Security\|Topology\|UnknownCategory)`.
+|label:deprecated[]
+|{check-mark}
+
+|5.28.2
+|link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#Single[`neo4j.Single`] is deprecated in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#SingleWithContext[`neo4j.SingleWithContext`].
 |label:deprecated[]
 |{check-mark}
 

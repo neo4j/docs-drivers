@@ -36,7 +36,7 @@ const driver = neo4j.driver(URI, neo4j.auth.kerberos(ticket))
 
 === Bearer authentication
 
-The bearer authentication scheme requires a base64-encoded token provided by an Identity Provider through Neo4j's link:{neo4j-docs-base-uri}/operations-manual/5/authentication-authorization/sso-integration[Single Sign-On feature].
+The bearer authentication scheme requires a base64-encoded token provided by an Identity Provider through Neo4j's link:{neo4j-docs-base-uri}/operations-manual/current/authentication-authorization/sso-integration[Single Sign-On feature].
 
 [source, javascript, test-skip]
 ----
@@ -44,7 +44,7 @@ const driver = neo4j.driver(URI, neo4j.auth.bearer(token))
 ----
 
 [NOTE]
-The bearer authentication scheme requires link:{neo4j-docs-base-uri}/operations-manual/5/authentication-authorization/sso-integration[configuring Single Sign-On on the server].
+The bearer authentication scheme requires link:{neo4j-docs-base-uri}/operations-manual/current/authentication-authorization/sso-integration[configuring Single Sign-On on the server].
 Once configured, clients can discover Neo4j's configuration through the link:https://neo4j.com/docs/http-api/5/endpoints/#discovery-api[Discovery API].
 
 
@@ -129,7 +129,7 @@ You can switch users at both xref:query-simple.adoc#impersonation[query level] a
 Mutual TLS (mTLS) allows you to use a client certificate as second factor for authenticating with the server.
 The certificate can only be used together with an authentication token and is not a replacement of regular authentication, unless authentication is disabled on the server.
 
-The client's certificate and public key must be placed in the server's `<NEO4J_HOME>/certificates/bolt/trusted` directory. For more information on server setup, see link:https://neo4j.com/docs/operations-manual/5/security/ssl-framework/#ssl-bolt-config[Configure SSL over Bolt].
+The client's certificate and public key must be placed in the server's `<NEO4J_HOME>/certificates/bolt/trusted` directory. For more information on server setup, see link:https://neo4j.com/docs/operations-manual/current/security/ssl-framework/#ssl-bolt-config[Configure SSL over Bolt].
 
 [NOTE]
 For mTLS to work, the driver's connection with the server must be encrypted, i.e. the xref:_connection_protocols_and_security[connection URI scheme] must be either `+s` or `+ssc` (ex. `neo4j+s://example.com:7687`).

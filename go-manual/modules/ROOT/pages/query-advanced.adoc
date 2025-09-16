@@ -12,7 +12,7 @@ It returns a `ResultWithContext` object that needs to be xref:transactions#proce
 
 [source, go]
 ----
-session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "<database-name>"})
 defer session.Close(ctx)
 result, err := session.Run(
     ctx,
@@ -34,12 +34,12 @@ Since the driver cannot figure out whether the query in a `SessionWithContext.Ru
 
 === Import CSV files
 
-The most common use case for using `SessionWithContext.Run()` is for importing large CSV files into the database with the link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/load-csv[`LOAD CSV`] Cypher clause, and preventing timeout errors due to the size of the transaction.
+The most common use case for using `SessionWithContext.Run()` is for importing large CSV files into the database with the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/load-csv[`LOAD CSV`] Cypher clause, and preventing timeout errors due to the size of the transaction.
 
 .Import CSV data into a Neo4j database
 [source, go]
 ----
-session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "<database-name>"})
 defer session.Close(ctx)
 result, err := session.Run(
     ctx, `
@@ -59,7 +59,7 @@ While `LOAD CSV` can be a convenience, there is nothing _wrong_ in deferring the
 In fact, moving the parsing logic to the application can give you more control over the importing process.
 For efficient bulk data insertion, see xref:performance.adoc#batch-data-creation[Performance -> Batch data creation].
 
-For more information, see link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/load-csv/[Cypher -> Clauses -> Load CSV].
+For more information, see link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/load-csv/[Cypher -> Clauses -> Load CSV].
 
 
 === Transaction configuration
@@ -70,7 +70,7 @@ For more information, see xref:transactions.adoc#_transaction_configuration[Tran
 
 [source, go]
 ----
-session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "<database-name>"})
 defer session.Close(ctx)
 people, err := session.Run(ctx,
     "MATCH (:Person) RETURN count(*) AS n",
@@ -109,7 +109,7 @@ result, err := neo4j.ExecuteQuery(ctx, driver,
         "name": "Alice",
     },
     neo4j.EagerResultTransformer,
-    neo4j.ExecuteQueryWithDatabase("neo4j"))
+    neo4j.ExecuteQueryWithDatabase("<database-name>"))
 ----
 
 Another workaround, which avoids string concatenation, is using the <<APOC>> procedure link:{neo4j-docs-base-uri}/apoc/5/overview/apoc.merge/apoc.merge.node/[`apoc.merge.node`].
@@ -128,7 +128,7 @@ result, err := neo4j.ExecuteQuery(ctx, driver,
         "properties": map[string]any{propertyKey: "Alice"},
     },
     neo4j.EagerResultTransformer,
-    neo4j.ExecuteQueryWithDatabase("neo4j"))
+    neo4j.ExecuteQueryWithDatabase("<database-name>"))
 ----
 
 [NOTE]
@@ -187,7 +187,7 @@ This applies to individual queries run using xref:query-simple.adoc[`ExecuteQuer
 ----
 result, err := neo4j.ExecuteQuery(ctx, driver,
     "RETURN 42 AS n", nil, neo4j.EagerResultTransformer,
-    neo4j.ExecuteQueryWithDatabase("neo4j"),
+    neo4j.ExecuteQueryWithDatabase("<database-name>"),
     neo4j.ExecuteQueryWithBoltLogger(neo4j.ConsoleBoltLogger()))
 ----
 
@@ -195,7 +195,7 @@ result, err := neo4j.ExecuteQuery(ctx, driver,
 .Enable logging for a session
 ----
 session := driver.NewSession(ctx, neo4j.SessionConfig{
-    DatabaseName: "neo4j",
+    DatabaseName: "<database-name>",
     BoltLogger: neo4j.ConsoleBoltLogger(),
 })
 defer session.Close(ctx)
@@ -205,13 +205,13 @@ session.Run(ctx, "RETURN 42 AS n", nil)
 .Example of Bolt logging output
 [source, log]
 ----
-2023-07-03 07:57:09.929   BOLT  [bolt-53@localhost:7687] C: BEGIN {"db":"neo4j"}
+2023-07-03 07:57:09.929   BOLT  [bolt-53@localhost:7687] C: BEGIN {"db":"<database-name>"}
 2023-07-03 07:57:09.930   BOLT  [bolt-53@localhost:7687] S: SUCCESS {}
 2023-07-03 07:57:09.930   BOLT  [bolt-53@localhost:7687] C: RUN "RETURN 42 AS n" null null
 2023-07-03 07:57:09.930   BOLT  [bolt-53@localhost:7687] C: PULL {"n":1000}
 2023-07-03 07:57:09.936   BOLT  [bolt-53@localhost:7687] S: SUCCESS {"fields":["n"],"t_first":5}
 2023-07-03 07:57:09.937   BOLT  [bolt-53@localhost:7687] S: RECORD [42]
-2023-07-03 07:57:09.937   BOLT  [bolt-53@localhost:7687] S: SUCCESS {"t_first":1,"db":"neo4j"}
+2023-07-03 07:57:09.937   BOLT  [bolt-53@localhost:7687] S: SUCCESS {"t_first":1,"db":"<database-name>"}
 2023-07-03 07:57:09.937   BOLT  [bolt-53@localhost:7687] C: COMMIT
 2023-07-03 07:57:09.938   BOLT  [bolt-53@localhost:7687] S: SUCCESS {"bookmark":"FB:kcwQhRyDJPONRxudy+QyzPSuSAaQ"}
 ----

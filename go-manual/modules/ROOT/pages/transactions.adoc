@@ -17,7 +17,7 @@ For further configuration parameters, see xref:_session_configuration[Session co
 
 [source, go]
 ----
-session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "<database-name>"})
 defer session.Close(ctx)
 ----
 
@@ -40,7 +40,7 @@ Both methods take a <<transaction_function>> callback, which is responsible for 
 .Retrieve people whose name starts with `Al`
 [source, go, role=nocollapse]
 ----
-session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})  // <1>
+session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "<database-name>"})  // <1>
 defer session.Close(ctx)
 people, err := session.ExecuteRead(ctx,  // <2>
     func(tx neo4j.ManagedTransaction) (any, error) {  // <3>
@@ -113,7 +113,7 @@ func main() {
         panic(err)
     }
 
-    session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+    session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "<database-name>"})
     defer session.Close(ctx)
 
     // Create 100 people and assign them to various organizations
@@ -251,7 +251,7 @@ You run queries inside an explicit transaction with the method link:https://pkg.
 
 [source, go]
 ----
-session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "<database-name>"})
 defer session.Close(ctx)
 tx, err := session.BeginTransaction(ctx)
 if err != nil {
@@ -261,6 +261,12 @@ if err != nil {
     //     tx.Commit() to commit the transaction
     //     tx.Rollback() to rollback the transaction
 ----
+
+[TIP]
+====
+Queries run with `tx.Run()` failing due to a transient server error can be retried without need to alter the original request.
+You can discover whether an error is transient via the function link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#IsRetryable[`neo4j.IsRetryable(error)`], which gives insights into whether a further attempt might be successful.
+====
 
 An explicit transaction can be committed with link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#ExplicitTransaction[`ExplicitTransaction.Commit()`] or rolled back with link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#ExplicitTransaction[`ExplicitTransaction.Rollback()`].
 If no explicit action is taken, the driver automatically rolls back the transaction at the end of its lifetime.
@@ -310,7 +316,7 @@ func createCustomer(ctx context.Context, driver neo4j.DriverWithContext) (string
     RETURN c.id AS id
     `, nil,
     neo4j.EagerResultTransformer,
-    neo4j.ExecuteQueryWithDatabase("neo4j"))
+    neo4j.ExecuteQueryWithDatabase("<database-name>"))
     if err != nil {
         return "", err
     }
@@ -319,7 +325,7 @@ func createCustomer(ctx context.Context, driver neo4j.DriverWithContext) (string
 }
 
 func transferToOtherBank(ctx context.Context, driver neo4j.DriverWithContext, customerId string, otherBankId int, amount float32) {
-    session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+    session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "<database-name>"})
     defer session.Close(ctx)
     tx, err := session.BeginTransaction(ctx)
     if err != nil {
@@ -453,17 +459,17 @@ For a complete list of `ResultWithContext` methods, see link:https://pkg.go.dev/
 
 It is recommended to *always specify the database explicitly* with the configuration parameter `DatabaseName` upon session creation, even on single-database instances.
 This allows the driver to work more efficiently, as it saves a network round-trip to the server to resolve the home database.
-If no database is given, the link:{neo4j-docs-base-uri}/operations-manual/5/database-administration/#manage-databases-default[default database] set in the Neo4j instance settings is used.
+If no database is given, the link:{neo4j-docs-base-uri}/operations-manual/current/database-administration/#manage-databases-default[default database] set in the Neo4j instance settings is used.
 
 [source, go]
 ----
 session := driver.NewSession(ctx, neo4j.SessionConfig{
-    DatabaseName: "neo4j",
+    DatabaseName: "<database-name>",
 })
 ----
 
 [TIP]
-Specifying the database through the configuration method is preferred over the link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/use/[`USE`] Cypher clause.
+Specifying the database through the configuration method is preferred over the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/use/[`USE`] Cypher clause.
 If the server runs on a cluster, queries with `USE` require server-side routing to be enabled.
 Queries may also take longer to execute as they may not reach the right cluster member at the first attempt, and need to be routed to one containing the requested database.
 
@@ -477,7 +483,7 @@ Note that `.ExecuteRead()` and `.ExecuteWrite()` automatically override the sess
 [source, go]
 ----
 session := driver.NewSession(ctx, neo4j.SessionConfig{
-    DatabaseName: "neo4j",
+    DatabaseName: "<database-name>",
     AccessMode: neo4j.AccessModeRead,
 })
 ----
@@ -504,21 +510,21 @@ Session-scoped authentication requires a server version >= 5.8.
 
 [source, go]
 ----
-sessionAuth := neo4j.BasicAuth("somebodyElse", "theirPassword", "")
+sessionAuth := neo4j.BasicAuth("<username>", "<password>", "")
 session := driver.NewSession(ctx, neo4j.SessionConfig{
-    DatabaseName: "neo4j",
+    DatabaseName: "<database-name>",
     Auth: &sessionAuth,
 })
 ----
 
 The option `ImpersonatedUser` provides a similar functionality, and is available in driver/server versions >= 4.4.
-The difference is that you don't need to know a user's password to impersonate them, but the user under which the `Driver` was created needs to have the link:{neo4j-docs-base-uri}/operations-manual/5/authentication-authorization/dbms-administration/#access-control-dbms-administration-impersonation[appropriate permissions].
+The difference is that you don't need to know a user's password to impersonate them, but the user under which the `Driver` was created needs to have the link:{neo4j-docs-base-uri}/operations-manual/current/authentication-authorization/dbms-administration/#access-control-dbms-administration-impersonation[appropriate permissions].
 
 [source, go]
 ----
 session := driver.NewSession(ctx, neo4j.SessionConfig{
-    DatabaseName: "neo4j",
-    ImpersonatedUser: "<somebodyElse>",
+    DatabaseName: "<database-name>",
+    ImpersonatedUser: "<username>",
 })
 ----
 
@@ -538,7 +544,7 @@ Use this to tag transactions.
 
 [source, go]
 ----
-session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "<database-name>"})
 defer session.Close(ctx)
 people, err := session.ExecuteRead(ctx,
     func(tx neo4j.ManagedTransaction) (any, error) {
@@ -558,7 +564,7 @@ When a session is closed, it is returned to the connection pool to be later reus
 
 [source, go]
 ----
-session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "<database-name>"})
 defer session.Close(ctx)
 // session usage
 ----

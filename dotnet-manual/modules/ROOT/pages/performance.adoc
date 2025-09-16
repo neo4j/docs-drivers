@@ -1,0 +1,540 @@
+= Performance recommendations
+
+[[target-database]]
+== Always specify the target database
+
+*Specify the target database on all queries*, both in xref:query-simple.adoc#database-selection[`Driver.ExecutableQuery()`] calls or xref:transactions.adoc#database-selection[when creating new sessions].
+If no database is provided, the driver has to send an extra request to the server to figure out what the default database is.
+The overhead is minimal for a single query, but becomes significant over hundreds of queries.
+
+[discrete]
+=== Good practices
+
+[source, csharp]
+----
+await driver.ExecutableQuery("<QUERY>")
+    .WithConfig(new QueryConfig(database: "<database-name>"))
+    .ExecuteAsync();
+----
+
+[source, csharp]
+----
+using var session = driver.AsyncSession(conf => conf.WithDatabase("<database-name>"));
+----
+
+[discrete]
+=== Bad practices
+
+[source, csharp]
+----
+await driver.ExecutableQuery("<QUERY>")
+    .ExecuteAsync();
+----
+
+[source, csharp]
+----
+using var session = driver.AsyncSession();
+----
+
+
+[[transactions-cost]]
+== Be aware of the cost of transactions
+
+When submitting queries through xref:query-simple.adoc[`.ExecutableQuery()`] or through xref:transactions.adoc#managed-transactions[`.ExecuteRead/WriteAsync()`], the driver wraps them into a <<transaction>>.
+This behavior ensures that the database always ends up in a consistent state, regardless of what happens during the execution of a transaction (power outages, software crashes, etc).
+As a further robustness layer, the driver also retries failed transactions with an exponential backoff.
+
+Creating a safe execution context around a query yields an overhead that is small, but that adds up as the number of transactions increases.
+When each query is sent as a transaction of its own, if one transaction fails and needs to be rolled back, all the other transactions are unaffected.
+This is the safest mode of execution with respect to failures, but also the slowest due to the overhead of transactions scaling with the number of queries.
+
+.Each query as a separate transaction (low throughput)
+[source, csharp]
+----
+for (int i=0; i<1000; i++) {
+    await driver.ExecutableQuery("<QUERY>")
+        .WithConfig(new QueryConfig(database: "<database-name>"))
+        .ExecuteAsync();
+    // or session.ExecuteRead/WriteAsync() calls
+}
+----
+
+A more performant approach is to group all queries into a single transaction.
+In this way, the transaction as a whole is isolated from others, but individual queries in the transaction are not isolated, and failure of one results in a rollback of all queries.
+
+.Group queries into one transaction (higher throughput)
+[source, csharp]
+----
+using var session = driver.AsyncSession(conf => conf.WithDatabase("<database-name>"));
+await session.ExecuteWriteAsync(async tx => {
+    for (int i=0; i<1000; i++) {
+        var result = await tx.RunAsync("<QUERY>");
+    }
+});
+----
+
+An even faster approach is to skip `.ExecuteRead/WriteAsync()` and call `.RunAsync()` directly on the session.
+The queries run as auto-commit transaction, and are still isolated from other concurrent queries, but if any of them fail, they will not be retried.
+With this method, you trade some robustness for more throughput, as the queries are shot to the server as fast as it can handle.
+One upper limit on the client size is given by the size of the connection pool: each call to `.RunAsync()` borrows a connection, so the amount of parallel work is limited by the number of available connections.
+
+.Queries as auto-commit transactions (highest throughput)
+[source, csharp]
+----
+using var session = driver.AsyncSession(conf => conf.WithDatabase("<database-name>"));
+for (int i=0; i<1000; i++) {
+    await session.RunAsync("<QUERY>");
+}
+----
+
+
+[[lazy-eager-loading]]
+== Don't fetch large result sets all at once
+
+When submitting queries that may result in a lot of records, don't retrieve them all at once.
+The Neo4j server can retrieve records in batches and stream them to the driver as they become available.
+Lazy-loading a result spreads out network traffic and memory usage (both client- and server-side).
+
+For convenience, xref:query-simple.adoc[`.ExecutableQuery()`] always retrieves all result records at once (eager loading).
+To lazy-load a result, use xref:transactions.adoc#managed-transactions[`.ExecuteRead/WriteAsync()`] (or other forms of manually-handled xref:transactions.adoc[transactions]) and do *not* call `.ToListAsync()` on the `IResultCursor` object when processing the result; iterate on it instead.
+
+.Comparison between eager and lazy loading
+====
+[cols="1a,1a", options="header"]
+|===
+|Eager loading
+|Lazy loading
+
+|
+- The server has to read all 250 records from the storage before it can send even the first one to the driver (i.e. it takes more time for the client to receive the first record).
+- Before any record is available to the application, the driver has to receive all 250 records.
+- The client has to hold in memory all 250 records.
+
+|
+- The server reads the first record and sends it to the driver.
+- The application can process records as soon as the first record is transferred.
+- Waiting time and resource consumption for the remaining records is deferred to when the application requests more records.
+- The server's fetch time can be used for client-side processing.
+- Resource consumption is bounded by the driver's fetch size.
+
+|===
+
+.Time and memory comparison between eager and lazy loading
+[source, csharp]
+----
+using Neo4j.Driver;
+
+const string dbUri = "<database-uri>";
+const string dbUser = "<username>";
+const string dbPassword = "<password>";
+
+// Returns 250 records, each with properties
+// - `output` (an expensive computation, to slow down retrieval)
+// - `dummyData` (a list of 10000 ints, about 8 KB).
+string slowQuery = @"
+UNWIND range(1, 250) AS s
+RETURN reduce(s=s, x in range(1,1000000) | s + sin(toFloat(x))+cos(toFloat(x))) AS output,
+       range(1, 10000) AS dummyData
+";
+// Delay for each processed record (ms)
+int sleepTime = 500;
+
+await using var driver = GraphDatabase.Driver(dbUri, AuthTokens.Basic(dbUser, dbPassword));
+await driver.VerifyConnectivityAsync();
+
+var watch = System.Diagnostics.Stopwatch.StartNew();
+log("LAZY LOADING (ExecuteReadAsync)");
+await lazyLoading(driver);
+log($"--- {watch.ElapsedMilliseconds/1000} seconds ---");
+Console.WriteLine();
+
+watch.Restart();
+log("EAGER LOADING (ExecutableQuery)");
+await eagerLoading(driver);
+log($"--- {watch.ElapsedMilliseconds/1000} seconds ---");
+
+async Task lazyLoading(IDriver driver) {
+    using var session = driver.AsyncSession(conf => conf.WithDatabase("<database-name>"));
+    await session.ExecuteReadAsync(async tx => {
+        log("Submit query");
+        var result = await tx.RunAsync(slowQuery);
+        while (await result.FetchAsync()) {
+            int recordN = result.Current.Get<int>("output");
+            log($"Processing record {recordN}");
+            System.Threading.Thread.Sleep(sleepTime);  // proxy for some expensive operation
+        }
+    });
+}
+
+async Task eagerLoading(IDriver driver) {
+    log("Submit query");
+    var result = await driver.ExecutableQuery(slowQuery)
+        .WithConfig(new QueryConfig(database: "<database-name>"))
+        .ExecuteAsync();
+    foreach (var record in result.Result) {
+        int recordN = record.Get<int>("output");
+        log($"Processing record {recordN}");
+        System.Threading.Thread.Sleep(sleepTime);  // proxy for some expensive operation
+    }
+}
+
+void log(string msg) {
+    Console.WriteLine($"[{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}] {msg}");
+}
+----
+
+.Output
+[source, output, role=nocollapse]
+----
+[1734336457] LAZY LOADING (ExecuteReadAsync)
+[1734336457] Submit query
+[1734336457] Processing record 1  // <.>
+[1734336457] Processing record 2
+[1734336458] Processing record 3
+...
+[1734336581] Processing record 249
+[1734336581] Processing record 250
+[1734336582] --- 125 seconds ---
+
+[1734336582] EAGER LOADING (ExecutableQuery)
+[1734336582] Submit query
+[1734336594] Processing record 1   // <.>
+[1734336594] Processing record 2
+[1734336595] Processing record 3
+...
+[1734336718] Processing record 249
+[1734336718] Processing record 250
+[1734336719] --- 136 seconds ---  // <.>
+----
+
+<.> With lazy loading, the first record is available sooner.
+<.> With eager loading, the first record is available once the result is consumed (i.e. after the server has retrieved all 250 records).
+<.> The total running time is longer with eager loading because the client waits until it receives the last record, whereas with lazy loading the client can process records while the server fetches the next ones.
+With lazy loading, the client can also stop requesting records after some condition is met (by calling .ConsumeAsync() on the Result object) to save time and resources.
+
+====
+
+[TIP]
+====
+When using `.ExecutableQuery()`, you can process records as they arrive using the link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IExecutableQuery-2.WithStreamProcessor.html[`.WithStreamProcessor()`] method.
+This will speed up response by not waiting for all records before processing them; it does not however improve memory footprint, as you can't control the flux of records.
+You can reduce the memory footprint of link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.EagerResult-1.html[`EagerResult`] using link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IConfiguredQuery-2.WithMap.html[`.WithMap()`] or link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IConfiguredQuery-2.WithReduce.html[`.WithReduce()`].
+====
+
+[NOTE]
+====
+The driver's link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.SessionConfigBuilder.WithFetchSize.html[fetch size] affects the behavior of lazy loading.
+It instructs the server to stream an amount of records equal to the fetch size, and then wait until the client has caught up before retrieving and sending more.
+
+The fetch size allows to bound memory consumption on the client side.
+It doesn't always bound memory consumption on the server side though: that depends on the query.
+For example, a query with link:https://neo4j.com/docs/cypher-manual/current/clauses/order-by/[`ORDER BY`] requires the whole result set to be loaded into memory for sorting, before records can be streamed to the client.
+
+The lower the fetch size, the more messages client and server have to exchange.
+Especially if the server's latency is high, a low fetch size may deteriorate performance.
+====
+
+
+[[read-mode]]
+== Route read queries to cluster readers
+
+In a cluster, *route read queries to any reader node*. You do this by:
+
+- using the config `routing: RoutingControl.Readers` in xref:query-simple.adoc#request-routing[`IDriver.ExecutableQuery()`] calls
+- using `Session.ExecuteReadAsync()` instead of `Session.ExecuteWriteAsync()` (for xref:transactions.adoc#managed-transactions[managed transactions])
+- using the config method xref:transactions.adoc#request-routing[`.WithDefaultAccessMode(AccessMode.Read)` when creating a new session] (for explicit transactions).
+
+[discrete]
+=== Good practices
+
+[source, csharp]
+----
+await driver.ExecutableQuery("MATCH (p:Person) RETURN p")
+    .WithConfig(new QueryConfig(
+        database: "<database-name>",
+        routing: RoutingControl.Readers
+    ))
+    .ExecuteAsync();
+----
+
+[source, csharp]
+----
+using var session = driver.AsyncSession(conf => conf
+    .WithDatabase("<database-name>")
+    .WithDefaultAccessMode(AccessMode.Read)
+);
+----
+
+
+[discrete]
+=== Bad practices
+
+[source, csharp]
+----
+// defaults to routing = writers
+await driver.ExecutableQuery("MATCH (p:Person) RETURN p")
+    .WithConfig(new QueryConfig(
+        database: "<database-name>"
+    ))
+    .ExecuteAsync();
+----
+
+[source, csharp]
+----
+using var session = driver.AsyncSession(conf => conf.WithDatabase("<database-name>"));
+
+// don't ask to write on a read-only operation
+await session.ExecuteWriteAsync(async tx => {
+    var result = await tx.RunAsync("MATCH (p:Person) RETURN p");
+    return result.ToListAsync();
+});
+----
+
+
+[[indexes]]
+== Create indexes
+
+*Create indexes for properties that you often filter against*.
+For example, if you often look up `Person` nodes by the `name` property, it is beneficial to create an index on `Person.name`.
+You can create indexes with the `CREATE INDEX` Cypher clause, for both nodes and relationships.
+
+.Create an index on `Person.name`
+[source, csharp]
+----
+await driver.ExecutableQuery("CREATE INDEX person_name FOR (n:Person) ON (n.name)").ExecuteAsync();
+----
+
+For more information, see link:{neo4j-docs-base-uri}/cypher-manual/current/indexes/search-performance-indexes/overview/[Indexes for search performance].
+
+
+[[profile-queries]]
+== Profile queries
+
+link:{neo4j-docs-base-uri}/cypher-manual/current/query-tuning/basic-example/#_profile_query[*Profile your queries*] to locate queries whose performance can be improved.
+You can profile queries by prepending them with `PROFILE`.
+The server output is available in the `Profile` property of the xref:result-summary.adoc[`IResultSummary`] object.
+
+[source, csharp]
+----
+var result = await driver.ExecutableQuery("PROFILE MATCH (p {name: $name}) RETURN p")
+    .WithParameters(new { name = "Alice" })
+    .WithConfig(new QueryConfig(database: "<database-name>"))
+    .ExecuteAsync();
+// Note: `result.Result` is non-empty
+var queryPlan = result.Summary.Profile;
+Console.WriteLine(queryPlan.Arguments["string-representation"]);
+/*
+Planner COST
+Runtime PIPELINED
+Runtime version 5.0
+Batch size 128
+
++-----------------+----------------+----------------+------+---------+----------------+------------------------+-----------+---------------------+
+| Operator        | Details        | Estimated Rows | Rows | DB Hits | Memory (Bytes) | Page Cache Hits/Misses | Time (ms) | Pipeline            |
++-----------------+----------------+----------------+------+---------+----------------+------------------------+-----------+---------------------+
+| +ProduceResults | p              |              1 |    1 |       3 |                |                        |           |                     |
+| |               +----------------+----------------+------+---------+----------------+                        |           |                     |
+| +Filter         | p.name = $name |              1 |    1 |       4 |                |                        |           |                     |
+| |               +----------------+----------------+------+---------+----------------+                        |           |                     |
+| +AllNodesScan   | p              |             10 |    4 |       5 |            120 |                 9160/0 |   108.923 | Fused in Pipeline 0 |
++-----------------+----------------+----------------+------+---------+----------------+------------------------+-----------+---------------------+
+
+Total database accesses: 12, total allocated memory: 184
+*/
+----
+
+In case some queries are so slow that you are unable to even run them in reasonable times, you can prepend them with `EXPLAIN` instead of `PROFILE`.
+This will return the _plan_ that the server would use to run the query, but without executing it.
+The server output is available in the `Plan` property of the xref:result-summary.adoc[`IResultSummary`] object.
+
+[source, csharp]
+----
+var result = await driver.ExecutableQuery("EXPLAIN MATCH (p {name: $name}) RETURN p")
+    .WithParameters(new { name = "Alice" })
+    .WithConfig(new QueryConfig(database: "<database-name>"))
+    .ExecuteAsync();
+var queryPlan = result.Summary.Plan;
+Console.WriteLine(queryPlan.Arguments["string-representation"]);
+/*
+Planner COST
+Runtime PIPELINED
+Runtime version 5.0
+Batch size 128
+
++-----------------+----------------+----------------+---------------------+
+| Operator        | Details        | Estimated Rows | Pipeline            |
++-----------------+----------------+----------------+---------------------+
+| +ProduceResults | p              |              1 |                     |
+| |               +----------------+----------------+                     |
+| +Filter         | p.name = $name |              1 |                     |
+| |               +----------------+----------------+                     |
+| +AllNodesScan   | p              |             10 | Fused in Pipeline 0 |
++-----------------+----------------+----------------+---------------------+
+
+Total database accesses: ?
+*/
+----
+
+
+[[node-labels]]
+== Specify node labels
+
+*Specify node labels* in all queries.
+This allows the query planner to work much more efficiently, and to leverage indexes where available.
+To learn how to combine labels, see link:https://neo4j.com/docs/cypher-manual/current/patterns/reference/#label-expressions[Cypher -> Label expressions].
+
+[discrete]
+=== Good practices
+
+[source, csharp]
+----
+var result = await driver.ExecutableQuery("MATCH (p:Person|Animal {name: $name}) RETURN p")
+    .WithParameters(new { name = "Alice" })
+    .WithConfig(new QueryConfig(database: "<database-name>"))
+    .ExecuteAsync();
+----
+
+[source, csharp]
+----
+using var session = driver.AsyncSession(conf => conf.WithDatabase("<database-name>"));
+await session.RunAsync("MATCH (p:Person|Animal {name: $name}) RETURN p", new { name = "Alice" });
+----
+
+
+[discrete]
+=== Bad practices
+
+[source, csharp]
+----
+var result = await driver.ExecutableQuery("MATCH (p {name: $name}) RETURN p")
+    .WithParameters(new { name = "Alice" })
+    .WithConfig(new QueryConfig(database: "<database-name>"))
+    .ExecuteAsync();
+----
+
+[source, csharp]
+----
+using var session = driver.AsyncSession(conf => conf.WithDatabase("<database-name>"));
+await session.RunAsync("MATCH (p {name: $name}) RETURN p", new { name = "Alice" });
+----
+
+
+[[batch-data-creation]]
+== Batch data creation
+
+*Batch queries when creating a lot of records* using the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/with/[`WITH`] and link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/unwind/[`UNWIND`] Cypher clauses.
+
+[discrete]
+=== Good practice
+
+.Submit one single queries with all values inside
+[source, csharp]
+----
+// Generate a sequence of numbers
+int start = 1;
+int end = 10000;
+var numbers = new List<Dictionary<string, dynamic>>();
+for (int i=start; i<=end; i++) {
+    numbers.Add(new Dictionary<string, dynamic>() {
+        {"value", i},
+    });
+}
+
+await driver.ExecutableQuery(@"
+    UNWIND $numbers AS node
+    MERGE (:Number {value: node.value})
+    ")
+    .WithParameters(new { numbers = numbers })
+    .WithConfig(new QueryConfig(database: "<database-name>"))
+    .ExecuteAsync();
+----
+
+[discrete]
+=== Bad practice
+
+.Submit a lot of single queries, one for each value
+[source, csharp]
+----
+for (int i=1; i<=10000; i++) {
+    await driver.ExecutableQuery("MERGE (:Number {value: $value})")
+        .WithParameters(new { value = i })
+        .WithConfig(new QueryConfig(database: "<database-name>"))
+        .ExecuteAsync();
+}
+----
+
+[TIP]
+The most efficient way of performing a _first import_ of large amounts of data into a new database is the link:{neo4j-docs-base-uri}/operations-manual/current/tutorial/neo4j-admin-import/[`neo4j-admin database import`] command.
+// source:  https://community.neo4j.com/t5/neo4j-graph-platform/improving-data-writing-efficiency-in-python/td-p/39520
+
+
+[[query-parameters]]
+== Use query parameters
+
+*Always use xref:query-simple#query-parameters[query parameters]* instead of hardcoding or concatenating values into queries.
+Besides protecting from Cypher injections, this allows to better leverage the database query cache.
+
+[discrete]
+=== Good practices
+
+[source, csharp]
+----
+await driver.ExecutableQuery("MATCH (p:Person {name: $name}) RETURN p")
+    .WithConfig(new QueryConfig(database: "<database-name>"))
+    .WithParameters(new { name = "Alice" })
+    .ExecuteAsync();
+----
+
+[source, csharp]
+----
+using var session = driver.AsyncSession(conf => conf.WithDatabase("<database-name>"));
+await session.RunAsync("MATCH (p:Person {name: $name}) RETURN p", new { name = "Alice" });
+----
+
+[discrete]
+=== Bad practices
+
+[source, csharp]
+----
+await driver.ExecutableQuery("MATCH (p:Person {name: 'Alice'}) RETURN p")
+    .WithConfig(new QueryConfig(database: "<database-name>"))
+    .ExecuteAsync();
+// or
+string name = "Alice";
+await driver.ExecutableQuery("MATCH (p:Person {name: '" + name + "'}) RETURN p")
+    .WithConfig(new QueryConfig(database: "<database-name>"))
+    .ExecuteAsync();
+----
+
+[source, csharp]
+----
+using var session = driver.AsyncSession(conf => conf.WithDatabase("<database-name>"));
+await session.RunAsync("MATCH (p:Person {name: 'Alice'}) RETURN p");
+// or
+string name = "Alice";
+session.RunAsync("MATCH (p:Person {name: '" + name + "'}) RETURN p");
+----
+
+
+[[merge]]
+== Use `MERGE` for creation only when needed
+
+The Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/merge/[`MERGE`] is convenient for data creation, as it allows to avoid duplicate data when an exact clone of the given pattern exists.
+However, it requires the database to run _two_ queries: it first needs to link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/match/[`MATCH`] the pattern, and only then can it link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/create/[`CREATE`] it (if needed).
+
+If you know already that the data you are inserting is new, avoid using `MERGE` and use `CREATE` directly instead -- this practically halves the number of database queries.
+
+
+[[filter-notifications]]
+== Filter notifications
+
+xref:result-summary.adoc#filter-notifications[Filter the category and/or severity of notifications] the server should raise.
+
+
+ifndef::backend-pdf[]
+[discrete.glossary]
+== Glossary
+
+include::{common-partial}/glossary.adoc[]
+include::../partials/glossary.adoc[]
+endif::[]

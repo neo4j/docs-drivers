@@ -12,12 +12,12 @@ The overhead is minimal for a single query, but becomes significant over hundred
 
 [source, javascript]
 ----
-await driver.executeQuery('<QUERY>', {}, {database: '{neo4j-database-name}'})
+await driver.executeQuery('<QUERY>', {}, {database: '<database-name>'})
 ----
 
 [source, javascript]
 ----
-driver.session({database: '{neo4j-database-name}'})
+driver.session({database: '<database-name>'})
 ----
 
 [discrete]
@@ -37,31 +37,50 @@ driver.session()
 [[transactions-cost]]
 == Be aware of the cost of transactions
 
-When submitting queries through xref:query-simple.adoc[`.executeQuery()`] or through xref:transactions.adoc#managed-transactions[`.executeRead/Qrite()`], the server automatically wraps them into a <<transaction>>.
+When submitting queries through xref:query-simple.adoc[`.executeQuery()`] or through xref:transactions.adoc#managed-transactions[`.executeRead/Write()`], the driver wraps them into a <<transaction>>.
 This behavior ensures that the database always ends up in a consistent state, regardless of what happens during the execution of a transaction (power outages, software crashes, etc).
+As a further robustness layer, the driver also retries failed transactions with an exponential backoff.
 
-Creating a safe execution context around a number of queries yields an overhead that is not present if the driver just shoots queries at the server and hopes they will get through.
-The overhead is small, but can add up as the number of queries increases.
-For this reason, if your use case values throughput more than data integrity, you may extract further performance by running all queries within a single (auto-commit) transaction.
-You do this by creating a session and using `session.run()` to run as many queries as needed.
+Creating a safe execution context around a query yields an overhead that is small, but that adds up as the number of transactions increases.
+When each query is sent as a transaction of its own, if one transaction fails and needs to be rolled back, all the other transactions are unaffected.
+This is the safest mode of execution with respect to failures, but also the slowest due to the overhead of transactions scaling with the number of queries.
 
-.Privilege throughput over data integrity
+.Each query as a separate transaction (low throughput)
 [source, javascript]
 ----
-let session = driver.session({database: '{neo4j-database-name}'})
+for(let i=0; i<1000; i++) {
+    await driver.executeQuery("<QUERY>", {}, {database: '<database-name>'})
+    // or session.executeRead/Write() calls
+}
+----
+
+A more performant approach is to group all queries into a single transaction.
+In this way, the transaction as a whole is isolated from others, but individual queries in the transaction are not isolated, and failure of one results in a rollback of all queries.
+
+.Group queries into one transaction (higher throughput)
+[source, javascript]
+----
+let session = driver.session({ database: '<database-name>' })
+await session.executeRead(async tx => {
+  for(let i=0; i<1000; i++) {
+    await tx.run('<QUERY>')
+  }
+})
+----
+
+An even faster approach is to skip `.executeRead/Write()` and call `.run()` directly on the session.
+The queries run as auto-commit transaction, and are still isolated from other concurrent queries, but if any of them fail, they will not be retried.
+With this method, you trade some robustness for more throughput, as the queries are shot to the server as fast as it can handle.
+One upper limit on the client size is given by the size of the connection pool: each call to `.run()` borrows a connection, so the amount of parallel work is limited by the number of available connections.
+
+.Queries as auto-commit transactions (highest throughput)
+[source, javascript]
+----
+let session = driver.session({database: '<database-name>'})
 for(let i=0; i<1000; i++) {
     await session.run("<QUERY>")
 }
 session.close()
-----
-
-.Privilege data integrity over throughput
-[source, javascript]
-----
-for(let i=0; i<1000; i++) {
-    await driver.executeQuery("<QUERY>", {}, {database: '{neo4j-database-name}'})
-    // or session.executeRead/Write() calls
-}
 ----
 
 
@@ -84,14 +103,14 @@ await driver.executeQuery(
   {},
   {
     routing: 'READ',  // short for neo4j.routing.READ
-    database: 'neo4j'
+    database: '<database-name>'
   }
 )
 ----
 
 [source, javascript]
 ----
-let session = driver.session({ database: 'neo4j' })
+let session = driver.session({ database: '<database-name>' })
 await session.executeRead(async tx => {
   return await tx.run('MATCH (p:Person) RETURN p.name', {})
 })
@@ -107,7 +126,7 @@ await driver.executeQuery(
   'MATCH (p:Person) RETURN p.name',
   {},
   {
-    database: 'neo4j'
+    database: '<database-name>'
   }
 )
 // defaults to routing = writers
@@ -115,7 +134,7 @@ await driver.executeQuery(
 
 [source, javascript]
 ----
-let session = driver.session({ database: 'neo4j' })
+let session = driver.session({ database: '<database-name>' })
 await session.executeRead(async tx => {
   return await tx.run('MATCH (p:Person) RETURN p.name', {})
 })
@@ -136,13 +155,13 @@ You can create indexes with the `CREATE INDEX` Cypher function, for both nodes a
 await driver.executeQuery('CREATE INDEX personName FOR (n:Person) ON (n.name)')
 ----
 
-For more information, see link:{neo4j-docs-base-uri}/cypher-manual/5/indexes-for-search-performance/[Indexes for search performance].
+For more information, see link:{neo4j-docs-base-uri}/cypher-manual/current/indexes-for-search-performance/[Indexes for search performance].
 
 
 [[profile-queries]]
 == Profile queries
 
-link:https://neo4j.com/docs/cypher-manual/5/appendix/tutorials/basic-query-tuning/#_profile_query[*Profile your queries*] to locate queries whose performance can be improved.
+link:https://neo4j.com/docs/cypher-manual/current/appendix/tutorials/basic-query-tuning/#_profile_query[*Profile your queries*] to locate queries whose performance can be improved.
 You can profile queries by prepending them with `PROFILE`.
 The server output is available in the `profile` property of the xref:result-summary.adoc[`ResultSummary`] object.
 
@@ -203,7 +222,7 @@ Total database accesses: ?
 == Specify node labels
 
 *Specify node labels* in all queries.
-To learn how to combine labels, see link:https://neo4j.com/docs/cypher-manual/5/patterns/reference/#label-expressions[Cypher -> Label expressions].
+To learn how to combine labels, see link:https://neo4j.com/docs/cypher-manual/current/patterns/reference/#label-expressions[Cypher -> Label expressions].
 
 [discrete]
 === Good practices
@@ -218,7 +237,7 @@ await driver.executeQuery(
 
 [source, javascript]
 ----
-let session = driver.session({database: '{neo4j-database-name}'})
+let session = driver.session({database: '<database-name>'})
 await session.run(
   'MATCH (p:Person|Animal {name: $name}) RETURN p',
   { name: 'Alice' }
@@ -238,7 +257,7 @@ await driver.executeQuery(
 
 [source, javascript]
 ----
-let session = driver.session({database: '{neo4j-database-name}'})
+let session = driver.session({database: '<database-name>'})
 await session.run(
   'MATCH (p {name: $name}) RETURN p',
   { name: 'Alice' }
@@ -249,7 +268,7 @@ await session.run(
 [[batch-data-creation]]
 == Batch data creation
 
-*Batch queries when creating a lot of records* using the link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/with/[`WITH`] and link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/unwind/[`UNWIND`] Cypher clauses.
+*Batch queries when creating a lot of records* using the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/with/[`WITH`] and link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/unwind/[`UNWIND`] Cypher clauses.
 
 [discrete]
 === Good practice
@@ -281,7 +300,7 @@ for(let i=0; i<10000; i++) {
 ----
 
 [TIP]
-The most efficient way of performing a _first import_ of large amounts of data into a new database is the link:{neo4j-docs-base-uri}/operations-manual/5/tutorial/neo4j-admin-import/[`neo4j-admin database import`] command.
+The most efficient way of performing a _first import_ of large amounts of data into a new database is the link:{neo4j-docs-base-uri}/operations-manual/current/tutorial/neo4j-admin-import/[`neo4j-admin database import`] command.
 // source:  https://community.neo4j.com/t5/neo4j-graph-platform/improving-data-writing-efficiency-in-python/td-p/39520
 
 
@@ -304,7 +323,7 @@ await driver.executeQuery(
 
 [source, javascript]
 ----
-let session = driver.session({database: '{neo4j-database-name}'})
+let session = driver.session({database: '<database-name>'})
 await session.run(
   'MATCH (p:Person {name: $name}) RETURN p',
   { name: 'Alice' }  // query parameters
@@ -324,7 +343,7 @@ await driver.executeQuery('MATCH (p:Person {name: "' + name + '"}) RETURN p')
 
 [source, javascript]
 ----
-let session = driver.session({database: '{neo4j-database-name}'})
+let session = driver.session({database: '<database-name>'})
 await session.run(
   'MATCH (p:Person {name: "Alice"}) RETURN p',
   // or 'MATCH (p:Person {name: ' + name + '}) RETURN p'
@@ -343,8 +362,8 @@ This is likely to be more impactful on performance if you parallelize complex an
 [[merge]]
 == Use `MERGE` for creation only when needed
 
-The Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/merge/[`MERGE`] is convenient for data creation, as it allows to avoid duplicate data when an exact clone of the given pattern exists.
-However, it requires the database to run _two_ queries: it first needs to link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/match/[`MATCH`] the pattern, and only then can it link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/create/[`CREATE`] it (if needed).
+The Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/merge/[`MERGE`] is convenient for data creation, as it allows to avoid duplicate data when an exact clone of the given pattern exists.
+However, it requires the database to run _two_ queries: it first needs to link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/match/[`MATCH`] the pattern, and only then can it link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/create/[`CREATE`] it (if needed).
 
 If you know already that the data you are inserting is new, avoid using `MERGE` and use `CREATE` directly instead -- this practically halves the number of database queries.
 

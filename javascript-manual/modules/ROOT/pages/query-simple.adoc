@@ -14,7 +14,7 @@ Due to the usage of `async/await`, the examples in this page need to be wrapped 
 
 == Write to the database
 
-To create two nodes representing persons named `Alice` and `David`, and a relationship `KNOWS` between them, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/create/[`CREATE`]:
+To create two nodes representing persons named `Alice` and `David`, and a relationship `KNOWS` between them, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/create/[`CREATE`]:
 
 .Create two nodes and a relationship
 [source, javascript]
@@ -25,7 +25,7 @@ let { records, summary } = await driver.executeQuery(`  // <1>
   CREATE (a)-[:KNOWS]->(b)
   `,
   { name: 'Alice', friendName: 'David' },  // <2>
-  { database: 'neo4j' }  // <3>
+  { database: '<database-name>' }  // <3>
 )
 console.log(
   `Created ${summary.counters.updates().nodesCreated} nodes ` +
@@ -40,7 +40,7 @@ console.log(
 
 == Read from the database
 
-To retrieve information from the database, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/match/[`MATCH`]:
+To retrieve information from the database, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/match/[`MATCH`]:
 
 .Retrieve all `Person` nodes who like other `Person` s
 [source, javascript, role=nocollapse]
@@ -50,7 +50,7 @@ let { records, summary } = await driver.executeQuery(`
   RETURN p.name AS name
   `,
   {},
-  { database: 'neo4j' }
+  { database: '<database-name>' }
 )
 
 // Loop through users and do something with them
@@ -72,7 +72,7 @@ console.log(  // <2>
 
 == Update the database
 
-To update a node's information in the database, use the Cypher clauses link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/match/[`MATCH`] and link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/set/[`SET`]:
+To update a node's information in the database, use the Cypher clauses link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/match/[`MATCH`] and link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/set/[`SET`]:
 
 .Update node `Alice` to add an `age` property
 [source, javascript]
@@ -82,7 +82,7 @@ let { _, summary } = await driver.executeQuery(`
   SET p.age = $age
   `,
   { name: 'Alice', age: 42 },
-  { database: 'neo4j' }
+  { database: '<database-name>' }
 )
 console.log('Query counters:')
 console.log(summary.counters.updates())
@@ -98,7 +98,7 @@ let { records, summary } = await driver.executeQuery(`
   MATCH (bob:Person {name: $friendName})  // <2>
   CREATE (alice)-[:KNOWS]->(bob)  // <3>
   `, { name: 'Alice', friendName: 'Bob' },
-  { database: 'neo4j' }
+  { database: '<database-name>' }
 )
 console.log('Query counters:')
 console.log(summary.counters.updates())
@@ -111,7 +111,7 @@ console.log(summary.counters.updates())
 
 == Delete from the database
 
-To remove a node and any relationship attached to it, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/delete/[`DETACH DELETE`]:
+To remove a node and any relationship attached to it, use the Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/delete/[`DETACH DELETE`]:
 
 .Remove the `Alice` node
 [source, javascript]
@@ -121,7 +121,7 @@ let { _, summary } = await driver.executeQuery(`
   MATCH (p:Person WHERE p.name = $name)
   DETACH DELETE p
   `, { name: 'Alice' },
-  { database: 'neo4j' }
+  { database: '<database-name>' }
 )
 console.log('Query counters:')
 console.log(summary.counters.updates())
@@ -132,7 +132,7 @@ console.log(summary.counters.updates())
 == Query parameters
 
 *Do not hardcode or concatenate parameters directly into queries*.
-Instead, always use placeholders and specify the link:{neo4j-docs-base-uri}/cypher-manual/5/syntax/parameters/[Cypher parameters] as keyword arguments or in a dictionary, as shown in the previous examples.
+Instead, always use placeholders and specify the link:{neo4j-docs-base-uri}/cypher-manual/current/syntax/parameters/[Cypher parameters] as keyword arguments or in a dictionary, as shown in the previous examples.
 This is for:
 
 1. *performance benefits*: Neo4j compiles and caches queries, but can only do so if the query structure is unchanged;
@@ -143,24 +143,117 @@ There can be circumstances where your query structure prevents the usage of para
 For those rare use cases, see xref:query-advanced#_dynamic_values_in_property_keys_relationship_types_and_labels[Dynamic values in property keys, relationship types, and labels].
 
 
+[#error-handling]
 == Error handling
 
-To avoid an error in one query crashing your application, you can wrap queries into `try/catch` blocks.
-We avoid proper error handling throughout this manual to make examples lighter to parse, and because appropriate error handling depends on the application.
-Here below an example with a `try/catch` block.
+A query run may fail for a number of reasons.
 
+When using `driver.execute_query()`, the driver automatically retries to run a failed query if the failure is deemed to be transient (for example due to temporary server unavailability).
+An error will be raised if the operation keeps failing after the configured link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/types.js~Config.html#instance-member-maxTransactionRetryTime[maximum retry time].
+
+All link:https://neo4j.com/docs/status-codes/current/errors/all-errors/[errors coming from the server] are subclasses of link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/error.js~Neo4jError.html[`Neo4jError`].
+You can use an exception's code to stably identify a specific error; error messages are instead not stable markers, and should not be relied upon.
+
+.Basic error handling
+[source, javascript, role=nocollapse]
+----
+let err = await driver.executeQuery(
+    'MATCH (p:Person) RETURN ',
+    {},
+    { database: 'neo4j' }
+  )
+} catch (err) {
+  console.log('Neo4j error code:', err.code)
+  console.log('Error message:', err.message)
+}
+/*
+Neo4j error code: Neo.ClientError.Statement.SyntaxError
+Error message: Neo4jError: Invalid input '': expected an expression, '*', 'ALL' or 'DISTINCT' (line 1, column 25 (offset: 24))
+"MATCH (p:Person) RETURN"
+                         ^
+*/
+----
+
+Error objects also expose errors as GQL-status objects.
+The main difference between link:https://neo4j.com/docs/status-codes/current/errors/all-errors/[Neo4j error codes] and link:https://neo4j.com/docs/status-codes/current/errors/gql-errors/[GQL error codes] is that the GQL ones are more granular: a single Neo4j error code might be broken in several, more specific GQL error codes.
+
+The actual _cause_ that triggered an error is sometimes found in the optional GQL-status object `.cause`, which is itself a `Neo4jError`.
+You might need to recursively traverse the cause chain before reaching the root cause of the error you caught.
+In the example below, the error's GQL status code is `42001`, but the actual source of the error has status code `42I06`.
+
+.Usage of `Neo4jError` with GQL-related methods
 [source, javascript]
 ----
-try {
-  let result = await driver.executeQuery('MATCH (p:Person) RETURN p')
-} catch(err) {
-  console.log(`Error in query\n${err}`)
+let err = await driver.executeQuery(
+    'MATCH (p:Person) RETURN ',
+    {},
+    { database: 'neo4j' }
+  )
+} catch (err) {
+  console.log('Error GQL status:', err.gqlStatus)
+  console.log('Error GQL status description:', err.gqlStatusDescription)
+  console.log('Error GQL classification:', err.classification)
+  console.log('Error GQL cause:', err.cause.message)
+  console.log('Error GQL diagnostic record:', err.diagnosticRecord)
+}
+/*
+Error GQL status: 42001
+Error GQL status description: error: syntax error or access rule violation - invalid syntax
+Error GQL classification: CLIENT_ERROR
+Error GQL cause: GQLError: 42I06: Invalid input '', expected: an expression, '*', 'ALL' or 'DISTINCT'.
+Error GQL diagnostic record: {
+  OPERATION: '',
+  OPERATION_CODE: '0',
+  CURRENT_SCHEMA: '/',
+  _classification: 'CLIENT_ERROR',
+  _position: {
+    line: Integer { low: 1, high: 0 },
+    column: Integer { low: 25, high: 0 },
+    offset: Integer { low: 24, high: 0 }
+  }
+}
+*/
+----
+
+GQL status codes are particularly helpful when you want your application to behave differently depending on the exact error that was raised by the server.
+
+.Distinguishing between different error codes
+[source, javascript]
+----
+let err = await driver.executeQuery(
+    'MATCH (p:Person) RETURN ',
+    {},
+    { database: 'neo4j' }
+  )
+} catch (err) {
+    if hasGqlStatus(err, '42001') {
+        # Neo.ClientError.Statement.SyntaxError
+        # special handling of syntax error in query
+        console.log(err.message)
+    } else if hasGqlStatus(err, '42NFF') {
+        # Neo.ClientError.Security.Forbidden
+        # special handling of user not having CREATE permissions
+        console.log(err.message)
+    } else {
+        # handling of all other errors
+        console.log(err.message)
+    }
 }
 ----
 
+[NOTE]
+====
+The GQL status code `50N42` is returned when an error does not have a GQL-status object.
+This can happen if the driver is connected to an older Neo4j server.
+Don't rely on this status code, as future Neo4j server versions might change it with a more appropriate one.
+====
+
 [TIP]
-The driver automatically retries to run a failed query, if the failure is deemed to be transient (for example due to temporary server unavailability).
-An exception will be raised if the operation keeps failing after a number of attempts.
+====
+Transient server errors can be retried without need to alter the original request.
+You can discover whether an error is transient via the method `Neo4jError.isRetryable()`, which gives insights into whether a further attempt might be successful.
+This is particular useful when running queries in xref:transactions#explicit-transactions[explicit transactions], to know if a failed query is worth re-running.
+====
 
 
 == Query configuration
@@ -172,7 +265,7 @@ You can supply a link:{neo4j-docs-base-uri}/api/javascript-driver/{javascript-dr
 
 It is recommended to *always specify the database explicitly* with the `database` parameter, even on single-database instances.
 This allows the driver to work more efficiently, as it saves a network round-trip to the server to resolve the home database.
-If no database is given, the link:{neo4j-docs-base-uri}/operations-manual/5/database-administration/#manage-databases-default[user's home database] is used.
+If no database is given, the link:{neo4j-docs-base-uri}/operations-manual/current/database-administration/#manage-databases-default[user's home database] is used.
 
 [source, javascript]
 ----
@@ -180,14 +273,14 @@ await driver.executeQuery(
   'MATCH (p:Person) RETURN p.name',
   {},
   {
-    database: 'neo4j'
+    database: '<database-name>'
   }
 )
 ----
 
 
 [TIP]
-Specifying the database through the configuration parameter is preferred over the link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/use/[`USE`] Cypher clause.
+Specifying the database through the configuration parameter is preferred over the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/use/[`USE`] Cypher clause.
 If the server runs on a cluster, queries with `USE` require server-side routing to be enabled.
 Queries may also take longer to execute as they may not reach the right cluster member at the first attempt, and need to be routed to one containing the requested database.
 
@@ -204,7 +297,7 @@ await driver.executeQuery(
   {},
   {
     routing: 'READ',  // short for neo4j.routing.READ
-    database: 'neo4j'
+    database: '<database-name>'
   }
 )
 ----
@@ -225,29 +318,29 @@ Switching user at the query level is cheaper than creating a new `Driver` object
 The query is then run within the security context of the given user (i.e., home database, permissions, etc.). +
 Query-scoped authentication requires a server version >= 5.8.
 
-[source, javascript, test-skip]
+[source, javascript]
 ----
 await driver.executeQuery(
   'MATCH (p:Person) RETURN p.name',
   {},
   {
-    auth: neo4j.auth.basic('somebodyElse', 'theirPassword'),
-    database: 'neo4j'
+    auth: neo4j.auth.basic('<username>', '<password>'),
+    database: '<database-name>'
   }
 )
 ----
 
 The parameter `impersonatedUser` provides a similar functionality, and is available in driver/server versions >= 4.4.
-The difference is that you don't need to know a user's password to impersonate them, but the user under which the `Driver` was created needs to have the link:{neo4j-docs-base-uri}/operations-manual/5/authentication-authorization/dbms-administration/#access-control-dbms-administration-impersonation[appropriate permissions].
+The difference is that you don't need to know a user's password to impersonate them, but the user under which the `Driver` was created needs to have the link:{neo4j-docs-base-uri}/operations-manual/current/authentication-authorization/dbms-administration/#access-control-dbms-administration-impersonation[appropriate permissions].
 
-[source, javascript, test-skip]
+[source, javascript]
 ----
 await driver.executeQuery(
   'MATCH (p:Person) RETURN p.name',
   {},
   {
-    impersonatedUser: 'somebodyElse',
-    database: 'neo4j'
+    impersonatedUser: '<username>',
+    database: '<database-name>'
   }
 )
 ----
@@ -285,7 +378,7 @@ const neo4j = require('neo4j-driver');
     await driver.executeQuery(
       'MERGE (p:Person {name: $person.name, age: $person.age})',
       { person: person },
-      { database: 'neo4j' }
+      { database: '<database-name>' }
     )
   }
 
@@ -298,7 +391,7 @@ const neo4j = require('neo4j-driver');
         MATCH (friend:Person {name: friendName})
         MERGE (p)-[:KNOWS]->(friend)
         `, { person: person },
-        { database: 'neo4j' }
+        { database: '<database-name>' }
       )
     }
   }
@@ -309,7 +402,7 @@ const neo4j = require('neo4j-driver');
     WHERE friend.age < $age
     RETURN friend
     `, { name: 'Alice', age: 40 },
-    { database: 'neo4j' }
+    { database: '<database-name>' }
   )
 
   // Loop through results and do something with them

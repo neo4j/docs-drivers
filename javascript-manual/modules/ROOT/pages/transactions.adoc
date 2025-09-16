@@ -19,7 +19,7 @@ For further parameters, see xref:_session_configuration[Session configuration].
 
 [source, javascript]
 ----
-session = driver.session({ database: 'neo4j' })
+session = driver.session({ database: '<database-name>' })
 ----
 
 Session creation is a lightweight operation, so sessions can be created and destroyed without significant cost.
@@ -41,7 +41,7 @@ Both methods take a <<transaction_function>> callback, which is responsible of a
 .Retrieve people whose name starts with `Al`.
 [source, javascript]
 ----
-let session = driver.session({ database: 'neo4j' })  // <1>
+let session = driver.session({ database: '<database-name>' })  // <1>
 try {
   let result = await session.executeRead(async tx => { // <2>
     return await tx.run(`  // <3>
@@ -98,7 +98,7 @@ const neo4j = require('neo4j-driver');
     return
   }
 
-  session = driver.session({ database: 'neo4j' })
+  session = driver.session({ database: '<database-name>' })
   for(let i=0; i<100; i++) {
     const name = `Neo-${i.toString()}`
     const orgId = await session.executeWrite(async tx => {
@@ -176,7 +176,7 @@ You run queries inside an explicit transaction with the method link:{neo4j-docs-
 
 [source, javascript]
 ----
-let session = driver.session({ database: 'neo4j' })
+let session = driver.session({ database: '<database-name>' })
 let transaction = await session.beginTransaction()
 
 // use tx.run() to run queries
@@ -186,6 +186,12 @@ let transaction = await session.beginTransaction()
 await transaction.commit()
 await session.close()
 ----
+
+[TIP]
+====
+Queries run with `tx.run()` failing due to a transient server error can be retried without need to alter the original request.
+You can discover whether an error is transient via the method `.isRetryable()`, which gives insights into whether a further attempt might be successful.
+====
 
 An explicit transaction can be committed with link:{neo4j-docs-base-uri}/api/javascript-driver/{javascript-driver-version}/class/lib6/transaction.js~Transaction.html#instance-method-commit[`Transaction.commit()`] or rolled back with link:{neo4j-docs-base-uri}/api/javascript-driver/{javascript-driver-version}/class/lib6/transaction.js~Transaction.html#instance-method-rollback[`Transaction.rollback()`].
 If no explicit action is taken, the driver will automatically roll back the transaction at the end of its lifetime.
@@ -222,13 +228,13 @@ async function createCustomer(driver) {
       MERGE (c:Customer {id: randomUUID()})
       RETURN c.id AS id
     `, {},
-    { database: 'neo4j' }
+    { database: '<database-name>' }
   )
   return records[0].get("id")
 }
 
 async function transferToOtherBank(driver, customerId, otherBankId, amount) {
-  const session = driver.session({ database: 'neo4j' })
+  const session = driver.session({ database: '<database-name>' })
   const tx = await session.beginTransaction()
   try {
     if(! checkCustomerBalance(tx, customerId, amount))
@@ -255,7 +261,7 @@ async function checkCustomerBalance(tx, customerId, amount) {
     MATCH (c:Customer {id: $id})
     RETURN c.balance >= $amount AS sufficient
     `, { id: customerId, amount: amount },
-    { database: 'neo4j' }
+    { database: '<database-name>' }
   )
   return result.records[0].get('sufficient')
 }
@@ -289,17 +295,17 @@ When creating a session, you can provide an optional parameter of type  link:{ne
 
 You should *always specify the database explicitly* with the `database` parameter, even on single-database instances.
 This allows the driver to work more efficiently, as it saves a network round-trip to the server to resolve the home database.
-If no database is given, the link:{neo4j-docs-base-uri}/operations-manual/5/database-administration/#manage-databases-default[user's home database] set in the Neo4j instance settings is used.
+If no database is given, the link:{neo4j-docs-base-uri}/operations-manual/current/database-administration/#manage-databases-default[user's home database] set in the Neo4j instance settings is used.
 
 [source, javascript]
 ----
 const session = driver.session({
-  database: 'neo4j'
+  database: '<database-name>'
 })
 ----
 
 [TIP]
-Specifying the database through the configuration method is preferred over the link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/use/[`USE`] Cypher clause.
+Specifying the database through the configuration method is preferred over the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/use/[`USE`] Cypher clause.
 If the server runs on a cluster, queries with `USE` require server-side routing to be enabled.
 Queries may also take longer to execute as they may not reach the right cluster member at the first attempt, and need to be routed to one containing the requested database.
 
@@ -313,7 +319,7 @@ Note that `.executeRead()` and `.executeWrite()` automatically override the sess
 [source, javascript]
 ----
 const session = driver.session({
-  database: 'neo4j',
+  database: '<database-name>',
   defaultAccessMode: neo4j.session.READ
 })
 ----
@@ -341,19 +347,19 @@ Session-scoped authentication requires a server version >= 5.8.
 [source, javascript]
 ----
 const session = driver.session({
-    database: 'neo4j',
-    auth: neo4j.auth.basic('somebodyElse', 'theirPassword')
+    database: '<database-name>',
+    auth: neo4j.auth.basic('<username>', '<password>')
 })
 ----
 
 The parameter `impersonatedUser` provides a similar functionality, and is available in driver/server versions >= 4.4.
-The difference is that you don't need to know a user's password to impersonate them, but the user under which the `Driver` was created needs to have the link:{neo4j-docs-base-uri}/operations-manual/5/authentication-authorization/dbms-administration/#access-control-dbms-administration-impersonation[appropriate permissions].
+The difference is that you don't need to know a user's password to impersonate them, but the user under which the `Driver` was created needs to have the link:{neo4j-docs-base-uri}/operations-manual/current/authentication-authorization/dbms-administration/#access-control-dbms-administration-impersonation[appropriate permissions].
 
 [source, javascript]
 ----
 const session = driver.session({
-    database: 'neo4j',
-    impersonatedUser: 'somebodyElse'
+    database: '<database-name>',
+    impersonatedUser: '<username>'
 })
 ----
 
@@ -373,7 +379,7 @@ Use this to tag transactions.
 
 [source, javascript]
 ----
-let session = driver.session({ database: 'neo4j' })
+let session = driver.session({ database: '<database-name>' })
 const people_n = await session.executeRead(
   async tx => { return await tx.run('MATCH (a:Person) RETURN count(a)') },
   { timeout: 5000, metadata: {'app_name': 'people'} }  // TransactionConfig
@@ -388,7 +394,7 @@ The best way is to wrap session usage in a `try/finally` block, calling `session
 
 [source, javascript]
 ----
-let session = driver.session({database: 'neo4j'})
+let session = driver.session({database: '<database-name>'})
 try {
   // use session to run queries
 } finally {

@@ -1,0 +1,91 @@
+= Connection
+
+Once you have xref:install.adoc#install-driver[installed the driver] and have xref:install.adoc#get-an-instance[a running Neo4j instance], you are ready to connect your application to the database.
+
+
+== Connect to the database
+
+You connect to a database by creating a <<IDriver>> object and providing a URL and an authentication token.
+
+[source, csharp]
+----
+using Neo4j.Driver;
+
+// URI examples: "neo4j://localhost", "neo4j+s://xxx.databases.neo4j.io"
+const string dbUri = "<database-uri>";
+const string dbUser = "<username>";
+const string dbPassword = "<password>";
+
+await using var driver = GraphDatabase.Driver(dbUri, AuthTokens.Basic(dbUser, dbPassword));  // <1>
+await driver.VerifyConnectivityAsync();  // <2>
+Console.WriteLine("Connection established.");
+----
+
+<1> Creating a `IDriver` instance only provides information on _how_ to access the database, but does not actually _establish_ a connection.
+Connection is instead deferred to when the first query is executed.
+<2> To verify immediately that the driver can connect to the database (valid credentials, compatible versions, etc), use the `.VerifyConnectivityAsync()` method after initializing the driver.
+
+Both the creation of a `IDriver` object and the connection verification can raise a number of different link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.Neo4jException.html[exceptions].
+Since a connection error is a blocker for any subsequent task, the most common choice is to let the program crash should an exception occur while establishing a connection.
+
+**`IDriver` objects are immutable, thread-safe, and expensive to create**, so your application should create only one instance and pass it around (you may share `IDriver` instances across threads).
+You can xref:query-simple#impersonation[run queries through several different users] without creating a new `IDriver` instance.
+If you want to alter a `IDriver` configuration, you need to create a new object.
+
+[TIP]
+The driver also supports other xref:connect-advanced.adoc#authentication-methods[authentication methods] (kerberos, bearer, custom).
+
+
+[#aura]
+== Connect to an Aura instance
+
+When you create an <<Aura>> instance, you receive a text file (a so-called _Dotenv file_) containing the connection information to the database in the form of environment variables.
+The file has a name of the form `Neo4j-a0a2fa1d-Created-2023-11-06.txt`.
+
+You can either manually extract the URI and the credentials from that file, or use a third party-module to load them.
+We recommend the module link:https://www.nuget.org/packages/dotenv.net/[`dotenv.net`] for that purpose.
+
+.Using `dotenv.net` to extract credentials from a Dotenv file
+[source, csharp]
+----
+using Neo4j.Driver;
+using dotenv.net;
+
+DotEnv.Load(options: new DotEnvOptions(
+    envFilePaths: new[] {"Neo4j-a0a2fa1d-Created-2023-11-06.txt"},
+    ignoreExceptions: false,
+    overwriteExistingVars: false
+));
+
+string? dbUri = Environment.GetEnvironmentVariable("NEO4J_URI");
+string? dbUser = Environment.GetEnvironmentVariable("NEO4J_USERNAME");
+string? dbPassword = Environment.GetEnvironmentVariable("NEO4J_PASSWORD");
+
+await using var driver = GraphDatabase.Driver(dbUri, AuthTokens.Basic(dbUser, dbPassword));
+await driver.VerifyConnectivityAsync();
+Console.WriteLine("Connection established.");
+----
+
+[TIP]
+An Aura instance is not conceptually different from any other Neo4j instance, as Aura is simply a _deployment mode_ for Neo4j.
+When interacting with a Neo4j database through the driver, it doesn't make a difference whether it is an Aura instance it is working with or a different deployment.
+
+
+== Close connections
+
+Always close `IDriver` objects to free up all allocated resources, even upon unsuccessful connection or runtime errors.
+Either create the `IDriver` object with the `using` keyword, or call the `Driver.CloseAsync()` method explicitly.
+
+
+== Further connection parameters
+
+For more `IDriver` configuration parameters and further connection settings, see xref:connect-advanced.adoc[Advanced connection information].
+
+
+ifndef::backend-pdf[]
+[discrete.glossary]
+== Glossary
+
+include::{common-partial}/glossary.adoc[]
+include::../partials/glossary.adoc[]
+endif::[]

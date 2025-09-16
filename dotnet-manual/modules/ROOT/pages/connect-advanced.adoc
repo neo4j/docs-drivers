@@ -1,0 +1,303 @@
+= Advanced connection information
+
+include::{common-partial}/connect-advanced.adoc[tag=connection-uri]
+
+include::{common-partial}/connect-advanced.adoc[tag=connection-protocols]
+
+
+[#authentication-methods]
+== Authentication methods
+
+[#auth-basic]
+=== Basic authentication (default)
+
+The basic authentication scheme relies on traditional username and password.
+These can either be the credentials for your local installation, or the ones provided with an Aura instance.
+
+[source, csharp]
+----
+await using var driver = GraphDatabase.Driver(dbUri, AuthTokens.Basic(dbUser, dbPassword));
+----
+
+[INFO]
+The basic authentication scheme can also be used to authenticate against an LDAP server (Enterprise Edition only).
+
+
+[#auth-kerberos]
+=== Kerberos authentication
+
+The Kerberos authentication scheme requires a base64-encoded ticket.
+It can only be used if the server has the link:{neo4j-docs-base-uri}/kerberos-add-on/current/deployment/[Kerberos Add-on installed].
+
+[source, csharp, test-skip]
+----
+await using var driver = GraphDatabase.Driver(dbUri, AuthTokens.Kerberos(ticket));
+----
+
+
+[#auth-bearer]
+=== Bearer authentication
+
+The bearer authentication scheme requires a base64-encoded token provided by an Identity Provider through Neo4j's link:{neo4j-docs-base-uri}/operations-manual/current/authentication-authorization/sso-integration/[Single Sign-On feature].
+
+[source, csharp, test-skip]
+----
+await using var driver = GraphDatabase.Driver(dbUri, AuthTokens.Bearer(ticket));
+----
+
+
+[#auth-custom]
+=== Custom authentication
+
+Use link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.AuthTokens.Custom.html[`AuthTokens.Custom()`] to log into a server having a custom authentication scheme.
+
+[source, csharp, test-skip]
+----
+await using var driver = GraphDatabase.Driver(
+    dbUri,
+    AuthTokens.Custom(principal, credentials, realm, scheme, parameters)
+);
+// `parameters` is optional
+----
+
+
+[#auth-none]
+=== No authentication
+
+If authentication is disabled on the server, the authentication parameter can be omitted entirely.
+
+
+[#rotating-tokens]
+[role=label--new-5.14]
+== Rotating authentication tokens
+
+It is possible to rotate authentication tokens that are expected to expire (e.g. SSO).
+You need to provide an link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IAuthTokenManager.html[`IAuthTokenManager`] instance when instantiating the `IDriver`, rather than a static authentication token.
+
+The easiest way to get started is to use link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.AuthTokenManagers.html[one of built-in `AuthTokenManagers` implementations]. AuthTokenManagers work with link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.AuthTokenAndExpiration.html[`AuthTokenAndExpiration`] objects.
+
+.Rotating a bearer token expiring every 60 seconds
+[source, csharp, test-skip]
+----
+await using var driver = GraphDatabase.Driver(
+    dbUri,
+    AuthTokenManagers.Bearer(GetTokenAsync));
+
+Task<AuthTokenAndExpiration> GetTokenAsync() {
+    var token = getToken();
+
+    // Assume we know tokens expire every 60 seconds
+    var expiresIn = 60 * 1000;
+    // Include a little buffer so that new token is fetched before the old one expires
+    expiresIn -= 10_000;
+
+    return Task.FromResult(new AuthTokenAndExpiration(token, expiresIn));
+}
+
+// Some way to get a token
+string getToken() {
+    return "token-string";
+}
+----
+
+[NOTE]
+This feature must not be used for switching users.
+Auth managers must always return tokens for the same identity.
+You can switch users at both xref:query-simple.adoc#impersonation[query level] and xref:transactions.adoc#impersonation[session level].
+
+[WARNING]
+`IAuthTokenManager` objects must not interact with the driver in any way, as this can cause deadlocks and undefined behavior.
+
+
+[#mtls]
+[role=label--new-5.27 label--not-on-aura]
+== Mutual TLS (client-side certificates as 2FA)
+
+Mutual TLS (mTLS) allows you to use a client certificate as second factor for authenticating with the server.
+The certificate can only be used together with an authentication token and is not a replacement of regular authentication, unless authentication is disabled on the server.
+
+The client's certificate and public key must be placed in the server's `<NEO4J_HOME>/certificates/bolt/trusted` directory. For more information on server setup, see link:https://neo4j.com/docs/operations-manual/current/security/ssl-framework/#ssl-bolt-config[Configure SSL over Bolt].
+
+[NOTE]
+For mTLS to work, the driver's connection with the server must be encrypted, i.e. the xref:_connection_protocols_and_security[connection URI scheme] must be either `+s` or `+ssc` (ex. `neo4j+s://example.com:7687`).
+
+Use the config method link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.ConfigBuilder.WithClientCertificateProvider.html[`WithClientCertificateProvider()`] to provide an link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IClientCertificateProvider.html[`IClientCertificateProvider`]. +
+Your implementation must provide a thread-safe `GetCertificateAsync()` method, returning a `ValueTask<link:https://learn.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.x509certificate2?view=net-9.0[X509Certificate2]>`.
+
+[source, csharp, test-skip]
+----
+using System.Security.Cryptography.X509Certificates;
+
+class ClientCertificateProvider {
+
+    public async ValueTask<X509Certificate2> GetCertificateAsync() {
+        string certPath = "path/to/cert.pem";
+        string certPassword = "password";
+
+        X509Certificate2 certificate = new X509Certificate2(certPath, certPassword, X509KeyStorageFlags.MachineKeySet);
+        return await Task.FromResult(certificate);
+    }
+
+}
+
+await using var driver = GraphDatabase.Driver(
+    dbUri,
+    AuthTokens.Basic(dbUser, dbPassword),
+    conf => conf.WithClientCertificateProvider(ClientCertificateProvider)
+);
+await driver.VerifyConnectivityAsync();
+----
+
+
+[#logging]
+== Logging
+
+To enable logging use link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.ConfigBuilder.WithLogger.html[`.withLogger(ILogger)`] config method when creating a `Driver` object, providing an implementation of link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.ILogger.html[`ILogger`].
+
+.Enable debug logging with example implementation of `ILogger`
+[source, csharp]
+----
+using Neo4j.Driver;
+
+const string dbUri = "<database-uri>";
+const string dbUser = "<username>";
+const string dbPassword = "<password>";
+
+var logger = new Neo4jLogger();
+logger.EnableDebug();
+
+await using var driver = GraphDatabase.Driver(
+    dbUri, AuthTokens.Basic(dbUser, dbPassword),
+    conf => conf.WithLogger(logger)
+);
+await driver.VerifyConnectivityAsync();
+
+
+public class Neo4jLogger : ILogger {
+
+    private bool debug = false;
+    private bool trace = false;
+
+    public void Log(string level, string message) {
+        DateTime localDate = DateTime.Now;
+        Console.WriteLine($"{localDate.TimeOfDay} {level} {message}");
+    }
+
+    public void Error(Exception cause, string message, params object[] args) {
+        this.Log("ERROR", String.Format($"{message}", args));
+    }
+    public void Warn(Exception cause, string message, params object[] args) {
+        this.Log("WARN", String.Format($"{message}", args));
+    }
+
+    public void Info(string message, params object[] args) {
+        this.Log("INFO", String.Format($"{message}", args));
+    }
+
+    public void Debug(string message, params object[] args) {
+        this.Log("DEBUG", String.Format($"{message}", args));
+    }
+
+    public void Trace(string message, params object[] args) {
+        this.Log("TRACE", String.Format($"{message}", args));
+    }
+
+    public void EnableDebug() {
+        this.debug = true;
+    }
+
+    public void EnableTrace() {
+        this.trace = true;
+    }
+
+    public bool IsTraceEnabled() {
+        return this.trace;
+    }
+
+    public bool IsDebugEnabled() {
+        return this.debug;
+    }
+}
+----
+
+.Example of log output upon successful connection
+[source, log]
+----
+12:34:27.3134245 DEBUG [conn-localhost:7687-1] ~~ [CONNECT] neo4j://localhost:7687/
+12:34:27.3322335 DEBUG [conn-localhost:7687-1] C: [HANDSHAKE] 60 60 B0 17 00 07 07 05 00 02 04 04 00 00 01 04 00 00 00 03
+12:34:27.3336518 DEBUG [conn-localhost:7687-1] S: [HANDSHAKE] 5.7
+12:34:27.3523440 DEBUG [conn-localhost:7687-1] C: HELLO [{user_agent, neo4j-dotnet/5.27}, {routing, [{address, localhost:7687}]}, {bolt_agent, [{product, neo4j-dotnet/5.27.38}, {platform, Linux Mint 22.1;X64}, {language_details, .NET 8.0.16}]}]
+12:34:27.3526200 DEBUG [conn-localhost:7687-1] C: LOGON [{scheme, basic}, {principal, neo4j}, {credentials, ******}]
+12:34:27.3599672 DEBUG [conn-localhost:7687-1] S: SUCCESS [{server, Neo4j/2025.06.0-30853}, {connection_id, bolt-228}, {hints, [{connection.recv_timeout_seconds, 120}]}]
+12:34:27.3650548 DEBUG [conn-localhost:7687-1] Connection 'conn-localhost:7687-1' renamed to 'bolt-228'. The new name identifies the connection uniquely both on the client side and the server side.
+12:34:27.3655529 DEBUG [bolt-228] S: SUCCESS []
+12:34:27.3714612 DEBUG [bolt-228] C: RESET
+12:34:27.3745223 DEBUG [bolt-228] S: SUCCESS []
+12:34:27.3806841 DEBUG [bolt-228] C: ROUTE { 'address':'localhost:7687' } [] { }
+12:34:27.3823965 DEBUG [bolt-228] S: SUCCESS [{rt, [{servers, [[{addresses, [localhost:7687]}, {role, WRITE}], [{addresses, [localhost:7687]}, {role, READ}], [{addresses, [localhost:7687]}, {role, ROUTE}]]}, {ttl, 300}, {db, neo4j}]}]
+12:34:27.3888866 DEBUG [bolt-228] C: RESET
+12:34:27.3893542 DEBUG [bolt-228] S: SUCCESS []
+12:34:27.3917428 INFO Routing table is updated => RoutingTable{database=neo4j, routers=[neo4j://localhost:7687/], writers=[neo4j://localhost:7687/], readers=[neo4j://localhost:7687/], expiresAfter=300s}
+12:34:27.3918886 DEBUG [bolt-228] C: RESET
+12:34:27.3922620 DEBUG [bolt-228] S: SUCCESS []
+12:34:27.3949034 DEBUG [pool-localhost:7687] Disposing Available Connection bolt-228
+12:34:27.3961484 DEBUG [bolt-228] C: GOODBYE
+----
+
+
+[#custom-address-resolver]
+== Custom address resolver
+
+When creating an `IDriver` object, you can specify a _resolver_ function to resolve the connection address the driver is initialized with.
+Note that addresses that the driver receives in routing tables are not resolved with the custom resolver.
+
+You specify a resolver through the link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.ConfigBuilder.WithResolver.html)[`.WithResolver()`] config method, which works with link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IServerAddressResolver.html[`IServerAddressResolver`] objects.
+
+*The resolved address must have the same port and URI scheme.*
+In the example below, the driver is initialized with a `neo4j://` URI scheme and port `7687`, so the resolved address provided in `dbUri` must also be available at `neo4j://` and port `7687`.
+
+.Connection to `example.com` is resolved to `localhost`
+[source, csharp, test-skip]
+----
+using Neo4j.Driver;
+
+const string dbUri = "localhost";  // omit scheme and port
+const string dbUser = "<username>";
+const string dbPassword = "<password>";
+
+// setting a port different than the one given in `driver` won't work
+var address = ServerAddress.From(dbUri, 7687);
+
+await using var driver = GraphDatabase.Driver(
+    "neo4j://example.com:7687",
+    AuthTokens.Basic(dbUser, dbPassword),
+    conf => conf.WithResolver(new ListAddressResolver(address))
+);
+await driver.VerifyConnectivityAsync();
+
+class ListAddressResolver : IServerAddressResolver {
+    private readonly ServerAddress[] _servers;
+
+    public ListAddressResolver(params ServerAddress[] servers) {
+        _servers = servers;
+    }
+
+    public ISet<ServerAddress> Resolve(ServerAddress address) {
+        return new HashSet<ServerAddress>(_servers);
+    }
+}
+----
+
+
+== Further connection parameters
+
+You can find all `IDriver` configuration parameters in the link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.ConfigBuilder.html[API documentation -> ConfigBuilder].
+
+
+ifndef::backend-pdf[]
+[discrete.glossary]
+== Glossary
+
+include::{common-partial}/glossary.adoc[]
+include::../partials/glossary.adoc[]
+endif::[]

@@ -13,13 +13,13 @@ The overhead is minimal for a single query, but becomes significant over hundred
 [source, java]
 ----
 driver.executableQuery("<QUERY>")
-    .withConfig(QueryConfig.builder().withDatabase("{neo4j-database-name}").build())
+    .withConfig(QueryConfig.builder().withDatabase("<database-name>").build())
     .execute();
 ----
 
 [source, java]
 ----
-driver.session(SessionConfig.builder().withDatabase("{neo4j-database-name}").build());
+driver.session(SessionConfig.builder().withDatabase("<database-name>").build());
 ----
 
 [discrete]
@@ -40,32 +40,52 @@ driver.session();
 [[transactions-cost]]
 == Be aware of the cost of transactions
 
-When submitting queries through xref:query-simple.adoc[`.executableQuery()`] or through xref:transactions.adoc#managed-transactions[`.executeRead/Write()`], the server automatically wraps them into a <<transaction>>.
+When submitting queries through xref:query-simple.adoc[`.executableQuery()`] or through xref:transactions.adoc#managed-transactions[`.executeRead/Write()`], the driver wraps them into a <<transaction>>.
 This behavior ensures that the database always ends up in a consistent state, regardless of what happens during the execution of a transaction (power outages, software crashes, etc).
+As a further robustness layer, the driver also retries failed transactions with an exponential backoff.
 
-Creating a safe execution context around a number of queries yields an overhead that is not present if the driver just shoots queries at the server and hopes they will get through.
-The overhead is small, but can add up as the number of queries increases.
-For this reason, if your use case values throughput more than data integrity, you may extract further performance by running all queries within a single (auto-commit) transaction.
-You do this by creating a session and using `session.run()` to run as many queries as needed.
+Creating a safe execution context around a query yields an overhead that is small, but that adds up as the number of transactions increases.
+When each query is sent as a transaction of its own, if one transaction fails and needs to be rolled back, all the other transactions are unaffected.
+This is the safest mode of execution with respect to failures, but also the slowest due to the overhead of transactions scaling with the number of queries.
 
-.Privilege throughput over data integrity
-[source, java]
-----
-try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
-    for (int i=0; i<1000; i++) {
-        session.run("<QUERY>");
-    }
-}
-----
-
-.Privilege data integrity over throughput
+.Each query as a separate transaction (low throughput)
 [source, java]
 ----
 for (int i=0; i<1000; i++) {
     driver.executableQuery("<QUERY>")
-        .withConfig(QueryConfig.builder().withDatabase("{neo4j-database-name}").build())
+        .withConfig(QueryConfig.builder().withDatabase("<database-name>").build())
         .execute();
     // or session.executeRead/Write() calls
+}
+----
+
+A more performant approach is to group all queries into a single transaction.
+In this way, the transaction as a whole is isolated from others, but individual queries in the transaction are not isolated, and failure of one results in a rollback of all queries.
+
+.Group queries into one transaction (higher throughput)
+[source, java]
+----
+try (var session = driver.session(SessionConfig.builder().withDatabase("<database-name>").build())) {
+    session.executeWriteWithoutResult(tx -> {
+        for (int i=0; i<1000; i++) {
+            tx.run("<QUERY>");
+        }
+    });
+}
+----
+
+An even faster approach is to skip `.executeRead/Write()` and call `.run()` directly on the session.
+The queries run as auto-commit transaction, and are still isolated from other concurrent queries, but if any of them fail, they will not be retried.
+With this method, you trade some robustness for more throughput, as the queries are shot to the server as fast as it can handle.
+One upper limit on the client size is given by the size of the connection pool: each call to `.run()` borrows a connection, so the amount of parallel work is limited by the number of available connections.
+
+.Queries as auto-commit transactions (highest throughput)
+[source, java]
+----
+try (var session = driver.session(SessionConfig.builder().withDatabase("<database-name>").build())) {
+    for (int i=0; i<1000; i++) {
+        session.run("<QUERY>");
+    }
 }
 ----
 
@@ -88,7 +108,7 @@ In a cluster, *route read queries to any reader node*. You do this by:
 
 driver.executableQuery("MATCH (p:Person) RETURN p")
     .withConfig(QueryConfig.builder()
-        .withDatabase("neo4j")
+        .withDatabase("<database-name>")
         .withRouting(RoutingControl.READ)
         .build())
     .execute();
@@ -96,7 +116,7 @@ driver.executableQuery("MATCH (p:Person) RETURN p")
 
 [source, java]
 ----
-try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
+try (var session = driver.session(SessionConfig.builder().withDatabase("<database-name>").build())) {
     session.executeRead(tx -> {
         var result = tx.run("MATCH (p:Person) RETURN p");
         return result.list();
@@ -113,7 +133,7 @@ try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").
 // defaults to routing = writers
 driver.executableQuery("MATCH (p:Person) RETURN p")
     .withConfig(QueryConfig.builder()
-        .withDatabase("neo4j")
+        .withDatabase("<database-name>")
         .build())
     .execute();
 ----
@@ -121,7 +141,7 @@ driver.executableQuery("MATCH (p:Person) RETURN p")
 [source, java]
 ----
 // don't ask to write on a read-only operation
-try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
+try (var session = driver.session(SessionConfig.builder().withDatabase("<database-name>").build())) {
     session.executeWrite(tx -> {
         var result = tx.run("MATCH (p:Person) RETURN p");
         return result.list();
@@ -143,13 +163,13 @@ You can create indexes with the `CREATE INDEX` Cypher clause, for both nodes and
 driver.executableQuery("CREATE INDEX person_name FOR (n:Person) ON (n.name)").execute();
 ----
 
-For more information, see link:{neo4j-docs-base-uri}/cypher-manual/5/indexes-for-search-performance/[Indexes for search performance].
+For more information, see link:{neo4j-docs-base-uri}/cypher-manual/current/indexes-for-search-performance/[Indexes for search performance].
 
 
 [[profile-queries]]
 == Profile queries
 
-link:https://neo4j.com/docs/cypher-manual/5/appendix/tutorials/basic-query-tuning/#_profile_query[*Profile your queries*] to locate queries whose performance can be improved.
+link:https://neo4j.com/docs/cypher-manual/current/appendix/tutorials/basic-query-tuning/#_profile_query[*Profile your queries*] to locate queries whose performance can be improved.
 You can profile queries by prepending them with `PROFILE`.
 The server output is available through the `.profile()` method of the xref:result-summary.adoc[`ResultSummary`] object.
 
@@ -157,7 +177,7 @@ The server output is available through the `.profile()` method of the xref:resul
 ----
 var result = driver.executableQuery("PROFILE MATCH (p {name: $name}) RETURN p")
     .withParameters(Map.of("name", "Alice"))
-    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+    .withConfig(QueryConfig.builder().withDatabase("<database-name>").build())
     .execute();
 var queryPlan = result.summary().profile().arguments().get("string-representation");
 System.out.println(queryPlan);
@@ -190,7 +210,7 @@ The server output is available through the `.plan()` method of the xref:result-s
 ----
 var result = driver.executableQuery("EXPLAIN MATCH (p {name: $name}) RETURN p")
     .withParameters(Map.of("name", "Alice"))
-    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+    .withConfig(QueryConfig.builder().withDatabase("<database-name>").build())
     .execute();
 var queryPlan = result.summary().plan().arguments().get("string-representation");
 System.out.println(queryPlan);
@@ -221,7 +241,7 @@ Total database accesses: ?
 
 *Specify node labels* in all queries.
 This allows the query planner to work much more efficiently, and to leverage indexes where available.
-To learn how to combine labels, see link:https://neo4j.com/docs/cypher-manual/5/patterns/reference/#label-expressions[Cypher -> Label expressions].
+To learn how to combine labels, see link:https://neo4j.com/docs/cypher-manual/current/patterns/reference/#label-expressions[Cypher -> Label expressions].
 
 [discrete]
 === Good practices
@@ -230,13 +250,13 @@ To learn how to combine labels, see link:https://neo4j.com/docs/cypher-manual/5/
 ----
 driver.executableQuery("MATCH (p:Person|Animal {name: $name}) RETURN p")
     .withParameters(Map.of("name", "Alice"))
-    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+    .withConfig(QueryConfig.builder().withDatabase("<database-name>").build())
     .execute();
 ----
 
 [source, java]
 ----
-try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
+try (var session = driver.session(SessionConfig.builder().withDatabase("<database-name>").build())) {
     session.run("MATCH (p:Person|Animal {name: $name}) RETURN p", Map.of("name", "Alice"));
 }
 ----
@@ -249,13 +269,13 @@ try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").
 ----
 driver.executableQuery("MATCH (p {name: $name}) RETURN p")
     .withParameters(Map.of("name", "Alice"))
-    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+    .withConfig(QueryConfig.builder().withDatabase("<database-name>").build())
     .execute();
 ----
 
 [source, java]
 ----
-try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
+try (var session = driver.session(SessionConfig.builder().withDatabase("<database-name>").build())) {
     session.run("MATCH (p {name: $name}) RETURN p", Map.of("name", "Alice"));
 }
 ----
@@ -264,7 +284,7 @@ try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").
 [[batch-data-creation]]
 == Batch data creation
 
-*Batch queries when creating a lot of records* using the link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/with/[`WITH`] and link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/unwind/[`UNWIND`] Cypher clauses.
+*Batch queries when creating a lot of records* using the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/with/[`WITH`] and link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/unwind/[`UNWIND`] Cypher clauses.
 
 [discrete]
 === Good practice
@@ -285,7 +305,7 @@ driver.executableQuery("""
     MERGE (:Number {value: node.value})
     """)
     .withParameters(Map.of("numbers", numbers))
-    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+    .withConfig(QueryConfig.builder().withDatabase("<database-name>").build())
     .execute();
 ----
 
@@ -298,13 +318,13 @@ driver.executableQuery("""
 for (int i=1; i<=10000; i++) {
 driver.executableQuery("MERGE (:Number {value: $value})")
     .withParameters(Map.of("value", i))
-    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+    .withConfig(QueryConfig.builder().withDatabase("<database-name>").build())
     .execute();
 }
 ----
 
 [TIP]
-The most efficient way of performing a _first import_ of large amounts of data into a new database is the link:{neo4j-docs-base-uri}/operations-manual/5/tutorial/neo4j-admin-import/[`neo4j-admin database import`] command.
+The most efficient way of performing a _first import_ of large amounts of data into a new database is the link:{neo4j-docs-base-uri}/operations-manual/current/tutorial/neo4j-admin-import/[`neo4j-admin database import`] command.
 // source:  https://community.neo4j.com/t5/neo4j-graph-platform/improving-data-writing-efficiency-in-python/td-p/39520
 
 
@@ -321,13 +341,13 @@ Besides protecting from Cypher injections, this allows to better leverage the da
 ----
 driver.executableQuery("MATCH (p:Person {name: $name}) RETURN p")
     .withParameters(Map.of("name", "Alice"))
-    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+    .withConfig(QueryConfig.builder().withDatabase("<database-name>").build())
     .execute();
 ----
 
 [source, java]
 ----
-try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
+try (var session = driver.session(SessionConfig.builder().withDatabase("<database-name>").build())) {
     session.run("MATCH (p:Person {name: $name}) RETURN p", Map.of("name", "Alice"));
 }
 ----
@@ -338,18 +358,18 @@ try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").
 [source, java]
 ----
 driver.executableQuery("MATCH (p:Person {name: 'Alice'}) RETURN p")
-    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+    .withConfig(QueryConfig.builder().withDatabase("<database-name>").build())
     .execute();
 // or
 String name = "Alice";
 driver.executableQuery("MATCH (p:Person {name: '" + name + "'}) RETURN p")
-    .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
+    .withConfig(QueryConfig.builder().withDatabase("<database-name>").build())
     .execute();
 ----
 
 [source, java]
 ----
-try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").build())) {
+try (var session = driver.session(SessionConfig.builder().withDatabase("<database-name>").build())) {
     session.run("MATCH (p:Person {name: 'Alice'}) RETURN p");
     // or
     String name = "Alice";
@@ -368,8 +388,8 @@ This is likely to be more impactful on performance if you parallelize complex an
 [[merge]]
 == Use `MERGE` for creation only when needed
 
-The Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/merge/[`MERGE`] is convenient for data creation, as it allows to avoid duplicate data when an exact clone of the given pattern exists.
-However, it requires the database to run _two_ queries: it first needs to link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/match/[`MATCH`] the pattern, and only then can it link:{neo4j-docs-base-uri}/cypher-manual/5/clauses/create/[`CREATE`] it (if needed).
+The Cypher clause link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/merge/[`MERGE`] is convenient for data creation, as it allows to avoid duplicate data when an exact clone of the given pattern exists.
+However, it requires the database to run _two_ queries: it first needs to link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/match/[`MATCH`] the pattern, and only then can it link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/create/[`CREATE`] it (if needed).
 
 If you know already that the data you are inserting is new, avoid using `MERGE` and use `CREATE` directly instead -- this practically halves the number of database queries.
 

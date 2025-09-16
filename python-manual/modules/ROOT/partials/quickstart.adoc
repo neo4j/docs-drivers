@@ -5,9 +5,8 @@
 The Neo4j Python driver is the official library to interact with a Neo4j instance through a Python application.
 
 At the hearth of Neo4j lies <<Cypher>>, the query language to interact with a Neo4j database.
-While this guide does not _require_ you to be a seasoned Cypher querier, it is going to be easier to focus on the Python-specific bits if you already know some Cypher.
-For this reason, although this guide does _also_ provide a gentle introduction to Cypher along the way, consider checking out link:https://neo4j.com/docs/getting-started/cypher/[Getting started -> Cypher] for a more detailed walkthrough of graph databases modelling and querying if this is your first approach.
-You may then apply that knowledge while following this guide to develop your Python application.
+While this guide does not _require_ you to be a seasoned Cypher querier, it's easier to focus on the Python-specific bits if you know some Cypher already.
+Although this guide does _also_ provide a gentle introduction to Cypher, check out link:https://neo4j.com/docs/getting-started/cypher/[Getting started -> Cypher] for a more detailed walkthrough of graph databases modelling and querying if this is your first approach.
 
 
 [#install]
@@ -59,7 +58,7 @@ summary = driver.execute_query("""
     CREATE (a)-[:KNOWS]->(b)
     """,
     name="Alice", friendName="David",
-    database_="neo4j",
+    database_="<database-name>",
 ).summary
 print("Created {nodes_created} nodes in {time} ms.".format(
     nodes_created=summary.counters.nodes_created,
@@ -82,7 +81,7 @@ records, summary, keys = driver.execute_query("""
     MATCH (p:Person)-[:KNOWS]->(:Person)
     RETURN p.name AS name
     """,
-    database_="neo4j",
+    database_="<database-name>",
 )
 
 # Loop through results and do something with them
@@ -110,7 +109,7 @@ from neo4j import GraphDatabase
 
 
 driver = GraphDatabase.driver(URI, auth=AUTH)
-session = driver.session(database="neo4j")
+session = driver.session(database="<database-name>")
 
 # session/driver usage
 
