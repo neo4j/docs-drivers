@@ -73,7 +73,7 @@ If you prefix a query with `EXPLAIN`, the server returns the plan it _would_ use
 The plan is available under the property `ResultSummary.plan`, and contains the list of link:https://neo4j.com/docs/cypher-manual/current/planning-and-tuning/operators/[Cypher operators] that would be used to retrieve the result set.
 Use this information to locate potential bottlenecks or potential performance improvements (for example the creation of indexes).
 
-[source, python, role=nocollapse]
+[source, python]
 ----
 _, summary, _ = driver.execute_query("EXPLAIN MATCH (p {name: $name}) RETURN p", name="Alice")
 print(summary.plan['args']['string-representation'])
@@ -103,7 +103,7 @@ This includes the list of operators that were used and additional profiling info
 The plan is available under the property `ResultSummary.profile`.
 Notice that the query is also _run_, so the result object also contains any result records.
 
-[source, python, role=nocollapse]
+[source, python]
 ----
 records, summary, _ = driver.execute_query("PROFILE MATCH (p {name: $name}) RETURN p", name="Alice")
 print(summary.profile['args']['string-representation'])
@@ -148,7 +148,7 @@ These are GQL-compliant status objects.
 Some (but not all) `GqlStatusObjects` are notifications, whereas some report an _outcome_ status: `00000` for "success", `02000` for "no data", and `00001` for "omitted result".
 `ResultSummary.gql_status_objects` always contains at least one entry, containing the outcome status.
 
-[source, python, role=nocollapse]
+[source, python]
 ----
 records, summary, keys = driver.execute_query("""
     MATCH p=shortestPath((:Person {name: 'Alice'})-[*]->(:Person {name: 'Bob'}))
@@ -205,7 +205,7 @@ label:deprecated[]
 
 The property `ResultSummary.summary_notifications` contains a list of link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.SummaryNotification[`SummaryNotification`] objects.
 
-[source, python, role=nocollapse]
+[source, python]
 ----
 records, summary, keys = driver.execute_query("""
     MATCH p=shortestPath((:Person {name: 'Alice'})-[*]->(:Person {name: 'Bob'}))
