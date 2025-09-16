@@ -80,7 +80,7 @@ The type xref:data-types.adoc#unknown[`UNKNOWN`] will be returned for objects co
 
 Deprecated features are likely to be removed in the next major version.
 
-[cols="1,5a,1,1"]
+[cols="1,5a,1"]
 |===
 |Version |Message |Status
 
@@ -99,8 +99,8 @@ Through the new methods, the first argument of transaction functions is a `Manag
 |label:removed[]
 
 |6.0
-|link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/temporal-types.js~Date.html#instance-method-toStandardDate[`Date.toStandardDate()`] is deprecated due to the unclear handling of timezones. `Date.toStandardDateLocal()` is a drop in replacement, but `Date.toStandardDateUTC()` may be more desireable to some users.
-|label:deprecated[]
+|Method `Neo4jError.isRetriable()` has been removed in favor of `Neo4jError.isRetryable()`.
+|label:removed[]
 
 |5.0
 |link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/graph-types.js~Node.html[`Node`], link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/graph-types.js~Relationship.html[`Relationship`] -- Property `.identity` (NumberOrInteger) is deprecated in favor of `.elementId` (String).
@@ -111,7 +111,11 @@ Through the new methods, the first argument of transaction functions is a `Manag
 |label:deprecated[]
 
 |6.0
-|link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/result-summary.js~ResultSummary.html[`ResultSummary`] -- Property `.notifications` is deprecated in favor of `.gqlStatusObjects`. The replacement contains GQL-complaint statuses (link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/notification.js~GqlStatusObject.html[`GqlStatusObject`]), which are a superset of the old notifications.
+|link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/temporal-types.js~Date.html#instance-method-toStandardDate[`Date.toStandardDate()`] is deprecated due to the unclear handling of timezones. `Date.toStandardDateLocal()` is a drop in replacement, but `Date.toStandardDateUTC()` may be more desireable to some users.
+|label:deprecated[]
+
+|6.0
+|xref:result-summary.adoc#_notifications[Notifications] as Neo4j status codes are deprecated in favor of GQL status objects.
 |label:deprecated[]
 
 |6.0

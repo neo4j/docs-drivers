@@ -144,7 +144,7 @@ For those rare use cases, see xref:query-advanced#_dynamic_values_in_property_ke
 
 A query run may fail for a number of reasons.
 
-When using `driver.execute_query()`, the driver automatically retries to run a failed query if the failure is deemed to be transient (for example due to temporary server unavailability).
+When using `Driver.executeQuery()`, the driver automatically retries to run a failed query if the failure is deemed to be transient (for example due to temporary server unavailability).
 An error will be raised if the operation keeps failing after the configured link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/types.js~Config.html#instance-member-maxTransactionRetryTime[maximum retry time].
 
 All link:https://neo4j.com/docs/status-codes/current/errors/all-errors/[errors coming from the server] are subclasses of link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/error.js~Neo4jError.html[`Neo4jError`].

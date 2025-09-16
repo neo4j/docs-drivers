@@ -213,6 +213,8 @@ console.log(summary.gqlStatusObjects)
 
 [.include-with-neo4j-status-code]
 ======
+label:deprecated[Deprecated in 6.0]
+
 The property `ResultSummary.notifications` contains a list of link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/notification.js~Notification.html[`Notification`] objects.
 
 [source, javascript]

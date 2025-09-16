@@ -176,7 +176,7 @@ If possible, try to group queries within a single transaction, or within a singl
 
 == Mix `.executeQuery()` and sessions
 
-To ensure causal consistency among transactions executed partly with `.executeQuery()` and partly with sessions, create the session with `bookmarkManager=driver.executeQueryBookmarkManager`.
+To ensure causal consistency among transactions executed partly with `.executeQuery()` and partly with sessions, create the session with the option `bookmarkManager` and set it to `driver.executeQueryBookmarkManager`.
 Since that is the default bookmark manager for `.executeQuery()` calls, this will ensure that all work is executed under the same bookmark manager and thus causally consistent.
 
 [source, javascript]

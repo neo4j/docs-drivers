@@ -201,7 +201,7 @@ Diagnostic record: {'_classification': 'PERFORMANCE', '_status_parameters': {'pa
 
 [.include-with-neo4j-status-code]
 ======
-label:deprecated[]
+label:deprecated[Deprecated in 6.0]
 
 The property `ResultSummary.summary_notifications` contains a list of link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.SummaryNotification[`SummaryNotification`] objects.
 
