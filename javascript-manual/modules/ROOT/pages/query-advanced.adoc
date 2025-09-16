@@ -96,7 +96,7 @@ let dangerousKey = 'name\\u0060'
 let escapedKey = dangerousKey.replace(/\\u0060/g, '`').replace(/`/g, '``')
 
 let result = await driver.executeQuery(
-  'MATCH (p:Person {`' + escapedLabel + '`: $name}) RETURN p.name',
+  'MATCH (p:Person {`' + escapedKey + '`: $name}) RETURN p.name',
   { name: 'Alice' },
   {database: '<database-name>'}
 )

@@ -153,7 +153,8 @@ You can use an exception's code to stably identify a specific error; error messa
 .Basic error handling
 [source, javascript, role=nocollapse]
 ----
-let err = await driver.executeQuery(
+try {
+  let err = await driver.executeQuery(
     'MATCH (p:Person) RETURN ',
     {},
     { database: 'neo4j' }
@@ -180,7 +181,8 @@ In the example below, the error's GQL status code is `42001`, but the actual sou
 .Usage of `Neo4jError` with GQL-related methods
 [source, javascript]
 ----
-let err = await driver.executeQuery(
+try {
+  let err = await driver.executeQuery(
     'MATCH (p:Person) RETURN ',
     {},
     { database: 'neo4j' }
@@ -216,7 +218,8 @@ GQL status codes are particularly helpful when you want your application to beha
 .Distinguishing between different error codes
 [source, javascript]
 ----
-let err = await driver.executeQuery(
+try {
+  let err = await driver.executeQuery(
     'MATCH (p:Person) RETURN ',
     {},
     { database: 'neo4j' }

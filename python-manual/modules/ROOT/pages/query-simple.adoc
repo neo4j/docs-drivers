@@ -168,7 +168,7 @@ All exceptions coming from the server are subclasses of link:https://neo4j.com/d
 You can use an exception's code to stably identify a specific error; error messages are instead not stable markers, and should not be relied upon.
 
 .Basic error handling
-[source, python, role=nocollapse]
+[source, python]
 ----
 # from neo4j.exceptions import Neo4jError
 

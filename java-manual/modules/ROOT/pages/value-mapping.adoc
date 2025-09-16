@@ -31,7 +31,7 @@ public class App {
     private static final String dbPassword = "<password>";
 
     public static void main(String... args) {
-        try (var driver = GraphDatabase.driver(URI, AuthTokens.basic(USER, PASSWORD))) {
+        try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword))) {
             record Person(String name, Integer age) {}
             var persons = driver.executableQuery("MERGE (p:Person {name: 'Margarida', age: 29}) RETURN p")
                 .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
