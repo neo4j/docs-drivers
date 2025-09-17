@@ -169,7 +169,7 @@ driver.executableQuery("CREATE (:Person $person)")
 var happyBirthday = new Person("Lucia", 30);
 driver.executableQuery("""
             MATCH (p:Person {name: $person.name})
-            SET person += $person
+            SET p += $person
             """)
     .withParameters(Map.of("person", happyBirthday))
     .execute();
