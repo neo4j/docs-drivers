@@ -7,5 +7,6 @@ nav:
 asciidoc:
   attributes:
     dotnet-driver-version: '5.28' # the version of the package published
+    dotnet-driver-version-minor: '5.28.3' # the version of the package published at https://www.nuget.org/packages/Neo4j.Driver
     common-partial: 5@common-content:ROOT:partial$
     common-image: 5@common-content:ROOT:image$
