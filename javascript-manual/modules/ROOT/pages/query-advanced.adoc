@@ -104,7 +104,7 @@ console.log(`Executed query: ${result.summary.query.text}`)
 // MATCH (p:Person {`name```: $name}) RETURN p.name
 ----
 
-Another workaround, to avoid string concatenation is to use <<APOC>> procedures, such as link:{neo4j-docs-base-uri}/apoc/current/overview/apoc.merge/apoc.merge.node/[`apoc.merge.node`], which supports dynamic labels and property keys.
+Another workaround to avoid string concatenation is to use <<APOC>> procedures, such as link:{neo4j-docs-base-uri}/apoc/current/overview/apoc.merge/apoc.merge.node/[`apoc.merge.node`], which supports dynamic labels and property keys.
 
 .Using `apoc.merge.node` to create a node with dynamic labels/property keys
 [source, javascript]

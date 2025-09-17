@@ -155,7 +155,6 @@ There can be circumstances where your query structure prevents the usage of para
 For those rare use cases, see xref:query-advanced#_dynamic_values_in_property_keys_relationship_types_and_labels[Dynamic values in property keys, relationship types, and labels].
 
 
-
 [#error-handling]
 == Error handling
 
@@ -173,7 +172,7 @@ You can use an exception's code to stably identify a specific error; error messa
 # from neo4j.exceptions import Neo4jError
 
 try:
-    driver.execute_query('MATCH (p:Person) RETURN', database_='neo4j')
+    driver.execute_query('MATCH (p:Person) RETURN', database_='<database-name>')
 except Neo4jError as e:
     print('Neo4j error code:', e.code)
     print('Exception message:', e.message)
@@ -198,7 +197,7 @@ In the example below, the exception's GQL status code is `42001`, but the actual
 # from neo4j.exceptions import Neo4jError
 
 try:
-    driver.execute_query('MATCH (p:Person) RETURN', database_='neo4j')
+    driver.execute_query('MATCH (p:Person) RETURN', database_='<database-name>')
 except Neo4jError as e:
     print('Exception GQL status:', e.gql_status)
     print('Exception GQL status description:', e.gql_status_description)
@@ -222,7 +221,7 @@ GQL status codes are particularly helpful when you want your application to beha
 # from neo4j.exceptions import Neo4jError
 
 try:
-    driver.execute_query('MATCH (p:Person) RETURN', database_='neo4j')
+    driver.execute_query('MATCH (p:Person) RETURN', database_='<database-name>')
 except Neo4jError as e:
     if e.find_by_gql_status('42001'):
         # Neo.ClientError.Statement.SyntaxError
