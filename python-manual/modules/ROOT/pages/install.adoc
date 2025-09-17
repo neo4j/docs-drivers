@@ -29,7 +29,7 @@ For the driver, this results in:
 ====
 
 [TIP]
-The link:https://github.com/neo4j-drivers/neo4j-python-driver-rust-ext[Rust extension to the Python driver] is an alternative driver package that yields a 3x to 10x speedup compared to the regular driver.
+The link:https://github.com/neo4j-drivers/neo4j-python-driver-rust-ext[Rust extension to the Python driver] is an alternative driver package that yields a link:https://medium.com/neo4j/neo4j-python-driver-10x-faster-with-rust-7059c56e8674[3x to 10x speedup] compared to the regular driver.
 You can install it with `pip install neo4j-rust-ext`, either alongside the `neo4j` package or as a replacement to it.
 Usage-wise, the drivers are identical: everything in this guide applies to both packages.
 
