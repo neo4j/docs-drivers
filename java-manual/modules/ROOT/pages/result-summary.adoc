@@ -260,6 +260,30 @@ var session = driver.session(
 );
 ----
 
+.Disable all notifications
+[source, java]
+----
+// import org.neo4j.driver.Config;
+// import org.neo4j.driver.NotificationSeverity;
+// import org.neo4j.driver.SessionConfig;
+
+// at `Driver` level
+var driver = GraphDatabase.driver(
+    dbUri, AuthTokens.basic(dbUser, dbPassword),
+    Config.builder()
+    .withMinimumNotificationSeverity(NotificationSeverity.OFF)
+    .build()
+);
+
+// at `Session` level
+var session = driver.session(
+    SessionConfig.builder()
+    .withDatabase("<database-name>")
+    .withMinimumNotificationSeverity(NotificationSeverity.OFF)
+    .build()
+);
+----
+
 .Notifications filtering on versions earlier than 5.22
 [%collapsible]
 ====
