@@ -11,11 +11,11 @@ For supported versions of the .NET Framework, see the link:https://dotnet.micros
 == Install the driver
 
 If you already have a .NET project, you can add the package link:https://www.nuget.org/packages/Neo4j.Driver[Neo4j.Driver] as a dependency.
-For example, with the .NET CLI,
 
-[source, bash]
+.Add the driver to a project with the .NET CLI
+[source, bash, subs="attributes+"]
 ----
-dotnet add package Neo4j.Driver
+dotnet add package Neo4j.Driver --version {dotnet-driver-version-minor}
 ----
 
 .How to create a .NET project for a Neo4j .NET application?
@@ -23,11 +23,11 @@ dotnet add package Neo4j.Driver
 ====
 To create a new project and add the Neo4j driver to it, assuming the .NET CLI is installed:
 
-[source, bash]
+[source, bash, subs="attributes+"]
 ----
 mkdir dotnet-neo4j && cd dotnet-neo4j
 dotnet new console
-dotnet install package Neo4j.Driver
+dotnet install package Neo4j.Driver --version {dotnet-driver-version-minor}
 ----
 
 To compile and run, use `dotnet run`.
