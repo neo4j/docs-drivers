@@ -1,3 +1,4 @@
 name: common-content
 title: Neo4j Driver Manuals Common content
-version: '5'
+version: '6'
+prerelease: true

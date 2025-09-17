@@ -9,7 +9,7 @@ Use `npm` to install the link:https://www.npmjs.com/package/neo4j-driver[Neo4j J
 
 [source,bash]
 ----
-npm i neo4j-driver
+npm i neo4j-driver@~6.0.0a1
 ----
 
 The latest version of the driver is guaranteed to work with all <<LTS>> releases of the Neo4j server, as well as with the current and next major releases.
