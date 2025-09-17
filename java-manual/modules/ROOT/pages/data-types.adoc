@@ -2,14 +2,14 @@
 
 The tables in this section show the mapping between Cypher data types and Java types.
 
-Regardless of their type, all values in query results are embedded within link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/Value.html[`Value`] objects.
+Regardless of their type, all values in query results are embedded within link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Value.html[`Value`] objects.
 To extract and cast them to the corresponding Java types, use `.as<type>()` (eg. `.asString()`, `asInt()`, etc).
 For example, if the `name` property coming from the database is a string, `record.get("name").asString()` will yield the property value as a `String` object.
 
 On the other hand, you don't need to use the driver types when submitting query parameters.
 The driver will automatically serialize objects of native Java types passed as parameters.
 
-For a complete list of the value types the driver serializes data into, see the link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/internal/value/package-summary.html[API documentation].
+For a complete list of the value types the driver serializes data into, see the link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/package-summary.html[API documentation].
 
 
 == Core types
@@ -17,14 +17,14 @@ For a complete list of the value types the driver serializes data into, see the 
 |===
 | Cypher type   | Driver type
 
-| <<NULL>>      | link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/internal/value/NullValue.html[`NullValue`]
-| `LIST`        | link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/internal/value/ListValue.html[`ListValue`]
-| `MAP`         | link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/internal/value/MapValue.html[`MapValue`]
-| `BOOLEAN`     | link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/internal/value/BooleanValue.html[`BooleanValue`]
-| `INTEGER`     | link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/internal/value/IntegerValue.html[`IntegerValue`]
-| `FLOAT`       | link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/internal/value/FloatValue.html[`FloatValue`]
-| `STRING`      | link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/internal/value/StringValue.html[`StringValue`]
-| `ByteArray`   | link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/internal/value/BytesValue.html[`BytesValue`]
+| <<NULL>>      | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/NullValue.html[`NullValue`]
+| `LIST`        | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/ListValue.html[`ListValue`]
+| `MAP`         | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/MapValue.html[`MapValue`]
+| `BOOLEAN`     | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/BooleanValue.html[`BooleanValue`]
+| `INTEGER`     | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/IntegerValue.html[`IntegerValue`]
+| `FLOAT`       | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/FloatValue.html[`FloatValue`]
+| `STRING`      | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/StringValue.html[`StringValue`]
+| `ByteArray`   | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/BytesValue.html[`BytesValue`]
 |===
 
 
@@ -34,7 +34,7 @@ The driver provides a set of temporal data types compliant with ISO-8601 and Cyp
 Sub-second values are measured to nanosecond precision.
 
 The driver's types rely on Java's link:https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/package-summary.html[`time`] types.
-All temporal types, except link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/internal/value/DurationValue.html[`DurationValue`], are in fact `java.time` objects under the hood.
+All temporal types, except link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/DurationValue.html[`DurationValue`], are in fact `java.time` objects under the hood.
 This means that:
 
 - if you want to _query_ the database with a temporal type, instantiate a `java.time` object and use it as query parameter (i.e. you don't need to care about driver's types).
@@ -43,12 +43,12 @@ This means that:
 |===
 | Cypher type      | Driver type
 
-| `DATE`           | link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/internal/value/DateValue.html[`DateValue`]
-| `ZONED TIME`     | link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/internal/value/TimeValue.html[`TimeValue`]
-| `LOCAL TIME`     | link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/internal/value/LocalTimeValue.html[`LocalTimeValue`]
-| `ZONED DATETIME` | link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/internal/value/DateTimeValue.html[`DateTimeValue`]
-| `LOCAL DATETIME` | link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/internal/value/LocalDateTimeValue.html[`LocalDateTimeValue`]
-| `DURATION`       | link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/internal/value/DurationValue.html[`DurationValue`]
+| `DATE`           | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/DateValue.html[`DateValue`]
+| `ZONED TIME`     | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/TimeValue.html[`TimeValue`]
+| `LOCAL TIME`     | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/LocalTimeValue.html[`LocalTimeValue`]
+| `ZONED DATETIME` | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/DateTimeValue.html[`DateTimeValue`]
+| `LOCAL DATETIME` | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/LocalDateTimeValue.html[`LocalDateTimeValue`]
+| `DURATION`       | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/DurationValue.html[`DurationValue`]
 
 |===
 
@@ -112,7 +112,7 @@ var duration = Values.isoDuration(1, 2, 3, 4);  // months, days, seconds, nanose
 System.out.println(duration);  // P1M2DT3.000000004S
 ----
 
-For full documentation, see link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/internal/value/DurationValue.html[API documentation -> DurationValue].
+For full documentation, see link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/DurationValue.html[API documentation -> DurationValue].
 
 
 == Spatial types
@@ -132,8 +132,8 @@ You can think of it as a unique identifier for each spatial type.
 
 |===
 
-You create a point value through link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/Values.html#point(int,double,double)[`Values.point(srid, x, y[, z\])`] (the third coordinate is optional).
-Points returned from database queries are of type link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/internal/value/PointValue.html[`PointValue`], and can be converted to link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/types/Point.html[`Point`] objects through the method `.asPoint()`.
+You create a point value through link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Values.html#point(int,double,double)[`Values.point(srid, x, y[, z\])`] (the third coordinate is optional).
+Points returned from database queries are of type link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/PointValue.html[`PointValue`], and can be converted to link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/types/Point.html[`Point`] objects through the method `.asPoint()`.
 
 .Receive a `Point` value from the database
 [source, java]
@@ -213,9 +213,9 @@ public class App {
 |===
 | Cypher Type    | Driver type
 
-| `NODE`         | link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/internal/value/NodeValue.html[`NodeValue`]
-| `RELATIONSHIP` | link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/internal/value/RelationshipValue.html[`RelationshipValue`]
-| `PATH`         | link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/internal/value/NodeValue.html[`PathValue`]
+| `NODE`         | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/NodeValue.html[`NodeValue`]
+| `RELATIONSHIP` | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/RelationshipValue.html[`RelationshipValue`]
+| `PATH`         | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/NodeValue.html[`PathValue`]
 
 |===
 
@@ -290,7 +290,7 @@ public class App {
 }
 ----
 
-For full documentation, see link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/internal/value/NodeValue.html[API documentation -> NodeValue].
+For full documentation, see link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/NodeValue.html[API documentation -> NodeValue].
 
 
 === RelationshipValue
@@ -378,7 +378,7 @@ public class App {
 }
 ----
 
-For full documentation, see link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/internal/value/RelationshipValue.html[API documentation -> RelationshipValue].
+For full documentation, see link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/RelationshipValue.html[API documentation -> RelationshipValue].
 
 
 === PathValue
@@ -458,7 +458,7 @@ public class App {
 }
 ----
 
-For full documentation, see link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/internal/value/PathValue.html[API documentation -> PathValue].
+For full documentation, see link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/PathValue.html[API documentation -> PathValue].
 
 
 ifndef::backend-pdf[]
