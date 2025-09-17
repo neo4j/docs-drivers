@@ -16,7 +16,7 @@ Add the Neo4j .NET driver to your project:
 
 [source, bash, copy=true]
 ----
-dotnet add package Neo4j.Driver
+dotnet add package Neo4j.Driver --version {dotnet-driver-version-minor}
 ----
 
 The driver supports the .NET Standard 2.0.
