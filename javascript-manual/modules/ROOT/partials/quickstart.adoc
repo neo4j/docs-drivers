@@ -1,13 +1,13 @@
 // This doc is also sourced in the Aura Developer Hub.
-// Because of that, cross-links are absolute and
-// source blocks have copy=true .
+// Because of that, cross-links are absolute,
+// source blocks have copy=true , and Antora attributes
+// (version) are explicitly resolved.
 
-The Neo4j JavaScript driver is the official library to interact with a Neo4j instance through a JavaScript application.
+The Neo4j Javascript driver is the official library to interact with a Neo4j instance through a Javascript application.
 
 At the hearth of Neo4j lies <<Cypher>>, the query language to interact with a Neo4j database.
-While this guide does not _require_ you to be a seasoned Cypher querier, it is going to be easier to focus on the JavaScript-specific bits if you already know some Cypher.
-For this reason, although this guide does _also_ provide a gentle introduction to Cypher along the way, consider checking out link:https://neo4j.com/docs/getting-started/cypher/[Getting started -> Cypher] for a more detailed walkthrough of graph databases modelling and querying if this is your first approach.
-You may then apply that knowledge while following this guide to develop your JavaScript application.
+Although this guide does not _require_ you to be a seasoned Cypher querier, it's easier to focus on the Javascript-specific bits if you know some Cypher already.
+You will also get a _gentle_ introduction to Cypher in these pages, but check out link:https://neo4j.com/docs/getting-started/cypher/[Getting started -> Cypher] for a more detailed walkthrough of graph databases modelling and querying if this is your first approach.
 
 
 [#install]
