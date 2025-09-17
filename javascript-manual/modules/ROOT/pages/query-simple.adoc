@@ -225,16 +225,16 @@ try {
     { database: 'neo4j' }
   )
 } catch (err) {
-    if hasGqlStatus(err, '42001') {
-        # Neo.ClientError.Statement.SyntaxError
-        # special handling of syntax error in query
+    if (err.findByGqlStatus('42001')) {
+        // Neo.ClientError.Statement.SyntaxError
+        // special handling of syntax error in query
         console.log(err.message)
-    } else if hasGqlStatus(err, '42NFF') {
-        # Neo.ClientError.Security.Forbidden
-        # special handling of user not having CREATE permissions
+    } else if (err.findByGqlStatus('42NFF')) {
+        // Neo.ClientError.Security.Forbidden
+        // special handling of user not having CREATE permissions
         console.log(err.message)
     } else {
-        # handling of all other errors
+        // handling of all other errors
         console.log(err.message)
     }
 }
