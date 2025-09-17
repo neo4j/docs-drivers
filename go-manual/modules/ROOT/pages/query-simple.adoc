@@ -198,7 +198,7 @@ You can use an exception's code to stably identify a specific error; error messa
 .Basic error handling
 [source, go, role=nocollapse]
 ----
-_, err := neo4j.ExecuteQuery(ctx, driver, "MATCH (p:Person) RETURN", nil,
+result, err := neo4j.ExecuteQuery(ctx, driver, "MATCH (p:Person) RETURN", nil,
     neo4j.EagerResultTransformer,
     neo4j.ExecuteQueryWithDatabase("neo4j"))
 if err != nil {
