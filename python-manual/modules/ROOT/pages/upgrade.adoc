@@ -115,7 +115,6 @@ Call `driver.close()` explicitly or create the driver via a `with` statement.
 - `Driver.session()` no longer accepts raw string bookmarks as bookmarks argument. Use a `neo4j.Bookmarks` object instead.
 |label:removed[]
 
-
 |6.0
 |*Imports*
 
@@ -168,6 +167,10 @@ This also affects link:https://neo4j.com/docs/api/python-driver/current/api.html
 |6.0
 |Passing raw sting bookmarks as `initial_bookmarks` to `GraphDatabase.bookmark_manager()` is deprecated.
 Use a `neo4j.Bookmarks` object instead.
+|label:deprecated[]
+
+|6.0
+|xref:result-summary.adoc#_filter_notifications[Filtering notifications] via `notifications_disabled_categories` is deprecated in favor of `notifications_disabled_classifications`.
 |label:deprecated[]
 
 |===

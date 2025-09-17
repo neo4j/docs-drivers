@@ -126,4 +126,8 @@ Through the new methods, the first argument of transaction functions is a `Manag
 |Result transformers `.eagerResultsTransformer()` and `.mappedResultsTransformer()` are deprecated in favor of link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/result-transformers.js~ResultTransformers.html#instance-method-eager[`.eager()`] and link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/result-transformers.js~ResultTransformers.html#instance-method-mapped[`.mapped()`].
 |label:deprecated[]
 
+|6.0
+|xref:result-summary.adoc#_filter_notifications[Filtering notifications] via `disabledClassifications` is deprecated in favor of `disabledClassifications`.
+|label:deprecated[]
+
 |===
