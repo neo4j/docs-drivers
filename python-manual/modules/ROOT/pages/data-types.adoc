@@ -420,35 +420,50 @@ with neo4j.GraphDatabase.driver(URI, auth=AUTH) as driver:
 ----
 
 
+[role=label--new-6.0]
 [#vector]
 == Vector type
 
-The driver type link:https://neo4j.com/docs/api/python-driver/current/types/vector.html#neo4j.vector.Vector[`Vector`] maps to the Cypher type link:https://neo4j.com/docs/cypher-manual/current/values-and-types/vector/[`VECTOR`].
+The type link:https://neo4j.com/docs/api/python-driver/current/types/vector.html#neo4j.vector.Vector[`Vector`] maps to the Cypher type link:https://neo4j.com/docs/cypher-manual/current/values-and-types/vector/[`VECTOR`].
 `Vector` objects are stored as contiguous blocks of memory (`bytes`), containing homogeneous values encoded in big-endian order.
+
 You can create a `Vector` from various data types.
 
 .Some examples of valid `Vector` invocations
 [source, python]
 ----
-Vector([1, 2, 3], "i8")
-Vector(b"\x00\x01\x00\x02", VectorDType.I16)
-Vector(b"\x01\x00\x02\x00", "i16", byteorder="little")
-Vector(numpy.array([1, 2, 3]))
-Vector(pyarrow.array([1, 2, 3]))
+Vector([1, 2, 3], "i8")  # <.>
+Vector(b"\x00\x01\x00\x02", "i16")  # <.>
+Vector(b"\x01\x00\x02\x00", "i16", byteorder="little")  # <.>
+Vector(numpy.array([1, 2, 3]))  # <.>
+Vector(pyarrow.array([1, 2, 3]))  # <.>
 ----
+
+<.> An iterable of floats/ints, and the type (link:https://neo4j.com/docs/api/python-driver/current/types/vector.html#neo4j.vector.VectorDType[`VectorDType`]) of the individual entries. +
+Supported types are:
+- `f32`: 32-bit floating point number (single)
+- `f64`: 64-bit floating point number (double)
+- `i8`: 8-bit integer
+- `i16`: 16-bit integer
+- `i32`: 32-bit integer
+- `i64`: 64-bit integer
+<.> Raw bytes, and the type (link:https://neo4j.com/docs/api/python-driver/current/types/vector.html#neo4j.vector.VectorDType[`VectorDType`]) to parse the bytes with.
+<.> When providing raw bytes, `byteorder` is optional and defaults to `"big"`.
+<.> A `numpy.ndarray`. No further parameters are accepted, and entries are parsed as `xx`.
+<.> A `pyarrow.Array`. No further parameters are accepted, and entries are parsed as `xx`.
 
 .Create and store a vector
 [source, python]
 ----
 from neo4j.vector import Vector
 
-# Create a vector (raw big-endian byte buffer by default)
+# Create a vector (parsing bytes as big-endian by default)
 v = Vector(b"\x00\x01\x02\x03", "i16")
 # or (less performant, but friendlier)
-v = Vector.from_native([1, 513], "i16")
+v = Vector([1, 513], "i16")
 
 # Store the vector as a node property
-driver.execute_query("CREATE (d:Doc {embedding: $vector})", vector=v)
+driver.execute_query("MERGE (d:Doc {embedding: $vector})", vector=v)
 ----
 
 .Retrieve and work with a vector
@@ -470,10 +485,12 @@ print("as numpy array:", v.to_numpy())
 ----
 
 
+[role=label--new-6.0]
 [#unsupportedtype]
 == UnsupportedType
 
-The type link:[`UnsupportedType`] is used for data types that the driver doesn't know about, most likely because the client version is too old with respect to the server version.
+The type link:[`UnsupportedType`] is used for data types returned by Cypher queries, but that the driver doesn't recognize.
+This happens when the client version is too old with respect to the server version.
 
 
 
