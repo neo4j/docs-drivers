@@ -53,9 +53,11 @@ To use reactive features, you need to add the relevant dependencies to your proj
 </dependency>
 ----
 
+
 == Reactive query examples
 
 The basic driver's concepts are the same as the synchronous case, but queries are run through a link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/reactivestreams/ReactiveSession.html[`ReactiveSession`], and the objects related to querying have a reactive counterpart and prefix.
+
 
 === Managed transaction with reactive sessions
 

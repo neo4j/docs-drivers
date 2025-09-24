@@ -449,8 +449,8 @@ Supported types are:
 - `i64`: 64-bit integer
 <.> Raw bytes, and the type (link:https://neo4j.com/docs/api/python-driver/current/types/vector.html#neo4j.vector.VectorDType[`VectorDType`]) to parse the bytes with.
 <.> When providing raw bytes, `byteorder` is optional and defaults to `"big"`.
-<.> A `numpy.ndarray`. No further parameters are accepted, and entries are parsed as `xx`.
-<.> A `pyarrow.Array`. No further parameters are accepted, and entries are parsed as `xx`.
+<.> A `numpy.ndarray`. No further parameters are accepted, and the `VectorDType` is inferred from the input.
+<.> A `pyarrow.Array`. No further parameters are accepted, and the `VectorDType` is inferred from the input.
 
 .Create and store a vector
 [source, python]
