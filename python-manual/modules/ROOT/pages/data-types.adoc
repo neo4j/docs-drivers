@@ -466,6 +466,9 @@ v = Vector([1, 513], "i16")
 driver.execute_query("MERGE (d:Doc {embedding: $vector})", vector=v)
 ----
 
+[IMPORTANT]
+Storing `VECTOR` objects in the database requires a server version >= 2025.10.
+
 .Retrieve and work with a vector
 [source, python]
 ----
