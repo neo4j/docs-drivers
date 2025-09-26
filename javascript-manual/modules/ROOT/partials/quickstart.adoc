@@ -17,7 +17,7 @@ Install the Neo4j Javascript driver with `npm`:
 
 [source, bash, copy=true]
 ----
-npm i neo4j-driver@~6.0.0a1
+npm i neo4j-driver
 ----
 
 link:https://neo4j.com/docs/javascript-manual/current/install/[More info on installing the driver]
