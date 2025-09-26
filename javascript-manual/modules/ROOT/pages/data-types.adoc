@@ -506,6 +506,10 @@ var retrievedTypedArray = neo4jVector.asTypedArray()
 var retrievedArray = Array.from(retrievedTypedArray)
 ----
 
+[NOTE]
+Whereas regular Javascript arrays are capped at 200 elements when stringified, the `Vector` type always shows all elements.
+Logging `Vector` objects risks clogging the log or resulting in Out of Memory errors.
+
 
 [role=label--new-6.0]
 [#unsupportedtype]

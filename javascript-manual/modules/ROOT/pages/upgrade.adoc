@@ -62,13 +62,6 @@ npm update neo4j-driver@5.27
 The type xref:data-types.adoc#vector[`Vector`] allows for storing and retrieving Cypher Vector objects stored in the database.
 ====
 |
-|
-.New type `UNKNOWN`
-[%collapsible]
-====
-The type xref:data-types.adoc#unknown[`UNKNOWN`] will be returned for objects coming from the server, when the driver doesn't recognize the type.
-====
-|
 .GQL status objects in errors
 [%collapsible]
 ====
