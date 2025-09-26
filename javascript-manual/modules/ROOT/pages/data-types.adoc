@@ -466,6 +466,55 @@ async function addFriend(driver, name, status, friendName) {
 For full documentation, see link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/graph-types.js~Path.html[API documentation -- Path] and link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/graph-types.js~PathSegment.html[PathSegment].
 
 
+[role=label--new-6.0]
+[#vector]
+== Vector type
+
+The type link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/vector.js~Vector.html[`Vector`] maps to the Cypher type link:https://neo4j.com/docs/cypher-manual/current/values-and-types/vector/[`VECTOR`].
+`Vector` objects are stored as contiguous blocks of memory containing homogeneous values.
+
+The `vector` constructor takes a Javascript link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray[`TypedArray`].
+Supported `TypedArray` objects are: `Int8Array`, `Int16Array`, `Int32Array`, `Int64Array`, `Float32Array`, `Float64Array`.
+
+.Create and store a vector
+[source, javascript]
+----
+// Create a vector
+var typedArray = Float32Array.from([1, 2, 3])
+var neo4jVector = neo4j.vector(typedArray)  // <.>
+
+// Store the vector as a node property
+driver.executeQuery('MERGE (d:Doc {embedding: $vector})', { vector: neo4jVector })
+----
+
+.Retrieve and work with a vector
+[source, javascript]
+----
+// Retrieve a vector
+var { records } = driver.executeQuery(
+  "MATCH (d:Doc) RETURN d.embedding AS v LIMIT 1"
+)
+var neo4jVector = records[0].get("v")
+
+console.log(neo4jVector.toString())
+// vector([1, 2, 3], 3, FLOAT32 NOT NULL)
+
+// Get a TypedArray of the same type as the Vector
+var retrievedTypedArray = neo4jVector.asTypedArray()
+
+// Convert the TypedArray into a regular array of Numbers (not safe for Int64 arrays)
+var retrievedArray = Array.from(retrievedTypedArray)
+----
+
+
+[role=label--new-6.0]
+[#unsupportedtype]
+== UnsupportedType
+
+The type link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/unsupported-type.js~UnsupportedType.html[`UnsupportedType`] is used for data types returned by Cypher queries, but that the driver doesn't recognize.
+This happens when the client version is too old with respect to the server version.
+
+
 ifndef::backend-pdf[]
 [discrete.glossary]
 == Glossary

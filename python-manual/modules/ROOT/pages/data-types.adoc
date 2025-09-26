@@ -489,7 +489,7 @@ print("as numpy array:", v.to_numpy())
 [#unsupportedtype]
 == UnsupportedType
 
-The type link:[`UnsupportedType`] is used for data types returned by Cypher queries, but that the driver doesn't recognize.
+The type link:https://neo4j.com/docs/api/python-driver/current/types/other.html#neo4j.types.UnsupportedType[`UnsupportedType`] is used for data types returned by Cypher queries, but that the driver doesn't recognize.
 This happens when the client version is too old with respect to the server version.
 
 
