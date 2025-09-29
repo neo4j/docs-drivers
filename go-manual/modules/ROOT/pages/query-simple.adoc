@@ -189,18 +189,17 @@ For those rare use cases, see xref:query-advanced#_dynamic_values_in_property_ke
 
 A query run may fail for a number of reasons.
 When using `ExecuteQuery()`, the driver automatically retries to run a failed query if the failure is deemed to be transient (for example due to temporary server unavailability).
+An error will be raised if the operation keeps failing after the configured link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/config#Config.MaxTransactionRetryTime[maximum retry time].
 
-An error is raised if the operation keeps failing after a number of attempts.
-
-All errors coming from the server are of type link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#Neo4jError[`Neo4jError`].
-You can use an exception's code to stably identify a specific error; error messages are instead not stable markers, and should not be relied upon.
+All link:https://neo4j.com/docs/status-codes/current/errors/all-errors/[errors coming from the server] are of type link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#Neo4jError[`Neo4jError`].
+You can use an error's code to stably identify a specific error; error messages are instead not stable markers, and should not be relied upon.
 
 .Basic error handling
-[source, go, role=nocollapse]
+[source, go]
 ----
-result, err := neo4j.ExecuteQuery(ctx, driver, "MATCH (p:Person) RETURN", nil,
+res, err := neo4j.ExecuteQuery(ctx, driver, "MATCH (p:Person) RETURN", nil,
     neo4j.EagerResultTransformer,
-    neo4j.ExecuteQueryWithDatabase("neo4j"))
+    neo4j.ExecuteQueryWithDatabase("<database-name>"))
 if err != nil {
     var neo4jErr *neo4j.Neo4jError
     if errors.As(err, &neo4jErr) {
@@ -218,86 +217,6 @@ Error message: Invalid input '': expected an expression, '*', 'ALL' or 'DISTINCT
                         ^
 */
 ----
-
-Exception objects also expose errors as GQL-status objects.
-The main difference between link:https://neo4j.com/docs/status-codes/current/errors/all-errors/[Neo4j error codes] and link:https://neo4j.com/docs/status-codes/current/errors/gql-errors/[GQL error codes] is that the GQL ones are more granular: a single Neo4j error code might be broken in several, more specific GQL error codes.
-
-The actual _cause_ that triggered an exception is sometimes found in the optional GQL-status object `.GqlCause`, which is itself a `Neo4jError`.
-You might need to recursively traverse the cause chain before reaching the root cause of the exception you caught.
-In the example below, the exception's GQL status code is `42001`, but the actual source of the error has status code `42I06`.
-
-.Usage of `Neo4jError` with GQL-related methods
-[source, go]
-----
-result, err := neo4j.ExecuteQuery(ctx, driver, "MATCH (p:Person) RETURN", nil,
-    neo4j.EagerResultTransformer,
-    neo4j.ExecuteQueryWithDatabase("neo4j"))
-if err != nil {
-    var neo4jErr *neo4j.Neo4jError
-    if errors.As(err, &neo4jErr) {
-        // Error is of type Neo4jError
-        fmt.Println("Error GQL status code:", neo4jErr.GqlStatus)
-        fmt.Println("Error GQL status description:", neo4jErr.GqlStatusDescription)
-        fmt.Println("Error GQL classification:", neo4jErr.GqlClassification)
-        if neo4jErr.GqlDiagnosticRecord != nil {
-            fmt.Printf("Error GQL diagnostic record: %+v\n", neo4jErr.GqlDiagnosticRecord)
-        }
-        if neo4jErr.GqlCause != nil {
-            fmt.Println("Error GQL cause:", neo4jErr.GqlCause.Error())
-        }
-    } else {
-        fmt.Println("Non-Neo4j error:", err.Error())
-    }
-}
-/*
-Error GQL status code: 42001
-Error GQL status description: error: syntax error or access rule violation - invalid syntax
-Error GQL classification: CLIENT_ERROR
-Error GQL diagnostic record: map[CURRENT_SCHEMA:/ OPERATION: OPERATION_CODE:0 _classification:CLIENT_ERROR _position:map[column:24 line:1 offset:23]]
-Error GQL cause: Neo4jError: Neo.DatabaseError.General.UnknownError (42I06: Invalid input '', expected: an expression, '*', 'ALL' or 'DISTINCT'.)
-*/
-----
-
-GQL status codes are particularly helpful when you want your application to behave differently depending on the exact error that was raised by the server.
-
-.Distinguishing between different error codes
-[source, go]
-----
-result, err := neo4j.ExecuteQuery(ctx, driver, "MATCH (p:Person) RETURN", nil,
-    neo4j.EagerResultTransformer,
-    neo4j.ExecuteQueryWithDatabase("neo4j"))
-if err != nil {
-    var neo4jErr *neo4j.Neo4jError
-    if errors.As(err, &neo4jErr) {
-        if hasGqlStatus(neo4jErr, '42001') {
-            // Neo.ClientError.Statement.SyntaxError
-            // special handling of syntax error in query
-            fmt.Println(neo4jErr.Error())
-        } else if hasGqlStatus(neo4jErr, '42NFF') {
-            // Neo.ClientError.Security.Forbidden
-            // special handling of user not having CREATE permissions
-            fmt.Println(neo4jErr.Error())
-        } else {
-            // handling of all other exceptions
-            fmt.Println(neo4jErr.Error())
-        }
-    }
-}
-----
-
-[NOTE]
-====
-The GQL status code `50N42` is returned when an error does not have a GQL-status object.
-This can happen if the driver is connected to an older Neo4j server.
-Don't rely on this status code, as future Neo4j server versions might change it with a more appropriate one.
-====
-
-[TIP]
-====
-Transient server errors can be retried without need to alter the original request.
-You can discover whether an error is transient via the function link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#IsRetryable[`neo4j.IsRetryable(error)`], which gives insights into whether a further attempt might be successful.
-This is particular useful when running queries in xref:transactions#explicit-transactions[explicit transactions], to know if a failed query is worth re-running.
-====
 
 
 == Query configuration

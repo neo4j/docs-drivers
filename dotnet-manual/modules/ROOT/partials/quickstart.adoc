@@ -1,13 +1,12 @@
 // This doc is also sourced in the Aura Developer Hub.
-// Because of that, cross-links are absolute,
-// source blocks have copy=true , and Antora attributes
-// (version) are explicitly resolved.
+// Because of that, cross-links are absolute and source blocks have copy=true .
 
 The Neo4j .NET driver is the official library to interact with a Neo4j instance through a .NET application.
 
 At the hearth of Neo4j lies <<Cypher>>, the query language to interact with a Neo4j database.
-Although this guide does not _require_ you to be a seasoned Cypher querier, it's easier to focus on the .NET-specific bits if you know some Cypher already.
-You will also get a _gentle_ introduction to Cypher in these pages, but check out link:https://neo4j.com/docs/getting-started/cypher/[Getting started -> Cypher] for a more detailed walkthrough of graph databases modelling and querying if this is your first approach.
+While this guide does not _require_ you to be a seasoned Cypher querier, it is going to be easier to focus on the .NET-specific bits if you already know some Cypher.
+For this reason, although this guide does _also_ provide a gentle introduction to Cypher along the way, consider checking out link:https://neo4j.com/docs/getting-started/cypher/[Getting started -> Cypher] for a more detailed walkthrough of graph databases modelling and querying if this is your first approach.
+You may then apply that knowledge while following this guide to develop your .NET application.
 
 
 [#install]
