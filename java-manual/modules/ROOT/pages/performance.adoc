@@ -400,6 +400,47 @@ If you know already that the data you are inserting is new, avoid using `MERGE` 
 xref:result-summary.adoc#_filter_notifications[Filter the category and/or severity of notifications] the server should raise.
 
 
+[[netty-native-transports]]
+== Switch to Netty native transports
+
+link:https://netty.io/wiki/native-transports.html[Netty native transports] add features specific to a particular platform, generate less garbage, and generally improve performance when compared to the NIO based transport.
+
+You need to provide a valid native dependency in your package manager.
+
+.Example dependency for native transports with Maven
+[source, xml]
+----
+<dependency>
+    <groupId>io.netty</groupId>
+    <artifactId>netty-transport-native-io_uring</artifactId>
+    <version>${netty-version}</version>
+    <classifier>linux-x86_64</classifier>
+</dependency>
+----
+
+
+[[enable-tfo]]
+== Enable TCP Fast Open (TFO)
+
+TCP Fast Open (TFO) enables the server to send data already during the TCP handshake (either during the Bolt or TLS handshake, depending on the encryption settings).
+You enable TCP Fast Open via the driver configuration `withTryTcpFastOpen(true)`.
+
+[source, java]
+----
+// import org.neo4j.driver.AuthTokens;
+// import org.neo4j.driver.Config;
+// import org.neo4j.driver.GraphDatabase;
+
+try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword),
+    Config.builder().withTryTcpFastOpen(true).build())) {
+    driver.verifyConnectivity();
+}
+----
+
+Both the client and the server must be configured for TFO to work. +
+For more information, see link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Config.ConfigBuilder.html#withTryTcpFastOpen(boolean)[API documentation -> `withTryTcpFastOpen`].
+
+
 ifndef::backend-pdf[]
 [discrete.glossary]
 == Glossary

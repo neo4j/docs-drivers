@@ -461,6 +461,49 @@ public class App {
 For full documentation, see link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/PathValue.html[API documentation -> PathValue].
 
 
+[role=label--new-6.0]
+[#vector]
+== Vector type
+
+The type link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/VectorValue.html[`VectorValue`] maps to the Cypher type link:https://neo4j.com/docs/cypher-manual/current/values-and-types/vector/[`VECTOR`].
+Vector objects are stored as contiguous blocks of memory, containing homogeneous values.
+
+You can create a vector from lists of `byte`, `short`, `int`, `long`, `float`, `double` via the method link:https://neo4j.com/docs/api/java-driver/curent/org.neo4j.driver/org/neo4j/driver/types/Vector.html[`Values.vector()`].
+
+.Create and store a vector
+[source, java]
+----
+// import org.neo4j.driver.Values;
+
+var vector = Values.vector(new float[8]);
+driver.executableQuery("CREATE (:Value {vector: $vector})")
+    .withParameters(Map.of("vector", vector))
+    .execute();
+----
+
+[IMPORTANT]
+Storing `VECTOR` objects in the database requires a server version >= 2025.10, Enterprise Edition.
+
+.Retrieve and work with a vector
+[source, java]
+----
+var result = driver.executableQuery("MATCH (v:Value) RETURN v.vector AS vector")
+    .execute();
+var vector = result.records().get(0).get("vector");
+
+System.out.printf("Retrieved vector: %s", vector);
+// Retrieved vector: vector([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], 8, FLOAT32 NOT NULL)
+----
+
+
+[role=label--new-6.0]
+[#unsupportedtype]
+== UnsupportedType
+
+The type link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/UnsupportedTypeValue.html[`UnsupportedTypeValue`] is used for data types returned by Cypher queries, but that the driver doesn't recognize.
+This happens when the client version is too old with respect to the server version.
+
+
 ifndef::backend-pdf[]
 [discrete.glossary]
 == Glossary

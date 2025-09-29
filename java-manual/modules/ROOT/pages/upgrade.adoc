@@ -28,15 +28,10 @@ With the xref:value-mapping.adoc[Value Mapping feature], you can declare a Java 
 .New type `Vector`
 [%collapsible]
 ====
-The type xref:data-types.adoc#vector[`Vector`] allows for storing and retrieving Cypher Vector objects stored in the database.
+The type xref:data-types.adoc#vector[`Vector`] allows for storing and retrieving Cypher `VECTOR` objects to/from the database.
+The `VECTOR` type is suitable for efficiently storing lists of homogeneous numbers, such as embeddings.
 ====
 
-|
-.New type `UNKNOWN`
-[%collapsible]
-====
-The type xref:data-types.adoc#unknown[`UNKNOWN`] will be returned for objects coming from the server, when the driver doesn't recognize the type.
-====
 |
 .GQL status objects in exceptions
 [%collapsible]
@@ -45,6 +40,32 @@ Exception objects also expose errors as GQL-status objects.
 The main difference between Neo4j error codes and GQL error codes is that the latter are more granular.
 For more information, see xref:query-simple.adoc#error-handling[Error handling].
 ====
+|
+.TCP Fast Open support
+[%collapsible]
+====
+TCP Fast Open enables the server to send data already during the TCP handshake (either during the Bolt or TLS handshake, depending on the encryption settings).
+
+For more information, see xref:performance.adoc#enable-tfo[Performance -> Enable TCP Fast Open (TFO)].
+====
+
+|
+.Unix sockets support
+[%collapsible]
+====
+The new `bolt+unix` URI scheme allows connecting to a Neo4j server over Unix sockets.
+
+For more information, see xref:connect-advanced.adoc#unix-sockets[Connecting through Unix sockets].
+====
+|
+.Netty native transports support
+[%collapsible]
+====
+link:https://netty.io/wiki/native-transports.html[Netty native transports] add features specific to a particular platform, generate less garbage, and generally improve performance when compared to the NIO based transport.
+
+For more information, see xref:performance.adoc#netty-native-transports[Performance -> Switch to Netty native transports].
+====
+
 
 |===
 

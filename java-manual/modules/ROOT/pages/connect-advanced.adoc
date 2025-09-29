@@ -5,6 +5,23 @@ include::{common-partial}/connect-advanced.adoc[tag=connection-uri]
 include::{common-partial}/connect-advanced.adoc[tag=connection-protocols]
 
 
+[role=label--not-on-aura]
+[#unix-sockets]
+== Connecting through Unix sockets
+
+The new `bolt+unix` URI scheme allows connecting to a Neo4j server >= 2025.08 over Unix sockets.
+Use it to connect to an instance even when all standard Bolt threads are busy.
+
+This feature requires a Neo4j server >= 2025.08 and to be link:https://neo4j.com/docs/operations-manual/current/configuration/configuration-settings/#config_server.bolt.unix_socket_enabled[enabled and configured] on the server first (including the socket's path).
+
+[source, java, test-skip]
+----
+var driver = GraphDatabase.driver(
+    "bolt+unix:///var/run/neo4j.sock",
+    AuthTokens.basic("dbUsername", "dbPassword"))
+----
+
+
 [#authentication-methods]
 == Authentication methods
 
