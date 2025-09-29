@@ -59,6 +59,8 @@ For more information, see xref:performance.adoc#netty-native-transports[Performa
 ====
 |
 
+|===
+
 ////
 experimental
 |
@@ -70,9 +72,6 @@ TCP Fast Open enables the server to send data already during the TCP handshake (
 For more information, see xref:performance.adoc#enable-tfo[Performance -> Enable TCP Fast Open (TFO)].
 ====
 ////
-
-
-|===
 
 
 [[breaking-changes]]
