@@ -419,7 +419,8 @@ The Netty version the driver depends on is `4.2`, and the Netty version you spec
 </dependency>
 ----
 
-
+////
+Still experimental
 [[enable-tfo]]
 == Enable TCP Fast Open (TFO)
 
@@ -440,6 +441,7 @@ try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPasswor
 
 Both the client and the server must be configured for TFO to work. +
 For more information, see link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Config.ConfigBuilder.html#withTryTcpFastOpen(boolean)[API documentation -> `withTryTcpFastOpen`].
+////
 
 
 ifndef::backend-pdf[]
