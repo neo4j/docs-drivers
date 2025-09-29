@@ -406,6 +406,7 @@ xref:result-summary.adoc#_filter_notifications[Filter the category and/or severi
 link:https://netty.io/wiki/native-transports.html[Netty native transports] add features specific to a particular platform, generate less garbage, and generally improve performance when compared to the NIO based transport.
 
 You need to provide a valid native dependency in your package manager.
+The Netty version the driver depends on is `4.2`, and the Netty version you specify for the transport dependency must be compatible with that.
 
 .Example dependency for native transports with Maven
 [source, xml]
