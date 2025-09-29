@@ -59,7 +59,8 @@ pip3 install -U neo4j==5.27
 .New type `Vector`
 [%collapsible]
 ====
-The type xref:data-types.adoc#vector[`Vector`] allows for storing and retrieving Cypher `VECTOR` objects stored in the database.
+The type xref:data-types.adoc#vector[`Vector`] allows for storing and retrieving Cypher `VECTOR` objects to/from the database.
+The `VECTOR` type is suitable for efficiently storing lists of homogeneous numbers, such as embeddings.
 ====
 |
 .GQL status objects in errors

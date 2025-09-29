@@ -488,7 +488,7 @@ driver.executeQuery('MERGE (d:Doc {embedding: $vector})', { vector: neo4jVector 
 ----
 
 [IMPORTANT]
-Storing `VECTOR` objects in the database requires a server version >= 2025.10.
+Storing `VECTOR` objects in the database requires a server version >= 2025.10, Enterprise Edition.
 
 .Retrieve and work with a vector
 [source, javascript]
