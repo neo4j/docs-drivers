@@ -147,7 +147,7 @@ If you were calling it directly, use `Record.\\__getitem__(slice(...))` or simpl
 |label:removed[Changed]
 
 |6.0
-|Graph type sets (`neo4j.graph.EntitySetView`) can no longer by indexed by legacy `id` (`int`, e.g., `graph.nodes[0]`).
+|Graph type sets (`neo4j.graph.EntitySetView`) can no longer be indexed by legacy `id` (`int`, e.g., `graph.nodes[0]`).
 Use the `element_id` instead (`str`, e.g., `graph.nodes["..."]`).
 |label:removed[Changed]
 
@@ -157,7 +157,14 @@ This also affects link:https://neo4j.com/docs/api/python-driver/current/api.html
 |label:deprecated[]
 
 |6.0
-|xref:result-summary.adoc#_notifications[Notifications] as Neo4j status codes are deprecated in favor of GQL status objects.
+|xref:result-summary.adoc#_notifications[*Notifications*] as Neo4j status codes are deprecated in favor of GQL status objects.
+
+As a result,
+
+- Object link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.SummaryNotification[`SummaryNotification`] is deprecated in favor of link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.GqlStatusObject[`GqlStatusObject`].
+- Objects link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.NotificationCategory[`NotificationCategory`] and link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.NotificationDisabledCategory[`NotificationDisabledCategory`] are deprecated in favor of link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.NotificationClassification[`NotificationClassification`] and link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.NotificationDisabledClassification[`NotificationDisabledClassification`].
+- Attributes link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.ResultSummary.notifications[`ResultSummary.notifications`] and link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.ResultSummary.summary_notifications[`ResultSummary.summary_notifications`] are deprecated in favor of link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.ResultSummary.gql_status_objects[`ResultSummary.gql_status_objects`].
+- xref:result-summary.adoc#_filter_notifications[Filtering notifications] via `notifications_disabled_categories` is deprecated in favor of `notifications_disabled_classifications`.
 |label:deprecated[]
 
 |6.0
@@ -165,12 +172,8 @@ This also affects link:https://neo4j.com/docs/api/python-driver/current/api.html
 |label:deprecated[]
 
 |6.0
-|Passing raw sting bookmarks as `initial_bookmarks` to `GraphDatabase.bookmark_manager()` is deprecated.
+|Passing raw string bookmarks as `initial_bookmarks` to `GraphDatabase.bookmark_manager()` is deprecated.
 Use a `neo4j.Bookmarks` object instead.
-|label:deprecated[]
-
-|6.0
-|xref:result-summary.adoc#_filter_notifications[Filtering notifications] via `notifications_disabled_categories` is deprecated in favor of `notifications_disabled_classifications`.
 |label:deprecated[]
 
 |===

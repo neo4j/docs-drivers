@@ -118,15 +118,19 @@ Through the new methods, the first argument of transaction functions is a `Manag
 |label:deprecated[]
 
 |6.0
-|xref:result-summary.adoc#_notifications[Notifications] as Neo4j status codes are deprecated in favor of GQL status objects.
+|xref:result-summary.adoc#_notifications[*Notifications*] as Neo4j status codes are deprecated in favor of GQL status objects.
+
+As a result,
+
+- Class link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/notification.js~Notification.html[`Notification`] is deprecated in favor of link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/notification.js~GqlStatusObject.html[`GqlStatusObject`].
+- Type link:https://neo4j.com/docs/api/javascript-driver/current/typedef/index.html#static-typedef-NotificationCategory[`NotificationCategory`] is deprecated in favor of link:https://neo4j.com/docs/api/javascript-driver/current/typedef/index.html#static-typedef-NotificationClassification[`NotificationClassification`]
+- Variables link:https://neo4j.com/docs/api/javascript-driver/current/variable/index.html#static-variable-notificationCategory[`notificationCategory`] and link:https://neo4j.com/docs/api/javascript-driver/current/variable/index.html#static-variable-notificationFilterDisabledCategory[`notificationFilterDisabledCategory`] are deprecated in favor of link:https://neo4j.com/docs/api/javascript-driver/current/variable/index.html#static-variable-notificationClassification[`notificationClassification`] and link:https://neo4j.com/docs/api/javascript-driver/current/variable/index.html#static-variable-notificationFilterDisabledClassification[`notificationFilterDisabledClassification`].
+- Attribute link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/result-summary.js~ResultSummary.html#instance-member-notifications[`ResultSummary.notifications`] is deprecated in favor of link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/result-summary.js~ResultSummary.html#instance-member-gqlStatusObjects[`ResultSummary.gqlStatusObjects`].
+- xref:result-summary.adoc#_filter_notifications[Filtering notifications] via `disabledCategories` is deprecated in favor of `disabledClassifications`.
 |label:deprecated[]
 
 |6.0
 |Result transformers `.eagerResultsTransformer()` and `.mappedResultsTransformer()` are deprecated in favor of link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/result-transformers.js~ResultTransformers.html#instance-method-eager[`.eager()`] and link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/result-transformers.js~ResultTransformers.html#instance-method-mapped[`.mapped()`].
-|label:deprecated[]
-
-|6.0
-|xref:result-summary.adoc#_filter_notifications[Filtering notifications] via `disabledClassifications` is deprecated in favor of `disabledClassifications`.
 |label:deprecated[]
 
 |===
