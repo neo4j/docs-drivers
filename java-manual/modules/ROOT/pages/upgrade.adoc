@@ -160,7 +160,7 @@ The new methods behave similarly, but the argument types are different and the n
 |label:deprecated[]
 
 |5.0
-|link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Config.TrustStrategy.html[`Config.TrustStrategy`] -- Method link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Config.TrustStrategy.html#certFile()[`.certFile()`] is deprecated in favor of link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Config.TrustStrategy.html#certFiles()[`.certFiles()`].
+|link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/Config.TrustStrategy.html[`Config.TrustStrategy`] -- Method link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/Config.TrustStrategy.html#certFile()[`.certFile()`] is deprecated in favor of link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/Config.TrustStrategy.html#certFiles()[`.certFiles()`].
 |label:deprecated[]
 
 |5.7
