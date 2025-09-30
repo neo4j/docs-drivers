@@ -86,7 +86,7 @@ Deprecated features are likely to be removed in the next major version.
 |6.0
 |link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/session.js~Session.html[`Session`] -- Methods `.readTransaction()` and `.writeTransaction()` have been removed in favor of link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/session.js~Session.html#instance-method-executeRead[`.executeRead()`] and link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/session.js~Session.html#instance-method-executeWrite[`.executeWrite()`].
 
-Through the new methods, the first argument of transaction functions is a `ManagedTransaction` object. It behaves like a regular `Transaction` object, except it does not offer the `.commit()`, `.rollback()`, `.close()`, and `.closed()` methods.
+Through the new methods, the first argument of transaction functions is a link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/transaction-managed.js~ManagedTransaction.html[`ManagedTransaction`] object. It behaves like a regular `Transaction` object, except it does not offer the `.commit()`, `.rollback()`, `.close()`, and `.closed()` methods.
 |label:removed[]
 
 |6.0
@@ -94,16 +94,20 @@ Through the new methods, the first argument of transaction functions is a `Manag
 |label:removed[]
 
 |6.0
-|link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/notification.js~Notification.html[`Notification`] -- Property `.severity` has been removed. Use `.rawSeverityLevel` for the raw value and `.severityLevel` for an enumerated value.
+|link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/notification.js~Notification.html[`Notification`] -- Property `.severity` has been removed. Use link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/notification.js~Notification.html#instance-member-rawSeverityLevel[`.rawSeverityLevel`] for the raw value and link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/notification.js~Notification.html#instance-member-severityLevel[`.severityLevel`] for an enumerated value.
 |label:removed[]
 
 |6.0
-|Method `Neo4jError.isRetriable()` has been removed in favor of `Neo4jError.isRetryable()`.
+|link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/result-summary.js~ResultSummary.html[`ResultSummary`] -- Attribute `.updateStatistics` has been removed in favor of link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/result-summary.js~ResultSummary.html#instance-member-counters[`.counters`].
 |label:removed[]
 
 |6.0
 |link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/driver.js~Driver.html[`Driver`] -- The method link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/driver.js~Driver.html#instance-method-verifyConnectivity[`.verifyConnectivity()`] now returns `void` instead of `ServerInfo`. To retrieve the server info, use link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/driver.js~Driver.html#instance-method-getServerInfo[`.getServerInfo()`].
-|label:removed[]
+|label:removed[Changed]
+
+|5.0
+|link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/error.js~Neo4jError.html[`Neo4jError`] -- Method `.isRetriable()` is deprecated in favor of `.isRetryable()`.
+|label:deprecated[]
 
 |5.0
 |link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/graph-types.js~Node.html[`Node`], link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/graph-types.js~Relationship.html[`Relationship`] -- Property `.identity` (NumberOrInteger) is deprecated in favor of `.elementId` (String).
@@ -114,7 +118,7 @@ Through the new methods, the first argument of transaction functions is a `Manag
 |label:deprecated[]
 
 |6.0
-|link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/temporal-types.js~Date.html#instance-method-toStandardDate[`Date.toStandardDate()`] is deprecated due to the unclear handling of timezones. `Date.toStandardDateLocal()` is a drop in replacement, but `Date.toStandardDateUTC()` may be more desireable to some users.
+|link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/temporal-types.js~Date.html[`Date`] -- Method link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/temporal-types.js~Date.html#static-method-fromStandardDate[`.fromStandardDate()`] is deprecated due to the unclear handling of timezones. link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/temporal-types.js~Date.html#static-method-fromStandardDateLocal[`.fromStandardDateLocal()`] is a drop in replacement, but link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/temporal-types.js~Date.html#static-method-fromStandardDateUTC[`.fromStandardDateUTC()`] may be more desireable to some users.
 |label:deprecated[]
 
 |6.0
@@ -130,7 +134,7 @@ As a result,
 |label:deprecated[]
 
 |6.0
-|Result transformers `.eagerResultsTransformer()` and `.mappedResultsTransformer()` are deprecated in favor of link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/result-transformers.js~ResultTransformers.html#instance-method-eager[`.eager()`] and link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/result-transformers.js~ResultTransformers.html#instance-method-mapped[`.mapped()`].
+|link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/result-transformers.js~ResultTransformers.html[`ResultTransformers`] -- link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/result-transformers.js~ResultTransformers.html#instance-method-eagerResultTransformer[`.eagerResultsTransformer()`] and link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/result-transformers.js~ResultTransformers.html#instance-method-mappedResultsTransformer[`.mappedResultsTransformer()`] are deprecated in favor of link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/result-transformers.js~ResultTransformers.html#instance-method-eager[`.eager()`] and link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/result-transformers.js~ResultTransformers.html#instance-method-mapped[`.mapped()`].
 |label:deprecated[]
 
 |===

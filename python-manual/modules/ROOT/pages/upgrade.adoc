@@ -93,7 +93,7 @@ Deprecated features are likely to be removed in the next major release.
 
 |6.0
 |link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.Session[`Session`] -- Methods `.read_transaction()` and `.write_transaction()` have been removed in favor of link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.Session.execute_read[`.execute_read()`] and link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.Session.execute_write[`.execute_write()`].
-Through the new methods, the first argument of transaction functions is a `ManagedTransaction` object. It behaves like a regular `Transaction` object, except it does not offer the `.commit()`, `.rollback()`, `.close()`, and `.closed()` methods.
+Through the new methods, the first argument of transaction functions is a link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.ManagedTransaction[`ManagedTransaction`] object. It behaves like a regular `Transaction` object, except it does not offer the `.commit()`, `.rollback()`, `.close()`, and `.closed()` methods.
 |label:removed[]
 
 |6.0
@@ -110,9 +110,9 @@ Call `driver.close()` explicitly or create the driver via a `with` statement.
 |6.0
 |*Bookmarks*
 
-- The method `Session.last_bookmark()` has been removed in favor of link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.Session.last_bookmarks[`Session.last_bookmarks()`]. The logic is similar, but the new method returns `neo4j.Bookmarks` instead of `str`.
-- `neo4j.Bookmark` has been removed in favor of link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.Bookmarks[`neo4j.Bookmarks`].
-- `Driver.session()` no longer accepts raw string bookmarks as bookmarks argument. Use a `neo4j.Bookmarks` object instead.
+- The method `Session.last_bookmark()` has been removed in favor of link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.Session.last_bookmarks[`Session.last_bookmarks()`]. The logic is similar, but the new method returns https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.Bookmarks[`Bookmarks`] instead of `str`.
+- `Bookmark` has been removed in favor of link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.Bookmarks[`Bookmarks`].
+- `Driver.session()` no longer accepts raw string bookmarks as bookmarks argument. Use a https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.Bookmarks[`Bookmarks`] object instead.
 |label:removed[]
 
 |6.0
@@ -134,7 +134,7 @@ Call `driver.close()` explicitly or create the driver via a `with` statement.
 |label:removed[]
 
 |6.0
-|Method `Neo4jError.is_retriable()` has been removed in favor of `Neo4jError.is_retryable()`.
+|link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.exceptions.Neo4jError[`Neo4jError`] -- Method link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.exceptions.Neo4jError.is_retriable[`.is_retriable()`] has been removed in favor of link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.exceptions.Neo4jError.is_retryable[`.is_retryable()`].
 |label:removed[]
 
 |6.0
@@ -172,8 +172,8 @@ As a result,
 |label:deprecated[]
 
 |6.0
-|Passing raw string bookmarks as `initial_bookmarks` to `GraphDatabase.bookmark_manager()` is deprecated.
-Use a `neo4j.Bookmarks` object instead.
+|Passing raw string bookmarks as `initial_bookmarks` to link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.GraphDatabase.bookmark_manager[`GraphDatabase.bookmark_manager()`] is deprecated.
+Use a link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.Bookmarks[`Bookmarks`] object instead.
 |label:deprecated[]
 
 |===
