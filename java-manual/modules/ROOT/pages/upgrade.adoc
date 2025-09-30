@@ -77,7 +77,7 @@ For more information, see xref:performance.adoc#enable-tfo[Performance -> Enable
 [[breaking-changes]]
 == Breaking changes and deprecations
 
-Deprecated features are likely to be removed in version 6.
+Deprecated features are likely to be removed in the next major version.
 
 [cols="1,5a,1"]
 |===
