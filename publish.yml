@@ -6,16 +6,25 @@ site:
 content:
   sources:
   - url : ./
-    branches: ['HEAD','4.4']
+    branches: ['HEAD','5.x','4.4']
+    edit_url: https://github.com/neo4j/docs-drivers/tree/{refname}/{path}
+    worktrees: true
+    start_paths:
+    - java-manual
+    - javascript-manual
+    - python-manual
+    - common-content
+    exclude:
+    - '!**/_includes/*'
+    - '!**/readme.adoc'
+    - '!**/README.adoc'
+  - url : ./
+    branches: ['5.x','4.4']
     edit_url: https://github.com/neo4j/docs-drivers/tree/{refname}/{path}
     worktrees: true
     start_paths:
     - dotnet-manual
     - go-manual
-    - java-manual
-    - javascript-manual
-    - python-manual
-    - common-content
     exclude:
     - '!**/_includes/*'
     - '!**/readme.adoc'
@@ -56,7 +65,7 @@ asciidoc:
     copyright: 2023
     common-license-page-uri: https://neo4j.com/docs/license/
     neo4j-version: 5.3@
-    driver-version: 5@
+    driver-version: 6@
     common-partial: common-content:ROOT:partial$@
     common-image: common-content:ROOT:image$@
     check-mark: icon:check[]
@@ -64,5 +73,3 @@ asciidoc:
     # attributes for doc links to other manuals in publish playbook
     neo4j-base-uri: ''
     neo4j-docs-base-uri: /docs
-
-

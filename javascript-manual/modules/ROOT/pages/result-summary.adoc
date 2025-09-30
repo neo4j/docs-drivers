@@ -1,7 +1,7 @@
 = Explore the query execution summary
 
-After all results coming from a query have been processed, the server ends the transaction by returning a summary of execution.
-It comes as a link:{neo4j-docs-base-uri}/api/javascript-driver/{javascript-driver-version}/class/lib6/result-summary.js~ResultSummary.html[`ResultSummary`] object, and it contains information among which:
+After all records of a query result have been processed, the server ends the transaction by returning a summary of execution.
+It comes as a link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/result-summary.js~ResultSummary.html[`ResultSummary`] object, and it contains information among which:
 
 - xref:_query_counters[**Query counters**] -- What changes the query triggered on the server
 - xref:_query_execution_plan[**Query execution plan**] -- How the database would execute (or executed) the query
@@ -11,7 +11,7 @@ It comes as a link:{neo4j-docs-base-uri}/api/javascript-driver/{javascript-drive
 
 == Retrieve the execution summary
 
-When running queries with xref:query-simple.adoc[`Driver.executeQuery()`], the execution summary is part of the default return object, under the `summary` attribute.
+When running queries with xref:query-simple.adoc[`Driver.executeQuery()`], the execution summary is part of the default return value, as second object.
 
 [source, javascript]
 ----
@@ -26,9 +26,7 @@ let { records, summary } = await driver.executeQuery(`
 
 If you are using xref:transactions.adoc[transaction functions], you can retrieve the query execution summary with the attribute `Result.summary` if you used `await` to resolve the result promise, or with the method `Result.summary()` if you consumed the result as a promise.
 
-**Notice that once you ask for the execution summary, the result stream is exhausted**.
-This means that any record which has not yet been processed is discarded.
-
+**Notice that once you ask for the execution summary, the result stream is __exhausted__**: any record yet to be processed is not available anymore.
 
 [source, javascript]
 ----
@@ -50,7 +48,7 @@ try {
 
 == Query counters
 
-The property `ResultSummary.counters` contains counters for the operations that a query triggered (as a link:{neo4j-docs-base-uri}/api/javascript-driver/{javascript-driver-version}/class/lib6/result-summary.js~QueryStatistics.html[`QueryStatistics`] object).
+The property `ResultSummary.counters` contains counters for the operations that a query triggered (as a link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/result-summary.js~QueryStatistics.html[`QueryStatistics`] object).
 
 .Insert some data and display the query counters
 [source, javascript, role=nocollapse]
@@ -84,16 +82,16 @@ console.log(summary.counters.containsSystemUpdates())  // false
 There are two additional methods on `ResultSummary.counters` which act as meta-counters:
 
 - `.containsUpdates()` -- whether the query triggered any write operation on the database on which it ran
-- `.containsSystemUpdates()` -- whether the query updated the `system` database
+- `.containsSystemUpdates()` -- whether the query triggered any write operation on the `system` database
 
 
 == Query execution plan
 
-If you prefix a query with `EXPLAIN`, the server will return the plan it _would_ use to run the query, but will not actually run it.
-The plan is then available as a link:{neo4j-docs-base-uri}/api/javascript-driver/{javascript-driver-version}/class/lib6/result-summary.js~Plan.html[`Plan`] object under the property `ResultSummary.plan`, and contains the list of link:https://neo4j.com/docs/cypher-manual/current/planning-and-tuning/operators/[Cypher operators] that would be used to retrieve the result set.
-You may use this information to locate potential bottlenecks or room for performance improvements (for example through the creation of indexes).
+If you prefix a query with `EXPLAIN`, the server returns the plan it _would_ use to run the query, but doesn't actually run it.
+The plan is then available as a link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/result-summary.js~Plan.html[`Plan`] object under the property `ResultSummary.plan`, and contains the list of link:https://neo4j.com/docs/cypher-manual/current/planning-and-tuning/operators/[Cypher operators] that would be used to retrieve the result set.
+Use this information to locate bottlenecks or potential performance improvements (for example through the creation of indexes).
 
-[source, javascript, role=nocollapse]
+[source, javascript]
 ----
 let result = await driver.executeQuery('EXPLAIN MATCH (p {name: $name}) RETURN p', { name: 'Alice' })
 console.log(result.summary.plan.arguments['string-representation'])
@@ -117,12 +115,12 @@ Total database accesses: ?
 */
 ----
 
-If you instead prefix a query with the keyword `PROFILE`, the server will return the execution plan it has used to run the query, together with profiler statistics.
+If you instead prefix a query with the keyword `PROFILE`, the server returns the execution plan it has used to run the query, together with profiler statistics.
 This includes the list of operators that were used and additional profiling information about each intermediate step.
 The plan is available under the property `ResultSummary.profile`.
 Notice that the query is also _run_, so the result object also contains any result records.
 
-[source, javascript, role=nocollapse]
+[source, javascript]
 ----
 let result = await driver.executeQuery('PROFILE MATCH (p {name: $name}) RETURN p', { name: 'Alice' })
 console.log(result.summary.profile.arguments['string-representation'])
@@ -151,58 +149,22 @@ For more information and examples, see link:{neo4j-docs-base-uri}/cypher-manual/
 
 == Notifications
 
-After executing a query, the server can return link:{neo4j-docs-base-uri}/status-codes/5/notifications/[notifications] alongside the query result.
+After executing a query, the server can return link:{neo4j-docs-base-uri}/status-codes/current/notifications/[notifications] alongside the query result.
 Notifications contain recommendations for performance improvements, warnings about the usage of deprecated features, and other hints about sub-optimal usage of Neo4j.
-
-[TIP]
-For driver version >= 5.25 and server version >= 5.23, two forms of notifications are available (_Neo4j status codes_ and _GQL status codes_).
-For earlier versions, only _Neo4j status codes_ are available. +
-GQL status codes are planned to supersede Neo4j status codes.
 
 .An unbounded shortest path raises a performance notification
 [.tabbed-example]
 =====
-[.include-with-neo4j-status-code]
-======
-The property `ResultSummary.notifications` contains a list of link:{neo4j-docs-base-uri}/api/javascript-driver/{javascript-driver-version}/class/lib6/notification.js~Notification.html[`Notification`] objects.
-
-[source, javascript, role=nocollapse]
-----
-let { records, summary } = await driver.executeQuery(`
-  MATCH p=shortestPath((:Person {name: 'Alice'})-[*]->(:Person {name: 'Bob'}))
-  RETURN p
-  `, {},
-  { database: '<database-name>' }
-)
-console.log(summary.notifications)
-/*
-[
-  Notification {
-    code: 'Neo.ClientNotification.Statement.UnboundedVariableLengthPattern',
-    title: 'The provided pattern is unbounded, consider adding an upper limit to the number of node hops.',
-    description: 'Using shortest path with an unbounded pattern will likely result in long execution times. It is recommended to use an upper limit to the number of node hops in your pattern.',
-    severity: 'INFORMATION',
-    position: { offset: 24, line: 2, column: 22 },
-    severityLevel: 'INFORMATION',
-    rawSeverityLevel: 'INFORMATION',
-    category: 'PERFORMANCE',
-    rawCategory: 'PERFORMANCE'
-  }
-]
-*/
-----
-
-======
 [.include-with-GQL-status-code]
 ======
 
-With version >= 5.25, the property `ResultSummary.gqlStatusObjects` contains a list of link:https://neo4j.com/docs/api/javascript-driver/{javascript-driver-version}/class/lib6/notification.js~GqlStatusObject.html[`GqlStatusObject`]s.
+The property `ResultSummary.gqlStatusObjects` contains a list of link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/notification.js~GqlStatusObject.html[`GqlStatusObject`]s.
 These are GQL-compliant status objects.
 
 Some (but not all) `GqlStatusObjects` are notifications, whereas some report an _outcome_ status: `00000` for "success", `02000` for "no data", and `00001` for "omitted result".
 `Summary.GqlStatusObjects()` always contains at least one entry, containing the outcome status.
 
-[source, javascript, role=nocollapse]
+[source, javascript]
 ----
 let { records, summary } = await driver.executeQuery(`
   MATCH p=shortestPath((:Person {name: 'Alice'})-[*]->(:Person {name: 'Bob'}))
@@ -248,19 +210,54 @@ console.log(summary.gqlStatusObjects)
 ----
 
 ======
+
+[.include-with-neo4j-status-code]
+======
+label:deprecated[Deprecated in 6.0]
+
+The property `ResultSummary.notifications` contains a list of link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/notification.js~Notification.html[`Notification`] objects.
+
+[source, javascript]
+----
+let { records, summary } = await driver.executeQuery(`
+  MATCH p=shortestPath((:Person {name: 'Alice'})-[*]->(:Person {name: 'Bob'}))
+  RETURN p
+  `, {},
+  { database: '<database-name>' }
+)
+console.log(summary.notifications)
+/*
+[
+  Notification {
+    code: 'Neo.ClientNotification.Statement.UnboundedVariableLengthPattern',
+    title: 'The provided pattern is unbounded, consider adding an upper limit to the number of node hops.',
+    description: 'Using shortest path with an unbounded pattern will likely result in long execution times. It is recommended to use an upper limit to the number of node hops in your pattern.',
+    severity: 'INFORMATION',
+    position: { offset: 24, line: 2, column: 22 },
+    severityLevel: 'INFORMATION',
+    rawSeverityLevel: 'INFORMATION',
+    category: 'PERFORMANCE',
+    rawCategory: 'PERFORMANCE'
+  }
+]
+*/
+----
+
+======
+
 =====
 
 
-[role=label--new-5.7]
 === Filter notifications
 
 By default, the server analyses each query for all categories and severity of notifications.
-Starting from version 5.7, you can use the parameters `minimumSeverityLevel` and/or `disabledCategories`/`disabledClassifications` to restrict the severity and/or category/classification of notifications that you are interested into.
+Use the parameters `minimumSeverityLevel` and/or `disabledCategories`/`disabledClassifications` to restrict the severity and/or category/classification of notifications that you are interested into.
 There is a slight performance gain in restricting the amount of notifications the server is allowed to raise.
+You can use any of those parameters either when creating a `Driver` instance, or when creating a session.
 
 The severity filter applies to both Neo4j and GQL notifications.
 Category and classification filters exist separately only due to the discrepancy in lexicon between GQL and Neo4j; both filters affect either form of notification though, so you should use only one of them.
-You can use any of those parameters either when creating a `Driver` instance, or when creating a session.
+From version 6.0, `disabledCategories` is deprecated.
 
 You can disable notifications altogether by setting the minimum severity to `'OFF'`.
 

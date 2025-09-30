@@ -69,7 +69,7 @@ await session.executeRead(async tx => {
 ----
 
 An even faster approach is to skip `.executeRead/Write()` and call `.run()` directly on the session.
-The queries run as auto-commit transaction, and are still isolated from other concurrent queries, but if any of them fail, they will not be retried.
+The queries run as auto-commit transactions, and are still isolated from other concurrent queries, but if any of them fail, they will not be retried.
 With this method, you trade some robustness for more throughput, as the queries are shot to the server as fast as it can handle.
 One upper limit on the client size is given by the size of the connection pool: each call to `.run()` borrows a connection, so the amount of parallel work is limited by the number of available connections.
 
@@ -222,6 +222,7 @@ Total database accesses: ?
 == Specify node labels
 
 *Specify node labels* in all queries.
+This allows the query planner to work more efficiently, and to leverage indexes where available.
 To learn how to combine labels, see link:https://neo4j.com/docs/cypher-manual/current/patterns/reference/#label-expressions[Cypher -> Label expressions].
 
 [discrete]

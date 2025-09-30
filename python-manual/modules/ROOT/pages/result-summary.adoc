@@ -1,7 +1,7 @@
 = Explore the query execution summary
 
-After all results coming from a query have been processed, the server ends the transaction by returning a summary of execution.
-It comes as a link:{neo4j-docs-base-uri}/api/python-driver/{python-driver-version}/api.html#resultsummary[`ResultSummary`] object, and it contains information among which:
+After all records of a query result have been processed, the server ends the transaction by returning a summary of execution.
+It comes as a link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#resultsummary[`ResultSummary`] object, and it contains information among which:
 
 - xref:_query_counters[**Query counters**] -- What changes the query triggered on the server
 - xref:_query_execution_plan[**Query execution plan**] -- How the database would execute (or executed) the query
@@ -11,7 +11,7 @@ It comes as a link:{neo4j-docs-base-uri}/api/python-driver/{python-driver-versio
 
 == Retrieve the execution summary
 
-When running queries with xref:query-simple.adoc[`Driver.execute_query()`], the execution summary is part of the default return object, under the `summary` key.
+When running queries with xref:query-simple.adoc[`Driver.execute_query()`], the execution summary is part of the default return value, as second object.
 
 [source, python]
 ----
@@ -24,8 +24,7 @@ records, result_summary, keys = driver.execute_query("""
 ----
 
 If you are using xref:transactions.adoc[transaction functions], or a xref:transformers.adoc#_custom_transformers[custom transformer] with `Driver.execute_query()`, you can retrieve the query execution summary with the method `Result.consume()`.
-**Notice that once you ask for the execution summary, the result stream is exhausted**.
-This means that any record which has not yet been processed is not available any longer.
+**Notice that once you ask for the execution summary, the result stream is __exhausted__**: any record yet to be processed is not available anymore.
 
 [source, python]
 ----
@@ -43,14 +42,15 @@ with driver.session(database="<database-name>") as session:
 
 == Query counters
 
-The property `ResultSummary.counters` contains counters for the operations that a query triggered (as a link:{neo4j-docs-base-uri}/api/python-driver/{python-driver-version}/api.html#summarycounters[`SummaryCounters`] object).
+The property `ResultSummary.counters` contains counters for the operations that a query triggered (as a link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#summarycounters[`SummaryCounters`] object).
 
 .Insert some data and display the query counters
 [source, python]
 ----
 summary = driver.execute_query("""
     MERGE (p:Person {name: $name})
-    MERGE (p)-[:KNOWS]->(:Person {name: $friend})
+    MERGE (f:Person {name: $friend})
+    MERGE (p)-[:KNOWS]->(f)
     """, name="Mark", friend="Bob",
     database_="<database-name>",
 ).summary
@@ -64,16 +64,16 @@ print(summary.counters)
 There are two additional boolean properties which act as meta-counters:
 
 - `contains_updates` -- whether the query triggered any write operation on the database on which it ran
-- `contains_system_updates` -- whether the query updated the `system` database
+- `contains_system_updates` -- whether the query triggered any write operation on the `system` database
 
 
 == Query execution plan
 
-If you prefix a query with `EXPLAIN`, the server will return the plan it _would_ use to run the query, but will not actually run it.
-The plan is then available under the property `ResultSummary.plan`, and contains the list of link:https://neo4j.com/docs/cypher-manual/current/planning-and-tuning/operators/[Cypher operators] that would be used to retrieve the result set.
-You may use this information to locate potential bottlenecks or room for performance improvements (for example through the creation of indexes).
+If you prefix a query with `EXPLAIN`, the server returns the plan it _would_ use to run the query, but doesn't actually run it.
+The plan is available under the property `ResultSummary.plan`, and contains the list of link:https://neo4j.com/docs/cypher-manual/current/planning-and-tuning/operators/[Cypher operators] that would be used to retrieve the result set.
+Use this information to locate potential bottlenecks or potential performance improvements (for example the creation of indexes).
 
-[source, python, role=nocollapse]
+[source, python]
 ----
 _, summary, _ = driver.execute_query("EXPLAIN MATCH (p {name: $name}) RETURN p", name="Alice")
 print(summary.plan['args']['string-representation'])
@@ -98,12 +98,12 @@ Total database accesses: ?
 """
 ----
 
-If you instead prefix a query with the keyword `PROFILE`, the server will return the execution plan it has used to run the query, together with profiler statistics.
+If you instead prefix a query with the keyword `PROFILE`, the server returns the execution plan it has used to run the query, together with profiler statistics.
 This includes the list of operators that were used and additional profiling information about each intermediate step.
 The plan is available under the property `ResultSummary.profile`.
 Notice that the query is also _run_, so the result object also contains any result records.
 
-[source, python, role=nocollapse]
+[source, python]
 ----
 records, summary, _ = driver.execute_query("PROFILE MATCH (p {name: $name}) RETURN p", name="Alice")
 print(summary.profile['args']['string-representation'])
@@ -133,53 +133,22 @@ For more information and examples, see link:{neo4j-docs-base-uri}/cypher-manual/
 
 == Notifications
 
-After executing a query, the server can return link:{neo4j-docs-base-uri}/status-codes/5/notifications/[notifications] alongside the query result.
+After executing a query, the server can return link:{neo4j-docs-base-uri}/status-codes/current/notifications/[notifications] alongside the query result.
 Notifications contain recommendations for performance improvements, warnings about the usage of deprecated features, and other hints about sub-optimal usage of Neo4j.
-
-[TIP]
-For driver version >= 5.25 and server version >= 5.23, two forms of notifications are available (_Neo4j status codes_ and _GQL status codes_).
-For earlier versions, only _Neo4j status codes_ are available. +
-GQL status codes are planned to supersede Neo4j status codes.
 
 .An unbounded shortest path raises a performance notification
 [.tabbed-example]
 =====
-[.include-with-neo4j-status-code]
-======
-The property `ResultSummary.summary_notifications` contains a list of link:{neo4j-docs-base-uri}/api/python-driver/{python-driver-version}/api.html#neo4j.SummaryNotification[`SummaryNotification`] objects.
-
-[source, python, role=nocollapse]
-----
-records, summary, keys = driver.execute_query("""
-    MATCH p=shortestPath((:Person {name: 'Alice'})-[*]->(:Person {name: 'Bob'}))
-    RETURN p
-    """, database_="<database-name>"
-)
-"""
-[SummaryNotification(
-    title='The provided pattern is unbounded, consider adding an upper limit to the number of node hops.',
-    code='Neo.ClientNotification.Statement.UnboundedVariableLengthPattern',
-    description='Using shortest path with an unbounded pattern will likely result in long execution times. It is recommended to use an upper limit to the number of node hops in your pattern.',
-    severity_level=<NotificationSeverity.INFORMATION: 'INFORMATION'>,
-    category=<NotificationCategory.PERFORMANCE: 'PERFORMANCE'>,
-    raw_severity_level='INFORMATION',
-    raw_category='PERFORMANCE',
-    position=SummaryNotificationPosition(line=1, column=22, offset=21)
-)]
-"""
-----
-
-======
 [.include-with-GQL-status-code]
 ======
 
-With version >= 5.25, the property `ResultSummary.gql_status_objects` contains a sequence of link:{neo4j-docs-base-uri}/api/python-driver/{python-driver-version}/api.html#gqlstatusobject[`GqlStatusObject`]s.
+The property `ResultSummary.gql_status_objects` contains a sequence of link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#gqlstatusobject[`GqlStatusObject`]s.
 These are GQL-compliant status objects.
 
 Some (but not all) `GqlStatusObjects` are notifications, whereas some report an _outcome_ status: `00000` for "success", `02000` for "no data", and `00001` for "omitted result".
 `ResultSummary.gql_status_objects` always contains at least one entry, containing the outcome status.
 
-[source, python, role=nocollapse]
+[source, python]
 ----
 records, summary, keys = driver.execute_query("""
     MATCH p=shortestPath((:Person {name: 'Alice'})-[*]->(:Person {name: 'Bob'}))
@@ -229,19 +198,49 @@ Diagnostic record: {'_classification': 'PERFORMANCE', '_status_parameters': {'pa
 ----
 
 ======
+
+[.include-with-neo4j-status-code]
+======
+label:deprecated[Deprecated in 6.0]
+
+The property `ResultSummary.summary_notifications` contains a list of link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.SummaryNotification[`SummaryNotification`] objects.
+
+[source, python]
+----
+records, summary, keys = driver.execute_query("""
+    MATCH p=shortestPath((:Person {name: 'Alice'})-[*]->(:Person {name: 'Bob'}))
+    RETURN p
+    """, database_="<database-name>"
+)
+"""
+[SummaryNotification(
+    title='The provided pattern is unbounded, consider adding an upper limit to the number of node hops.',
+    code='Neo.ClientNotification.Statement.UnboundedVariableLengthPattern',
+    description='Using shortest path with an unbounded pattern will likely result in long execution times. It is recommended to use an upper limit to the number of node hops in your pattern.',
+    severity_level=<NotificationSeverity.INFORMATION: 'INFORMATION'>,
+    category=<NotificationCategory.PERFORMANCE: 'PERFORMANCE'>,
+    raw_severity_level='INFORMATION',
+    raw_category='PERFORMANCE',
+    position=SummaryNotificationPosition(line=1, column=22, offset=21)
+)]
+"""
+----
+
+======
+
 =====
 
 
-[role=label--new-5.7]
 === Filter notifications
 
 By default, the server analyses each query for all categories and severity of notifications.
-Starting from version 5.7, you can use the parameters `notifications_min_severity` and/or `notifications_disabled_categories`/`notifications_disabled_classifications` to restrict the severity and/or category/classification of notifications that you are interested into.
+Use the parameters `notifications_min_severity` and/or `notifications_disabled_categories`/`notifications_disabled_classifications` to restrict the severity and/or category/classification of notifications that you are interested into.
 There is a slight performance gain in restricting the amount of notifications the server is allowed to raise.
+You can use any of those parameters either when creating a `Driver` instance, or when creating a session.
 
 The severity filter applies to both Neo4j and GQL notifications.
 Category and classification filters exist separately only due to the discrepancy in lexicon between GQL and Neo4j; both filters affect either form of notification though, so you should use only one of them. If you provide both a category and a classification filter, their contents will be merged.
-You can use any of those parameters either when creating a `Driver` instance, or when creating a session.
+From version 6.0, `notifications_disabled_categories` is deprecated.
 
 You can disable notifications altogether by setting the minimum severity to `'OFF'`.
 

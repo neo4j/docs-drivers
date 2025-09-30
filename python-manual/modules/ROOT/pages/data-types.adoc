@@ -251,7 +251,7 @@ For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/{python
 
 == Graph types
 
-*Graph types are only passed as results and may not be used as parameters*.
+*Graph types are only passed as results and can't be used as parameters*.
 The section xref:transformers#_transform_to_graph[Manipulate query results -- Transform to graph] contains an example with graph types.
 
 [options="header"]
@@ -405,7 +405,6 @@ The driver supports more types as query parameters, which get automatically mapp
 | pandas `Array`     | `list`
 |===
 
-
 In general, if you are unsure about the type conversion that would happen on a given parameter, you can test it as in the following example:
 
 [source, python]
@@ -419,6 +418,83 @@ with neo4j.GraphDatabase.driver(URI, auth=AUTH) as driver:
     print(type(type_out))  # <class 'list'>
     print(type_out)        # ['foo', 'bar']
 ----
+
+
+[role=label--new-6.0]
+[#vector]
+== Vector type
+
+The type link:https://neo4j.com/docs/api/python-driver/current/types/vector.html#neo4j.vector.Vector[`Vector`] maps to the Cypher type link:https://neo4j.com/docs/cypher-manual/current/values-and-types/vector/[`VECTOR`].
+`Vector` objects are stored as contiguous blocks of memory (`bytes`), containing homogeneous values encoded in big-endian order.
+
+You can create a `Vector` from various data types.
+
+.Some examples of valid `Vector` invocations
+[source, python]
+----
+Vector([1, 2, 3], "i8")  # <.>
+Vector(b"\x00\x01\x00\x02", "i16")  # <.>
+Vector(b"\x01\x00\x02\x00", "i16", byteorder="little")  # <.>
+Vector(numpy.array([1, 2, 3]))  # <.>
+Vector(pyarrow.array([1, 2, 3]))  # <.>
+----
+
+<.> An iterable of floats/ints, and the type (link:https://neo4j.com/docs/api/python-driver/current/types/vector.html#neo4j.vector.VectorDType[`VectorDType`]) of the individual entries. +
+Supported types are:
+- `f32`: 32-bit floating point number (single)
+- `f64`: 64-bit floating point number (double)
+- `i8`: 8-bit integer
+- `i16`: 16-bit integer
+- `i32`: 32-bit integer
+- `i64`: 64-bit integer
+<.> Raw bytes, and the type (link:https://neo4j.com/docs/api/python-driver/current/types/vector.html#neo4j.vector.VectorDType[`VectorDType`]) to parse the bytes with.
+<.> When providing raw bytes, `byteorder` is optional and defaults to `"big"`.
+<.> A `numpy.ndarray`. No further parameters are accepted, and the `VectorDType` is inferred from the input.
+<.> A `pyarrow.Array`. No further parameters are accepted, and the `VectorDType` is inferred from the input.
+
+.Create and store a vector
+[source, python]
+----
+from neo4j.vector import Vector
+
+# Create a vector (parsing bytes as big-endian by default)
+v = Vector(b"\x00\x01\x02\x03", "i16")
+# or (less performant, but friendlier)
+v = Vector([1, 513], "i16")
+
+# Store the vector as a node property
+driver.execute_query("MERGE (d:Doc {embedding: $vector})", vector=v)
+----
+
+[IMPORTANT]
+Storing `VECTOR` objects in the database requires a server version >= 2025.10, Enterprise Edition.
+
+.Retrieve and work with a vector
+[source, python]
+----
+from neo4j.vector import Vector
+
+# Retrieve a vector
+v = driver.execute_query(
+    "MATCH (d:Doc) RETURN d.embedding AS v LIMIT 1",
+    database_="neo4j",
+).records[0]["v"]
+
+# Work with the vector
+print(f"Got vector of type {v.dtype} with {len(v)} elements: {v}")
+print("raw bytes:", v.raw())
+print("python list:", v.to_native())
+print("as numpy array:", v.to_numpy())
+----
+
+
+[role=label--new-6.0]
+[#unsupportedtype]
+== UnsupportedType
+
+The type link:https://neo4j.com/docs/api/python-driver/current/types/other.html#neo4j.types.UnsupportedType[`UnsupportedType`] is used for data types returned by Cypher queries, but that the driver doesn't recognize.
+This happens when the client version is too old with respect to the server version.
+
 
 
 ifndef::backend-pdf[]

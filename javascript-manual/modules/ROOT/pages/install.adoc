@@ -12,9 +12,9 @@ Use `npm` to install the link:https://www.npmjs.com/package/neo4j-driver[Neo4j J
 npm i neo4j-driver
 ----
 
-Always use the latest version of the driver, as it will always work both with the previous Neo4j <<LTS>> release and with the current and next major releases.
-The latest `5.x` driver supports connection to any Neo4j instances version 4.4, 5.x, and 2025.x.
-For a detailed list of changes across versions, see the link:https://github.com/neo4j/neo4j-javascript-driver/wiki/5.0-changelog[driver's changelog].
+The latest version of the driver is guaranteed to work with all <<LTS>> releases of the Neo4j server, as well as with the current and next major releases.
+The latest `6.x` driver supports connection to Neo4j instances version 4.4, 5.x, and 2025.x.
+For a detailed list of changes across versions, see the link:https://github.com/neo4j/neo4j-javascript-driver/wiki/6.x-changelog[driver's changelog].
 
 [NOTE]
 --

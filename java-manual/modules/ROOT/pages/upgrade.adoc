@@ -1,17 +1,16 @@
-:driver-changelog-url: https://github.com/neo4j/neo4j-java-driver/wiki/5.x-changelog
+:driver-changelog-url: https://github.com/neo4j/neo4j-java-driver/wiki/6.x-changelog
 
 = Upgrade from older versions
 
-This page contains the list of new features and breaking changes of the driver from version 4.4 to 5.x.
+This page contains the list of new features and breaking changes of the driver from version 5.28 to to 6.x.
 For a full list of changes, see the link:{driver-changelog-url}[Driver -> Changelog].
 
-The latest driver version of the 5.x series ({java-driver-version}) is compatible with Neo4j server both 4.4 and 5.x, so you can upgrade the driver before you upgrade the server.
-At the same time, the driver version 4.4 is forward compatible with Neo4j server 5.x, so you could also upgrade the server before the driver; however, given that it's easier to roll back an application upgrade than a server upgrade, it's recommended to start with the driver.
+The latest driver version of the 6.x series is compatible with Neo4j server both 4.4, 5.x, and 202[56].x, so you can upgrade the driver before you upgrade the server.
+At the same time, the driver version 5.28 is forward compatible with Neo4j server 202[56].x, so you could also upgrade the server before the driver; however, given that it's easier to roll back an application upgrade than a server upgrade, it's recommended to start with the driver.
 
 [TIP]
 When upgrading the Neo4j server to a newer version, the Cypher queries in your application may also need updating. +
 See link:https://neo4j.com/docs/cypher-manual/current/deprecations-additions-removals-compatibility/[Cypher -> Deprecations, additions, and compatibility].
-
 
 [[new-features]]
 == New features
@@ -20,147 +19,130 @@ See link:https://neo4j.com/docs/cypher-manual/current/deprecations-additions-rem
 |===
 
 |
-.Run transactions with less knowledge of driver's internals
+.Value mapping
 [%collapsible]
 ====
-The new method `Driver.executableQuery()` is a wrapper for `Session.executeRead/Write()`, but it abstracts away the result processing part and returns a list of records to the caller directly. For more information, see xref:query-simple.adoc[].
-
-The new method link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/Session.html#executeWriteWithoutResult(java.util.function.Consumer,org.neo4j.driver.TransactionConfig)[`Session.executeWriteWithoutResult()`] allows for running write queries without result processing.
+With the xref:value-mapping.adoc[Value Mapping feature], you can declare a Java Record containing the specification of the values your query is expected to return, and ask the driver to use that class to spawn new objects from a query result.
 ====
 |
-.Packaging changes
+.New type `Vector`
 [%collapsible]
 ====
-The `org.neo4j.driver:neo4j-java-driver` artifact no longer includes shaded Netty and Project Reactor dependencies and replaces the `org.neo4j.driver:neo4j-java-driver-slim` introduced in version 4.4.
-
-A new `org.neo4j.driver:neo4j-java-driver-all` artifact includes shaded Netty and Project Reactor dependencies dependencies and is similar to the original packaging of the `org.neo4j.driver:neo4j-java-driver` before this update.
-
-The `org.neo4j.driver:neo4j-java-driver` includes an explicit module declaration for Java Platform Module System (JMPS). The module name remains unchanged.
+The type xref:data-types.adoc#vector[`Vector`] allows for storing and retrieving Cypher `VECTOR` objects to/from the database.
+The `VECTOR` type is suitable for efficiently storing lists of homogeneous numbers, such as embeddings.
 ====
 
 |
-.New reactive sessions
+.GQL status objects in exceptions
 [%collapsible]
 ====
-New link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/reactive/ReactiveSession.html[`ReactiveSession` (Flow)] and link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/reactivestreams/ReactiveSession.html[`ReactiveSession` (reactivestreams)] implementations.
-
-For more information, see xref:reactive.adoc[].
+Exception objects also expose errors as GQL-status objects.
+The main difference between Neo4j error codes and GQL error codes is that the latter are more granular.
+For more information, see xref:query-simple.adoc#error-handling[Error handling].
 ====
 |
-.Re-authentication
+.Unix sockets support
 [%collapsible]
 ====
-Allows for xref:connect-advanced.adoc#rotating-tokens[rotating authentication tokens] as well as xref:transactions.adoc#impersonation[session-scoped] and xref:query-simple.adoc#impersonation[query-scoped] authentication.
-====
+The new `bolt+unix` URI scheme allows connecting to a Neo4j server over Unix sockets.
 
-|
-.Mutual TLS (mTLS) as second authentication factor (2FA)
-[%collapsible]
-====
-Allows for configuring client side TLS certificates to authenticate against the server.
-
-See xref:connect-advanced.adoc#mtls[Mutual TLS].
-====
-|
-.`BookmarkManager` support
-[%collapsible]
-====
-Bookmark managers make it easier to achieve causal chaining of sessions.
-
-For more information, see xref:bookmarks.adoc[], link:https://github.com/neo4j/neo4j-java-driver/pull/1285[BookmarkManager], and link:https://github.com/neo4j/neo4j-java-driver/pull/1211[Update to Bookmarks API].
+For more information, see xref:connect-advanced.adoc#unix-sockets[Connecting through Unix sockets].
 ====
 
 |
-.Notification filtering API
+.Netty native transports support
 [%collapsible]
 ====
-Filtering allows to receive only a subset of notifications from the server, and to improve performance server-side.
+link:https://netty.io/wiki/native-transports.html[Netty native transports] add features specific to a particular platform, generate less garbage, and generally improve performance when compared to the NIO based transport.
 
-For more information, see xref:result-summary.adoc#_filter_notifications[Explore the query execution summary -> Filter notifications].
-====
-|
-.GQL statuses and errors
-[%collapsible]
-====
-The property `ResultSummary.gqlStatusObjects` contains a sequence of `GqlStatusObject`, holding information about the execution of the query.
-This API is planned to supersede the current notifications API.
-
-Interface link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/exceptions/Neo4jException.html[`Neo4jException`] exposes GQL metadata as well.
-
-For more information, see xref:result-summary.adoc#_notifications[Explore the query execution summary -> Notifications].
-====
-
-|
-.Telemetry
-[%collapsible]
-====
-The driver sends anonymous API usage statistics to the server.
-Use the driver configuration `telemetryDisabled: true` to opt out.
-
-See link:https://github.com/neo4j/neo4j-java-driver/pull/1487[API Telemetry].
+For more information, see xref:performance.adoc#netty-native-transports[Performance -> Switch to Netty native transports].
 ====
 |
 
 |===
+
+////
+experimental
+|
+.TCP Fast Open support
+[%collapsible]
+====
+TCP Fast Open enables the server to send data already during the TCP handshake (either during the Bolt or TLS handshake, depending on the encryption settings).
+
+For more information, see xref:performance.adoc#enable-tfo[Performance -> Enable TCP Fast Open (TFO)].
+====
+////
 
 
 [[breaking-changes]]
 == Breaking changes and deprecations
 
-Deprecated features are likely to be removed in version 6.
+Deprecated features are likely to be removed in the next major version.
 
 [cols="1,5a,1"]
 |===
 |Version |Message |Status
 
-|5.0
-|Baseline Java version 17.
+|6.0
+|link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Session.html[`Session`] -- Methods `.readTransaction()` and `.writeTransaction()` have been removed in favor of `.executeRead()` and `.executeWrite()`.
+The same holds for their async conterparts `.executeReadAsync()` and `.executeWriteAsync()`.
+The new methods behave similarly, but the argument types are different and the new methods do not support the `.commit()`, `.rollback()`, `.close()`, and `.closed()` methods.
+|label:removed[]
+
+|6.0
+|Interface link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/reactive/RxSession.html[`RxSession`] has been removed in favor of link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/reactive/ReactiveSession.html[`ReactiveSession` (Flow)] and link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/reactivestreams/ReactiveSession.html[`ReactiveSession` (reactivestreams)]. +
+For reactive examples, see xref:reactive.adoc[].
+|label:removed[]
+
+|6.0
+|link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Session.html[`Session`] -- Methods `.asyncSession()` and `.reactiveSession()` have been removed. Use `Session(Class)`, with `Class` controlling the desired type of session.
+|label:removed[]
+
+|6.0
+|link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Config.TrustStrategy.html[`Config.TrustStrategy`] -- Method link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Config.TrustStrategy.html#certFile()[`.certFile()`] has been removed in favor of link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Config.TrustStrategy.html#certFiles()[`.certFiles()`].
+|label:removed[]
+
+|6.0
+|link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/summary/Notification.html[`Notification`] -- Method `.severity()` has been removed. Use `.rawSeverityLevel()` for the raw value and `.severityLevel()` for an enumerated value.
+|label:removed[]
+
+|6.0
+|*Bookmarks*
+
+- Method `Session.lastBookmark()` has been removed in favor of link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Session.html#lastBookmarks()[`.lastBookmarks()`].
+- link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Bookmark.html[`Bookmark`] no longer supports being initialized with multiple values (as `Set<String>`); only a single `String` can be passed.
+Multiple values are supported via multiple instances of `Bookmark`.
+|label:removed[]
+
+|6.0
+|The default driver logging implementation has been changed from `Logging.none()` to link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Logging.html#systemLogging()[`Logging.systemLogging()`].
 |label:removed[Changed]
 
 |5.0
-|link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/GraphDatabase.html[`GraphDatabase`] -- Method `.routingDriver()` has been removed. Use `.driver()` instead.
-|label:removed[]
-
-|5.0
-|link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/summary/ServerInfo.html[`ServerInfo`] -- Method `.version()` has been removed.
-Use `.agent()`, `.protocolVersion()`, or call the link:https://neo4j.com/docs/operations-manual/current/reference/procedures/#procedure_dbms_components[`dbms.components`] Cypher procedure instead.
-|label:removed[]
-
-|5.0
-|link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/Session.html[`Session`] -- Method `.reset()` has been removed without replacement.
-|label:removed[]
-
-|5.0
-|link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/exceptions/Neo4jException.html[`Neo4jException`] -- Method `.neo4jErrorCode()` has been removed in favor of `.code()`.
-|label:removed[]
-
-|5.0
-|link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/Session.html[`Session`] -- Methods `.readTransaction()` and `.writeTransaction()` are deprecated in favor of `.executeRead()` and `.executeWrite()`. The same holds for their async conterparts `.executeReadAsync()` and `.executeWriteAsync()`.
-The new methods behave similarly, but the argument types are different and the new methods do not support the `.commit()`, `.rollback()`, `.close()`, and `.closed()` methods.
+|link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/types/Node.html[`Node`], link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/types/Relationship.html[`Relationship`] -- Method `.id()` (`long`) is deprecated in favor of `.elementId()` (`string`).
 |label:deprecated[]
 
 |5.0
-|link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/Session.html[`Session`] -- Method `.lastBookmark()` is deprecated in favor of link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/Session.html#lastBookmarks()[`.lastBookmarks()`].
+|link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/types/Relationship.html[`Relationship`] -- Methods `.startNodeId()` and `.endNodeId()` are deprecated in favor of `.startNodeElementId()` and `.endNodeElementId()`. Old identifiers were `long`, whereas new ElementIds are `string`.
 |label:deprecated[]
 
-|5.0
-|link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/Session.html[`Session`] -- Methods `.asyncSession()` and `reactiveSession()` are deprecated. Use `Session(Class)`, with `Class` controlling what type of session you  wish for.
+|6.0
+|xref:result-summary.adoc#_notifications[Notifications] as Neo4j status codes are deprecated in favor of GQL status objects.
+
+As a result,
+
+- Interface link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/summary/Notification.html[`Notification`] is deprecated in favor of link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/summary/GqlNotification.html[`GqlNotification`].
+- Method link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/summary/ResultSummary.html#notifications()[`ResultSummary.notifications()`] is deprecated in favor of link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/summary/ResultSummary.html#gqlStatusObjects()[`ResultSummary.gqlStatusObjects()`].
+- Interface link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/NotificationCategory.html[`NotificationCategory`] is deprecated in favor of link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/NotificationClassification.html[`NotificationClassification`]
+- xref:result-summary.adoc#_filter_notifications[Filtering notifications] via categories is deprecated in favor of classifications. As a result, interface link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/NotificationConfig.html[`NotificationConfig`] is deprecated, and method link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Config.ConfigBuilder.html#withNotificationConfig(org.neo4j.driver.NotificationConfig)[`Config.ConfigBuilder.withNotificationConfig()`] is deprecated in favor of link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Config.ConfigBuilder.html#withMinimumNotificationSeverity(org.neo4j.driver.NotificationSeverity)[`.withMinimumNotificationSeverity()`] and link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Config.ConfigBuilder.html#withDisabledNotificationClassifications(java.util.Set)[`.withDisabledNotificationClassifications()`].
 |label:deprecated[]
 
-|5.0
-|link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/types/Node.html[`Node`], link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/types/Relationship.html[`Relationship`] -- Method `.id()` (`long`) is deprecated in favor of `.elementId()` (`string`).
-|label:deprecated[]
+|6.0
+|The driver's logging abstraction is deprecated in favour of `System.Logger`.
+As a result,
 
-|5.0
-|link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/types/Relationship.html[`Relationship`] -- Methods `.startNodeId()` and `.endNodeId()` are deprecated in favor of `.startNodeElementId()` and `.endNodeElementId()`. Old identifiers were `long`, whereas new ElementIds are `string`.
-|label:deprecated[]
-
-|5.0
-|Reactive sessions -- Interface link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/reactive/RxSession.html[`RxSession`] is deprecated in favor of link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/reactive/ReactiveSession.html[`ReactiveSession` (Flow)] and link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/reactivestreams/ReactiveSession.html[`ReactiveSession` (reactivestreams)].
-|label:deprecated[]
-
-|5.7
-|link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/summary/Notification.html[`Notification`] -- Method `.severity()` is deprecated. Use `.rawSeverityLevel()` for the raw value and `.severityLevel()` for an enumerated value.
+- Interfaces link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Logging.html[`Logging`] and link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Logger.html[`Logger`] are deprecated.
+- Methods link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Config.ConfigBuilder.html#withLogging(org.neo4j.driver.Logging)[`Config.ConfigBuilder.withLogging()`] and  link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Config.html#logging()[`Config.logging()`] are deprecated.
 |label:deprecated[]
 
 |===

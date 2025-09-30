@@ -6,7 +6,7 @@ The workflow is very similar to the synchronous version, except that you must us
 If you need <<causal_consistency>> across different transactions, use xref:bookmarks.adoc[bookmarks].
 
 .An async driver example with `execute_query`
-[source, python, role=nocollapse]
+[source, python]
 ----
 import asyncio
 from neo4j import AsyncGraphDatabase
@@ -31,7 +31,7 @@ if __name__ == "__main__":
 ----
 
 .An async driver example with transaction functions
-[source, python, role=nocollapse]
+[source, python]
 ----
 import asyncio
 from neo4j import AsyncGraphDatabase
@@ -60,7 +60,7 @@ if __name__ == "__main__":
 
 [TIP]
 Async implements a concurrency model, but it is not the only possible one.
-Multithreading is also possible, although `asyncio` is often easier to implement in an application.
+Multithreading is another option, although `asyncio` is often easier to implement in an application.
 
 [WARNING]
 There is a known issue with Python 3.8 and the async driver where it gradually slows down.

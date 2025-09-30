@@ -1,12 +1,9 @@
 = Coordinate parallel transactions
 
-When working with a Neo4j cluster, <<causal_consistency>> is enforced by default in most cases, which guarantees that a query is able to read changes made by previous queries.
+When working with a Neo4j cluster, <<causal_consistency>> is enforced by default in most cases, guaranteeing that a query is able to read changes made by previous queries.
 The same does not happen by default for multiple xref:transactions.adoc[transactions] running in parallel though.
 In that case, you can use _bookmarks_ to have one transaction wait for the result of another to be propagated across the cluster before running its own work.
-This is not a requirement, and *you should only use bookmarks if you _need_ casual consistency across different transactions*, as waiting for bookmarks can have a negative performance impact.
-
-A _bookmark_ is a token that represents some state of the database.
-By passing one or multiple bookmarks along with a query, the server will make sure that the query does not get executed before the represented state(s) have been established.
+This is not a requirement, and *you should only use <<bookmark,bookmarks>> if you _need_ casual consistency across different transactions*, as waiting for bookmarks can have a negative performance impact.
 
 
 == Bookmarks with `.executableQuery()`
@@ -36,7 +33,7 @@ driver.executableQuery("<QUERY>")
 
 == Bookmarks within a single session
 
-Bookmark management happens automatically for queries run within a single session, so that you can trust that queries inside one session are causally chained.
+Bookmark management happens automatically for queries run within a single session: queries inside the same session are causally chained.
 
 [source, java]
 ----
@@ -148,19 +145,19 @@ public class App {
 
 ----
 
-<1> Collect and combine bookmarks from different sessions using `Session.lastBookmarks()`, storing them in a link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/Bookmark.html[`Bookmark`] object.
+<1> Collect and combine bookmarks from different sessions using `Session.lastBookmarks()`, storing them in a link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Bookmark.html[`Bookmark`] object.
 <2> Use them to initialize another session with the `.withBookmarks()` config method.
 
 image:{common-image}/driver-passing-bookmarks.svg[]
 
 [TIP]
 The use of bookmarks can negatively impact performance, since all queries are forced to wait for the latest changes to be propagated across the cluster.
-For simple use-cases, try to group queries within a single transaction, or within a single session.
+If possible, try to group queries within a single transaction, or within a single session.
 
 
 == Mix `.executableQuery()` and sessions
 
-To ensure causal consistency among transactions executed partly with `.executableQuery()` and partly with sessions, you can retrieve the default bookmark manager for `ExecutableQuery` instances through `driver.executableQueryBookmarkManager()` and pass it to new sessions through the `.withBookmarkManager()` config method.
+To ensure causal consistency among transactions executed partly with `.executableQuery()` and partly with sessions, retrieve the default bookmark manager for `ExecutableQuery` instances through `driver.executableQueryBookmarkManager()` and pass it to new sessions through the `.withBookmarkManager()` config method.
 This will ensure that all work is executed under the same bookmark manager and thus causally consistent.
 
 [source, java]
