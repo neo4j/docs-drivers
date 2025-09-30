@@ -74,13 +74,6 @@ For more information, see xref:performance.adoc#enable-tfo[Performance -> Enable
 ////
 
 
-
-BREAKING CHANGE: the org.neo4j.driver.Bookmark no longer supports having multiple bookmark values, multiple values are supportted by simply having multiple instances of Bookmark
-
-feat(logging): add support for System.Logger and deprecate Logging #1648
-
-
-
 [[breaking-changes]]
 == Breaking changes and deprecations
 
