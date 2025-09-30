@@ -64,7 +64,7 @@ constraintsRemoved=0, systemUpdates=0}
 */
 ----
 
-There are two additional boolean methods which act as meta-counters:
+Two additional boolean methods act as meta-counters:
 
 - `.containsUpdates()` -- Whether the query triggered any write operation on the database on which it ran
 - `.containsSystemUpdates()` -- Whether the query triggered any write operation on the `system` database

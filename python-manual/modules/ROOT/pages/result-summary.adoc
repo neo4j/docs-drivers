@@ -61,7 +61,7 @@ print(summary.counters)
 """
 ----
 
-There are two additional boolean properties which act as meta-counters:
+Two additional boolean properties act as meta-counters:
 
 - `contains_updates` -- whether the query triggered any write operation on the database on which it ran
 - `contains_system_updates` -- whether the query triggered any write operation on the `system` database

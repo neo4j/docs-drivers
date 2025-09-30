@@ -79,7 +79,7 @@ console.log(summary.counters.containsUpdates())  // true
 console.log(summary.counters.containsSystemUpdates())  // false
 ----
 
-There are two additional methods on `ResultSummary.counters` which act as meta-counters:
+Two additional methods on `ResultSummary.counters` act as meta-counters:
 
 - `.containsUpdates()` -- whether the query triggered any write operation on the database on which it ran
 - `.containsSystemUpdates()` -- whether the query triggered any write operation on the `system` database
