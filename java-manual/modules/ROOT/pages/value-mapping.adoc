@@ -33,7 +33,8 @@ public class App {
     public static void main(String... args) {
         try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword))) {
             record Person(String name, Integer age) {}
-            var persons = driver.executableQuery("MERGE (p:Person {name: 'Margarida', age: 29}) RETURN p")
+            var persons = driver.executableQuery("MERGE (p:Person {name: $name, age: $age}) RETURN p")
+                .withParameters(Map.of("name", "Margarida", "age", 29))
                 .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
                 .execute()
                 .records()
@@ -77,7 +78,8 @@ You can always alter the return key with the Cypher operator link:https://neo4j.
 // import org.neo4j.driver.mapping.Property;
 
 record Person(@Property("name") String firstName, @Property("age") Integer Years) {}
-var persons = driver.executableQuery("MERGE (p:Person {name: 'Margarida', age: 29}) RETURN p")
+var persons = driver.executableQuery("MERGE (p:Person {name: $name, age: $age}) RETURN p")
+    .withParameters(Map.of("name", "Margarida", "age", 29))
     .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
     .execute()
     .records()
@@ -100,9 +102,10 @@ You can also use the mapping feature with driver `Record` instances, through the
 
 record Person(String name, @Property("p.age") Integer age) {}
 var persons = driver.executableQuery("""
-            MERGE (p:Person {name: 'Margarida', age: 29})
+            MERGE (p:Person {name: $name, age: $age})
             RETURN p.name AS name, p.age
         """)
+    .withParameters(Map.of("name", "Margarida", "age", 29))
     .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
     .execute()
     .records()
@@ -134,7 +137,8 @@ record Person(String name, int age) {
         this(name, -1);
     }
 }
-var persons = driver.executableQuery("MERGE (p:Person {name: 'Axel'}) RETURN p")
+var persons = driver.executableQuery("MERGE (p:Person {name: $name}) RETURN p")
+    .withParameters(Map.of("name", "Axel"))
     .withConfig(QueryConfig.builder().withDatabase("neo4j").build())
     .execute()
     .records()
