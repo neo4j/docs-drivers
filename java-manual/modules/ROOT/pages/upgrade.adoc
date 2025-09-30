@@ -156,7 +156,8 @@ The new methods behave similarly, but the argument types are different and the n
 |label:deprecated[]
 
 |5.0
-|Reactive sessions -- Interface link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/reactive/RxSession.html[`RxSession`] is deprecated in favor of link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/reactive/ReactiveSession.html[`ReactiveSession` (Flow)] and link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/reactivestreams/ReactiveSession.html[`ReactiveSession` (reactivestreams)].
+|Reactive sessions -- Interface link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/reactive/RxSession.html[`RxSession`] is deprecated in favor of link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/reactive/ReactiveSession.html[`ReactiveSession` (Flow)] and link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/reactivestreams/ReactiveSession.html[`ReactiveSession` (reactivestreams)]. +
+For reactive examples, see xref:reactive.adoc[].
 |label:deprecated[]
 
 |5.0
