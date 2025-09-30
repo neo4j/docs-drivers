@@ -134,7 +134,7 @@ Call `driver.close()` explicitly or create the driver via a `with` statement.
 |label:removed[]
 
 |6.0
-|link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.exceptions.Neo4jError[`Neo4jError`] -- Method link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.exceptions.Neo4jError.is_retriable[`.is_retriable()`] has been removed in favor of link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.exceptions.Neo4jError.is_retryable[`.is_retryable()`].
+|link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.exceptions.Neo4jError[`Neo4jError`] -- Method `.is_retriable()` has been removed in favor of link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.exceptions.Neo4jError.is_retryable[`.is_retryable()`].
 |label:removed[]
 
 |6.0
