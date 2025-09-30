@@ -199,21 +199,21 @@ try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPasswor
 
 == Logging
 
-By default, the driver logs `INFO` messages through the Java logging framework `java.util.logging`.
-To change the driver's logging behavior, use the link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Config.ConfigBuilder.html#withLogging(org.neo4j.driver.Logging)[`.withLogging()`] method when creating a `Driver` object.
+Logging is supported via Java's link:https://docs.oracle.com/en/java/javase/21/core/java-logging-overview.html[`System.Logger`].
+By default, you can control the driver's logging setup by tweaking the content of the file `$JAVA_HOME/conf/logging.properties`.
 
-[source, java]
+[source, conf]
 ----
-// import java.util.logging.Level;
-// import org.neo4j.driver.AuthTokens;
-// import org.neo4j.driver.Config;
-// import org.neo4j.driver.GraphDatabase;
-// import org.neo4j.driver.Logging;
+# Enable driver and Bolt logging
+org.neo4j.driver.level = FINE
+org.neo4j.bolt.connection.level = FINE
+----
 
-try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword),
-    Config.builder().withLogging(Logging.console(Level.FINE)).build())) {
-    driver.verifyConnectivity();
-}
+For log messages to appear in the console, you also need to adjust the console logging level.
+
+[source, conf]
+----
+java.util.logging.ConsoleHandler.level = FINE
 ----
 
 .Example of log output upon driver connection

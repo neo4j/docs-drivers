@@ -121,6 +121,10 @@ For reactive examples, see xref:reactive.adoc[].
 Multiple values are supported via multiple instances of `Bookmark`.
 |label:removed[]
 
+|6.0
+|The default driver logging implementation has been changed from `Logging.none()` to link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Logging.html#systemLogging()[`Logging.systemLogging()`].
+|label:removed[Changed]
+
 |5.0
 |link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/types/Node.html[`Node`], link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/types/Relationship.html[`Relationship`] -- Method `.id()` (`long`) is deprecated in favor of `.elementId()` (`string`).
 |label:deprecated[]
