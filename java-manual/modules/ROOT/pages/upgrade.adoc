@@ -74,6 +74,13 @@ For more information, see xref:performance.adoc#enable-tfo[Performance -> Enable
 ////
 
 
+
+BREAKING CHANGE: the org.neo4j.driver.Bookmark no longer supports having multiple bookmark values, multiple values are supportted by simply having multiple instances of Bookmark
+
+feat(logging): add support for System.Logger and deprecate Logging #1648
+
+
+
 [[breaking-changes]]
 == Breaking changes and deprecations
 
@@ -84,33 +91,61 @@ Deprecated features are likely to be removed in version 6.
 |Version |Message |Status
 
 |6.0
-|link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/Session.html[`Session`] -- Methods `.readTransaction()` and `.writeTransaction()` have been removed in favor of `.executeRead()` and `.executeWrite()`.
+|link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Session.html[`Session`] -- Methods `.readTransaction()` and `.writeTransaction()` have been removed in favor of `.executeRead()` and `.executeWrite()`.
 The same holds for their async conterparts `.executeReadAsync()` and `.executeWriteAsync()`.
 The new methods behave similarly, but the argument types are different and the new methods do not support the `.commit()`, `.rollback()`, `.close()`, and `.closed()` methods.
 |label:removed[]
 
 |6.0
-|link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/Session.html[`Session`] -- Method `.lastBookmark()` has been removed in favor of link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/Session.html#lastBookmarks()[`.lastBookmarks()`].
+|Reactive sessions -- Interface link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/reactive/RxSession.html[`RxSession`] has been removed in favor of link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/reactive/ReactiveSession.html[`ReactiveSession` (Flow)] and link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/reactivestreams/ReactiveSession.html[`ReactiveSession` (reactivestreams)]. +
+For reactive examples, see xref:reactive.adoc[].
+|label:removed[]
+
+|6.0
+|link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Session.html[`Session`] -- Methods `.asyncSession()` and `.reactiveSession()` have been removed. Use `Session(Class)`, with `Class` controlling the desired type of session.
+|label:removed[]
+
+|6.0
+|link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Config.TrustStrategy.html[`Config.TrustStrategy`] -- Method link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Config.TrustStrategy.html#certFile()[`.certFile()`] has been removed in favor of link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Config.TrustStrategy.html#certFiles()[`.certFiles()`].
+|label:removed[]
+
+|6.0
+|link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/summary/Notification.html[`Notification`] -- Method `.severity()` has been removed. Use `.rawSeverityLevel()` for the raw value and `.severityLevel()` for an enumerated value.
+|label:removed[]
+
+|6.0
+|*Bookmarks*
+
+- Method `Session.lastBookmark()` has been removed in favor of link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Session.html#lastBookmarks()[`.lastBookmarks()`].
+- link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Bookmark.html[`Bookmark`] no longer supports being initialized with multiple values (as `Set<String>`); only a single `String` can be passed.
+Multiple values are supported via multiple instances of `Bookmark`.
 |label:removed[]
 
 |5.0
-|link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/Session.html[`Session`] -- Methods `.asyncSession()` and `reactiveSession()` are deprecated. Use `Session(Class)`, with `Class` controlling what type of session you  wish for.
+|link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/types/Node.html[`Node`], link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/types/Relationship.html[`Relationship`] -- Method `.id()` (`long`) is deprecated in favor of `.elementId()` (`string`).
 |label:deprecated[]
 
 |5.0
-|Reactive sessions -- Interface link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/reactive/RxSession.html[`RxSession`] is deprecated in favor of link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/reactive/ReactiveSession.html[`ReactiveSession` (Flow)] and link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/reactivestreams/ReactiveSession.html[`ReactiveSession` (reactivestreams)].
+|link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/types/Relationship.html[`Relationship`] -- Methods `.startNodeId()` and `.endNodeId()` are deprecated in favor of `.startNodeElementId()` and `.endNodeElementId()`. Old identifiers were `long`, whereas new ElementIds are `string`.
 |label:deprecated[]
 
-|5.7
-|link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/summary/Notification.html[`Notification`] -- Method `.severity()` is deprecated. Use `.rawSeverityLevel()` for the raw value and `.severityLevel()` for an enumerated value.
+|6.0
+|xref:result-summary.adoc#_notifications[Notifications] as Neo4j status codes are deprecated in favor of GQL status objects.
+
+As a result,
+
+- Interface link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/summary/Notification.html[`Notification`] is deprecated in favor of link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/summary/GqlNotification.html[`GqlNotification`].
+- Method link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/summary/ResultSummary.html#notifications()[`ResultSummary.notifications()`] is deprecated in favor of link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/summary/ResultSummary.html#gqlStatusObjects()[`ResultSummary.gqlStatusObjects()`].
+- Interface link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/NotificationCategory.html[`NotificationCategory`] is deprecated in favor of link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/NotificationClassification.html[`NotificationClassification`]
+- xref:result-summary.adoc#_filter_notifications[Filtering notifications] via categories is deprecated in favor of classifications. As a result, interface link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/NotificationConfig.html[`NotificationConfig`] is deprecated, and method link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Config.ConfigBuilder.html#withNotificationConfig(org.neo4j.driver.NotificationConfig)[`Config.ConfigBuilder.withNotificationConfig()`] is deprecated in favor of link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Config.ConfigBuilder.html#withMinimumNotificationSeverity(org.neo4j.driver.NotificationSeverity)[`.withMinimumNotificationSeverity()`] and link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Config.ConfigBuilder.html#withDisabledNotificationClassifications(java.util.Set)[`.withDisabledNotificationClassifications()`].
 |label:deprecated[]
 
-|5.0
-|link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/types/Node.html[`Node`], link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/types/Relationship.html[`Relationship`] -- Method `.id()` (`long`) is deprecated in favor of `.elementId()` (`string`).
-|label:deprecated[]
+|6.0
+|The driver's logging abstraction is deprecated in favour of `System.Logger`.
+As a result,
 
-|5.0
-|link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/types/Relationship.html[`Relationship`] -- Methods `.startNodeId()` and `.endNodeId()` are deprecated in favor of `.startNodeElementId()` and `.endNodeElementId()`. Old identifiers were `long`, whereas new ElementIds are `string`.
+- Interfaces link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Logging.html[`Logging`] and link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Logger.html[`Logger`] are deprecated.
+- Methods link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Config.ConfigBuilder.html#withLogging(org.neo4j.driver.Logging)[`Config.ConfigBuilder.withLogging()`] and  link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Config.html#logging()[`Config.logging()`] are deprecated.
 |label:deprecated[]
 
 |===
