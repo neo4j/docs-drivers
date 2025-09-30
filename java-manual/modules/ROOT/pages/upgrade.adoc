@@ -97,7 +97,7 @@ The new methods behave similarly, but the argument types are different and the n
 |label:removed[]
 
 |6.0
-|Reactive sessions -- Interface link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/reactive/RxSession.html[`RxSession`] has been removed in favor of link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/reactive/ReactiveSession.html[`ReactiveSession` (Flow)] and link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/reactivestreams/ReactiveSession.html[`ReactiveSession` (reactivestreams)]. +
+|Interface link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/reactive/RxSession.html[`RxSession`] has been removed in favor of link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/reactive/ReactiveSession.html[`ReactiveSession` (Flow)] and link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/reactivestreams/ReactiveSession.html[`ReactiveSession` (reactivestreams)]. +
 For reactive examples, see xref:reactive.adoc[].
 |label:removed[]
 

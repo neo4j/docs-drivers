@@ -106,15 +106,16 @@ Through the new methods, the first argument of transaction functions is a link:h
 |label:removed[Changed]
 
 |5.0
-|link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/error.js~Neo4jError.html[`Neo4jError`] -- Method `.isRetriable()` is deprecated in favor of `.isRetryable()`.
-|label:deprecated[]
-
-|5.0
 |link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/graph-types.js~Node.html[`Node`], link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/graph-types.js~Relationship.html[`Relationship`] -- Property `.identity` (NumberOrInteger) is deprecated in favor of `.elementId` (String).
 |label:deprecated[]
 
 |5.0
 |link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/graph-types.js~Relationship.html[`Relationship`] -- Properties `.start` and `.end` are deprecated in favor of `.startNodeElementId` and `.endNodeElementId`. Old identifiers were `NumberOrInteger`, whereas new ElementIds are `string`.
+|label:deprecated[]
+
+
+|6.0
+|link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/error.js~Neo4jError.html[`Neo4jError`] -- Method link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/error.js~Neo4jError.html#static-method-isRetriable[`.isRetriable()`] is deprecated in favor of link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/error.js~Neo4jError.html#static-method-isRetryable[`.isRetryable()`].
 |label:deprecated[]
 
 |6.0
