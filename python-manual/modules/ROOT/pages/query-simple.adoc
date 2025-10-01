@@ -161,11 +161,11 @@ For those rare use cases, see xref:query-advanced#_dynamic_values_in_property_ke
 
 == Error handling
 
-A query run may fail for a number of reasons, with different link:https://neo4j.com/docs/api/python-driver/current/api.html#errors[exceptions] being raised.
+A query run may fail for a number of reasons, with different link:https://neo4j.com/docs/api/python-driver/{python-driver-version}/api.html#errors[exceptions] being raised.
 When using `driver.execute_query()`, the driver automatically retries to run a failed query if the failure is deemed to be transient (for example due to temporary server unavailability).
 An error will be raised if the operation keeps failing after the configured link:https://neo4j.com/docs/api/python-driver/{python-driver-version}/api.html#max-transaction-retry-time[maximum retry time].
 
-All link:https://neo4j.com/docs/status-codes/current/errors/all-errors/[exceptions coming from the server] are subclasses of link:https://neo4j.com/docs/api/python-driver/current/api.html#neo4j.exceptions.Neo4jError[`Neo4jError`].
+All link:https://neo4j.com/docs/status-codes/current/errors/all-errors/[exceptions coming from the server] are subclasses of link:https://neo4j.com/docs/api/python-driver/{python-driver-version}/api.html#neo4j.exceptions.Neo4jError[`Neo4jError`].
 You can use an exception's code to stably identify a specific error; error messages are instead not stable markers, and should not be relied upon.
 
 .Basic error handling
