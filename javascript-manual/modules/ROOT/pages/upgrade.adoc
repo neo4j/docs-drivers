@@ -102,7 +102,12 @@ Through the new methods, the first argument of transaction functions is a link:h
 |label:removed[]
 
 |6.0
-|link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/driver.js~Driver.html[`Driver`] -- The method link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/driver.js~Driver.html#instance-method-verifyConnectivity[`.verifyConnectivity()`] now returns `void` instead of `ServerInfo`. To retrieve the server info, use link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/driver.js~Driver.html#instance-method-getServerInfo[`.getServerInfo()`].
+|link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/driver.js~Driver.html[`Driver`] -- The return type of method link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/driver.js~Driver.html#instance-method-verifyConnectivity[`.verifyConnectivity()`] changed from `ServerInfo` to `void`.
+To retrieve the server info, use link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/driver.js~Driver.html#instance-method-getServerInfo[`.getServerInfo()`].
+|label:removed[Changed]
+
+|6.0
+|link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/result-summary.js~ServerInfo.html[`ServerInfo`] -- The return type of attribute link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/result-summary.js~ServerInfo.html#instance-member-protocolVersion[`protocolVersion`] changed from `number` to `ProtocolVersion`.
 |label:removed[Changed]
 
 |5.0
@@ -113,13 +118,13 @@ Through the new methods, the first argument of transaction functions is a link:h
 |link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/graph-types.js~Relationship.html[`Relationship`] -- Properties `.start` and `.end` are deprecated in favor of `.startNodeElementId` and `.endNodeElementId`. Old identifiers were `NumberOrInteger`, whereas new ElementIds are `string`.
 |label:deprecated[]
 
-
 |6.0
 |link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/error.js~Neo4jError.html[`Neo4jError`] -- Method link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/error.js~Neo4jError.html#static-method-isRetriable[`.isRetriable()`] is deprecated in favor of link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/error.js~Neo4jError.html#static-method-isRetryable[`.isRetryable()`].
 |label:deprecated[]
 
 |6.0
-|link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/temporal-types.js~Date.html[`Date`] -- Method link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/temporal-types.js~Date.html#static-method-fromStandardDate[`.fromStandardDate()`] is deprecated due to the unclear handling of timezones. link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/temporal-types.js~Date.html#static-method-fromStandardDateLocal[`.fromStandardDateLocal()`] is a drop in replacement, but link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/temporal-types.js~Date.html#static-method-fromStandardDateUTC[`.fromStandardDateUTC()`] may be more desireable to some users.
+|link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/temporal-types.js~Date.html[`Date`] -- Method link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/temporal-types.js~Date.html#static-method-fromStandardDate[`.fromStandardDate()`] is deprecated due to the unclear handling of timezones.
+link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/temporal-types.js~Date.html#static-method-fromStandardDateLocal[`.fromStandardDateLocal()`] is a drop in replacement, but link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/temporal-types.js~Date.html#static-method-fromStandardDateUTC[`.fromStandardDateUTC()`] may be more desireable to some users.
 |label:deprecated[]
 
 |6.0
