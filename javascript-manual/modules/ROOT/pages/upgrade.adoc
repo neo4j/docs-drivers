@@ -107,7 +107,7 @@ To retrieve the server info, use link:https://neo4j.com/docs/api/javascript-driv
 |label:removed[Changed]
 
 |6.0
-|link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/result-summary.js~ServerInfo.html[`ServerInfo`] -- The return type of attribute link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/result-summary.js~ServerInfo.html#instance-member-protocolVersion[`protocolVersion`] changed from `number` to `ProtocolVersion`.
+|link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/result-summary.js~ServerInfo.html[`ServerInfo`] -- The return type of attribute link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/result-summary.js~ServerInfo.html#instance-member-protocolVersion[`protocolVersion`] changed from `number` to link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/protocol-version.js~ProtocolVersion.html[`ProtocolVersion`].
 |label:removed[Changed]
 
 |5.0
