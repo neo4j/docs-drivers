@@ -1,7 +1,6 @@
 name: javascript-manual
 title: Neo4j JavaScript Driver Manual
 version: '6'
-prerelease: true
 start_page: ROOT:index.adoc
 nav:
 - modules/ROOT/content-nav.adoc
