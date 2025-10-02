@@ -17,7 +17,7 @@ on:
       - completed
 
 jobs:
-  publish-docs:
+  deploy-docs:
     # Uncomment this if statement to deploy only when the PR builds cleanly
     # if: github.event.workflow_run.conclusion == 'success'
 
@@ -63,11 +63,6 @@ jobs:
       - id: unzip-docs
         run: unzip docs.zip
 
-      - id: get-top-dir
-        run: |
-          root=$(ls -d */index.html | sed -r 's/(.*)\/index\.html/\1/')
-          echo "top-dir=$root" >> $GITHUB_OUTPUT
-
       - id: unzip-changelog
         if: ${{ hashFiles('changelog.zip') != '' }}
         run: unzip changelog.zip
@@ -99,7 +94,7 @@ jobs:
           SITE_DIR: ${{ steps.get-top-dir.outputs.top-dir }}
         run: |
           npm install -g surge
-          surge ./$SITE_DIR $DEPLOY_URL --token "$SURGE_TOKEN"
+          surge . $DEPLOY_URL --token "$SURGE_TOKEN"
 
       # If the PR artifacts include a changelog file, add it to the PR as a comment
       # The changelog contains links to new and changed files in the deployed docs
