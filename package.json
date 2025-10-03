@@ -10,8 +10,8 @@
     "serve": "node server.js",
     "build": "antora --stacktrace preview.yml",
     "publish": "antora --stacktrace publish.yml",
-    "build-verify": "antora --stacktrace --fetch preview.yml --log-format=json --log-level=info --log-file ./build/log/log.json",
-    "publish-verify": "antora --stacktrace --fetch publish.yml --log-format=json --log-file ./build/log/log.json",
+    "verify:preview": "antora --stacktrace --fetch preview.yml --log-format=json --log-level=info --log-file ./build/log/log.json",
+    "verify:publish": "antora --stacktrace --fetch publish.yml --log-format=json --log-level=info --log-file ./build/log/log.json",
     "lint": "node scripts/lint-links.js"
   },
   "repository": {
