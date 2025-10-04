@@ -2,16 +2,16 @@
 
 When xref:query-simple.adoc[querying the database with `ExecuteQuery()`], the driver automatically creates a _transaction_. A transaction is a unit of work that is either _committed_ in its entirety or _rolled back_ on failure. You can include multiple Cypher statements in a single query, as for example when using `MATCH` and `CREATE` in sequence to xref:query-simple#_update_the_database[update the database], but you cannot have multiple queries and interleave some client-logic in between them.
 
-For these more advanced use-cases, the driver provides functions to take full control over the transaction lifecycle.
-These are called _managed transactions_, and you can think of them as a way of unwrapping the flow of `executableQuery()` and being able to specify its desired behavior in more places.
+For these more advanced use-cases, the driver provides functions to manually control transactions.
+The most common form is _managed transactions_, and you can think of them as a way of unwrapping the flow of `ExecutableQuery()` and being able to specify its desired behavior in more places.
 
 
 == Create a session
 
 Before running a transaction, you need to obtain a _session_.
-Sessions act as concrete query channels between the driver and the server, and ensure <<causal consistency>> is enforced.
+Sessions act as query channels between the driver and the server, and ensure <<causal consistency>> is enforced.
 
-Sessions are created with the method `DriverWithContext.NewSession()`.
+Sessions are created with the method `Driver.NewSession()`.
 Use the second argument to alter the session's configuration, among which for example the xref:_database_selection[target database].
 For further configuration parameters, see xref:_session_configuration[Session configuration].
 
@@ -21,20 +21,20 @@ session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "<database-n
 defer session.Close(ctx)
 ----
 
-Session creation is a lightweight operation, so sessions can be created and destroyed without significant cost.
+Creating a session is a lightweight operation, so sessions can be created and destroyed without significant cost.
 Always xref:_close_sessions[close sessions] when you are done with them.
 
-*Sessions are _not_ thread safe*: you can share the main `DriverWithContext` object across threads, but make sure each routine creates its own sessions.
+*Sessions are _not_ thread safe*: you can share the main `Driver` object across threads, but each routine should create its own sessions.
 
 
 [#managed-transactions]
 == Run a managed transaction
 
-A transaction can contain any number of queries.
+A transaction can contain multiple queries.
 As Neo4j is <<ACID>> compliant, *queries within a transaction will either be executed as a whole or not at all*: you cannot get a part of the transaction succeeding and another failing.
 Use transactions to group together related queries which work together to achieve a single _logical_ database operation.
 
-A managed transaction is created with the methods link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#SessionWithContext[`SessionWithContext.ExecuteRead()`] and link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#SessionWithContext[`SessionWithContext.ExecuteWrite()`], depending on whether you want to retrieve data from the database or alter it.
+You create a managed transaction with the methods link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#Session[`Session.ExecuteRead()`] and link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#Session[`Session.ExecuteWrite()`], depending on whether you want to retrieve data from the database or alter it.
 Both methods take a <<transaction_function>> callback, which is responsible for actually carrying out the queries and processing the result.
 
 .Retrieve people whose name starts with `Al`
@@ -67,8 +67,8 @@ for _, person := range people.([]*neo4j.Record) {
 <1> Create a session. A single session can be the container for multiple queries. Remember to close it when done (here we `defer` its closure just after opening).
 <2> The `.ExecuteRead()` (or `.ExecuteWrite()`) method is the entry point into a transaction.
 <3> The transaction function callback is responsible of running queries.
-<4> Use the method link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#ManagedTransaction[`ManagedTransaction.Run()`] to run queries. Each query run returns a link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#ResultWithContext[`ResultWithContext`] object.
-<5> xref:process-result[Process the result] using any of the methods on `ResultWithContext`. The method `.Collect()` retrieves all records into a list.
+<4> Use the method link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#ManagedTransaction[`ManagedTransaction.Run()`] to run queries. Each query run returns a link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#Result[`Result`] object.
+<5> xref:process-result[Process the result] using any of the methods on `Result`. The method `.Collect()` retrieves all records into a list.
 
 *Do not hardcode or concatenate parameters directly into the query*.
 Use xref:query-simple#query-parameters[query parameters] instead, both for performance and security reasons.
@@ -76,9 +76,6 @@ Use xref:query-simple#query-parameters[query parameters] instead, both for perfo
 *Transaction functions should never return the result object directly*.
 Instead, always xref:process-result[process the result] in some way.
 Within a transaction function, a `return` statement where `error` is `nil` results in the transaction being committed, while the transaction is automatically rolled back if the returned `error` value is not `nil`.
-
-[CAUTION]
-The methods `.ExecuteRead()` and `.ExecuteWrite()` have replaced `.ReadTransaction()` and `.WriteTransaction()`, which are deprecated in version 5.x and will be removed in version 6.0.
 
 .A transaction with multiple queries, client logic, and potential roll backs
 [source, go]
@@ -90,7 +87,7 @@ import (
     "context"
     "strconv"
     "errors"
-    "github.com/neo4j/neo4j-go-driver/v5/neo4j"
+    "github.com/neo4j/neo4j-go-driver/v6/neo4j"
 )
 
 func main() {
@@ -101,7 +98,7 @@ func main() {
     dbUri := "<database-uri>"
     dbUser := "<username>"
     dbPassword := "<password>"
-    driver, err := neo4j.NewDriverWithContext(
+    driver, err := neo4j.NewDriver(
         dbUri,
         neo4j.BasicAuth(dbUser, dbPassword, ""))
     if err != nil {
@@ -234,10 +231,11 @@ func addPersonToOrganization(ctx context.Context, tx neo4j.ManagedTransaction, p
 }
 ----
 
-Should a transaction fail for a reason that the driver deems transient, it automatically retries to run the transaction function (with an exponentially increasing delay).
-For this reason, *transaction functions must be _idempotent_* (i.e., they should produce the same effect when run several times), because you do not know upfront how many times they are going to be executed.
-In practice, this means that you should not edit nor rely on globals, for example.
-Note that although transactions functions might be executed multiple times, the queries inside it will always run only once.
+The driver automatically retries to run a failed transaction if the failure is deemed to be transient (for example due to temporary server unavailability).
+An exception will be raised if the operation keeps failing after the configured link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j/config#Config.MaxTransactionRetryTime[maximum retry time].
+
+Because a transaction might be re-run, *transaction functions should produce the same effect when run several times (_idempotent_)*, because you do not know upfront how many times they are going to be executed.
+Note that although transactions functions might be executed multiple times, the database queries inside it will always run only once.
 
 A session can chain multiple transactions, but *only one single transaction can be active within a session at any given time*.
 To maintain multiple concurrent transactions, use multiple concurrent sessions.
@@ -246,8 +244,8 @@ To maintain multiple concurrent transactions, use multiple concurrent sessions.
 [#explicit-transactions]
 == Run an explicit transaction
 
-You can achieve full control over transactions by manually beginning one with the method link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#SessionWithContext[`SessionWithContext.BeginTransaction()`].
-You run queries inside an explicit transaction with the method link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#ExplicitTransaction[`ExplicitTransaction.Run()`].
+You can achieve full control over transactions by manually beginning one with the method link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#Session[`Session.BeginTransaction()`].
+You run queries inside an explicit transaction with the method link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#ExplicitTransaction[`ExplicitTransaction.Run()`].
 
 [source, go]
 ----
@@ -262,14 +260,14 @@ if err != nil {
     //     tx.Rollback() to rollback the transaction
 ----
 
+An explicit transaction can be committed with link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#ExplicitTransaction[`ExplicitTransaction.Commit()`] or rolled back with link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#ExplicitTransaction[`ExplicitTransaction.Rollback()`].
+If no explicit action is taken, the driver automatically rolls back the transaction at the end of its lifetime.
+
 [TIP]
 ====
 Queries run with `tx.Run()` failing due to a transient server error can be retried without need to alter the original request.
-You can discover whether an error is transient via the function link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#IsRetryable[`neo4j.IsRetryable(error)`], which gives insights into whether a further attempt might be successful.
+You can discover whether an error is transient via the function link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#IsRetryable[`neo4j.IsRetryable(error)`], which gives insights into whether a further attempt might be successful.
 ====
-
-An explicit transaction can be committed with link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#ExplicitTransaction[`ExplicitTransaction.Commit()`] or rolled back with link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#ExplicitTransaction[`ExplicitTransaction.Rollback()`].
-If no explicit action is taken, the driver automatically rolls back the transaction at the end of its lifetime.
 
 Explicit transactions are most useful for applications that need to distribute Cypher execution across multiple functions for the same transaction, or for applications that need to run multiple queries within a single transaction but without the automatic retries provided by managed transactions.
 
@@ -281,7 +279,7 @@ package main
 import (
     "fmt"
     "context"
-    "github.com/neo4j/neo4j-go-driver/v5/neo4j"
+    "github.com/neo4j/neo4j-go-driver/v6/neo4j"
 )
 
 func main() {
@@ -291,7 +289,7 @@ func main() {
     dbUri := "<database-uri>"
     dbUser := "<username>"
     dbPassword := "<password>"
-    driver, err := neo4j.NewDriverWithContext(
+    driver, err := neo4j.NewDriver(
         dbUri,
         neo4j.BasicAuth(dbUser, dbPassword, ""))
     if err != nil {
@@ -310,7 +308,7 @@ func main() {
     transferToOtherBank(ctx, driver, customerId, otherBankId, 999)
 }
 
-func createCustomer(ctx context.Context, driver neo4j.DriverWithContext) (string, error) {
+func createCustomer(ctx context.Context, driver neo4j.Driver) (string, error) {
     result, err := neo4j.ExecuteQuery(ctx, driver, `
     MERGE (c:Customer {id: randomUUID()})
     RETURN c.id AS id
@@ -324,7 +322,7 @@ func createCustomer(ctx context.Context, driver neo4j.DriverWithContext) (string
     return customerId.(string), err
 }
 
-func transferToOtherBank(ctx context.Context, driver neo4j.DriverWithContext, customerId string, otherBankId int, amount float32) {
+func transferToOtherBank(ctx context.Context, driver neo4j.Driver, customerId string, otherBankId int, amount float32) {
     session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "<database-name>"})
     defer session.Close(ctx)
     tx, err := session.BeginTransaction(ctx)
@@ -396,7 +394,7 @@ func requestInspection(ctx context.Context, customerId string, otherBankId int, 
 [[process-result]]
 == Process query results
 
-The driver's output of a query is a link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#ResultWithContext[`ResultWithContext`] object, which does not directly contain the result records.
+The driver's output of a query is a link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#Result[`Result`] object, which does not directly contain the result records.
 Rather, it encapsulates the Cypher result in a rich data structure that requires some parsing on the client side.
 There are two main points to be aware of:
 
@@ -420,11 +418,11 @@ The animation below follows the path of a single query: it shows how the driver 
   type="video/mp4"></video>
 ++++
 
-**The easiest way of processing a result is by calling `.Collect(ctx)` on it**, which yields an array of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/db#Record[`Record`] objects.
-Otherwise, a `ResultWithContext` object implements a number of methods for processing records.
+**The easiest way of processing a result is by calling `.Collect(ctx)` on it**, which yields an array of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j/db#Record[`Record`] objects.
+Otherwise, a `Result` object implements a number of methods for processing records.
 The most commonly needed ones are listed below.
 
-// .An essential list of `ResultWithContext` methods
+// .An essential list of `Result` methods
 [cols="3,4"]
 |===
 |Name |Description
@@ -450,14 +448,14 @@ In that case, it also advances the result iterator.
 It exhausts the result, so should only be called when data processing is over.
 |===
 
-For a complete list of `ResultWithContext` methods, see link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#ResultWithContext[API documentation -> ResultWithContext].
+For a complete list of `Result` methods, see link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#Result[API documentation -> Result].
 
 
 == Session configuration
 
 === Database selection
 
-It is recommended to *always specify the database explicitly* with the configuration parameter `DatabaseName` upon session creation, even on single-database instances.
+*Always specify the database explicitly* with the configuration parameter `DatabaseName` upon session creation, even on single-database instances.
 This allows the driver to work more efficiently, as it saves a network round-trip to the server to resolve the home database.
 If no database is given, the link:{neo4j-docs-base-uri}/operations-manual/current/database-administration/#manage-databases-default[default database] set in the Neo4j instance settings is used.
 
@@ -470,8 +468,8 @@ session := driver.NewSession(ctx, neo4j.SessionConfig{
 
 [TIP]
 Specifying the database through the configuration method is preferred over the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/use/[`USE`] Cypher clause.
-If the server runs on a cluster, queries with `USE` require server-side routing to be enabled.
-Queries may also take longer to execute as they may not reach the right cluster member at the first attempt, and need to be routed to one containing the requested database.
+If the server runs on a cluster, queries with `USE` require link:https://neo4j.com/docs/operations-manual/current/clustering/setup/routing/#clustering-routing[server-side routing] to be enabled.
+Queries can also take longer to execute as they may not reach the right cluster member at the first attempt, and need to be routed to one containing the requested database.
 
 
 === Request routing
@@ -492,21 +490,19 @@ session := driver.NewSession(ctx, neo4j.SessionConfig{
 // .Routing ≠ Access control
 [NOTE]
 ====
-Although executing a _write_ query in read mode likely results in a runtime error, *you should not rely on this for access control.* The difference between the two modes is that _read_ transactions will be routed to any node of a cluster, whereas _write_ ones are directed to primaries.
-In other words, there is no guarantee that a write query submitted in read mode will be rejected.
+Although executing a _write_ query in read mode results in a runtime error, *you should not rely on this for access control.* The difference between the two modes is that _read_ transactions will be routed to any node of a cluster, whereas _write_ ones are directed to primaries.
+There is no security guarantee that a write query submitted in read mode will be rejected.
 
 Similar remarks hold for the `.ExecuteRead()` and `.ExecuteWrite()` methods.
 ====
 
 
 [#impersonation]
-[role=label--new-5.14]
 === Run queries as a different user
 
 You can execute a query through a different user with the configuration option `Auth`.
-Switching user at the session level is cheaper than creating a new `DriverWithContext` object.
+Switching user at the session level is cheaper than creating a new `Driver` object.
 Queries are then run within the security context of the given user (i.e., home database, permissions, etc.). +
-Session-scoped authentication requires a server version >= 5.8.
 
 [source, go]
 ----
@@ -517,8 +513,7 @@ session := driver.NewSession(ctx, neo4j.SessionConfig{
 })
 ----
 
-The option `ImpersonatedUser` provides a similar functionality, and is available in driver/server versions >= 4.4.
-The difference is that you don't need to know a user's password to impersonate them, but the user under which the `Driver` was created needs to have the link:{neo4j-docs-base-uri}/operations-manual/current/authentication-authorization/dbms-administration/#access-control-dbms-administration-impersonation[appropriate permissions].
+The option `ImpersonatedUser` provides a similar functionality: the difference is that you don't need to know a user's password to impersonate them, but the user under which the `Driver` was created needs to have the link:{neo4j-docs-base-uri}/operations-manual/current/authentication-authorization/dbms-administration/#access-control-dbms-administration-impersonation[appropriate permissions].
 
 [source, go]
 ----

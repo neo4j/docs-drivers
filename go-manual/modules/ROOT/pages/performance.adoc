@@ -1,5 +1,6 @@
 = Performance recommendations
 
+
 [[target-database]]
 == Always specify the target database
 
@@ -78,7 +79,7 @@ res, err := session.ExecuteRead(ctx, func(tx neo4j.ManagedTransaction) (any, err
 ----
 
 An even faster approach is to skip `.ExecuteRead/Write()` and call `.Run()` directly on the session.
-The queries run as auto-commit transaction, and are still isolated from other concurrent queries, but if any of them fail, they will not be retried.
+The queries run as auto-commit transactions, and are still isolated from other concurrent queries, but if any of them fail, they will not be retried.
 With this method, you trade some robustness for more throughput, as the queries are shot to the server as fast as it can handle.
 One upper limit on the client size is given by the size of the connection pool: each call to `.Run()` borrows a connection, so the amount of parallel work is limited by the number of available connections.
 
@@ -134,7 +135,7 @@ import (
     "context"
     "time"
     "fmt"
-    "github.com/neo4j/neo4j-go-driver/v5/neo4j"
+    "github.com/neo4j/neo4j-go-driver/v6/neo4j"
 )
 
 // Returns 250 records, each with properties
@@ -153,7 +154,7 @@ func main() {
     dbUri := "<database-uri>"
     dbUser := "<username>"
     dbPassword := "<password>"
-    driver, err := neo4j.NewDriverWithContext(
+    driver, err := neo4j.NewDriver(
         dbUri,
         neo4j.BasicAuth(dbUser, dbPassword, ""))
     if err != nil {
@@ -173,7 +174,7 @@ func main() {
     eagerLoading(ctx, driver)
 }
 
-func lazyLoading(ctx context.Context, driver neo4j.DriverWithContext) {
+func lazyLoading(ctx context.Context, driver neo4j.Driver) {
     defer timer("lazyLoading")()
 
     sleepTimeParsed, err := time.ParseDuration(sleepTime)
@@ -200,7 +201,7 @@ func lazyLoading(ctx context.Context, driver neo4j.DriverWithContext) {
         })
 }
 
-func eagerLoading(ctx context.Context, driver neo4j.DriverWithContext) {
+func eagerLoading(ctx context.Context, driver neo4j.Driver) {
     defer timer("eagerLoading")()
 
     log("Submit query")
@@ -239,7 +240,7 @@ func timer(name string) func() {
 ----
 
 .Output
-[source, output, role=nocollapse]
+[source, output]
 ----
 [ 1718802595 ]  LAZY LOADING (executeRead)
 [ 1718802595 ]  Submit query
@@ -269,7 +270,7 @@ With lazy loading, the client can also stop requesting records after some condit
 
 [TIP]
 ====
-The driver's link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#SessionConfig[fetch size] affects the behavior of lazy loading.
+The driver's link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#SessionConfig[fetch size] affects the behavior of lazy loading.
 It instructs the server to stream an amount of records equal to the fetch size, and then wait until the client has caught up before retrieving and sending more.
 
 The fetch size usually allows to bound memory consumption on the client side, especially for results in which the variance of the records size is small.
