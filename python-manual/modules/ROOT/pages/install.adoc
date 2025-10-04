@@ -5,16 +5,16 @@ To start creating a Neo4j Python application, you first need to install the Pyth
 [#install-driver]
 == Install the driver
 
-Use `pip` to install the link:https://pypi.org/project/neo4j/[Neo4j Python Driver] (requires Python >= 3.7):
+Use `pip` to install the link:https://pypi.org/project/neo4j/[Neo4j Python Driver] (requires Python >= 3.10):
 
 [source,bash]
 ----
 pip install neo4j
 ----
 
-Always use the latest version of the driver, as it will always work both with the previous Neo4j <<LTS>> release and with the current and next major releases.
-The latest `5.x` driver supports connection to any Neo4j instances version 4.4, 5.x, and 2025.x.
-For a detailed list of changes across versions, see the link:https://github.com/neo4j/neo4j-python-driver/wiki/5.x-changelog[driver's changelog].
+The latest version of the driver is guaranteed to work with all <<LTS>> releases of the Neo4j server, as well as with the current and next major releases.
+The latest `6.x` driver supports connection to Neo4j instances version 4.4, 5.x, and 2025.x.
+For a detailed list of changes across versions, see the link:https://github.com/neo4j/neo4j-python-driver/wiki/6.x-changelog[driver's changelog].
 
 .Activate Python's development mode
 [%collapsible]
@@ -23,15 +23,15 @@ For development, running Python in link:https://docs.python.org/3/library/devmod
 You can do so via the `-X dev` command line option or by setting the `PYTHONDEVMODE` environment variable to `1`. +
 For the driver, this results in:
 
-- `ResourceWarning` to be emitted if resources aren't properly closed.
-- `DeprecationWarning` to be emitted if deprecated APIs are used.
-- The driver's debug mode to be enabled (which can also be achieved by setting the environment variable `PYTHONNEO4JDEBUG`).
+- `ResourceWarning` being emitted if resources aren't properly closed.
+- `DeprecationWarning` being emitted if deprecated APIs are used.
+- The driver's debug mode to be enabled (achieved also by setting the environment variable `PYTHONNEO4JDEBUG`).
 ====
 
 [TIP]
-The link:https://github.com/neo4j-drivers/neo4j-python-driver-rust-ext[Rust extension to the Python driver] is an alternative driver package that yields a 3x to 10x speedup compared to the regular driver.
+The link:https://github.com/neo4j-drivers/neo4j-python-driver-rust-ext[Rust extension to the Python driver] is an alternative package that yields a link:https://medium.com/neo4j/neo4j-python-driver-10x-faster-with-rust-7059c56e8674[3x to 10x speedup] compared to the regular driver.
 You can install it with `pip install neo4j-rust-ext`, either alongside the `neo4j` package or as a replacement to it.
-Usage-wise, the drivers are identical: everything in this guide applies to both packages.
+Usage-wise, the libraries are identical: everything in this guide applies to both.
 
 [NOTE]
 To get the driver on an air-gapped machine, link:https://pypi.org/project/neo4j/#files[download the latest driver] tarball and install it with `pip install neo4j-<version>.tar.gz`.

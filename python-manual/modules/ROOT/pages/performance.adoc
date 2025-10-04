@@ -76,7 +76,7 @@ with driver.session(database="<database-name>") as session:
 ----
 
 An even faster approach is to skip `.execute_read/write()` and call `.run()` directly on the session.
-The queries run as auto-commit transaction, and are still isolated from other concurrent queries, but if any of them fail, they will not be retried.
+The queries run as auto-commit transactions and are still isolated from other concurrent queries, but if any of them fail, they will not be retried.
 With this method, you trade some robustness for more throughput, as the queries are shot to the server as fast as it can handle.
 One upper limit on the client size is given by the size of the connection pool: each call to `.run()` borrows a connection, so the amount of parallel work is limited by the number of available connections.
 
@@ -98,6 +98,7 @@ Lazy-loading a result spreads out network traffic and memory usage (both client-
 
 For convenience, xref:query-simple.adoc[`.execute_query()`] always retrieves all result records at once (it is what the `Eager` in `EagerResult` stands for).
 To lazy-load a result, you have to use xref:transactions.adoc#managed-transactions[`.execute_read/write()`] (or other forms of manually-handled xref:transactions.adoc[transactions]) and *not* cast the `Result` object to `list` when processing the result; iterate on it instead.
+
 For more information on result processing, see xref:transactions.adoc#process-result[Transactions -> Process query results].
 
 .Comparison between eager and lazy loading
@@ -108,9 +109,9 @@ For more information on result processing, see xref:transactions.adoc#process-re
 |Lazy loading
 
 |
-- The server has to read all 250 records from the storage before it can send even the first one to the driver (i.e. it takes more time for the client to receive the first record).
-- Before any record is available to the application, the driver has to receive all 250 records.
-- The client has to hold in memory all 250 records.
+- The server has to read all records from the storage before it can send even the first one to the driver (i.e. it takes more time for the client to receive the first record).
+- Before any record is available to the application, the driver has to receive all records.
+- The client has to hold in memory all records.
 
 |
 - The server reads the first record and sends it to the driver.
@@ -240,7 +241,7 @@ On the other hand, the fetch size doesn't always bound memory consumption on the
 For example, a query with link:https://neo4j.com/docs/cypher-manual/current/clauses/order-by/[`ORDER BY`] requires the whole result set to be loaded into memory for sorting, before records can be streamed to the client.
 
 The lower the fetch size, the more messages client and server have to exchange.
-Especially if the server's latency is high, a low fetch size may deteriorate performance.
+Especially if the server's latency is high, a low fetch size can deteriorate performance.
 ====
 
 
@@ -363,7 +364,7 @@ Total database accesses: ?
 == Specify node labels
 
 *Specify node labels* in all queries.
-This allows the query planner to work much more efficiently, and to leverage indexes where available.
+This allows the query planner to work more efficiently, and to leverage indexes where available.
 To learn how to combine labels, see link:https://neo4j.com/docs/cypher-manual/current/patterns/reference/#label-expressions[Cypher -> Label expressions].
 
 [discrete]
