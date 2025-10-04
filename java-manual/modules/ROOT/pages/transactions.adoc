@@ -446,6 +446,8 @@ var session = driver.session(SessionConfig.builder()
 Although executing a _write_ query in read mode results in a runtime error, *you should not rely on this for access control.*
 The difference between the two modes is that _read_ transactions are routed to any node of a cluster, whereas _write_ ones are directed to primaries.
 There is no security guarantee that a write query submitted in read mode will be rejected.
+
+Similar remarks hold for the `.executeRead()` and `.executeWrite()` methods.
 ====
 
 
