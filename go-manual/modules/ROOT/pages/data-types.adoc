@@ -69,10 +69,13 @@ func main() {
     dbUri := "<database-uri>"
     dbUser := "<username>"
     dbPassword := "<password>"
-    driver, _ := neo4j.NewDriver(
+    driver, err := neo4j.NewDriver(
         dbUri,
         neo4j.BasicAuth(dbUser, dbPassword, ""))
-    driver.VerifyConnectivity(ctx)
+    defer driver.Close(ctx)
+    if err != nil {
+        panic(err)
+    }
 
     // Define a date, with timezone
     location, _ := time.LoadLocation("Europe/Stockholm")
@@ -118,10 +121,13 @@ func main() {
     dbUri := "<database-uri>"
     dbUser := "<username>"
     dbPassword := "<password>"
-    driver, _ := neo4j.NewDriver(
+    driver, err := neo4j.NewDriver(
         dbUri,
         neo4j.BasicAuth(dbUser, dbPassword, ""))
-    driver.VerifyConnectivity(ctx)
+    defer driver.Close(ctx)
+    if err != nil {
+        panic(err)
+    }
 
     // Query and return a neo4j.Time object
     result, err := neo4j.ExecuteQuery(ctx, driver, `
@@ -340,10 +346,13 @@ func main() {
     dbUri := "<database-uri>"
     dbUser := "<username>"
     dbPassword := "<password>"
-    driver, _ := neo4j.NewDriver(
+    driver, err := neo4j.NewDriver(
         dbUri,
         neo4j.BasicAuth(dbUser, dbPassword, ""))
-    driver.VerifyConnectivity(ctx)
+    defer driver.Close(ctx)
+    if err != nil {
+        panic(err)
+    }
 
     // Create some :Person nodes linked by :KNOWS relationships
     addFriend(ctx, driver, "Alice", "BFF", "Bob")
@@ -394,34 +403,66 @@ For full documentation, see link:https://pkg.go.dev/github.com/neo4j/neo4j-go-dr
 
 [role=label--new-6.0]
 [#vector]
-== Vector type
+== Vector
 
-The type link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/VectorValue.html[`VectorValue`] maps to the Cypher type link:https://neo4j.com/docs/cypher-manual/current/values-and-types/vector/[`VECTOR`].
+The type link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#Vector[`Vector`] maps to the Cypher type link:https://neo4j.com/docs/cypher-manual/current/values-and-types/vector/[`VECTOR`].
 Vector objects are stored as contiguous blocks of memory, containing homogeneous values.
-
-You can create a vector from lists of `byte`, `short`, `int`, `long`, `float`, `double` via the method link:https://neo4j.com/docs/api/java-driver/curent/org.neo4j.driver/org/neo4j/driver/types/Vector.html[`Values.vector()`].
-
-.Create and store a vector
-[source, java]
-----
-// import org.neo4j.driver.Values;
-var vector = Values.vector(new float[8]);
-driver.executableQuery("CREATE (:Value {vector: $vector})")
-    .withParameters(Map.of("vector", vector))
-    .execute();
-----
+You can create vectors from lists of `float64`, `float32`, `int8`, `int16`, `int32`, `int64`.
 
 [IMPORTANT]
 Storing `VECTOR` objects in the database requires a server version >= 2025.10, Enterprise Edition.
 
-.Retrieve and work with a vector
-[source, java]
+.Create, store, and retrieve a vector
+[source, go]
 ----
-var result = driver.executableQuery("MATCH (v:Value) RETURN v.vector AS vector")
-    .execute();
-var vector = result.records().get(0).get("vector");
-System.out.printf("Retrieved vector: %s", vector);
-// Retrieved vector: vector([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], 8, FLOAT32 NOT NULL)
+package main
+
+import (
+    "context"
+    "fmt"
+
+    "github.com/neo4j/neo4j-go-driver/v6/neo4j"
+    "github.com/neo4j/neo4j-go-driver/v6/neo4j/dbtype"
+)
+
+func main() {
+    // Connection to database
+    ctx := context.Background()
+    dbUri := "<database-uri>"
+    dbUser := "<username>"
+    dbPassword := "<password>"
+    driver, err := neo4j.NewDriver(
+        dbUri,
+        neo4j.BasicAuth(dbUser, dbPassword, ""))
+    defer driver.Close(ctx)
+    if err != nil {
+        panic(err)
+    }
+
+    // Create and store a vector
+    vec := dbtype.Vector[float64]{1.0, 2.0, 3.0}
+
+    _, err := neo4j.ExecuteQuery(ctx, driver,
+        "MERGE (n:Doc {vector: $vec})",
+        map[string]any{"vec": vec},
+        neo4j.EagerResultTransformer)
+    if err != nil {
+        panic(err)
+    }
+
+    result, err := neo4j.ExecuteQuery(ctx, driver,
+        "MATCH (n:Doc) RETURN n.vec AS vec LIMIT 1",
+        nil,
+        neo4j.EagerResultTransformer)
+    if err != nil {
+        panic(err)
+    }
+
+    if v, ok := result.Records[0].Values[0].(dbtype.Vector[float64]); ok {
+        fmt.Printf("Read vector: %v\n", v)
+    }
+    // Read vector: vector([1.0, 2.0, 3.0], 3, FLOAT64 NOT NULL)
+}
 ----
 
 
@@ -429,7 +470,7 @@ System.out.printf("Retrieved vector: %s", vector);
 [#unsupportedtype]
 == UnsupportedType
 
-The type link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/UnsupportedTypeValue.html[`UnsupportedTypeValue`] is used for data types returned by Cypher queries, but that the driver doesn't recognize.
+The type link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#UnsupportedType[`UnsupportedType`] is used for data types returned by Cypher queries, but that the driver doesn't recognize.
 This happens when the client version is too old with respect to the server version.
 
 
