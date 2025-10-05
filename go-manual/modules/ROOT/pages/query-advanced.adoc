@@ -143,12 +143,13 @@ To enable driver logging, use the `Config.Log` option when instantiating the dri
 [source, go]
 ----
 // import "github.com/neo4j/neo4j-go-driver/v6/neo4j/config"
+// import "github.com/neo4j/neo4j-go-driver/v6/neo4j/log"
 
 driver, err := neo4j.NewDriver(
     dbUri,
     neo4j.BasicAuth(dbUser, dbPassword, ""),
     func(conf *config.Config) {
-        conf.Log = neo4j.ConsoleLogger(neo4j.DEBUG)
+        conf.Log = log.ToConsole(log.DEBUG)
     })
 ----
 
@@ -187,7 +188,7 @@ This applies to individual queries run using xref:query-simple.adoc[`ExecuteQuer
 result, err := neo4j.ExecuteQuery(ctx, driver,
     "RETURN 42 AS n", nil, neo4j.EagerResultTransformer,
     neo4j.ExecuteQueryWithDatabase("<database-name>"),
-    neo4j.ExecuteQueryWithBoltLogger(neo4j.ConsoleBoltLogger()))
+    neo4j.ExecuteQueryWithBoltLogger(log.BoltToConsole()))
 ----
 
 [source, go]
@@ -195,7 +196,7 @@ result, err := neo4j.ExecuteQuery(ctx, driver,
 ----
 session := driver.NewSession(ctx, neo4j.SessionConfig{
     DatabaseName: "<database-name>",
-    BoltLogger: neo4j.ConsoleBoltLogger(),
+    BoltLogger: log.BoltToConsole(),
 })
 defer session.Close(ctx)
 session.Run(ctx, "RETURN 42 AS n", nil)

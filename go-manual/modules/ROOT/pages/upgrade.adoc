@@ -90,181 +90,73 @@ Deprecated features are likely to be removed in the next major version.
 |Minimum supported Go version is 1.24.
 |label:removed[Changed]
 
-|5.0
-|link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#ExplicitTransaction[`ExplicitTransaction`] -- Calling `Rollback()` or `Commit()` multiple times is now prohibited and results in a `UsageError`.
-|label:removed[Changed]
-|{cross-mark}
-
-|5.0
-|Operations on closed sessions fail with error with `Operation attempted on a closed session`.
-|label:removed[Changed]
-|{cross-mark}
-
-|5.0
-|link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#Counters.ContainsUpdates[`ResultSummary.ContainUpdates()`] -- In 4.x, the function returned `true` if any of the summary counters were strictly positive.
-It now returns true only if at least a deletion or creation of the following entities happened: constraint, index, node, relationship, label, property.
-|label:removed[Changed]
-|{cross-mark}
-
-|5.0
-|A link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#WithTxTimeout[transaction timeout] of `0` (which is not the default value anymore) now disables the timeout on the server side.
-If no timeout is specified, the server uses the server-defined timeout.
-|label:removed[Changed]
-
-
-|5.0
-|`Driver.Session()` has been removed in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#Driver.NewSession[`Driver.NewSession()`].
-|label:removed[]
-
-
-|5.0
-|`Query.Params()` has been removed in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#Query.Parameters[`Query.Parameters()`].
-|label:removed[]
-
-
-|5.0
-|`Record.GetByIndex()` has been removed.
-Access the link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j/db#Record[`Record.Values`] struct slice directly instead.
-|label:removed[]
-
-
-|5.0
-|`ResultSummary.Statement()` has been removed in favor of `ResultSummary.Query()`.
-The new method returns a link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#ResultSummary.Query[`Query`] rather than a `Statement` object.
-|label:removed[]
-
-
-|5.0
-|`Session.LastBookmark()` is deprecated in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#Session.LastBookmarks[`Session.LastBookmarks()`].
-The logic is similar, but the new method returns `neo4j.Bookmarks` instead of `string`.
-|label:removed[]
-
-
-|5.0
-|Some of the previously exported types from `neo4j.db` are now internal. +
-For `db.AccessMode`, `db.WriteMode` and `db.ReadMode`, use link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#AccessMode[`neo4j.AccessMode`], link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#AccessModeWrite[`neo4j.AccessModeWrite`] and link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#AccessModeRead[`neo4j.AccessModeRead`]. +
-For `db.TxConfig`, use link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#TransactionConfig[`neo4j.TransactionConfig`]. +
-All others have no replacement: `db.TxHandle`, `db.StreamHandle`, `db.Command`, `db.Connection`, `db.RoutingTable`, `db.DefaultDatabase`, `db.DatabaseSelector`.
-|label:removed[]
-
-
-|5.0
-|`ServerInfo.Version` has been removed.
-Use link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#ServerInfo[`ServerInfo.Agent`, `ServerInfo.ProtocolVersion`], or call the link:https://neo4j.com/docs/operations-manual/current/reference/procedures/#procedure_dbms_components[`dbms.components`] Cypher procedure instead.
-|label:removed[]
-
-
-|5.0
-|`NewDriver()` is deprecated in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#NewDriver[`NewDriver()`].
-The behavior is similar, except that the new function takes a `ctx.Context` as first argument.
-|label:deprecated[]
-
-
-|5.0
-|`Session.WriteTransaction()` and `Session.ReadTransaction()` are deprecated in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#Session.ExecuteWrite[`Session.ExecuteWrite()`] and link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#Session.ExecuteRead[`Session.ExecuteRead()`].
+|6.0
+|`Session.WriteTransaction()` and `Session.ReadTransaction()` have been removed in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#Session.ExecuteWrite[`Session.ExecuteWrite()`] and link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#Session.ExecuteRead[`Session.ExecuteRead()`].
 The logic is the same, but the argument type changed from `Transaction` to `ManagedTransaction`, and explicit transaction handling methods (`.Commit()`, `.Rollback()`, `.Close()`) are not available on managed transactions anymore.
-|label:deprecated[]
+|label:removed[]
 
+|6.0
+|`neo4j.Transaction` has been removed in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#ExplicitTransaction[`neo4j.ExplicitTransaction`].
+|label:removed[]
+
+|6.0
+|`neo4j.TransactionWork` has been removed in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#ManagedTransactionWork[`neo4j.ManagedTransactionWork`].
+|label:removed[]
+
+|6.0
+|`Config.RootCAs` has been removed in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j/config#Config.TlsConfig[`Config.TlsConfig`].
+|label:removed[]
+
+|6.0
+|`neo4j.Config` has been removed in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j/config#Config[`config.Config`].
+|label:removed[]
+
+|6.0
+|`neo4j.ServerAddress` has been removed in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j/config#ServerAddress[`config.ServerAddress`].
+
+`neo4j.NewServerAddress()` has been removed in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j/config#NewServerAddress[`config.NewServerAddress()`].
+|label:removed[]
+
+|6.0
+|`neo4j.ServerAddressResolver` has been removed in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j/config#ServerAddressResolver[`config.ServerAddressResolver`].
+|label:removed[]
+
+|6.0
+|`neo4j.(LogLevel\|ERROR\|WARNING\|INFO\|DEBUG)` have been removed in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j/log#Level[`log.(Level\|ERROR\|WARNING\|INFO\|DEBUG)`].
+|label:removed[]
+
+|6.0
+|*Logging*
+
+- `neo4j.ConsoleLogger()` has been removed in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j/log#ToConsole[`neo4j.log.ToConsole()`]. The behavior is similar, except that the new function takes a `ctx.Context` as first argument.
+- `neo4j.ConsoleBoltLogger()` has been removed in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j/log#BoltToConsole[`neo4j.log.BoltToConsole()`].
+- Types `neo4j.log.Console` and `neo4j.log.Void` have been removed and unified into link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j/log#Logger[`neo4j.log.Logger`].
+- Functions `neo4j.ConsoleLogger()` and `neo4j.Void()` have been removed in favor of https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j/log#ToConsole[`neo4j.log.ToConsole()`] and https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j/log#ToVoid[`neo4j.log.ToVoid()`], both returning a `neo4j.log.Logger` object.
+|label:removed[]
+
+|6.0
+|Notifications-related objects have been moved from the global namespace `neo4j` into link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j/notifications[`neo4j/notifications`].
+
+As a result, `neo4j.(NotificationSeverity\|Warning\|Information\|UnknownSeverity\|NotificationCategory\|Hint\|Unrecognized\|Unsupported\|Performance\|Deprecation\|Generic\|Security\|Topology\|UnknownCategory)` have been removed in favor of `notifications.(NotificationSeverity\|Warning\|Information\|UnknownSeverity\|NotificationCategory\|Hint\|Unrecognized\|Unsupported\|Performance\|Deprecation\|Generic\|Security\|Topology\|UnknownCategory)`.
+|label:removed[]
 
 |5.0
 |link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j/dbtype#Node[`Node.Id`] and link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j/dbtype#Relationship[`Relationship.Id`] are deprecated in favor of `Node.ElementId` and `Relationship.ElementId`.
 Old identifiers were Int64, whereas new ElementIds are String.
 |label:deprecated[]
 
+|6.0
+|`*WithContext` functions and types are deprecated in favor of the non-suffixed names, which are context-aware by default.
+In particular,
 
-|5.0
-|`neo4j.SingleT()` is deprecated in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#SingleTWithContext[`neo4j.SingleTWithContext()`].
-The behavior is similar, except that the new function takes a `ctx.Context` as first argument.
+- `NewDriverWithContext()` is deprecated in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#NewDriver[`NewDriver()`].
+- `neo4j.SingleTWithContext()` is deprecated in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#SingleT[`neo4j.SingleT()`].
+- `neo4j.CollectWithContext()` is deprecated in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#Collect[`neo4j.Collect()`].
+- `neo4j.CollectTWithContext()` is deprecated in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#CollectT[`neo4j.CollectT()`].
+- `neo4j.SingleWithContext()` is deprecated in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#Single[`neo4j.Single()`].
+- `neo4j.SessionWithContext` is deprecated in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#Session[`neo4j.Session`].
+- `neo4j.DriverWithContext` is deprecated in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#Driver[`neo4j.Driver`].
+- `neo4j.ResultWithContext` is deprecated in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#Result[`neo4j.Result`].
 |label:deprecated[]
-
-
-|5.0
-|`neo4j.Collect()` is deprecated in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#CollectWithContext[`neo4j.CollectWithContext()`].
-The behavior is similar, except that the new function takes a `ctx.Context` as first argument.
-|label:deprecated[]
-
-
-|5.0
-|`neo4j.CollectT()` is deprecated in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#CollectTWithContext[`neo4j.CollectTWithContext()`].
-The behavior is similar, except that the new function takes a `ctx.Context` as first argument.
-|label:deprecated[]
-
-
-|5.0
-|`neo4j.Session` is deprecated in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#Session[`neo4j.Session`].
-|label:deprecated[]
-
-
-|5.0
-|`neo4j.Driver` is deprecated in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#Driver[`neo4j.Driver`].
-|label:deprecated[]
-
-
-|5.0
-|`neo4j.Transaction` is deprecated in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#ExplicitTransaction[`neo4j.ExplicitTransaction`].
-|label:deprecated[]
-
-
-|5.0
-|`neo4j.TransactionWork` is deprecated in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#ManagedTransactionWork[`neo4j.ManagedTransactionWork`].
-|label:deprecated[]
-
-
-|5.0
-|`neo4j.Result` is deprecated in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#Result[`neo4j.Result`].
-|label:deprecated[]
-
-
-|5.0
-|`Config.RootCAs` is deprecated in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j/config#Config.TlsConfig[`Config.TlsConfig`].
-|label:deprecated[]
-
-
-|5.8
-|`neo4j.Config` is deprecated in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j/config#Config[`config.Config`].
-|label:deprecated[]
-
-
-|5.8
-|`neo4j.ServerAddress` is deprecated in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j/config#ServerAddress[`config.ServerAddress`].
-|label:deprecated[]
-
-
-|5.8
-|`neo4j.ServerAddressResolver` is deprecated in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j/config#ServerAddressResolver[`config.ServerAddressResolver`].
-|label:deprecated[]
-
-
-|5.17
-|`neo4j.(LogLevel\|ERROR\|WARNING\|INFO\|DEBUG)` are deprecated in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j/log#Level[`log.(Level\|ERROR\|WARNING\|INFO\|DEBUG)`].
-|label:deprecated[]
-
-
-|5.17
-|`neo4j.ConsoleLogger()` is deprecated in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j/log#ToConsole[`neo4j.log.ToConsole()`].
-The behavior is similar, except that the new function takes a `ctx.Context` as first argument.
-|label:deprecated[]
-
-
-|5.17
-|`neo4j.ConsoleBoltLogger()` is deprecated in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j/log#BoltToConsole[`neo4j.log.BoltToConsole()`].
-|label:deprecated[]
-
-
-|5.17
-|Types `neo4j.log.Console` and `neo4j.log.Void` are deprecated and unified into link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j/log#Logger[`neo4j.log.Logger`]. +
-Functions `neo4j.ConsoleLogger()` and `neo4j.Void()` are deprecated in favor of https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j/log#ToConsole[`neo4j.log.ToConsole()`] and https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j/log#ToVoid[`neo4j.log.ToVoid()`], both returning a `neo4j.log.Logger` object.
-|label:deprecated[]
-
-
-|5.23
-|Notifications-related objects have been moved from the global namespace `neo4j` into link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j/notifications[`neo4j/notifications`] -- `neo4j.(NotificationSeverity\|Warning\|Information\|UnknownSeverity\|NotificationCategory\|Hint\|Unrecognized\|Unsupported\|Performance\|Deprecation\|Generic\|Security\|Topology\|UnknownCategory)` are deprecated in favor of `notifications.(NotificationSeverity\|Warning\|Information\|UnknownSeverity\|NotificationCategory\|Hint\|Unrecognized\|Unsupported\|Performance\|Deprecation\|Generic\|Security\|Topology\|UnknownCategory)`.
-|label:deprecated[]
-
-
-|5.28.2
-|link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#Single[`neo4j.Single`] is deprecated in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#SingleWithContext[`neo4j.SingleWithContext`].
-|label:deprecated[]
-
 
 |===
