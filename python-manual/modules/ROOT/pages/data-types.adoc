@@ -424,7 +424,7 @@ with neo4j.GraphDatabase.driver(URI, auth=AUTH) as driver:
 [#vector]
 == Vector type
 
-The type link:https://neo4j.com/docs/api/python-driver/current/types/vector.html#neo4j.vector.Vector[`Vector`] maps to the Cypher type link:https://neo4j.com/docs/cypher-manual/current/values-and-types/vector/[`VECTOR`].
+The type link:https://neo4j.com/docs/api/python-driver/current/types/vector.html#neo4j.vector.Vector[`Vector`] maps to the Cypher type link:https://neo4j.com/docs/cypher-manual/current/functions/vector/[`VECTOR`].
 `Vector` objects are stored as contiguous blocks of memory (`bytes`), containing homogeneous values encoded in big-endian order.
 
 You can create a `Vector` from various data types.
