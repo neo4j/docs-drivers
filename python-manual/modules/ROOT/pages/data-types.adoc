@@ -487,6 +487,10 @@ print("python list:", v.to_native())
 print("as numpy array:", v.to_numpy())
 ----
 
+[IMPORTANT]
+Because Python has no native `float32` type, vectors of `float32` converted into native Python lists become lists of `float64`, leading to potential representation imprecisions. 
+To retain the `float32` representation, transform the result vector into a numpy array (link:https://neo4j.com/docs/api/python-driver/current/types/vector.html#neo4j.vector.Vector.to_numpy[`Vector.to_numpy`]) or into a pyarrow array (link:https://neo4j.com/docs/api/python-driver/current/types/vector.html#neo4j.vector.Vector.to_pyarrow[`Vector.to_pyarrow`]).
+
 
 [role=label--new-6.0]
 [#unsupportedtype]
