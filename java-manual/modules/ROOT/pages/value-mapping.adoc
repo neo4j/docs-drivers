@@ -19,6 +19,7 @@ Either way, you provide the class definition to the driver through the link:http
 ----
 package demo;
 
+import java.util.Map;
 import org.neo4j.driver.AuthTokens;
 import org.neo4j.driver.Driver;
 import org.neo4j.driver.GraphDatabase;
