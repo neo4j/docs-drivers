@@ -93,9 +93,8 @@ Notice that Cypher processes Unicode, so take care of the Unicode literal `\u006
 .Manually escaping dynamic property keys before concatenation
 [source, go]
 ----
-dangerousKey := "Person\\u0060n"
+dangerousKey := "name\\u0060n"
 // convert \u0060 to literal backtick and then escape backticks
-// remember to import `strings`
 escapedKey := strings.ReplaceAll(dangerousKey, "\\u0060", "`")
 escapedKey = strings.ReplaceAll(escapedKey, "`", "``")
 
