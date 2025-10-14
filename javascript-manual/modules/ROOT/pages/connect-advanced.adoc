@@ -12,7 +12,6 @@ include::{common-partial}/connect-advanced.adoc[tag=connection-protocols]
 === Basic authentication
 
 The basic authentication scheme relies on traditional username and password.
-These can either be the credentials for your local installation, or the ones provided with an Aura instance.
 
 [source, javascript]
 ----
@@ -67,13 +66,12 @@ If authentication is disabled on the server, the authentication parameter can be
 
 
 [#rotating-tokens]
-[role=label--new-5.14]
 == Rotating authentication tokens
 
 It is possible to rotate authentication tokens that are expected to expire (e.g. SSO).
-You need to provide a link:https://neo4j.com/docs/api/javascript-driver/{javascript-driver-version}/class/lib6/auth-token-manager.js~AuthTokenManager.html[`AuthTokenManager`] instance when instantiating the `Driver`, rather than a static authentication token.
+You need to provide a link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/auth-token-manager.js~AuthTokenManager.html[`AuthTokenManager`] instance when instantiating the `Driver`, rather than a static authentication token.
 
-The easiest way to get started is to use link:https://neo4j.com/docs/api/javascript-driver/{javascript-driver-version}/class/lib6/auth-token-manager.js~AuthTokenManagers.html[one of built-in `AuthTokenManager` implementations].
+The easiest way to get started is to use link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/auth-token-manager.js~AuthTokenManagers.html[one of built-in `AuthTokenManager` implementations].
 
 .Rotating a bearer token expiring every 60 seconds
 [source, javascript, test-skip]
@@ -115,7 +113,8 @@ const driver = neo4j.driver(
 ----
 
 [NOTE]
-This API must not be used for switching users. Auth managers must always return tokens for the same identity.
+This API must not be used for switching users.
+Auth managers must always return tokens for the same identity.
 You can switch users at both xref:query-simple.adoc#impersonation[query level] and xref:transactions.adoc#impersonation[session level].
 
 [WARNING]
@@ -123,7 +122,7 @@ You can switch users at both xref:query-simple.adoc#impersonation[query level] a
 
 
 [#mtls]
-[role=label--new-5.27 label--not-on-aura]
+[role=label--not-on-aura]
 == Mutual TLS (client-side certificates as 2FA)
 
 Mutual TLS (mTLS) allows you to use a client certificate as second factor for authenticating with the server.
@@ -138,7 +137,7 @@ For mTLS to work, the driver's connection with the server must be encrypted, i.e
 =====
 [.include-with-static-certificate]
 ======
-Use the driver configuration option link:https://neo4j.com/docs/api/javascript-driver/{javascript-driver-version}/class/lib6/types.js~Config.html#instance-member-clientCertificate[`clientCertificate`] to provide the certificate information as an object.
+Use the driver configuration option link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/types.js~Config.html#instance-member-clientCertificate[`clientCertificate`] to provide the certificate information as an object.
 
 [source, javascript, test-skip]
 ----
@@ -155,7 +154,7 @@ const driver = neo4j.driver(URI, neo4j.auth.basic(USER, PASSWORD), {
 [.include-with-rotating-certificate]
 ======
 
-Instantiate the certificate object via link:https://neo4j.com/docs/api/javascript-driver/{javascript-driver-version}/class/lib6/client-certificate.js~ClientCertificateProviders.html[`clientCertificateProviders.rotating`] and provide it when instantiating the driver via the configuration option link:https://neo4j.com/docs/api/javascript-driver/{javascript-driver-version}/class/lib6/types.js~Config.html#instance-member-clientCertificate[`clientCertificate`].
+Instantiate the certificate object via link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/client-certificate.js~ClientCertificateProviders.html[`clientCertificateProviders.rotating`] and provide it when instantiating the driver via the configuration option link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/types.js~Config.html#instance-member-clientCertificate[`clientCertificate`].
 
 [source, javascript, test-skip]
 ----
@@ -204,7 +203,7 @@ let driver = neo4j.driver(URI, neo4j.auth.basic(USER, PASSWORD), {
 
 == Further connection parameters
 
-You can find all `Driver` configuration parameters in the link:{neo4j-docs-base-uri}/api/javascript-driver/{javascript-driver-version}/function/index.html#static-function-driver[API documentation].
+You can find all `Driver` configuration parameters in the link:{neo4j-docs-base-uri}/api/javascript-driver/current/function/index.html#static-function-driver[API documentation].
 
 
 ifndef::backend-pdf[]

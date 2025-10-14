@@ -15,9 +15,9 @@ The Reactive API ensures that the receiving side is not forced to buffer arbitra
 
 The driver provides two implementations of reactive features:
 
-- link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/reactivestreams/package-summary.html[`org.neo4j.driver.reactivestreams`] uses the Reactive Streams API for Java.
+- link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/reactivestreams/package-summary.html[`org.neo4j.driver.reactivestreams`] uses the Reactive Streams API for Java.
 It depends on the link:https://projectreactor.io/docs/core/release/reference/[`reactor-core` package] from link:https://projectreactor.io/[Project Reactor].
-- link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/reactive/package-summary.html[`org.neo4j.driver.reactive`] uses the native Java Flow API introduced in Java 9 (such as link:https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/Flow.Publisher.html[`Flow.Publisher`]).
+- link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/reactive/package-summary.html[`org.neo4j.driver.reactive`] uses the native Java Flow API introduced in Java 9 (such as link:https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/Flow.Publisher.html[`Flow.Publisher`]).
 
 The examples on this page use `org.neo4j.driver.reactivestreams`.
 
@@ -53,9 +53,11 @@ To use reactive features, you need to add the relevant dependencies to your proj
 </dependency>
 ----
 
+
 == Reactive query examples
 
-The basic driver's concepts are the same as the synchronous case, but queries are run through a link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/reactivestreams/ReactiveSession.html[`ReactiveSession`], and the objects related to querying have a reactive counterpart and prefix.
+The basic driver's concepts are the same as the synchronous case, but queries are run through a link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/reactivestreams/ReactiveSession.html[`ReactiveSession`], and the objects related to querying have a reactive counterpart and prefix.
+
 
 === Managed transaction with reactive sessions
 
@@ -114,9 +116,9 @@ It will ensure the resource is alive for the time it is needed for, and allows t
 Read more on this pattern in xref:session-creation[Always defer session creation].
 <2> `.usingWhen()` takes a _resource supplier_ in the form of a `Publisher`, hence why session creation is wrapped in a link:https://projectreactor.io/docs/core/release/api/reactor/core/publisher/Mono.html#just-T-[`Mono.just()`] call, which spawns a `Mono` from any value.
 <3> The session creation is similar to the async case, and xref:transactions.adoc#_session_configuration[the same configuration methods] apply.
-The difference is that the first argument must be `ReactiveSession.class`, and the return value is a link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/reactivestreams/ReactiveSession.html[`ReactiveSession`] object.
-<4> The method link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/reactive/ReactiveSession.html#executeRead(org.neo4j.driver.reactive.ReactiveTransactionCallback)[`ReactiveSession.executeRead()`] runs a read transaction and returns a `Publisher` with the callee's return, which link:https://projectreactor.io/docs/core/release/api/reactor/core/publisher/Mono.html#fromDirect-org.reactivestreams.Publisher-[`Mono.fromDirect()`] converts into a `Mono`.
-<5> The method link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/reactivestreams/ReactiveQueryRunner.html#method-summary[`tx.run()`] returns a `Publisher<link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/reactivestreams/ReactiveResult.html[ReactiveResult]>`, which link:https://projectreactor.io/docs/core/release/api/reactor/core/publisher/Mono.html#fromDirect-org.reactivestreams.Publisher-[`Mono.fromDirect()`] converts into a `Mono`.
+The difference is that the first argument must be `ReactiveSession.class`, and the return value is a link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/reactivestreams/ReactiveSession.html[`ReactiveSession`] object.
+<4> The method link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/reactive/ReactiveSession.html#executeRead(org.neo4j.driver.reactive.ReactiveTransactionCallback)[`ReactiveSession.executeRead()`] runs a read transaction and returns a `Publisher` with the callee's return, which link:https://projectreactor.io/docs/core/release/api/reactor/core/publisher/Mono.html#fromDirect-org.reactivestreams.Publisher-[`Mono.fromDirect()`] converts into a `Mono`.
+<5> The method link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/reactivestreams/ReactiveQueryRunner.html#method-summary[`tx.run()`] returns a `Publisher<link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/reactivestreams/ReactiveResult.html[ReactiveResult]>`, which link:https://projectreactor.io/docs/core/release/api/reactor/core/publisher/Mono.html#fromDirect-org.reactivestreams.Publisher-[`Mono.fromDirect()`] converts into a `Mono`.
 <6> Before the final result is returned, link:https://projectreactor.io/docs/core/release/api/reactor/core/publisher/Mono.html#flatMapMany-java.util.function.Function-[`Mono.flatMapMany()`] retrieves the records from the result and returns them as a new `Flux`.
 <7> The final cleanup closes the session.
 <8> To show the result of the reactive workflow, `.block()` waits for the flow to complete so that values can be printed.
@@ -124,6 +126,7 @@ In a real application you wouldn't block but rather forward the records publishe
 
 [NOTE]
 You can run several queries within the same reactive session through several calls to `executeRead/Write()` within the `workerClosure`.
+
 
 === Implicit transaction with reactive sessions
 

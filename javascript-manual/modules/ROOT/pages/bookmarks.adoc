@@ -1,12 +1,9 @@
 = Coordinate parallel transactions
 
-When working with a Neo4j cluster, <<causal_consistency>> is enforced by default in most cases, which guarantees that a query is able to read changes made by previous queries.
+When working with a Neo4j cluster, <<causal_consistency>> is enforced by default in most cases, guaranteeing that a query is able to read changes made by previous queries.
 The same does not happen by default for multiple xref:transactions.adoc[transactions] running in parallel though.
 In that case, you can use _bookmarks_ to have one transaction wait for the result of another to be propagated across the cluster before running its own work.
-This is not a requirement, and *you should only use bookmarks if you _need_ casual consistency across different transactions*, as waiting for bookmarks can have a negative performance impact.
-
-A _bookmark_ is a token that represents some state of the database.
-By passing one or multiple bookmarks along with a query, the server will make sure that the query does not get executed before the represented state(s) have been established.
+This is not a requirement, and *you should only use <<bookmark,bookmarks>> if you _need_ casual consistency across different transactions*, as waiting for bookmarks can have a negative performance impact.
 
 
 == Bookmarks with `.executeQuery()`
@@ -40,7 +37,7 @@ await driver.executeQuery(
 
 == Bookmarks within a single session
 
-Bookmark management happens automatically for queries run within a single session, so that you can trust that queries inside one session are causally chained.
+Bookmark management happens automatically for queries run within a single session: queries inside the same session are causally chained.
 
 [source, javascript]
 ----
@@ -174,12 +171,12 @@ image:{common-image}/driver-passing-bookmarks.svg[]
 
 [TIP]
 The use of bookmarks can negatively impact performance, since all queries are forced to wait for the latest changes to be propagated across the cluster.
-For simple use-cases, try to group queries within a single transaction, or within a single session.
+If possible, try to group queries within a single transaction, or within a single session.
 
 
 == Mix `.executeQuery()` and sessions
 
-To ensure causal consistency among transactions executed partly with `.executeQuery()` and partly with sessions, you can use the option `bookmarkManager` upon session creation, setting it to `driver.executeQueryBookmarkManager`.
+To ensure causal consistency among transactions executed partly with `.executeQuery()` and partly with sessions, create the session with the option `bookmarkManager` and set it to `driver.executeQueryBookmarkManager`.
 Since that is the default bookmark manager for `.executeQuery()` calls, this will ensure that all work is executed under the same bookmark manager and thus causally consistent.
 
 [source, javascript]

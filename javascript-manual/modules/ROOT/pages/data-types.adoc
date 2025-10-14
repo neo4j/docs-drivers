@@ -11,15 +11,15 @@ The tables in this section show the mapping between Cypher data types and JavaSc
 | LIST        | `Array`
 | MAP         | `Object`
 | BOOLEAN     | `Boolean`
-| INTEGER     | link:{neo4j-docs-base-uri}/api/javascript-driver/{javascript-driver-version}/class/lib6/integer.js~Integer.html[`Integer`]
+| INTEGER     | link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/integer.js~Integer.html[`Integer`]
 | FLOAT       | `Number`
 | STRING      | `String`
 | ByteArray   | `Int8Array`
 |===
 
 [TIP]
-link:{neo4j-docs-base-uri}/api/javascript-driver/{javascript-driver-version}/class/lib6/integer.js~Integer.html[`Integer`] is not one of JavaScript's native types, but rather a custom one accomodating Cypher's precision.
-You can disable this through the link:{neo4j-docs-base-uri}/api/javascript-driver/{javascript-driver-version}/function/index.html#configuration[`disableLosslessIntegers` configuration entry] when instantiating the driver, so that JavaScript's native `Number` type is used instead.
+link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/integer.js~Integer.html[`Integer`] is not one of JavaScript's native types, but rather a custom one accomodating Cypher's precision.
+You can disable this through the link:{neo4j-docs-base-uri}/api/javascript-driver/current/function/index.html#configuration[`disableLosslessIntegers` configuration entry] when instantiating the driver, so that JavaScript's native `Number` type is used instead.
 Note that this can lead to a loss of precision.
 
 
@@ -112,7 +112,7 @@ d = new neo4j.Date(2021, 11, 2)
 d.toString() // '2021-11-02'
 ----
 
-For full documentation, see link:{neo4j-docs-base-uri}/api/javascript-driver/{javascript-driver-version}/class/lib6/temporal-types.js~Date.html[API documentation -- Date].
+For full documentation, see link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/temporal-types.js~Date.html[API documentation -- Date].
 
 
 === Time
@@ -134,7 +134,7 @@ Time {
 d.toString() // '07:47:00.000004123-04:00'
 ----
 
-For full documentation, see link:{neo4j-docs-base-uri}/api/javascript-driver/{javascript-driver-version}/class/lib6/temporal-types.js~Time.html[API documentation -- Time].
+For full documentation, see link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/temporal-types.js~Time.html[API documentation -- Time].
 
 
 === LocalTime
@@ -148,7 +148,7 @@ d = new neo4j.LocalTime(7, 47, 0, 4123)
 d.toString() // '07:47:00.000004123'
 ----
 
-For full documentation, see link:{neo4j-docs-base-uri}/api/javascript-driver/{javascript-driver-version}/class/lib6/temporal-types.js~LocalTime.html[API documentation -- LocalTime].
+For full documentation, see link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/temporal-types.js~LocalTime.html[API documentation -- LocalTime].
 
 
 === DateTime
@@ -175,7 +175,7 @@ DateTime {
 d.toString() // '2021-11-02T07:47:00.000004123-04:00[US/Eastern]'
 ----
 
-For full documentation, see link:{neo4j-docs-base-uri}/api/javascript-driver/{javascript-driver-version}/class/lib6/temporal-types.js~DateTime.html[API documentation -- DateTime].
+For full documentation, see link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/temporal-types.js~DateTime.html[API documentation -- DateTime].
 
 
 === LocalDateTime
@@ -199,7 +199,7 @@ LocalDateTime {
 d.toString() // '2021-11-02T07:47:00.000004123'
 ----
 
-For full documentation, see link:{neo4j-docs-base-uri}/api/javascript-driver/{javascript-driver-version}/class/lib6/temporal-types.js~LocalDateTime.html[API documentation -- LocalDateTime].
+For full documentation, see link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/temporal-types.js~LocalDateTime.html[API documentation -- LocalDateTime].
 
 
 === Duration
@@ -220,14 +220,14 @@ Duration {
 d.toString() // 'P1M2DT3.000000004S'
 ----
 
-For full documentation, see link:{neo4j-docs-base-uri}/api/javascript-driver/{javascript-driver-version}/class/lib6/temporal-types.js~Duration.html[API documentation -- Duration].
+For full documentation, see link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/temporal-types.js~Duration.html[API documentation -- Duration].
 
 
 == Spatial types
 
 Cypher supports spatial values (points), and Neo4j can store these point values as properties on nodes and relationships.
 
-The driver has a single type link:{neo4j-docs-base-uri}/api/javascript-driver/{javascript-driver-version}/class/lib6/spatial-types.js~Point.html[`neo4j.types.Point`], which can behave as a 2D/3D cartesian/WGS-84 point, depending on the `SRID` it is initialized with.
+The driver has a single type link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/spatial-types.js~Point.html[`neo4j.types.Point`], which can behave as a 2D/3D cartesian/WGS-84 point, depending on the `SRID` it is initialized with.
 The `SRID` (short for _Spatial Reference Identifier_) is a number identifying the coordinate system the point is to be interpreted in.
 You can think of it as a unique identifier for each spatial type.
 
@@ -283,7 +283,7 @@ const point3d = new neo4j.types.Point(
 // Point { srid: 4979, x: 1, y: -2, z: 3.1 }
 ----
 
-For full documentation, see link:{neo4j-docs-base-uri}/api/javascript-driver/{javascript-driver-version}/class/lib6/spatial-types.js~Point.html[API documentation -- Point].
+For full documentation, see link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/spatial-types.js~Point.html[API documentation -- Point].
 
 
 == Graph types
@@ -298,6 +298,7 @@ For full documentation, see link:{neo4j-docs-base-uri}/api/javascript-driver/{ja
 | PATH         | xref:_path_pathsegment[`neo4j.types.Path`]
 |              | xref:_path_pathsegment[`neo4j.types.PathSegment`]
 |===
+
 
 === Node
 Represents a node in a graph. +
@@ -331,7 +332,7 @@ const PASSWORD = '<password>';
 })()
 ----
 
-For full documentation, see link:{neo4j-docs-base-uri}/api/javascript-driver/{javascript-driver-version}/class/lib6/graph-types.js~Node.html[API documentation -- Node].
+For full documentation, see link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/graph-types.js~Node.html[API documentation -- Node].
 
 
 === Relationship
@@ -380,7 +381,7 @@ const PASSWORD = '<password>';
 })()
 ----
 
-For full documentation, see link:{neo4j-docs-base-uri}/api/javascript-driver/{javascript-driver-version}/class/lib6/graph-types.js~Relationship.html[API documentation -- Relationship].
+For full documentation, see link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/graph-types.js~Relationship.html[API documentation -- Relationship].
 
 
 === Path, PathSegment
@@ -462,7 +463,63 @@ async function addFriend(driver, name, status, friendName) {
 }
 ----
 
-For full documentation, see link:{neo4j-docs-base-uri}/api/javascript-driver/{javascript-driver-version}/class/lib6/graph-types.js~Path.html[API documentation -- Path] and link:{neo4j-docs-base-uri}/api/javascript-driver/{javascript-driver-version}/class/lib6/graph-types.js~PathSegment.html[PathSegment].
+For full documentation, see link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/graph-types.js~Path.html[API documentation -- Path] and link:{neo4j-docs-base-uri}/api/javascript-driver/current/class/lib6/graph-types.js~PathSegment.html[PathSegment].
+
+
+[role=label--new-6.0]
+[#vector]
+== Vector type
+
+The type link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/vector.js~Vector.html[`Vector`] maps to the Cypher type link:https://neo4j.com/docs/cypher-manual/current/values-and-types/vector/[`VECTOR`].
+`Vector` objects are stored as contiguous blocks of memory containing homogeneous values.
+
+The `vector` constructor takes a Javascript link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray[`TypedArray`].
+Supported `TypedArray` objects are: `Int8Array`, `Int16Array`, `Int32Array`, `Int64Array`, `Float32Array`, `Float64Array`.
+
+.Create and store a vector
+[source, javascript]
+----
+// Create a vector
+var typedArray = Float32Array.from([1, 2, 3])
+var neo4jVector = neo4j.vector(typedArray)  // <.>
+
+// Store the vector as a node property
+driver.executeQuery('MERGE (d:Doc {embedding: $vector})', { vector: neo4jVector })
+----
+
+[IMPORTANT]
+Storing `VECTOR` objects in the database requires a server version >= 2025.10, Enterprise Edition.
+
+.Retrieve and work with a vector
+[source, javascript]
+----
+// Retrieve a vector
+var { records } = driver.executeQuery(
+  "MATCH (d:Doc) RETURN d.embedding AS v LIMIT 1"
+)
+var neo4jVector = records[0].get("v")
+
+console.log(neo4jVector.toString())
+// vector([1, 2, 3], 3, FLOAT32 NOT NULL)
+
+// Get a TypedArray of the same type as the Vector
+var retrievedTypedArray = neo4jVector.asTypedArray()
+
+// Convert the TypedArray into a regular array of Numbers (not safe for Int64 arrays)
+var retrievedArray = Array.from(retrievedTypedArray)
+----
+
+[NOTE]
+Whereas regular Javascript arrays are capped when stringified, the `Vector` type always shows all elements.
+Logging `Vector` objects risks clogging the log or resulting in Out of Memory errors.
+
+
+[role=label--new-6.0]
+[#unsupportedtype]
+== UnsupportedType
+
+The type link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/unsupported-type.js~UnsupportedType.html[`UnsupportedType`] is used for data types returned by Cypher queries, but that the driver doesn't recognize.
+This happens when the client version is too old with respect to the server version.
 
 
 ifndef::backend-pdf[]

@@ -1,17 +1,13 @@
 # tag::intro[]
 
-This page contains the list of new features and breaking changes of the driver from version 4.4 to 5.x.
+This page contains the list of new features and breaking changes of the driver from version 5.28 to 6.x.
 For a full list of changes, see the link:{driver-changelog-url}[driver changelog].
 
-The link:https://github.com/neo4j/drivers-migration-assistent[Neo4j Drivers Migration Assistent] simplifies the upgrade process by contextualizing the changelog to your application.
-It scans your codebase for usage of deprecations and removals, and brings them up to you.
-The tool doesn't automatically rewrite your code; it only points at where action is needed, providing in-context information on how each hit should be addressed.
-
-The latest driver version of the 5.x series (5.28) is compatible with Neo4j server both 4.4 and 5.x, so you can upgrade the driver before you upgrade the server.
-At the same time, the driver version 4.4 is forward compatible with Neo4j server 5.x, so you could also upgrade the server before the driver; however, given that it's easier to roll back an application upgrade than a server upgrade, it's recommended to start with the driver.
+The latest driver version of the 6.x series is compatible with Neo4j server both 4.4, 5.x, and 202[56].x, so you can upgrade the driver before you upgrade the server.
+At the same time, the driver version 5.28 is forward compatible with Neo4j server 202[56].x, so you could also upgrade the server before the driver; however, given that it's easier to roll back an application upgrade than a server upgrade, it's recommended to start with the driver.
 
 [TIP]
-When upgrading the Neo4j server to a newer version, the Cypher queries in your application may also need updating.
+When upgrading the Neo4j server to a newer version, the Cypher queries in your application might also need updating.
 The Drivers Migration Assistent doesn't cover Cypher changes. +
 See link:https://neo4j.com/docs/cypher-manual/current/deprecations-additions-removals-compatibility/[Cypher -> Deprecations, additions, and compatibility].
 
