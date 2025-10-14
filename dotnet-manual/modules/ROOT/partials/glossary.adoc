@@ -1,2 +1,2 @@
 [[transaction_function]]transaction function:: A transaction function is a callback executed by an `.ExecuteReadAsync()` or `.ExecuteWriteAsync()` call. The driver automatically re-executes the callback in case of server failure.
-[[IDriver]]IDriver:: A link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IDriver.html[`IDriver`] object holds the details required to establish connections with a Neo4j database.
+[[IDriver]]IDriver:: A link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IDriver.html[`IDriver`] object holds the details required to establish connections with a Neo4j database.

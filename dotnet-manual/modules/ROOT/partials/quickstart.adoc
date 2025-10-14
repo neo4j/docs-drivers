@@ -20,7 +20,7 @@ Add the Neo4j .NET driver to your project:
 dotnet add package Neo4j.Driver
 ----
 
-The driver supports the .NET Standard 2.0.
+The driver supports .NET 8.0 and 9.0.
 
 link:https://neo4j.com/docs/dotnet-manual/current/install/[More info on installing the driver]
 

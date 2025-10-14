@@ -1,12 +1,10 @@
 = Coordinate parallel transactions
 
-When working with a Neo4j cluster, <<causal_consistency>> is enforced by default in most cases, which guarantees that a query is able to read changes made by previous queries.
+When working with a Neo4j cluster, <<causal_consistency>> is enforced by default in most cases, guaranteeing that a query is able to read changes made by previous queries.
 The same does not happen by default for multiple xref:transactions.adoc[transactions] running in parallel though.
 In that case, you can use _bookmarks_ to have one transaction wait for the result of another to be propagated across the cluster before running its own work.
-This is not a requirement, and *you should only use bookmarks if you _need_ casual consistency across different transactions*, as waiting for bookmarks can have a negative performance impact.
 
-A _bookmark_ is a token that represents some state of the database.
-By passing one or multiple bookmarks along with a query, the server will make sure that the query does not get executed before the represented state(s) have been established.
+This is not a requirement, and *you should only use <<bookmark,bookmarks>> if you _need_ casual consistency across different transactions*, as waiting for bookmarks can have a negative performance impact.
 
 
 [#executablequery]
@@ -38,7 +36,7 @@ await driver.ExecutableQuery("<QUERY>")
 [#single-session]
 == Bookmarks within a single session
 
-Bookmark management happens automatically for queries run within a single session, so you can trust that queries inside one session are causally chained.
+Bookmark management happens automatically for queries run within a single session: queries inside the same session are causally chained.
 
 [source, csharp]
 ----
@@ -131,44 +129,39 @@ async Task printFriendships(IAsyncQueryRunner tx) {
 }
 ----
 
-<1> Collect and combine bookmarks from different sessions using `AsyncSession.LastBookmarks`, storing them in a link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.Bookmarks.html[`Bookmarks`] object.
+<1> Collect and combine bookmarks from different sessions using `AsyncSession.LastBookmarks`, storing them in a link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.Bookmarks.html[`Bookmarks`] object.
 <2> Use them to initialize another session with the `.WithBookmarks()` config method.
 
 image:{common-image}/driver-passing-bookmarks.svg[]
 
 [TIP]
 The use of bookmarks can negatively impact performance, since all queries are forced to wait for the latest changes to be propagated across the cluster.
-For simple use-cases, try to group queries within a single transaction, or within a single session.
+If possible, group queries within a single transaction, or within a single session.
 
-////
-Note: not possible on .NET
 
 == Mix `.ExecutableQuery()` and sessions
 
-To ensure causal consistency among transactions executed partly with `.ExecutableQuery()` and partly with sessions, you can retrieve the default bookmark manager for `ExecutableQuery` instances through `driver.executableQueryBookmarkManager()` and pass it to new sessions through the `.WithBookmarkManager()` config method.
+To ensure causal consistency among transactions executed partly with `.ExecutableQuery()` and partly with sessions, you can retrieve the default bookmark manager for the `ExecutableQuery` interface through `driver.GetExecutableQueryBookmarkManager()` and pass it to new sessions through the link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.SessionConfigBuilder.WithBookmarkManager.html#Neo4j_Driver_SessionConfigBuilder_WithBookmarkManager_Neo4j_Driver_IBookmarkManager_[`SessionConfigBuilder.WithBookmarkManager()`] config method.
 This will ensure that all work is executed under the same bookmark manager and thus causally consistent.
 
-[source, java]
+[source, dotnet]
 ----
-// import org.neo4j.driver.Driver;
-// import org.neo4j.driver.SessionConfig;
 
-driver.executableQuery("<QUERY 1>").execute();
+await driver.ExecutableQuery("<QUERY 1>").ExecuteAsync();
 
-try (var session = driver.session(SessionConfig.builder()
-    .withBookmarkManager(driver.executableQueryBookmarkManager())
-    .build())) {
+using var session = driver.AsyncSession(conf => conf.
+    WithDatabase("<database-name>")
+    .WithBookmarkManager(driver.GetExecutableQueryBookmarkManager()));
 
-    // every query inside this session will be causally chained
-    // (i.e., can read what was written by <QUERY 1>)
-    session.executeWriteWithoutResult(tx -> tx.run("<QUERY 2>"));
-}
+// every query inside this session will be causally chained
+// (i.e., can read what was written by <QUERY 1>)
+await session.ExecuteWriteAsync(async tx => await tx.RunAsync("<QUERY 2>"));
 
-// subsequent executableQuery calls will also be causally chained
+
+// subsequent ExecutableQuery calls will also be causally chained
 // (i.e., can read what was written by <QUERY 2>)
-driver.executableQuery("<QUERY 3>").execute();
+await driver.ExecutableQuery("<QUERY 3>").ExecuteAsync();
 ----
-////
 
 
 ifndef::backend-pdf[]

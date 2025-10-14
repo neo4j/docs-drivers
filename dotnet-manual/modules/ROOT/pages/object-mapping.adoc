@@ -1,7 +1,6 @@
 = Map query results to objects
-:page-role: new-5.24
 
-When xref:query-simple.adoc#read[reading data from the database], results come back as link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IRecord.html[`IRecord`] objects.
+When xref:query-simple.adoc#read[reading data from the database], results come back as link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IRecord.html[`IRecord`] objects.
 To process records, you can either extract properties with `.Get()` and other helper methods, or you can map them to objects in your application.
 You can either map records to classes you have explicitly defined, or provide a record-specific blueprint from which the driver will spawn new objects.
 
@@ -205,7 +204,7 @@ The constructor signature implies that the `name` return key is mapped to the cl
 Especially if your queries return a variety of result keys, it can feel pointless to define a number of different classes just for the mapping to work, or to engineer one single class and try to make it adapt to a variety of return keys with attribute decorators.
 In those cases, you can provide a skeleton of definition (a _blueprint_) to the driver and let it instantiate anonymous objects out of that.
 
-You provide a blueprint with the method link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.Mapping.RecordExtensions.AsObjectFromBlueprint.html[`IRecord.AsObjectFromBlueprint()`], and the record must match it exactly (i.e. you can't use decorators).
+You provide a blueprint with the method link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.Mapping.RecordExtensions.AsObjectFromBlueprint.html[`IRecord.AsObjectFromBlueprint()`], and the record must match it exactly (i.e. you can't use decorators).
 
 [source, csharp]
 ----

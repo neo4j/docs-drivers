@@ -1,10 +1,6 @@
 = Query the database
 
-Once you have xref:connect.adoc[connected to the database], you can execute <<Cypher>> queries through the method `IDriver.ExecutableQuery()`.
-
-[TIP]
-`IDriver.ExecutableQuery()` was introduced with the version 5.8 of the driver. +
-For queries with earlier versions, use xref:transactions.adoc[sessions and transactions].
+Once you have xref:connect.adoc[connected to the database], you can execute <<Cypher>> queries through the method link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IDriver.ExecutableQuery.html[`IDriver.ExecutableQuery()`].
 
 
 [#write]
@@ -58,7 +54,7 @@ var summary = result.Summary;  // <.>
 Console.WriteLine($"The query `{summary.Query.Text}` returned {result.Result.Count()} results in {summary.ResultAvailableAfter.Milliseconds} ms.");
 ----
 
-<.> `result.Result` contains the result as a list of link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IRecord.html[`IRecord`] objects
+<.> `result.Result` contains the result as a list of link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IRecord.html[`IRecord`] objects
 <.> `.Get<type>(key)` extracts the entry named `key` from the returned record and casts it to `type`.
 For more information on types, see xref:data-types.adoc[].
 <.> The xref:result-summary.adoc[summary of execution] returned by the server
@@ -147,7 +143,7 @@ Console.WriteLine($"Query updated the database? {result.Summary.Counters.Contain
 == Query parameters
 
 *Do not hardcode or concatenate parameters directly into queries*.
-Instead, always use placeholders and specify the link:{neo4j-docs-base-uri}/cypher-manual/current/syntax/parameters/[Cypher parameters], as shown in the previous examples.
+Instead, always use placeholders and provide dynamic data as link:{neo4j-docs-base-uri}/cypher-manual/current/syntax/parameters/[Cypher parameters], as shown in the previous examples.
 This is for:
 
 1. *performance benefits*: Neo4j compiles and caches queries, but can only do so if the query structure is unchanged;
@@ -173,10 +169,10 @@ For those rare use cases, see xref:query-advanced.adoc#dynamic-advanced[Dynamic 
 
 A query run may fail for a number of reasons.
 When using `IDriver.ExecutableQuery()`, the driver automatically retries to run a failed query if the failure is deemed to be transient (for example due to temporary server unavailability).
-An error will be raised if the operation keeps failing after the configured link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.ConfigBuilder.WithMaxTransactionRetryTime.html[maximum retry time].
+An error is raised if the operation keeps failing after the configured link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.ConfigBuilder.WithMaxTransactionRetryTime.html[maximum retry time].
 
-All link:https://neo4j.com/docs/status-codes/current/errors/all-errors/[errors coming from the server] are of type link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.Neo4jException.html[`Neo4jException`].
-You can use an error's code to stably identify a specific error; error messages are instead not stable markers, and should not be relied upon.
+All link:https://neo4j.com/docs/status-codes/current/errors/all-errors/[errors coming from the server] are of type link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.Neo4jException.html[`Neo4jException`].
+You can use an exception's code to stably identify a specific error; error messages are instead not stable markers, and should not be relied upon.
 
 .Basic error handling
 [source, csharp]
@@ -196,18 +192,100 @@ Exception message: Invalid input '': expected an expression, '*', 'ALL' or 'DIST
 */
 ----
 
+////
+
+Exception objects also expose errors as GQL-status objects.
+The main difference between link:https://neo4j.com/docs/status-codes/current/errors/all-errors/[Neo4j error codes] and link:https://neo4j.com/docs/status-codes/current/errors/gql-errors/[GQL error codes] is that the GQL ones are more granular: a single Neo4j error code might be broken in several, more specific GQL error codes.
+
+The actual _cause_ that triggered an exception is sometimes found in the optional GQL-status object `.GqlCause`, which is itself a `Neo4jError`.
+You might need to recursively traverse the cause chain before reaching the root cause of the exception you caught.
+In the example below, the exception's GQL status code is `42001`, but the actual source of the error has status code `42I06`.
+
+.Usage of `Neo4jError` with GQL-related methods
+[source, go]
+----
+result, err := neo4j.ExecuteQuery(ctx, driver, "MATCH (p:Person) RETURN", nil,
+    neo4j.EagerResultTransformer,
+    neo4j.ExecuteQueryWithDatabase("neo4j"))
+if err != nil {
+    var neo4jErr *neo4j.Neo4jError
+    if errors.As(err, &neo4jErr) {
+        // Error is of type Neo4jError
+        fmt.Println("Error GQL status code:", neo4jErr.GqlStatus)
+        fmt.Println("Error GQL status description:", neo4jErr.GqlStatusDescription)
+        fmt.Println("Error GQL classification:", neo4jErr.GqlClassification)
+        if neo4jErr.GqlDiagnosticRecord != nil {
+            fmt.Printf("Error GQL diagnostic record: %+v\n", neo4jErr.GqlDiagnosticRecord)
+        }
+        if neo4jErr.GqlCause != nil {
+            fmt.Println("Error GQL cause:", neo4jErr.GqlCause.Error())
+        }
+    } else {
+        fmt.Println("Non-Neo4j error:", err.Error())
+    }
+}
+/*
+Error GQL status code: 42001
+Error GQL status description: error: syntax error or access rule violation - invalid syntax
+Error GQL classification: CLIENT_ERROR
+Error GQL diagnostic record: map[CURRENT_SCHEMA:/ OPERATION: OPERATION_CODE:0 _classification:CLIENT_ERROR _position:map[column:24 line:1 offset:23]]
+Error GQL cause: Neo4jError: Neo.DatabaseError.General.UnknownError (42I06: Invalid input '', expected: an expression, '*', 'ALL' or 'DISTINCT'.)
+*/
+----
+
+GQL status codes are particularly helpful when you want your application to behave differently depending on the exact error that was raised by the server.
+
+.Distinguishing between different error codes
+[source, go]
+----
+result, err := neo4j.ExecuteQuery(ctx, driver, "MATCH (p:Person) RETURN", nil,
+    neo4j.EagerResultTransformer,
+    neo4j.ExecuteQueryWithDatabase("neo4j"))
+if err != nil {
+    var neo4jErr *neo4j.Neo4jError
+    if errors.As(err, &neo4jErr) {
+        if hasGqlStatus(neo4jErr, '42001') {
+            // Neo.ClientError.Statement.SyntaxError
+            // special handling of syntax error in query
+            fmt.Println(neo4jErr.Error())
+        } else if hasGqlStatus(neo4jErr, '42NFF') {
+            // Neo.ClientError.Security.Forbidden
+            // special handling of user not having CREATE permissions
+            fmt.Println(neo4jErr.Error())
+        } else {
+            // handling of all other exceptions
+            fmt.Println(neo4jErr.Error())
+        }
+    }
+}
+----
+
+[NOTE]
+====
+The GQL status code `50N42` is returned when an error does not have a GQL-status object.
+This can happen if the driver is connected to an older Neo4j server.
+Don't rely on this status code, as future Neo4j server versions might change it with a more appropriate one.
+====
+
+[TIP]
+====
+Transient server errors can be retried without need to alter the original request.
+You can discover whether an error is transient via the property link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.Neo4jException.IsRetriable.html#Neo4j_Driver_Neo4jException_IsRetriable[`IsRetriable`], which gives insights into whether a further attempt might be successful.
+This is particular useful when running queries in xref:transactions#explicit-transactions[explicit transactions], to know if a failed query is worth re-running.
+====
+////
 
 [#query-config]
 == Query configuration
 
 You can supply further configuration parameters to alter the default behavior of `.ExecutableQuery()`.
-You do so through the method `.WithConfig()`, which takes a link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.QueryConfig.html[`QueryConfig`] object.
+You do so through the method `.WithConfig()`, which takes a link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.QueryConfig.html[`QueryConfig`] object.
 
 
 [#database-selection]
 === Database selection
 
-It is recommended to *always specify the database explicitly*, even on single-database instances.
+*Always specify the database explicitly*, even on single-database instances.
 This allows the driver to work more efficiently, as it saves a network round-trip to the server to resolve the home database.
 If no database is given, the link:https://neo4j.com/docs/operations-manual/current/database-administration/#manage-databases-default[user's home database] is used.
 
@@ -220,8 +298,8 @@ await driver.ExecutableQuery("MATCH (p:Person) RETURN p.name")
 
 [TIP]
 Specifying the database through the configuration method is preferred over the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/use/[`USE`] Cypher clause.
-If the server runs on a cluster, queries with `USE` require server-side routing to be enabled.
-Queries may also take longer to execute as they may not reach the right cluster member at the first attempt, and need to be routed to one containing the requested database.
+If the server runs on a cluster, queries with `USE` require link:https://neo4j.com/docs/operations-manual/current/clustering/setup/routing/#clustering-routing[server-side routing] to be enabled.
+Queries can also take longer to execute as they may not reach the right cluster member at the first attempt, and need to be routed to one containing the requested database.
 
 
 [#request-routing]
@@ -242,21 +320,19 @@ await driver.ExecutableQuery("MATCH (p:Person) RETURN p.name")
 
 [NOTE]
 ====
-Although executing a _write_ query in read mode likely results in a runtime error, *you should not rely on this for access control.*
+Although executing a _write_ query in read mode results in a runtime error, *you should not rely on this for access control.*
 The difference between the two modes is that _read_ transactions will be routed to any node of a cluster, whereas _write_ ones are directed to primaries.
-There is no guarantee that a write query submitted in read mode will be rejected, and an issue with this feature will not be classified as a security vulnerability.
+There is no security guarantee that a write query submitted in read mode will be rejected.
 ====
 
 
 [#impersonation]
-[role=label--new-5.14]
 === Run queries as a different user
 
 You can execute a query through a different user with the config key `authToken`.
 Switching user at the query level is cheaper than creating a new `IDriver` object.
 The query is then run within the security context of the given user (i.e., home database, permissions, etc.).
-See link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.AuthTokens.html[`AuthTokens`] for available native implementations of authentication methods. +
-Query-scoped authentication requires a Neo4j server version >= 5.8.
+See link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.AuthTokens.html[`AuthTokens`] for available native implementations of authentication methods.
 
 [source, csharp]
 ----
@@ -268,8 +344,7 @@ await driver.ExecutableQuery("MATCH (p:Person) RETURN p.name")
     .ExecuteAsync();
 ----
 
-The `QueryConfig` key `impersonatedUser` provides a similar functionality, and is available in driver/server versions >= 4.4.
-The difference is that you don't need to know a user's password to impersonate them, but the user under which the `IDriver` was created needs to have link:{neo4j-docs-base-uri}/operations-manual/current/authentication-authorization/dbms-administration/#access-control-dbms-administration-impersonation[`IMPERSONATE` privileges].
+The `QueryConfig` key `impersonatedUser` provides a similar functionality: the difference is that you don't need to know a user's password to impersonate them, but the user under which the `IDriver` was created needs to have link:{neo4j-docs-base-uri}/operations-manual/current/authentication-authorization/dbms-administration/#access-control-dbms-administration-impersonation[`IMPERSONATE` privileges].
 
 [source, csharp]
 ----
@@ -379,7 +454,7 @@ try {
 }
 ----
 
-For more information see link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IDriver.ExecutableQuery.html[API documentation -> IDriver.ExecutableQuery()].
+For more information see link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IDriver.ExecutableQuery.html[API documentation -> IDriver.ExecutableQuery()].
 
 
 ifndef::backend-pdf[]
