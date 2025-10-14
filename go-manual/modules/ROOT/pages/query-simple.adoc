@@ -195,7 +195,7 @@ You can use an exception's code to stably identify a specific error; error messa
 ----
 result, err := neo4j.ExecuteQuery(ctx, driver, "MATCH (p:Person) RETURN", nil,
     neo4j.EagerResultTransformer,
-    neo4j.ExecuteQueryWithDatabase("neo4j"))
+    neo4j.ExecuteQueryWithDatabase("<database-name>"))
 if err != nil {
     var neo4jErr *neo4j.Neo4jError
     if errors.As(err, &neo4jErr) {
@@ -226,7 +226,7 @@ In the example below, the exception's GQL status code is `42001`, but the actual
 ----
 result, err := neo4j.ExecuteQuery(ctx, driver, "MATCH (p:Person) RETURN", nil,
     neo4j.EagerResultTransformer,
-    neo4j.ExecuteQueryWithDatabase("neo4j"))
+    neo4j.ExecuteQueryWithDatabase("<database-name>"))
 if err != nil {
     var neo4jErr *neo4j.Neo4jError
     if errors.As(err, &neo4jErr) {
@@ -260,7 +260,7 @@ GQL status codes are particularly helpful when you want your application to beha
 ----
 result, err := neo4j.ExecuteQuery(ctx, driver, "MATCH (p:Person) RETURN", nil,
     neo4j.EagerResultTransformer,
-    neo4j.ExecuteQueryWithDatabase("neo4j"))
+    neo4j.ExecuteQueryWithDatabase("<database-name>"))
 if err != nil {
     var neo4jErr *neo4j.Neo4jError
     if errors.As(err, &neo4jErr) {
