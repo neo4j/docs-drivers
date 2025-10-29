@@ -1,4 +1,4 @@
-:driver-changelog-url: https://github.com/neo4j/neo4j-dotnet-driver/wiki/5.X-Change-Log
+:driver-changelog-url: https://github.com/neo4j/neo4j-dotnet-driver/wiki/6.X-Change-Log
 
 = Upgrade from older versions
 
@@ -42,46 +42,48 @@ For more information, see xref:query-simple.adoc#error-handling[Error handling].
 
 Deprecated features are likely to be removed in the next major version.
 
-MIN VERSION 8.0
-
 [cols="1,5a,1"]
 |===
 |Version |Message |Status
 
 |6.0
-|`ISession`, `IRxSession`, link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IAsyncSession.html[`IAsyncSession`] -- Methods `.ReadTransaction()` and `.WriteTransaction()` are deprecated in favor of `.ExecuteRead()` and `.ExecuteWrite()`.
+|Supported .NET versions are 8.0 and 9.0.
+|label:removed[Changed]
+
+|6.0
+|`ISession`, `IRxSession`, link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IAsyncSession.html[`IAsyncSession`] -- Methods `.ReadTransaction()` and `.WriteTransaction()` have been removed in favor of `.ExecuteRead()` and `.ExecuteWrite()`.
 The same holds for the async counterparts `.ReadTransactionAsync()` and `.WriteTransactionAsync()`, replaced by `.ExecuteReadAsync()` and `.ExecuteWriteAsync()`.
 
 The new methods behave similarly, but the argument types are different and the new methods do not support the `.commit()`, `.rollback()`, `.close()`, and `.closed()` methods.
 |label:removed[]
 
-|5.0
-|`ISession`, link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IAsyncSession.html[`IAsyncSession`] -- Method `.LastBookmark()` is deprecated in favor of `.LastBookmarks()`.
-|label:deprecated[]
+|6.0
+|link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IDriver.html[`IDriver`] -- Method `.CloseAsync()` has been removed in favor of `.DisposeAsync()`.
+|label:removed[]
 
-|5.0
-|Class `Bookmark` is deprecated in favor of link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.Bookmarks.html[`Bookmarks`].
-|label:deprecated[]
+|6.0
+|**Bookmarks**
 
-|5.0
-|link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.SessionConfigBuilder.html[`SessionConfigBuilder`] -- Method link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.SessionConfigBuilder.WithBookmarks.html#Neo4j_Driver_SessionConfigBuilder_WithBookmarks_Neo4j_Driver_Bookmarks___[`.WithBookmarks()`] takes `Bookmarks[]` as argument rather than `Bookmark[]`.
-|label:deprecated[]
+- `ISession`, `IRxSession` link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IAsyncSession.html[`IAsyncSession`] -- Method `.LastBookmark()` has been removed in favor of `.LastBookmarks()`.
+- Class `Bookmark` has been removed in favor of link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.Bookmarks.html[`Bookmarks`].
+- link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.SessionConfigBuilder.html[`SessionConfigBuilder`] -- Method link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.SessionConfigBuilder.WithBookmarks.html#Neo4j_Driver_SessionConfigBuilder_WithBookmarks_Neo4j_Driver_Bookmarks___[`.WithBookmarks()`] takes `Bookmarks[]` as argument rather than `Bookmark[]`.
+|label:removed[]
 
 // a backslash is needed in first url to avoid it becoming a <em> with the subsequent link __
-|5.0
+|6.0
 |`ZonedDateTime` -- Two constructors not including `DateTimeKind` are deprecated (link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.ZonedDateTime.-ctor.html#Neo4j_Driver_ZonedDateTime_\_ctor_System_Int32_System_Int32_System_Int32_System_Int32_System_Int32_System_Int32_Neo4j_Driver_Zone_[this] and link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.ZonedDateTime.-ctor.html#Neo4j_Driver_ZonedDateTime_\_ctor_System_Int32_System_Int32_System_Int32_System_Int32_System_Int32_System_Int32_System_Int32_Neo4j_Driver_Zone_[this]).
+|label:removed[]
+
+|6.0
+|link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.INotification.html[`INotification`] -- Property `Severity` has been removed in favor of `SeverityLevel`/`RawSeverityLevel`.
+|label:removed[]
+
+|5.0
+|link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IEntity.html[`IEntity`], link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.INode.html[`INode`], link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IRelationship.html[`IRelationship`] -- Method `.Id()` (`long`) is deprecated in favor of `.ElementId()` (`string`).
 |label:deprecated[]
 
 |5.0
-|link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IEntity.html[`IEntity`], link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.INode.html[`INode`], link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IRelationship.html[`IRelationship`] -- Method `.Id()` (`long`) is deprecated in favor of `.ElementId()` (`string`).
-|label:deprecated[]
-
-|5.0
-|link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IRelationship.html[`IRelationship`] -- Methods `.StartNodeId()` and `.EndNodeId()` are deprecated in favor of `.StartNodeElementId()` and `.EndNodeElementId()`. Old identifiers were `long`, whereas new ElementIds are `string`.
-|label:deprecated[]
-
-|5.7
-|link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.INotification.html[`INotification`] -- Property `Severity` is deprecated in favor of `SeverityLevel` or `RawSeverityLevel`.
+|link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IRelationship.html[`IRelationship`] -- Methods `.StartNodeId()` and `.EndNodeId()` are deprecated in favor of `.StartNodeElementId()` and `.EndNodeElementId()`. Old identifiers were `long`, whereas new ElementIds are `string`.
 |label:deprecated[]
 
 |===

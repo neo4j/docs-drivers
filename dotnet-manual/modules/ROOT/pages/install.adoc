@@ -2,9 +2,8 @@
 
 To start creating a Neo4j .NET application, you first need to install the .NET driver and get a Neo4j database instance to connect to.
 
-[NOTE]
-The driver supports the .NET Standard 2.0.
-For supported versions of the .NET Framework, see the link:https://dotnet.microsoft.com/en-us/platform/dotnet-standard[.NET Standard page].
+[IMPORTANT]
+The driver supports .NET 8.0 and 9.0.
 
 
 [#install-driver]
