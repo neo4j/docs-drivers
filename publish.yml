@@ -13,6 +13,7 @@ content:
     - java-manual
     - javascript-manual
     - python-manual
+    - dotnet-manual
     - common-content
     exclude:
     - '!**/_includes/*'
@@ -23,7 +24,6 @@ content:
     edit_url: https://github.com/neo4j/docs-drivers/tree/{refname}/{path}
     worktrees: true
     start_paths:
-    - dotnet-manual
     - go-manual
     exclude:
     - '!**/_includes/*'

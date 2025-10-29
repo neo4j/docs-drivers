@@ -14,6 +14,7 @@ content:
     - javascript-manual
     - python-manual
     - java-manual
+    - dotnet-manual
     - common-content
     exclude:
     - '!**/_includes/*'
@@ -25,7 +26,6 @@ content:
     worktrees: true
     start_paths:
     - go-manual
-    - dotnet-manual
     exclude:
     - '!**/_includes/*'
     - '!**/readme.adoc'
