@@ -264,11 +264,11 @@ result, err := neo4j.ExecuteQuery(ctx, driver, "MATCH (p:Person) RETURN", nil,
 if err != nil {
     var neo4jErr *neo4j.Neo4jError
     if errors.As(err, &neo4jErr) {
-        if hasGqlStatus(neo4jErr, '42001') {
+        if neo4jErr.ContainsGqlStatus("42001") {
             // Neo.ClientError.Statement.SyntaxError
             // special handling of syntax error in query
             fmt.Println(neo4jErr.Error())
-        } else if hasGqlStatus(neo4jErr, '42NFF') {
+        } else if neo4jErr.ContainsGqlStatus("42NFF") {
             // Neo.ClientError.Security.Forbidden
             // special handling of user not having CREATE permissions
             fmt.Println(neo4jErr.Error())
