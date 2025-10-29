@@ -466,7 +466,7 @@ Each connection pool has *a finite number of sessions*, so if you open sessions 
 It is thus recommended to create sessions with the `using` keyword, which automatically closes them when the scope ends.
 When a session is closed, it is returned to the connection pool to be later reused.
 
-If you do not open sessions with `using`, remember to call the `.CloseAsync()` method when you have finished using them.
+If you do not open sessions with `using`, remember to call the `.DisposeAsync()` method when you have finished using them.
 
 [source, csharp]
 ----
@@ -474,7 +474,7 @@ var session = driver.AsyncSession(conf => conf.WithDatabase("<database-name>"));
 
 // session usage
 
-await session.CloseAsync();
+await session.DisposeAsync();
 ----
 
 
