@@ -74,7 +74,7 @@ When interacting with a Neo4j database through the driver, it doesn't make a dif
 == Close connections
 
 Always close `IDriver` objects to free up all allocated resources, even upon unsuccessful connection or runtime errors.
-Either create the `IDriver` object with the `using` keyword, or call the `Driver.CloseAsync()` method explicitly.
+Either create the `IDriver` object with the `using` keyword, or call the `Driver.DisposeAsync()` method explicitly.
 
 
 == Further connection parameters
