@@ -109,6 +109,6 @@ Unless you created them with the `using` keyword, remember to close all `IDriver
 
 [source, csharp, test-skip, copy=true]
 ----
-await session.CloseAsync();
-await driver.CloseAsync();
+await session.DisposeAsync();
+await driver.DisposeAsync();
 ----
