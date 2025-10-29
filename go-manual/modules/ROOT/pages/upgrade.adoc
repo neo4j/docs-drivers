@@ -113,16 +113,14 @@ The logic is the same, but the argument type changed from `Transaction` to `Mana
 
 |6.0
 |`neo4j.ServerAddress` has been removed in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j/config#ServerAddress[`config.ServerAddress`].
+|label:removed[]
 
-`neo4j.NewServerAddress()` has been removed in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j/config#NewServerAddress[`config.NewServerAddress()`].
+|6.0
+|`neo4j.NewServerAddress()` has been removed in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j/config#NewServerAddress[`config.NewServerAddress()`].
 |label:removed[]
 
 |6.0
 |`neo4j.ServerAddressResolver` has been removed in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j/config#ServerAddressResolver[`config.ServerAddressResolver`].
-|label:removed[]
-
-|6.0
-|`neo4j.(LogLevel\|ERROR\|WARNING\|INFO\|DEBUG)` have been removed in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j/log#Level[`log.(Level\|ERROR\|WARNING\|INFO\|DEBUG)`].
 |label:removed[]
 
 |6.0
@@ -132,6 +130,7 @@ The logic is the same, but the argument type changed from `Transaction` to `Mana
 - `neo4j.ConsoleBoltLogger()` has been removed in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j/log#BoltToConsole[`neo4j.log.BoltToConsole()`].
 - Types `neo4j.log.Console` and `neo4j.log.Void` have been removed and unified into link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j/log#Logger[`neo4j.log.Logger`].
 - Functions `neo4j.ConsoleLogger()` and `neo4j.Void()` have been removed in favor of https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j/log#ToConsole[`neo4j.log.ToConsole()`] and https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j/log#ToVoid[`neo4j.log.ToVoid()`], both returning a `neo4j.log.Logger` object.
+- `neo4j.(LogLevel\|ERROR\|WARNING\|INFO\|DEBUG)` have been removed in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j/log#Level[`log.(Level\|ERROR\|WARNING\|INFO\|DEBUG)`].
 |label:removed[]
 
 |6.0
@@ -157,6 +156,12 @@ In particular,
 - `neo4j.SessionWithContext` is deprecated in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#Session[`neo4j.Session`].
 - `neo4j.DriverWithContext` is deprecated in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#Driver[`neo4j.Driver`].
 - `neo4j.ResultWithContext` is deprecated in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#Result[`neo4j.Result`].
+|label:deprecated[]
+
+|6.0
+|Type link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#StatementType[`StatementType`] is deprecated in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#QueryType[`QueryType`].
+
+As a result, link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#ResultSummary.StatementType[`ResultSummary.StatementType()`] is deprecated in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#ResultSummary.QueryType[`ResultSummary.QueryType()`].
 |label:deprecated[]
 
 |===
