@@ -7,7 +7,7 @@ This is the most basic and limited form with which to run a Cypher query.
 The driver will not automatically retry implicit transactions, as it does instead for queries run with xref:query-simple.adoc[`.ExecutableQuery()`] and with xref:transactions#managed-transactions[managed transactions].
 Implicit transactions should only be used when the other driver query interfaces do not fit the purpose, or for quick prototyping.
 
-You run an implicit transaction with the method link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IAsyncSession.RunAsync.html[`ISessionAsync.RunAsync()]`.
+You run an implicit transaction with the method link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IAsyncSession.RunAsync.html[`ISessionAsync.RunAsync()`].
 It returns a link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IResultCursor.html[`IResultCursor`] object that needs to be xref:transactions#process-result[processed accordingly].
 
 [source, csharp]
