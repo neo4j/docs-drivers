@@ -405,7 +405,7 @@ For full documentation, see link:https://pkg.go.dev/github.com/neo4j/neo4j-go-dr
 [#vector]
 == Vector
 
-The type link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#Vector[`Vector`] maps to the Cypher type link:https://neo4j.com/docs/cypher-manual/current/values-and-types/vector/[`VECTOR`].
+The type link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#Vector[`Vector`] maps to the Cypher type link:https://neo4j.com/docs/cypher-manual/25/values-and-types/vector/[`VECTOR`].
 Vector objects are stored as contiguous blocks of memory, containing homogeneous values.
 You can create vectors from lists of `float64`, `float32`, `int8`, `int16`, `int32`, `int64`.
 
