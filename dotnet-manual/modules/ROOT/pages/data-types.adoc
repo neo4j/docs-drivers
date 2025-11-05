@@ -290,7 +290,7 @@ For full documentation, see link:https://neo4j.com/docs/api/dotnet-driver/curren
 [#vector]
 == Vector
 
-The type link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.Vector.html[`Vector`] maps to the Cypher type link:https://neo4j.com/docs/cypher-manual/current/values-and-types/vector/[`VECTOR`].
+The type link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.Vector.html[`Vector`] maps to the Cypher type link:https://neo4j.com/docs/cypher-manual/25/values-and-types/vector/[`VECTOR`].
 Vector objects are stored as contiguous blocks of memory, containing homogeneous values.
 You can create vectors from lists of `float`, `double`, `sbyte`, `short`, `int`, `long`.
 
