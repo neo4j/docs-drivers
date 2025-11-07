@@ -187,7 +187,7 @@ Exception message: Invalid input '': expected an expression, '*', 'ALL' or 'DIST
 Exception objects also expose errors as GQL-status objects.
 The main difference between link:https://neo4j.com/docs/status-codes/current/errors/all-errors/[Neo4j error codes] and link:https://neo4j.com/docs/status-codes/current/errors/gql-errors/[GQL error codes] is that the GQL ones are more granular: a single Neo4j error code might be broken in several, more specific GQL error codes.
 
-The actual _cause_ that triggered an exception is sometimes found in the optional GQL-status object `\\__cause__`, which is itself a `Neo4jError`.
+The actual _cause_ that triggered an exception is sometimes found in the optional GQL-status object `\\__cause__`, which is itself an exception (or `None`).
 You might need to recursively traverse the cause chain before reaching the root cause of the exception you caught.
 In the example below, the exception's GQL status code is `42001`, but the actual source of the error has status code `42I06`.
 
