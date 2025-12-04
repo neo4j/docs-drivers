@@ -12,11 +12,10 @@ include::{common-partial}/connect-advanced.adoc[tag=connection-protocols]
 === Basic authentication
 
 The basic authentication scheme relies on traditional username and password.
-These can either be the credentials for your local installation, or the ones provided with an Aura instance.
 
 [source, go]
 ----
-driver, err := neo4j.NewDriverWithContext(
+driver, err := neo4j.NewDriver(
     dbUri,
     neo4j.BasicAuth(dbUser, dbPassword, ""))
 ----
@@ -32,7 +31,7 @@ It can only be used if the server has the link:{neo4j-docs-base-uri}/kerberos-ad
 
 [source, go, test-skip]
 ----
-driver, err := neo4j.NewDriverWithContext(dbUri, neo4j.KerberosAuth(ticket))
+driver, err := neo4j.NewDriver(dbUri, neo4j.KerberosAuth(ticket))
 ----
 
 
@@ -42,7 +41,7 @@ The bearer authentication scheme requires a base64-encoded token provided by an 
 
 [source, go, test-skip]
 ----
-driver, err := neo4j.NewDriverWithContext(dbUri, neo4j.BearerAuth(token))
+driver, err := neo4j.NewDriver(dbUri, neo4j.BearerAuth(token))
 ----
 
 [NOTE]
@@ -52,27 +51,26 @@ Once configured, clients can discover Neo4j's configuration through the link:htt
 
 === Custom authentication
 
-Use the function link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#CustomAuth[`CustomAuth`] to log into a server having a custom authentication scheme.
+Use the function link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#CustomAuth[`CustomAuth`] to log into a server having a custom authentication scheme.
 
 
 === No authentication
 
-Use the function link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#NoAuth[`NoAuth`] to access a server where authentication is disabled.
+Use the function link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#NoAuth[`NoAuth`] to access a server where authentication is disabled.
 
 [source, go, test-skip]
 ----
-driver, err := neo4j.NewDriverWithContext(dbUri, neo4j.NoAuth())
+driver, err := neo4j.NewDriver(dbUri, neo4j.NoAuth())
 ----
 
 
 [#rotating-tokens]
-[role=label--new-5.14]
 == Rotating authentication tokens
 
 It is possible to rotate authentication tokens that are expected to expire (e.g. SSO).
-You need to provide a link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/auth#TokenManager[`TokenManager`] instance when instantiating the `Driver`, rather than a static authentication token.
+You need to provide a link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j/auth#TokenManager[`TokenManager`] instance when instantiating the `Driver`, rather than a static authentication token.
 
-The easiest way to get started is to use one of built-in implementations: link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/auth#BasicTokenManager[`BasicTokenManager`] and link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/auth#BearerTokenManager[`BearerTokenManager`].
+The easiest way to get started is to use one of built-in implementations: link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j/auth#BasicTokenManager[`BasicTokenManager`] and link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j/auth#BearerTokenManager[`BearerTokenManager`].
 
 .Rotating a bearer token expiring every 60 seconds
 [source, go, test-skip]
@@ -92,7 +90,7 @@ fetchAuthTokenFromProvider := func(ctx context.Context) (neo4j.AuthToken, *time.
 }
 
 // create a new driver with a bearer token manager
-_, _ = neo4j.NewDriverWithContext(dbUri, auth.BearerTokenManager(fetchAuthTokenFromProvider))
+_, _ = neo4j.NewDriver(dbUri, auth.BearerTokenManager(fetchAuthTokenFromProvider))
 ----
 
 [NOTE]
@@ -104,7 +102,7 @@ You can switch users at both xref:query-simple.adoc#impersonation[query level] a
 
 
 [#mtls]
-[role=label--new-5.27 label--not-on-aura]
+[role=label--not-on-aura]
 == Mutual TLS (client-side certificates as 2FA)
 
 Mutual TLS (mTLS) allows you to use a client certificate as second factor for authenticating with the server.
@@ -119,8 +117,8 @@ For mTLS to work, the driver's connection with the server must be encrypted, i.e
 =====
 [.include-with-static-certificate]
 ======
-Use link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/auth#NewStaticClientCertificateProvider[`auth.NewStaticClientCertificateProvider()`] for static certificates. +
-The method takes a link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/auth#ClientCertificate[`ClientCertificate`] instance.
+Use link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j/auth#NewStaticClientCertificateProvider[`auth.NewStaticClientCertificateProvider()`] for static certificates. +
+The method takes a link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j/auth#ClientCertificate[`ClientCertificate`] instance.
 
 [source, go, test-skip]
 ----
@@ -132,7 +130,7 @@ certProvider, err := auth.NewStaticClientCertificateProvider(auth.ClientCertific
 if err != nil {
   log.Fatalf("Failed to load certificate: %v", err)
 }
-_, _ = neo4j.NewDriverWithContext(dbUri, neo4j.BasicAuth(dbUser, dbPassword, ""), func(config *config.Config) {
+_, _ = neo4j.NewDriver(dbUri, neo4j.BasicAuth(dbUser, dbPassword, ""), func(config *config.Config) {
   config.ClientCertificateProvider = certProvider
 })
 ----
@@ -141,8 +139,8 @@ _, _ = neo4j.NewDriverWithContext(dbUri, neo4j.BasicAuth(dbUser, dbPassword, "")
 [.include-with-rotating-certificate]
 ======
 
-Use link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/auth#NewRotatingClientCertificateProvider[`auth.NewRotatingClientCertificateProvider()`] for rotating certificates. +
-The method takes a link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/auth#ClientCertificate[`ClientCertificate`] instance.
+Use link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j/auth#NewRotatingClientCertificateProvider[`auth.NewRotatingClientCertificateProvider()`] for rotating certificates. +
+The method takes a link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j/auth#ClientCertificate[`ClientCertificate`] instance.
 
 [source, go, test-skip]
 ----
@@ -155,7 +153,7 @@ certProvider, err := auth.NewRotatingClientCertificateProvider(auth.ClientCertif
 if err != nil {
   log.Fatalf("Failed to load certificate: %v", err)
 }
-_, _ = neo4j.NewDriverWithContext(dbUri, neo4j.BasicAuth(dbUser, dbPassword, ""), func(config *config.Config) {
+_, _ = neo4j.NewDriver(dbUri, neo4j.BasicAuth(dbUser, dbPassword, ""), func(config *config.Config) {
   config.ClientCertificateProvider = certProvider
 })
 // use the driver a bit...
@@ -175,21 +173,21 @@ if err != nil {
 =====
 
 
-For more information, see link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/auth#ClientCertificateProvider[API docs -> `ClientCertificateProvider`].
+For more information, see link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j/auth#ClientCertificateProvider[API docs -> `ClientCertificateProvider`].
 
 
 == Custom address resolver
 
-When creating a `DriverWithContext` object, you can specify a _resolver_ function to resolve the connection address the driver is initialized with.
+When creating a `Driver` object, you can specify a _resolver_ function to resolve the connection address the driver is initialized with.
 Note that addresses that the driver receives in routing tables are not resolved with the custom resolver.
-Your resolver function is called with a link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/config#ServerAddress[`ServerAddress`] object and should return a list of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/config#ServerAddress[`ServerAddress`] objects.
+Your resolver function is called with a link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j/config#ServerAddress[`ServerAddress`] object and should return a list of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j/config#ServerAddress[`ServerAddress`] objects.
 
 .Connection to `example.com` on port `9999` is resolved to `localhost` on port `7687`
 [source, go]
 ----
-// import "github.com/neo4j/neo4j-go-driver/v5/neo4j/config"
+// import "github.com/neo4j/neo4j-go-driver/v6/neo4j/config"
 
-driver, err := neo4j.NewDriverWithContext(
+driver, err := neo4j.NewDriver(
     "neo4j://example.com:9999", neo4j.BasicAuth(dbUser, dbPassword, ""),
     func(conf *config.Config) {
         conf.AddressResolver = func(address config.ServerAddress) []config.ServerAddress {
@@ -204,7 +202,7 @@ defer driver.Close(ctx)
 
 == Further connection parameters
 
-You can find all `DriverWithContext` configuration parameters in the link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/config#Config[API documentation -> config package].
+You can find all `Driver` configuration parameters in the link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j/config#Config[API documentation -> config package].
 
 
 ifndef::backend-pdf[]

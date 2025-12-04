@@ -1,12 +1,9 @@
 = Coordinate parallel transactions
 
-When working with a Neo4j cluster, <<causal_consistency>> is enforced by default in most cases, which guarantees that a query is able to read changes made by previous queries.
+When working with a Neo4j cluster, <<causal_consistency>> is enforced by default in most cases, guaranteeing that a query is able to read changes made by previous queries.
 The same does not happen by default for multiple xref:transactions.adoc[transactions] running in parallel though.
 In that case, you can use _bookmarks_ to have one transaction wait for the result of another to be propagated across the cluster before running its own work.
-This is not a requirement, and *you should only use bookmarks if you _need_ casual consistency across different transactions*, as waiting for bookmarks can have a negative performance impact.
-
-A _bookmark_ is a token that represents some state of the database.
-By passing one or multiple bookmarks along with a query, the server will make sure that the query does not get executed before the represented state(s) have been established.
+This is not a requirement, and *you should only use <<bookmark,bookmarks>> if you _need_ casual consistency across different transactions*, as waiting for bookmarks can have a negative performance impact.
 
 
 == Bookmarks with `ExecuteQuery()`
@@ -43,7 +40,7 @@ neo4j.ExecuteQuery(
 
 == Bookmarks within a single session
 
-Bookmark management happens automatically for queries run within a single session, so that you can trust that queries inside one session are causally chained.
+Bookmark management happens automatically for queries run within a single session: queries inside the same session are causally chained.
 
 [source, go]
 ----
@@ -79,7 +76,7 @@ package main
 import (
     "fmt"
     "context"
-    "github.com/neo4j/neo4j-go-driver/v5/neo4j"
+    "github.com/neo4j/neo4j-go-driver/v6/neo4j"
 )
 
 func main() {
@@ -89,7 +86,7 @@ func main() {
     dbUri := "<database-uri>"
     dbUser := "<username>"
     dbPassword := "<password>"
-    driver, err := neo4j.NewDriverWithContext(
+    driver, err := neo4j.NewDriver(
         dbUri,
         neo4j.BasicAuth(dbUser, dbPassword, ""))
     if err != nil {
@@ -131,7 +128,7 @@ func main() {
 }
 
 // Create a Person node
-func createPerson(ctx context.Context, session neo4j.SessionWithContext, name string) (any, error) {
+func createPerson(ctx context.Context, session neo4j.Session, name string) (any, error) {
     return session.ExecuteWrite(ctx,
         func(tx neo4j.ManagedTransaction) (any, error) {
             return tx.Run(ctx,
@@ -142,7 +139,7 @@ func createPerson(ctx context.Context, session neo4j.SessionWithContext, name st
 
 // Create an employment relationship to a pre-existing company node
 // This relies on the person first having been created
-func employ(ctx context.Context, session neo4j.SessionWithContext, personName string, companyName string) (any, error) {
+func employ(ctx context.Context, session neo4j.Session, personName string, companyName string) (any, error) {
     return session.ExecuteWrite(ctx,
         func(tx neo4j.ManagedTransaction) (any, error) {
             return session.Run(ctx, `
@@ -157,7 +154,7 @@ func employ(ctx context.Context, session neo4j.SessionWithContext, personName st
 }
 
 // Create a friendship between two people
-func createFriendship(ctx context.Context, session neo4j.SessionWithContext, nameA string, nameB string) (any, error) {
+func createFriendship(ctx context.Context, session neo4j.Session, nameA string, nameB string) (any, error) {
     return session.ExecuteWrite(ctx,
         func(tx neo4j.ManagedTransaction) (any, error) {
             return session.Run(ctx, `
@@ -172,7 +169,7 @@ func createFriendship(ctx context.Context, session neo4j.SessionWithContext, nam
 }
 
 // Retrieve and display all friendships
-func printFriendships(ctx context.Context, session neo4j.SessionWithContext) (any, error) {
+func printFriendships(ctx context.Context, session neo4j.Session) (any, error) {
     return session.ExecuteRead(ctx,
         func(tx neo4j.ManagedTransaction) (any, error) {
             result, err := session.Run(ctx,
@@ -192,19 +189,19 @@ func printFriendships(ctx context.Context, session neo4j.SessionWithContext) (an
 }
 ----
 
-<1> Collect and combine bookmarks from different sessions using `SessionWithContext.LastBookmarks()` and `neo4j.CombineBookmarks()`, storing them in a link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#Bookmarks[`Bookmarks`] object.
+<1> Collect and combine bookmarks from different sessions using `Session.LastBookmarks()` and `neo4j.CombineBookmarks()`, storing them in a link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#Bookmarks[`Bookmarks`] object.
 <2> Use them to initialize another session with the `Bookmarks` config parameter.
 
 image:{common-image}/driver-passing-bookmarks.svg[]
 
 [TIP]
 The use of bookmarks can negatively impact performance, since all queries are forced to wait for the latest changes to be propagated across the cluster.
-For simple use-cases, try to group queries within a single transaction, or within a single session.
+If possible, group queries within a single transaction, or within a single session.
 
 
 == Mix `ExecuteQuery()` and sessions
 
-To ensure causal consistency among transactions executed partly with `ExecuteQuery()` and partly with sessions, you can use the parameter `BookmarkManager` upon session creation, setting it to `driver.ExecuteQueryBookmarkManager()`.
+To ensure causal consistency among transactions executed partly with `ExecuteQuery()` and partly with sessions, use the parameter `BookmarkManager` upon session creation, setting it to `driver.ExecuteQueryBookmarkManager()`.
 Since that is the default bookmark manager for `ExecuteQuery()` calls, this will ensure that all work is executed under the same bookmark manager and thus causally consistent.
 
 [source, go]

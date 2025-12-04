@@ -1,13 +1,11 @@
 name: go-manual
 title: Neo4j Go Driver Manual
-version: '5'
+version: '6'
 start_page: ROOT:index.adoc
 nav:
 - modules/ROOT/content-nav.adoc
 asciidoc:
   attributes:
-    go-driver-version: '5.28' # the version of published go api docs
-    go-driver-apidoc-release: '5.0' # the github branch or release that contains examples included in docs
-    go-examples: https://raw.githubusercontent.com/neo4j/neo4j-go-driver/{go-driver-apidoc-release}/tests/integration/examples
-    common-partial: 5@common-content:ROOT:partial$
-    common-image: 5@common-content:ROOT:image$
+    go-driver-version: '6.0' # the version of published go api docs
+    common-partial: 6@common-content:ROOT:partial$
+    common-image: 6@common-content:ROOT:image$

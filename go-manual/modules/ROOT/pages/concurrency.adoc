@@ -1,6 +1,6 @@
 = Run concurrent transactions
 
-You may leverage link:https://go.dev/tour/concurrency/1[Goroutines and channels] to run concurrent queries, or to delegate the processing of a query's result to multiple threads.
+Use link:https://go.dev/tour/concurrency/1[Goroutines and channels] to run concurrent queries, or to delegate the processing of a query's result to multiple threads.
 The examples below also use the Go link:https://pkg.go.dev/sync[`sync` package] to coordinate different routines.
 If you are not familiar with concurrency in Go, checkout link:https://go.dev/blog/pipelines[The Go Programming Language -> Go Concurrency Patterns: Pipelines and cancellation].
 
@@ -20,7 +20,7 @@ import (
     "context"
     "time"
     "sync"
-    "github.com/neo4j/neo4j-go-driver/v5/neo4j"
+    "github.com/neo4j/neo4j-go-driver/v6/neo4j"
 )
 
 func main() {
@@ -30,7 +30,7 @@ func main() {
     dbUri := "<database-uri>"
     dbUser := "<username>"
     dbPassword := "<password>"
-    driver, err := neo4j.NewDriverWithContext(
+    driver, err := neo4j.NewDriver(
         dbUri,
         neo4j.BasicAuth(dbUser, dbPassword, ""))
     if err != nil {
@@ -65,7 +65,7 @@ func main() {
     }
 }
 
-func queryToChannel(ctx context.Context, driver neo4j.DriverWithContext) chan *neo4j.Record {
+func queryToChannel(ctx context.Context, driver neo4j.Driver) chan *neo4j.Record {
     recordsC := make(chan *neo4j.Record, 10)  // <2>
     session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "<database-name>"})
     defer session.Close(ctx)
@@ -100,7 +100,7 @@ func consumer(wg *sync.WaitGroup, records <-chan *neo4j.Record, log chan string,
 }
 ----
 
-<1> A Goroutine runs the query to the Neo4j server with a xref:transactions.adoc[managed transaction].
+<1> A Goroutine runs the query to the Neo4j server with a xref:transactions.adoc#managed-transactions[managed transaction].
 Notice that the driver session is created _inside_ the routine, as sessions are not thread-safe.
 <2> The channel `recordsC` is where the query result records get streamed to.
 The transaction function from `.ExecuteWrite()` writes to it, and the various ``consumer``s read from it.
@@ -126,7 +126,7 @@ import (
     "fmt"
     "context"
     "sync"
-    "github.com/neo4j/neo4j-go-driver/v5/neo4j"
+    "github.com/neo4j/neo4j-go-driver/v6/neo4j"
 )
 
 func main() {
@@ -136,7 +136,7 @@ func main() {
     dbUri := "<database-uri>"
     dbUser := "<username>"
     dbPassword := "<password>"
-    driver, err := neo4j.NewDriverWithContext(
+    driver, err := neo4j.NewDriver(
         dbUri,
         neo4j.BasicAuth(dbUser, dbPassword, ""))
     if err != nil {
@@ -167,7 +167,7 @@ func main() {
 }
 
 // Run Neo4j query with random sleep time, returning the sleep time in ms
-func runQuery(wg *sync.WaitGroup, ctx context.Context, driver neo4j.DriverWithContext, log chan string) {
+func runQuery(wg *sync.WaitGroup, ctx context.Context, driver neo4j.Driver, log chan string) {
     defer wg.Done()  // will communicate that routine is done
     result, err := neo4j.ExecuteQuery(ctx, driver, `
         WITH round(rand()*2000) AS waitTime

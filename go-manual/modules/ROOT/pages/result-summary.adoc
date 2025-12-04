@@ -1,7 +1,7 @@
 = Explore the query execution summary
 
-After all results coming from a query have been processed, the server ends the transaction by returning a summary of execution.
-It comes as a link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#ResultSummary[`ResultSummary`] object, and it contains information among which:
+After all records of a query result have been processed, the server ends the transaction by returning a summary of execution.
+It comes as a link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#ResultSummary[`ResultSummary`] object, and it contains information among which:
 
 - xref:_query_counters[**Query counters**] -- What changes the query triggered on the server
 - xref:_query_execution_plan[**Query execution plan**] -- How the database would execute (or executed) the query
@@ -25,8 +25,7 @@ summary := result.Summary
 ----
 
 If you are using xref:transactions.adoc[transaction functions], you can retrieve the query execution summary with the method `Result.Consume()`.
-**Notice that once you ask for the execution summary, the result stream is exhausted**.
-This means that any record which has not yet been processed is discarded.
+**Notice that once you ask for the execution summary, the result stream is __exhausted__**: any record yet to be processed is not available anymore.
 
 [source, go]
 ----
@@ -46,7 +45,7 @@ summary, _ := session.ExecuteWrite(ctx,
 
 == Query counters
 
-The method `ResultSummary.Counters()` returns counters for the operations that a query triggered (as a link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#Counters[`Counters`] object).
+The method `ResultSummary.Counters()` returns counters for the operations that a query triggered (as a link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#Counters[`Counters`] object).
 
 .Insert some data and display the query counters
 [source, go]
@@ -72,19 +71,19 @@ fmt.Println("Relationships created:", counters.RelationshipsCreated())
 // Relationships created: 1
 ----
 
-There are two additional boolean methods which act as meta-counters:
+Two additional boolean methods act as meta-counters:
 
 - `.ContainsUpdates()` -- whether the query triggered any write operation on the database on which it ran
-- `.ContainsSystemUpdates()` -- whether the query updated the `system` database
+- `.ContainsSystemUpdates()` -- whether the query triggered any write operation on the `system` database
 
 
 == Query execution plan
 
-If you prefix a query with `EXPLAIN`, the server will return the plan it _would_ use to run the query, but will not actually run it.
+If you prefix a query with `EXPLAIN`, the server returns the plan it _would_ use to run the query, but does not actually run it.
 You can retrieve the plan by calling `ResultSummary.Plan()`, which contains the list of link:https://neo4j.com/docs/cypher-manual/current/planning-and-tuning/operators/[Cypher operators] that would be used to retrieve the result set.
-You may use this information to locate potential bottlenecks or room for performance improvements (for example through the creation of indexes).
+Use this information to locate potential bottlenecks or room for performance improvements (for example through the creation of indexes).
 
-[source, go, role=nocollapse]
+[source, go]
 ----
 result, _ := neo4j.ExecuteQuery(ctx, driver,
     "EXPLAIN MATCH (p {name: $name}) RETURN p",
@@ -114,12 +113,12 @@ Total database accesses: ?
 */
 ----
 
-If you instead prefix a query with the keyword `PROFILE`, the server will return the execution plan it has used to run the query, together with profiler statistics.
+If you instead prefix a query with the keyword `PROFILE`, the server returns the execution plan it has used to run the query, together with profiler statistics.
 This includes the list of operators that were used and additional profiling information about each intermediate step.
 You can access the plan by calling `ResultSummary.Profile()`.
 Notice that the query is also _run_, so the result object also contains any result records.
 
-[source, go, role=nocollapse]
+[source, go]
 ----
 result, _ := neo4j.ExecuteQuery(ctx, driver,
     "PROFILE MATCH (p {name: $name}) RETURN p",
@@ -154,57 +153,22 @@ For more information and examples, see link:{neo4j-docs-base-uri}/cypher-manual/
 
 == Notifications
 
-After executing a query, the server can return link:{neo4j-docs-base-uri}/status-codes/5/notifications/[notifications] alongside the query result.
+After executing a query, the server can return link:{neo4j-docs-base-uri}/status-codes/current/notifications/[notifications] alongside the query result.
 Notifications contain recommendations for performance improvements, warnings about the usage of deprecated features, and other hints about sub-optimal usage of Neo4j.
-
-[TIP]
-For driver version >= 5.25 and server version >= 5.23, two forms of notifications are available (_Neo4j status codes_ and _GQL status codes_).
-For earlier versions, only _Neo4j status codes_ are available. +
-GQL status codes are planned to supersede Neo4j status codes.
 
 .An unbounded shortest path raises a performance notification
 [.tabbed-example]
 =====
-[.include-with-neo4j-status-code]
-======
-The method `Summary.Notifications()` returns a list of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#Notification[`Notification`] objects.
-
-[source, go, role=nocollapse]
-----
-result, _ := neo4j.ExecuteQuery(ctx, driver, `
-    MATCH p=shortestPath((:Person {name: 'Alice'})-[*]->(:Person {name: 'Bob'}))
-    RETURN p
-    `, nil,
-    neo4j.EagerResultTransformer,
-    neo4j.ExecuteQueryWithDatabase("<database-name>"))
-
-for _, notification := range result.Summary.Notifications() {
-    fmt.Println("Code:", notification.Code())
-    fmt.Println("Title:", notification.Title())
-    fmt.Println("Description:", notification.Description())
-    fmt.Println("Severity:", notification.SeverityLevel())
-    fmt.Println("Category:", notification.Category(), "\n")
-}
-/*
-Code: Neo.ClientNotification.Statement.UnboundedVariableLengthPattern
-Title: The provided pattern is unbounded, consider adding an upper limit to the number of node hops.
-Description: Using shortest path with an unbounded pattern will likely result in long execution times. It is recommended to use an upper limit to the number of node hops in your pattern.
-Severity: INFORMATION
-Category: PERFORMANCE
-*/
-----
-
-======
 [.include-with-GQL-status-code]
 ======
 
-With version >= 5.25, the method `Summary.GqlStatusObjects()` returns a list of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j#GqlStatusObject[`GqlStatusObject`]s.
+The method `Summary.GqlStatusObjects()` returns a list of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#GqlStatusObject[`GqlStatusObject`]s.
 These are GQL-compliant status objects.
 
 Some (but not all) `GqlStatusObjects` are notifications, whereas some report an _outcome_ status: `00000` for "success", `02000` for "no data", and `00001` for "omitted result".
 `Summary.GqlStatusObjects()` always contains at least one entry, containing the outcome status.
 
-[source, go, role=nocollapse]
+[source, go]
 ----
 result, _ := neo4j.ExecuteQuery(ctx, driver, `
     MATCH p=shortestPath((:Person {name: 'Alice'})-[*]->(:Person {name: 'Bob'}))
@@ -253,14 +217,47 @@ Diagnostic record: map[CURRENT_SCHEMA:/ OPERATION: OPERATION_CODE:0 _classificat
 ----
 
 ======
+
+[.include-with-neo4j-status-code]
+======
+label:deprecated[Deprecated in 6.0]
+
+The method `Summary.Notifications()` returns a list of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#Notification[`Notification`] objects.
+
+[source, go]
+----
+result, _ := neo4j.ExecuteQuery(ctx, driver, `
+    MATCH p=shortestPath((:Person {name: 'Alice'})-[*]->(:Person {name: 'Bob'}))
+    RETURN p
+    `, nil,
+    neo4j.EagerResultTransformer,
+    neo4j.ExecuteQueryWithDatabase("<database-name>"))
+
+for _, notification := range result.Summary.Notifications() {
+    fmt.Println("Code:", notification.Code())
+    fmt.Println("Title:", notification.Title())
+    fmt.Println("Description:", notification.Description())
+    fmt.Println("Severity:", notification.SeverityLevel())
+    fmt.Println("Category:", notification.Category(), "\n")
+}
+/*
+Code: Neo.ClientNotification.Statement.UnboundedVariableLengthPattern
+Title: The provided pattern is unbounded, consider adding an upper limit to the number of node hops.
+Description: Using shortest path with an unbounded pattern will likely result in long execution times. It is recommended to use an upper limit to the number of node hops in your pattern.
+Severity: INFORMATION
+Category: PERFORMANCE
+*/
+----
+
+======
+
 =====
 
 
-[role=label--new-5.7]
 === Filter notifications
 
 By default, the server analyses each query for all categories and severity of notifications.
-Starting from version 5.7, you can use the parameters `NotificationsMinSeverity` and/or `NotificationsDisabledCategories`/`NotificationsDisabledClassifications` to restrict the severity and/or category/classification of notifications that you are interested into.
+Use the parameters `NotificationsMinSeverity` and/or `NotificationsDisabledCategories`/`NotificationsDisabledClassifications` to restrict the severity and/or category/classification of notifications that you are interested into.
 There is a slight performance gain in restricting the amount of notifications the server is allowed to raise.
 
 The severity filter applies to both Neo4j and GQL notifications.
@@ -273,12 +270,12 @@ You can disable notifications altogether by setting the minimum severity to `"OF
 [source, go]
 ----
 // import (
-//     "github.com/neo4j/neo4j-go-driver/v5/neo4j/notifications"
-//     "github.com/neo4j/neo4j-go-driver/v5/neo4j/config"
+//     "github.com/neo4j/neo4j-go-driver/v6/neo4j/notifications"
+//     "github.com/neo4j/neo4j-go-driver/v6/neo4j/config"
 // )
 
 // At driver level
-driverNot, _ := neo4j.NewDriverWithContext(
+driverNot, _ := neo4j.NewDriver(
     dbUri,
     neo4j.BasicAuth(dbUser, dbPassword, ""),
     func (conf *config.Config) {
