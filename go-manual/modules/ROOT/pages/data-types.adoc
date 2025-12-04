@@ -405,7 +405,7 @@ For full documentation, see link:https://pkg.go.dev/github.com/neo4j/neo4j-go-dr
 [#vector]
 == Vector
 
-The type link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#Vector[`Vector`] maps to the Cypher type link:https://neo4j.com/docs/cypher-manual/25/values-and-types/vector/[`VECTOR`].
+The type link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#Vector[`Vector`] maps to the Cypher type link:https://neo4j.com/docs/cypher-manual/current/values-and-types/vector/[`VECTOR`].
 Vector objects are stored as contiguous blocks of memory, containing homogeneous values.
 You can create vectors from lists of `float64`, `float32`, `int8`, `int16`, `int32`, `int64`.
 
@@ -439,9 +439,10 @@ func main() {
         panic(err)
     }
 
-    // Create and store a vector
-    vec := dbtype.Vector[float64]{1.0, 2.0, 3.0}
+    // Create a vector...
+    vec := neo4j.Vector[float64]{Elems: []float64{1.0, 2.0, 3.0}}
 
+    // ... and store it as a node property
     _, err := neo4j.ExecuteQuery(ctx, driver,
         "MERGE (n:Doc {vector: $vec})",
         map[string]any{"vec": vec},
@@ -450,6 +451,7 @@ func main() {
         panic(err)
     }
 
+    // Retrieve the vector from the database
     result, err := neo4j.ExecuteQuery(ctx, driver,
         "MATCH (n:Doc) RETURN n.vec AS vec LIMIT 1",
         nil,
@@ -458,7 +460,9 @@ func main() {
         panic(err)
     }
 
-    if v, ok := result.Records[0].Values[0].(dbtype.Vector[float64]); ok {
+    record := result.Records[0]
+
+    if v, ok := record.Values[0].(neo4j.Vector[float64]); ok {
         fmt.Printf("Read vector: %v\n", v)
     }
     // Read vector: vector([1.0, 2.0, 3.0], 3, FLOAT64 NOT NULL)
