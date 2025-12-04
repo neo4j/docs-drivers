@@ -442,7 +442,7 @@ func main() {
     vec := neo4j.Vector[float64]{Elems: []float64{1.0, 2.0, 3.0}}
 
     // ... and store it as a node property
-    _, err := neo4j.ExecuteQuery(ctx, driver,
+    _, err = neo4j.ExecuteQuery(ctx, driver,
         "MERGE (n:Doc {vector: $vec})",
         map[string]any{"vec": vec},
         neo4j.EagerResultTransformer)
