@@ -32,12 +32,12 @@ Inbound conversion is carried out using link:http://cldr.unicode.org/development
 |===
 | Cypher type      | Driver type
 
-| `DATE`           | link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.LocalDate.html[`LocalDate`]
-| `ZONED TIME`     | link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.OffsetTime.html[`OffsetTime`]
-| `LOCAL TIME`     | link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.LocalTime.html[`LocalTime`]
-| `ZONED DATETIME` | link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.ZonedDateTime.html[`ZonedDateTime`]
-| `LOCAL DATETIME` | link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.LocalDateTime.html[`LocalDateTime`]
-| `DURATION`       | link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.Duration.html[`Duration`]
+| `DATE`           | link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.LocalDate.html[`LocalDate`]
+| `ZONED TIME`     | link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.OffsetTime.html[`OffsetTime`]
+| `LOCAL TIME`     | link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.LocalTime.html[`LocalTime`]
+| `ZONED DATETIME` | link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.ZonedDateTime.html[`ZonedDateTime`]
+| `LOCAL DATETIME` | link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.LocalDateTime.html[`LocalDateTime`]
+| `DURATION`       | link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.Duration.html[`Duration`]
 
 |===
 
@@ -72,10 +72,10 @@ You can think of it as a unique identifier for each spatial type.
 |===
 | Cypher type            | Driver type | SRID
 
-| `POINT` (2D Cartesian) | link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.Point.html[`Point`]     | 7203
-| `POINT` (2D WGS-84)    | link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.Point.html[`Point`]     | 4326
-| `POINT` (3D Cartesian) | link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.Point.html[`Point`]     | 9157
-| `POINT` (3D WGS-84)    | link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.Point.html[`Point`]     | 4979
+| `POINT` (2D Cartesian) | link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.Point.html[`Point`]     | 7203
+| `POINT` (2D WGS-84)    | link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.Point.html[`Point`]     | 4326
+| `POINT` (3D Cartesian) | link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.Point.html[`Point`]     | 9157
+| `POINT` (3D WGS-84)    | link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.Point.html[`Point`]     | 4979
 
 |===
 
@@ -111,9 +111,9 @@ Console.WriteLine(result.Result[0].Get<INode>("p").Get<Point>("location"));
 |===
 | Cypher Type    | Driver type
 
-| `NODE`         | link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.INode.html[`INode`]
-| `RELATIONSHIP` | link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IRelationship.html[`IRelationship`]
-| `PATH`         | link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IPath.html[`IPath`]
+| `NODE`         | link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.INode.html[`INode`]
+| `RELATIONSHIP` | link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IRelationship.html[`IRelationship`]
+| `PATH`         | link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IPath.html[`IPath`]
 
 |===
 
@@ -161,7 +161,7 @@ Name property: Carla
 */
 ----
 
-For full documentation, see link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.INode.html[API documentation -> INode].
+For full documentation, see link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.INode.html[API documentation -> INode].
 
 
 [#irelationship]
@@ -219,7 +219,7 @@ Status property: BFF
 */
 ----
 
-For full documentation, see link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IRelationship.html[API documentation -> IRelationship].
+For full documentation, see link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IRelationship.html[API documentation -> IRelationship].
 
 
 [#ipath]
@@ -283,7 +283,38 @@ async Task addFriend(IDriver driver, string name, string status, string friendNa
 }
 ----
 
-For full documentation, see link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IPath.html[API documentation -> IPath].
+For full documentation, see link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IPath.html[API documentation -> IPath].
+
+
+[role=label--new-6.0]
+[#vector]
+== Vector
+
+The type link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.Vector.html[`Vector`] maps to the Cypher type link:https://neo4j.com/docs/cypher-manual/25/values-and-types/vector/[`VECTOR`].
+Vector objects are stored as contiguous blocks of memory, containing homogeneous values.
+You can create vectors from lists of `float`, `double`, `sbyte`, `short`, `int`, `long`.
+
+[IMPORTANT]
+Storing `VECTOR` objects in the database requires a server version >= 2025.10, Enterprise Edition.
+
+.Create and store a vector
+[source, csharp]
+----
+var vector = new Vector<int>([5, 6, 7]);
+var result = await driver.ExecutableQuery("MERGE (d:Doc {embedding: $vector})")
+    .WithParameters(new { vector = vector })
+    .WithConfig(new QueryConfig(database: "<database-name>"))
+    .ExecuteAsync();
+----
+
+
+[role=label--new-6.0]
+[#unsupportedtype]
+== UnsupportedType
+
+The type link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.UnsupportedType.html[`UnsupportedType`] is used for data types returned by Cypher queries that the driver doesn't recognize.
+This happens when the client version is too old with respect to the server version.
+
 
 
 ifndef::backend-pdf[]

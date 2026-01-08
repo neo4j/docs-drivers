@@ -31,7 +31,7 @@ The basic driver's concepts are the same as the synchronous case, except that qu
 
 === Managed transaction with reactive sessions
 
-.A managed transaction `.executeRead()` example
+.A managed transaction `.ExecuteRead()` example
 [source, csharp]
 ----
 using Neo4j.Driver;
@@ -75,7 +75,7 @@ await tcs.Task;
 
 The following example is very similar to the previous one, except it uses an xref:query-advanced.adoc#implicit-transactions[implicit transaction].
 
-.An implicit transaction `.run()` example
+.An implicit transaction `.Run()` example
 [source, csharp]
 ----
 using Neo4j.Driver;

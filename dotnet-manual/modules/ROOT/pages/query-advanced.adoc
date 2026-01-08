@@ -3,12 +3,12 @@
 [#implicit-transactions]
 == Implicit (or auto-commit) transactions
 
-This is the most basic and limited form with which to run a Cypher query.
-The driver will not automatically retry implicit transactions, as it does instead for queries run with xref:query-simple.adoc[`.ExecutableQuery()`] and with xref:transactions#managed-transactions[managed transactions].
+This is the most basic and limited form to run a Cypher query with.
+The driver does *not* automatically retry implicit transactions, as it does instead for queries run with xref:query-simple.adoc[`.ExecutableQuery()`] and with xref:transactions#managed-transactions[managed transactions].
 Implicit transactions should only be used when the other driver query interfaces do not fit the purpose, or for quick prototyping.
 
-You run an implicit transaction with the method link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IAsyncSession.RunAsync.html[`ISessionAsync.RunAsync()]`.
-It returns a link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IResultCursor.html[`IResultCursor`] object that needs to be xref:transactions#process-result[processed accordingly].
+You run an implicit transaction with the method link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IAsyncSession.RunAsync.html[`ISessionAsync.RunAsync()`].
+It returns a link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IResultCursor.html[`IResultCursor`] object that needs to be xref:transactions#process-result[processed accordingly].
 
 [source, csharp]
 ----
@@ -20,10 +20,11 @@ An implicit transaction gets committed _at the latest_ when the session is destr
 Other than that, there is no clear guarantee on when exactly an implicit transaction will be committed during the lifetime of a session.
 To ensure an implicit transaction is committed, you can call the `.ConsumeAsync()` method on its result.
 
-Since the driver cannot figure out whether the query in a `ISessionAsync.RunAsync()` call requires a read or write session with the database, it defaults to write. If your implicit transaction contains read queries only, there is a performance gain in xref:transactions#request-routing[making the driver aware] through the config method `.WithDefaultAccessMode(AccessMode.Read)` when creating the session.
+Since the driver cannot figure out whether the query in a `ISessionAsync.RunAsync()` call requires a read or write session with the database, it defaults to write.
+If your implicit transaction contains read queries only, there is a performance gain in xref:transactions#request-routing[making the driver aware] through the config method `.WithDefaultAccessMode(AccessMode.Read)` when creating the session.
 
 [TIP]
-*Implicit transactions are the only ones that can be used for link:{neo4j-docs-base-uri}/cypher-manual/{page-version}/subqueries/subqueries-in-transactions[`CALL { ... } IN TRANSACTIONS`] queries*.
+Implicit transactions are the only ones that can be used for link:{neo4j-docs-base-uri}/cypher-manual/current/subqueries/subqueries-in-transactions[`CALL { ... } IN TRANSACTIONS`] queries.
 
 
 [#import-csv]
@@ -57,7 +58,7 @@ For more information, see link:{neo4j-docs-base-uri}/cypher-manual/current/claus
 [#tx-config]
 === Transaction configuration
 
-You can exert further control on implicit transactions by providing a link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.TransactionConfigBuilder.html[`TransactionConfigBuilder`] object as optional last parameter to `IAsyncSession.RunAsync()` calls.
+You can exert further control on implicit transactions by providing a link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.TransactionConfigBuilder.html[`TransactionConfigBuilder`] object as optional last parameter to `IAsyncSession.RunAsync()` calls.
 The configuration callbacks allow to specify a query timeout and to attach metadata to the transaction.
 For more information, see xref:transactions.adoc#tx-config[Transactions -> Transaction configuration].
 
@@ -78,30 +79,28 @@ await session.RunAsync(
 
 In general, you should not concatenate parameters directly into a query, but rather use xref:query-simple#query-parameters[query parameters].
 There can however be circumstances where your query structure prevents the usage of parameters in all its parts.
-In fact, although parameters can be used for literals and expressions as well as node and relationship ids, they cannot be used for the following constructs:
+In fact, although parameters work for literals and expressions, as well as link:https://neo4j.com/docs/cypher-manual/current/clauses/match/#dynamic-match[node labels and relationship types], they can't be used for property keys, so `MATCH (n) WHERE n.$param = 'something'` is invalid.
 
-- property keys, so `MATCH (n) WHERE n.$param = 'something'` is invalid;
-- relationship types, so `MATCH (n)-[:$param]->(m)` is invalid;
-- labels, so `MATCH (n:$param)` is invalid.
-
-For those queries, you are forced to use string concatenation.
-To protect against link:https://neo4j.com/developer/kb/protecting-against-cypher-injection/[Cypher injections], you should enclose the dynamic values in backticks and escape them yourself.
+When using string concatenation, enclose the dynamic values in backticks and escape them yourself to protect against link:https://neo4j.com/developer/kb/protecting-against-cypher-injection/[Cypher injections].
 Notice that Cypher processes Unicode, so take care of the Unicode literal `\u0060` as well.
 
-.Manually escaping dynamic labels before concatenation.
+.Manually escaping dynamic property keys before concatenation.
 [source, csharp]
 ----
-var label = "Person\\u0060n";
+var dangerousKey = "name\\u0060n";
 // convert \u0060 to literal backtick and then escape backticks
-var escapedLabel = label.Replace("\\u0060", "`").Replace("`", "``");
+var escapedKey = dangerousKey.Replace("\\u0060", "`").Replace("`", "``");
 
-var result = await driver.ExecutableQuery("MATCH (p:`" + escapedLabel + "` {name: $name}) RETURN p.name")
+var result = await driver.ExecutableQuery("MATCH (p:Person {`" + escapedKey + "`}) RETURN p.name")
     .WithParameters( new { name = "Alice" })
     .WithConfig(new QueryConfig(database: "<database-name>"))
     .ExecuteAsync();
+
+// rewritten to
+// MATCH (p:Person {`name```: $name}) RETURN p.name
 ----
 
-Another workaround, which avoids string concatenation, is using <<APOC>> procedures, such as link:{neo4j-docs-base-uri}/apoc/5/overview/apoc.merge/apoc.merge.node/[`apoc.merge.node`], which supports dynamic labels and property keys.
+Another workaround to avoid string concatenation is to use <<APOC>> procedures, such as link:{neo4j-docs-base-uri}/apoc/current/overview/apoc.merge/apoc.merge.node/[`apoc.merge.node`], which supports dynamic labels and property keys.
 
 .Using `apoc.merge.node` to create a node with dynamic labels/property keys.
 [source, csharp]

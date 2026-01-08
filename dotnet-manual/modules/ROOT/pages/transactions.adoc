@@ -2,17 +2,17 @@
 
 When xref:query-simple.adoc[querying the database with `.ExecutableQuery()`], the driver automatically creates a _transaction_. A transaction is a unit of work that is either _committed_ in its entirety or _rolled back_ on failure. You can include multiple Cypher statements in a single query, as for example when using `MATCH` and `CREATE` in sequence to xref:query-simple#update[update the database], but you cannot have multiple queries and interleave some client-logic in between them.
 
-For these more advanced use-cases, the driver provides functions to take full control over the transaction lifecycle.
-These are called _managed transactions_, and you can think of them as a way of unwrapping the flow of `.ExecutableQuery()` and being able to specify its desired behavior in more places.
+For these more advanced use-cases, the driver provides functions to manually control transactions.
+The most common form is _managed transactions_, and you can think of them as a way of unwrapping the flow of `ExecutableQuery()` and being able to specify its desired behavior in more places.
 
 
 [#session-create]
 == Create a session
 
 Before running a transaction, you need to obtain a _session_.
-Sessions act as concrete query channels between the driver and the server, and ensure <<causal consistency>> is enforced.
+Sessions act as query channels between the driver and the server, and ensure <<causal consistency>> is enforced.
 
-Sessions are created with the method link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IDriver.AsyncSession.html#Neo4j_Driver_IDriver_AsyncSession[`IDriver.AsyncSession()`].
+Sessions are created with the method link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IDriver.AsyncSession.html#Neo4j_Driver_IDriver_AsyncSession[`IDriver.AsyncSession()`].
 Use the optional argument to alter the session's configuration, among which for example the xref:database-selection[target database].
 For further configuration parameters, see xref:session-config[Session configuration].
 
@@ -21,20 +21,20 @@ For further configuration parameters, see xref:session-config[Session configurat
 using var session = driver.AsyncSession(conf => conf.WithDatabase("<database-name>"));
 ----
 
-Session creation is a lightweight operation, so sessions can be created and destroyed without significant cost.
+Creating a session is a lightweight operation, so sessions can be created and destroyed without significant cost.
 Always xref:close-session[close sessions] when you are done with them.
 
-*Sessions are _not_ thread safe*: you can share the main `IDriver` object across threads, but make sure each thread creates its own sessions.
+*Sessions are _not_ thread safe*: you can share the main `IDriver` object across threads, but each thread should create its own sessions.
 
 
 [#managed-transactions]
 == Run a managed transaction
 
-A transaction can contain any number of queries.
+A transaction can contain multiple queries.
 As Neo4j is <<ACID>> compliant, *queries within a transaction will either be executed as a whole or not at all*: you cannot get a part of the transaction succeeding and another failing.
 Use transactions to group together related queries which work together to achieve a single _logical_ database operation.
 
-A managed transaction is created with the methods link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IAsyncSession.ExecuteReadAsync.html)[`IAsyncSession.ExecuteRead()`] and link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IAsyncSession.ExecuteWriteAsync.html)[`IAsyncSession.ExecuteWrite()`], depending on whether you want to retrieve data from the database or alter it.
+You create a managed transaction with the methods link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IAsyncSession.ExecuteReadAsync.html)[`IAsyncSession.ExecuteRead()`] and link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IAsyncSession.ExecuteWriteAsync.html)[`IAsyncSession.ExecuteWrite()`], depending on whether you want to retrieve data from the database or alter it.
 Both methods take a <<transaction_function>> callback, which is responsible for actually carrying out the queries and processing the result.
 
 .Retrieve people whose name starts with `Al`.
@@ -70,7 +70,7 @@ foreach (var person in people) {
 
 <1> Create a session. A single session can be the container for multiple queries. Unless created as a resource with the `using` keyword, remember to close it when done.
 <2> The `.ExecuteRead()` (or `.ExecuteWrite()`) method is the entry point into a transaction. It takes a callback to a _transaction function_, which is responsible of running queries.
-<3> Use the method link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IAsyncQueryRunner.RunAsync.html[`tx.RunAsync()`] to execute queries. You can provide a map of query parameters as second argument. Each query run returns a link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IResultCursor.html[`IResultCursor`] object.
+<3> Use the method link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IAsyncQueryRunner.RunAsync.html[`tx.RunAsync()`] to execute queries. You can provide a map of query parameters as second argument. Each query run returns a link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IResultCursor.html[`IResultCursor`] object.
 <4> xref:process-result[Process the result] using any of the methods on `IResultCursor`. The method `.FetchAsync()` retrieves the next record in the queue and stores it in the property `.Current`; the method `.ToListAsync()` retrieves all records into a list.
 
 *Do not hardcode or concatenate parameters directly into the query*.
@@ -79,9 +79,6 @@ Use xref:query-simple#query-parameters[query parameters] instead, both for perfo
 *Transaction functions should never return the result object directly*.
 Instead, always xref:process-result[process the result] in some way.
 Within a transaction function, a `return` statement results in the transaction being committed, while the transaction is automatically rolled back if an exception is raised.
-
-[CAUTION]
-The methods `.ExecuteRead()` and `.ExecuteWrite()` have replaced `.ReadTransaction()` and `.WriteTransaction()`, which are deprecated in version 5.x and removed in version 6.0.
 
 .A transaction with multiple queries, client logic, and potential roll backs
 [source, csharp]
@@ -173,10 +170,11 @@ async Task addPersonToOrganization(IAsyncQueryRunner tx, string personName, stri
 }
 ----
 
-Should a transaction fail for a reason that the driver deems transient, it automatically retries to run the transaction function (with an exponentially increasing delay).
-For this reason, *transaction functions must be _idempotent_* (i.e., they should produce the same effect when run several times), because you do not know upfront how many times they are going to be executed.
-In practice, this means that you should not edit nor rely on globals, for example.
-Note that although transactions functions might be executed multiple times, the queries inside it will always run only once.
+The driver automatically retries to run a failed transaction if the failure is deemed to be transient (for example due to temporary server unavailability).
+An exception will be raised if the operation keeps failing after the configured link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.ConfigBuilder.WithMaxTransactionRetryTime.html[maximum retry time].
+
+Because a transaction might be re-run, *transaction functions should produce the same effect when run several times (_idempotent_)*, because you do not know upfront how many times they are going to be executed.
+Note that although transactions functions might be executed multiple times, the database queries inside it will always run only once.
 
 A session can chain multiple transactions, but *only one single transaction can be active within a session at any given time*.
 To maintain multiple concurrent transactions, use multiple concurrent sessions.
@@ -185,8 +183,8 @@ To maintain multiple concurrent transactions, use multiple concurrent sessions.
 [#explicit-transactions]
 == Run an explicit transaction
 
-You can achieve full control over transactions by manually beginning one with the method link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IAsyncSession.BeginTransactionAsync.html[`IAsyncSession.BeginTransactionAsync()`], which returns a link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IAsyncTransaction.html[`IAsyncTransaction`] object.
-You may then run queries inside an explicit transaction with the method link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IAsyncQueryRunner.RunAsync.html[`.RunAsync()`].
+You can achieve full control over transactions by manually beginning one with the method link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IAsyncSession.BeginTransactionAsync.html[`IAsyncSession.BeginTransactionAsync()`], which returns a link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IAsyncTransaction.html[`IAsyncTransaction`] object.
+You may then run queries inside an explicit transaction with the method link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IAsyncQueryRunner.RunAsync.html[`.RunAsync()`].
 
 [source, csharp]
 ----
@@ -197,14 +195,14 @@ using var tx = await session.BeginTransactionAsync();
 //     tx.RollbackAsync() to roll the transaction back
 ----
 
+An explicit transaction can be committed with  link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IAsyncTransaction.CommitAsync.html[`.CommitAsync()`] or rolled back with link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IAsyncTransaction.RollbackAsync.html[`.RollbackAsync()`].
+If no explicit action is taken, the driver will automatically roll the transaction back at the end of its lifetime.
+
 [TIP]
 ====
 Queries run with `tx.Run()` failing due to a transient server error can be retried without need to alter the original request.
-You can discover whether an error is transient via the link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.Neo4jException.IsRetriable.html#Neo4j_Driver_Neo4jException_IsRetriable[`IsRetriable`] property, which gives insights into whether a further attempt might be successful.
+You can discover whether an error is transient via the link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.Neo4jException.IsRetriable.html#Neo4j_Driver_Neo4jException_IsRetriable[`IsRetriable`] property, which gives insights into whether a further attempt might be successful.
 ====
-
-An explicit transaction can be committed with  link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IAsyncTransaction.CommitAsync.html[`.CommitAsync()`] or rolled back with link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IAsyncTransaction.RollbackAsync.html[`.RollbackAsync()`].
-If no explicit action is taken, the driver will automatically roll the transaction back at the end of its lifetime.
 
 Explicit transactions are most useful for applications that need to distribute Cypher execution across multiple functions for the same transaction, or for applications that need to run multiple queries within a single transaction but without the automatic retries provided by managed transactions.
 
@@ -294,7 +292,7 @@ void requestInspection(string customerId, int otherBankId, float amount, Excepti
 [#process-result]
 == Process query results
 
-The driver's output of a query is a link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IResultCursor.html[`IResultCursor`] object, which encapsulates the Cypher result in a rich data structure that requires some parsing on the client side.
+The driver's output of a query is a link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IResultCursor.html[`IResultCursor`] object, which encapsulates the Cypher result in a rich data structure that requires some parsing on the client side.
 There are two main points to be aware of:
 
 - *The result records are not immediately and entirely fetched and returned by the server*.
@@ -312,12 +310,12 @@ The animation below follows the path of a single query: it shows how the driver 
   class="rounded-corners"
   controls
   width="100%"
-  src="../../../common-content/5/_images/result.mp4"
-  poster="../../../common-content/5/_images/result-poster.jpg"
+  src="../../../common-content/6/_images/result.mp4"
+  poster="../../../common-content/6/_images/result-poster.jpg"
   type="video/mp4"></video>
 ++++
 
-**The easiest way of processing a result is by calling `.ToListAsync()` on it**, which yields a list of link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IRecord.html[`IRecord`] objects.
+**The easiest way of processing a result is by calling `.ToListAsync()` on it**, which yields a list of link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IRecord.html[`IRecord`] objects.
 Otherwise, a `IResultCursor` object implements a number of properties and methods for processing records.
 The most commonly needed ones are listed below.
 
@@ -345,20 +343,20 @@ This leaves the record in the buffer for further processing.
 It exhausts the result, so should only be called when data processing is over.
 |===
 
-For a complete list of `IResultCursor` methods, see link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IResultCursor.html[API documentation -> IResultCursor].
+For a complete list of `IResultCursor` methods, see link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IResultCursor.html[API documentation -> IResultCursor].
 
 
 [#session-config]
 == Session configuration
 
 You can customize the behavior of a session via the optional `SessioncConfig` parameter when creating a session.
-Use link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.SessionConfigBuilder.html[`SessionConfigBuilder`] to create a session configuration object.
+Use link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.SessionConfigBuilder.html[`SessionConfigBuilder`] to create a session configuration object.
 
 
 [#database-selection]
 === Database selection
 
-It is recommended to *always specify the database explicitly* through the `.WithDatabase("<dbName>")` session config method, even on single-database instances.
+*Always specify the database explicitly* through the `.WithDatabase("<dbName>")` session config method, even on single-database instances.
 This allows the driver to work more efficiently, as it saves a network round-trip to the server to resolve the home database.
 If no database is given, the link:{neo4j-docs-base-uri}/operations-manual/current/manage-databases/introduction#manage-databases-default[default database] set in the Neo4j instance settings is used.
 
@@ -371,8 +369,8 @@ using var session = driver.AsyncSession(conf => conf
 
 [TIP]
 Specifying the database through the configuration method is preferred over the link:{neo4j-docs-base-uri}/cypher-manual/current/clauses/use/[`USE`] Cypher clause.
-If the server runs on a cluster, queries with `USE` require server-side routing to be enabled.
-Queries may also take longer to execute as they may not reach the right cluster member at the first attempt, and need to be routed to one containing the requested database.
+If the server runs on a cluster, queries with `USE` require link:https://neo4j.com/docs/operations-manual/current/clustering/setup/routing/#clustering-routing[server-side routing] to be enabled.
+Queries can also take longer to execute as they may not reach the right cluster member at the first attempt, and need to be routed to one containing the requested database.
 
 
 [#request-routing]
@@ -394,22 +392,20 @@ using var session = driver.AsyncSession(conf => conf
 // .Routing ≠ Access control
 [NOTE]
 ====
-Although executing a _write_ query in read mode likely results in a runtime error, *you should not rely on this for access control.*
+Although executing a _write_ query in read mode results in a runtime error, *you should not rely on this for access control.*
 The difference between the two modes is that _read_ transactions are routed to any node of a cluster, whereas _write_ ones are directed to primaries.
-There is no guarantee that a write query submitted in read mode will be rejected, and an issue with this feature will not be classified as a security vulnerability.
+There is no security guarantee that a write query submitted in read mode will be rejected.
 
 Similar remarks hold for the `.ExecuteReadAsync()` and `.ExecuteWriteAsync()` methods.
 ====
 
 
 [#impersonation]
-[role=label--new-5.14]
 === Run queries as a different user
 
 You can execute a query through a different user by providing an link:https://neo4j.com/docs/api/dotnet-driver/5.28/api/Neo4j.Driver.IAuthToken.html[`IAuthToken`] to the `.WithAuthToken()` config method.
 Switching user at the session level is cheaper than creating a new `IDriver` object.
-Queries are then run within the security context of the given user (i.e., home database, permissions, etc.). +
-Session-scoped authentication requires a server version >= 5.8.
+Queries are then run within the security context of the given user (i.e., home database, permissions, etc.).
 
 [source, csharp]
 ----
@@ -419,8 +415,7 @@ using var session = driver.AsyncSession(conf => conf
 );
 ----
 
-The method `.WithImpersonatedUser()` provides a similar functionality, and is available in driver/server versions >= 4.4.
-The difference is that you don't need to know a user's password to impersonate them, but the user under which the `IDriver` was created needs to have the link:{neo4j-docs-base-uri}/operations-manual/current/authentication-authorization/dbms-administration/#access-control-dbms-administration-impersonation[appropriate permissions].
+The method `.WithImpersonatedUser()` provides a similar functionality: the difference is that you don't need to know a user's password to impersonate them, but the user under which the `IDriver` was created needs to have the link:{neo4j-docs-base-uri}/operations-manual/current/authentication-authorization/dbms-administration/#access-control-dbms-administration-impersonation[appropriate permissions].
 
 [source, csharp]
 ----
@@ -435,7 +430,7 @@ using var session = driver.AsyncSession(conf => conf
 == Transaction configuration
 
 You can exert further control on transactions by providing a `TransactionConfig` object as (optional) last parameter to `.ExecuteReadAsync()`, `.ExecuteWriteAsync()`, and `.BeginTransactionAsync()`.
-You can create one via link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.TransactionConfigBuilder.html[`TransactionConfigBuilder`].
+You can create one via link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.TransactionConfigBuilder.html[`TransactionConfigBuilder`].
 Use it to specify:
 
 - A transaction timeout.
@@ -471,7 +466,7 @@ Each connection pool has *a finite number of sessions*, so if you open sessions 
 It is thus recommended to create sessions with the `using` keyword, which automatically closes them when the scope ends.
 When a session is closed, it is returned to the connection pool to be later reused.
 
-If you do not open sessions with `using`, remember to call the `.CloseAsync()` method when you have finished using them.
+If you do not open sessions with `using`, remember to call the `.DisposeAsync()` method when you have finished using them.
 
 [source, csharp]
 ----
@@ -479,7 +474,7 @@ var session = driver.AsyncSession(conf => conf.WithDatabase("<database-name>"));
 
 // session usage
 
-await session.CloseAsync();
+await session.DisposeAsync();
 ----
 
 

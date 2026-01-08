@@ -1,12 +1,11 @@
-:driver-changelog-url: https://github.com/neo4j/neo4j-dotnet-driver/wiki/5.X-Change-Log
+:driver-changelog-url: https://github.com/neo4j/neo4j-dotnet-driver/wiki/6.X-Change-Log
 
 = Upgrade from older versions
 
-This page contains the list of new features and breaking changes of the driver from version 4.4 to 5.x.
+This page contains the list of new features and breaking changes of the driver from version 5.28 to 6.x.
 For a full list of changes, see the link:{driver-changelog-url}[driver changelog].
 
-The latest driver version of the 5.x series ({dotnet-driver-version}) is compatible with Neo4j server both 4.4 and 5.x, so you can upgrade the driver before you upgrade the server.
-At the same time, the driver version 4.4 is forward compatible with Neo4j server 5.x, so you could also upgrade the server before the driver; however, given that it's easier to roll back an application upgrade than a server upgrade, it's recommended to start with the driver.
+The latest driver version of the 6.x series is compatible with Neo4j server both 4.4, 5.x, and 202[56].x, so you can upgrade the driver before you upgrade the server. At the same time, the driver version 5.28 is forward compatible with Neo4j server 202[56].x, so you could also upgrade the server before the driver; however, given that it’s easier to roll back an application upgrade than a server upgrade, it’s recommended to start with the driver.
 
 [TIP]
 When upgrading the Neo4j server to a newer version, the Cypher queries in your application may also need updating. +
@@ -20,80 +19,20 @@ See link:https://neo4j.com/docs/cypher-manual/current/deprecations-additions-rem
 |===
 
 |
-.Support for .NET 8
+.New type `Vector`
 [%collapsible]
 ====
-The driver supports the .NET Standard 2.0. For supported versions of the .NET Framework, see the link:https://dotnet.microsoft.com/en-us/platform/dotnet-standard[.NET Standard page].
+The type xref:data-types.adoc#vector[`Vector`] allows for storing and retrieving Cypher `VECTOR` objects to/from the database.
+The `VECTOR` type is suitable for efficiently storing lists of homogeneous numbers, such as embeddings.
 ====
 |
-.Run transactions with less knowledge of driver's internals
+.GQL status objects in errors
 [%collapsible]
 ====
-The new method `Driver.ExecutableQuery()` is a wrapper for `Session.ExecuteRead/Write()`, but it abstracts away the result processing part and returns a list of records to the caller directly.
-
-For more information, see xref:query-simple.adoc[`ExecutableQuery`].
+Exception objects also expose errors as GQL-status objects.
+The main difference between Neo4j error codes and GQL error codes is that the latter are more granular.
+For more information, see xref:query-simple.adoc#error-handling[Error handling].
 ====
-
-|
-.Record to object mapping
-[%collapsible]
-====
-Allows records to be mapped to objects simply and without endless boilerplate.
-
-For more information, see xref:object-mapping.adoc[Record to Object Mapping].
-====
-|
-.Re-authentication
-[%collapsible]
-====
-Allows for handling xref:connect-advanced.adoc#rotating-tokens[expiring authentication (rotating tokens)] as well as xref:transactions.adoc#impersonation[session scoped authentication].
-====
-
-|
-.Mutual TLS (mTLS) as second authentication factor (2FA)
-[%collapsible]
-====
-Allows for configuring client side TLS certificates to authenticate against the server.
-
-For more information, see xref:connect-advanced.adoc#mtls[Mutual TLS].
-====
-|
-.`BookmarkManager` support
-[%collapsible]
-====
-Bookmark managers make it easier to achieve causal chaining of sessions.
-
-See link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IBookmarkManager.html[interface `IBookmarkManager`].
-====
-
-|
-.Notification filtering API
-[%collapsible]
-====
-Filtering allows to receive only a subset of notifications from the server, and to improve performance server-side.
-
-For more information, see xref:result-summary.adoc#filter-notifications[Explore the query execution summary -> Filter notifications].
-====
-|
-.GQL statuses and errors
-[%collapsible]
-====
-The property link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IResultSummary.GqlStatusObjects.html[`IResultSummary.GqlStatusObjects`] contains a sequence of link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IGqlStatusObject.html[`IGqlStatusObject`], holding information about the execution of the query.
-This API is planned to supersede the current notifications API.
-
-For more information, see xref:result-summary.adoc#notifications[Explore the query execution summary -> Notifications].
-====
-
-|
-.Telemetry
-[%collapsible]
-====
-The driver sends anonymous API usage statistics to the server.
-Use the driver configuration method `.WithTelemetryDisabled()` to opt out.
-
-See link:https://github.com/neo4j/neo4j-dotnet-driver/pull/735[API Telemetry].
-====
-|
 
 |===
 
@@ -101,51 +40,59 @@ See link:https://github.com/neo4j/neo4j-dotnet-driver/pull/735[API Telemetry].
 [[breaking-changes]]
 == Breaking changes and deprecations
 
-Deprecated features are likely to be removed in version 6.
+Deprecated features are likely to be removed in the next major version.
 
 [cols="1,5a,1"]
 |===
 |Version |Message |Status
 
-|5.0
-|link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IServerInfo.html[`IServerInfo`] -- Method `.Version()` has been removed.
-Use `.Agent()`, `.ProtocolVersion()`, or call the link:https://neo4j.com/docs/operations-manual/current/reference/procedures/#procedure_dbms_components[`dbms.components`] Cypher procedure instead.
+|6.0
+|.NET Standard 2.1 support removed.
+Supported runtimes are .NET versions 8, 9, and 10.
+|label:removed[Changed]
+
+|6.0
+|`ISession`, `IRxSession`, link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IAsyncSession.html[`IAsyncSession`] -- Methods `.ReadTransaction()` and `.WriteTransaction()` have been removed in favor of `.ExecuteRead()` and `.ExecuteWrite()`.
+The same holds for the async counterparts `.ReadTransactionAsync()` and `.WriteTransactionAsync()`, replaced by `.ExecuteReadAsync()` and `.ExecuteWriteAsync()`.
+
+The new methods behave similarly, but the argument types are different and the new methods do not support the `.commit()`, `.rollback()`, `.close()`, and `.closed()` methods.
+|label:removed[]
+
+|6.0
+|link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IDriver.html[`IDriver`] -- Method `.CloseAsync()` has been removed in favor of `.DisposeAsync()`.
+|label:removed[]
+
+|6.0
+|**Bookmarks**
+
+- `ISession`, `IRxSession` link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IAsyncSession.html[`IAsyncSession`] -- Method `.LastBookmark()` has been removed in favor of `.LastBookmarks()`.
+- Class `Bookmark` has been removed in favor of link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.Bookmarks.html[`Bookmarks`].
+- link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.SessionConfigBuilder.html[`SessionConfigBuilder`] -- Method link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.SessionConfigBuilder.WithBookmarks.html#Neo4j_Driver_SessionConfigBuilder_WithBookmarks_Neo4j_Driver_Bookmarks___[`.WithBookmarks()`] takes `Bookmarks[]` as argument rather than `Bookmark[]`.
+|label:removed[]
+
+// a backslash is needed in first url to avoid it becoming a <em> with the subsequent link __
+|6.0
+|`ZonedDateTime` -- Two constructors not including `DateTimeKind` are deprecated (link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.ZonedDateTime.-ctor.html#Neo4j_Driver_ZonedDateTime_\_ctor_System_Int32_System_Int32_System_Int32_System_Int32_System_Int32_System_Int32_Neo4j_Driver_Zone_[this] and link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.ZonedDateTime.-ctor.html#Neo4j_Driver_ZonedDateTime_\_ctor_System_Int32_System_Int32_System_Int32_System_Int32_System_Int32_System_Int32_System_Int32_Neo4j_Driver_Zone_[this]).
+|label:removed[]
+
+|6.0
+|link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.INotification.html[`INotification`] -- Property `Severity` has been removed in favor of `SeverityLevel`/`RawSeverityLevel`.
+|label:removed[]
+
+|6.0
+|Interface `ILogger` was renamed to link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.INeo4jLogger.html[`INeo4jLogger`] in preparation for integration with standard logging framework.
+|label:removed[Changed]
+
+|6.0
+|IP6 -- Methods `ConfigBuilder.WithIpv6Enabled()` and `Config.Ipv6Enabled()` have been removed; IP6 is now always enabled.
 |label:removed[]
 
 |5.0
-|`ISession`, `IRxSession`, link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IAsyncSession.html[`IAsyncSession`] -- Methods `.ReadTransaction()` and `.WriteTransaction()` are deprecated in favor of `.ExecuteRead()` and `.ExecuteWrite()`.
-The same holds for the async coounterparts `.ReadTransactionAsync()` and `.WriteTransactionAsync()`, replaced by `.ExecuteReadAsync()` and `.ExecuteWriteAsync()`.
-
-The new methods behave similarly, but the argument types are different and the new methods do not support the `.commit()`, `.rollback()`, `.close()`, and `.closed()` methods.
+|link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IEntity.html[`IEntity`], link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.INode.html[`INode`], link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IRelationship.html[`IRelationship`] -- Method `.Id()` (`long`) is deprecated in favor of `.ElementId()` (`string`).
 |label:deprecated[]
 
 |5.0
-|`ISession`, link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IAsyncSession.html[`IAsyncSession`] -- Method `.LastBookmark()` is deprecated in favor of `.LastBookmarks()`.
-|label:deprecated[]
-
-|5.0
-|Class `Bookmark` is deprecated in favor of link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.Bookmarks.html[`Bookmarks`].
-|label:deprecated[]
-
-|5.0
-|link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.SessionConfigBuilder.html[`SessionConfigBuilder`] -- Method link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.SessionConfigBuilder.WithBookmarks.html#Neo4j_Driver_SessionConfigBuilder_WithBookmarks_Neo4j_Driver_Bookmarks___[`.WithBookmarks()`] takes `Bookmarks[]` as argument rather than `Bookmark[]`.
-|label:deprecated[]
-
-// a backslash is needed in first url to avoid it becoming a <em> with the subsequent link __
-|5.0
-|`ZonedDateTime` -- Two constructors not including `DateTimeKind` are deprecated (link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.ZonedDateTime.-ctor.html#Neo4j_Driver_ZonedDateTime_\_ctor_System_Int32_System_Int32_System_Int32_System_Int32_System_Int32_System_Int32_Neo4j_Driver_Zone_[this] and link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.ZonedDateTime.-ctor.html#Neo4j_Driver_ZonedDateTime_\_ctor_System_Int32_System_Int32_System_Int32_System_Int32_System_Int32_System_Int32_System_Int32_Neo4j_Driver_Zone_[this]).
-|label:deprecated[]
-
-|5.0
-|link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IEntity.html[`IEntity`], link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.INode.html[`INode`], link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IRelationship.html[`IRelationship`] -- Method `.Id()` (`long`) is deprecated in favor of `.ElementId()` (`string`).
-|label:deprecated[]
-
-|5.0
-|link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IRelationship.html[`IRelationship`] -- Methods `.StartNodeId()` and `.EndNodeId()` are deprecated in favor of `.StartNodeElementId()` and `.EndNodeElementId()`. Old identifiers were `long`, whereas new ElementIds are `string`.
-|label:deprecated[]
-
-|5.7
-|link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.INotification.html[`INotification`] -- Property `Severity` is deprecated in favor of `SeverityLevel` or `RawSeverityLevel`.
+|link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IRelationship.html[`IRelationship`] -- Methods `.StartNodeId()` and `.EndNodeId()` are deprecated in favor of `.StartNodeElementId()` and `.EndNodeElementId()`. Old identifiers were `long`, whereas new ElementIds are `string`.
 |label:deprecated[]
 
 |===

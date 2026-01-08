@@ -12,7 +12,6 @@ include::{common-partial}/connect-advanced.adoc[tag=connection-protocols]
 === Basic authentication (default)
 
 The basic authentication scheme relies on traditional username and password.
-These can either be the credentials for your local installation, or the ones provided with an Aura instance.
 
 [source, csharp]
 ----
@@ -49,7 +48,7 @@ await using var driver = GraphDatabase.Driver(dbUri, AuthTokens.Bearer(ticket));
 [#auth-custom]
 === Custom authentication
 
-Use link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.AuthTokens.Custom.html[`AuthTokens.Custom()`] to log into a server having a custom authentication scheme.
+Use link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.AuthTokens.Custom.html[`AuthTokens.Custom()`] to log into a server having a custom authentication scheme.
 
 [source, csharp, test-skip]
 ----
@@ -68,13 +67,12 @@ If authentication is disabled on the server, the authentication parameter can be
 
 
 [#rotating-tokens]
-[role=label--new-5.14]
 == Rotating authentication tokens
 
 It is possible to rotate authentication tokens that are expected to expire (e.g. SSO).
-You need to provide an link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IAuthTokenManager.html[`IAuthTokenManager`] instance when instantiating the `IDriver`, rather than a static authentication token.
+You need to provide an link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IAuthTokenManager.html[`IAuthTokenManager`] instance when instantiating the `IDriver`, rather than a static authentication token.
 
-The easiest way to get started is to use link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.AuthTokenManagers.html[one of built-in `AuthTokenManagers` implementations]. AuthTokenManagers work with link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.AuthTokenAndExpiration.html[`AuthTokenAndExpiration`] objects.
+The easiest way to get started is to use link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.AuthTokenManagers.html[one of built-in `AuthTokenManagers` implementations]. AuthTokenManagers work with link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.AuthTokenAndExpiration.html[`AuthTokenAndExpiration`] objects.
 
 .Rotating a bearer token expiring every 60 seconds
 [source, csharp, test-skip]
@@ -110,7 +108,7 @@ You can switch users at both xref:query-simple.adoc#impersonation[query level] a
 
 
 [#mtls]
-[role=label--new-5.27 label--not-on-aura]
+[role=label--not-on-aura]
 == Mutual TLS (client-side certificates as 2FA)
 
 Mutual TLS (mTLS) allows you to use a client certificate as second factor for authenticating with the server.
@@ -121,7 +119,7 @@ The client's certificate and public key must be placed in the server's `<NEO4J_H
 [NOTE]
 For mTLS to work, the driver's connection with the server must be encrypted, i.e. the xref:_connection_protocols_and_security[connection URI scheme] must be either `+s` or `+ssc` (ex. `neo4j+s://example.com:7687`).
 
-Use the config method link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.ConfigBuilder.WithClientCertificateProvider.html[`WithClientCertificateProvider()`] to provide an link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IClientCertificateProvider.html[`IClientCertificateProvider`]. +
+Use the config method link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.ConfigBuilder.WithClientCertificateProvider.html[`WithClientCertificateProvider()`] to provide an link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IClientCertificateProvider.html[`IClientCertificateProvider`]. +
 Your implementation must provide a thread-safe `GetCertificateAsync()` method, returning a `ValueTask<link:https://learn.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.x509certificate2?view=net-9.0[X509Certificate2]>`.
 
 [source, csharp, test-skip]
@@ -152,7 +150,7 @@ await driver.VerifyConnectivityAsync();
 [#logging]
 == Logging
 
-To enable logging use link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.ConfigBuilder.WithLogger.html[`.withLogger(ILogger)`] config method when creating a `Driver` object, providing an implementation of link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.ILogger.html[`ILogger`].
+To enable logging use link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.ConfigBuilder.WithLogger.html[`.withLogger(ILogger)`] config method when creating a `Driver` object, providing an implementation of link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.ILogger.html[`ILogger`].
 
 .Enable debug logging with example implementation of `ILogger`
 [source, csharp]
@@ -251,7 +249,7 @@ public class Neo4jLogger : ILogger {
 When creating an `IDriver` object, you can specify a _resolver_ function to resolve the connection address the driver is initialized with.
 Note that addresses that the driver receives in routing tables are not resolved with the custom resolver.
 
-You specify a resolver through the link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.ConfigBuilder.WithResolver.html)[`.WithResolver()`] config method, which works with link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IServerAddressResolver.html[`IServerAddressResolver`] objects.
+You specify a resolver through the link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.ConfigBuilder.WithResolver.html)[`.WithResolver()`] config method, which works with link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IServerAddressResolver.html[`IServerAddressResolver`] objects.
 
 *The resolved address must have the same port and URI scheme.*
 In the example below, the driver is initialized with a `neo4j://` URI scheme and port `7687`, so the resolved address provided in `dbUri` must also be available at `neo4j://` and port `7687`.
@@ -291,7 +289,7 @@ class ListAddressResolver : IServerAddressResolver {
 
 == Further connection parameters
 
-You can find all `IDriver` configuration parameters in the link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.ConfigBuilder.html[API documentation -> ConfigBuilder].
+You can find all `IDriver` configuration parameters in the link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.ConfigBuilder.html[API documentation -> ConfigBuilder].
 
 
 ifndef::backend-pdf[]

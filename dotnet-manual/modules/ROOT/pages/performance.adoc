@@ -74,7 +74,7 @@ await session.ExecuteWriteAsync(async tx => {
 ----
 
 An even faster approach is to skip `.ExecuteRead/WriteAsync()` and call `.RunAsync()` directly on the session.
-The queries run as auto-commit transaction, and are still isolated from other concurrent queries, but if any of them fail, they will not be retried.
+The queries run as auto-commit transactions, and are still isolated from other concurrent queries, but if any of them fail, they will not be retried.
 With this method, you trade some robustness for more throughput, as the queries are shot to the server as fast as it can handle.
 One upper limit on the client size is given by the size of the connection pool: each call to `.RunAsync()` borrows a connection, so the amount of parallel work is limited by the number of available connections.
 
@@ -184,7 +184,7 @@ void log(string msg) {
 ----
 
 .Output
-[source, output, role=nocollapse]
+[source, output]
 ----
 [1734336457] LAZY LOADING (ExecuteReadAsync)
 [1734336457] Submit query
@@ -216,14 +216,14 @@ With lazy loading, the client can also stop requesting records after some condit
 
 [TIP]
 ====
-When using `.ExecutableQuery()`, you can process records as they arrive using the link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IExecutableQuery-2.WithStreamProcessor.html[`.WithStreamProcessor()`] method.
+When using `.ExecutableQuery()`, you can process records as they arrive using the link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IExecutableQuery-2.WithStreamProcessor.html[`.WithStreamProcessor()`] method.
 This will speed up response by not waiting for all records before processing them; it does not however improve memory footprint, as you can't control the flux of records.
-You can reduce the memory footprint of link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.EagerResult-1.html[`EagerResult`] using link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IConfiguredQuery-2.WithMap.html[`.WithMap()`] or link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.IConfiguredQuery-2.WithReduce.html[`.WithReduce()`].
+You can reduce the memory footprint of link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.EagerResult-1.html[`EagerResult`] using link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IConfiguredQuery-2.WithMap.html[`.WithMap()`] or link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IConfiguredQuery-2.WithReduce.html[`.WithReduce()`].
 ====
 
 [NOTE]
 ====
-The driver's link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.SessionConfigBuilder.WithFetchSize.html[fetch size] affects the behavior of lazy loading.
+The driver's link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.SessionConfigBuilder.WithFetchSize.html[fetch size] affects the behavior of lazy loading.
 It instructs the server to stream an amount of records equal to the fetch size, and then wait until the client has caught up before retrieving and sending more.
 
 The fetch size allows to bound memory consumption on the client side.
