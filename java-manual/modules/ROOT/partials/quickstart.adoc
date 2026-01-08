@@ -20,7 +20,7 @@ Add the Neo4j Java driver to the list of dependencies in the `pom.xml` of your M
 <dependency>
     <groupId>org.neo4j.driver</groupId>
     <artifactId>neo4j-java-driver</artifactId>
-    <version>6.0.0</version>
+    <version>6.0.2</version>
 </dependency>
 ----
 

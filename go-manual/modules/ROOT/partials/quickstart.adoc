@@ -1,23 +1,23 @@
 // This doc is also sourced in the Aura Developer Hub.
-// Because of that, cross-links are absolute and
-// source blocks have copy=true .
+// Because of that, cross-links are absolute,
+// source blocks have copy=true , and Antora attributes
+// (version) are explicitly resolved.
 
 The Neo4j Go driver is the official library to interact with a Neo4j instance through a Go application.
 
 At the hearth of Neo4j lies <<Cypher>>, the query language to interact with a Neo4j database.
-While this guide does not _require_ you to be a seasoned Cypher querier, it is going to be easier to focus on the Go-specific bits if you already know some Cypher.
-For this reason, although this guide does _also_ provide a gentle introduction to Cypher along the way, consider checking out link:https://neo4j.com/docs/getting-started/cypher/[Getting started -> Cypher] for a more detailed walkthrough of graph databases modelling and querying if this is your first approach.
-You may then apply that knowledge while following this guide to develop your Go application.
+Although this guide does not _require_ you to be a seasoned Cypher querier, it's easier to focus on the Go-specific bits if you know some Cypher already.
+You will also get a _gentle_ introduction to Cypher in these pages, but check out link:https://neo4j.com/docs/getting-started/cypher/[Getting started -> Cypher] for a more detailed walkthrough of graph databases modelling and querying if this is your first approach.
 
 
 [#install]
 == Install
 
-From within a module, use `go get` to install the link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/[Neo4j Go Driver]:
+From within a module, use `go get` to install the link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/[Neo4j Go Driver]:
 
 [source, bash, copy=true]
 ----
-go get github.com/neo4j/neo4j-go-driver/v5
+go get github.com/neo4j/neo4j-go-driver/v6
 ----
 
 link:https://neo4j.com/docs/go-manual/current/install/[More info on installing the driver]
@@ -26,8 +26,8 @@ link:https://neo4j.com/docs/go-manual/current/install/[More info on installing t
 [#connect]
 == Connect to the database
 
-Connect to a database by creating a `DriverWithContext` object and providing a URL and an authentication token.
-Once you have a `DriverWithContext` instance, use the `.VerifyConnectivity()` method to ensure that a working connection can be established.
+Connect to a database by creating a `Driver` object and providing a URL and an authentication token.
+Once you have a `Driver` instance, use the `.VerifyConnectivity()` method to ensure that a working connection can be established.
 
 [source, go, role=nocollapse, copy=true]
 ----
@@ -36,7 +36,7 @@ package main
 import (
     "fmt"
     "context"
-    "github.com/neo4j/neo4j-go-driver/v5/neo4j"
+    "github.com/neo4j/neo4j-go-driver/v6/neo4j"
 )
 
 func main() {
@@ -45,7 +45,7 @@ func main() {
     dbUri := "<database-uri>"
     dbUser := "<username>"
     dbPassword := "<password>"
-    driver, err := neo4j.NewDriverWithContext(
+    driver, err := neo4j.NewDriver(
         dbUri,
         neo4j.BasicAuth(dbUser, dbPassword, ""))
     defer driver.Close(ctx)
@@ -131,12 +131,12 @@ link:https://neo4j.com/docs/go-manual/current/query-simple/[More info on queryin
 
 [#close]
 == Close connections and sessions
-Call the `.close()` method on all `DriverWithContext` and `SessionWithContext` instances to release any resources still held by them.
+Call the `.close()` method on all `Driver` and `Session` instances to release any resources still held by them.
 The best practice is to call the methods with the `defer` keyword as soon as you create new objects.
 
 [source, go, copy=true]
 ----
-driver, err := neo4j.NewDriverWithContext(dbUri, neo4j.BasicAuth(dbUser, dbPassword, ""))
+driver, err := neo4j.NewDriver(dbUri, neo4j.BasicAuth(dbUser, dbPassword, ""))
 defer driver.Close(ctx)
 ----
 

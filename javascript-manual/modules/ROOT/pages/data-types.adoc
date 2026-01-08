@@ -470,7 +470,7 @@ For full documentation, see link:{neo4j-docs-base-uri}/api/javascript-driver/cur
 [#vector]
 == Vector type
 
-The type link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/vector.js~Vector.html[`Vector`] maps to the Cypher type link:https://neo4j.com/docs/cypher-manual/current/values-and-types/vector/[`VECTOR`].
+The type link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/vector.js~Vector.html[`Vector`] maps to the Cypher type link:https://neo4j.com/docs/cypher-manual/25/values-and-types/vector/[`VECTOR`].
 `Vector` objects are stored as contiguous blocks of memory containing homogeneous values.
 
 The `vector` constructor takes a Javascript link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray[`TypedArray`].
@@ -484,7 +484,7 @@ var typedArray = Float32Array.from([1, 2, 3])
 var neo4jVector = neo4j.vector(typedArray)  // <.>
 
 // Store the vector as a node property
-driver.executeQuery('MERGE (d:Doc {embedding: $vector})', { vector: neo4jVector })
+await driver.executeQuery('MERGE (d:Doc {embedding: $vector})', { vector: neo4jVector })
 ----
 
 [IMPORTANT]
@@ -494,7 +494,7 @@ Storing `VECTOR` objects in the database requires a server version >= 2025.10, E
 [source, javascript]
 ----
 // Retrieve a vector
-var { records } = driver.executeQuery(
+var { records } = await driver.executeQuery(
   "MATCH (d:Doc) RETURN d.embedding AS v LIMIT 1"
 )
 var neo4jVector = records[0].get("v")

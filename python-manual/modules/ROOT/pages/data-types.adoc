@@ -424,7 +424,7 @@ with neo4j.GraphDatabase.driver(URI, auth=AUTH) as driver:
 [#vector]
 == Vector type
 
-The type link:https://neo4j.com/docs/api/python-driver/current/types/vector.html#neo4j.vector.Vector[`Vector`] maps to the Cypher type link:https://neo4j.com/docs/cypher-manual/current/values-and-types/vector/[`VECTOR`].
+The type link:https://neo4j.com/docs/api/python-driver/current/types/vector.html#neo4j.vector.Vector[`Vector`] maps to the Cypher type link:https://neo4j.com/docs/cypher-manual/25/values-and-types/vector/[`VECTOR`].
 `Vector` objects are stored as contiguous blocks of memory (`bytes`), containing homogeneous values encoded in big-endian order.
 
 You can create a `Vector` from various data types.
@@ -488,7 +488,7 @@ print("as numpy array:", v.to_numpy())
 ----
 
 [IMPORTANT]
-Because Python has no native `float32` type, vectors of `float32` converted into native Python lists become lists of `float64`, leading to potential representation imprecisions. 
+Because Python has no native `float32` type, vectors of `float32` converted into native Python lists become lists of `float64`, leading to potential representation imprecisions.
 To retain the `float32` representation, transform the result vector into a numpy array (link:https://neo4j.com/docs/api/python-driver/current/types/vector.html#neo4j.vector.Vector.to_numpy[`Vector.to_numpy`]) or into a pyarrow array (link:https://neo4j.com/docs/api/python-driver/current/types/vector.html#neo4j.vector.Vector.to_pyarrow[`Vector.to_pyarrow`]).
 
 

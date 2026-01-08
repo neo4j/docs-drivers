@@ -58,7 +58,7 @@ import (
     "fmt"
     "context"
     "time"
-    "github.com/neo4j/neo4j-go-driver/v5/neo4j"
+    "github.com/neo4j/neo4j-go-driver/v6/neo4j"
     "reflect"
 )
 
@@ -69,10 +69,13 @@ func main() {
     dbUri := "<database-uri>"
     dbUser := "<username>"
     dbPassword := "<password>"
-    driver, _ := neo4j.NewDriverWithContext(
+    driver, err := neo4j.NewDriver(
         dbUri,
         neo4j.BasicAuth(dbUser, dbPassword, ""))
-    driver.VerifyConnectivity(ctx)
+    defer driver.Close(ctx)
+    if err != nil {
+        panic(err)
+    }
 
     // Define a date, with timezone
     location, _ := time.LoadLocation("Europe/Stockholm")
@@ -107,7 +110,7 @@ import (
     "fmt"
     "context"
     "time"
-    "github.com/neo4j/neo4j-go-driver/v5/neo4j"
+    "github.com/neo4j/neo4j-go-driver/v6/neo4j"
     "reflect"
 )
 
@@ -118,10 +121,13 @@ func main() {
     dbUri := "<database-uri>"
     dbUser := "<username>"
     dbPassword := "<password>"
-    driver, _ := neo4j.NewDriverWithContext(
+    driver, err := neo4j.NewDriver(
         dbUri,
         neo4j.BasicAuth(dbUser, dbPassword, ""))
-    driver.VerifyConnectivity(ctx)
+    defer driver.Close(ctx)
+    if err != nil {
+        panic(err)
+    }
 
     // Query and return a neo4j.Time object
     result, err := neo4j.ExecuteQuery(ctx, driver, `
@@ -160,7 +166,7 @@ duration := neo4j.Duration{
 fmt.Println(duration)  // 'P1Y2DT3.000000004S'
 ----
 
-For full documentation, see link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/dbtype#Duration[API documentation -> Duration].
+For full documentation, see link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j/dbtype#Duration[API documentation -> Duration].
 
 
 == Spatial types
@@ -277,7 +283,7 @@ fmt.Println("Node properties:", node.Props)
 // Node properties: map[name:Alice]
 ----
 
-For full documentation, see link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/dbtype#Node[API documentation -> Node].
+For full documentation, see link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j/dbtype#Node[API documentation -> Node].
 
 
 === Relationship
@@ -315,7 +321,7 @@ fmt.Println("Relationship end elID:", relationship.EndElementId)
 // Relationship end elID: 4:2691aa68-87cc-467d-9d09-431df9f5c456:1
 ----
 
-For full documentation, see link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/dbtype#Relationship[API documentation -> Relationship].
+For full documentation, see link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j/dbtype#Relationship[API documentation -> Relationship].
 
 
 === Path
@@ -330,7 +336,7 @@ package main
 import (
     "fmt"
     "context"
-    "github.com/neo4j/neo4j-go-driver/v5/neo4j"
+    "github.com/neo4j/neo4j-go-driver/v6/neo4j"
 )
 
 func main() {
@@ -340,10 +346,13 @@ func main() {
     dbUri := "<database-uri>"
     dbUser := "<username>"
     dbPassword := "<password>"
-    driver, _ := neo4j.NewDriverWithContext(
+    driver, err := neo4j.NewDriver(
         dbUri,
         neo4j.BasicAuth(dbUser, dbPassword, ""))
-    driver.VerifyConnectivity(ctx)
+    defer driver.Close(ctx)
+    if err != nil {
+        panic(err)
+    }
 
     // Create some :Person nodes linked by :KNOWS relationships
     addFriend(ctx, driver, "Alice", "BFF", "Bob")
@@ -372,7 +381,7 @@ func main() {
     }
 }
 
-func addFriend(ctx context.Context, driver neo4j.DriverWithContext, name string, status string, friendName string) {
+func addFriend(ctx context.Context, driver neo4j.Driver, name string, status string, friendName string) {
     _, err := neo4j.ExecuteQuery(ctx, driver, `
         MERGE (p:Person {name: $name})
         MERGE (p)-[r:KNOWS {status: $status, since: date()}]->(friend:Person {name: $friendName})
@@ -389,7 +398,83 @@ func addFriend(ctx context.Context, driver neo4j.DriverWithContext, name string,
 
 ----
 
-For full documentation, see link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v5/neo4j/dbtype#Path[API documentation -> Path].
+For full documentation, see link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j/dbtype#Path[API documentation -> Path].
+
+
+[role=label--new-6.0]
+[#vector]
+== Vector
+
+The type link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#Vector[`Vector`] maps to the Cypher type link:https://neo4j.com/docs/cypher-manual/current/values-and-types/vector/[`VECTOR`].
+Vector objects are stored as contiguous blocks of memory, containing homogeneous values.
+You can create vectors from lists of `float64`, `float32`, `int8`, `int16`, `int32`, `int64`.
+
+[IMPORTANT]
+Storing `VECTOR` objects in the database requires a server version >= 2025.10, Enterprise Edition.
+
+.Create, store, and retrieve a vector
+[source, go]
+----
+package main
+
+import (
+    "context"
+    "fmt"
+
+    "github.com/neo4j/neo4j-go-driver/v6/neo4j"
+)
+
+func main() {
+    // Connection to database
+    ctx := context.Background()
+    dbUri := "<database-uri>"
+    dbUser := "<username>"
+    dbPassword := "<password>"
+    driver, err := neo4j.NewDriver(
+        dbUri,
+        neo4j.BasicAuth(dbUser, dbPassword, ""))
+    defer driver.Close(ctx)
+    if err != nil {
+        panic(err)
+    }
+
+    // Create a vector...
+    vec := neo4j.Vector[float64]{Elems: []float64{1.0, 2.0, 3.0}}
+
+    // ... and store it as a node property
+    _, err = neo4j.ExecuteQuery(ctx, driver,
+        "MERGE (n:Doc {vector: $vec})",
+        map[string]any{"vec": vec},
+        neo4j.EagerResultTransformer)
+    if err != nil {
+        panic(err)
+    }
+
+    // Retrieve the vector from the database
+    result, err := neo4j.ExecuteQuery(ctx, driver,
+        "MATCH (n:Doc) RETURN n.vec AS vec LIMIT 1",
+        nil,
+        neo4j.EagerResultTransformer)
+    if err != nil {
+        panic(err)
+    }
+
+    record := result.Records[0]
+
+    if v, ok := record.Values[0].(neo4j.Vector[float64]); ok {
+        fmt.Printf("Read vector: %v\n", v)
+    }
+    // Read vector: vector([1.0, 2.0, 3.0], 3, FLOAT64 NOT NULL)
+}
+----
+
+
+[role=label--new-6.0]
+[#unsupportedtype]
+== UnsupportedType
+
+The type link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#UnsupportedType[`UnsupportedType`] is used for data types returned by Cypher queries, but that the driver doesn't recognize.
+This happens when the client version is too old with respect to the server version.
 
 
 ifndef::backend-pdf[]
