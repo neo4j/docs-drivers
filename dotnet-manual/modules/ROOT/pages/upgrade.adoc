@@ -47,7 +47,8 @@ Deprecated features are likely to be removed in the next major version.
 |Version |Message |Status
 
 |6.0
-|Supported .NET versions are 8.0 and 9.0.
+|.NET Standard 2.1 support removed.
+Supported runtimes are .NET versions 8, 9, and 10.
 |label:removed[Changed]
 
 |6.0
@@ -76,6 +77,14 @@ The new methods behave similarly, but the argument types are different and the n
 
 |6.0
 |link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.INotification.html[`INotification`] -- Property `Severity` has been removed in favor of `SeverityLevel`/`RawSeverityLevel`.
+|label:removed[]
+
+|6.0
+|Interface `ILogger` was renamed to link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.INeo4jLogger.html[`INeo4jLogger`] in preparation for integration with standard logging framework.
+|label:removed[Changed]
+
+|6.0
+|IP6 -- Methods `ConfigBuilder.WithIpv6Enabled()` and `Config.Ipv6Enabled()` have been removed; IP6 is now always enabled.
 |label:removed[]
 
 |5.0
