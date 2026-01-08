@@ -15,17 +15,8 @@ content:
     - python-manual
     - java-manual
     - dotnet-manual
-    - common-content
-    exclude:
-    - '!**/_includes/*'
-    - '!**/readme.adoc'
-    - '!**/README.adoc'
-  - url : ./
-    branches: ['5.x']
-    edit_url: https://github.com/neo4j/docs-drivers/tree/{refname}/{path}
-    worktrees: true
-    start_paths:
     - go-manual
+    - common-content
     exclude:
     - '!**/_includes/*'
     - '!**/readme.adoc'
