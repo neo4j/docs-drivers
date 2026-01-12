@@ -20,9 +20,8 @@ You connect to a database by creating a <<Driver>> object and providing a URL an
 
   try {
     driver = neo4j.driver(URI, neo4j.auth.basic(USER, PASSWORD))  // <1>
-    const serverInfo = await driver.getServerInfo()  // <2>
+    await driver.verifyConnectivity()  // <2>
     console.log('Connection established')
-    console.log(serverInfo)
   } catch(err) {
     console.log(`Connection error\n${err}\nCause: ${err.cause}`)
     await driver.close()
@@ -37,7 +36,7 @@ You connect to a database by creating a <<Driver>> object and providing a URL an
 
 <1> Creating a `Driver` instance only provides information on _how_ to access the database, but does not actually _establish_ a connection.
 Connection is deferred to when the first query is executed.
-<2> To verify immediately that the driver can connect to the database (valid credentials, compatible versions, etc), use the `.getServerInfo()` method after initializing the driver.
+<2> To verify immediately that the driver can connect to the database (valid credentials, compatible versions, etc), use the `.verifyConnectivity()` method after initializing the driver.
 <3> Always close `Driver` objects to free up all allocated resources, even upon unsuccessful connection or runtime errors in subsequent querying.
 
 Both the creation of a `Driver` object and the connection verification can raise exceptions, so error catching should include both.
