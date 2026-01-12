@@ -91,7 +91,7 @@ var dangerousKey = "name\\u0060n";
 // convert \u0060 to literal backtick and then escape backticks
 var escapedKey = dangerousKey.Replace("\\u0060", "`").Replace("`", "``");
 
-var result = await driver.ExecutableQuery("MATCH (p:Person {`" + escapedKey + "`}) RETURN p.name")
+var result = await driver.ExecutableQuery("MATCH (p:Person {`" + escapedKey + "`: $name}) RETURN p.name")
     .WithParameters( new { name = "Alice" })
     .WithConfig(new QueryConfig(database: "<database-name>"))
     .ExecuteAsync();
