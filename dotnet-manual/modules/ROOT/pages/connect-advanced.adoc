@@ -171,7 +171,7 @@ await using var driver = GraphDatabase.Driver(
 await driver.VerifyConnectivityAsync();
 
 
-public class Neo4jLogger : ILogger {
+public class Neo4jLogger : INeo4jLogger {
 
     private bool debug = false;
     private bool trace = false;
