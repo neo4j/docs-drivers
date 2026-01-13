@@ -93,8 +93,9 @@ If authentication is disabled on the server, the authentication parameter can be
 == Rotating authentication tokens
 
 It is possible to rotate authentication tokens that are expected to expire (e.g. SSO).
-You need to provide a link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/AuthTokenManager.html[`AuthTokenManager`] instance when instantiating the `Driver`, rather than a static authentication token.
+Transactions running longer than the validity of a token will carry through without re-authenticating, whereas different transactions within the same session might work under different authentication tokens.
 
+To work with rotating tokens, you need to provide a link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/AuthTokenManager.html[`AuthTokenManager`] instance when instantiating the `Driver`, rather than a static authentication token.
 The easiest way to get started is to use link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/AuthTokenManagers.html[one of built-in `AuthTokenManager` implementations]. AuthTokenManagers work with link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/AuthTokens.html[`AuthToken`] objects.
 
 .Rotating a bearer token expiring every 60 seconds

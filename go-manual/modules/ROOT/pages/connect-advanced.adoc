@@ -68,8 +68,9 @@ driver, err := neo4j.NewDriver(dbUri, neo4j.NoAuth())
 == Rotating authentication tokens
 
 It is possible to rotate authentication tokens that are expected to expire (e.g. SSO).
-You need to provide a link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j/auth#TokenManager[`TokenManager`] instance when instantiating the `Driver`, rather than a static authentication token.
+Transactions running longer than the validity of a token will carry through without re-authenticating, whereas different transactions within the same session might work under different authentication tokens.
 
+To work with rotating tokens, you need to provide a link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j/auth#TokenManager[`TokenManager`] instance when instantiating the `Driver`, rather than a static authentication token.
 The easiest way to get started is to use one of built-in implementations: link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j/auth#BasicTokenManager[`BasicTokenManager`] and link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j/auth#BearerTokenManager[`BearerTokenManager`].
 
 .Rotating a bearer token expiring every 60 seconds
