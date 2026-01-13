@@ -70,9 +70,10 @@ If authentication is disabled on the server, the authentication parameter can be
 == Rotating authentication tokens
 
 It is possible to rotate authentication tokens that are expected to expire (e.g. SSO).
-You need to provide an link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IAuthTokenManager.html[`IAuthTokenManager`] instance when instantiating the `IDriver`, rather than a static authentication token.
+Transactions running longer than the validity of a token will carry through without re-authenticating, whereas different transactions within the same session might work under different authentication tokens.
 
-The easiest way to get started is to use link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.AuthTokenManagers.html[one of built-in `AuthTokenManagers` implementations]. AuthTokenManagers work with link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.AuthTokenAndExpiration.html[`AuthTokenAndExpiration`] objects.
+To work with rotating tokens, you need to provide an link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IAuthTokenManager.html[`IAuthTokenManager`] instance when instantiating the `IDriver`, rather than a static authentication token.
+The easiest way to get started is to use link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.AuthTokenManagers.html[one of built-in `AuthTokenManagers` implementations]. `AuthTokenManagers` work with link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.AuthTokenAndExpiration.html[`AuthTokenAndExpiration`] objects.
 
 .Rotating a bearer token expiring every 60 seconds
 [source, csharp, test-skip]
