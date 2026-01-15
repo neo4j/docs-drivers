@@ -233,6 +233,7 @@ Error GQL cause: Neo4j.Driver.DatabaseException: 42I06: Invalid input '', expect
 
 GQL status codes are particularly helpful when you want your application to behave differently depending on the exact error that was raised by the server.
 
+////
 .Distinguishing between different error codes
 [source, go]
 ----
@@ -257,6 +258,7 @@ if err != nil {
     }
 }
 ----
+////
 
 [NOTE]
 ====
