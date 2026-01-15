@@ -192,49 +192,48 @@ Exception message: Invalid input '': expected an expression, '*', 'ALL' or 'DIST
 */
 ----
 
-////
-
 Exception objects also expose errors as GQL-status objects.
 The main difference between link:https://neo4j.com/docs/status-codes/current/errors/all-errors/[Neo4j error codes] and link:https://neo4j.com/docs/status-codes/current/errors/gql-errors/[GQL error codes] is that the GQL ones are more granular: a single Neo4j error code might be broken in several, more specific GQL error codes.
 
-The actual _cause_ that triggered an exception is sometimes found in the optional GQL-status object `.GqlCause`, which is itself a `Neo4jError`.
+The actual _cause_ that triggered an exception is sometimes found in the optional GQL-status object `IGqlStatusObject.GqlCause`.
 You might need to recursively traverse the cause chain before reaching the root cause of the exception you caught.
 In the example below, the exception's GQL status code is `42001`, but the actual source of the error has status code `42I06`.
 
-.Usage of `Neo4jError` with GQL-related methods
-[source, go]
+.Usage of `Neo4jException` with GQL-related methods
+[source, csharp]
 ----
-result, err := neo4j.ExecuteQuery(ctx, driver, "MATCH (p:Person) RETURN", nil,
-    neo4j.EagerResultTransformer,
-    neo4j.ExecuteQueryWithDatabase("neo4j"))
-if err != nil {
-    var neo4jErr *neo4j.Neo4jError
-    if errors.As(err, &neo4jErr) {
-        // Error is of type Neo4jError
-        fmt.Println("Error GQL status code:", neo4jErr.GqlStatus)
-        fmt.Println("Error GQL status description:", neo4jErr.GqlStatusDescription)
-        fmt.Println("Error GQL classification:", neo4jErr.GqlClassification)
-        if neo4jErr.GqlDiagnosticRecord != nil {
-            fmt.Printf("Error GQL diagnostic record: %+v\n", neo4jErr.GqlDiagnosticRecord)
-        }
-        if neo4jErr.GqlCause != nil {
-            fmt.Println("Error GQL cause:", neo4jErr.GqlCause.Error())
-        }
-    } else {
-        fmt.Println("Non-Neo4j error:", err.Error())
+try {
+    await driver.ExecutableQuery("MATCH (p:Person) RETURN")
+        .WithConfig(new QueryConfig(database: "<database-name>"))
+        .ExecuteAsync();
+} catch (Neo4jException e) {
+    Console.WriteLine($"Error GQL status code: {e.GqlStatus}");
+    Console.WriteLine($"Error GQL status description: {e.GqlStatusDescription}");
+    Console.WriteLine($"Error GQL classification: {e.GqlClassification}");
+    Console.WriteLine("Error GQL diagnostic record: {");
+    foreach (KeyValuePair<string, object> kvp in e.GqlDiagnosticRecord) {
+        Console.WriteLine("  {0}: {1}", kvp.Key, kvp.Value);
     }
-}
+    Console.WriteLine("}");
+    Console.WriteLine($"Error GQL cause: {e.InnerException}");
 /*
 Error GQL status code: 42001
 Error GQL status description: error: syntax error or access rule violation - invalid syntax
 Error GQL classification: CLIENT_ERROR
-Error GQL diagnostic record: map[CURRENT_SCHEMA:/ OPERATION: OPERATION_CODE:0 _classification:CLIENT_ERROR _position:map[column:24 line:1 offset:23]]
-Error GQL cause: Neo4jError: Neo.DatabaseError.General.UnknownError (42I06: Invalid input '', expected: an expression, '*', 'ALL' or 'DISTINCT'.)
+Error GQL diagnostic record: {
+  _classification: CLIENT_ERROR
+  _position: System.Collections.Generic.Dictionary`2[System.String,System.Object]
+  OPERATION:
+  OPERATION_CODE: 0
+  CURRENT_SCHEMA: /
+}
+Error GQL cause: Neo4j.Driver.DatabaseException: 42I06: Invalid input '', expected: an expression, '*' or 'DISTINCT'.
 */
 ----
 
 GQL status codes are particularly helpful when you want your application to behave differently depending on the exact error that was raised by the server.
 
+////
 .Distinguishing between different error codes
 [source, go]
 ----
@@ -259,6 +258,7 @@ if err != nil {
     }
 }
 ----
+////
 
 [NOTE]
 ====
@@ -273,7 +273,7 @@ Transient server errors can be retried without need to alter the original reques
 You can discover whether an error is transient via the property link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.Neo4jException.IsRetriable.html#Neo4j_Driver_Neo4jException_IsRetriable[`IsRetriable`], which gives insights into whether a further attempt might be successful.
 This is particular useful when running queries in xref:transactions#explicit-transactions[explicit transactions], to know if a failed query is worth re-running.
 ====
-////
+
 
 [#query-config]
 == Query configuration
