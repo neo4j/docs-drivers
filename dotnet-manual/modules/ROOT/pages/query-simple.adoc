@@ -208,17 +208,26 @@ try {
         .ExecuteAsync();
 } catch (Neo4jException e) {
     Console.WriteLine($"Error GQL status code: {e.GqlStatus}");
-    Console.WriteLine($"Error GQL status description: {e.StatusDescription}");
-    Console.WriteLine($"Error GQL classification: {e.Classification}");
-    Console.WriteLine($"Error GQL diagnostic record: {e.DiagnosticRecord}");
-    Console.WriteLine($"Error GQL cause: {e.DiagnosticRecord}");
-}
+    Console.WriteLine($"Error GQL status description: {e.GqlStatusDescription}");
+    Console.WriteLine($"Error GQL classification: {e.GqlClassification}");
+    Console.WriteLine("Error GQL diagnostic record: {");
+    foreach (KeyValuePair<string, object> kvp in e.GqlDiagnosticRecord) {
+        Console.WriteLine("  {0}: {1}", kvp.Key, kvp.Value);
+    }
+    Console.WriteLine("}");
+    Console.WriteLine($"Error GQL cause: {e.InnerException}");
 /*
 Error GQL status code: 42001
 Error GQL status description: error: syntax error or access rule violation - invalid syntax
 Error GQL classification: CLIENT_ERROR
-Error GQL diagnostic record: map[CURRENT_SCHEMA:/ OPERATION: OPERATION_CODE:0 _classification:CLIENT_ERROR _position:map[column:24 line:1 offset:23]]
-Error GQL cause: Neo4jError: Neo.DatabaseError.General.UnknownError (42I06: Invalid input '', expected: an expression, '*', 'ALL' or 'DISTINCT'.)
+Error GQL diagnostic record: {
+  _classification: CLIENT_ERROR
+  _position: System.Collections.Generic.Dictionary`2[System.String,System.Object]
+  OPERATION:
+  OPERATION_CODE: 0
+  CURRENT_SCHEMA: /
+}
+Error GQL cause: Neo4j.Driver.DatabaseException: 42I06: Invalid input '', expected: an expression, '*' or 'DISTINCT'.
 */
 ----
 
