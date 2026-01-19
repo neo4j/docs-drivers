@@ -216,6 +216,7 @@ try {
     }
     Console.WriteLine("}");
     Console.WriteLine($"Error GQL cause: {e.InnerException}");
+}
 /*
 Error GQL status code: 42001
 Error GQL status description: error: syntax error or access rule violation - invalid syntax
