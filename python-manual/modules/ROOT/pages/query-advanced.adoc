@@ -27,12 +27,18 @@ Not consuming all records yields potentially surprising behavior: there is no gu
 ====
 Don't rely on session closure for committing implicit transactions.
 Pending queries will be committed to the database before closing the session, but there is no guarantee that they will succeed, and no exception will be raised unless the result is explicitly processed in some way.
-The following example contains a broken query but doesn't result in an exception:
+The following example contains a broken query which might not result in an exception:
 
 [source, python]
 ----
 with driver.session(database="<database-name>") as session:
-    session.run("ATE (a:Person {name: $name})")
+    session.run("""
+    UNWIND [4, 2, 1, 0] AS i
+    CALL (i) {
+      CREATE (:Person {num: 100/i}) // Fails for i = 0
+    } IN TRANSACTIONS OF 2 ROWS
+    RETURN i
+    """)
 ----
 ====
 
