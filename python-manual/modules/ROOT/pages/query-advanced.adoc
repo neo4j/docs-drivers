@@ -21,7 +21,7 @@ with driver.session(database="<database-name>") as session:
 ----
 
 To ensure an implicit transaction is committed, consume all records (either by calling `.consume()` on its result or by iterating over all records).
-Because an implicit transaction can contain sub-transactions (with link:{neo4j-docs-base-uri}/cypher-manual/current/subqueries/subqueries-in-transactions[`CALL { ... } IN TRANSACTIONS`]), not consuming all records yields potentially surprising behavior: there is no guarantee on when exactly an implicit transaction will be committed during the lifetime of a session.
+Not consuming all records yields potentially surprising behavior: there is no guarantee on when exactly an implicit transaction will be committed during the lifetime of a session.
 
 [CAUTION]
 ====
