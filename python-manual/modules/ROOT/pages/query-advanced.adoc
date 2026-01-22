@@ -3,7 +3,10 @@
 [[implicit-transactions]]
 == Implicit (or auto-commit) transactions
 
-This is the most basic and limited form to run a Cypher query with.
+[TIP]
+Implicit transactions are the only ones that can be used for link:{neo4j-docs-base-uri}/cypher-manual/current/subqueries/subqueries-in-transactions[`CALL { ... } IN TRANSACTIONS`] queries.
+
+Implicit transactions are the most basic and limited form of transactions.
 The driver does **not** automatically retry implicit transactions, as it does instead for queries run with xref:query-simple.adoc[`.execute_query()`] and with xref:transactions#managed-transactions[managed transactions].
 Implicit transactions should only be used when the other query interfaces do not fit the purpose, or for quick prototyping.
 
@@ -13,17 +16,33 @@ It returns a `Result` object that needs to be xref:transactions#process-result[p
 [source, python]
 ----
 with driver.session(database="<database-name>") as session:
-    session.run("CREATE (a:Person {name: $name})", name="Licia")
+    res = session.run("CREATE (a:Person {name: $name})", name="Licia")
+    res.consume()
 ----
 
-An implicit transaction gets committed _at the latest_ when the session is destroyed, or before another transaction is executed within the same session.
-Other than that, there is no clear guarantee on when exactly an implicit transaction will be committed during the lifetime of a session.
-To ensure an implicit transaction is committed, you can call the `.consume()` method on its result.
+To ensure an implicit transaction is committed, consume all records (either by calling `.consume()` on its result or by iterating over all records).
+Not consuming all records yields potentially surprising behavior: there is no guarantee on when exactly an implicit transaction will be committed during the lifetime of a session.
+
+[CAUTION]
+====
+Don't rely on session closure for committing implicit transactions.
+Pending queries will be committed to the database before closing the session, but there is no guarantee that they will succeed, and no exception will be raised unless the result is explicitly processed in some way.
+The following example contains a broken query which might not result in an exception:
+
+[source, python]
+----
+with driver.session(database="<database-name>") as session:
+    session.run("""
+    UNWIND [4, 2, 1, 0] AS i
+    CALL (i) {
+      CREATE (:Person {num: 100/i}) // Fails for i = 0
+    } IN TRANSACTIONS OF 2 ROWS
+    RETURN i
+    """)
+----
+====
 
 Since the driver cannot figure out whether the query in a `session.run()` call requires a read or write session with the database, it defaults to write. If your implicit transaction contains read queries only, there is a performance gain in xref:transactions#_request_routing[making the driver aware] by setting the keyword argument `default_access_mode=neo4j.READ_ACCESS` when creating the session.
-
-[TIP]
-Implicit transactions are the only ones that can be used for link:{neo4j-docs-base-uri}/cypher-manual/current/subqueries/subqueries-in-transactions[`CALL { ... } IN TRANSACTIONS`] queries.
 
 
 === Import CSV files
