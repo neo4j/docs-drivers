@@ -9,7 +9,7 @@ Use `pip` to install the link:https://pypi.org/project/neo4j/[Neo4j Python Drive
 
 [source,bash]
 ----
-pip install neo4j~=5.28.0
+pip install neo4j~=5.28
 ----
 
 Always use the latest version of the driver, as it will always work both with the previous Neo4j <<LTS>> release and with the current and next major releases.

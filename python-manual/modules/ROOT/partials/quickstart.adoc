@@ -17,7 +17,7 @@ Install the Neo4j Python driver with `pip`:
 
 [source, bash, copy=true]
 ----
-pip install neo4j~=5.28.0
+pip install neo4j~=5.28
 ----
 
 link:https://neo4j.com/docs/python-manual/current/install/[More info on installing the driver]
