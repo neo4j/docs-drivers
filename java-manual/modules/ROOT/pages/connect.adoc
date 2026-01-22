@@ -34,6 +34,7 @@ public class App {
 <1> Creating a `Driver` instance only provides information on _how_ to access the database, but does not actually _establish_ a connection.
 Connection is instead deferred to when the first query is executed.
 <2> To verify immediately that the driver can connect to the database (valid credentials, compatible versions, etc), use the `.verifyConnectivity()` method after initializing the driver.
+In case of failure, xref:connect-advanced.adoc#_logging[enabling the driver's logs] can help diagnosing the issue.
 
 Both the creation of a `Driver` object and the connection verification can raise a number of different link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/exceptions/package-summary.html[exceptions].
 Since a connection error is a blocker for any subsequent task, the most common choice is to let the program crash should an exception occur while estabilishing a connection.

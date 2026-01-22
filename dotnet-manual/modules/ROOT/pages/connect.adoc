@@ -24,6 +24,7 @@ Console.WriteLine("Connection established.");
 <1> Creating a `IDriver` instance only provides information on _how_ to access the database, but does not actually _establish_ a connection.
 Connection is instead deferred to when the first query is executed.
 <2> To verify immediately that the driver can connect to the database (valid credentials, compatible versions, etc), use the `.VerifyConnectivityAsync()` method after initializing the driver.
+In case of failure, xref:query-advanced.adoc#logging[enabling the driver's logs] can help diagnosing the issue.
 
 Both the creation of a `IDriver` object and the connection verification can raise a number of different link:https://neo4j.com/docs/api/dotnet-driver/{dotnet-driver-version}/api/Neo4j.Driver.Neo4jException.html[exceptions].
 Since a connection error is a blocker for any subsequent task, the most common choice is to let the program crash should an exception occur while establishing a connection.
