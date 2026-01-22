@@ -3,7 +3,10 @@
 [[implicit-transactions]]
 == Implicit (or auto-commit) transactions
 
-This is the most basic and limited form to run a Cypher query with.
+[TIP]
+Implicit transactions are the only ones that can be used for link:{neo4j-docs-base-uri}/cypher-manual/current/subqueries/subqueries-in-transactions[`CALL { ... } IN TRANSACTIONS`] queries.
+
+Implicit transactions are the most basic and limited form of transactions.
 The driver does *not* automatically retry implicit transactions, as it does instead for queries run with xref:query-simple.adoc[`ExecuteQuery()`] and with xref:transactions#managed-transactions[managed transactions].
 Implicit transactions should only be used when the other query interfaces do not fit the purpose, or for quick prototyping.
 
@@ -22,15 +25,11 @@ result, err := session.Run(
     })
 ----
 
-An implicit transaction gets committed _at the latest_ when the session is destroyed, or before another transaction is executed within the same session.
-Other than that, there is no clear guarantee on when exactly an implicit transaction will be committed during the lifetime of a session.
-To ensure an implicit transaction is committed, you can call the `.Consume(ctx)` method on its result.
+To ensure an implicit transaction is committed, consume all records (either by calling `.Consume(ctx)` on its result or by iterating over all records).
+Not consuming all records yields potentially surprising behavior: there is no guarantee on when exactly an implicit transaction will be committed during the lifetime of a session.
 
 Since the driver cannot figure out whether the query in a `Session.Run()` call requires a read or write session with the database, it defaults to write.
 If your implicit transaction contains read queries only, there is a performance gain in xref:transactions#_request_routing[making the driver aware] by setting the session config `AccessMode: neo4j.AccessModeRead` when creating the session.
-
-[TIP]
-Implicit transactions are the only ones that can be used for link:{neo4j-docs-base-uri}/cypher-manual/current/subqueries/subqueries-in-transactions[`CALL { ... } IN TRANSACTIONS`] queries.
 
 
 === Import CSV files
