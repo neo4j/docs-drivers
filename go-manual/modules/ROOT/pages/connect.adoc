@@ -42,6 +42,7 @@ func main() {
 Connection is deferred to when the first query is executed.
 <2> Most driver functions require a `context.Context` parameter, see the link:https://pkg.go.dev/context[context] package.
 <3> To verify immediately that the driver can connect to the database (valid credentials, compatible versions, etc), use the `.VerifyConnectivity(ctx)` method after initializing the driver.
+In case of failure, xref:query-advanced.adoc#_logging[enabling the driver's logs] can help diagnosing the issue.
 <4> Always close `Driver` objects to free up all allocated resources, even upon unsuccessful connection or runtime errors in subsequent querying.
 The safest practice is to `defer` the call to `Driver.Close(ctx)` after the object is successfully created.
 Note that there are corner cases in which `.Close()` might return an error, so you may want to catch that as well.
