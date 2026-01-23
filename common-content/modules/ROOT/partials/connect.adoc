@@ -1,0 +1,12 @@
+# tag::cluster[]
+
+[[cluster]]
+== Connect to a cluster
+
+You connect to a link:https://neo4j.com/docs/operations-manual/current/clustering/[Neo4j cluster] by using the address of any machine belonging to it.
+Upon connection, the driver gets a _routing table_ containing information about all the machines in the cluster (including their roles), and will point requests to primaries or secondaries as needed.
+
+You can override the default DNS resolution via a xref:connect-advanced.adoc#_custom_address_resolver[Custom address resolver].
+You can also connect to a specific machine in the cluster using its address together with the `bolt[+s[sc]]://` scheme (see xref:connect-advanced.adoc#_connection_uri[connection URI] for more information).
+
+# end::cluster[]
