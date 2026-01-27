@@ -212,8 +212,8 @@ For more information, see link:https://neo4j.com/docs/api/python-driver/current/
 When creating a `Driver` object, you can specify a _resolver_ function to resolve any addresses the driver receives ahead of DNS resolution.
 Your resolver function is called with an link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Address[`Address`] object and should return an iterable of link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Address[`Address`] objects (or values that can be used to construct `Address` objects).
 
-The resolved address(es) must have the same URI scheme as the initial one. In the example below, the driver is initialized with a `neo4j://` URI scheme, so the resolved addresses must also be available at `neo4j://`.
-
+[NOTE]
+`Address` objects don't carry a scheme, so a custom address resolver cannot alter the URI scheme (`neo4j://` in the example below).
 
 .Connection to `example.com` on port `9999` is resolved to `localhost` on port `7687`
 [source, python]

@@ -19,7 +19,7 @@ def custom_resolver(socket_address):
     yield "server01.example.com", 7687
     yield "server02.example.com", 7687
     yield "server03.example.com", 7687
-    yield "backup.another.com", 7687
+    yield "backup.example.org", 7687
 
 
 driver = GraphDatabase.driver(
