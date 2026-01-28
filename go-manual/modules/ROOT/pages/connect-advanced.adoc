@@ -177,6 +177,7 @@ if err != nil {
 For more information, see link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j/auth#ClientCertificateProvider[API docs -> `ClientCertificateProvider`].
 
 
+[#custom-address-resolver]
 == Custom address resolver
 
 When creating a `Driver` object, you can specify a _resolver_ function to resolve the connection address the driver is initialized with.
