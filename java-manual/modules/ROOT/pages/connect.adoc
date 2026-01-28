@@ -100,7 +100,7 @@ Upon connection, the driver gets a _routing table_ containing information about 
 - If the cluster members are all link:https://neo4j.com/docs/operations-manual/current/clustering/setup/discovery/#clustering-discovery-dns[discoverable] via a hostname that provides multiple `A`/`AAAA` records, you can use the hostname and port.
 - If the addresses of the cluster members are known, but not advertised via `A`/`AAAA` records, you can use a xref:connect-advanced.adoc#custom-address-resolver[Custom address resolver] to extend the DNS resolution on the client side. +
 +
-[source, java]
+[source, java, test-skip]
 ----
 // import java.util.Set;
 // import org.neo4j.driver.AuthTokens;
