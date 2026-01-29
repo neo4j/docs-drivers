@@ -207,10 +207,14 @@ cert_provider.update_certificate(
 For more information, see link:https://neo4j.com/docs/api/python-driver/{python-driver-version}/api.html#neo4j.auth_management.ClientCertificateProvider[API docs -> `ClientCertificateProvider`].
 
 
+[#custom-address-resolver]
 == Custom address resolver
 
 When creating a `Driver` object, you can specify a _resolver_ function to resolve any addresses the driver receives ahead of DNS resolution.
-Your resolver function is called with an link:{neo4j-docs-base-uri}/api/python-driver/{python-driver-version}/api.html#neo4j.Address[`Address`] object and should return an iterable of link:{neo4j-docs-base-uri}/api/python-driver/{python-driver-version}/api.html#neo4j.Address[`Address`] objects (or values that can be used to construct `Address` objects)
+Your resolver function is called with an link:{neo4j-docs-base-uri}/api/python-driver/{python-driver-version}/api.html#neo4j.Address[`Address`] object and should return an iterable of link:{neo4j-docs-base-uri}/api/python-driver/{python-driver-version}/api.html#neo4j.Address[`Address`] objects (or values that can be used to construct `Address` objects).
+
+[NOTE]
+A custom address resolver cannot alter the URI scheme (`neo4j://` in the example below).
 
 .Connection to `example.com` on port `9999` is resolved to `localhost` on port `7687`
 [source, python]

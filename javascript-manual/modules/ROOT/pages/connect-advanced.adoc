@@ -184,10 +184,14 @@ clientCertificateProvider.updateCertificate({
 =====
 
 
+[#custom-address-resolver]
 == Custom address resolver
 
 When creating a `Driver` object, you can specify a _resolver_ function to resolve the connection address the driver is initialized with.
-Note that addresses that the driver receives in routing tables are not resolved with the custom resolver.
+Note that addresses that the driver receives in routing tables are not resolved with the custom resolver: the custom resolver is only used for the initial connection.
+
+[NOTE]
+A custom address resolver cannot alter the URI scheme (`neo4j://` in the example below).
 
 .Connection to `example.com` on port `9999` is resolved to `localhost` on port `7687`
 [source, javascript]
