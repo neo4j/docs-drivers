@@ -90,6 +90,45 @@ An Aura instance is not conceptually different from any other Neo4j instance, as
 When interacting with a Neo4j database through the driver, it doesn't make a difference whether it is an Aura instance it is working with or a different deployment.
 
 
+[[cluster]]
+== Connect to a cluster
+
+When working with a link:https://neo4j.com/docs/operations-manual/current/clustering/[Neo4j cluster], you have a few options to connect to it, depending on how it's deployed.
+
+Upon connection, the driver gets a _routing table_ containing information about all the machines in the cluster (including their roles), and will point requests to primaries or secondaries as needed. The routing table is periodically refreshed.
+
+- If the cluster members are all link:https://neo4j.com/docs/operations-manual/current/clustering/setup/discovery/#clustering-discovery-dns[discoverable] via a hostname that provides multiple `A`/`AAAA` records, you can use the hostname and port.
+- If the addresses of the cluster members are known, but not advertised via `A`/`AAAA` records, you can use a xref:connect-advanced.adoc#custom-address-resolver[Custom address resolver] to extend the DNS resolution on the client side. +
++
+[source, java, test-skip]
+----
+// import java.util.Set;
+// import org.neo4j.driver.AuthTokens;
+// import org.neo4j.driver.Config;
+// import org.neo4j.driver.GraphDatabase;
+// import org.neo4j.driver.net.ServerAddress;
+
+var addresses = Set.of(
+    ServerAddress.of("server01.example.com", 7687),
+    ServerAddress.of("server02.example.com", 7687),
+    ServerAddress.of("server03.example.com", 7687),
+    ServerAddress.of("backup.example.org", 7687)
+);
+var config = Config.builder()
+    .withResolver(address -> addresses)
+    .build();
+try (var driver = GraphDatabase.driver(
+        "neo4j://example.com:7687",
+        AuthTokens.basic(dbUser, dbPassword),
+        config)) {
+    driver.verifyConnectivity();
+}
+----
+- You can also use the address of any machine belonging to the cluster: the driver will discover the others. This is the least fail-safe option, because if the machine you use as entrypoint becomes unavailable, the driver won't be able to fetch a routing table.
+
+You can also bypass the routing table and connect to a specific machine in the cluster using its address together with the `bolt[+s[sc]]://` scheme (see xref:connect-advanced.adoc#_connection_uri[connection URI] for more information).
+
+
 == Close connections
 
 Always close `Driver` objects to free up all allocated resources, even upon unsuccessful connection or runtime errors.
