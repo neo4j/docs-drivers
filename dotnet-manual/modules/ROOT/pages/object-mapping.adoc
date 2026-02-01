@@ -6,12 +6,12 @@ You can either map records to classes you have explicitly defined, or provide a 
 
 The object mapping feature can help you reduce boilerplate code and work more easily with the results of your queries.
 
-[TIP]
+[IMPORTANT]
 To use the object mapping feature, you need to include the namespace `Neo4j.Driver.Mapping` beside the root `Neo4j.Driver`.
 
 
-[#existing-classes]
-== Map to existing classes
+[#read]
+== Read from the database
 
 If you want to map records to an existing class, define a class having the same attributes as the keys returned by the query.
 **The class attributes must match exactly the query return keys**, and they are case-sensitive.
@@ -87,13 +87,104 @@ class Person {  // <.>
 // Max one level of nesting with `.`
 
 
+[#write]
+== Write to the database
+
+You can use domain objects directly as parameters in Cypher queries.
+
+[source, csharp]
+----
+var person = new Person { FirstName = "John", LastName = "Doe", Age = 30 };
+session.Run("CREATE (p:Person $params)", person);
+// Creates: {FirstName: "John", LastName: "Doe", Age: 30}
+
+public class Person {
+    public string FirstName { get; set; }
+    public string LastName { get; set; }
+    public int Age { get; set; }
+}
+----
+
+
+[role=label--new-6.1]
+[#pascal-camelcase-translation]
+== PascalCase/camelCase identifiers translation
+
+Whereas the C# naming convention is PascalCase, the naming convention in Cypher is camelCase, so you could often find yourself needing to tweak return keys or class attributes to handle the name mapping.
+
+The driver can handle this for you via the method `RecordObjectMapping.TranslateIdentifiers()`, to be called at application startup.
+
+.Automatic PascalCase/camelCase translation
+[source, csharp]
+----
+// At application startup
+RecordObjectMapping.TranslateIdentifiers(translateCypherParameters: true);
+
+var person = new Person { FirstName = "John", LastName = "Doe", Age = 30 };
+session.Run("CREATE (p:Person $params)", person);
+// Creates: {firstName: "John", lastName: "Doe", age: 30}
+
+public class Person {
+    public string FirstName { get; set; }
+    public string LastName { get; set; }
+    public int Age { get; set; }
+}
+----
+
+
 [#decorators]
-=== Class attribute decorators
+== Class attribute decorators
 
 To make the mapping more flexible, decorators are available.
 Use them on class attributes to alter how each attribute should be mapped to its respective query return key.
 
-- `[MappingSource("<returnedKeyName>")]` -- Map `returnedKeyName` to the class attribute, instead of looking for a returned key that matches the class attribute name.
+
+[[base-decorator]]
+[role=label--new-6.1]
+=== The base decorator
+
+`[MappingBindings]` is the primary attribute and supports all mapping scenarios.
+This attribute accepts a number of parameters:
+
+- `Path` -- The path to the data in the source (e.g., field name in a record or property name in a node).
+- `Source` -- The source type for the mapping (e.g., Property, Label, Id).
+- `Optional` - Whether to throw an exception if the source value is missing.
+- `DefaultValue` -- The value to use if the source value is missing and the mapping is optional.
+- `Explicit` -- Whether this mapping binding was explicitly defined by the user.
+- `CypherParameterName` -- The name of the parameter when mapping to Cypher parameters.
+
+.Example using `[MappingBindings]`
+[source, csharp]
+----
+// When used as parameter
+Person john = new Person("John");
+session.Run("CREATE (p:Person $params)", person);
+// Creates: (:Person {first_name: "John"})
+
+// When reading from database
+var record = session.Run("MATCH (p:Person) RETURN p").Single();
+var person = record["p"].As<INode>().AsObject<Person>();
+// Maps from "firstName" property in the node to "FirstName" C# property
+
+public class Person {
+    [MappingBindings(
+        Path = "firstName",
+        Source = MappingSource.Property,
+        CypherParameterName = "first_name")]
+    public string FirstName { get; set; }
+
+    public Person(string firstName) {
+        FirstName = firstName;
+    }
+}
+----
+
+
+[#standalone-decorators]
+=== Standalone decorators
+
+- `[MappingSource("returnedKeyName")]` -- Map `returnedKeyName` to the class attribute, instead of looking for a returned key that matches the class attribute name. Applies when **reading** from the database.
+- label:new[Introduced in 6.1] `[CypherParameterMapping(name)]` -- Map the class attribute to `name`. Applies when using an object as Cypher **parameters**.
 - `[MappingIgnored]` -- Ignore the class attribute (i.e. don't look for a corresponding returned key).
 - `[MappingOptional]` -- Use the class attribute if it can be matched, but ignore it if the query doesn't return a compatible key to match.
 - `[MappingDefaultValue(val)]` -- Same as `[MappingOptional]`, and specify a default value `val` in case of missing match.
@@ -102,8 +193,9 @@ Use them on class attributes to alter how each attribute should be mapped to its
 [source, csharp]
 ----
 class Person {
-    [MappingSource("p.name")]  // <.>
-    public string name { get; set; }
+    [MappingSource("p.firstName")]  // <.>
+    [CypherParameterMapping("firstName")]  // <.>
+    public string first_name { get; set; }
 
     [MappingOptional]  // <.>
     public int age { get; set; }
@@ -116,10 +208,26 @@ class Person {
 }
 ----
 
-<.> Map the `p.name` return key to the `name` class attribute.
+<.> When reading from the database, map the `p.firstName` return key to the `first_name` class attribute. When using the object as parameter, map the class attibute `first_name` to the node property `firstName`.
 <.> Populate the class attribute `age` with the `age` return key if present, and set the attribute to `null` otherwise.
 <.> Set the `address` class attribute to `null` regardless of the query return keys.
 <.> Populate the class attribute `role` with the `role` return key if present, and set the attribute to the default value `Subscriber` otherwise.
+
+[TIP]
+====
+Attributes are processed in declaration order, with later attributes overriding earlier ones.
+
+[source, chsarp, test-skip]
+----
+public class Person {
+    [MappingBindings(CypherParameterName = "first")]
+    [CypherParameterMapping("override_name")]  // This wins!
+    public string FirstName { get; set; }
+}
+
+// Creates: {override_name: "John"}
+----
+====
 
 An extra optional parameter to the `[MappingSource]` decorator allows you to map node labels and relationship types into class attributes:
 
@@ -161,7 +269,7 @@ class Person {
 
 
 [#constructors]
-=== Work with constructors
+== Work with constructors
 
 When mapping records to an existing class, the first thing the driver has to do is to instantiate an object onto which to map records, which results in the class constructor to be invoked.
 
