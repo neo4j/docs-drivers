@@ -7,6 +7,6 @@ nav:
 asciidoc:
   attributes:
     java-driver-version: '6.0' # the version of the api docs
-    java-driver-version-minor: '6.0.2' # the version of the package published at https://central.sonatype.com/artifact/org.neo4j.driver/neo4j-java-driver
+    java-driver-version-minor: '6.0.3' # the version of the package published at https://central.sonatype.com/artifact/org.neo4j.driver/neo4j-java-driver
     common-partial: 6@common-content:ROOT:partial$
     common-image: 6@common-content:ROOT:image$
