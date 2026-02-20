@@ -223,8 +223,7 @@ driver, err := neo4j.NewDriver(
     dbUri, neo4j.BasicAuth(dbUser, dbPassword, ""),
     func(conf *config.Config) {
         conf.TelemetryDisabled = false
-    }
-)
+    })
 defer driver.Close(ctx)
 ----
 
