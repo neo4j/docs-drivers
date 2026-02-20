@@ -288,6 +288,27 @@ class ListAddressResolver : IServerAddressResolver {
 ----
 
 
+[#telemetry]
+== Disable telemetry
+
+The driver can send anonymous usage statistics to the server it connects to, if the server requests those.
+Telemetry is managed on the server-side via the configuration setting link:https://neo4j.com/docs/operations-manual/current/configuration/configuration-settings/#config_server.bolt.telemetry.enabled[`server.bolt.telemetry.enabled`].
+By default, telemetry is disabled on self-managed instances and enabled on Aura instances.
+
+By using `.WithTelemetryDisabled()` upon connection, the driver will never send any telemetry data.
+
+.Disable telemetry on the driver side
+[source, csharp]
+----
+await using var driver = GraphDatabase.Driver(
+    dbUri,
+    AuthTokens.Basic(dbUser, dbPassword),
+    conf => conf.WithTelemetryDisabled());
+----
+
+For more information on what information is transmitted, see link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.ConfigBuilder.WithTelemetryDisabled.html[API documentation -> `.WithTelemetryDisabled()`].
+
+
 == Further connection parameters
 
 You can find all `IDriver` configuration parameters in the link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.ConfigBuilder.html[API documentation -> ConfigBuilder].
