@@ -97,7 +97,7 @@ For more information, see xref:result-summary.adoc#_notifications[Explore the qu
 The driver sends anonymous API usage statistics to the server.
 Use the driver configuration `telemetryDisabled: true` to opt out.
 
-See link:https://github.com/neo4j/neo4j-java-driver/pull/1487[API Telemetry].
+See xref:connect-advanced.adoc#telemetry[Advanced connection information -> Disable telemetry].
 ====
 |
 

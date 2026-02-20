@@ -91,7 +91,7 @@ For more information, see xref:result-summary.adoc#notifications[Explore the que
 The driver sends anonymous API usage statistics to the server.
 Use the driver configuration method `.WithTelemetryDisabled()` to opt out.
 
-See link:https://github.com/neo4j/neo4j-dotnet-driver/pull/735[API Telemetry].
+See xref:connect-advanced.adoc#telemetry[Advanced connection information -> Disable telemetry].
 ====
 |
 

@@ -164,6 +164,8 @@ See link:https://github.com/neo4j/neo4j-python-driver/discussions/1064[Convenien
 ====
 The driver sends anonymous API usage statistics to the server.
 Use the driver configuration `telemetry_disabled=True` to opt out.
+
+See xref:connect-advanced.adoc#telemetry[Advanced connection information -> Disable telemetry].
 ====
 |
 .Concurrency misuse checks
