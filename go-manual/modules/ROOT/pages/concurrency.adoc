@@ -72,7 +72,7 @@ func main() {
 
 func queryToChannel(ctx context.Context, driver neo4j.DriverWithContext) chan item {
     recordsC := make(chan item, 10)
-    session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+    session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "<database-name>"})
     defer session.Close(ctx)
     go session.ExecuteWrite(ctx,
         func(tx neo4j.ManagedTransaction) (any, error) {
