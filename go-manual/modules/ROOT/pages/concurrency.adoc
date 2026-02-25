@@ -23,6 +23,11 @@ import (
     "github.com/neo4j/neo4j-go-driver/v6/neo4j"
 )
 
+type item struct {
+    record *neo4j.Record
+    err    error
+}
+
 func main() {
     ctx := context.Background()
 
@@ -65,9 +70,9 @@ func main() {
     }
 }
 
-func queryToChannel(ctx context.Context, driver neo4j.Driver) chan *neo4j.Record {
-    recordsC := make(chan *neo4j.Record, 10)  // <2>
-    session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "<database-name>"})
+func queryToChannel(ctx context.Context, driver neo4j.DriverWithContext) chan item {
+    recordsC := make(chan item, 10)
+    session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
     defer session.Close(ctx)
     go session.ExecuteWrite(ctx,
         func(tx neo4j.ManagedTransaction) (any, error) {
@@ -78,12 +83,17 @@ func queryToChannel(ctx context.Context, driver neo4j.Driver) chan *neo4j.Record
                 RETURN p
                 `, nil)
             if err != nil {
-                panic(err)
-            }
-            // Stream results to channel as they come from the server
-            for result.Next(ctx) {  // <3>
-                record := result.Record()
-                recordsC <- record
+                var it item
+                it.record, it.err = nil, err
+                recordsC <- it
+            } else {
+                // Stream results to channel as they come from the server
+                for result.Next(ctx) {
+                    record := result.Record()
+                    var it item
+                    it.record, it.err = record, nil
+                    recordsC <- it
+                }
             }
             close(recordsC)
             return nil, err
@@ -91,11 +101,15 @@ func queryToChannel(ctx context.Context, driver neo4j.Driver) chan *neo4j.Record
     return recordsC
 }
 
-func consumer(wg *sync.WaitGroup, records <-chan *neo4j.Record, log chan string, n int) {
+func consumer(wg *sync.WaitGroup, records <-chan item, log chan string, n int) {
     defer wg.Done()  // will communicate that routine is done
-    for record := range records {
-        log <- fmt.Sprintf("Receiver %v processed %v", n, record)
-        time.Sleep(time.Duration(n) * time.Second)  // proxy for a time-consuming processing
+    for it := range records {
+        if it.err != nil {
+            fmt.Println("ERROR:", it.err)
+        } else {
+            log <- fmt.Sprintf("Receiver %v processed %v", n, it.record)
+            time.Sleep(time.Duration(n) * time.Second)  // proxy for a time-consuming processing
+        }
     }
 }
 ----
