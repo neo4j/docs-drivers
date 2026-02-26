@@ -73,33 +73,34 @@ func main() {
 func queryToChannel(ctx context.Context, driver neo4j.DriverWithContext) chan item {
     recordsC := make(chan item, 10)
     go func() {
+        defer close(recordsC)
         session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "<database-name>"})
         defer session.Close(ctx)
-        session.ExecuteWrite(ctx,
-            func(tx neo4j.ManagedTransaction) (any, error) {
-                time.Sleep(time.Duration(10) * time.Second)
-                // Neo4j query to create and retrieve some nodes
-                result, err := tx.Run(ctx, `
-                    UNWIND range(1,25) AS id
-                    MERGE (p:Person {id: id})
-                    RETURN p
-                    `, nil)
-                if err != nil {
-                    var it item
-                    it.record, it.err = nil, err
-                    recordsC <- it
-                } else {
-                    // Stream results to channel as they come from the server
-                    for result.Next(ctx) {
-                        record := result.Record()
-                        var it item
-                        it.record, it.err = record, nil
-                        recordsC <- it
-                    }
-                }
-                close(recordsC)
-                return nil, err
-            })
+        // Cypher query to create and retrieve some nodes
+        result, err := session.Run(ctx, `
+            UNWIND range(1,25) AS id
+            MERGE (p:Person {id: id})
+            RETURN p
+            `, nil)
+        if err != nil {
+            var it item
+            it.record, it.err = nil, err
+            recordsC <- it
+        } else {
+            // Stream results to channel as they come from the server
+            for result.Next(ctx) {
+                record := result.Record()
+                var it item
+                it.record, it.err = record, nil
+                recordsC <- it
+            }
+            // If the stream interrupts, send the error through the channel
+            if result.Err() != nil {
+                var it item
+                it.record, it.err = nil, err
+                recordsC <- it
+            }
+        }
     }()
     return recordsC
 }
