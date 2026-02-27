@@ -100,10 +100,9 @@ func consumer(wg *sync.WaitGroup, records <-chan *neo4j.Record, log chan string,
 }
 ----
 
-<1> A Goroutine runs the query to the Neo4j server with a xref:transactions.adoc[managed transaction].
-Notice that the driver session is created _inside_ the routine, as sessions are not thread-safe.
-<2> The channel `recordsC` is where the query result records get streamed to.
-The transaction function from `.ExecuteWrite()` writes to it, and the various ``consumer``s read from it.
+<1> A Goroutine runs the query to the Neo4j server with an xref:query-advanced.adoc#implicit-transactions[implicit transaction].
+Notice that the driver xref:transactions.adoc#create-session[session] is created _inside_ the routine, as sessions are not thread-safe.
+<2> The channel `recordsC` is where the query result records get streamed to, and the various ``consumer``s read from it.
 It is buffered so that the driver does not retrieve records faster than what the consumers can handle.
 <3> Each result record coming from the server is sent over the `recordsC` channel.
 The streaming continues so long as there are records to be processed, after which the channel gets closed and the routine exits.
@@ -113,6 +112,13 @@ The streaming continues so long as there are records to be processed, after whic
 Each consumer reads and processes records from the `recordsC` channel.
 Each consumer simulates a lengthy operation with a sleeping timer.
 
+[IMPORTANT]
+====
+The example above uses an xref:query-advanced.adoc#implicit-transactions[implicit transaction] and not a xref:transactions.adoc#managed-transactions[managed transaction].
+Managed transactions require transaction functions to be idempotent -- that is however not possible when working with Goroutines and channels.
+In the scenario in which records `v1, v2, v3` have been streamed and sent into the channel, and a retriable error happens (causing the driver to re-run the transaction function), the channel will overall stream `v1, v2, v3, err, v1, v2, v3, ...`.
+To avoid this behavior, in cases when you still want to stream the result and not buffer it, use other forms of transaction (either xref:query-advanced.adoc#implicit-transactions[implicit] or xref:query-advanced.adoc#explicit-transactions[explicit]).
+====
 
 == Concurrent run of multiple queries (using `ExecuteQuery()`)
 
