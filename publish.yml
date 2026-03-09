@@ -30,12 +30,19 @@ ui:
 urls:
   html_extension_style: indexify
 
+antora:
+  extensions:
+  - "@neo4j-antora/roles-labels"
+  - "@neo4j-antora/table-footnotes"
+
 asciidoc:
   extensions:
   - "@neo4j-documentation/remote-include"
   - "@neo4j-documentation/macros"
+  - "@neo4j-antora/antora-add-notes"
   - "@neo4j-antora/antora-page-roles"
-  - "@neo4j-antora/antora-table-footnotes"
+  - "@neo4j-antora/mark-terms"
+  - asciidoctor-kroki
   attributes:
     page-theme: docs
     page-type: Docs
@@ -47,21 +54,15 @@ asciidoc:
     page-origin-private: false
     page-hide-toc: false
     page-mixpanel: 4bfb2414ab973c741b6f067bf06d5575
-    # page-add-notes-module: review-note@
-    # page-add-notes-tags: review@
     includePDF: false
     nonhtmloutput: ""
-    # sectnums: true, removed so they are off by default
-    # sectnumlevel: 3,
     experimental: ''
-    copyright: 2023
+    copyright: 2026
     common-license-page-uri: https://neo4j.com/docs/license/
-    neo4j-version: 5.3@
     driver-version: 6@
     common-partial: common-content:ROOT:partial$@
     common-image: common-content:ROOT:image$@
     check-mark: icon:check[]
     cross-mark: icon:times[]
-    # attributes for doc links to other manuals in publish playbook
     neo4j-base-uri: ''
     neo4j-docs-base-uri: /docs
