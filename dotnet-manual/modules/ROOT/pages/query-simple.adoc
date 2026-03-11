@@ -234,33 +234,6 @@ Error GQL cause: Neo4j.Driver.DatabaseException: 42I06: Invalid input '', expect
 
 GQL status codes are particularly helpful when you want your application to behave differently depending on the exact error that was raised by the server.
 
-////
-.Distinguishing between different error codes
-[source, go]
-----
-result, err := neo4j.ExecuteQuery(ctx, driver, "MATCH (p:Person) RETURN", nil,
-    neo4j.EagerResultTransformer,
-    neo4j.ExecuteQueryWithDatabase("neo4j"))
-if err != nil {
-    var neo4jErr *neo4j.Neo4jError
-    if errors.As(err, &neo4jErr) {
-        if hasGqlStatus(neo4jErr, '42001') {
-            // Neo.ClientError.Statement.SyntaxError
-            // special handling of syntax error in query
-            fmt.Println(neo4jErr.Error())
-        } else if hasGqlStatus(neo4jErr, '42NFF') {
-            // Neo.ClientError.Security.Forbidden
-            // special handling of user not having CREATE permissions
-            fmt.Println(neo4jErr.Error())
-        } else {
-            // handling of all other exceptions
-            fmt.Println(neo4jErr.Error())
-        }
-    }
-}
-----
-////
-
 [NOTE]
 ====
 The GQL status code `50N42` is returned when an error does not have a GQL-status object.
