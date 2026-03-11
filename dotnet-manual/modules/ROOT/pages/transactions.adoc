@@ -34,7 +34,7 @@ A transaction can contain multiple queries.
 As Neo4j is <<ACID>> compliant, *queries within a transaction will either be executed as a whole or not at all*: you cannot get a part of the transaction succeeding and another failing.
 Use transactions to group together related queries which work together to achieve a single _logical_ database operation.
 
-You create a managed transaction with the methods link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IAsyncSession.ExecuteReadAsync.html)[`IAsyncSession.ExecuteRead()`] and link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IAsyncSession.ExecuteWriteAsync.html)[`IAsyncSession.ExecuteWrite()`], depending on whether you want to retrieve data from the database or alter it.
+You create a managed transaction with the methods link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IAsyncSession.ExecuteReadAsync.html[`IAsyncSession.ExecuteRead()`] and link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IAsyncSession.ExecuteWriteAsync.html[`IAsyncSession.ExecuteWrite()`], depending on whether you want to retrieve data from the database or alter it.
 Both methods take a <<transaction_function>> callback, which is responsible for actually carrying out the queries and processing the result.
 
 .Retrieve people whose name starts with `Al`.
@@ -69,7 +69,7 @@ foreach (var person in people) {
 ----
 
 <1> Create a session. A single session can be the container for multiple queries. Unless created as a resource with the `using` keyword, remember to close it when done.
-<2> The `.ExecuteRead()` (or `.ExecuteWrite()`) method is the entry point into a transaction. It takes a callback to a _transaction function_, which is responsible of running queries.
+<2> The `.ExecuteReadAsync()` (or `.ExecuteWriteAsync()`) method is the entry point into a transaction. It takes a callback to a _transaction function_, which is responsible of running queries.
 <3> Use the method link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IAsyncQueryRunner.RunAsync.html[`tx.RunAsync()`] to execute queries. You can provide a map of query parameters as second argument. Each query run returns a link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IResultCursor.html[`IResultCursor`] object.
 <4> xref:process-result[Process the result] using any of the methods on `IResultCursor`. The method `.FetchAsync()` retrieves the next record in the queue and stores it in the property `.Current`; the method `.ToListAsync()` retrieves all records into a list.
 
@@ -415,7 +415,7 @@ using var session = driver.AsyncSession(conf => conf
 );
 ----
 
-The method `.WithImpersonatedUser()` provides a similar functionality: the difference is that you don't need to know a user's password to impersonate them, but the user under which the `IDriver` was created needs to have the link:{neo4j-docs-base-uri}/operations-manual/current/authentication-authorization/dbms-administration/#access-control-dbms-administration-impersonation[appropriate permissions].
+The method `.WithImpersonatedUser()` provides a similar functionality: the difference is that you don't need to know a user's password to impersonate them, but the user under which the `IDriver` was created needs to have the link:https://neo4j.com/docs/operations-manual/current/authentication-authorization/dbms-administration/dbms-impersonate-privileges/[appropriate permissions].
 
 [source, csharp]
 ----

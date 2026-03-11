@@ -136,7 +136,7 @@ Each consumer simulates a lengthy operation with a sleeping timer.
 The example above uses an xref:query-advanced.adoc#implicit-transactions[implicit transaction] and not a xref:transactions.adoc#managed-transactions[managed transaction].
 Managed transactions require transaction functions to be idempotent -- that is however not possible when working with Goroutines and channels.
 In the scenario in which records `v1, v2, v3` have been streamed and sent into the channel, and a retriable error happens (causing the driver to re-run the transaction function), the channel will overall stream `v1, v2, v3, err, v1, v2, v3, ...`.
-To avoid this behavior, in cases when you still want to stream the result and not buffer it, use other forms of transaction (either xref:query-advanced.adoc#implicit-transactions[implicit] or xref:query-advanced.adoc#explicit-transactions[explicit]).
+To avoid this behavior, in cases when you still want to stream the result and not buffer it, use other forms of transaction (either xref:query-advanced.adoc#implicit-transactions[implicit] or xref:transactions.adoc#explicit-transactions[explicit]).
 ====
 
 

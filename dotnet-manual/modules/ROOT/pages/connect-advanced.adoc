@@ -151,9 +151,9 @@ await driver.VerifyConnectivityAsync();
 [#logging]
 == Logging
 
-To enable logging use link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.ConfigBuilder.WithLogger.html[`.withLogger(ILogger)`] config method when creating a `Driver` object, providing an implementation of link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.ILogger.html[`ILogger`].
+To enable logging use link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.ConfigBuilder.WithLogger.html[`.withLogger(INeo4jLogger)`] config method when creating a `Driver` object, providing an implementation of link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.INeo4jLogger.html[`ILogger`].
 
-.Enable debug logging with example implementation of `ILogger`
+.Enable debug logging with example implementation of `INeo4jLogger`
 [source, csharp]
 ----
 using Neo4j.Driver;

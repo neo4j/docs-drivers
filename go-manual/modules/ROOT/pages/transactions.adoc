@@ -514,7 +514,7 @@ session := driver.NewSession(ctx, neo4j.SessionConfig{
 })
 ----
 
-The option `ImpersonatedUser` provides a similar functionality: the difference is that you don't need to know a user's password to impersonate them, but the user under which the `Driver` was created needs to have the link:{neo4j-docs-base-uri}/operations-manual/current/authentication-authorization/dbms-administration/#access-control-dbms-administration-impersonation[appropriate permissions].
+The option `ImpersonatedUser` provides a similar functionality: the difference is that you don't need to know a user's password to impersonate them, but the user under which the `Driver` was created needs to have the link:https://neo4j.com/docs/operations-manual/current/authentication-authorization/dbms-administration/dbms-impersonate-privileges/[appropriate permissions].
 
 [source, go]
 ----

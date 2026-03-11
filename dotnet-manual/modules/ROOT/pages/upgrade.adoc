@@ -72,7 +72,7 @@ The new methods behave similarly, but the argument types are different and the n
 
 // a backslash is needed in first url to avoid it becoming a <em> with the subsequent link __
 |6.0
-|`ZonedDateTime` -- Two constructors not including `DateTimeKind` are deprecated (link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.ZonedDateTime.-ctor.html#Neo4j_Driver_ZonedDateTime_\_ctor_System_Int32_System_Int32_System_Int32_System_Int32_System_Int32_System_Int32_Neo4j_Driver_Zone_[this] and link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.ZonedDateTime.-ctor.html#Neo4j_Driver_ZonedDateTime_\_ctor_System_Int32_System_Int32_System_Int32_System_Int32_System_Int32_System_Int32_System_Int32_Neo4j_Driver_Zone_[this]).
+|`ZonedDateTime` -- Two constructors not including `DateTimeKind` are removed (link:https://neo4j.com/docs/api/dotnet-driver/5.28/api/Neo4j.Driver.ZonedDateTime.-ctor.html#Neo4j_Driver_ZonedDateTime_\_ctor_System_Int32_System_Int32_System_Int32_System_Int32_System_Int32_System_Int32_Neo4j_Driver_Zone_[this] and link:https://neo4j.com/docs/api/dotnet-driver/5.28/api/Neo4j.Driver.ZonedDateTime.-ctor.html#Neo4j_Driver_ZonedDateTime_\_ctor_System_Int32_System_Int32_System_Int32_System_Int32_System_Int32_System_Int32_System_Int32_Neo4j_Driver_Zone_[this]; references to v5.28).
 |label:removed[]
 
 |6.0

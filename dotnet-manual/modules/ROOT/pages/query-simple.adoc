@@ -318,7 +318,7 @@ await driver.ExecutableQuery("MATCH (p:Person) RETURN p.name")
     .ExecuteAsync();
 ----
 
-The `QueryConfig` key `impersonatedUser` provides a similar functionality: the difference is that you don't need to know a user's password to impersonate them, but the user under which the `IDriver` was created needs to have link:{neo4j-docs-base-uri}/operations-manual/current/authentication-authorization/dbms-administration/#access-control-dbms-administration-impersonation[`IMPERSONATE` privileges].
+The `QueryConfig` key `impersonatedUser` provides a similar functionality: the difference is that you don't need to know a user's password to impersonate them, but the user under which the `IDriver` was created needs to have link:https://neo4j.com/docs/operations-manual/current/authentication-authorization/dbms-administration/dbms-impersonate-privileges/[`IMPERSONATE` privileges].
 
 [source, csharp]
 ----
