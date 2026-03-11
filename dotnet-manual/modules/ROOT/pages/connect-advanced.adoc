@@ -250,7 +250,7 @@ public class Neo4jLogger : INeo4jLogger {
 When creating an `IDriver` object, you can specify a _resolver_ function to resolve the connection address the driver is initialized with.
 Note that addresses that the driver receives in routing tables are not resolved with the custom resolver.
 
-You specify a resolver through the link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.ConfigBuilder.WithResolver.html)[`.WithResolver()`] config method, which works with link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IServerAddressResolver.html[`IServerAddressResolver`] objects.
+You specify a resolver through the link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.ConfigBuilder.WithResolver.html[`.WithResolver()`] config method, which works with link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IServerAddressResolver.html[`IServerAddressResolver`] objects.
 
 *The resolved address must have the same port and URI scheme.*
 In the example below, the driver is initialized with a `neo4j://` URI scheme and port `7687`, so the resolved address provided in `dbUri` must also be available at `neo4j://` and port `7687`.
