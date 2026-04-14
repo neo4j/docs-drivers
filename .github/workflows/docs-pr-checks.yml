@@ -1,5 +1,8 @@
-
 name: "Verify docs PR"
+
+permissions:
+  contents: read
+  pull-requests: read
 
 on:
   pull_request:
@@ -40,14 +43,14 @@ jobs:
     steps:
       - name: Get file changes
         id: get-file-changes
-        uses: tj-actions/changed-files@2f7c5bfce28377bc069a65ba478de0a74aa0ca32 # v46.0.1
+        uses: tj-actions/changed-files@24d32ffd492484c1d75e0c0b894501ddb9d30d62 # v47
         with:
           separator: ','
           files_yaml: |
             pages:
-            - '*/modules/**/pages/**/*.adoc'
+            - '**/modules/**/pages/**/*.adoc'
             asciidoc:
-            - '*/modules/**/*.adoc'
+            - '**/modules/**/*.adoc'
 
   # Generate a PR comment if the docs are using the pageList extension
   # The extension maps asciidoc source files to their HTML output paths
