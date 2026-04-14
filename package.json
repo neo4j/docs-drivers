@@ -26,24 +26,33 @@
   },
   "homepage": "https://github.com/neo4j/docs-drivers#readme",
   "dependencies": {
-    "@antora/cli": "^3.1.6",
-    "@antora/site-generator-default": "^3.1.6",
-    "@neo4j-antora/antora-add-notes": "^0.3.1",
-    "@neo4j-antora/antora-page-roles": "^0.3.2",
-    "@neo4j-antora/antora-table-footnotes": "^0.3.2",
-    "@neo4j-documentation/macros": "^1.0.2",
+    "@neo4j-antora/aliases-redirects": "^0.2.7",
+    "@neo4j-antora/antora-add-notes": "^0.3.2",
+    "@neo4j-antora/mark-terms": "^1.1.4",
+    "@neo4j-antora/roles-labels": "^0.1.8",
+    "@neo4j-antora/selector-labels": "^0.1.1",
+    "@neo4j-antora/table-footnotes": "^1.0.1",
+    "@neo4j-antora/xref-hash-validator": "^0.1.4",
+    "@neo4j-documentation/macros": "^1.0.4",
     "@neo4j-documentation/remote-include": "^1.0.0",
-    "js-yaml": "^4.1.0",
-    "simple-git": "^3.22.0",
-    "yargs": "^18.0.0"
+    "antora": "3.1.14"
   },
   "devDependencies": {
-    "express": "^5.0.1",
-    "nodemon": "^3.0.2"
+    "express": "5.2.1",
+    "nodemon": "3.1.14"
   },
-  "overrides": {
-    "@antora/site-generator-default": {
-      "glob-parent": "6.0.2"
-    }
+  "nodemonConfig": {
+    "watch": [
+      "**/modules/**",
+      "**/antora.yml",
+      "**/preview.yml",
+      "**/publish.yml"
+    ],
+    "ext": "yml,yaml,adoc,svg,png,jpg",
+    "ignore": [
+      "build/**",
+      "node_modules/**"
+    ],
+    "delay": 1000
   }
 }

@@ -1,12 +1,17 @@
 #  copy this workflow into your repo
 name: "Documentation Teardown"
 
+permissions:
+  contents: read
+  pull-requests: write
+
 on:
   pull_request_target:
     branches:
-      - "4.4"
-      - "5.x"
-      - "dev"
+      - 4.4
+      - 5.x
+      - 6.x
+      - dev
     types:
       - closed
 
@@ -15,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f #v6
         with:
           node-version: lts/*
 
@@ -38,7 +43,7 @@ jobs:
           surge teardown $DEPLOY_URL --token "$SURGE_TOKEN"
 
       - name: Comment on PR
-        uses: marocchino/sticky-pull-request-comment@331f8f5b4215f0445d3c07b4967662a32a2d3e31 # v2.9.0
+        uses: marocchino/sticky-pull-request-comment@70d2764d1a7d5d9560b100cbea0077fc8f633987 #v3
         with:
           number: ${{ github.event.pull_request.number }}
           header: docs-pr-changes
@@ -47,4 +52,4 @@ jobs:
 
             The preview documentation has now been torn down - reopening this PR will republish it.
           GITHUB_TOKEN: ${{ secrets.DOCS_PR_COMMENT_TOKEN }}
-      
+
