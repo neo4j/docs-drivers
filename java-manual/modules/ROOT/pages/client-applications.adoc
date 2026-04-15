@@ -9,7 +9,7 @@ include::{common-partial}/client-applications.adoc[tag=abstract]
 
 include::{common-partial}/client-applications.adoc[tag=object-pt1]
 
-To construct a driver instance, a xref:client-applications.adoc#driver-connection-uris[connection URI] and xref:client-applications.adoc#driver-authentication[authentication information] must be supplied.
+To construct a driver instance, a xref:client-applications.adoc#java-driver-connection-uris[connection URI] and xref:client-applications.adoc#java-driver-authentication[authentication information] must be supplied.
 
 include::{common-partial}/client-applications.adoc[tag=object-pt2]
 
