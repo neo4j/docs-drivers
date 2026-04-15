@@ -6,6 +6,7 @@ For these more advanced use-cases, the driver provides functions to take full co
 These are called _managed transactions_, and you can think of them as a way of unwrapping the flow of `executableQuery()` and being able to specify its desired behavior in more places.
 
 
+[[create-session]]
 == Create a session
 
 Before running a transaction, you need to obtain a _session_.
