@@ -77,7 +77,7 @@ For more information, see xref:query-simple.adoc#error-handling[Error handling].
 ====
 As of version 6.2, the driver is compatible with `pandas` 3.x.
 
-The driver might indirectly behave differently when used with pandas 3. For example, calling `Result.to_df` on a `Result` containing a string-only column produces a `pandas.DataFrame` with `dtype` object for this column. When using pandas 3, the `dtype` will be `StringDtype` instead.
+The driver might indirectly behave differently when used with pandas 3. For example, calling `Result.to_df` on a `Result` containing a string-only column produces a `pandas.DataFrame` with `dtype` `object` for this column. When using pandas 3, the `dtype` will be `StringDtype` instead.
 ====
 |
 
