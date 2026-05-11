@@ -7,8 +7,8 @@
 Implicit transactions are the only ones that can be used for link:{neo4j-docs-base-uri}/cypher-manual/current/subqueries/subqueries-in-transactions[`CALL { ... } IN TRANSACTIONS`] queries.
 
 Implicit transactions are the most basic and limited form of transactions.
-The driver does **not** automatically retry implicit transactions, as it does instead for queries run with xref:query-simple.adoc[`.execute_query()`] and with xref:transactions#managed-transactions[managed transactions].
-Implicit transactions should only be used when the other query interfaces do not fit the purpose, or for quick prototyping.
+Contrary to xref:query-simple.adoc[`.execute_query()`] and xref:transactions#managed-transactions[managed transactions], implicit transactions offer limited guarantees of automatic retrial.
+As of version 6.2, implicit transactions are retried on errors marked as idempotent by the server (currently consisting of admission control errors only). You can disable auto-retry on implicit transactions via the configuration option link:https://neo4j.com/docs/api/python-driver/current/api.html#session-disable-auto-commit-retries-ref[`disable_auto_commit_retries`] both at the driver and session level.
 
 You run an implicit transaction with the method link:{neo4j-docs-base-uri}/api/python-driver/current/api.html#neo4j.Session.run[`Session.run()`].
 It returns a `Result` object that needs to be xref:transactions#process-result[processed accordingly].
