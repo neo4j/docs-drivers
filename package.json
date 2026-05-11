@@ -4,15 +4,17 @@
   "description": "Neo4j Driver Documentation",
   "main": "server.js",
   "scripts": {
-    "clean": "rm -rf build",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon -e adoc --exec \"npm run build && npm run serve\"",
+    "prestart": "npm update",
+    "start": "nodemon --exec \"npm run build\"",
     "serve": "node server.js",
-    "build": "antora --stacktrace preview.yml",
-    "publish": "antora --stacktrace publish.yml",
-    "build-verify": "antora --stacktrace --fetch preview.yml --log-format=json --log-level=info --log-file ./build/log/log.json",
-    "publish-verify": "antora --stacktrace --fetch publish.yml --log-format=json --log-file ./build/log/log.json",
-    "lint": "node scripts/lint-links.js"
+    "clean": "rm -rf build",
+    "build": "npm run build:preview",
+    "postbuild": "node server.js",
+    "build:preview": "antora preview.yml --stacktrace --log-format=pretty",
+    "build:publish": "npm run clean && antora publish.yml --stacktrace --log-format=pretty",
+    "verify:preview": "antora --stacktrace --fetch preview.yml --log-format=json --log-level=info --log-file ./build/log/log.json",
+    "verify:publish": "antora --stacktrace --fetch publish.yml --log-format=json --log-level=info --log-file ./build/log/log.json"
   },
   "repository": {
     "type": "git",
