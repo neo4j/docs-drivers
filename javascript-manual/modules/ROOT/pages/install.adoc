@@ -2,6 +2,11 @@
 
 To create a Neo4j JavaScript application, you first need to install the JavaScript Driver and get a Neo4j database instance to connect to.
 
+.Server compatibility
+[IMPORTANT]
+The latest driver in the `6.x` series supports connection to Neo4j instances version 4.4.x, 5.x, 2025.x, and 2026.x.
+It is also guaranteed to be forward-compatible with the next major release.
+
 [#install-driver]
 == Install the driver
 
@@ -11,10 +16,6 @@ Use `npm` to install the link:https://www.npmjs.com/package/neo4j-driver[Neo4j J
 ----
 npm i neo4j-driver
 ----
-
-The latest version of the driver is guaranteed to work with all <<LTS>> releases of the Neo4j server, as well as with the current and next major releases.
-The `6.x` driver series supports connection to Neo4j instances version 4.4, 5.x, 2025.x, and 2026.x.
-For a detailed list of changes across versions, see the link:https://github.com/neo4j/neo4j-javascript-driver/wiki/6.x-changelog[driver's changelog].
 
 [NOTE]
 --
