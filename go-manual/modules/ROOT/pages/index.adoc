@@ -26,6 +26,10 @@ Copyright (C) {copyright}
 License: <<license, Creative Commons 4.0>>
 endif::[]
 
+[IMPORTANT]
+The latest driver in the `4.4.x` series supports connection to Neo4j instances version 4.4.x, 5.x, 2025.x, and 2026.x.
+Some of features introduced in the server in versions 5.x and later are not available via the driver version `4.4.x`; use the link:https://neo4j.com/docs/go-manual/current/[latest version] instead.
+
 This manual covers the following areas:
 
 * xref:get-started.adoc[Get started] -- An overview of the official Neo4j Go Driver and how to connect to a Neo4j database.
