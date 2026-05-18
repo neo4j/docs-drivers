@@ -232,8 +232,6 @@ Error GQL cause: Neo4j.Driver.DatabaseException: 42I06: Invalid input '', expect
 */
 ----
 
-GQL status codes are particularly helpful when you want your application to behave differently depending on the exact error that was raised by the server.
-
 [NOTE]
 ====
 The GQL status code `50N42` is returned when an error does not have a GQL-status object.
@@ -247,6 +245,37 @@ Transient server errors can be retried without need to alter the original reques
 You can discover whether an error is transient via the property link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.Neo4jException.IsRetriable.html#Neo4j_Driver_Neo4jException_IsRetriable[`IsRetriable`], which gives insights into whether a further attempt might be successful.
 This is particular useful when running queries in xref:transactions#explicit-transactions[explicit transactions], to know if a failed query is worth re-running.
 ====
+
+[#gql-errors-filter]
+[role=label--new-6.1]
+=== GQL errors filtering
+
+GQL status codes are particularly helpful when you want your application to behave differently depending on the exact error that was raised by the server.
+
+[source, csharp]
+----
+try {
+    await driver.ExecutableQuery("MATCH (p:Person) RETURN")
+        .WithConfig(new QueryConfig(database: "neo4j"))
+        .ExecuteAsync();
+} catch (Neo4jException e) {
+    if (e.ContainsGqlStatus("42001")) {
+        // Neo.ClientError.Statement.SyntaxError
+        // special handling of syntax error in query
+        Console.WriteLine($"Error GQL status code: {e.GqlStatus}");
+        Console.WriteLine($"{e.ToString()}");
+    } else if (e.ContainsGqlStatus("42NFF")) {
+        // Neo.ClientError.Security.Forbidden
+        // special handling of user not having CREATE permissions
+        Console.WriteLine($"Error GQL status code: {e.GqlStatus}");
+        Console.WriteLine($"{e.ToString()}");
+    } else {
+        // handling of all other exceptions
+        Console.WriteLine($"Error GQL status code: {e.GqlStatus}");
+        Console.WriteLine($"{e.ToString()}");
+    }
+}
+----
 
 
 [#query-config]
