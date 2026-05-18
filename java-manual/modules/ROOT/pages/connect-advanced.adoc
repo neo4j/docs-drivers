@@ -353,6 +353,32 @@ try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPasswor
 // Caused by: javax.net.ssl.SSLHandshakeException: PKIX path validation failed: java.security.cert.CertPathValidatorException: Could not determine revocation status
 
 
+[#telemetry]
+== Disable telemetry
+
+The driver can send anonymous usage statistics to the server it connects to, if the server requests those.
+Telemetry is managed on the server-side via the configuration setting link:https://neo4j.com/docs/operations-manual/current/configuration/configuration-settings/#config_server.bolt.telemetry.enabled[`server.bolt.telemetry.enabled`].
+By default, telemetry is disabled on self-managed instances and enabled on Aura instances.
+
+By using `.withTelemetryDisabled(true)` upon connection, the driver will never send any telemetry data.
+
+.Disable telemetry on the driver side
+[source, java]
+----
+// import org.neo4j.driver.Config;
+// import org.neo4j.driver.GraphDatabase;
+
+var config = Config.builder()
+    .withTelemetryDisabled(true)
+    .build();
+try (var driver = GraphDatabase.driver(dbUri, AuthTokens.basic(dbUser, dbPassword), config)) {
+    driver.verifyConnectivity();
+}
+----
+
+For more information on what information is transmitted, see link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Config.ConfigBuilder.html#withTelemetryDisabled(boolean)[API documentation -> `.withTelemetryDisabled()`].
+
+
 == Further connection parameters
 
 You can find all `Driver` configuration parameters in the link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/GraphDatabase.html[API documentation -> driver.GraphDatabase].

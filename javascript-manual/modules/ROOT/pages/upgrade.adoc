@@ -140,7 +140,7 @@ As a result,
 |label:deprecated[]
 
 |6.0
-|link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/result-transformers.js~ResultTransformers.html[`ResultTransformers`] -- link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/result-transformers.js~ResultTransformers.html#instance-method-eagerResultTransformer[`.eagerResultsTransformer()`] and link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/result-transformers.js~ResultTransformers.html#instance-method-mappedResultsTransformer[`.mappedResultsTransformer()`] are deprecated in favor of link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/result-transformers.js~ResultTransformers.html#instance-method-eager[`.eager()`] and link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/result-transformers.js~ResultTransformers.html#instance-method-mapped[`.mapped()`].
+|link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/result-transformers.js~ResultTransformers.html[`ResultTransformers`] -- link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/result-transformers.js~ResultTransformers.html#instance-method-eagerResultTransformer[`.eagerResultsTransformer()`] and link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/result-transformers.js~ResultTransformers.html#instance-method-mappedResultTransformer[`.mappedResultsTransformer()`] are deprecated in favor of link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/result-transformers.js~ResultTransformers.html#instance-method-eager[`.eager()`] and link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/result-transformers.js~ResultTransformers.html#instance-method-mapped[`.mapped()`].
 |label:deprecated[]
 
 |===

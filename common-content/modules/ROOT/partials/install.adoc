@@ -19,6 +19,6 @@ docker run \
 
 Alternatively, you can obtain a free *cloud instance* through <<Aura>>.
 
-You can also link:https://neo4j.com/download-center/#gdb-selfmanaged[install Neo4j on your system], or use link:https://neo4j.com/download-center/#desktop-gdb[Neo4j Desktop] to create a local development environment (not for production).
+You can also link:https://neo4j.com/deployment-center/[install Neo4j on your system], or use Neo4j Desktop to create a local development environment (not for production).
 
 # end::get-an-instance[]

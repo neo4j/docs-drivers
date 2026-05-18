@@ -206,6 +206,26 @@ let driver = neo4j.driver(URI, neo4j.auth.basic(USER, PASSWORD), {
 ----
 
 
+[#telemetry]
+== Disable telemetry
+
+The driver can send anonymous usage statistics to the server it connects to, if the server requests those.
+Telemetry is managed on the server-side via the configuration setting link:https://neo4j.com/docs/operations-manual/current/configuration/configuration-settings/#config_server.bolt.telemetry.enabled[`server.bolt.telemetry.enabled`].
+By default, telemetry is disabled on self-managed instances and enabled on Aura instances.
+
+By setting `telemetryDisabled: true` upon connection, the driver will never send any telemetry data.
+
+.Disable telemetry on the driver side
+[source, javascript]
+----
+let driver = neo4j.driver(URI, neo4j.auth.basic(USER, PASSWORD), {
+  telemetryDisabled: true
+})
+----
+
+For more information on what information is transmitted, see link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/types.js~Config.html#instance-member-telemetryDisabled[API documentation -> `telemetryDisabled`].
+
+
 == Further connection parameters
 
 You can find all `Driver` configuration parameters in the link:{neo4j-docs-base-uri}/api/javascript-driver/current/function/index.html#static-function-driver[API documentation].

@@ -2,6 +2,11 @@
 
 To start creating a Neo4j Go application, you first need to install the Go Driver and get a Neo4j database instance to connect to.
 
+.Server compatibility
+[IMPORTANT]
+The latest driver in the `6.x` series supports connection to Neo4j instances version 4.4.x, 5.x, 2025.x, and 2026.x.
+It is also guaranteed to be forward-compatible with the next major release.
+
 [#install-driver]
 == Install the driver
 
@@ -21,10 +26,6 @@ From within a module, use `go get` to install the link:https://pkg.go.dev/github
 ----
 go get github.com/neo4j/neo4j-go-driver/v6
 ----
-
-The latest version of the driver is guaranteed to work with all <<LTS>> releases of the Neo4j server, as well as with the current and next major releases.
-The latest `6.x` driver supports connection to Neo4j instances version 4.4, 5.x, and 2025.x.
-For a detailed list of changes across versions, see the link:https://github.com/neo4j/neo4j-go-driver/wiki/6.x-changelog[driver's changelog].
 
 [NOTE]
 The Neo4j Go Driver is compatible (and requires) any link:https://go.dev/doc/devel/release#policy[officially maintained Go version].

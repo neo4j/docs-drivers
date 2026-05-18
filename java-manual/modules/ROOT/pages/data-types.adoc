@@ -468,7 +468,7 @@ For full documentation, see link:https://neo4j.com/docs/api/java-driver/current/
 The type link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/VectorValue.html[`VectorValue`] maps to the Cypher type link:https://neo4j.com/docs/cypher-manual/25/values-and-types/vector/[`VECTOR`].
 Vector objects are stored as contiguous blocks of memory, containing homogeneous values.
 
-You can create a vector from lists of `byte`, `short`, `int`, `long`, `float`, `double` via the method link:https://neo4j.com/docs/api/java-driver/curent/org.neo4j.driver/org/neo4j/driver/types/Vector.html[`Values.vector()`].
+You can create a vector from lists of `byte`, `short`, `int`, `long`, `float`, `double` via one of the link:++https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Values.html#vector(byte[])++[`Values.vector()`] methods.
 
 .Create and store a vector
 [source, java]
