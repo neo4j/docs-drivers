@@ -249,10 +249,41 @@ public class Neo4jLogger : INeo4jLogger {
 
 When creating an `IDriver` object, you can specify a _resolver_ function to resolve the connection address the driver is initialized with.
 Note that addresses that the driver receives in routing tables are not resolved with the custom resolver.
-
 You specify a resolver through the link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.ConfigBuilder.WithResolver.html[`.WithResolver()`] config method, which works with link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IServerAddressResolver.html[`IServerAddressResolver`] objects.
 
-*The resolved address must have the same port and URI scheme.*
+[.tabbed-example]
+====
+[.include-with-Version-6-1-and-later]
+=====
+*The resolved addresses must have the same URI scheme.*
+In the example below, the driver is initialized with a `neo4j://` URI scheme, so the resolved address provided in `dbUri` must also be available at `neo4j://`.
+
+Versions >= 6.1 support resolved addresses to specify a different port number.
+A default implementation link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.ListAddressResolver.-ctor.html[`ListAddressResolver`] for the interface link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IServerAddressResolver.html[`IServerAddressResolver`] is provided as well.
+
+.Connection to `example.com:999` is resolved to `localhost:7687`
+[source, csharp, test-skip]
+----
+using Neo4j.Driver;
+
+const string dbUri = "localhost";  // omit scheme and port
+const string dbUser = "<username>";
+const string dbPassword = "<password>";
+
+var address = ServerAddress.From(dbUri, 7687);
+
+await using var driver = GraphDatabase.Driver(
+    "neo4j://example.com:999",
+    AuthTokens.Basic(dbUser, dbPassword),
+    conf => conf.WithResolver(new ListAddressResolver(address))
+);
+await driver.VerifyConnectivityAsync();
+----
+=====
+
+[.include-with-Version-6-0]
+=====
+*The resolved addresses must have the same port and URI scheme.*
 In the example below, the driver is initialized with a `neo4j://` URI scheme and port `7687`, so the resolved address provided in `dbUri` must also be available at `neo4j://` and port `7687`.
 
 .Connection to `example.com` is resolved to `localhost`
@@ -286,6 +317,8 @@ class ListAddressResolver : IServerAddressResolver {
     }
 }
 ----
+=====
+====
 
 
 [#telemetry]
