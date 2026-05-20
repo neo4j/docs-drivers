@@ -94,8 +94,11 @@ You can use domain objects directly as parameters in Cypher queries.
 
 [source, csharp]
 ----
-var person = new Person { FirstName = "John", LastName = "Doe", Age = 30 };
-session.Run("CREATE (p:Person $params)", person);
+var person = new Person { FirstName = "Alice", LastName = "Smith", Age = 28 };
+await driver
+    .ExecutableQuery("CREATE (p:Person $person)")
+    .WithParameters(new { person })
+    .ExecuteAsync();
 // Creates: {FirstName: "John", LastName: "Doe", Age: 30}
 
 public class Person {
@@ -114,21 +117,29 @@ Whereas the C# naming convention is PascalCase, the naming convention in Cypher 
 
 The driver can handle this for you via the method `RecordObjectMapping.TranslateIdentifiers()`, to be called at application startup.
 
-.Automatic PascalCase/camelCase translation
+.Automatic PascalCase/camelCase translation -- Round-trip example
 [source, csharp]
 ----
 // At application startup
 RecordObjectMapping.TranslateIdentifiers(translateCypherParameters: true);
 
-var person = new Person { FirstName = "John", LastName = "Doe", Age = 30 };
-session.Run("CREATE (p:Person $params)", person);
-// Creates: {firstName: "John", lastName: "Doe", age: 30}
+// Write — PascalCase properties translated to $firstName, $lastName, $age
+var person = new Person { FirstName = "Alice", LastName = "Smith", Age = 28 };
+await driver
+    .ExecutableQuery("CREATE (p:Person $person)")
+    .WithParameters(new { person })
+    .ExecuteAsync();
 
-public class Person {
-    public string FirstName { get; set; }
-    public string LastName { get; set; }
-    public int Age { get; set; }
-}
+// Read back — camelCase fields translated back to PascalCase properties
+var people = await driver
+    .ExecutableQuery(
+        "MATCH (p:Person {firstName: 'Alice'}) " +
+        "RETURN p.firstName AS firstName, p.lastName AS lastName, p.age AS age")
+    .ExecuteAsync()
+    .AsObjectsAsync<Person>();
+
+var retrieved = people[0];
+Console.WriteLine(retrieved);
 ----
 
 
