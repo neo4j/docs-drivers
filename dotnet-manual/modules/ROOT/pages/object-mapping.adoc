@@ -176,7 +176,7 @@ This attribute accepts a number of parameters:
 ----
 // When used as parameter
 Person john = new Person("John");
-session.Run("CREATE (p:Person $params)", person);
+session.Run("CREATE (p:Person $params)", john);
 // Creates: (:Person {first_name: "John"})
 
 // When reading from database
@@ -187,7 +187,7 @@ var person = record["p"].As<INode>().AsObject<Person>();
 public class Person {
     [MappingBindings(
         Path = "firstName",
-        Source = MappingSource.Property,
+        Source = EntityMappingSource.Property,
         CypherParameterName = "first_name")]
     public string FirstName { get; set; }
 
