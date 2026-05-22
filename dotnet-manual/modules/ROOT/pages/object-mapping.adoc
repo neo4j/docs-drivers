@@ -174,29 +174,25 @@ This attribute accepts a number of parameters:
 .Example using `[MappingBindings]`
 [source, csharp]
 ----
-// CypherParameterName = "first_name" means FirstName is passed as $first_name
-var john = new Person("John");
-await driver.ExecutableQuery("CREATE (p:Person {firstName: $first_name})")
-    .WithParameters(john)
+// CypherParameterName = "product_code" means ProductCode is passed as $product_code
+var product = new Product { ProductCode = "PROD123" };
+await driver.ExecutableQuery("CREATE (p:Product {productCode: $product_code})")
+    .WithParameters(product)
     .ExecuteAsync();
 
-// Path = "firstName" maps the record field "firstName" to the FirstName property
+// Path = "productCode" maps the record field "productCode" to the ProductCode property
 var result = await driver
-    .ExecutableQuery("MATCH (p:Person) RETURN p.firstName AS firstName")
+    .ExecutableQuery("MATCH (p:Product) RETURN p.productCode AS productCode")
     .ExecuteAsync();
-var person = result.Result[0].AsObject<Person>();
-// person.FirstName == "John"
+var retrieved = result.Result[0].AsObject<Product>();
+// retrieved.ProductCode == "PROD123"
 
-public class Person {
+public class Product {
     [MappingBindings(
-        Path = "firstName",
+        Path = "productCode",
         Source = EntityMappingSource.Property,
-        CypherParameterName = "first_name")]
-    public string FirstName { get; set; }
-
-    public Person(string firstName) {
-        FirstName = firstName;
-    }
+        CypherParameterName = "product_code")]
+    public string ProductCode { get; set; }
 }
 ----
 
