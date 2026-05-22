@@ -174,15 +174,18 @@ This attribute accepts a number of parameters:
 .Example using `[MappingBindings]`
 [source, csharp]
 ----
-// When used as parameter
-Person john = new Person("John");
-session.Run("CREATE (p:Person $params)", john);
-// Creates: (:Person {first_name: "John"})
+// CypherParameterName = "first_name" means FirstName is passed as $first_name
+var john = new Person("John");
+await driver.ExecutableQuery("CREATE (p:Person {firstName: $first_name})")
+    .WithParameters(john)
+    .ExecuteAsync();
 
-// When reading from database
-var record = session.Run("MATCH (p:Person) RETURN p").Single();
-var person = record["p"].As<INode>().AsObject<Person>();
-// Maps from "firstName" property in the node to "FirstName" C# property
+// Path = "firstName" maps the record field "firstName" to the FirstName property
+var result = await driver
+    .ExecutableQuery("MATCH (p:Person) RETURN p.firstName AS firstName")
+    .ExecuteAsync();
+var person = result.Result[0].AsObject<Person>();
+// person.FirstName == "John"
 
 public class Person {
     [MappingBindings(
