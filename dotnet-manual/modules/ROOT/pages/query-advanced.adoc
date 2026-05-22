@@ -7,8 +7,9 @@
 Implicit transactions are the only ones that can be used for link:{neo4j-docs-base-uri}/cypher-manual/current/subqueries/subqueries-in-transactions[`CALL { ... } IN TRANSACTIONS`] queries.
 
 Implicit transactions are the most basic and limited form of transactions.
-The driver does *not* automatically retry implicit transactions, as it does instead for queries run with xref:query-simple.adoc[`.ExecutableQuery()`] and with xref:transactions#managed-transactions[managed transactions].
-Implicit transactions should only be used when the other driver query interfaces do not fit the purpose, or for quick prototyping.
+Contrary to xref:query-simple.adoc[`.ExecutableQuery()`] and xref:transactions#managed-transactions[managed transactions], implicit transactions offer limited guarantees of automatic retrial.
+As of version 6.1, implicit transactions are retried once on errors marked as idempotent by the server.
+You can disable auto-retry on implicit transactions via the configuration method `.WithDisableAutoCommitRetries()` both at the link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.ConfigBuilder.WithDisableAutoCommitRetries.html[driver] and link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.SessionConfigBuilder.WithDisableAutoCommitRetries.html[session] level.
 
 You run an implicit transaction with the method link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IAsyncSession.RunAsync.html[`ISessionAsync.RunAsync()`].
 It returns a link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IResultCursor.html[`IResultCursor`] object that needs to be xref:transactions#process-result[processed accordingly].
