@@ -171,6 +171,9 @@ This attribute accepts a number of parameters:
 - `Explicit` -- Whether this mapping binding was explicitly defined by the user.
 - `CypherParameterName` -- The name of the parameter when mapping to Cypher parameters.
 
+////
+Other examples create Person nodes in the database without a ‘firstName’ property. When testing comes to run this example, the MATCH statement brings back one of the junk nodes and it correctly fails to map. So using a different schema here.
+////
 .Example using `[MappingBindings]`
 [source, csharp]
 ----
