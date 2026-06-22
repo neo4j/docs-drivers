@@ -109,7 +109,7 @@ public class App {
 }
 ----
 
-<1> link:https://projectreactor.io/docs/core/release/api/reactor/core/publisher/Flux.html#usingWhen-org.reactivestreams.Publisher-java.util.function.Function-java.util.function.Function-[`Flux.usingWhen(resourceSupplier, workerClosure, cleanupFunction)`] is used to create a new session, run queries using it, and finally close it.
+<1> link:https://projectreactor.io/docs/core/release/api/reactor/core/publisher/Flux.html#usingWhen(org.reactivestreams.Publisher,java.util.function.Function,java.util.function.Function)[`Flux.usingWhen(resourceSupplier, workerClosure, cleanupFunction)`] is used to create a new session, run queries using it, and finally close it.
 It will ensure the resource is alive for the time it is needed for, and allows to specify the cleanup operation to undertake at the end.
 Read more on this pattern in xref:session-creation[Always defer session creation].
 <2> `.usingWhen()` takes a _resource supplier_ in the form of a `Publisher`, hence why session creation is wrapped in a link:https://projectreactor.io/docs/core/release/api/reactor/core/publisher/Mono.html#just-T-[`Mono.just()`] call, which spawns a `Mono` from any value.
