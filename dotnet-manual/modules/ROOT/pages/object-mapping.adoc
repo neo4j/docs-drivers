@@ -326,6 +326,48 @@ The constructor signature implies that the `name` return key is mapped to the cl
 <.> Because the constructor sets the `Name` and `Age` attributes, the attributes can have private setters.
 
 
+[#optional-constructor-parameters]
+=== Optional constructor parameters
+
+If a constructor parameter has a C# default value, the mapper honours that default when the value is absent from the record.
+If the value _is_ present but its value is incompatible with the parameter type, an exception is still thrown.
+
+[NOTE]
+====
+If `[MappingDefaultValue]` is applied to a parameter that also has a C# default value and the value is missing, the attribute's value takes precedence over the C# default.
+To avoid code that looks ambiguous it is recommended not to use `[MappingDefaultValue]` on optional parameters.
+====
+
+.A class with an optional constructor parameter
+[source, csharp]
+----
+var people = await driver.ExecutableQuery(@"
+    MERGE (p:Person {name: $name})
+    RETURN p.name AS name  // <.>
+    ")
+    .WithParameters(new { name = "Alice" })
+    .WithConfig(new QueryConfig(database: "<database-name>"))
+    .ExecuteAsync()
+    .AsObjectsAsync<Person>();
+
+Console.WriteLine(people[0].Age);  // 18  // <.>
+
+class Person {
+    [MappingConstructor]
+    public Person(string name, int age = 18) {
+        Name = name;
+        Age = age;
+    }
+
+    public string Name { get; }
+    public int Age { get; }
+}
+----
+
+<.> The query does not return `age`.
+<.> `age` is absent from the record, so the mapper uses the C# default of `18`.
+
+
 [#anonymous-types]
 == Map to anonymous types
 
