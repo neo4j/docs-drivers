@@ -17,6 +17,7 @@ The tables in this section show the mapping between Cypher data types and .NET t
 | `FLOAT`       | `double`
 | `STRING`      | `string`
 | `ByteArray`   | `byte[]`
+| `UUID`        | `System.Guid`
 |===
 
 
@@ -305,6 +306,34 @@ var result = await driver.ExecutableQuery("MERGE (d:Doc {embedding: $vector})")
     .WithParameters(new { vector = vector })
     .WithConfig(new QueryConfig(database: "<database-name>"))
     .ExecuteAsync();
+----
+
+
+[role=label--new-6.1]
+[#uuid]
+== UUID
+
+The Cypher type `UUID` maps directly to link:https://learn.microsoft.com/en-us/dotnet/api/system.guid[`System.Guid`].
+It can be used as a property value, query parameter, and return value in the same way as any other scalar type such as `INTEGER` or `BOOLEAN`.
+
+[IMPORTANT]
+Storing and retrieving `UUID` values requires Bolt 6.1.
+
+.Store and retrieve a UUID property
+[source, csharp]
+----
+var guid = Guid.NewGuid();
+var ids = await driver.ExecutableQuery(@"
+    MERGE (n:Item {id: $id})
+    RETURN n.id AS id
+    ")
+    .WithParameters(new { id = guid })
+    .WithConfig(new QueryConfig(database: "<database-name>"))
+    .ExecuteAsync()
+    .AsObjectsAsync((Guid id) => id);
+
+Console.WriteLine(ids[0]);
+Console.WriteLine(guid);   // same value
 ----
 
 
