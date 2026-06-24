@@ -317,23 +317,27 @@ The Cypher type `UUID` maps directly to link:https://learn.microsoft.com/en-us/d
 It can be used as a property value, query parameter, and return value in the same way as any other scalar type such as `INTEGER` or `BOOLEAN`.
 
 [IMPORTANT]
-Storing and retrieving `UUID` values requires Bolt 6.1.
+`UUID` support requires a server that negotiates Bolt 6.1.
 
 .Store and retrieve a UUID property
 [source, csharp]
 ----
-var guid = Guid.NewGuid();
-var ids = await driver.ExecutableQuery(@"
-    MERGE (n:Item {id: $id})
-    RETURN n.id AS id
+var original = Guid.NewGuid();
+var result = await driver.ExecutableQuery(@"
+    MERGE (n:Item {nodeId: $input})
+    RETURN n.nodeId AS nodeId
     ")
-    .WithParameters(new { id = guid })
+    .WithParameters(new { input = original })
     .WithConfig(new QueryConfig(database: "<database-name>"))
-    .ExecuteAsync()
-    .AsObjectsAsync((Guid id) => id);
+    .ExecuteAsync();
 
-Console.WriteLine(ids[0]);
-Console.WriteLine(guid);   // same value
+var record = result.Result[0];
+Console.WriteLine(record["nodeId"].As<Guid>());    // direct access
+Console.WriteLine(record.AsObject<Item>().nodeId); // via object mapping
+
+class Item {
+    public Guid nodeId { get; set; }
+}
 ----
 
 

@@ -335,7 +335,7 @@ If the value _is_ present but its value is incompatible with the parameter type,
 [NOTE]
 ====
 If `[MappingDefaultValue]` is applied to a parameter that also has a C# default value and the value is missing, the attribute's value takes precedence over the C# default.
-To avoid code that looks ambiguous it is recommended not to use `[MappingDefaultValue]` on optional parameters.
+If both are present, the attribute value wins. Using both is not recommended as it makes the intended default unclear.
 ====
 
 .A class with an optional constructor parameter
