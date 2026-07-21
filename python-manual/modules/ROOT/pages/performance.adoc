@@ -45,42 +45,46 @@ driver.session()
 [[transactions-cost]]
 == Be aware of the cost of transactions
 
-When submitting queries through xref:query-simple.adoc[`.execute_query()`] or through xref:transactions.adoc#managed-transactions[`.execute_read/write()`], the driver wraps them into a <<transaction>>.
-This behavior ensures that the database always ends up in a consistent state, regardless of what happens during the execution of a transaction (power outages, software crashes, etc).
-As a further robustness layer, the driver also retries failed transactions with an exponential backoff.
+Queries are always run within <<transaction, transactions>> on the server, so that the database always ends up in a consistent state regardless of what happens during a transaction execution (power outages, software crashes, etc).
+Queries submitted via xref:query-simple.adoc[`.execute_query()`] or xref:transactions.adoc#managed-transactions[`.execute_read/write()`] are also automatically retried in case of failure.
+A transactions yields an overhead that is small, but that adds up as the number of transactions increases.
 
-Creating a safe execution context around a query yields an overhead that is small, but that adds up as the number of transactions increases.
-When each query is sent as a transaction of its own, if one transaction fails and needs to be rolled back, all the other transactions are unaffected.
-This is the safest mode of execution with respect to failures, but also the slowest due to the overhead of transactions scaling with the number of queries.
+As your workload grows, evaluate what level of isolation each query needs and be intentional about your usage of transactions.
+There are essentially three approaches to running queries depending on your needs for _safety_ and _performance_.
+Remember that there's no free lunch and that it's always a trade-off between the two.
 
-.Each query as a separate transaction (low throughput)
+1. **One transaction ⟷ One query (lowest throughput, highest safety)** +
+The safest mode of execution with respect to failures, because of the isolation and auto-retry guarantees, but also the slowest due to the overhead of transactions scaling with the number of queries.
++
+.Run 1000 queries, each as a separate transaction
 [source, python]
 ----
 for i in range(1000):
     driver.execute_query("<QUERY>", database_="<database-name>")
-    # or session.execute_read/write() calls
+    # or session.execute_read/write() calls, each with one query
 ----
 
-A more performant approach is to group all queries into a single transaction.
-In this way, the transaction as a whole is isolated from others, but individual queries in the transaction are not isolated, and failure of one results in a rollback of all queries.
-
-.Group queries into one transaction (higher throughput)
+2. **One transaction ⟷ Multiple queries (higher throughput, high safety)** +
+When multiple queries are grouped into a single transaction, the transaction as a whole is isolated from others, whereas individual queries in the transaction are not isolated and failure of one query results in a rollback of all queries.
++
+.Run 10 transactions with 100 queries each
 [source, python]
 ----
 def query(tx):
-    for i in range(1000):
+    for i in range(100):
         tx.run("<QUERY>")
 
 with driver.session(database="<database-name>") as session:
-    people = session.execute_read(query)
+    for i in range(10):
+        people = session.execute_read(query)
 ----
 
-An even faster approach is to skip `.execute_read/write()` and call `.run()` directly on the session.
-The queries run as auto-commit transactions and are still isolated from other concurrent queries, but if any of them fail, they will not be retried.
-With this method, you trade some robustness for more throughput, as the queries are shot to the server as fast as it can handle.
-One upper limit on the client size is given by the size of the connection pool: each call to `.run()` borrows a connection, so the amount of parallel work is limited by the number of available connections.
-
-.Queries as auto-commit transactions (highest throughput)
+3. **Auto-commit transactions (highest throughput, lowest safety)** +
+xref:query-advanced.adoc#implicit-transactions[Auto-commit transactions] shoot queries to the server as fast as it can handle.
+Failed queries are not retried, and there's no exact guarantee on when changes get written to the database.
+One upper limit on the client size is given by the size of the connection pool: each call to `session.run()` borrows a connection, so the amount of parallel work is limited by the number of available connections.
++
+.Run 1000 queries as auto-commit transactions
 [source, python]
 ----
 with driver.session(database="<database-name>") as session:
