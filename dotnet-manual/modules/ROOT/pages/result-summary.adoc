@@ -107,9 +107,9 @@ Total database accesses: ?
 */
 ----
 
-If you instead prefix a query with the keyword `PROFILE`, the server returns the execution plan it has used to run the query, together with profiler statistics.
+If you instead prefix a query with `PROFILE`, the server returns the execution plan it has used to run the query, together with profiler statistics.
 This includes the list of operators that were used and additional profiling information about each intermediate step.
-The plan is available as a link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IProfiledPlan.html[`IProfiledPlan`] object in the property `IResultSummary.Profile`.
+The plan is available as a link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IQueryProfile.html[`IQueryProfile`] object in the property `IResultSummary.QueryProfile`. (For versions < 6.3, the property is `IResultSummary.Profile` and the object type link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IProfiledPlan.html[`IProfiledPlan`].)
 Notice that the query is also _run_, so the result object also contains any result records.
 
 [source, csharp]
@@ -119,7 +119,7 @@ var result = await driver.ExecutableQuery("PROFILE MATCH (p {name: $name}) RETUR
     .WithConfig(new QueryConfig(database: "<database-name>"))
     .ExecuteAsync();
 // Note: `result.Result` is non-empty
-var queryPlan = result.Summary.Profile;
+var queryPlan = result.Summary.QueryProfile;
 Console.WriteLine(queryPlan.Arguments["string-representation"]);
 /*
 Planner COST
