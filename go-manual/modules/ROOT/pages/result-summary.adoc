@@ -113,9 +113,9 @@ Total database accesses: ?
 */
 ----
 
-If you instead prefix a query with the keyword `PROFILE`, the server returns the execution plan it has used to run the query, together with profiler statistics.
+If you instead prefix a query with `PROFILE`, the server returns the execution plan it has used to run the query, together with profiler statistics.
 This includes the list of operators that were used and additional profiling information about each intermediate step.
-You can access the plan by calling `ResultSummary.Profile()`.
+You can access the plan by calling `ResultSummary.QueryProfile()` (for versions < 6.2, the method is `ResultSummary.Profile()`).
 Notice that the query is also _run_, so the result object also contains any result records.
 
 [source, go]
@@ -127,7 +127,7 @@ result, _ := neo4j.ExecuteQuery(ctx, driver,
     },
     neo4j.EagerResultTransformer,
     neo4j.ExecuteQueryWithDatabase("<database-name>"))
-fmt.Println(result.Summary.Profile().Arguments()["string-representation"])
+fmt.Println(result.Summary.QueryProfile().Arguments()["string-representation"])
 /*
 Planner COST
 Runtime PIPELINED
