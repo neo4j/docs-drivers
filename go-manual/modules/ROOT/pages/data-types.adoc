@@ -471,14 +471,14 @@ func main() {
 ----
 
 
-[role=label--new-6.2]
+[role=label--new-6.2 label--enterprise-edition]
 [#uuid]
 == UUID
 
 The Cypher type link:https://neo4j.com/docs/cypher-manual/current/values-and-types/uuid/[`UUID`] maps to link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j/dbtype#UUID[`UUID`], providing 16-byte RFC 9562 universally unique identifiers.
 
 .Store and work with a UUID
-[source, python]
+[source, go]
 ----
 package main
 

@@ -498,15 +498,14 @@ System.out.printf("Retrieved vector: %s", vector);
 ----
 
 
-
-[role=label--new-6.2]
+[role=label--new-6.2 label--enterprise-edition]
 [#uuid]
 == UUID
 
 The Cypher type link:https://neo4j.com/docs/cypher-manual/current/values-and-types/uuid/[`UUID`] maps to link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/UUIDValue.html[`UUIDValue`], basing on `java.util.UUID`.
 
 .Store and work with a UUID
-[source, python]
+[source, java]
 ----
 // import java.util.UUID;
 // import org.neo4j.driver.Values;

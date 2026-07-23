@@ -15,6 +15,8 @@ The tables in this section show the mapping between Cypher data types and JavaSc
 | FLOAT       | `Number`
 | STRING      | `String`
 | ByteArray   | `Int8Array`
+| VECTOR      | `Vector`
+| UUID        | `UUID`
 |===
 
 [TIP]
@@ -512,6 +514,25 @@ var retrievedArray = Array.from(retrievedTypedArray)
 [NOTE]
 Whereas regular Javascript arrays are capped when stringified, the `Vector` type always shows all elements.
 Logging `Vector` objects risks clogging the log or resulting in Out of Memory errors.
+
+
+[role=label--new-6.2 label--enterprise-edition]
+[#uuid]
+== UUID
+
+The Cypher type link:https://neo4j.com/docs/cypher-manual/current/values-and-types/uuid/[`UUID`] maps to link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/uuid.js~UUID.html[`UUID`].
+
+.Store and work with a UUID
+[source, javascript]
+----
+// Store UUID as a node property and get it back
+var { records } = await driver.executeQuery(
+    'MERGE (d:Doc {id: $uuid}) RETURN d.id AS uuid',
+    { uuid: neo4j.uuid('12345678-1234-1234-1234-123456789abc'), }
+)
+
+var uuid = records[0].get("uuid")
+----
 
 
 [role=label--new-6.0]
