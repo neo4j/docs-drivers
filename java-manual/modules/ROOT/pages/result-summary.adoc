@@ -73,7 +73,7 @@ Two additional boolean methods act as meta-counters:
 == Query execution plan
 
 If you prefix a query with `EXPLAIN`, the server returns the plan it _would_ use to run the query, but doesn't actually run it.
-The plan is then available as a link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/summary/Plan.html[`Plan`] object through the method `ResultSummary.plan()`, and contains the list of link:https://neo4j.com/docs/cypher-manual/current/planning-and-tuning/operators/[Cypher operators] that would be used to retrieve the result set.
+The plan is then available as a link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/summary/Plan.html[`Plan`] object through the method `ResultSummary.queryPlan()` (or `ResultSummary.plan()` for versions < 6.2), and contains the list of link:https://neo4j.com/docs/cypher-manual/current/planning-and-tuning/operators/[Cypher operators] that would be used to retrieve the result set.
 Use this information to locate bottlenecks or potential room for xref:performance.adoc[performance improvements] (for example through the creation of indexes).
 
 [source, java]
@@ -82,7 +82,7 @@ var result = driver.executableQuery("EXPLAIN MATCH (p {name: $name}) RETURN p")
     .withParameters(Map.of("name", "Alice"))
     .withConfig(QueryConfig.builder().withDatabase("<database-name>").build())
     .execute();
-var queryPlan = result.summary().plan().arguments().get("string-representation");
+var queryPlan = result.summary().queryPlan().arguments().get("string-representation");
 System.out.println(queryPlan);
 
 /*
@@ -105,9 +105,9 @@ Total database accesses: ?
 */
 ----
 
-If you instead prefix a query with the keyword `PROFILE`, the server returns the execution plan it has used to run the query, together with profiler statistics.
+If you instead prefix a query with `PROFILE`, the server returns the execution plan it has used to run the query, together with profiler statistics.
 This includes the list of operators that were used and additional profiling information about each intermediate step.
-The plan is available as a link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/summary/Plan.html[`Plan`] object through the method `ResultSummary.profile()`.
+The plan is available as a link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/summary/QueryProfile.html[`QueryProfile`] object through the method `ResultSummary.queryProfile()` (or a link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/summary/Profile.html[`Profile`] object via `ResultSummary.profile()` for versions < 6.2).
 Notice that the query is also _run_, so the result object also contains any result records.
 
 [source, java]
@@ -116,7 +116,7 @@ var result = driver.executableQuery("PROFILE MATCH (p {name: $name}) RETURN p")
     .withParameters(Map.of("name", "Alice"))
     .withConfig(QueryConfig.builder().withDatabase("<database-name>").build())
     .execute();
-var queryPlan = result.summary().profile().arguments().get("string-representation");
+var queryPlan = result.summary().queryProfile().arguments().get("string-representation");
 System.out.println(queryPlan);
 
 /*
