@@ -309,15 +309,14 @@ var result = await driver.ExecutableQuery("MERGE (d:Doc {embedding: $vector})")
 ----
 
 
-[role=label--new-6.1]
+[role=label--new-6.2]
 [#uuid]
 == UUID
 
-The Cypher type `UUID` maps directly to link:https://learn.microsoft.com/en-us/dotnet/api/system.guid[`System.Guid`].
-It can be used as a property value, query parameter, and return value in the same way as any other scalar type such as `INTEGER` or `BOOLEAN`.
+The Cypher type link:https://neo4j.com/docs/cypher-manual/current/values-and-types/uuid/[`UUID`] maps directly to link:https://learn.microsoft.com/en-us/dotnet/api/system.guid[`System.Guid`].
 
 [IMPORTANT]
-`UUID` support requires a server that negotiates Bolt 6.1.
+`UUID` requires a Neo4j server version 2026.08 or later.
 
 .Store and retrieve a UUID property
 [source, csharp]
