@@ -25,6 +25,8 @@ For a complete list of the value types the driver serializes data into, see the 
 | `FLOAT`       | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/FloatValue.html[`FloatValue`]
 | `STRING`      | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/StringValue.html[`StringValue`]
 | `ByteArray`   | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/BytesValue.html[`BytesValue`]
+| `VECTOR`      | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/VectorValue.html[`VectorValue`]
+| `UUID`        | link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/UUIDValue.html[`UUIDValue`]
 |===
 
 
@@ -493,6 +495,29 @@ var vector = result.records().get(0).get("vector");
 
 System.out.printf("Retrieved vector: %s", vector);
 // Retrieved vector: vector([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], 8, FLOAT32 NOT NULL)
+----
+
+
+
+[role=label--new-6.2]
+[#uuid]
+== UUID
+
+The Cypher type link:https://neo4j.com/docs/cypher-manual/current/values-and-types/uuid/[`UUID`] maps to link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/UUIDValue.html[`UUIDValue`], basing on `java.util.UUID`.
+
+.Store and work with a UUID
+[source, python]
+----
+// import java.util.UUID;
+// import org.neo4j.driver.Values;
+
+var result = driver.executableQuery("CREATE (v:Value {id: $uid}) RETURN v.id AS uid")
+    .withParameters(Map.of("uid", UUID.randomUUID()))
+    .execute();
+
+var uuidValue = result.records().get(0).get("$uid");
+uuidValue.type(); // TypeSystem.UUID()
+uuidValue.asUUID(); // java.util.UUID value
 ----
 
 
