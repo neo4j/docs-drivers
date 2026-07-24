@@ -67,6 +67,7 @@ Two additional boolean properties act as meta-counters:
 - `contains_system_updates` -- whether the query triggered any write operation on the `system` database
 
 
+[#execution-plan]
 == Query execution plan
 
 If you prefix a query with `EXPLAIN`, the server returns the plan it _would_ use to run the query, but doesn't actually run it.
