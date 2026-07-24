@@ -1,0 +1,13 @@
+# tag::profile-queries[]
+
+[#profile-queries]
+== Profile queries
+
+link:++https://neo4j.com/docs/cypher-manual/current/appendix/tutorials/basic-query-tuning/#_profile_query++[Profile your queries] to locate queries whose performance can be improved.
+You can profile queries by prepending them with `PROFILE`.
+In case some queries are so slow that you are unable to even run them in reasonable times, you can prepend them with `EXPLAIN` instead of `PROFILE`.
+This will return the plan that the server would use to run the query, but without executing it.
+
+For more information, see xref:result-summary.adoc#execution-plan[Explore the query execution summary -> Query execution plan].
+
+# end::profile-queries[]
