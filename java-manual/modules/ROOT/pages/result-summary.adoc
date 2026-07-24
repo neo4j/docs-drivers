@@ -82,8 +82,12 @@ var result = driver.executableQuery("EXPLAIN MATCH (p {name: $name}) RETURN p")
     .withParameters(Map.of("name", "Alice"))
     .withConfig(QueryConfig.builder().withDatabase("<database-name>").build())
     .execute();
-var queryPlan = result.summary().queryPlan().arguments().get("string-representation");
-System.out.println(queryPlan);
+result.summary()
+        .queryPlan()
+        .ifPresentOrElse(
+                queryPlan ->
+                        System.out.println(queryPlan.arguments().get("string-representation")),
+                () -> System.out.println("No query plan available"));
 
 /*
 Planner COST
@@ -116,8 +120,12 @@ var result = driver.executableQuery("PROFILE MATCH (p {name: $name}) RETURN p")
     .withParameters(Map.of("name", "Alice"))
     .withConfig(QueryConfig.builder().withDatabase("<database-name>").build())
     .execute();
-var queryPlan = result.summary().queryProfile().arguments().get("string-representation");
-System.out.println(queryPlan);
+result.summary()
+        .queryProfile()
+        .ifPresentOrElse(
+                queryProfile ->
+                        System.out.println(queryProfile.arguments().get("string-representation")),
+                () -> System.out.println("No query profile available"));
 
 /*
 Planner COST
