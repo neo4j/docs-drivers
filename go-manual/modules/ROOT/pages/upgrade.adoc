@@ -167,7 +167,7 @@ As a result, link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#R
 |6.2
 |**Query profile**
 
-- Type link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#ProfiledPlan[`ProfiledPlan`] is deprecated in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#QueryProfile[`QueryProfile`]. +
+- Type link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#ProfiledPlan[`ProfiledPlan`] is deprecated in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#QueryProfile[`QueryProfile`]. Methods in the new type expose whether stats (such as `DbHits()`, `Time()`, etc.) have been recorded by returning `(T, bool)` instead of `T`. +
 As a result, link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#ResultSummary.Profile[`ResultSummary.Profile()`] is deprecated in favor of link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#ResultSummary.QueryProfile[`ResultSummary.QueryProfile()`].
 - `QueryProfile.Time()` returns `time.Duration` instead of `int64`.
 - The summary types in `neo4j/db` (`Plan, ProfiledPlan, StreamSummary, GqlStatusObject, InputPosition, Summary, QueryType`) have been marked as internal.
