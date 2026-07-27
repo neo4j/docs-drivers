@@ -4,7 +4,7 @@ After all records of a query result have been processed, the server ends the tra
 It comes as a link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/summary/ResultSummary.html[`ResultSummary`] object, and it contains information among which:
 
 - xref:_query_counters[**Query counters**] -- What changes the query triggered on the server
-- xref:_query_execution_plan[**Query execution plan**] -- How the database would execute (or executed) the query
+- xref:execution-plan[**Query execution plan**] -- How the database would execute (or executed) the query
 - xref:_notifications[**Notifications**] -- Extra information raised by the server while running the query
 - Timing information and query request summary
 
