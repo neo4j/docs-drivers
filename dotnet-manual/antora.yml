@@ -6,6 +6,9 @@ nav:
 - modules/ROOT/content-nav.adoc
 asciidoc:
   attributes:
+    page-tabs: drivers-apis@
+    page-tabs-index: 18
+    page-tabs-group: drivers
     dotnet-driver-version: '5.28' # the version of the package published
     dotnet-driver-version-minor: '5.28.4' # the version of the package published at https://www.nuget.org/packages/Neo4j.Driver
     common-partial: 5@common-content:ROOT:partial$
