@@ -11,6 +11,8 @@
     "build": "antora --stacktrace preview.yml",
     "publish": "antora --stacktrace publish.yml",
     "build-verify": "antora --stacktrace --fetch preview.yml --log-format=json --log-level=info --log-file ./build/log/log.json",
+    "verify:preview": "antora --stacktrace --fetch preview.yml --log-format=json --log-level=info --log-file ./build/log/log.json",
+    "verify:publish": "antora --stacktrace --fetch publish.yml --log-format=json --log-level=info --log-file ./build/log/log.json",
     "publish-verify": "antora --stacktrace --fetch publish.yml --log-format=json --log-file ./build/log/log.json",
     "lint": "node scripts/lint-links.js"
   },
@@ -39,7 +41,7 @@
     "yargs": "^17.5.1"
   },
   "devDependencies": {
-    "express": "^4.17.1",
+    "express": "5.2.1",
     "nodemon": "^2.0.15"
   }
 }
