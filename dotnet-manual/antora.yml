@@ -6,6 +6,9 @@ nav:
 - modules/ROOT/content-nav.adoc
 asciidoc:
   attributes:
+    page-tabs: drivers-apis@
+    page-tabs-index: 18
+    page-tabs-group: drivers
     dotnet-driver-version: '6.3' # the version of the package published
     common-partial: 6@common-content:ROOT:partial$
     common-image: 6@common-content:ROOT:image$

@@ -6,6 +6,9 @@ nav:
 - modules/ROOT/content-nav.adoc
 asciidoc:
   attributes:
+    page-tabs: drivers-apis@
+    page-tabs-index: 16
+    page-tabs-group: drivers
     javascript-driver-version: '6.2' # the version of the api docs published at https://neo4j.com/docs/api/javascript-driver/
     common-partial: 6@common-content:ROOT:partial$
     common-image: 6@common-content:ROOT:image$

@@ -6,6 +6,9 @@ nav:
 - modules/ROOT/content-nav.adoc
 asciidoc:
   attributes:
+    page-tabs: drivers-apis@
+    page-tabs-index: 12
+    page-tabs-group: drivers
     go-driver-version: '6.2' # the version of published go api docs
     common-partial: 6@common-content:ROOT:partial$
     common-image: 6@common-content:ROOT:image$
