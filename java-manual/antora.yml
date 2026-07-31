@@ -6,6 +6,9 @@ nav:
 - modules/ROOT/content-nav.adoc
 asciidoc:
   attributes:
+    page-tabs: drivers-apis@
+    page-tabs-index: 14
+    page-tabs-group: drivers
     neo4j-version: '4.4'
     driver-version: "4.4"
     java-driver-version: "4.4.0"
