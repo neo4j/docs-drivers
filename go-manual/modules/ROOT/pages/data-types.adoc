@@ -511,7 +511,7 @@ func main() {
 
     // Create a node with a UUID property
     result, err := neo4j.ExecuteQuery(ctx, driver,
-        "CREATE (d:Doc {id: $uid}) RETURN n.uid AS uid",
+        "CREATE (d:Doc {id: $uid}) RETURN d.uid AS uid",
         map[string]any{"uid": uid},
         neo4j.EagerResultTransformer)
     if err != nil {

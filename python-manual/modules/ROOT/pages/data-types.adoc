@@ -510,7 +510,7 @@ import uuid
 # Insert and read a UUID
 uuid = driver.execute_query(
     "CREATE (d:Doc {id: $uuid}) RETURN d.id AS uuid LIMIT 1",
-    uuid=uuid.uuid1()
+    uuid=uuid.uuid1(),
     database_="neo4j",
 ).records[0]["uuid"]
 
