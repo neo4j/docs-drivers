@@ -112,7 +112,7 @@ Total database accesses: ?
 
 If you instead prefix a query with `PROFILE`, the server returns the execution plan it has used to run the query, together with profiler statistics.
 This includes the list of operators that were used and additional profiling information about each intermediate step.
-The plan is available as a link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/summary/QueryProfile.html[`QueryProfile`] object through the method `ResultSummary.queryProfile()` (or a link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/summary/Profile.html[`Profile`] object via `ResultSummary.profile()` for versions < 6.2).
+The plan is available as a link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/summary/QueryProfile.html[`QueryProfile`] object through the method `ResultSummary.queryProfile()` (or a link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/summary/ProfiledPlan.html[`ProfiledPlan`] object via `ResultSummary.profile()` for versions < 6.2).
 Notice that the query is also _run_, so the result object also contains any result records.
 
 [source, java]
