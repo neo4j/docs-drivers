@@ -477,7 +477,7 @@ func main() {
 
 The Cypher type link:https://neo4j.com/docs/cypher-manual/current/values-and-types/uuid/[`UUID`] maps to link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j/dbtype#UUID[`UUID`], providing 16-byte RFC 9562 universally unique identifiers.
 
-.Store and work with a UUID
+.Store and work with UUID
 [source, go]
 ----
 package main
@@ -511,8 +511,8 @@ func main() {
 
     // Create a node with a UUID property
     result, err := neo4j.ExecuteQuery(ctx, driver,
-        "CREATE (d:Doc {id: $uid}) RETURN d.uid AS uid",
-        map[string]any{"uid": uid},
+        "CREATE (d:Doc {id: $uid}) RETURN d.id AS id",
+        map[string]any{"id": uid},
         neo4j.EagerResultTransformer)
     if err != nil {
         panic(err)
@@ -521,10 +521,10 @@ func main() {
     record := result.Records[0]
 
     // Direct map access with explicit type assertion
-    rawRecordUid := record.AsMap()["uid"].(dbtype.UUID)
+    rawRecordUid := record.AsMap()["id"].(dbtype.UUID)
 
     // Typed access with GetRecordValue for clearer errors
-    recordUid, _, err := neo4j.GetRecordValue[dbtype.UUID](record, "uid")
+    recordUid, _, err := neo4j.GetRecordValue[dbtype.UUID](record, "id")
     if err != nil {
         panic(err)
     }

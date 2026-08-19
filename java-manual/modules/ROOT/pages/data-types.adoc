@@ -504,17 +504,17 @@ System.out.printf("Retrieved vector: %s", vector);
 
 The Cypher type link:https://neo4j.com/docs/cypher-manual/current/values-and-types/uuid/[`UUID`] maps to link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/internal/value/UUIDValue.html[`UUIDValue`], basing on `java.util.UUID`.
 
-.Store and work with a UUID
+.Store and work with UUID
 [source, java]
 ----
 // import java.util.UUID;
 // import org.neo4j.driver.Values;
 
-var result = driver.executableQuery("CREATE (v:Value {id: $uid}) RETURN v.id AS uid")
-    .withParameters(Map.of("uid", UUID.randomUUID()))
+var result = driver.executableQuery("CREATE (d:Doc {id: $uid}) RETURN d.id AS id")
+    .withParameters(Map.of("id", UUID.randomUUID()))
     .execute();
 
-var uuidValue = result.records().get(0).get("uid");
+var uuidValue = result.records().get(0).get("id");
 uuidValue.type(); // TypeSystem.UUID()
 uuidValue.asUUID(); // java.util.UUID value
 ----

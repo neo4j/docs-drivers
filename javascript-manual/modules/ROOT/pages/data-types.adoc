@@ -522,16 +522,16 @@ Logging `Vector` objects risks clogging the log or resulting in Out of Memory er
 
 The Cypher type link:https://neo4j.com/docs/cypher-manual/current/values-and-types/uuid/[`UUID`] maps to link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/uuid.js~UUID.html[`UUID`].
 
-.Store and work with a UUID
+.Store and work with UUID
 [source, javascript]
 ----
 // Store UUID as a node property and get it back
 var { records } = await driver.executeQuery(
-    'MERGE (d:Doc {id: $uuid}) RETURN d.id AS uuid',
-    { uuid: neo4j.uuid('12345678-1234-1234-1234-123456789abc'), }
+    'MERGE (d:Doc {id: $uid}) RETURN d.id AS id',
+    { id: neo4j.uuid('12345678-1234-1234-1234-123456789abc'), }
 )
 
-var uuid = records[0].get("uuid")
+var id = records[0].get("id")
 ----
 
 

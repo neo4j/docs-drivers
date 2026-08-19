@@ -502,17 +502,17 @@ The Cypher type link:https://neo4j.com/docs/cypher-manual/current/values-and-typ
 [NOTE]
 The `UUID.is_safe` property is not preserved when a UUID is stored and retrieved from the database.
 
-.Store and work with a UUID
+.Store and work with UUID
 [source, python]
 ----
 import uuid
 
 # Insert and read a UUID
 uuid = driver.execute_query(
-    "CREATE (d:Doc {id: $uuid}) RETURN d.id AS uuid LIMIT 1",
+    "CREATE (d:Doc {id: $uuid}) RETURN d.id AS id LIMIT 1",
     uuid=uuid.uuid1(),
     database_="neo4j",
-).records[0]["uuid"]
+).records[0]["id"]
 
 print(f"Got UUID: {uuid}")
 ----
