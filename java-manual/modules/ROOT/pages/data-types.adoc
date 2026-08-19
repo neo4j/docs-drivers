@@ -514,7 +514,7 @@ var result = driver.executableQuery("CREATE (v:Value {id: $uid}) RETURN v.id AS 
     .withParameters(Map.of("uid", UUID.randomUUID()))
     .execute();
 
-var uuidValue = result.records().get(0).get("$uid");
+var uuidValue = result.records().get(0).get("uid");
 uuidValue.type(); // TypeSystem.UUID()
 uuidValue.asUUID(); // java.util.UUID value
 ----
