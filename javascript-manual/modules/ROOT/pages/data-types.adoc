@@ -528,7 +528,7 @@ The Cypher type link:https://neo4j.com/docs/cypher-manual/current/values-and-typ
 // Store UUID as a node property and get it back
 var { records } = await driver.executeQuery(
     'MERGE (d:Doc {id: $uid}) RETURN d.id AS id',
-    { id: neo4j.uuid('12345678-1234-1234-1234-123456789abc'), }
+    { uid: neo4j.uuid('12345678-1234-1234-1234-123456789abc'), }
 )
 
 var id = records[0].get("id")

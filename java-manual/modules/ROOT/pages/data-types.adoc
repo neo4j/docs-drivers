@@ -511,7 +511,7 @@ The Cypher type link:https://neo4j.com/docs/cypher-manual/current/values-and-typ
 // import org.neo4j.driver.Values;
 
 var result = driver.executableQuery("CREATE (d:Doc {id: $uid}) RETURN d.id AS id")
-    .withParameters(Map.of("id", UUID.randomUUID()))
+    .withParameters(Map.of("uid", UUID.randomUUID()))
     .execute();
 
 var uuidValue = result.records().get(0).get("id");
