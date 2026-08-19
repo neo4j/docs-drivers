@@ -34,20 +34,22 @@ Once you have a `Driver` instance, use the `.VerifyConnectivity()` method to ens
 package main
 
 import (
-    "fmt"
     "context"
+    "fmt"
     "github.com/neo4j/neo4j-go-driver/v6/neo4j"
 )
 
 func main() {
     ctx := context.Background()
-    // URI examples: "neo4j://localhost", "neo4j+s://xxx.databases.neo4j.io"
     dbUri := "<database-uri>"
     dbUser := "<username>"
     dbPassword := "<password>"
     driver, err := neo4j.NewDriver(
         dbUri,
         neo4j.BasicAuth(dbUser, dbPassword, ""))
+    if err != nil {
+        panic(err)
+    }
     defer driver.Close(ctx)
 
     err = driver.VerifyConnectivity(ctx)

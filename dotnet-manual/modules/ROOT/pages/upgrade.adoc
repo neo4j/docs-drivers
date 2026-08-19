@@ -95,4 +95,9 @@ The new methods behave similarly, but the argument types are different and the n
 |link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IRelationship.html[`IRelationship`] -- Methods `.StartNodeId()` and `.EndNodeId()` are deprecated in favor of `.StartNodeElementId()` and `.EndNodeElementId()`. Old identifiers were `long`, whereas new ElementIds are `string`.
 |label:deprecated[]
 
+|6.3
+|Interface link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IProfiledPlan.html[`IProfiledPlan`] is deprecated in favor of link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IQueryProfile.html[`IQueryProfile`], which provides nullable properties. +
+As a result, link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IResultSummary.Profile.html[`IResultSummary.Profile`] is deprecated in favor of link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.IResultSummary.QueryProfile.html[`ResultSummary.QueryProfile`].
+|label:deprecated[] label:removed[Changed]
+
 |===

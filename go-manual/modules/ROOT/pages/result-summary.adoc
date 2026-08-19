@@ -4,7 +4,7 @@ After all records of a query result have been processed, the server ends the tra
 It comes as a link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#ResultSummary[`ResultSummary`] object, and it contains information among which:
 
 - xref:_query_counters[**Query counters**] -- What changes the query triggered on the server
-- xref:_query_execution_plan[**Query execution plan**] -- How the database would execute (or executed) the query
+- xref:execution-plan[**Query execution plan**] -- How the database would execute (or executed) the query
 - xref:_notifications[**Notifications**] -- Extra information raised by the server while running the query
 - Timing information and query request summary
 
@@ -77,6 +77,7 @@ Two additional boolean methods act as meta-counters:
 - `.ContainsSystemUpdates()` -- whether the query triggered any write operation on the `system` database
 
 
+[#execution-plan]
 == Query execution plan
 
 If you prefix a query with `EXPLAIN`, the server returns the plan it _would_ use to run the query, but does not actually run it.
@@ -113,9 +114,9 @@ Total database accesses: ?
 */
 ----
 
-If you instead prefix a query with the keyword `PROFILE`, the server returns the execution plan it has used to run the query, together with profiler statistics.
+If you instead prefix a query with `PROFILE`, the server returns the execution plan it has used to run the query, together with profiler statistics.
 This includes the list of operators that were used and additional profiling information about each intermediate step.
-You can access the plan by calling `ResultSummary.Profile()`.
+You can access the plan by calling `ResultSummary.QueryProfile()` (for versions < 6.2, the method is `ResultSummary.Profile()`).
 Notice that the query is also _run_, so the result object also contains any result records.
 
 [source, go]
@@ -127,7 +128,7 @@ result, _ := neo4j.ExecuteQuery(ctx, driver,
     },
     neo4j.EagerResultTransformer,
     neo4j.ExecuteQueryWithDatabase("<database-name>"))
-fmt.Println(result.Summary.Profile().Arguments()["string-representation"])
+fmt.Println(result.Summary.QueryProfile().Arguments()["string-representation"])
 /*
 Planner COST
 Runtime PIPELINED
