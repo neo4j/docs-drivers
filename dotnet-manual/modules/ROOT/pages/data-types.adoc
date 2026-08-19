@@ -17,6 +17,7 @@ The tables in this section show the mapping between Cypher data types and .NET t
 | `FLOAT`       | `double`
 | `STRING`      | `string`
 | `ByteArray`   | `byte[]`
+| `UUID`        | `System.Guid`
 |===
 
 
@@ -305,6 +306,37 @@ var result = await driver.ExecutableQuery("MERGE (d:Doc {embedding: $vector})")
     .WithParameters(new { vector = vector })
     .WithConfig(new QueryConfig(database: "<database-name>"))
     .ExecuteAsync();
+----
+
+
+[role=label--new-6.2]
+[#uuid]
+== UUID
+
+The Cypher type link:https://neo4j.com/docs/cypher-manual/current/values-and-types/uuid/[`UUID`] maps directly to link:https://learn.microsoft.com/en-us/dotnet/api/system.guid[`System.Guid`].
+
+[IMPORTANT]
+`UUID` requires a Neo4j server version 2026.08 or later.
+
+.Store and retrieve a UUID property
+[source, csharp]
+----
+var original = Guid.NewGuid();
+var result = await driver.ExecutableQuery(@"
+    MERGE (n:Item {nodeId: $input})
+    RETURN n.nodeId AS nodeId
+    ")
+    .WithParameters(new { input = original })
+    .WithConfig(new QueryConfig(database: "<database-name>"))
+    .ExecuteAsync();
+
+var record = result.Result[0];
+Console.WriteLine(record["nodeId"].As<Guid>());    // direct access
+Console.WriteLine(record.AsObject<Item>().nodeId); // via object mapping
+
+class Item {
+    public Guid nodeId { get; set; }
+}
 ----
 
 

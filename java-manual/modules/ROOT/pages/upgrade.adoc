@@ -145,4 +145,9 @@ As a result,
 - Methods link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Config.ConfigBuilder.html#withLogging(org.neo4j.driver.Logging)[`Config.ConfigBuilder.withLogging()`] and  link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Config.html#logging()[`Config.logging()`] are deprecated.
 |label:deprecated[]
 
+|6.2
+|Interface link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/summary/ProfiledPlan.html[`ProfiledPlan`] is deprecated in favor of link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/summary/QueryProfile.html[`QueryProfile`]. +
+As a result, link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/summary/ResultSummary.html#profile()[`ResultSummary.profile()`] is deprecated in favor of link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/summary/ResultSummary.html#queryProfile()[`ResultSummary.queryProfile()`], and link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/summary/ResultSummary.html#plan()[`ResultSummary.plan()`] is deprecated in favor of link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/summary/ResultSummary.html#queryPlan()[`ResultSummary.queryPlan()`].
+|label:deprecated[] label:removed[Changed]
+
 |===

@@ -4,7 +4,7 @@ After all records of a query result have been processed, the server ends the tra
 It comes as a link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j#ResultSummary[`ResultSummary`] object, and it contains information among which:
 
 - xref:_query_counters[**Query counters**] -- What changes the query triggered on the server
-- xref:_query_execution_plan[**Query execution plan**] -- How the database would execute (or executed) the query
+- xref:execution-plan[**Query execution plan**] -- How the database would execute (or executed) the query
 - xref:_notifications[**Notifications**] -- Extra information raised by the server while running the query
 - Timing information and query request summary
 
@@ -77,6 +77,7 @@ Two additional boolean methods act as meta-counters:
 - `.ContainsSystemUpdates()` -- whether the query triggered any write operation on the `system` database
 
 
+[#execution-plan]
 == Query execution plan
 
 If you prefix a query with `EXPLAIN`, the server returns the plan it _would_ use to run the query, but does not actually run it.
