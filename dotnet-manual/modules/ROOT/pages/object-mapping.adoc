@@ -329,12 +329,12 @@ The constructor signature implies that the `name` return key is mapped to the cl
 [#optional-constructor-parameters]
 === Optional constructor parameters
 
-If a constructor parameter has a C# default value, the mapper honours that default when the value is absent from the record.
-If the value _is_ present but its value is incompatible with the parameter type, an exception is still thrown.
+If a constructor parameter has a default value, the mapper uses it when the value is absent from the record.
+If the value _is_ present but its value is incompatible with the parameter type, an exception is thrown.
 
 [NOTE]
 ====
-If `[MappingDefaultValue]` is applied to a parameter that also has a C# default value and the value is missing, the attribute's value takes precedence over the C# default.
+If `[MappingDefaultValue]` is applied to a parameter that also has a default value and the value is missing, the attribute's value takes precedence over the parameter default.
 If both are present, the attribute value wins. Using both is not recommended as it makes the intended default unclear.
 ====
 
@@ -365,7 +365,7 @@ class Person {
 ----
 
 <.> The query does not return `age`.
-<.> `age` is absent from the record, so the mapper uses the C# default of `18`.
+<.> `age` is absent from the record, so the constructor's default is used.
 
 
 [#anonymous-types]
