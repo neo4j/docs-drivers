@@ -46,7 +46,7 @@ driver.session()
 == Be aware of the cost of transactions
 
 Queries are always run within <<transaction, transactions>> on the server, so that the database always ends up in a consistent state regardless of what happens during a transaction execution (power outages, software crashes, etc).
-Queries submitted via xref:query-simple.adoc[`.execute_query()`] or xref:transactions.adoc#managed-transactions[`.execute_read/write()`] are also automatically retried in case of failure.
+The driver automatically retries transactions started with xref:query-simple.adoc[`.execute_query()`] or xref:transactions.adoc#managed-transactions[`.execute_read/write()`] in case of failure.
 A transactions yields an overhead that is small, but that adds up as the number of transactions increases.
 
 As your workload grows, evaluate what level of isolation each query needs and be intentional about your usage of transactions.
