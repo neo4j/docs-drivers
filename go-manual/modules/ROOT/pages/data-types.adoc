@@ -22,6 +22,8 @@ For it to work, cast the value to string _before_ using it as a string: `name :=
 | `FLOAT`       | `float64`
 | `STRING`      | `string`
 | `ByteArray`   | `[]byte`
+| `VECTOR`      | `Vector`
+| `UUID`        | `UUID`
 |===
 
 
@@ -465,6 +467,69 @@ func main() {
         fmt.Printf("Read vector: %v\n", v)
     }
     // Read vector: vector([1.0, 2.0, 3.0], 3, FLOAT64 NOT NULL)
+}
+----
+
+
+[role=label--new-6.2 label--enterprise-edition]
+[#uuid]
+== UUID
+
+The Cypher type link:https://neo4j.com/docs/cypher-manual/current/values-and-types/uuid/[`UUID`] maps to link:https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j/dbtype#UUID[`UUID`], providing 16-byte RFC 9562 universally unique identifiers.
+
+.Store and work with UUID
+[source, go]
+----
+package main
+
+import (
+    "context"
+    "fmt"
+
+    "github.com/neo4j/neo4j-go-driver/v6/neo4j"
+    "github.com/neo4j/neo4j-go-driver/v6/neo4j/dbtype"
+)
+
+func main() {
+    // Connection to database
+    ctx := context.Background()
+    dbUri := "<database-uri>"
+    dbUser := "<username>"
+    dbPassword := "<password>"
+    driver, err := neo4j.NewDriver(
+        dbUri,
+        neo4j.BasicAuth(dbUser, dbPassword, ""))
+    defer driver.Close(ctx)
+    if err != nil {
+        panic(err)
+    }
+
+    uid, err := dbtype.ParseUUID("550e8400-e29b-41d4-a716-446655440000")
+    if err != nil {
+        panic(err)
+    }
+
+    // Create a node with a UUID property
+    result, err := neo4j.ExecuteQuery(ctx, driver,
+        "CREATE (d:Doc {id: $uid}) RETURN d.id AS id",
+        map[string]any{"uid": uid},
+        neo4j.EagerResultTransformer)
+    if err != nil {
+        panic(err)
+    }
+
+    record := result.Records[0]
+
+    // Direct map access with explicit type assertion
+    rawRecordUid := record.AsMap()["id"].(dbtype.UUID)
+
+    // Typed access with GetRecordValue for clearer errors
+    recordUid, _, err := neo4j.GetRecordValue[dbtype.UUID](record, "id")
+    if err != nil {
+        panic(err)
+    }
+
+    fmt.Printf("record raw=%v, record typed=%v\n", rawRecordUid, recordUid)
 }
 ----
 
