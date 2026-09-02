@@ -20,7 +20,7 @@ RETURN p AS person, r as roles, m AS movie, COLLECT(c) AS costars
 ----
 
 And the following classes:
-[source, javascript]
+[source, typescript]
 ----
 class ActingJob {
     person: Person
@@ -50,7 +50,7 @@ class Roles {
 ----
 
 This is a set of Rules objects to allow the query result to be mapped into a list of ActingJobs
-[source, javascript]
+[source, typescript]
 ----
 const personRules: Rules = {
     name: rule.asString(),
@@ -59,7 +59,7 @@ const personRules: Rules = {
 ----
 This sets string typechecking for the `name` property and Number typechecking for `born`. In addition, the born property is set to be optional and be an Integer (this will automatically convert between an integer in the database and a JavaScript number in client code).
 
-[source, javascript]
+[source, typescript]
 ----
 const movieRules: Rules = {
     title: rule.asString({}),
@@ -75,7 +75,7 @@ The Movie rules are rather similar to those for Person, but it introduces the ex
 Since actors have a list of roles for each movie they acted in, we have to set that the roles are a list, each entry of which is a string.
 
 Now we put these rules together to create the rules to map the query result to an ActingJob object.
-[source, javascript]
+[source, typescript]
 ----
 const actingJobRules: Rules = {
     person: rule.asNode({
@@ -103,7 +103,7 @@ The mapping rules can be used to map Result objects, individual Records or be us
 Each of the mapping methods take the type to map to and/or a set of rules. If only the class is provided, then the driver will make a best effort, but cannot ensure type safety. If only a Rules object is supplied, then the Result or Record will be mapped, but the driver cannot provide the IDE with type hints. The recommended usage is to utilize both, later in this document there is a convenience function to make this simpler.
 
 === Usage with transaction functions
-[source, javascript]
+[source, typescript]
 ----
 const res = await session.executeRead(async (tx) => {
     return tx.run(
@@ -116,7 +116,7 @@ res.records[0].person.born //after being awaited, res is a MappedQueryResult, co
 ----
 
 === Usage with driver.executeQuery()
-[source, javascript]
+[source, typescript]
 ----
 const res = await driver.executeQuery<MappedQueryResult<ActingJob>>(`MATCH (p:Person)-[r:ACTED_IN]->(m:Movie)<-[:ACTED_IN]-(c:Person) 
  WHERE id(p) <> id(c) 
@@ -124,7 +124,7 @@ const res = await driver.executeQuery<MappedQueryResult<ActingJob>>(`MATCH (p:Pe
 ----
 
 === Usage with session.run()
-[source, javascript]
+[source, typescript]
 ----
 const res2 = await session.run(
     `MATCH (p:Person)-[r:ACTED_IN]->(m:Movie)<-[:ACTED_IN]-(c:Person) 
@@ -142,7 +142,7 @@ Much like other instances when you can pass rules, you can also pass a class' co
 
 With `asObject` we can create a set of rules for ActingJobs that can be used without returning whole Nodes and Relationships.
 
-[source, javascript]
+[source, typescript]
 ----
 const actingJobRulesObject: Rules = {
     person: rule.asObject(Person, personRules),
@@ -166,20 +166,20 @@ This setup saves on bandwitdth, especially if the nodes contain large properties
 In the examples above, we have always provided both `ActingJob` and `actingJobRules`, which requires these rules to be available in every part of the code where a query is run.
 
 The following will register this pair in global memory, meaning it persists between driver instances. This means you can run this function for every type you need mapped, and never need to explicitly provide rules to the mappers in your code unless you want the default case overridden. 
-[source, javascript]
+[source, typescript]
 ----
 recordObjectMapping.register(ActingJob, actingJobRules)
 ----
 
 This includes inside the rules themselves. When writing the `actingJobRules`, we had to set the rule for the `person` property as
-[source, javascript]
+[source, typescript]
 ----
 person: rule.asNode({
         convert: (node: Node) => node.as(Person, personRules)
     })
 ----
 however, if we know we have registed `personRules` to `Person` with `recordObjectMapping.register(ActingJob, actingJobRules)` we can replace that with:
-[source, javascript]
+[source, typescript]
 ----
 person: rule.asNode({
         convert: (node: Node) => node.as(Person)
@@ -192,7 +192,7 @@ The Object Mapping rules also function for Object Parameter Mapping. Allowing th
 
 If your domain object is already a simple JavaScript object with all the properties in the correct format to be sent as parameters there is of course no need for any mapping to occur. But if you store temporal data as Neo4j temporal types in the database but use them as strings in your Domain Object, or if your Domain Object includes functions or properties which can not or should not be sent as parameters, the mapping rules can assist in sanitizing the data for transmission.
 
-[source, javascript]
+[source, typescript]
 ----
 class TestObj {
     number: number
