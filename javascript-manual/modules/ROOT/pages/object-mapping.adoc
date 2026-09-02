@@ -57,7 +57,7 @@ const personRules: Rules = {
     born: rule.asNumber({ isInteger: true, optional: true })
 }
 ----
-This sets string typechecking for the `name` property and Number typechecking for `born`. In addition, the born property is set to be optional and be an Integer (this will automatically convert between an integer in the database and a JavaScript number in client code).
+This sets string type validation for the `name` property and Number type validation for `born`. In addition, the born property is set to be optional and be an Integer (this will automatically convert between an integer in the database and a JavaScript number in client code).
 
 [source, typescript]
 ----
@@ -71,8 +71,8 @@ const rolesRules = {
     roleNames: rule.asList({apply: rule.asString(), from: "roles"})
 }
 ----
-The Movie rules are rather similar to those for Person, but it introduces the extra rule config `from`. This simply changes the key the property is matched from, useful when there is an inconsistency in the name between code and data. 
-Since actors have a list of roles for each movie they acted in, we have to set that the roles are a list, each entry of which is a string.
+The Movie rules are rather similar to those for Person, but it introduces the extra rule config `from`. This simply changes the key the property is matched from, for when there is an inconsistency in the name used in client code and in the database. 
+The `asList` rule will apply the rule in it's `apply` parameter to every entry in the list.
 
 Now we put these rules together to create the rules to map the query result to an ActingJob object.
 [source, typescript]
@@ -94,13 +94,14 @@ const actingJobRules: Rules = {
     })
 }
 ----
-This introduces the functions `asNode`, `asRelationship`. These perform typechecking, then take optional configurations to convert into other types.
+This introduces the functions `asNode`, `asRelationship`. These create rules that allow conversion of Relationships and Nodes into other types.
 
-A record mapped according to these Rules is then known to obey these rules and function as an ActingJob object, and IDEs like VSCode will be able to provide reasonable hints and help.
+The mapping rules can be used to map Result objects, individual Records or be used to by a `hydrated` ResultTransformer to map the results of a query.
 
-The mapping rules can be used to map Result objects, individual Records or be used to by a special ResultTransformer to map the results of a query.
-
-Each of the mapping methods take the type to map to and/or a set of rules. If only the class is provided, then the driver will make a best effort, but cannot ensure type safety. If only a Rules object is supplied, then the Result or Record will be mapped, but the driver cannot provide the IDE with type hints. The recommended usage is to utilize both, later in this document there is a convenience function to make this simpler.
+[NOTE]
+====
+The funtions under `rule` create objects of the `Rule` class, it is possible to create custom `Rule` objects that perform more advanced type validation or conversions. The `Rule` type is exported by the driver and documented in the API docs.
+====
 
 === Usage with transaction functions
 [source, typescript]
@@ -134,13 +135,9 @@ const res2 = await session.run(
 ----
 
 === Nested Rules
-The `asObject` rule factory allows nesting in the created rules.
+The `asObject` rule factory allows createing nested rules. It allows to mapping of results into multiple objects without returning full nodes or relationships to transform.
 
-It's useful when you're not just returning one object in your records, and allows you to map your result into multiple objects without returning full nodes or relationships to transform.
-
-Much like other instances when you can pass rules, you can also pass a class' constructor to have the `asObject` conversion convert to that class.
-
-With `asObject` we can create a set of rules for ActingJobs that can be used without returning whole Nodes and Relationships.
+With `asObject`, a set of rules for ActingJobs that can be used without returning whole Nodes and Relationships can be created.
 
 [source, typescript]
 ----
@@ -163,9 +160,9 @@ await session.run(
 This setup saves on bandwitdth, especially if the nodes contain large properties like vectors which are not used for mapping.
 
 == Registering per-type default rules.
-In the examples above, we have always provided both `ActingJob` and `actingJobRules`, which requires these rules to be available in every part of the code where a query is run.
+In the examples above, both `ActingJob` and `actingJobRules` have been provided together, which requires these rules to be available in every part of the code where a query is run.
 
-The following will register this pair in global memory, meaning it persists between driver instances. This means you can run this function for every type you need mapped, and never need to explicitly provide rules to the mappers in your code unless you want the default case overridden. 
+The following code registers the rules to the object, meaning the rules do not need to be provided when using Object Mapping except to override the default.
 [source, typescript]
 ----
 recordObjectMapping.register(ActingJob, actingJobRules)
@@ -188,9 +185,9 @@ person: rule.asNode({
 
 == Mapping Rules for Parameters
 
-The Object Mapping rules also function for Object Parameter Mapping. Allowing the same rules used to map records into object to be used to map objects to query parameters.
+The Object Mapping rules also function for Object Parameter Mapping, allowing the same rules used to map records into object to be used to map objects to query parameters.
 
-If your domain object is already a simple JavaScript object with all the properties in the correct format to be sent as parameters there is of course no need for any mapping to occur. But if you store temporal data as Neo4j temporal types in the database but use them as strings in your Domain Object, or if your Domain Object includes functions or properties which can not or should not be sent as parameters, the mapping rules can assist in sanitizing the data for transmission.
+If a domain object is a simple JavaScript object with all the properties in the correct format to be sent as parameters there is no need for any mapping to occur, but if temporal data is stored as Neo4j temporal types in the database but used as strings in client code, or if a Domain Object includes functions or properties which can not or should not be sent as parameters, the mapping rules can assist in sanitizing the data for transmission.
 
 [source, typescript]
 ----
