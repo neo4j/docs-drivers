@@ -2,7 +2,7 @@
 
 Neither JavaScript nor Neo4j are strongly typed, which can lead to mistakes where a property is set to the wrong type, or an unexpected type is returned from the database and causes errors in client code.
 
-The driver offers Object Mapping to alleviate this. Object Mapping enables users to map the data in their records into classes with known propety types, and to map these classes into parameters for their queries.
+Object Mapping enables users to map the data in their records into classes with known propety types, and to map these classes into parameters for their queries.
 
 [NOTE]
 ====
@@ -27,8 +27,14 @@ class ActingJob {
     movie: Movie
     roles: Roles
     costars: Person[]
+    constructor(person: Person, movie: Movie, roles: Roles, costars: Person[]) {
+        this.person = person
+        this.movie = movie
+        this.roles = roles
+        this.costars = costars
+    }
 
-    function toString(): string {
+    toString(): string {
         return `${this.person.name} acted in ${this.movie.title} as the role(s) ${this.roles.roleNames.toString()} along with ${this.costars.map((p:person) => p.name).toString()}`
     }
 }
@@ -36,16 +42,26 @@ class ActingJob {
 class  Movie {
     title: string
     release?: number
-    tagline?: string
+    constructor(title: string, release: number) {
+        this.title = title
+        this.release = release
+    }
 }
 
 class Person {
     name: string
     born?: number
+    constructor(name: string, born: number) {
+        this.name = name
+        this.born = born
+    }
 }
 
 class Roles {
     roleNames: string[]
+    constructor(roleNames: string[]) {
+        this.roleNames = roleNames
+    }
 }
 ----
 
@@ -64,7 +80,6 @@ This sets string type validation for the `name` property and Number type validat
 const movieRules: Rules = {
     title: rule.asString({}),
     release: rule.asNumber({ isInteger: true, optional: true, from: "released" }),
-    tagline: rule.asString({ optional: true })
 }
 
 const rolesRules = {
@@ -106,11 +121,12 @@ The funtions under `rule` create objects of the `Rule` class, it is possible to 
 === Usage with transaction functions
 [source, typescript]
 ----
-const res = await session.executeRead(async (tx) => {
+await session.executeRead(async (tx) => {
     return tx.run(
-    `MATCH (p:Person)-[r:ACTED_IN]->(m:Movie)<-[:ACTED_IN]-(c:Person) 
- WHERE id(p) <> id(c) 
- RETURN p AS person, r as roles, m AS movie, COLLECT(c) AS costars`).as(ActingJob, actingJobRules)  //The Result is here converted to a MappedResult<ActingJob> and can be consumed, subscribed to or awaited like a normal result, but all Records are replaced with ActingJobs.
+        `MATCH (p:Person)-[r:ACTED_IN]->(m:Movie)<-[:ACTED_IN]-(c:Person) 
+        WHERE id(p) <> id(c) 
+        RETURN p AS person, r as roles, m AS movie, COLLECT(c) AS costars`
+    ).as(ActingJob, actingJobRules)  //The Result is here converted to a MappedResult<ActingJob> and can be consumed, subscribed to or awaited like a normal result, but all Records are replaced with ActingJobs.
 });
 
 res.records[0].person.born //after being awaited, res is a MappedQueryResult, containing an array of ActingJobs and a ResultSummary. You and your IDE can now feel safe in knowing that this is a Number.
@@ -119,19 +135,23 @@ res.records[0].person.born //after being awaited, res is a MappedQueryResult, co
 === Usage with driver.executeQuery()
 [source, typescript]
 ----
-const res = await driver.executeQuery<MappedQueryResult<ActingJob>>(`MATCH (p:Person)-[r:ACTED_IN]->(m:Movie)<-[:ACTED_IN]-(c:Person) 
- WHERE id(p) <> id(c) 
- RETURN p AS person, r as roles, m AS movie, COLLECT(c) AS costars`, {}, {resultTransformer: neo4j.resultTransformers.hydrated(ActingJob, actingJobRules)})
+await driver.executeQuery<MappedQueryResult<ActingJob>>(
+    `MATCH (p:Person)-[r:ACTED_IN]->(m:Movie)<-[:ACTED_IN]-(c:Person) 
+    WHERE id(p) <> id(c) 
+    RETURN p AS person, r as roles, m AS movie, COLLECT(c) AS costars`,
+    {},
+    {resultTransformer: neo4j.resultTransformers.hydrated(ActingJob, actingJobRules)}
+)
 ----
 
 === Usage with session.run()
 [source, typescript]
 ----
-const res2 = await session.run(
+await session.run(
     `MATCH (p:Person)-[r:ACTED_IN]->(m:Movie)<-[:ACTED_IN]-(c:Person) 
- WHERE id(p) <> id(c) 
- RETURN p AS person, r as roles, m AS movie, COLLECT(c) AS costars`
- ).as(ActingJob, actingJobRules)
+    WHERE id(p) <> id(c) 
+    RETURN p AS person, r as roles, m AS movie, COLLECT(c) AS costars`
+).as(ActingJob, actingJobRules)
 ----
 
 === Nested Rules
@@ -143,7 +163,7 @@ With `asObject`, a set of rules for ActingJobs that can be used without returnin
 ----
 const actingJobRulesObject: Rules = {
     person: rule.asObject(Person, personRules),
-    role: rule.asObject(Role, roleRules),
+    roles: rule.asObject(Roles, rolesRules),
     movie: rule.asObject(Movie, movieRules),
     costars: rule.asList({
         apply: rule.asObject(Person, personRules),
@@ -153,7 +173,7 @@ const actingJobRulesObject: Rules = {
 await session.run(
     `MATCH (p:Person)-[r:ACTED_IN]->(m:Movie)<-[:ACTED_IN]-(c:Person) 
     WHERE id(p) <> id(c) 
-    RETURN {name: p.name, born: p.born} AS person, {name: r.characterName} as role, {released: m.release, title: m.title, tagline: m.tagline} AS movie, COLLECT({name: c.name, born: c.born}) AS costars`
+    RETURN {name: p.name, born: p.born} AS person, {roles: r.roles} as roles, {released: m.release, title: m.title} AS movie, COLLECT({name: c.name, born: c.born}) AS costars`
 ).as(ActingJob, actingJobRulesObject)
 ----
 
@@ -196,7 +216,7 @@ class TestObj {
     string: string
     date: string
     list: string[]
-    constructor(number, string, date, list) {
+    constructor(number: number, string: string, date: string, list: string[]) {
         this.number = number
         this.string = string
         this.date = date
@@ -219,8 +239,8 @@ const rules = {
 
 neo4j.RecordObjectMapping.register(TestObj, rules) // Register the rules object to the TestObj class
 
-const res = await driver.executeQuery<MappedQueryResult<ActingJob>>(
+const res = await driver.executeQuery<MappedQueryResult<TestObj>>(
     'RETURN $string as string, $number as number, $big_int as big_int, $date as date, $dob as dob, $list as list',
-    new TestObj(1, "hello", ["good", "bye"], "2026-09-02"), // executeQuery automatically applies the TestObj rules to this object.
+    new TestObj(1, "hello", "2026-09-02", ["good", "bye"]), // executeQuery automatically applies the TestObj rules to this object.
     {resultTransformer: neo4j.resultTransformers.hydrated(TestObj)})
 ----
