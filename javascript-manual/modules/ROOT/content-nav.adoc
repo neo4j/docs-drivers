@@ -15,6 +15,7 @@
 * xref:query-advanced.adoc[Further query mechanisms]
 * xref:performance.adoc[Performance recommendations]
 * xref:browser-websockets.adoc[Usage within a browser (WebSockets)]
+* xref:object-mapping.adoc[Type checking and mapping]
 
 * *Reference*
 

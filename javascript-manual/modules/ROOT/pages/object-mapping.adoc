@@ -1,0 +1,246 @@
+= JavaScript Driver Record and Parameter Object Mapping
+
+Neither JavaScript nor Neo4j are strongly typed, which can lead to mistakes where a property is set to the wrong type, or an unexpected type is returned from the database and causes errors in client code.
+
+Object Mapping enables users to map the data in their records into classes with known propety types, and to map these classes into parameters for their queries.
+
+[NOTE]
+====
+The classes being mapped must have a constructor function that can be called without arguments, and all properties that are mapped must be publicly accessible. Mapping values into a constructor may be a future feature.
+====
+
+== Mapping Rules
+
+Given the following query:
+[source, cypher]
+----
+MATCH (p:Person)-[r:ACTED_IN]->(m:Movie)<-[:ACTED_IN]-(c:Person) 
+WHERE id(p) <> id(c) 
+RETURN p AS person, r as roles, m AS movie, COLLECT(c) AS costars
+----
+
+And the following classes:
+[source, typescript]
+----
+class ActingJob {
+    person: Person
+    movie: Movie
+    roles: Roles
+    costars: Person[]
+    constructor(person: Person, movie: Movie, roles: Roles, costars: Person[]) {
+        this.person = person
+        this.movie = movie
+        this.roles = roles
+        this.costars = costars
+    }
+
+    toString(): string {
+        return `${this.person.name} acted in ${this.movie.title} as the role(s) ${this.roles.roleNames.toString()} along with ${this.costars.map((p:person) => p.name).toString()}`
+    }
+}
+
+class  Movie {
+    title: string
+    release?: number
+    constructor(title: string, release: number) {
+        this.title = title
+        this.release = release
+    }
+}
+
+class Person {
+    name: string
+    born?: number
+    constructor(name: string, born: number) {
+        this.name = name
+        this.born = born
+    }
+}
+
+class Roles {
+    roleNames: string[]
+    constructor(roleNames: string[]) {
+        this.roleNames = roleNames
+    }
+}
+----
+
+This is a set of Rules objects to allow the query result to be mapped into a list of ActingJobs
+[source, typescript]
+----
+const personRules: Rules = {
+    name: rule.asString(),
+    born: rule.asNumber({ isInteger: true, optional: true })
+}
+----
+This sets string type validation for the `name` property and Number type validation for `born`. In addition, the born property is set to be optional and be an Integer (this will automatically convert between an integer in the database and a JavaScript number in client code).
+
+[source, typescript]
+----
+const movieRules: Rules = {
+    title: rule.asString({}),
+    release: rule.asNumber({ isInteger: true, optional: true, from: "released" }),
+}
+
+const rolesRules = {
+    roleNames: rule.asList({apply: rule.asString(), from: "roles"})
+}
+----
+The Movie rules are rather similar to those for Person, but it introduces the extra rule config `from`. This simply changes the key the property is matched from, for when there is an inconsistency in the name used in client code and in the database. 
+The `asList` rule will apply the rule in it's `apply` parameter to every entry in the list.
+
+Now we put these rules together to create the rules to map the query result to an ActingJob object.
+[source, typescript]
+----
+const actingJobRules: Rules = {
+    person: rule.asNode({
+        convert: (node: Node) => node.as(Person, personRules)
+    }),
+    roles: rule.asRelationship({
+        convert: (rel: Relationship) => rel.as(Roles, rolesRules)
+    }),
+    movie: rule.asNode({ 
+        convert: (node:  Node) => node.as(Movie, movieRules)
+    }),
+    costars: rule.asList({
+        apply: rule.asNode({
+            convert: (node: Node) => node.as(Person, personRules)
+        })
+    })
+}
+----
+This introduces the functions `asNode`, `asRelationship`. These create rules that allow conversion of Relationships and Nodes into other types.
+
+The mapping rules can be used to map Result objects, individual Records or be used to by a `hydrated` ResultTransformer to map the results of a query.
+
+[NOTE]
+====
+The funtions under `rule` create objects of the `Rule` class, it is possible to create custom `Rule` objects that perform more advanced type validation or conversions. The `Rule` type is exported by the driver and documented in the API docs.
+====
+
+=== Usage with transaction functions
+[source, typescript]
+----
+await session.executeRead(async (tx) => {
+    return tx.run(
+        `MATCH (p:Person)-[r:ACTED_IN]->(m:Movie)<-[:ACTED_IN]-(c:Person) 
+        WHERE id(p) <> id(c) 
+        RETURN p AS person, r as roles, m AS movie, COLLECT(c) AS costars`
+    ).as(ActingJob, actingJobRules)  //The Result is here converted to a MappedResult<ActingJob> and can be consumed, subscribed to or awaited like a normal result, but all Records are replaced with ActingJobs.
+});
+
+res.records[0].person.born //after being awaited, res is a MappedQueryResult, containing an array of ActingJobs and a ResultSummary. You and your IDE can now feel safe in knowing that this is a Number.
+----
+
+=== Usage with driver.executeQuery()
+[source, typescript]
+----
+await driver.executeQuery<MappedQueryResult<ActingJob>>(
+    `MATCH (p:Person)-[r:ACTED_IN]->(m:Movie)<-[:ACTED_IN]-(c:Person) 
+    WHERE id(p) <> id(c) 
+    RETURN p AS person, r as roles, m AS movie, COLLECT(c) AS costars`,
+    {},
+    {resultTransformer: neo4j.resultTransformers.hydrated(ActingJob, actingJobRules)}
+)
+----
+
+=== Usage with session.run()
+[source, typescript]
+----
+await session.run(
+    `MATCH (p:Person)-[r:ACTED_IN]->(m:Movie)<-[:ACTED_IN]-(c:Person) 
+    WHERE id(p) <> id(c) 
+    RETURN p AS person, r as roles, m AS movie, COLLECT(c) AS costars`
+).as(ActingJob, actingJobRules)
+----
+
+=== Nested Rules
+The `asObject` rule factory allows createing nested rules. It allows to mapping of results into multiple objects without returning full nodes or relationships to transform.
+
+With `asObject`, a set of rules for ActingJobs that can be used without returning whole Nodes and Relationships can be created.
+
+[source, typescript]
+----
+const actingJobRulesObject: Rules = {
+    person: rule.asObject(Person, personRules),
+    roles: rule.asObject(Roles, rolesRules),
+    movie: rule.asObject(Movie, movieRules),
+    costars: rule.asList({
+        apply: rule.asObject(Person, personRules),
+    })
+}
+
+await session.run(
+    `MATCH (p:Person)-[r:ACTED_IN]->(m:Movie)<-[:ACTED_IN]-(c:Person) 
+    WHERE id(p) <> id(c) 
+    RETURN {name: p.name, born: p.born} AS person, {roles: r.roles} as roles, {released: m.release, title: m.title} AS movie, COLLECT({name: c.name, born: c.born}) AS costars`
+).as(ActingJob, actingJobRulesObject)
+----
+
+This setup saves on bandwitdth, especially if the nodes contain large properties like vectors which are not used for mapping.
+
+== Registering per-type default rules.
+In the examples above, both `ActingJob` and `actingJobRules` have been provided together, which requires these rules to be available in every part of the code where a query is run.
+
+The following code registers the rules to the object, meaning the rules do not need to be provided when using Object Mapping except to override the default.
+[source, typescript]
+----
+recordObjectMapping.register(ActingJob, actingJobRules)
+----
+
+This includes inside the rules themselves. When writing the `actingJobRules`, we had to set the rule for the `person` property as
+[source, typescript]
+----
+person: rule.asNode({
+        convert: (node: Node) => node.as(Person, personRules)
+    })
+----
+however, if we know we have registed `personRules` to `Person` with `recordObjectMapping.register(ActingJob, actingJobRules)` we can replace that with:
+[source, typescript]
+----
+person: rule.asNode({
+        convert: (node: Node) => node.as(Person)
+    })
+----
+
+== Mapping Rules for Parameters
+
+The Object Mapping rules also function for Object Parameter Mapping, allowing the same rules used to map records into object to be used to map objects to query parameters.
+
+If a domain object is a simple JavaScript object with all the properties in the correct format to be sent as parameters there is no need for any mapping to occur, but if temporal data is stored as Neo4j temporal types in the database but used as strings in client code, or if a Domain Object includes functions or properties which can not or should not be sent as parameters, the mapping rules can assist in sanitizing the data for transmission.
+
+[source, typescript]
+----
+class TestObj {
+    number: number
+    string: string
+    date: string
+    list: string[]
+    constructor(number: number, string: string, date: string, list: string[]) {
+        this.number = number
+        this.string = string
+        this.date = date
+        this.list = list
+    }
+    function() {
+        return "function string"
+    } // the driver cannot send functions over bolt
+}
+const rules = {
+    number: neo4j.rule.asNumber({isInteger: true}),
+    string: neo4j.rule.asString(),
+    date: neo4j.rule.asDate({stringify: true}), // this will ensure date is stored as a Date in the DB and retrieved as a string
+    list: neo4j.rule.asList({ apply: neo4j.rule.asString() }),
+    function: {
+        parameterConversion: () => undefined, // explicitly skips the function when sending parameters
+        optional: true // Record mapping will attempt to get all properties of the object from the Record, we need to explicitly mark that it's okay that there is no function. This is not needed if this is only mapped to parameter objects, and never used to map Records to TestObjs
+    },
+}
+
+neo4j.RecordObjectMapping.register(TestObj, rules) // Register the rules object to the TestObj class
+
+const res = await driver.executeQuery<MappedQueryResult<TestObj>>(
+    'RETURN $string as string, $number as number, $big_int as big_int, $date as date, $dob as dob, $list as list',
+    new TestObj(1, "hello", "2026-09-02", ["good", "bye"]), // executeQuery automatically applies the TestObj rules to this object.
+    {resultTransformer: neo4j.resultTransformers.hydrated(TestObj)})
+----
