@@ -1,21 +1,83 @@
-= JavaScript Driver Record and Parameter Object Mapping
+= Type checking and object mapping
 
 Neither JavaScript nor Neo4j are strongly typed, which can lead to mistakes where a property is set to the wrong type, or an unexpected type is returned from the database and causes errors in client code.
 
-Object Mapping enables users to map the data in their records into classes with known propety types, and to map these classes into parameters for their queries.
+Object mapping helps contain such mistakes. It allows you to map result records into classes with properties of explicit types, and to submit typed query parameters.
 
 [NOTE]
 ====
-The classes being mapped must have a constructor function that can be called without arguments, and all properties that are mapped must be publicly accessible. Mapping values into a constructor may be a future feature.
+The classes being mapped must have a constructor function that can be called without arguments, and all properties that are mapped must be publicly accessible.
 ====
+
+== Read from the database
+
+[source, typescript]
+----
+import neo4j, {Rules, rule, MappedQueryResult, Node} from 'neo4j-driver'
+
+class Movie { // <.>
+  title: string
+  release?: number
+  constructor(title: string, release: number) {
+    this.title = title
+    this.release = release
+  }
+};
+class MovieNode { // <.>
+  movie: Movie
+  constructor(movie: Movie) {
+    this.movie = movie
+  }
+}
+
+const movieRules: Rules = { // <.>
+  title: rule.asString({}),
+  release: rule.asNumber({ isInteger: true, optional: true, from: "released" })
+};
+const movieNodeRules: Rules = { // <.>
+  movie: rule.asNode({
+    convert: (node:  Node) => node.as(Movie, movieRules)
+  }),
+};
+
+(async () => {
+
+  // URI examples: 'neo4j://localhost', 'neo4j+s://xxx.databases.neo4j.io'
+  const URI = '<database-uri>'
+  const USER = '<username>'
+  const PASSWORD = '<password>'
+  let driver = neo4j.driver(URI, neo4j.auth.basic(USER, PASSWORD))
+
+  let res = await driver.executeQuery<MappedQueryResult<MovieNode>>( // <.>
+    `MERGE (m:Movie {title: "Cloud atlas", released: 2013}) RETURN m AS movie`,
+    {},
+    {resultTransformer: neo4j.resultTransformers.hydrated(MovieNode, movieNodeRules)} // <.>
+  )
+
+  console.log(res.records[0])
+  // MovieNode { movie: Movie { title: 'Cloud atlas', release: 2013 } }
+
+  await driver.close()
+
+})().catch((e: Error) => {
+  console.log(e)
+});
+----
+
+<.> l
+<.> l
+<.> l
+<.> l
+<.> l
+<.> l
 
 == Mapping Rules
 
 Given the following query:
 [source, cypher]
 ----
-MATCH (p:Person)-[r:ACTED_IN]->(m:Movie)<-[:ACTED_IN]-(c:Person) 
-WHERE id(p) <> id(c) 
+MATCH (p:Person)-[r:ACTED_IN]->(m:Movie)<-[:ACTED_IN]-(c:Person)
+WHERE id(p) <> id(c)
 RETURN p AS person, r as roles, m AS movie, COLLECT(c) AS costars
 ----
 
