@@ -25,13 +25,51 @@ You can install it with `npm i neo4j-driver-lite`.
 
 == Include the driver
 
-Unless you are going to xref:browser-websockets.adoc[use the driver within a web browser], you use the JavaScript driver in a Node.js or TypeScript application.
+Unless you are going to xref:browser-websockets.adoc[use the driver within a web browser], you use the driver in a Node.js or TypeScript application.
+
+[.tabbed-example]
+=====
+[.include-with-javascript]
+======
 To include the driver in your application, use `require`:
 
 [source, javascript]
 ----
 const neo4j = require('neo4j-driver')
 ----
+
+======
+[.include-with-typescript]
+======
+To include the driver in your application, use `import`:
+
+[source, javascript]
+----
+import neo4j, {Node} from 'neo4j-driver'
+----
+
+[IMPORTANT]
+Import `Node` explicitly to avoid conflicts with the native `Node` type.
+
+You can provide the list of libraries the driver needs via the `tsconfig.json` file (or exclude the interpreter check with `"skipLibCheck": true`), and then run your application with `tsc`.
+
+.tsconfig.json sample file
+[source, json]
+----
+{
+  "compilerOptions": {
+    "lib": ["ES6", "dom", "es2020.bigint", "esnext.asynciterable", "esnext.disposable"]
+  },
+  "include": ["neo4j-main.ts"]
+}
+----
+
+[TIP]
+The minimum supported version is TypeScript 5.2.
+
+
+======
+=====
 
 
 include::{common-partial}/install.adoc[tag=get-an-instance]
