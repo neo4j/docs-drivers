@@ -43,7 +43,7 @@ const neo4j = require('neo4j-driver')
 ======
 To include the driver in your application, use `import`:
 
-[source, javascript]
+[source, typescript]
 ----
 import neo4j, {Node} from 'neo4j-driver'
 ----
