@@ -153,6 +153,9 @@ await driver.VerifyConnectivityAsync();
 
 To enable logging use link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.ConfigBuilder.WithLogger.html[`.withLogger(INeo4jLogger)`] config method when creating a `Driver` object, providing an implementation of link:https://neo4j.com/docs/api/dotnet-driver/current/api/Neo4j.Driver.INeo4jLogger.html[`ILogger`].
 
+[WARNING]
+Log entries registered via `Trace` can contain sensitive information (such as database credentials), so consider such logs confidential.
+
 .Enable debug logging with example implementation of `INeo4jLogger`
 [source, csharp]
 ----
