@@ -492,8 +492,9 @@ If a class you use for mapping has **function properties**, you need to exclude 
 [source, typescript]
 ----
 class Person {
+  function1: Function
   constructor() {
-    this.function = () => "test" // <.>
+    this.function1 = () => "test" // <.>
   }
   function2() { // <.>
     return "function string"
