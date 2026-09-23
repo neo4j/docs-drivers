@@ -259,8 +259,7 @@ async function checkCustomerBalance(tx, customerId, amount) {
   result = await tx.run(`
     MATCH (c:Customer {id: $id})
     RETURN c.balance >= $amount AS sufficient
-    `, { id: customerId, amount: amount },
-    { database: '<database-name>' }
+    `, { id: customerId, amount: amount }
   )
   return result.records[0].get('sufficient')
 }

@@ -35,7 +35,7 @@ You can install it with `pip install neo4j-rust-ext`, either alongside the `neo4
 Usage-wise, the libraries are identical: everything in this guide applies to both.
 
 [NOTE]
-To get the driver on an air-gapped machine, link:https://pypi.org/project/neo4j/#files[download the latest driver] tarball and install it with `pip install neo4j-<version>.tar.gz`.
+To get the driver on an air-gapped machine, link:https://pypi.org/project/neo4j/[download the latest driver] tarball and install it with `pip install neo4j-<version>.tar.gz`.
 
 
 include::{common-partial}/install.adoc[tag=get-an-instance]

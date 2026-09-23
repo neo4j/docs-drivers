@@ -15,6 +15,7 @@ The tables in this section show the mapping between Cypher data types and Python
 | `FLOAT`       | `float`
 | `STRING`      | `str`
 | `ByteArray`   | `bytearray`
+| `UUID`        | `uuid.UUID`
 |===
 
 For full documentation, see link:{neo4j-docs-base-uri}/api/python-driver/{python-driver-version}/api.html#core-data-types[API documentation -- Core data types].
@@ -424,7 +425,7 @@ with neo4j.GraphDatabase.driver(URI, auth=AUTH) as driver:
 [#vector]
 == Vector type
 
-The type link:https://neo4j.com/docs/api/python-driver/current/types/vector.html#neo4j.vector.Vector[`Vector`] maps to the Cypher type link:https://neo4j.com/docs/cypher-manual/25/values-and-types/vector/[`VECTOR`].
+The type link:https://neo4j.com/docs/api/python-driver/current/types/vector.html#neo4j.vector.Vector[`Vector`] maps to the Cypher type link:https://neo4j.com/docs/cypher-manual/current/values-and-types/vector/[`VECTOR`].
 `Vector` objects are stored as contiguous blocks of memory (`bytes`), containing homogeneous values encoded in big-endian order.
 
 You can create a `Vector` from various data types.
@@ -490,6 +491,31 @@ print("as numpy array:", v.to_numpy())
 [IMPORTANT]
 Because Python has no native `float32` type, vectors of `float32` converted into native Python lists become lists of `float64`, leading to potential representation imprecisions.
 To retain the `float32` representation, transform the result vector into a numpy array (link:https://neo4j.com/docs/api/python-driver/current/types/vector.html#neo4j.vector.Vector.to_numpy[`Vector.to_numpy`]) or into a pyarrow array (link:https://neo4j.com/docs/api/python-driver/current/types/vector.html#neo4j.vector.Vector.to_pyarrow[`Vector.to_pyarrow`]).
+
+
+[role=label--new-6.3 label--enterprise-edition]
+[#uuid]
+== UUID
+
+The Cypher type link:https://neo4j.com/docs/cypher-manual/current/values-and-types/uuid/[`UUID`] maps directly to link:https://docs.python.org/3.10/library/uuid.html#uuid.UUID[`uuid.UUID`].
+
+[NOTE]
+The `UUID.is_safe` property is not preserved when a UUID is stored and retrieved from the database.
+
+.Store and work with UUID
+[source, python]
+----
+import uuid
+
+# Insert and read a UUID
+uuid = driver.execute_query(
+    "CREATE (d:Doc {id: $uuid}) RETURN d.id AS id LIMIT 1",
+    uuid=uuid.uuid1(),
+    database_="neo4j",
+).records[0]["id"]
+
+print(f"Got UUID: {uuid}")
+----
 
 
 [role=label--new-6.0]

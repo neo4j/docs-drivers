@@ -217,6 +217,9 @@ For log messages to appear in the console, you also need to adjust the console l
 java.util.logging.ConsoleHandler.level = FINE
 ----
 
+[WARNING]
+Log entries of level `FINER` can contain sensitive information (such as database credentials), so consider such logs confidential.
+
 .Example of log output upon driver connection
 [source, log]
 ----
