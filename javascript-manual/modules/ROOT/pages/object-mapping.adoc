@@ -4,6 +4,16 @@ Neither JavaScript nor Neo4j are strongly typed, which can lead to mistakes wher
 Object mapping helps contain such mistakes.
 It allows you to map result records into classes with properties of explicit types, and to submit typed query parameters.
 
+[TIP]
+====
+The examples in this page assume mapping symbols are imported into your application:
+
+[source, typescript]
+----
+import neo4j, {Rules, rule, MappedQueryResult, Node, RecordObjectMapping} from 'neo4j-driver'
+----
+====
+
 [[read]]
 == Read from the database
 
@@ -13,7 +23,7 @@ To map records into objects of a specific type, define a class having the same a
 === Queries returning properties
 
 .Class and mapping definition
-[source, typescript]
+[source, typescript, test-id=queries-props]
 ----
 class Movie { // <.>
   title: string
@@ -35,7 +45,7 @@ const movieRules: Rules = { // <.>
 <.> Type-specific (optional) attributes allow you to tweak the mapping behavior. For example, `release` is set to be optional, will automatically be converted from an integer in the database to a JavaScript number on the client, and is matched to the node property `released` even if the class attribute is called differently. For more information on allowed parameters, see link:https://neo4j.com/docs/api/javascript-driver/current/variable/index.html#static-variable-rule[API docs -> `rule`].
 
 .Query execution
-[source, typescript]
+[source, typescript, test-id=queries-props]
 ----
 let res = await driver.executeQuery<MappedQueryResult<Movie>>(` // <.>
   MERGE (m:Movie {title: "Cloud atlas", released: 2013})
@@ -51,59 +61,13 @@ console.log(res.records[0])
 <.> The return type `MappedQueryResult<Movie>` is optional. If given, it must match the type provided in the `.hydrated()` call later.
 <.> The link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/result-transformers.js~ResultTransformers.html#instance-method-hydrated[`.hydrated()`] call maps each return record to a `Movie` object according to `movieRules.`
 
-////
-.A full example
-[source, typescript]
-----
-import neo4j, {Rules, rule, MappedQueryResult, Node} from 'neo4j-driver'
-
-class Movie {
-  title: string
-  release?: number
-  constructor(title: string, release: number) {
-    this.title = title
-    this.release = release
-  }
-};
-
-const movieRules: Rules = {
-  title: rule.asString({}),
-  release: rule.asNumber({ isInteger: true, optional: true, from: "released" })
-};
-
-(async () => {
-
-  // URI examples: 'neo4j://localhost', 'neo4j+s://xxx.databases.neo4j.io'
-  const URI = '<database-uri>'
-  const USER = '<username>'
-  const PASSWORD = '<password>'
-  let driver = neo4j.driver(URI, neo4j.auth.basic(USER, PASSWORD))
-
-  let res = await driver.executeQuery<MappedQueryResult<Movie>>(`
-    MERGE (m:Movie {title: "Cloud atlas", released: 2013})
-    RETURN m.title AS title, m.released AS released
-    `, {},
-    {resultTransformer: neo4j.resultTransformers.hydrated(Movie, movieRules)}
-  )
-
-  console.log(res.records[0])
-  // Movie { title: 'Cloud atlas', release: 2013 }
-
-  await driver.close()
-
-})().catch((e: Error) => {
-  console.log(e)
-});
-----
-////
-
 [[queries-nodes-rels]]
 === Queries returning nodes or relationships
 
-For queries returning graph entities (nodes/relationships), you need two classes: one with the inner properties of the node (ex. `Movie`), and one wrapping the node object itself (ex. `MovieNode`), which references the first class.
+For queries returning graph entities (nodes/relationships), you need two classes: one with the inner properties of the node (ex. `Movie`), and one wrapping the node object itself (ex. `movieNode`), which references the first class.
 
 .Class definitions
-[source, typescript]
+[source, typescript, test-id=queries-nodes]
 ----
 class Movie { // <1>
   title: string
@@ -113,7 +77,7 @@ class Movie { // <1>
     this.release = release
   }
 };
-class MovieNode { // <1>
+class movieNode { // <1>
   movie: Movie
   constructor(movie: Movie) {
     this.movie = movie
@@ -121,10 +85,10 @@ class MovieNode { // <1>
 };
 ----
 
-<.> Each record from the query result must conform to the `MovieNode` class definition, and the contents of nodes must conform to the `Movie` class. The mapper invokes class constructors with all arguments set to undefined and then populates them later, so don't rely on constructors to manipulate attributes.
+<.> Each record from the query result must conform to the `movieNode` class definition, and the contents of nodes must conform to the `Movie` class. The mapper invokes class constructors with all arguments set to undefined and then populates them later, so don't rely on constructors to manipulate attributes.
 
 .Mapping definitions
-[source, typescript]
+[source, typescript, test-id=queries-nodes]
 ----
 const movieRules: Rules = { // <1>
   title: rule.asString({}),
@@ -141,76 +105,20 @@ const movieNodeRules: Rules = { // <1>
 <.> Type-specific (optional) attributes allow you to tweak the mapping behavior. For example, `release` is set to be optional, will automatically be converted from an integer in the database to a JavaScript number on the client, and is matched to the node property `released` even if the class attribute is called differently. For more information on allowed parameters, see link:https://neo4j.com/docs/api/javascript-driver/current/variable/index.html#static-variable-rule[API docs -> `rule`].
 
 .Query execution
-[source, typescript]
+[source, typescript, test-id=queries-nodes]
 ----
-let res = await driver.executeQuery<MappedQueryResult<MovieNode>>( // <.>
+let res = await driver.executeQuery<MappedQueryResult<movieNode>>( // <.>
   `MERGE (m:Movie {title: "Cloud atlas", released: 2013}) RETURN m AS movie`,
   {},
-  {resultTransformer: neo4j.resultTransformers.hydrated(MovieNode, movieNodeRules)} // <.>
+  {resultTransformer: neo4j.resultTransformers.hydrated(movieNode, movieNodeRules)} // <.>
 )
 
 console.log(res.records[0])
-// MovieNode { movie: Movie { title: 'Cloud atlas', release: 2013 } }
+// movieNode { movie: Movie { title: 'Cloud atlas', release: 2013 } }
 ----
 
-<.> The return type `MappedQueryResult<MovieNode>` is optional. If given, it must match the type provided in the `.hydrated()` call later.
-<.> The link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/result-transformers.js~ResultTransformers.html#instance-method-hydrated[`.hydrated()`] call maps each return record to a `MovieNode` object according to `movieNodeRules.`
-
-////
-.A full example
-[source, typescript]
-----
-import neo4j, {Rules, rule, MappedQueryResult, Node} from 'neo4j-driver'
-
-class Movie {
-  title: string
-  release?: number
-  constructor(title: string, release: number) {
-    this.title = title
-    this.release = release
-  }
-};
-class MovieNode {
-  movie: Movie
-  constructor(movie: Movie) {
-    this.movie = movie
-  }
-};
-
-const movieRules: Rules = {
-  title: rule.asString({}),
-  release: rule.asNumber({ isInteger: true, optional: true, from: "released" })
-};
-const movieNodeRules: Rules = {
-  movie: rule.asNode({
-    convert: (node:  Node) => node.as(Movie, movieRules)
-  }),
-};
-
-(async () => {
-
-  // URI examples: 'neo4j://localhost', 'neo4j+s://xxx.databases.neo4j.io'
-  const URI = '<database-uri>'
-  const USER = '<username>'
-  const PASSWORD = '<password>'
-  let driver = neo4j.driver(URI, neo4j.auth.basic(USER, PASSWORD))
-
-  let res = await driver.executeQuery<MappedQueryResult<MovieNode>>( // <.>
-    `MERGE (m:Movie {title: "Cloud atlas", released: 2013}) RETURN m AS movie`,
-    {},
-    {resultTransformer: neo4j.resultTransformers.hydrated(MovieNode, movieNodeRules)} // <.>
-  )
-
-  console.log(res.records[0])
-  // MovieNode { movie: Movie { title: 'Cloud atlas', release: 2013 } }
-
-  await driver.close()
-
-})().catch((e: Error) => {
-  console.log(e)
-});
-----
-////
+<.> The return type `MappedQueryResult<movieNode>` is optional. If given, it must match the type provided in the `.hydrated()` call later.
+<.> The link:https://neo4j.com/docs/api/javascript-driver/current/class/lib6/result-transformers.js~ResultTransformers.html#instance-method-hydrated[`.hydrated()`] call maps each return record to a `movieNode` object according to `movieNodeRules.`
 
 [[queries-objects]]
 === Queries returning objects
@@ -219,7 +127,7 @@ With `rule.asObject()` you can create mappings for results returning subsets of 
 Excluding some properties from return can save bandwidth, especially if the nodes contain large properties (such as vectors) which are not relevant for the mapping.
 
 .Class definitions
-[source, typescript]
+[source, typescript, test-id=queries-objects]
 ----
 class Person {
   name: string
@@ -258,7 +166,7 @@ class ActingJob {
 Properties for each objects are specified via link:https://neo4j.com/docs/api/javascript-driver/current/variable/index.html#static-variable-rule[`rule`] calls.
 
 .Mapping definitions
-[source, typescript]
+[source, typescript, test-id=queries-objects]
 ----
 const personRules: Rules = {
     name: rule.asString(),
@@ -282,10 +190,10 @@ const actingRules: Rules = {
 <.> The `.asList()` rule applies the rule given in its `apply` parameter to every entry in the list. Here, each `costars` entry is made into a `Person` object.
 
 .Query execution
-[source, typescript]
+[source, typescript, test-id=queries-objects]
 ----
 let res = await driver.executeQuery<MappedQueryResult<ActingJob>>(` // <.>
-  MATCH (p:Person)-[r:ACTED_IN]->(m:Movie)
+  MATCH (p:Person)-[r:ACTED_IN]->(m:Movie)<-[:ACTED_IN]-(c:Person)
   RETURN
     {name: p.name, born: p.born} AS person,
     {roles: r.roles} AS roles,
@@ -309,18 +217,69 @@ The previous examples provided `ActingJob` and `actingRules` together, which req
 To avoid this, you can link the rules to the object, so that you don't have to provide the rules anywhere else (except to override the default).
 This registry exists in global memory and is thus shared between driver instances.
 
-.Register rules to their objects
-[source, typescript, test-skip]
+////
+.Class and rules definitions
+[source, typescript, test-id=obj-defaults]
 ----
-recordObjectMapping.register(Person, personRules)
-recordObjectMapping.register(Movie, movieRules)
-recordObjectMapping.register(Roles, rolesRules)
+class Person {
+  name: string
+  born?: number
+  constructor(name: string, born: number) {
+    this.name = name
+    this.born = born
+  }
+};
+class Movie {
+  title: string
+  release?: number
+  constructor(title: string, release: number) {
+    this.title = title
+    this.release = release
+  }
+};
+class Roles {
+  roleNames: string[]
+  constructor(roleNames: string[]) {
+    this.roleNames = roleNames
+  }
+};
+class ActingJob {
+  person: Person
+  movie: Movie
+  roles: Roles
+  constructor(person: Person, movie: Movie, roles: Roles) {
+      this.person = person
+      this.movie = movie
+      this.roles = roles
+  }
+};
+
+const personRules: Rules = {
+    name: rule.asString(),
+    born: rule.asNumber({ isInteger: true, optional: true })
+};
+const movieRules: Rules = {
+    title: rule.asString({}),
+    release: rule.asNumber({ isInteger: true, optional: true, from: "released" }),
+};
+const rolesRules = {
+    roleNames: rule.asList({apply: rule.asString(), from: "roles"})
+};
+----
+////
+
+.Register rules to their objects
+[source, typescript, test-id=obj-defaults]
+----
+neo4j.RecordObjectMapping.register(Person, personRules)
+neo4j.RecordObjectMapping.register(Movie, movieRules)
+neo4j.RecordObjectMapping.register(Roles, rolesRules)
 ----
 
 The object rules and the `.hydrate()` call can then be stripped of their rules objects:
 
 .Simplified rules
-[source, typescript, test-skip]
+[source, typescript, test-id=obj-defaults]
 ----
 const actingRules: Rules = {
   person: rule.asObject(Person),
@@ -331,10 +290,10 @@ const actingRules: Rules = {
 ----
 
 .Simplified query execution
-[source, typescript]
+[source, typescript, test-id=obj-defaults]
 ----
 let res = await driver.executeQuery<MappedQueryResult<ActingJob>>(`
-  MATCH (p:Person)-[r:ACTED_IN]->(m:Movie)
+  MATCH (p:Person)-[r:ACTED_IN]->(m:Movie)<-[:ACTED_IN]-(c:Person)
   RETURN
     {name: p.name, born: p.born} AS person,
     {roles: r.roles} AS roles,
@@ -352,10 +311,44 @@ let res = await driver.executeQuery<MappedQueryResult<ActingJob>>(`
 [[driver-executequery]]
 === Usage with driver.executeQuery()
 
-[source, typescript]
+////
+.Class and mapping definitions
+[source, typescript, test-id=api-executequery]
+----
+class Movie {
+  title: string
+  release?: number
+  constructor(title: string, release: number) {
+    this.title = title
+    this.release = release
+  }
+};
+class movieNode {
+  movie: Movie
+  constructor(movie: Movie) {
+    this.movie = movie
+  }
+};
+----
+
+[source, typescript, test-id=api-executequery]
+----
+const movieRules: Rules = {
+  title: rule.asString({}),
+  release: rule.asNumber({ isInteger: true, optional: true, from: "released" })
+};
+const movieNodeRules: Rules = {
+  movie: rule.asNode({
+    convert: (node:  Node) => node.as(Movie, movieRules)
+  }),
+};
+----
+////
+
+[source, typescript, test-id=api-executequery]
 ----
 await driver.executeQuery<MappedQueryResult<movieNode>>(
-    `MERGE (m:Movie {title: "Cloud atlas", released: 2013}) RETURN m AS movie`
+    `MERGE (m:Movie {title: "Cloud atlas", released: 2013}) RETURN m AS movie`,
     {},
     {resultTransformer: neo4j.resultTransformers.hydrated(movieNode, movieNodeRules)}
 )
@@ -364,9 +357,43 @@ await driver.executeQuery<MappedQueryResult<movieNode>>(
 [[driver-tx-func]]
 === Usage with transaction functions
 
-[source, typescript]
+////
+.Class and mapping definitions
+[source, typescript, test-id=api-tx-func]
 ----
-await session.executeRead(async (tx) => {
+class Movie {
+  title: string
+  release?: number
+  constructor(title: string, release: number) {
+    this.title = title
+    this.release = release
+  }
+};
+class movieNode {
+  movie: Movie
+  constructor(movie: Movie) {
+    this.movie = movie
+  }
+};
+----
+
+[source, typescript, test-id=api-tx-func]
+----
+const movieRules: Rules = {
+  title: rule.asString({}),
+  release: rule.asNumber({ isInteger: true, optional: true, from: "released" })
+};
+const movieNodeRules: Rules = {
+  movie: rule.asNode({
+    convert: (node:  Node) => node.as(Movie, movieRules)
+  }),
+};
+----
+////
+
+[source, typescript, test-id=api-tx-func]
+----
+await session.executeWrite(async (tx) => {
     return await tx.run(
       `MERGE (m:Movie {title: "Cloud atlas", released: 2013}) RETURN m AS movie`
     ).as(movieNode, movieNodeRules) // <.>
@@ -378,7 +405,41 @@ await session.executeRead(async (tx) => {
 [[driver-session-run]]
 === Usage with session.run()
 
-[source, typescript]
+////
+.Class and mapping definitions
+[source, typescript, test-id=api-session-run]
+----
+class Movie {
+  title: string
+  release?: number
+  constructor(title: string, release: number) {
+    this.title = title
+    this.release = release
+  }
+};
+class movieNode {
+  movie: Movie
+  constructor(movie: Movie) {
+    this.movie = movie
+  }
+};
+----
+
+[source, typescript, test-id=api-session-run]
+----
+const movieRules: Rules = {
+  title: rule.asString({}),
+  release: rule.asNumber({ isInteger: true, optional: true, from: "released" })
+};
+const movieNodeRules: Rules = {
+  movie: rule.asNode({
+    convert: (node:  Node) => node.as(Movie, movieRules)
+  }),
+};
+----
+////
+
+[source, typescript, test-id=api-session-run]
 ----
 await session.run(
     `MERGE (m:Movie {title: "Cloud atlas", released: 2013}) RETURN m AS movie`
