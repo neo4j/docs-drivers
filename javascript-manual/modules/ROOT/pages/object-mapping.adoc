@@ -271,9 +271,9 @@ const rolesRules = {
 .Register rules to their objects
 [source, typescript, test-id=obj-defaults]
 ----
-neo4j.RecordObjectMapping.register(Person, personRules)
-neo4j.RecordObjectMapping.register(Movie, movieRules)
-neo4j.RecordObjectMapping.register(Roles, rolesRules)
+RecordObjectMapping.register(Person, personRules)
+RecordObjectMapping.register(Movie, movieRules)
+RecordObjectMapping.register(Roles, rolesRules)
 ----
 
 The object rules and the `.hydrate()` call can then be stripped of their rules objects:
@@ -469,10 +469,10 @@ class Person {
 
 const rules = { // <.>
   name: rule.asString(),
-  created: neo4j.rule.asDate({ stringify: true }), // stored as Date in the DB; mapped as string
+  created: rule.asDate({ stringify: true }), // stored as Date in the DB; mapped as string
 }
 
-neo4j.RecordObjectMapping.register(Person, rules) // <.>
+RecordObjectMapping.register(Person, rules) // <.>
 
 const res = await driver.executeQuery<MappedQueryResult<Person>>(`
     MERGE (p:Person {name: $name, created: $created})
