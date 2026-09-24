@@ -520,4 +520,3 @@ const rules = {
 
 - The mapper invokes class constructors with all arguments set to undefined and then populates them later, so don't rely on constructors to manipulate attributes.
 - You can create custom `Rule` objects performing more advanced type validation or conversions. The `Rule` type is exported by the driver.
-////; for more information see link:[API docs -> `Rule`].
