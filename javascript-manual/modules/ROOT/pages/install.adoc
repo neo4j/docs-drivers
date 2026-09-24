@@ -49,7 +49,7 @@ import neo4j, {Node} from 'neo4j-driver'
 ----
 
 [IMPORTANT]
-Import `Node` explicitly to avoid conflicts with the native `Node` type.
+Import `Node` explicitly to avoid conflicts with the native `Node` type. The driver also doesn't declare a namespace, so you'll need to explicitly import any types (such as `Rules`, `MappedQueryResult`, `RecordObjectMapping`, etc).
 
 You can provide the list of libraries the driver needs via the `tsconfig.json` file (or exclude the interpreter check with `"skipLibCheck": true`), and then compile your code with `tsc` or run with an execution engine.
 
