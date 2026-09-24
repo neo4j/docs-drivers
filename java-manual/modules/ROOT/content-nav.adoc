@@ -17,6 +17,10 @@
 * xref:reactive.adoc[Control results flow with reactive streams]
 * xref:performance.adoc[Performance recommendations]
 
+* *Preview features*
+
+* xref:property-encryption.adoc[Property Encryption]
+
 * *Reference*
 
 * xref:connect-advanced.adoc[Advanced connection information]

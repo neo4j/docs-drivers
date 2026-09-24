@@ -1,0 +1,916 @@
+= Property Encryption
+
+Property Encryption allows Neo4j properties to be encrypted and decrypted on the driver side.
+
+Property values are encrypted and encoded into bytes. The resulting bytes contain the encrypted value together with the
+metadata required to decrypt it. The application is responsible for storing these bytes in a representation supported by
+Neo4j property types. To decrypt a value, the application retrieves the stored bytes and provides them to the driver.
+
+The feature is designed to be easy to use, with an opinionated approach to encryption and decryption. All official Neo4j
+drivers are expected to support the feature, enabling interoperability between drivers when they are configured to use
+compatible encryption settings.
+
+.Preview Feature
+[IMPORTANT]
+====
+The preview feature is a new feature that is a candidate for a future GA status.
+It enables users to try the feature out and maintainers to refine and update it.
+The preview features are not considered to be experimental, temporary or unstable.
+However, they may change more rapidly, without following the usual deprecation cycle.
+Most preview features are expected to be granted the GA status unless some unexpected conditions arise.
+====
+
+[NOTE]
+This feature is available from version 6.3.0 onwards.
+
+If you prefer to see the API in use before reading about its configuration and related concepts, see
+<<property-encryption-api>> for examples of encrypting and decrypting property values.
+
+[#supported-types]
+== Supported types
+
+Property Encryption supports encrypting Neo4j Database https://neo4j.com/docs/cypher-manual/current/values-and-types/property-structural-constructed/#property-types[Property types]
+, namely:
+
+* BOOLEAN
+* DATE
+* DURATION
+* FLOAT
+* INTEGER
+* LIST
+** Homogeneous lists of property types can be stored as properties (except VECTOR and LIST types, which cannot be
+  stored in lists), although lists in general cannot be stored as properties. Lists stored as properties cannot contain
+  null values.
+** POINT values in a list must have the same dimensionality and SRID.
+* LOCAL DATETIME
+* LOCAL TIME
+* POINT
+* STRING
+* VECTOR
+* ZONED DATETIME
+* ZONED TIME
+* UUID
+* BYTES
+* NULL
+
+[#encryption-profile]
+== Encryption profile
+
+An encryption profile defines the settings and operating mode used by the driver when encrypting and decrypting values.
+
+Each profile has a unique, user-defined name. The profile name is stored with encrypted values and allows drivers to
+identify which profile must be used to decrypt a value.
+
+Multiple profiles can be configured at the same time, providing each has a unique name.
+
+[IMPORTANT]
+When driver interoperability is required, users are expected to configure each driver with compatible profiles.
+
+Profiles are configured at the driver level using a driver configuration option:
+
+.Add profiles to driver configuration
+[source, java]
+----
+var config = Config.builder()
+        .withPropertyEncryptionProfiles(profiles) // <1>
+        .build();
+----
+
+<1> Accepts one or multiple profiles.
+
+`PropertyEncryptionProfile` is the base type for encryption profiles. At present, the driver provides one profile type:
+`EnvelopePropertyEncryptionProfile`. Additional profile types may be introduced in the future.
+
+[#envelope-profile]
+=== Envelope profile
+
+`EnvelopePropertyEncryptionProfile` enables envelope encryption of Neo4j properties.
+
+Envelope encryption separates the encryption of the data from the protection of the key used to encrypt that data. The
+key used to encrypt the data is sometimes referred to as a Data Encryption Key (DEK). Depending on the implementation,
+the encryption key may be the DEK itself or it may be derived from the DEK.
+
+The DEK must itself be protected. When a separate Key Encryption Key (KEK) is used to protect the DEK, the process is
+commonly referred to as key wrapping. Alternatively, a Key Encapsulation Mechanism (KEM) can be used to protect or
+establish the secret material associated with the DEK. In the latter case, the terminology and exact mechanism depend on
+the KEM being used, such as MK-KEM.
+
+The envelope profile setup requires two fundamental components. These are covered in separate sections, but are briefly
+introduced here:
+
+* <<key-encapsulation-service>> - responsible for generating, encapsulating, and decapsulating data encryption keys.
+* <<encapsulated-key-record-repository>> - responsible for providing storage for encapsulated keys.
+
+Property values are encrypted using the following:
+
+* **Encryption Key** — AES-256
+* **Encryption algorithm** — AES-GCM ("AES/GCM/NoPadding")
+* **Initialization vector (IV)** — 12 bytes (96 bits)
+* **Authentication tag** — 16 bytes (128 bits)
+* **Additional authenticated data (AAD)** — optional
+
+The `EnvelopePropertyEncryptionProfile` provides a builder for creating a profile instance.
+
+.Create an envelope profile
+[source, java]
+----
+var profile = EnvelopePropertyEncryptionProfile.builder("profile-name", keyEncapsulationService, keyRepository)
+        .build();
+----
+
+The builder has additional options that are introduced alongside the relevant concepts later in this manual.
+
+[#key-encapsulation-service]
+== Key Encapsulation Service
+
+Key Encapsulation Service is responsible for generating, encapsulating, and decapsulating data encryption keys. It
+generates a new data encryption key together with its encapsulation, and can later decapsulate the encapsulation to
+recover the data encryption key when it is needed for encryption or decryption.
+
+The key encapsulation mechanism is implementation-specific. It may use key wrapping, symmetric or asymmetric
+cryptography, a key management service (KMS), or a post-quantum key encapsulation mechanism such as ML-KEM.
+
+The service is represented by `KeyEncapsulationService` interface that has 2 primary methods:
+
+* `encapsulate` - supplies a new AES-256 key and its encapsulation
+* `decapsulate` - decapsulates an existing encapsulation to AES-256 key
+
+.KeyEncapsulationService
+[source, java]
+----
+/**
+ * A service responsible for encapsulating and decapsulating keys.
+ * <p>
+ * Implementations may perform blocking operations. The driver adapts synchronous operations to its asynchronous
+ * execution model using the {@link #executor()}.
+ * <p>
+ * Implementations MUST supply 256-bit AES keys only.
+ *
+ * @see KeyEncapsulationOptions
+ * @see KeyEncapsulationResult
+ * @see KeyEncapsulationServices
+ * @since 6.3.0
+ */
+@Preview(name = "Property Encryption")
+public non-sealed interface KeyEncapsulationService extends BaseKeyEncapsulationService {
+    /**
+     * Creates a new key, encapsulates it and returns the result.
+     *
+     * @param options the encapsulation options
+     * @return the encapsulation result
+     */
+    KeyEncapsulationResult encapsulate(KeyEncapsulationOptions options);
+
+    /**
+     * Decapsulates encapsulated bytes.
+     *
+     * @param encapsulation the encapsulated bytes, must not be {@code null}
+     * @param metadata      the key metadata, must not be {@code null}
+     * @return the decapsulated key
+     */
+    SecretKey decapsulate(byte[] encapsulation, Map<String, String> metadata);
+}
+----
+
+.Non-blocking variant
+[%collapsible]
+====
+For users wishing to provide a non-blocking implementation, there is an `AsyncKeyEncapsulationService` variant:
+
+.AsyncKeyEncapsulationService
+[source, java]
+----
+/**
+ * A service responsible for encapsulating and decapsulating keys.
+ * <p>
+ * Implementations MUST be non-blocking. In particular, implementations MUST NOT perform blocking operations on
+ * the calling thread.
+ * <p>
+ * Implementations MUST supply 256-bit AES keys only.
+ *
+ * @see KeyEncapsulationOptions
+ * @see KeyEncapsulationResult
+ * @see KeyEncapsulationServices
+ * @since 6.3.0
+ */
+@Preview(name = "Property Encryption")
+public non-sealed interface AsyncKeyEncapsulationService extends BaseKeyEncapsulationService {
+    /**
+     * Creates a new key, encapsulates it and returns the result.
+     *
+     * @param options the encapsulation options
+     * @return a {@link CompletionStage} that completes with the encapsulation result
+     */
+    CompletionStage<KeyEncapsulationResult> encapsulateAsync(KeyEncapsulationOptions options);
+
+    /**
+     * Decapsulates encapsulated bytes.
+     *
+     * @param encapsulation the encapsulated bytes, must not be {@code null}
+     * @param metadata      the key metadata, must not be {@code null}
+     * @return a {@link CompletionStage} that completes with the decapsulated key
+     */
+    CompletionStage<SecretKey> decapsulateAsync(byte[] encapsulation, Map<String, String> metadata);
+}
+----
+====
+
+The interface can be implemented to integrate different key encapsulation mechanisms. The driver also provides several
+implementations, described in the following sections.
+
+=== Local
+
+The local implementation uses a user-provided AES-256 `SecretKey` as a master key for encapsulating and decapsulating
+data encryption keys.
+
+The encapsulation uses AES-GCM (`"AES/GCM/NoPadding"`) with the provided master key. The resulting encapsulation
+contains a 256-bit AES data encryption key protected by the master key, together with a 96-bit (12-byte) initialization
+vector (IV) and a 128-bit (16-byte) authentication tag.
+
+.Create a service instance
+[source, java]
+----
+var encapsulationService = KeyEncapsulationServices.local(masterKey);
+----
+
+=== AWS KMS
+
+The AWS KMS implementation generates 256-bit AES data encryption keys locally and uses AWS KMS to encapsulate and
+decapsulate those keys.
+
+[NOTE]
+This implementation is provided as a separate Neo4j Java Driver module, **neo4j-java-driver-encryption-aws-kms**, which
+must be used together with the driver module.
+
+[TIP]
+It is recommended to use **neo4j-java-driver-bom** to manage compatible versions of the Neo4j Java Driver modules. See
+https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html#Bill_of_Materials_.28BOM.29_POMs[BOM]
+for more details.
+
+.Add dependencies in Maven
+[source, xml]
+----
+<dependencies>
+    <dependency>
+        <groupId>org.neo4j.driver</groupId>
+        <artifactId>neo4j-java-driver</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.neo4j.driver</groupId>
+        <artifactId>neo4j-java-driver-encryption-aws-kms</artifactId>
+    </dependency>
+</dependencies>
+
+<dependencyManagement>
+    <dependencies>
+        <dependency>
+            <groupId>org.neo4j.driver</groupId>
+            <artifactId>neo4j-java-driver-bom</artifactId>
+            <type>pom</type>
+            <scope>import</scope>
+            <version>6.3.0</version>
+        </dependency>
+    </dependencies>
+</dependencyManagement>
+----
+
+.Create a service instance
+[source, java]
+----
+var defaultOptions = AwsKeyEncapsulationOptions.of(keyId);
+var encapsulationService = AWSKeyEncapsulationServices.create(defaultOptions);
+----
+
+The AWS KMS client is used for communication with AWS KMS. AWS credentials are resolved by the client using the
+AWS SDK's default credential resolution mechanism.
+
+=== Azure Key Vault
+
+The Azure Key Vault implementation generates 256-bit AES data encryption keys locally and uses Azure Key Vault to
+encapsulate and decapsulate those keys.
+
+[NOTE]
+This implementation is provided as a separate Neo4j Java Driver module, **neo4j-java-driver-encryption-azure-keyvault**,
+which must be used together with the driver module.
+
+[TIP]
+It is recommended to use **neo4j-java-driver-bom** to manage compatible versions of the Neo4j Java Driver modules. See
+https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html#Bill_of_Materials_.28BOM.29_POMs[BOM]
+for more details.
+
+.Add dependencies in Maven
+[source, xml]
+----
+<dependencies>
+    <dependency>
+        <groupId>org.neo4j.driver</groupId>
+        <artifactId>neo4j-java-driver</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.neo4j.driver</groupId>
+        <artifactId>neo4j-java-driver-encryption-azure-keyvault</artifactId>
+    </dependency>
+</dependencies>
+
+<dependencyManagement>
+    <dependencies>
+        <dependency>
+            <groupId>org.neo4j.driver</groupId>
+            <artifactId>neo4j-java-driver-bom</artifactId>
+            <type>pom</type>
+            <scope>import</scope>
+            <version>6.3.0</version>
+        </dependency>
+    </dependencies>
+</dependencyManagement>
+----
+
+.Create a service instance
+[source, java]
+----
+var defaultOptions = AzureEncapsulationOptions.of(keyId);
+var encapsulationService = AzureKeyEncapsulationServices.create(defaultOptions);
+----
+
+Azure credentials are resolved using the Azure Identity library's default credential resolution mechanism.
+
+The service caches up to 10 `CryptographyAsyncClient` instances, keyed by Azure Key Vault key id. When the cache reaches
+its capacity, the least recently used client is evicted. To configure a different cache size, an overloaded `create`
+method.
+
+=== Google Cloud KMS
+
+The Google Cloud KMS implementation generates 256-bit AES data encryption keys locally and uses Google Cloud KMS to
+encapsulate and decapsulate those keys.
+
+[NOTE]
+This implementation is provided as a separate Neo4j Java Driver module,
+**neo4j-java-driver-encryption-google-cloud-kms**, which must be used together with the driver module.
+
+[TIP]
+It is recommended to use **neo4j-java-driver-bom** to manage compatible versions of the Neo4j Java Driver modules. See
+https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html#Bill_of_Materials_.28BOM.29_POMs[BOM]
+for more details.
+
+.Add dependencies in Maven
+[source, xml]
+----
+<dependencies>
+    <dependency>
+        <groupId>org.neo4j.driver</groupId>
+        <artifactId>neo4j-java-driver</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.neo4j.driver</groupId>
+        <artifactId>neo4j-java-driver-encryption-google-cloud-kms</artifactId>
+    </dependency>
+</dependencies>
+
+<dependencyManagement>
+    <dependencies>
+        <dependency>
+            <groupId>org.neo4j.driver</groupId>
+            <artifactId>neo4j-java-driver-bom</artifactId>
+            <type>pom</type>
+            <scope>import</scope>
+            <version>6.3.0</version>
+        </dependency>
+    </dependencies>
+</dependencyManagement>
+----
+
+.Create a service instance
+[source, java]
+----
+var defaultOptions = CloudKmsKeyEncapsulationOptions.of(project, location, keyRing, cryptoKey);
+var encapsulationService = CloudKeyEncapsulationServices.create(defaultOptions);
+----
+
+[#encapsulated-key-record-repository]
+== Encapsulated Key Record Repository
+
+An Encapsulated Key Record Repository is a user-provided repository for storing encapsulated data keys and their
+associated metadata.
+
+Each encapsulated key record has a globally unique and immutable identifier.
+
+[IMPORTANT]
+====
+The repository implementation is responsible for assigning globally unique and immutable key identifiers.
+In addition, the repository is also responsible for enforcing alias uniqueness.
+====
+
+The repository is represented by `EncapsulatedKeyRecordRepository` interface that has 5 primary methods:
+
+* `create` - creates a new key record
+* `findById` - finds key by id
+* `findByAlias` - finds key by alias
+* `setAliasById` - sets key alias by id
+* `deleteById` - deletes key by id
+
+.EncapsulatedKeyRecordRepository
+[source, java]
+----
+/**
+ * A repository for {@link EncapsulatedKeyRecord} data.
+ * <p>
+ * Implementations may perform blocking operations. The driver adapts synchronous operations to its asynchronous
+ * execution model using the {@link #executor()}.
+ * <p>
+ * Implementations MUST enforce alias uniqueness and generate globally unique and immutable key identifiers.
+ *
+ * @since 6.3.0
+ */
+@Preview(name = "Property Encryption")
+public non-sealed interface EncapsulatedKeyRecordRepository extends BaseEncapsulatedKeyRecordRepository {
+    /**
+     * Finds and returns an {@link EncapsulatedKeyRecord} by its id.
+     *
+     * @param id the key id, must not be {@literal null}
+     * @return an {@link Optional} containing the key, or {@link Optional#empty()} if no key with the given id exists
+     */
+    Optional<EncapsulatedKeyRecord> findById(String id);
+
+    /**
+     * Finds and returns an {@link EncapsulatedKeyRecord} by its alias.
+     *
+     * @param alias the key alias, must not be {@literal null}
+     * @return an {@link Optional} containing the key, or {@link Optional#empty()} if no key with the given alias exists
+     */
+    Optional<EncapsulatedKeyRecord> findByAlias(String alias);
+
+    /**
+     * Creates the encapsulation as a key and assigns it a globally unique id.
+     * <p>
+     * The generated id MUST be globally unique and immutable. Implementations SHOULD use a mechanism designed to
+     * generate globally unique identifiers, such as UUIDs.
+     *
+     * @param alias         the key alias, may be {@literal null}
+     * @param encapsulation the key encapsulation, must not be {@literal null}
+     * @param metadata      the key metadata, must not be {@literal null}
+     * @return the created key
+     */
+    EncapsulatedKeyRecord create(String alias, byte[] encapsulation, Map<String, String> metadata);
+
+    /**
+     * Sets the alias of an encapsulated key by id. The alias must not be used by another key. To assign an alias
+     * currently used by another key, it must first be deleted from that key.
+     *
+     * @param id    the key id, must not be {@literal null}
+     * @param alias the key alias, may be {@literal null} to remove the alias
+     */
+    void setAliasById(String id, String alias);
+
+    /**
+     * Deletes a key by id.
+     *
+     * @param id the key id, must not be {@literal null}
+     */
+    void deleteById(String id);
+}
+----
+
+.Non-blocking variant
+[%collapsible]
+====
+For users wishing to provide a non-blocking implementation, there is an `AsyncEncapsulatedKeyRecordRepository` variant:
+
+.AsyncEncapsulatedKeyRecordRepository
+[source, java]
+----
+/**
+ * A repository for {@link EncapsulatedKeyRecord} data.
+ * <p>
+ * Implementations MUST NOT block the calling thread. Repository operations that require I/O or other potentially
+ * blocking work must perform that work asynchronously and return a {@link CompletionStage} that completes when the
+ * operation has finished.
+ * <p>
+ * Implementations MUST enforce alias uniqueness and generate globally unique and immutable key identifiers.
+ *
+ * @since 6.3.0
+ */
+@Preview(name = "Property Encryption")
+public non-sealed interface AsyncEncapsulatedKeyRecordRepository extends BaseEncapsulatedKeyRecordRepository {
+    /**
+     * Finds and returns an {@link EncapsulatedKeyRecord} by its id.
+     *
+     * @param id the key id, must not be {@literal null}
+     * @return a {@link CompletionStage} that completes with the key, or completes with {@literal null} if no key with the given id exists
+     */
+    CompletionStage<EncapsulatedKeyRecord> findByIdAsync(String id);
+
+    /**
+     * Finds and returns an {@link EncapsulatedKeyRecord} by its alias.
+     *
+     * @param alias the key alias, must not be {@literal null}
+     * @return a {@link CompletionStage} that completes with the key, or completes with {@literal null} if no key with the given alias
+     * exists
+     */
+    CompletionStage<EncapsulatedKeyRecord> findByAliasAsync(String alias);
+
+    /**
+     * Creates the encapsulation as a key and assigns it a globally unique id.
+     * <p>
+     * The generated id MUST be globally unique and immutable. Implementations SHOULD use a mechanism designed to
+     * generate globally unique identifiers, such as UUIDs.
+     *
+     * @param alias         the key alias, may be {@literal null}
+     * @param encapsulation the key encapsulation, must not be {@literal null}
+     * @param metadata      the key metadata, must not be {@literal null}
+     * @return a {@link CompletionStage} that completes with the created key
+     */
+    CompletionStage<EncapsulatedKeyRecord> createAsync(
+            String alias, byte[] encapsulation, Map<String, String> metadata);
+
+    /**
+     * Sets the alias of an encapsulated key by id. The alias must not be used by another key. To assign an alias
+     * currently used by another key, it must first be deleted from that key.
+     *
+     * @param id    the key id, must not be {@literal null}
+     * @param alias the key alias, may be {@literal null} to remove the alias
+     * @return a {@link CompletionStage} that completes when the alias has been updated
+     */
+    CompletionStage<Void> setAliasByIdAsync(String id, String alias);
+
+    /**
+     * Deletes a key by id.
+     *
+     * @param id the key id, must not be {@literal null}
+     * @return a {@link CompletionStage} that completes when the key has been deleted
+     */
+    CompletionStage<Void> deleteByIdAsync(String id);
+}
+----
+====
+
+[NOTE]
+An implementation of repository is supplied by the user.
+
+
+[#property-encryption-api]
+== Property Encryption API
+
+The Property Encryption API is exposed through `PropertyEncryption`, which is available directly from the `Driver`
+object. This makes the API easy to access, particularly in existing applications where the driver object is already
+available.
+
+.Obtain PropertyEncryption
+[source, java]
+----
+PropertyEncryption propertyEncryption = driver.propertyEncryption();
+----
+
+.Using asynchronous or reactive?
+[%collapsible]
+====
+Property Encryption is also available in asynchronous and reactive variants.
+
+Those variants may be obtained via `Driver#propertyEncryption(Class<T>)` method.
+
+.Obtain AsyncPropertyEncryption
+[source, java]
+----
+AsyncPropertyEncryption propertyEncryption = driver.propertyEncryption(AsyncPropertyEncryption.class)
+----
+
+.Obtain ReactivePropertyEncryption with `java.util.concurrent.Flow` types
+[source, java]
+----
+import org.neo4j.driver.encryption.reactive.ReactivePropertyEncryption;
+
+ReactivePropertyEncryption propertyEncryption = driver.propertyEncryption(ReactivePropertyEncryption.class)
+----
+
+.Obtain ReactivePropertyEncryption with `org.reactivestreams` types
+[source, java]
+----
+import org.neo4j.driver.encryption.reactivestreams.ReactivePropertyEncryption;
+
+ReactivePropertyEncryption propertyEncryption = driver.propertyEncryption(ReactivePropertyEncryption.class)
+----
+====
+
+
+=== EncapsulatedKeyManager
+
+The <<envelope-profile>> requires data keys to exist before they can be used to encrypt or decrypt property values.
+
+Creating a data key involves obtaining a new data encryption key and its encapsulation from the
+<<key-encapsulation-service>> and creating the corresponding record in the <<encapsulated-key-record-repository>>.
+
+To simplify these operations, `PropertyEncryption` provides an `EncapsulatedKeyManager` through
+`PropertyEncryption#keyManager()` when a single profile is configured and `PropertyEncryption#keyManager(String)` when
+multiple profiles are configured.
+
+.Obtain key manager
+[source, java]
+----
+var keyManager = propertyEncryption.keyManager("profile-name");
+----
+
+[NOTE]
+====
+A data key can be referenced by its globally unique identifier or, if assigned, by an alias. Both are *String* values.
+
+The key identifier is immutable and globally unique, assigned by the key repository. The alias is a mutable,
+application-level reference that can be reassigned to a different key over time.
+
+Aliases allow applications to refer to keys using stable application-level names without having to reference the key's
+identifier.
+====
+
+The key manager provides operations to create, find, and delete keys. It also provides operations to set and delete key
+aliases. When <<caching>> is enabled, key management operations update the <<key-cache>> and <<key-alias-index>> as
+necessary.
+
+.Create a data key with an alias
+[source, java]
+----
+EncapsulatedKey key = keyManager.create("users-key");
+----
+
+The returned `EncapsulatedKey` has accessors for:
+
+* **id** - the globally unique key identifier
+* **alias** - the key alias if assigned
+
+.Find key by alias
+[source, java]
+----
+Optional<EncapsulatedKey> key = keyManager.findByAlias("users-key");
+----
+
+.Set alias by id
+[source, java]
+----
+keyManager.setAliasById(key.id(),"users-key");
+----
+
+.Delete alias by id
+[source, java]
+----
+keyManager.deleteAliasById(key.id());
+----
+
+.Delete key by id
+[source, java]
+----
+keyManager.deleteById(key.id());
+----
+
+
+=== PropertyEncryptionRequest
+
+Property values are encrypted by creating a `PropertyEncryptionRequest` and providing it to `PropertyEncryption`.
+`PropertyEncryptionRequest#builder()` returns a staged builder for creating a `PropertyEncryptionRequest`.
+
+.Encrypt value
+[source, java]
+----
+var secretValue = "secret";
+var userId = 1000;
+var encryptionRequest = PropertyEncryptionRequest.builder()
+        .fromValue(secretValue) // <1>
+        .withAAD(userId) // <2>
+        .usingProfile("profile-name") // <3>
+        .usingKeyAlias("users-key") // <4>
+        .build();
+byte[] encrypted = propertyEncryption.encryptToBytes(encryptionRequest); <5>
+----
+
+<1> A mandatory step for providing the value to encrypt. These methods support all types listed in <<supported-types>>.
+<2> An optional step for providing Additional Authenticated Data (AAD), which is described later in this section.
+<3> An optional step for specifying <<encryption-profile>> name. It is mandatory when multiple profiles are configured.
+<4> A mandatory step for specifying encryption key to use. This is an alias version, but there is also `usingKeyId` variant.
+<5> Returns the bytes containing the encrypted value together with its metadata. The application can store these bytes in any representation supported as a Neo4j property type.
+
+[IMPORTANT]
+The encrypted value always references the encryption key identifier, which is expected to be immutable and globally
+unique. This ensures that the identifier used by the encrypted value is stable, even when a key alias is used in the
+encryption request.
+
+Additional Authenticated Data (AAD) is optional, non-secret data that is authenticated together with the encrypted
+value but is not itself encrypted. The same AAD must be provided during decryption. Otherwise, decryption fails.
+
+[IMPORTANT]
+====
+It is recommended to use AAD to bind an encrypted value to application-specific context where possible, such as a user
+identifier. This ensures that the context is authenticated when the value is later decrypted.
+
+AAD should not contain confidential information.
+====
+
+Only the following Neo4j property types are supported as AAD:
+
+* DATE
+* INTEGER
+* LOCAL TIME
+* POINT
+* STRING - consider normalizing values using something like `NFC` before providing them to the driver when both
+encrypting and decrypting values
+* ZONED TIME
+* UUID
+* BYTES
+
+
+=== PropertyDecryptionRequest
+
+Encoded encrypted values are decrypted by creating a `PropertyDecryptionRequest` and providing it to
+`PropertyEncryption`. `PropertyDecryptionRequest#builder()` returns a staged builder for creating a
+`PropertyDecryptionRequest`.
+
+.Decrypt value
+[source, java]
+----
+var userId = 1000;
+var decryptionRequest = PropertyDecryptionRequest.builder()
+        .fromValue(encrypted) // <1>
+        .withAAD(userId) // <2>
+        .build();
+Value decrypted = propertyEncryption.decrypt(decryptionRequest); // <3>
+----
+
+<1> A mandatory step for providing the value to decrypt. This is expected to be `byte[]`.
+<2> A mandatory step for selecting AAD handling.
+<3> Returns decrypted value.
+
+The AAD step provides a choice of how AAD is handled. An external AAD can be provided using one of the `withAAD(...)`
+methods. This AAD must be supplied independently during decryption and therefore can bind the encrypted value to
+external application context, such as a user identifier.
+
+Alternatively, `withoutExternalAAD()` can be used to rely on the AAD configuration recorded in the encrypted value
+metadata. If AAD was used when the value was encrypted, that AAD is used during decryption. If no AAD was used, no
+effective AAD is used during decryption. Because this AAD is obtained from the encrypted value itself, it does not
+bind the value to an independently supplied external context.
+
+[IMPORTANT]
+It is recommended to provide AAD externally when possible, especially when the encrypted value was bound to
+application-specific context during encryption. The externally provided AAD must match the AAD used during encryption.
+
+
+[#caching]
+== Caching
+
+The <<envelope-profile>> supports 2 related caches:
+
+* <<key-cache>>
+* <<key-alias-index>>
+
+[NOTE]
+Each profile instance maintains its own dedicated caches.
+
+[#key-cache]
+=== Key Cache
+
+The driver caches decapsulated data encryption keys by default to avoid repeatedly resolving and decapsulating the same
+key.
+
+Depending on the <<key-encapsulation-service>> and <<encapsulated-key-record-repository>> implementations, resolving a
+key may require network exchanges. Caching can therefore reduce the number of repeated key resolution operations.
+
+The key cache is keyed by the key's globally unique identifier and has a configurable maximum size and time-to-live
+(TTL). The default size is `100` and TTL is `15` minutes.
+
+The key cache can be configured when creating an <<envelope-profile>>:
+
+.Configure Key Cache
+[source, java]
+----
+var profile = EnvelopePropertyEncryptionProfile.builder("profile-name", keyEncapsulationService, keyRepository)
+        .withKeyCache(100, Duration.ofHours(1)) // <1>
+        .build();
+----
+
+<1> Sets custom key cache size and TTL.
+
+The key cache is bounded and uses a least-recently-used (LRU) eviction policy when its configured maximum size is
+reached. Entries that have exceeded their configured TTL are treated as cache misses and are not used.
+
+The key cache can also be disabled:
+
+.Disable Key Cache
+[source, java]
+----
+var profile = EnvelopePropertyEncryptionProfile.builder("profile-name", keyEncapsulationService, keyRepository)
+        .withoutKeyCache() // <1>
+        .build();
+----
+
+<1> Disables key cache.
+
+[#key-alias-index]
+=== Key Alias Index
+
+Aliases are resolved through a key alias index that maps aliases to key identifiers. The alias index does not contain
+key material.
+
+The alias index has its own configurable maximum size and TTL. The default size is `100` and TTL is `15` seconds.
+
+[NOTE]
+This allows alias mappings to expire independently of cached keys and limits the period for which a driver may use a
+stale alias after it has been reassigned.
+
+The alias index can be configured when creating an <<envelope-profile>>:
+
+.Customize Key Alias Index
+[source, java]
+----
+var profile = EnvelopePropertyEncryptionProfile.builder("profile-name", keyEncapsulationService, keyRepository)
+        .withKeyAliasIndex(100, Duration.ofMinutes(1)) // <1>
+        .build();
+----
+
+<1> Sets custom key alias index size and ttl.
+
+Like the key cache, the alias index is bounded and uses a least-recently-used (LRU) eviction policy when its configured
+maximum size is reached. Entries that have exceeded their configured TTL are treated as cache misses and are not used.
+
+The key alias index is disabled when the key cache is disabled. It can also be disabled independently:
+
+.Disable Key Alias Index
+[source, java]
+----
+var profile = EnvelopePropertyEncryptionProfile.builder("profile-name", keyEncapsulationService, keyRepository)
+        .withoutKeyAliasIndex // <1>
+        .build();
+----
+
+<1> Disables key alias index.
+
+[#security-providers]
+== Security Providers
+
+Cryptographic operations for Property Encryption are performed through the Java Cryptography Architecture (JCA) and
+related Java security APIs rather than being implemented directly by the driver.
+
+By default, the driver uses the cryptographic implementations selected by the Java runtime. Where applicable, users can
+explicitly provide a `java.security.Provider` and `java.security.SecureRandom` to control the cryptographic
+implementations used by the driver.
+
+[IMPORTANT]
+====
+The cryptographic algorithms and parameters used by this feature, including key sizes, initialization vector (IV) sizes,
+and authentication tag sizes, have been selected with FIPS requirements in mind. However, FIPS compliance depends on
+more than the algorithms and parameters used by the driver. It can also depend on the cryptographic provider or
+validated cryptographic module, its configuration, the runtime environment, key management, storage, and other aspects
+of the deployment that are outside the driver's control.
+
+Users requiring FIPS-compliant operation are responsible for ensuring that the driver and its surrounding environment
+are configured appropriately for their requirements. The driver uses the provider and secure random source supplied by
+the user, subject to the requirements documented in the relevant Javadoc.
+====
+
+=== Provider Example
+
+The following example uses Bouncy Castle FIPS `2.1.1` (NIST 4943 FIPS 140-3 Active, check NIST directly for the latest
+validation status).
+
+.Add dependencies in Maven
+[source, xml]
+----
+<dependencies>
+    <dependency>
+        <groupId>org.neo4j.driver</groupId>
+        <artifactId>neo4j-java-driver</artifactId>
+        <version>6.3.0</version>
+    </dependency>
+    <dependency>
+        <groupId>org.bouncycastle</groupId>
+        <artifactId>bc-fips</artifactId>
+        <version>2.1.1</version>
+    </dependency>
+</dependencies>
+----
+
+.Select Security Provider
+[source, java]
+----
+var provider = new BouncyCastleFipsProvider(); // <1>
+var ivSecureRandom = SecureRandom.getInstance("NONCEANDIV", provider); // <2>
+var keyEncapsulationService = KeyEncapsulationServices.local(masterKey, provider, ivSecureRandom); // <3>
+var profile = EnvelopePropertyEncryptionProfile.builder("profile-name", keyEncapsulationService, keyRepository) // <4>
+        .withCryptoContext(provider, ivSecureRandom) // <5>
+        .build(); // <6>
+var config = Config.builder()
+        .withPropertyEncryptionProfiles(profile) // <7>
+        .build();
+----
+
+<1> Instantiate or obtain a desired provider.
+<2> Instantiate or obtain a secure random for IV generation.
+<3> Provide both the provider and the secure random to <<key-encapsulation-service>> implementation.
+<4> Provide the <<key-encapsulation-service>> instance to <<envelope-profile>> configuration.
+<5> Provide both the provider and the secure random to <<envelope-profile>> configuration.
+<6> Build a new <<envelope-profile>> instance.
+<7> Provide the <<envelope-profile>> instance to the driver.
+
+A similar approach can be used with `org.bouncycastle:bc-fips:1.0.2.4` (NIST 4616 FIPS 140-2 Historical, check NIST
+directly for the latest validation status).
+
+ifndef::backend-pdf[]
+[discrete.glossary]
+== Glossary
+
+include::{common-partial}/glossary.adoc[]
+include::../partials/glossary.adoc[]
+endif::[]
