@@ -23,8 +23,53 @@ Most preview features are expected to be granted the GA status unless some unexp
 [NOTE]
 This feature is available from version 6.3.0 onwards.
 
-If you prefer to see the API in use before reading about its configuration and related concepts, see
-<<property-encryption-api>> for examples of encrypting and decrypting property values.
+[NOTE]
+====
+At present, all encryption and decryption is manual. As an official Neo4j Driver feature, Property Encryption enables:
+
+* **Cross-driver and cross-version interoperability**: Consistent encryption and decryption of Neo4j Property values
+  across drivers and supported driver versions, including consistent Additional Authenticated Data (AAD) handling. This
+  enables a Neo4j Property encrypted by a driver in one language to be successfully decrypted by a driver in another
+  language.
+* **Standardized cryptography**: The cryptographic algorithms and parameters, including key sizes, initialization vector
+  (IV) sizes, and authentication tag sizes, are defined by the feature and selected with FIPS requirements in mind.
+  Users can optionally configure the driver to use a validated cryptographic provider that satisfies their operational
+  requirements.
+* **Composable key management**: The envelope encryption design separates property encryption from key protection and
+  allows different key encapsulation mechanisms to be integrated through a well-defined API. The driver provides four
+  implementations for local keys, AWS KMS, Azure Key Vault and Google Cloud KMS, while also allowing users to provide
+  their own implementations where required.
+* **Standardized encrypted-value representation**: The driver defines how encrypted property values and the metadata
+  required for their decryption are encoded, providing a common representation that can be stored using Neo4j-supported
+  property types.
+* **Server version agnostic**: Encryption and decryption are performed on the driver side, with encrypted values
+  represented as bytes that can be stored as Neo4j Properties. This allows the feature to be used with any Neo4j server
+  version supported by the driver, without requiring server upgrade.
+====
+
+While <<property-encryption-api>> includes a more detailed overview, the following two examples demonstrate the basic
+usage of the API.
+
+.Encryption example
+[source, java]
+----
+var secretValue = "secret";
+var encryptionRequest = PropertyEncryptionRequest.builder()
+        .fromValue(secretValue)
+        .usingKeyAlias("users-key")
+        .build();
+byte[] encrypted = propertyEncryption.encryptToBytes(encryptionRequest);
+----
+
+.Decryption example
+[source, java]
+----
+var decryptionRequest = PropertyDecryptionRequest.builder()
+        .fromValue(encrypted)
+        .withoutExternalAAD()
+        .build();
+Value decrypted = propertyEncryption.decrypt(decryptionRequest);
+----
 
 [#supported-types]
 == Supported types
@@ -546,6 +591,143 @@ public non-sealed interface AsyncEncapsulatedKeyRecordRepository extends BaseEnc
 [NOTE]
 An implementation of repository is supplied by the user.
 
+An example of a basic implementation using Cypher 5 is shown below.
+
+.Sample Cypher 5 implementation
+[source, java]
+----
+/**
+ * A sample {@link EncapsulatedKeyRecordRepository} implementation using Cypher 5.
+ */
+class Neo4jEncapsulatedKeyRecordRepository implements EncapsulatedKeyRecordRepository {
+    private static final List<String> CONSTRAINTS = List.of(
+            """
+                    CYPHER 5
+                    CREATE CONSTRAINT key_id IF NOT EXISTS
+                    FOR (k:Key)
+                    REQUIRE k.id IS UNIQUE
+                    """,
+            """
+                    CYPHER 5
+                    CREATE CONSTRAINT key_alias IF NOT EXISTS
+                    FOR (k:Key)
+                    REQUIRE k.alias IS UNIQUE
+                    """
+    );
+    private static final String CREATE_QUERY = """
+            CYPHER 5
+            CREATE (key:Key {
+                id: randomUUID(),
+                alias: $alias,
+                encapsulation: $encapsulation
+            })-[:HAS_METADATA]->(metadata:KeyMetadata $metadata)
+            RETURN key, metadata
+            """;
+    private static final String FIND_BY_ID_QUERY = """
+            CYPHER 5
+            MATCH (key:Key {id: $id})-[:HAS_METADATA]->(metadata:KeyMetadata)
+            RETURN key, metadata
+            LIMIT 1
+            """;
+    private static final String FIND_BY_ALIAS_QUERY = """
+            CYPHER 5
+            MATCH (key:Key {alias: $alias})-[:HAS_METADATA]->(metadata:KeyMetadata)
+            RETURN key, metadata
+            LIMIT 1
+            """;
+    private static final String SET_ALIAS_BY_ID_QUERY = """
+            CYPHER 5
+            MATCH (key:Key {id: $id})
+            SET key.alias = $alias
+            """;
+    private static final String DELETE_BY_ID_QUERY = """
+            CYPHER 5
+            MATCH (key:Key {id: $id})-[:HAS_METADATA]->(metadata:KeyMetadata)
+            DETACH DELETE key, metadata
+            """;
+
+    private final Driver driver;
+    private final QueryConfig writeQueryConfig;
+    private final QueryConfig readQueryConfig;
+
+    Neo4jEncapsulatedKeyRecordRepository(Driver driver, String database) {
+        this.driver = driver;
+        this.writeQueryConfig = QueryConfig.builder()
+                .withDatabase(database)
+                .build();
+        this.readQueryConfig = QueryConfig.builder()
+                .withDatabase(database)
+                .withRouting(RoutingControl.READ)
+                .build();
+    }
+
+    public void createConstraints() {
+        CONSTRAINTS.forEach(constraint -> driver.executableQuery(constraint)
+                .withConfig(writeQueryConfig)
+                .execute());
+    }
+
+    @Override
+    public Optional<EncapsulatedKeyRecord> findById(String id) {
+        var result = driver.executableQuery(FIND_BY_ID_QUERY)
+                .withParameters(Map.of("id", id))
+                .withConfig(readQueryConfig)
+                .execute();
+        return result.records().stream()
+                .findFirst()
+                .map(this::toEncapsulatedKeyRecord);
+    }
+
+    @Override
+    public Optional<EncapsulatedKeyRecord> findByAlias(String alias) {
+        var result = driver.executableQuery(FIND_BY_ALIAS_QUERY)
+                .withParameters(Map.of("alias", alias))
+                .withConfig(readQueryConfig)
+                .execute();
+        return result.records().stream()
+                .findFirst()
+                .map(this::toEncapsulatedKeyRecord);
+    }
+
+    @Override
+    public EncapsulatedKeyRecord create(String alias, byte[] encapsulation, Map<String, String> metadata) {
+        var result = driver.executableQuery(CREATE_QUERY)
+                .withParameters(Map.of("alias", Values.value((Object) alias), "encapsulation", encapsulation, "metadata", metadata))
+                .withConfig(writeQueryConfig)
+                .execute();
+        return toEncapsulatedKeyRecord(result.records().get(0));
+    }
+
+    @Override
+    public void setAliasById(String id, String alias) {
+        driver.executableQuery(SET_ALIAS_BY_ID_QUERY)
+                .withParameters(Map.of("id", id, "alias", alias))
+                .withConfig(writeQueryConfig)
+                .execute();
+    }
+
+    @Override
+    public void deleteById(String id) {
+        driver.executableQuery(DELETE_BY_ID_QUERY)
+                .withParameters(Map.of("id", id))
+                .withConfig(writeQueryConfig)
+                .execute();
+    }
+
+    private EncapsulatedKeyRecord toEncapsulatedKeyRecord(Record record) {
+        var key = record.get("key").asNode();
+        var metadata = record.get("metadata").asNode();
+
+        var id = key.get("id").asString();
+        var alias = key.get("alias").asString(null);
+        var encapsulation = key.get("encapsulation").asByteArray();
+        var meta = metadata.asMap(Value::asString);
+
+        return EncapsulatedKeyRecord.of(id, alias, encapsulation, meta);
+    }
+}
+----
+
 
 [#property-encryption-api]
 == Property Encryption API
@@ -560,7 +742,7 @@ available.
 PropertyEncryption propertyEncryption = driver.propertyEncryption();
 ----
 
-.Using asynchronous or reactive?
+.Asynchronous ans reactive variants
 [%collapsible]
 ====
 Property Encryption is also available in asynchronous and reactive variants.
