@@ -743,7 +743,7 @@ available.
 PropertyEncryption propertyEncryption = driver.propertyEncryption();
 ----
 
-.Asynchronous ans reactive variants
+.Asynchronous and reactive variants
 [%collapsible]
 ====
 Property Encryption is also available in asynchronous and reactive variants.
