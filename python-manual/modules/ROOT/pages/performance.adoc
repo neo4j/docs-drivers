@@ -82,7 +82,7 @@ with driver.session(database="<database-name>") as session:
 3. **Auto-commit transactions (highest throughput, lowest safety)** +
 xref:query-advanced.adoc#implicit-transactions[Auto-commit transactions] shoot queries to the server as fast as it can handle.
 Failed queries are not retried, and there's no exact guarantee on when changes get written to the database.
-One upper limit on the client size is given by the size of the connection pool: each call to `session.run()` borrows a connection, so the amount of parallel work is limited by the number of available connections.
+One upper limit on the client side is given by the size of the connection pool: each call to `session.run()` borrows a connection, so the amount of parallel work is limited by the number of available connections.
 +
 .Run 1000 queries as auto-commit transactions
 [source, python]
