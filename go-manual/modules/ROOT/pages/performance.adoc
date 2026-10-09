@@ -69,23 +69,12 @@ for i := 0; i < 1000; i++ {
 When multiple queries are grouped into a single transaction, the transaction as a whole is isolated from others, whereas individual queries in the transaction are not isolated and failure of one query results in a rollback of all queries.
 +
 .Run 10 transactions with 100 queries each
-[source, csharp]
-----
-using var session = driver.AsyncSession(conf => conf.WithDatabase("<database-name>"));
-for (int k=0; k<10; k++) {
-    await session.ExecuteWriteAsync(async tx => {
-        for (int i=0; i<1000; i++) {
-            var result = await tx.RunAsync("<QUERY>");
-        }
-    });
-}
-----
 [source, go]
 ----
 session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "<database-name>"})
 defer session.Close(ctx)
 for k := 0; k < 10; k++ {
-    res, err := session.ExecuteRead(ctx, func(tx neo4j.ManagedTransaction) (any, error) {
+    _, _ := session.ExecuteRead(ctx, func(tx neo4j.ManagedTransaction) (any, error) {
         for i := 0; i < 100; i++ {
             tx.Run(ctx, "<QUERY>", nil)
         }
