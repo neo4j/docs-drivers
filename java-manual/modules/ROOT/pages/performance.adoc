@@ -36,6 +36,7 @@ driver.executableQuery("<QUERY>")
 driver.session();
 ----
 
+
 [[transactions-cost]]
 == Be aware of the cost of transactions
 
