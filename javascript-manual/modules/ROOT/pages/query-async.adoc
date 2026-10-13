@@ -190,23 +190,35 @@ The reactive API is recommended for applications that are already oriented towar
 
 [source, javascript]
 ----
+const neo4j = require('neo4j-driver');
 const rxjs = require('rxjs');
 
-const rxSession = driver.rxSession()  // <1>
-const rxResult = await rxSession.executeWrite(tx => {
-  return tx
-    .run('MERGE (p:Person {name: $name}) RETURN p.name AS name', {  // <2>
-      name: 'Alice'
-    })
-    .records()  // <3>
-    .pipe(  // <4>
-      rxjs.map(record => record.get('name')),
-      //rxjs.materialize(),  // optional, turns outputs into Notifications
-      rxjs.toArray()
-    )
-  })
-const people = await rxResult.toPromise()
-console.log(people)
+(async () => {
+    const URI = "<database-uri>";
+    const USER = "<username>";
+    const PASSWORD = "<password>";
+    const DATABASE = "<database-name>";
+    const driver = neo4j.driver(URI, neo4j.auth.basic(USER, PASSWORD));
+    await driver.getServerInfo();
+
+    const rxSession = driver.rxSession()  // <1>
+    const rxResult = await rxSession.executeWrite(tx => {
+      return tx
+        .run('MERGE (p:Person {name: $name}) RETURN p.name AS name', {  // <2>
+          name: 'Alice'
+        })
+        .records()  // <3>
+        .pipe(  // <4>
+          rxjs.map(record => record.get('name')),
+          //rxjs.materialize(),  // optional, turns outputs into Notifications
+          rxjs.toArray()
+        )
+      })
+    const people = await rxResult.toPromise()
+    console.log(people)
+
+    await driver.close();
+})();
 ----
 <1> Obtain a reactive session
 <2> Run a query
