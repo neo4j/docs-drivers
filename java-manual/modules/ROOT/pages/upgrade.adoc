@@ -161,6 +161,10 @@ For reactive examples, see xref:reactive.adoc[].
 |label:deprecated[]
 
 |5.0
+|Interfaces `TransactionWork`, `AsyncTransactionWork`, and `RxTransactionWork` are deprecated in favor of link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/TransactionCallback.html[`TransactionCallback`], link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/async/AsyncTransactionCallback.html[`AsyncTransactionCallback`], and link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/reactive/ReactiveTransactionCallback.html[`reactive.ReactiveTransactionCallback`] / link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/reactivestreams/ReactiveTransactionCallback.html[`reactivestreams.ReactiveTransactionCallback`].
+|label:removed[]
+
+|5.0
 |link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/Config.TrustStrategy.html[`Config.TrustStrategy`] -- Method link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/Config.TrustStrategy.html#certFile()[`.certFile()`] is deprecated in favor of link:https://neo4j.com/docs/api/java-driver/{java-driver-version}/org.neo4j.driver/org/neo4j/driver/Config.TrustStrategy.html#certFiles()[`.certFiles()`].
 |label:deprecated[]
 
