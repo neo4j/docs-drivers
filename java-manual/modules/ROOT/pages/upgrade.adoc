@@ -95,6 +95,10 @@ For reactive examples, see xref:reactive.adoc[].
 |label:removed[]
 
 |6.0
+|Interfaces `TransactionWork`, `AsyncTransactionWork`, and `RxTransactionWork` have been removed in favor of link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/TransactionCallback.html[`TransactionCallback`], link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/async/AsyncTransactionCallback.html[`AsyncTransactionCallback`], and link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/reactive/ReactiveTransactionCallback.html[`reactive.ReactiveTransactionCallback`] / link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/reactivestreams/ReactiveTransactionCallback.html[`reactivestreams.ReactiveTransactionCallback`].
+|label:removed[]
+
+|6.0
 |link:https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Session.html[`Session`] -- Methods `.asyncSession()` and `.reactiveSession()` have been removed. Use `Session(Class)`, with `Class` controlling the desired type of session.
 |label:removed[]
 
