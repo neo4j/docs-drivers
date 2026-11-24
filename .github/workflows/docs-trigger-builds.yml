@@ -1,0 +1,41 @@
+name: "Trigger docs builds"
+
+# Dispatches output generation builds. The reusable workflow determines which builds are
+# triggered, the branch that each build runs on, and the environment (prod or dev) that the
+# build generates output for.
+#
+# This repository has one docset for each driver, so each push builds a PDF only for the
+# docsets whose folder it changes. A change in common-content, or in a path that no docset
+# claims, builds every PDF. To build now, run this workflow from the branch, and choose a
+# docset or all.
+
+permissions:
+  contents: read
+  actions: write
+
+# List all the branches that contain publishable docs.
+on:
+  push:
+    branches:
+    - '4.4'
+    - '5.x'
+    - '6.x'
+    - 'dev'
+  workflow_dispatch:
+    inputs:
+      pdf-docset:
+        description: "The PDF to build: the folder of one docset (for example java-manual), or all. Leave blank to work it out from the last push."
+        type: string
+        required: false
+        default: ''
+
+jobs:
+  trigger:
+    name: Trigger builds
+    uses: neo4j/docs-tools/.github/workflows/reusable-docs-trigger-builds.yml@v2
+    with:
+      pdf-docsets: true
+      pdf-shared-paths: common-content
+      pdf-docset: ${{ inputs.pdf-docset }}
+    secrets:
+      DOCS_DISPATCH_TOKEN: ${{ secrets.DOCS_DISPATCH_TOKEN }}
