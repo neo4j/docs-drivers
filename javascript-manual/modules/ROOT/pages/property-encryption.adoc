@@ -668,7 +668,7 @@ new EnvelopeEncryptionProfile({
 ----
 
 <1> Sets custom key cache TTL in milliseconds.
-<1> Sets custom key cache Size.
+<2> Sets custom key cache Size.
 
 The key cache is bounded and uses a least-recently-used (LRU) eviction policy when its configured maximum size is
 reached. Entries that have exceeded their configured TTL are treated as cache misses and are not used.
