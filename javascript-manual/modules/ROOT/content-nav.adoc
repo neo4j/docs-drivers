@@ -17,6 +17,10 @@
 * xref:browser-websockets.adoc[Usage within a browser (WebSockets)]
 * xref:object-mapping.adoc[Type checking and object mapping]
 
+* *Preview features*
+
+* xref:property-encryption.adoc[Property Encryption]
+
 * *Reference*
 
 * xref:connect-advanced.adoc[Advanced connection information]

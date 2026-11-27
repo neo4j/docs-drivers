@@ -139,7 +139,7 @@ the encryption key may be the DEK itself or it may be derived from the DEK.
 The DEK must itself be protected. When a separate Key Encryption Key (KEK) is used to protect the DEK, the process is
 commonly referred to as key wrapping. Alternatively, a Key Encapsulation Mechanism (KEM) can be used to protect or
 establish the secret material associated with the DEK. In the latter case, the terminology and exact mechanism depend on
-the KEM being used, such as MK-KEM.
+the KEM being used, such as ML-KEM.
 
 The envelope profile setup requires two fundamental components. These are covered in separate sections, but are briefly
 introduced here:
