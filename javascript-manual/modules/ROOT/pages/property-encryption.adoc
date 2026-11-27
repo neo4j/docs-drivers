@@ -55,7 +55,7 @@ const encryptedValue = await driver.encryption.encrypt({
     value: "Secret String", // <1>
     keyOptions: {alias: "key1"}, // <2>
     encryptionProfile: "profile1", // <3>
-    aad: 123 // <4>
+    aad: "user1" // <4>
 }) // <5>
 ----
 <1> Any value which can be stored as a property in a Neo4j database can be encrypted by the driver
@@ -69,7 +69,7 @@ const encryptedValue = await driver.encryption.encrypt({
 ----
 const decryptedValue = await driver.encryption.decrypt({
     ciphertext: result.records[0].get("x"),
-    aad: 123
+    aad: "user1"
 })
 ----
 
@@ -111,7 +111,7 @@ identify which profile must be used to decrypt a value.
 Multiple profiles can be configured at the same time, providing each has a unique name.
 
 [IMPORTANT]
-When driver interoperability is required, users are expected to configure each driver with compatible profiles.
+When driver interoperability is required, users are expected to configure each driver with compatible profiles with matching names.
 
 Profiles are configured at the driver level using a driver configuration option:
 
@@ -140,7 +140,7 @@ the encryption key may be the DEK itself or it may be derived from the DEK.
 The DEK must itself be protected. When a separate Key Encryption Key (KEK) is used to protect the DEK, the process is
 commonly referred to as key wrapping. Alternatively, a Key Encapsulation Mechanism (KEM) can be used to protect or
 establish the secret material associated with the DEK. In the latter case, the terminology and exact mechanism depend on
-the KEM being used, such as MK-KEM.
+the KEM being used, such as ML-KEM.
 
 The envelope profile setup requires two fundamental components. These are covered in separate sections, but are briefly
 introduced here:
@@ -162,13 +162,17 @@ The `EnvelopePropertyEncryptionProfile` provides a builder for creating a profil
 [source, javascript]
 ----
 new EnvelopeEncryptionProfile({
-    name: "main", //name of the encryption profile, 
-    encapsulationService: neo4j.localKeyEncapsulationService(masterkey), //the service responsible for generating, encapsulating and decapsulating Data Encryption Keys (DEKs). The driver provides an implementation that uses a local 256-bit masterkey
-    keyRepository: new userImplementedKeyRepo() // The place to store encapsulated DEKs, must be implemented by the user, an example implementation is provided further down.
+    name: "main", // <1> 
+    encapsulationService: neo4j.localKeyEncapsulationService(masterkey), // <2>
+    keyRepository: new userImplementedKeyRepo() // <3>
 })
 ----
 
-The builder has additional options that are introduced alongside the relevant concepts later in this manual.
+<1> Name of the encryption profile
+<2> The service responsible for generating, encapsulating and decapsulating Data Encryption Keys (DEKs). The driver provides an implementation that uses a local 256-bit masterkey represented by a length 32 Uint8Array.
+<3> The place to store encapsulated DEKs, must be implemented by the user, an example implementation is provided further down.
+
+The config parameter has additional options that are introduced alongside the relevant concepts later in this manual.
 
 [#key-encapsulation-service]
 == Key Encapsulation Service
@@ -318,9 +322,11 @@ export interface EncapsulatedKeyRecordRepository {
 ----
 
 [NOTE]
-An implementation of repository is supplied by the user.
+An implementation of `EncapsulatedKeyRecordRepository` must be supplied by the user when creating an `EnvelopeEncryptionProfile`.
 
-An example of a typescript implementation using Cypher 5 is shown below.
+An example of a typescript implementation using Cypher 5 is shown below. 
+This version needs a neo4j driver connected to a database which it has write access to.
+This could be the same database as the rest of your data, another database on the same DBMS, or a database on a different DBMS
 
 .Sample Cypher 5 implementation
 [source, typescript]
@@ -548,7 +554,7 @@ await keyManager.deleteById(key.id());
 ----
 
 
-=== encrypt
+=== Encrypting Data
 
 Property values can be encrypted using the asynchronous `encrypt` function, which takes a parameter object.
 
@@ -598,7 +604,7 @@ encrypting and decrypting values
 * BYTES
 
 
-=== decrypt
+=== Decrypting Data
 
 The decrypting function `decrypt` functions similarly to `encrypt`
 
